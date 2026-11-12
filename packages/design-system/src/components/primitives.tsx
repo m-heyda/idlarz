@@ -221,8 +221,8 @@ export const IconButton: React.FC<
 );
 
 /** Diamond-shaped level gems: yellow for levels bought, dim for the rest, purple once the upgrade is maxed. */
-export const DiamondLevel: React.FC<{ level: number; max: number }> = ({ level, max }) => (
-	<span className='ds-gems' role='img' aria-label={`Level ${level} of ${max}`}>
+export const DiamondLevel: React.FC<{ level: number; max: number; small?: boolean }> = ({ level, max, small }) => (
+	<span className='ds-gems' data-size={small ? 'sm' : undefined} role='img' aria-label={`Level ${level} of ${max}`}>
 		{gemStates(level, max).map((s, i) => (
 			<i key={i} className='ds-gem' data-state={s} />
 		))}

@@ -428,11 +428,11 @@ test('every building (Producers, Extractors and Idols) has lore for its window',
 	for (const def of BUILDINGS) assert.ok((BUILDING_LORE[def.id] ?? '').length > 20, `${def.id} has lore`);
 });
 
-test('farm sprites: cows (first look), pigs and sheep look right, chickens look left', async () => {
+test('farm sprites: both cows (the bell cow too), pigs and sheep look right, chickens look left', async () => {
 	const { facesRight } = await import('../../src/config/pixelIcons');
 	assert.equal(facesRight('animal_pig'), true);
 	assert.equal(facesRight('animal_cow_1'), true);
 	assert.equal(facesRight('animal_sheep'), true);
 	assert.equal(facesRight('animal_chicken_1'), false);
-	assert.equal(facesRight('animal_cow_2'), false);
+	assert.equal(facesRight('animal_cow_2'), true);
 });

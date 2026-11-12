@@ -96,10 +96,10 @@
 
 .farm-shadow {
 	position: absolute;
-	left: calc(9px * var(--z, 2));
-	top: calc(38px * var(--z, 2));
-	width: calc(30px * var(--z, 2));
-	height: calc(8px * var(--z, 2));
+	left: calc(12px * var(--z, 2));
+	top: calc(40px * var(--z, 2));
+	width: calc(24px * var(--z, 2));
+	height: calc(6px * var(--z, 2));
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.32);
 	pointer-events: none;
@@ -241,10 +241,9 @@
 	padding: 5px 7px 7px;
 	font-size: 0.75rem;
 	color: #d8c8a0;
-	background: rgba(10, 7, 6, 0.92);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
+	background: rgba(13, 16, 25, 0.94);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: inset 0 0 0 1px #05060a;
 }
 
 .farm-animal-card[data-ok='true'] {
@@ -263,13 +262,13 @@
 	font-weight: 700;
 	font-size: 0.95rem;
 	line-height: 1.1;
-	color: var(--px-gold, #f0d27a);
+	color: var(--ds-gold-lt, #f4d57e);
 }
 
 .farm-animal-count {
 	font-weight: 700;
 	line-height: 1.1;
-	color: #bff59a;
+	color: var(--ds-good, #62d48a);
 }
 
 .farm-animal-yield {
@@ -285,49 +284,7 @@
 }
 
 .farm-animal-buy {
-	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 5px;
-}
-
-/* a buy button: green when you can pay, dark and disabled when you cannot (its hover card says why) */
-.farm-buy {
-	width: 100%;
-	min-width: 0;
-	padding: 5px 2px 4px;
-	font-family: var(--font-pixel);
-	font-size: 0.74rem;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	line-height: 1.1;
-	text-transform: uppercase;
-	white-space: nowrap;
-	color: #fff;
-	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
-	background: #3f8f2e;
-	border: 2px solid var(--px-ink);
-	box-shadow:
-		inset 2px 2px 0 rgba(255, 255, 255, 0.3),
-		inset -2px -2px 0 rgba(0, 0, 0, 0.4);
-	cursor: pointer;
-	transition: filter 0.1s;
-}
-
-.farm-buy:hover:not(:disabled) {
-	filter: brightness(1.18);
-}
-
-.farm-buy:active:not(:disabled) {
-	transform: translateY(1px);
-}
-
-.farm-buy:disabled {
-	color: #b9a77f;
-	background: #2e2824;
-	box-shadow:
-		inset 2px 2px 0 rgba(255, 255, 255, 0.08),
-		inset -2px -2px 0 rgba(0, 0, 0, 0.45);
-	cursor: not-allowed;
+	display: block;
 }
 
 /* --- stats readout (top-left) --- */
@@ -342,10 +299,9 @@
 	padding: 4px 10px 8px;
 	font-size: 0.72rem;
 	color: #a89878;
-	background: rgba(10, 7, 6, 0.86);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
+	background: rgba(13, 16, 25, 0.9);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: inset 0 0 0 1px #05060a;
 }
 
 .farm-hud-title {
@@ -359,7 +315,7 @@
 	font-size: 0.78rem;
 	letter-spacing: 1px;
 	text-transform: uppercase;
-	color: var(--px-gold, #f0d27a);
+	color: var(--ds-gold-lt, #f4d57e);
 	cursor: pointer;
 }
 
@@ -445,12 +401,11 @@
 	overflow-y: auto;
 	scrollbar-width: thin;
 	padding: 8px;
-	background: rgba(10, 7, 6, 0.5);
+	background: rgba(8, 10, 16, 0.6);
 	-webkit-backdrop-filter: blur(6px);
 	backdrop-filter: blur(6px);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: inset 0 0 0 1px #05060a;
 	/* auto-fit: the cards share the whole width (no empty tracks), and wrap onto further rows when the window is narrow */
 	display: grid;
 	grid-template-columns: repeat(auto-fit, minmax(116px, 1fr));
@@ -471,19 +426,7 @@
 }
 
 .farm-dock-toggle {
-	padding: 1px 12px;
-	font-size: 0.72rem;
-	font-weight: 700;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	cursor: pointer;
-	color: var(--px-gold, #f0d27a);
-	background: rgba(10, 7, 6, 0.9);
-	border: 2px solid #5a3f1c;
-}
-
-.farm-dock-toggle:hover {
-	filter: brightness(1.25);
+	min-height: 26px;
 }
 
 .farm-up {
@@ -493,10 +436,9 @@
 	padding: 5px 7px 6px;
 	font-size: 0.72rem;
 	color: #a89878;
-	background: rgba(10, 7, 6, 0.8);
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
+	background: rgba(13, 16, 25, 0.9);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: inset 0 0 0 1px #05060a;
 }
 
 .farm-up[data-ok='true'] {
@@ -512,12 +454,7 @@
 .farm-up-name {
 	font-weight: 700;
 	font-size: 0.8rem;
-	color: #ecdcb4;
-}
-
-.farm-up-lvl {
-	color: #bff59a;
-	font-weight: 700;
+	color: var(--ds-text, #e9e4d6);
 }
 
 .farm-up-effect {
@@ -528,4 +465,20 @@
 /* the buy button sits at the bottom of every card, so the cards of one row line up whatever their text length */
 .farm-up > :last-child {
 	margin-top: auto;
+}
+
+.farm-up-gems {
+	line-height: 0;
+	padding: 1px 0 2px;
+}
+
+.farm-animal-card[data-ok='true'],
+.farm-up[data-ok='true'] {
+	box-shadow:
+		inset 0 0 0 1px #05060a,
+		0 0 0 1px var(--ds-gold-dk, #8a5f16);
+}
+
+.farm-up[data-maxed='true'] {
+	border-color: var(--ds-r-epic, #b05cf5);
 }

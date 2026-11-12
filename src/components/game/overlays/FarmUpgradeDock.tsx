@@ -4,8 +4,11 @@ import { FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { canAffordBundle } from '@/utils/game/costs';
 import { farmUpgradeCost, farmUpgradeLevel } from '@/utils/game/farm';
 import audioManager from '@/utils/audioManager';
-import CostList from '../CostList';
-import { TipButton } from './Merchant/TipButton';
+import { Button, DiamondLevel, HoverTip } from '../../../../packages/design-system/src/components/primitives';
+import { HintTooltip, TipCostList, TipLine, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
+import { compact } from '../../../../packages/design-system/src/logic';
+import { RESOURCES, sortedCostEntries } from '@/catalog';
+import { resourceIconUrl } from '../hero/recipeUi';
 
 const IDS = Object.keys(FARM_UPGRADES) as FarmUpgradeId[];
 
@@ -35,37 +38,52 @@ const UpgradeCards: React.FC = () => {
 					<div key={id} className='farm-up' data-ok={affordable} data-maxed={maxed}>
 						<div className='farm-up-head'>
 							<span className='farm-up-name'>{def.label}</span>
-							<span className='farm-up-lvl'>
-								{level}/{def.maxLevel}
-							</span>
+						</div>
+						{/* the level as small diamonds (one per level the upgrade can reach: the cap can grow later) */}
+						<div className='farm-up-gems' title={`Level ${level} of ${def.maxLevel}`}>
+							<DiamondLevel level={level} max={def.maxLevel} small />
 						</div>
 						<div className='farm-up-effect'>{level > 0 ? def.description(level) : 'not built yet'}</div>
-						<TipButton
-							className='px-btn px-btn-sm w-full'
-							label={maxed ? 'Max' : 'Upgrade'}
-							disabled={!affordable}
-							onClick={() => {
-								if (buy(id)) {
-									audioManager.playSound('purchase');
-								}
-							}}
+						<HoverTip
+							fill
+							placement='above'
+							align='center'
 							tip={
-								<>
-									<div className='px-tip-title'>
-										{def.label} {level}/{def.maxLevel}
-									</div>
+								<Tooltip title={`${def.label} ${level}/${def.maxLevel}`} className='ds-tip-compact'>
 									{maxed ? (
-										<div className='px-tip-muted'>Fully upgraded.</div>
+										<TipLine tone='muted'>Fully upgraded.</TipLine>
 									) : (
 										<>
-											<div className='text-[#7ac27a]'>Next: {def.description(level + 1)}</div>
-											<CostList cost={cost} />
-											{!affordable && <div className='px-tip-muted'>Not enough resources.</div>}
+											<TipLine tone='green'>Next: {def.description(level + 1)}</TipLine>
+											<TipCostList
+												costs={sortedCostEntries<keyof typeof resources>(cost).map(([key, amount]) => ({
+													label: RESOURCES[key].label,
+													icon: resourceIconUrl(key),
+													have: resources[key] ?? 0,
+													cost: amount,
+													text: compact(amount),
+												}))}
+											/>
+											{!affordable ? <HintTooltip title='' text='Not enough resources.' tone='bad' /> : null}
 										</>
 									)}
-								</>
+								</Tooltip>
 							}
-						/>
+						>
+							<Button
+								tone={affordable ? 'gold' : 'dark'}
+								size='sm'
+								style={{ width: '100%' }}
+								disabled={!affordable}
+								onClick={() => {
+									if (buy(id)) {
+										audioManager.playSound('purchase');
+									}
+								}}
+							>
+								{maxed ? 'Max' : 'Upgrade'}
+							</Button>
+						</HoverTip>
 					</div>
 				);
 			})}
@@ -104,9 +122,9 @@ const FarmUpgradeDock: React.FC<FarmUpgradeDockProps> = ({ open, onOpenChange })
 
 	return (
 		<div className='farm-dock' data-open={open}>
-			<button className='farm-dock-toggle' onClick={() => onOpenChange(!open)} aria-expanded={open}>
+			<Button size='sm' className='farm-dock-toggle' onClick={() => onOpenChange(!open)} aria-expanded={open}>
 				Upgrades {open ? '▼' : '▲'}
-			</button>
+			</Button>
 			<div className='farm-drawer'>{shown && <UpgradeCards />}</div>
 		</div>
 	);

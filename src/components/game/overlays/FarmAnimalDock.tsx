@@ -1,15 +1,18 @@
 import React from 'react';
-import { useGameStore } from '@/stores/gameStore';
+import { Button, HoverTip } from '../../../../packages/design-system/src/components/primitives';
+import { HintTooltip, TipCostList, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
+import { compact } from '../../../../packages/design-system/src/logic';
+import { RESOURCES } from '@/catalog';
 import { ANIMALS, FARM_UPGRADES } from '@/config/farm';
 import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
-import { formatNumber } from '@/utils/formatters';
-import { animalBatchCost, animalOutput, calculateAnimalCost, farmCap, farmUpgradeLevel } from '@/utils/game/farm';
-import type { Animal } from '@/types/game';
+import { useGameStore } from '@/stores/gameStore';
 import audioManager from '@/utils/audioManager';
+import { formatNumber } from '@/utils/formatters';
+import { animalOutput, calculateAnimalCost, farmCap, farmUpgradeLevel } from '@/utils/game/farm';
+import type { Animal } from '@/types/game';
 import PixelIcon from '../PixelIcon';
 import ResourceIcon from '../ResourceIcon';
-import CostList from '../CostList';
-import { TipButton } from './Merchant/TipButton';
+import { resourceIconUrl } from '../hero/recipeUi';
 
 /** Width the scene keeps clear on the right while the panel is open (panel width plus its margin) */
 export const ANIMAL_DOCK_WIDTH = 272;
@@ -32,41 +35,22 @@ interface AnimalRowProps {
 	onHover: (hovering: boolean) => void;
 }
 
-/** The hover card of a buy button: what it buys, the price, and (when the button is off) why */
-const buyTip = (name: string, count: number, cost: number, reason: string | null) => (
-	<>
-		<div className='px-tip-title'>Buy {count > 1 ? `${count} ${name}s` : name}</div>
-		<CostList cost={{ food: cost }} />
-		{reason && <div className='px-tip-muted'>{reason}</div>}
-	</>
-);
-
-/** One animal in the panel: what it yields, how many you have, and Buy / Buy 10 buttons (the price is in their hover card). */
+/** One animal in the panel: what it yields, how many you have out of the pen limit, and a Buy button (the price is in its hover card). */
 const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, onBuy, onHover }) => {
 	const cap = farmCap(upgrades);
 	const full = owned >= cap;
 	const one = animalOutput(animal, 1, upgrades);
 	const product = animal.product.resource;
-	const costOne = calculateAnimalCost(animal, owned);
-	const costTen = animalBatchCost(animal, owned, 10);
+	const cost = calculateAnimalCost(animal, owned);
 	const penMaxed = farmUpgradeLevel(upgrades, 'pen') >= FARM_UPGRADES.pen.maxLevel;
-	const roomFor = (count: number) => owned + count <= cap;
-	const canOne = !full && food >= costOne;
-	const canTen = roomFor(10) && food >= costTen;
-	const penReason = penMaxed ? 'The pen is as big as it gets.' : 'Pen full: expand it below.';
-	const reasonOne = full ? penReason : 'Not enough food.';
-	const reasonTen = !roomFor(10) ? (full ? penReason : `Room for only ${cap - owned} more.`) : 'Not enough food.';
-
-	const buy = (count: number) => {
-		onBuy(count);
-		audioManager.playSound('click');
-	};
+	const canBuy = !full && food >= cost;
+	const reason = full ? (penMaxed ? 'The pen is as big as it gets.' : 'Pen full: expand it below.') : 'Not enough food.';
 
 	return (
 		<div
 			className='farm-animal-card'
 			data-tutorial={animal.id === ANIMALS[0].id ? 'farm-animal' : undefined}
-			data-ok={!full && food >= costOne}
+			data-ok={canBuy}
 			role='group'
 			aria-label={animal.name}
 			onMouseEnter={() => onHover(true)}
@@ -80,31 +64,38 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 				</span>
 			</div>
 			<div className='farm-animal-yield'>
-				<span className='inline-flex items-center gap-1 text-red-400'>
+				<span className='inline-flex items-center gap-1' style={{ color: '#ff8d7c' }}>
 					{formatNumber(one.meat)}/s <ResourceIcon resource='meat' />
 				</span>
-				<span className='inline-flex items-center gap-1 text-[#e8d08a]'>
+				<span className='inline-flex items-center gap-1' style={{ color: '#f0d27a' }}>
 					{formatNumber(one[product])}/s <ResourceIcon resource={product} />
 				</span>
 				<span className='farm-animal-each'>each</span>
 			</div>
-
-			<div className='farm-animal-buy'>
-				<TipButton
-					className='farm-buy'
-					label='Buy'
-					disabled={!canOne}
-					onClick={() => buy(1)}
-					tip={buyTip(animal.name, 1, costOne, canOne ? null : reasonOne)}
-				/>
-				<TipButton
-					className='farm-buy'
-					label='Buy 10'
-					disabled={!canTen}
-					onClick={() => buy(10)}
-					tip={buyTip(animal.name, 10, costTen, canTen ? null : reasonTen)}
-				/>
-			</div>
+			<HoverTip
+				fill
+				placement='below'
+				align='center'
+				tip={
+					<Tooltip icon={resourceIconUrl('food')} title={`Buy ${animal.name}`} className='ds-tip-compact'>
+						<TipCostList costs={[{ label: RESOURCES.food.label, icon: resourceIconUrl('food'), have: food, cost, text: compact(cost) }]} />
+						{canBuy ? null : <HintTooltip title='' text={reason} tone='bad' />}
+					</Tooltip>
+				}
+			>
+				<Button
+					tone={canBuy ? 'gold' : 'dark'}
+					size='sm'
+					style={{ width: '100%' }}
+					disabled={!canBuy}
+					onClick={() => {
+						onBuy(1);
+						audioManager.playSound('click');
+					}}
+				>
+					Buy · {compact(cost)} food
+				</Button>
+			</HoverTip>
 		</div>
 	);
 };
@@ -117,9 +108,9 @@ const FarmAnimalDock: React.FC<FarmAnimalDockProps> = ({ open, onToggle, onBuy, 
 
 	return (
 		<div className='farm-animals' data-open={open}>
-			<button className='farm-dock-toggle' onClick={onToggle} aria-expanded={open}>
+			<Button size='sm' className='farm-dock-toggle' onClick={onToggle} aria-expanded={open}>
 				Animals {open ? '▶' : '◀'}
-			</button>
+			</Button>
 			{open && (
 				<div className='farm-animals-list'>
 					{ANIMALS.map((animal) => (

@@ -270,7 +270,14 @@ export const animalIcon = (kind: string, seed?: string): PixelIconName => {
 };
 
 /** The farm sprites whose art looks to the right (head on the right); every other animal sprite looks left. The farm mirrors an animal so it always walks the way it looks. */
-const FACES_RIGHT: ReadonlySet<PixelIconName> = new Set<PixelIconName>(['animal_cow_1', 'animal_pig', 'animal_sheep', 'animal_duck', 'animal_rooster']);
+const FACES_RIGHT: ReadonlySet<PixelIconName> = new Set<PixelIconName>([
+	'animal_cow_1',
+	'animal_cow_2',
+	'animal_pig',
+	'animal_sheep',
+	'animal_duck',
+	'animal_rooster',
+]);
 
 /** Whether this animal sprite looks to the right without a flip (see {@link FACES_RIGHT}). */
 export const facesRight = (icon: PixelIconName): boolean => FACES_RIGHT.has(icon);

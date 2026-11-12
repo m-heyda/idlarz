@@ -3,6 +3,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { useWindowStore } from '@/stores/windowStore';
 import audioManager from '@/utils/audioManager';
 import '@idlarz/design-system';
+import GameWindow from '../GameWindow';
 import PixelWindow from '../PixelWindow';
 import PixelIcon from '../PixelIcon';
 import CastleUpgradeDialog from '../CastleUpgradeDialog';
@@ -41,11 +42,11 @@ const GameWindows: React.FC = () => {
 				</WindowErrorBoundary>
 			)}
 			{open.includes('farm') && (
-				<PixelWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>
-					<WindowErrorBoundary name='Farm'>
+				<WindowErrorBoundary name='Farm'>
+					<GameWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>
 						<FarmOverlay />
-					</WindowErrorBoundary>
-				</PixelWindow>
+					</GameWindow>
+				</WindowErrorBoundary>
 			)}
 			{open.includes('achievements') && (
 				<PixelWindow id='achievements' title='Achievements' icon={<PixelIcon name='menu_achievements' alt='' scale={0.5} />} width={560} height={620}>

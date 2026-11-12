@@ -3991,3 +3991,18 @@ button.ds-income-head:hover {
 .ds-amount-field {
 	min-width: 0;
 }
+
+/* the small diamond level: for tiles packed tight (the farm upgrades) */
+.ds-gems[data-size='sm'] {
+	gap: 2px;
+}
+
+.ds-gems[data-size='sm'] .ds-gem {
+	width: 8px;
+	height: 10px;
+}
+
+/* a flush window body (the farm scene) is the positioning parent of what fills it */
+.ds-window-body[data-flush='true'] {
+	position: relative;
+}
