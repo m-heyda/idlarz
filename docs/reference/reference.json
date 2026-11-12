@@ -1806,6 +1806,19 @@
   ]
  },
  {
+  "id": "isjunk",
+  "name": "isJunk",
+  "symbol": "isJunk",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/loot/junk.ts",
+  "line": 18,
+  "summary": "Whether a piece of gear in the bag counts as junk for the \"Sell junk\" button. **This is the one place that defines junk.** It is false for everything until the rule is decided (IDL-312), so the button sells nothing yet; the server (`sellJunk` with `rule: 'junk'`) and the browser both ask it, so they always agree. Never junk, whatever the rule says: worn gear (it is not in the bag), potions and other stacks (they are not gear), and, once they exist, set pieces and items the player locked.",
+  "see": [
+   "countJunk"
+  ]
+ },
+ {
   "id": "killincome",
   "name": "killIncome",
   "symbol": "killIncome",
@@ -2315,8 +2328,19 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/offline/inventory.ts",
-  "line": 63,
+  "line": 64,
   "summary": "The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up, so taking a belt off, or a rebirth, never shrinks the bag below the items in it.",
+  "see": []
+ },
+ {
+  "id": "selljunkrule",
+  "name": "sellJunkRule",
+  "symbol": "sellJunkRule",
+  "kind": "function",
+  "category": "Loot/Junk",
+  "file": "src/lib/offline/inventory.ts",
+  "line": 235,
+  "summary": "The \"Sell junk\" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.",
   "see": []
  },
  {

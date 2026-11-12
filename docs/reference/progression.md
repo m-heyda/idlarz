@@ -394,7 +394,7 @@ bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots
 
 ### `beltSlotsFor` <small>function</small>
 
-Source: [`src/lib/offline/inventory.ts:63`](../../src/lib/offline/inventory.ts)
+Source: [`src/lib/offline/inventory.ts:64`](../../src/lib/offline/inventory.ts)
 
 The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up,
 so taking a belt off, or a rebirth, never shrinks the bag below the items in it.

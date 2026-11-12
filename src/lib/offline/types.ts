@@ -31,7 +31,9 @@ export type InventoryOp =
 	| { action: 'organize' }
 	| { action: 'discard'; index: number; qty?: number }
 	| { action: 'sell'; index: number; qty?: number }
+	/** Sells every bag piece up to a rarity (Quick sell in the Merchant), or every piece the junk rule names (`rule: 'junk'`, the Bag's Sell junk button) */
 	| { action: 'sellJunk'; maxRarity: string }
+	| { action: 'sellJunk'; rule: 'junk' }
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
 	| { action: 'buyOffer'; item: ItemInstance }

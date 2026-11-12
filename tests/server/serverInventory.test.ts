@@ -7,7 +7,8 @@ import { encodeSave } from '../../src/lib/saveFormat';
 import { acceptSave, type SaveRepo, type StatsRow, type StoredSave, type WorldPart } from '../../src/lib/cloudSave/pipeline';
 import type { ServiceDeps } from '../../src/lib/offline/service';
 import { fightStep, inventoryStep, redeemChest, syncTickets, type Online } from '../../src/lib/offline/online';
-import { applyOp, bagCountOf, inventoryFromCore, parseOp, stampInventory } from '../../src/lib/offline/inventory';
+import { applyOp, bagCountOf, inventoryFromCore, parseOp, sellJunkRule, stampInventory } from '../../src/lib/offline/inventory';
+import { countJunk, isJunk } from '../../src/lib/loot/junk';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import { sellPayout } from '../../src/utils/game/merchant';
@@ -454,4 +455,34 @@ test('use: an instant potion (mana) fills the pool through the same op, in the s
 	assert.ok(p.m.ledgers.get(p.id)!.combat!.mp > 0, 'mana restored');
 	assert.equal(potionsLeft(p, 'potion_mana'), 0);
 	assert.deepEqual(p.m.ledgers.get(p.id)!.buffs, [], 'no buff for an instant potion');
+});
+
+// IDL-311: the junk rule is one function that says no to everything today, so the button sells nothing until the rule exists
+
+test('sellJunk with the junk rule sells nothing today, and exactly the flagged gear once the rule says so (Haggler paid)', async () => {
+	const p = await player();
+	const rare = { ...plainItem('steel_mace'), rarity: 'rare' as const };
+	const slots = bag({ item: plainItem('steel_helm') }, { item: rare }, { id: 'potion_minor', qty: 1 }, { item: plainItem('steel_cuirass') });
+	p.m.ledgers.set(p.id, { ...p.m.ledgers.get(p.id)!, inv: { ...p.inv(), bag: slots } });
+	assert.equal(isJunk(plainItem('steel_helm')), false, 'nothing is junk yet');
+	const none = await op(p, { action: 'sellJunk', rule: 'junk' });
+	assert.equal(none.ok, false);
+	assert.equal(none.count, 0);
+	assert.deepEqual(p.inv().bag, slots, 'the bag is untouched');
+	assert.equal(countJunk(slots), 0);
+
+	// flipping the rule in a fixture: only the flagged pieces go, potions and unflagged gear stay, and the payout is the normal sale payout
+	const inv = { ...p.inv(), bag: slots };
+	const ctx = { merchantUpgrades: {}, prestige: { rebirths: 0, legacyPoints: 0, legacyEarned: 0 } } as unknown as Parameters<typeof sellJunkRule>[1];
+	const flagged = (item: { rarity: string }) => item.rarity === 'rare';
+	assert.equal(countJunk(slots, flagged), 1);
+	const sold = sellJunkRule(inv, ctx, flagged);
+	assert.equal(sold.ok, true);
+	assert.equal(sold.count, 1);
+	assert.equal(sold.gold, sellPayout(sellValueOf(rare), 1, ctx));
+	assert.deepEqual(sold.inv.bag[2], { id: 'potion_minor', qty: 1 });
+	assert.equal(sold.inv.bag.filter((slot) => slot && 'item' in slot).length, 2);
+	assert.deepEqual(parseOp({ action: 'sellJunk', rule: 'junk' }), { action: 'sellJunk', rule: 'junk' });
+	assert.deepEqual(parseOp({ action: 'sellJunk', maxRarity: 'common' }), { action: 'sellJunk', maxRarity: 'common' });
+	assert.equal(parseOp({ action: 'sellJunk' }), null);
 });

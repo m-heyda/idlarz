@@ -10,6 +10,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot), [`BOSS_LOOT`](#boss-loot)
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
+- Junk: [`isJunk`](#isjunk), [`sellJunkRule`](#selljunkrule)
 
 ## Pipeline
 
@@ -412,3 +413,26 @@ See also: [`gear`](loot.md#gear), [`RARITIES`](loot.md#rarities), [`LOOT_SOURCES
 Source: [`src/catalog/items/define.ts:101`](../../src/catalog/items/define.ts)
 
 The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).
+
+## Junk
+
+<a id="isjunk"></a>
+
+### `isJunk` <small>function</small>
+
+Source: [`src/lib/loot/junk.ts:18`](../../src/lib/loot/junk.ts)
+
+Whether a piece of gear in the bag counts as junk for the "Sell junk" button. **This is the one place that defines junk.** It is false for everything until the rule is decided (IDL-312), so the button sells nothing yet; the server
+(`sellJunk` with `rule: 'junk'`) and the browser both ask it, so they always agree. Never junk, whatever the rule says: worn gear (it is not in the bag), potions and other stacks (they are not gear), and, once they exist, set pieces and items the
+player locked.
+
+See also: `countJunk`
+
+<a id="selljunkrule"></a>
+
+### `sellJunkRule` <small>function</small>
+
+Source: [`src/lib/offline/inventory.ts:235`](../../src/lib/offline/inventory.ts)
+
+The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
+every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.

@@ -19,6 +19,7 @@ import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
 import { isAutoSold } from '@/lib/loot/autoSell';
+import { isJunk } from '@/lib/loot/junk';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
 import type { Inventory, InventoryOp } from '@/lib/offline/types';
 import type { PersistedGame } from '@/lib/sanitizeSave';
@@ -225,6 +226,27 @@ const wholeQty = (qty: number | undefined, available: number): number | null => 
 };
 
 /**
+ * The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
+ * every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.
+ *
+ * @category Loot/Junk
+ * @order 2
+ */
+export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: ItemInstance) => boolean = isJunk): OpResult => {
+	let bag = inv.bag;
+	let gold = 0;
+	let count = 0;
+	bag.forEach((slot, index) => {
+		const item = gearOf(slot);
+		if (!item || !junk(item)) return;
+		gold += sellPayout(sellValueOf(item), 1, sellCtx);
+		count += 1;
+		bag = removeFromBag(bag, index, 1);
+	});
+	return count === 0 ? refused(inv) : done(bump(inv, { bag }), gold, count);
+};
+
+/**
  * Applies one of the player's operations. Returns the new inventory (with a higher `ver`) or `ok: false` with the inventory untouched. The
  * gold of a sale is worked out here, with the merchant's Haggler bonus the save holds; a purchase adds to the bag only (the price is
  * paid in the browser until the merchant is server-priced).
@@ -268,6 +290,7 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 			return done(bump(inv, { bag: removeFromBag(inv.bag, op.index, amount) }), sellPayout(unit, amount, sellCtx), amount);
 		}
 		case 'sellJunk': {
+			if ('rule' in op) return op.rule === 'junk' ? sellJunkRule(inv, sellCtx) : refused(inv);
 			if (typeof op.maxRarity !== 'string' || !Object.prototype.hasOwnProperty.call(RARITIES, op.maxRarity)) return refused(inv);
 			let bag = inv.bag;
 			let gold = 0;
@@ -332,6 +355,7 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 				? { action: raw.action, index: raw.index, ...(raw.qty === undefined ? {} : { qty: raw.qty as number }) }
 				: null;
 		case 'sellJunk':
+			if (raw.rule === 'junk') return { action: 'sellJunk', rule: 'junk' };
 			return typeof raw.maxRarity === 'string' ? { action: 'sellJunk', maxRarity: raw.maxRarity } : null;
 		case 'autoSell':
 			return raw.rarity === null || typeof raw.rarity === 'string' ? { action: 'autoSell', rarity: raw.rarity as string | null } : null;

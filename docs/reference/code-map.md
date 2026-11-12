@@ -454,6 +454,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`data.ts`](../../src/lib/loot/data.ts) — ~ Everything the loot pipeline reads, as one injectable bundle.
 - [`generate.ts`](../../src/lib/loot/generate.ts) — ~ The monster's level (sets the item level of what it drops and the per-level chances); omitted for a chest or the shelf
 - [`index.ts`](../../src/lib/loot/index.ts) — The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
+- [`junk.ts`](../../src/lib/loot/junk.ts) — ~ What the junk rule may look at besides the piece itself.
 - [`kill.ts`](../../src/lib/loot/kill.ts) — ~ Hide per second of the farm; a kill pays a share of it (0 without pigs)
 - [`pools.ts`](../../src/lib/loot/pools.ts) — ~ Whether an item belongs to a pool:
 - [`receive.ts`](../../src/lib/loot/receive.ts) — ~ What actually went into the bag

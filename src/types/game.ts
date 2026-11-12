@@ -426,7 +426,8 @@ export interface GameState {
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;
 	sellItem: (bagIndex: number, qty?: number) => number; // sells `qty` (default 1) of the stack; returns the gold paid (0 = nothing sold)
 	discardItem: (bagIndex: number, qty?: number) => boolean; // throws away `qty` (default 1) of the stack for nothing; refused during a fight
-	sellJunk: (maxRarity: string) => { gold: number; count: number };
+	/** Sells the gear up to a rarity (Quick sell); with no argument it sells what the junk rule names (the Bag's Sell junk button: nothing until the rule exists) */
+	sellJunk: (maxRarity?: string) => { gold: number; count: number };
 	buyItem: (id: string, qty?: number) => boolean;
 	buyOffer: (index: number) => boolean;
 	refreshMerchantStock: () => boolean;

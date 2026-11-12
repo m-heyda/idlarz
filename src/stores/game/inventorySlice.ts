@@ -6,7 +6,7 @@ import { sellPayout } from '@/utils/game/merchant';
 import { maxHp, maxMana } from '@/lib/combat';
 import { equipFromBag, gearOf, moveSlot, organizeBag, removeFromBag, slotQty, stackOf, unequip } from '@/lib/inventory';
 import { sellValueOf } from '@/lib/itemInstance';
-import { isAutoSold } from '@/lib/loot';
+import { isAutoSold, isJunk } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
@@ -119,22 +119,23 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 		},
 
 		// Sell every bag item of this rarity or lower that is gear (potions and stacks stay)
-		sellJunk: (maxRarity: string) => {
+		sellJunk: (maxRarity?: string) => {
 			const state = get();
 			if (state.combat.fight) return { gold: 0, count: 0 };
-			if (!Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
+			if (maxRarity !== undefined && !Object.prototype.hasOwnProperty.call(RARITIES, maxRarity)) return { gold: 0, count: 0 };
 			let bag = state.bag;
 			let gold = 0;
 			let count = 0;
 			bag.forEach((slot, index) => {
 				const item = gearOf(slot);
-				if (!item || !isAutoSold(item, maxRarity)) return;
+				// no rarity: the junk rule decides (isJunk: nothing yet)
+				if (!item || !(maxRarity === undefined ? isJunk(item) : isAutoSold(item, maxRarity))) return;
 				gold += sellPayout(sellValueOf(item), 1, state);
 				count += 1;
 				bag = removeFromBag(bag, index, 1);
 			});
 			if (count === 0) return { gold: 0, count: 0 };
-			sendInventoryOp({ action: 'sellJunk', maxRarity }, settleSale(gold));
+			sendInventoryOp(maxRarity === undefined ? { action: 'sellJunk', rule: 'junk' } : { action: 'sellJunk', maxRarity }, settleSale(gold));
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
 			return { gold, count };
 		},

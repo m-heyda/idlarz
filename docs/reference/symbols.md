@@ -34,7 +34,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
 | `BASELINE_EPOCH` | Saves & Server / Epoch | [`src/config/epoch.ts:13`](../../src/config/epoch.ts) | The data epoch: |
 | Basics: tick, caps, start | Economy / Basics | [`src/config/economy.ts:22`](../../src/config/economy.ts) | Game constants the economy runs on: |
-| `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:63`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
+| `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:64`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
 | Bestiary mastery | Progression / Mastery | [`src/catalog/mastery.ts:27`](../../src/catalog/mastery.ts) | The mastery ladder shared by every monster type: |
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_ART` | Architecture / Art | [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts) | The picture of each rebirth biome: |
@@ -153,6 +153,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
 | `isInWard` | Economy / Castle | [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts) | Is this tile inside the ward: |
+| `isJunk` | Loot / Junk | [`src/lib/loot/junk.ts:18`](../../src/lib/loot/junk.ts) | Whether a piece of gear in the bag counts as junk for the "Sell junk" button. |
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:51`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
@@ -240,6 +241,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `SAVE_SCHEMA` | Saves & Server / The save | [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts) | The save in the browser. |
 | `sealedRng` | Saves & Server / The ledger | [`src/lib/offline/seal.ts:18`](../../src/lib/offline/seal.ts) | A random source for one reward: |
 | Season restart (reset-players) | Ops / Operator guides | [`scripts/reset-players.ts:1`](../../scripts/reset-players.ts) | Season restart: |
+| `sellJunkRule` | Loot / Junk | [`src/lib/offline/inventory.ts:235`](../../src/lib/offline/inventory.ts) | The "Sell junk" button: |
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
 | `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:153`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
