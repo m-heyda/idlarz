@@ -240,7 +240,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
-| `rollJunkDrops` | Loot / Junk | [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 1,000). |
+| `rollJunkDrops` | Loot / Junk | [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:56`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
