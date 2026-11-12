@@ -2,6 +2,7 @@ import { DAILY_BONUS_GEMS, DAY_SEC, gemItemById, type GemItem } from '@/config/g
 import { GEMS_CAP } from '@/config/economy';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { respecAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
+import { recordRespec } from '@/lib/offline/stats';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
 import type { DailyInfo, GemShop, GemsRefusal, PendingIdentity } from '@/lib/offline/gemTypes';
 
@@ -99,6 +100,7 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 			...ledger,
 			gems: ledger.gems - price,
 			attrs,
+			stats: item.id === 'class_change' || item.id === 'name_change' ? ledger.stats : recordRespec(ledger.stats),
 			gemShop: {
 				...ledger.gemShop,
 				bought: { ...ledger.gemShop.bought, [item.id]: (ledger.gemShop.bought[item.id] ?? 0) + 1 },

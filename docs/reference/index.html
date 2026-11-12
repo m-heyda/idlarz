@@ -1859,11 +1859,11 @@ level = min(level on the tile, level the account remembers for the biome)
 </tbody></table>
 </article><article><p><a id="dailyinfo"></a></p>
 <h3><code>dailyInfo</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/gems.ts"><code>src/lib/offline/gems.ts:19</code></a></p>
+<p>Source: <a href="../../src/lib/offline/gems.ts"><code>src/lib/offline/gems.ts:20</code></a></p>
 <p>The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).</p>
 </article><article><p><a id="applyspend"></a></p>
 <h3><code>applySpend</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/gems.ts"><code>src/lib/offline/gems.ts:71</code></a></p>
+<p>Source: <a href="../../src/lib/offline/gems.ts"><code>src/lib/offline/gems.ts:72</code></a></p>
 <p>One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item&#39;s own rule must hold. Nothing is changed
 when it is refused. A paid purchase takes the gems, counts the purchase and records <code>spentSinceSave</code>; a class or name change is left as a <code>pending</code> identity change for the caller to write on the profile (and clear), and an attribute respec is done here.</p>
 <ul>
@@ -2172,12 +2172,12 @@ The queue&#39;s head starts as soon as HP is back at 80%, ignoring retry time an
 <p>Freezes everything a fight needs about the player into a <code>PlayerProfile</code> (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt&#39;s potion cooldown, power and slots), from the last accepted save and the ledger&#39;s gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (<code>classPassives</code>).</p>
 </article><article><p><a id="fightstep"></a></p>
 <h3><code>fightStep</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:124</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:126</code></a></p>
 <p>One tick of the open fight. Returns when the fight ended.</p>
 <p>One tick of the open fight, in the order of the numbered list on <a href="#runcombat"><code>runCombat</code></a>.</p>
 </article><article><p><a id="endfight"></a></p>
 <h3><code>endFight</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:94</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:95</code></a></p>
 <p>Closes the open fight as <code>defeated</code>, <code>timeout</code> or <code>retreat</code>: a defeat sets HP to 30% of max, a defeat or timeout starts the monster&#39;s retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.</p>
 <p><strong>Defeat streak</strong>: auto-battle stays on after a defeat. Each defeat adds one to <code>CombatState.defeatStreak</code>; a win resets it; at <code>COMBAT.auto.pauseAfterDefeats</code> (3) defeats in a row auto-battle is switched off, a <code>paused</code> event is logged (the browser says &#39;Auto-battle paused: 3 defeats in a row&#39;) and the count starts again. A timeout or a retreat neither adds nor resets. The player turns the switch back on.</p>
 </article><article><p><a id="engage"></a></p>
@@ -2236,7 +2236,7 @@ chance     = min(logistic(6 x ln(surviveSec / killSec)), logistic(6 x ln(limit /
 </code></pre>
 </article><article><p><a id="autouse"></a></p>
 <h3><code>autoUse</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:73</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:74</code></a></p>
 <p>Auto-use&#39;s rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt&#39;s Potion Power included) and waits out the shared cooldown the belt shortens (<code>profile.potionCooldownSec</code>); it picks among every healing potion in the bag, not only the ones on the hotkey bar.</p>
 </article><article><p><a id="potioncooldownsec"></a></p>
 <h3><code>potionCooldownSec</code> <small>function</small></h3>

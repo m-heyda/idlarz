@@ -38,6 +38,20 @@ export interface LifetimeStats {
 	claimedAt: Record<string, number>;
 	/** The manual achievements (the testers) held in `player_achievements` have been merged into `achievements` once */
 	manualSynced: boolean;
+	/** The most gold the player held at an accepted save (Hoarder). Additive: absent reads as 0. */
+	goldPeak: number;
+	/** Resource units sold to the merchant and the gold they paid (Market Day); counted by the server's trade step ({@link recordSale}). Additive. */
+	unitsSold: number;
+	goldFromSales: number;
+	/** Crafts delivered, instant or claimed (Apprentice Smith). Additive. */
+	crafted: number;
+	/** Fights won without taking a single hit (Untouched). Additive. */
+	flawless: number;
+	/** Respecs bought (attribute points taken back). Additive. */
+	respecs: number;
+	/** Per monster type id: times the monster beat the player, and the fastest win in ms (the Bestiary). Additive: absent reads as none. */
+	deaths: Record<string, number>;
+	bestMs: Record<string, number>;
 }
 
 /** Counters are written to the ledger at most this often by the save path (kills and chests are written with their own request, which writes the ledger anyway). */
@@ -60,6 +74,14 @@ export const emptyStats = (): LifetimeStats => ({
 	earnedAt: {},
 	claimedAt: {},
 	manualSynced: false,
+	goldPeak: 0,
+	unitsSold: 0,
+	goldFromSales: 0,
+	crafted: 0,
+	flawless: 0,
+	respecs: 0,
+	deaths: {},
+	bestMs: {},
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -94,18 +116,35 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		earnedAt: counts(r.earnedAt),
 		claimedAt: counts(r.claimedAt),
 		manualSynced: r.manualSynced === true,
+		goldPeak: num(r.goldPeak),
+		unitsSold: Math.floor(num(r.unitsSold)),
+		goldFromSales: num(r.goldFromSales),
+		crafted: Math.floor(num(r.crafted)),
+		flawless: Math.floor(num(r.flawless)),
+		respecs: Math.floor(num(r.respecs)),
+		deaths: counts(r.deaths),
+		bestMs: counts(r.bestMs),
 	};
 };
 
 /** The stored form: the claim fields are left out while they hold nothing (a row from before claiming existed stays byte-for-byte what it was; `claimed: null` means "not initialised", which is the same as absent). */
 export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
-	const { claimed, earnedAt, claimedAt, manualSynced, ...rest } = s;
+	const { claimed, earnedAt, claimedAt, manualSynced, goldPeak, unitsSold, goldFromSales, crafted, flawless, respecs, deaths, bestMs, ...rest } = s;
 	return {
 		...rest,
 		...(claimed !== null ? { claimed } : {}),
 		...(Object.keys(earnedAt).length > 0 ? { earnedAt } : {}),
 		...(Object.keys(claimedAt).length > 0 ? { claimedAt } : {}),
 		...(manualSynced ? { manualSynced } : {}),
+		// the deeds counters (IDL-307) are left out while they hold nothing, so a row from before stays byte-for-byte what it was
+		...(goldPeak > 0 ? { goldPeak } : {}),
+		...(unitsSold > 0 ? { unitsSold } : {}),
+		...(goldFromSales > 0 ? { goldFromSales } : {}),
+		...(crafted > 0 ? { crafted } : {}),
+		...(flawless > 0 ? { flawless } : {}),
+		...(respecs > 0 ? { respecs } : {}),
+		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
+		...(Object.keys(bestMs).length > 0 ? { bestMs } : {}),
 	};
 };
 
@@ -123,15 +162,45 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.achievements.length === 0 &&
 	!s.manualSynced &&
 	(s.claimed === null || s.claimed.length === 0) &&
-	Object.keys(s.earnedAt).length === 0;
+	Object.keys(s.earnedAt).length === 0 &&
+	s.goldPeak === 0 &&
+	s.unitsSold === 0 &&
+	s.goldFromSales === 0 &&
+	s.crafted === 0 &&
+	s.flawless === 0 &&
+	s.respecs === 0 &&
+	Object.keys(s.deaths).length === 0 &&
+	Object.keys(s.bestMs).length === 0;
 
-/** A kill of monster `type`: counted once, when the server pays it. */
-export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: boolean; boss: boolean }): LifetimeStats => ({
-	...stats,
-	kills: { ...stats.kills, [kill.type]: (stats.kills[kill.type] ?? 0) + 1 },
-	golden: stats.golden + (kill.lucky ? 1 : 0),
-	bosses: stats.bosses + (kill.boss ? 1 : 0),
-});
+/**
+ * A kill of monster `type`: counted once, when the server pays it. `ms` (how long the fight lasted) keeps the fastest win per type for the Bestiary, and `flawless` (the hero took no hit) counts
+ * towards Untouched.
+ */
+export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: boolean; boss: boolean; ms?: number; flawless?: boolean }): LifetimeStats => {
+	const ms = kill.ms !== undefined && Number.isFinite(kill.ms) ? Math.max(1, Math.round(kill.ms)) : 0;
+	const best = stats.bestMs[kill.type];
+	return {
+		...stats,
+		kills: { ...stats.kills, [kill.type]: (stats.kills[kill.type] ?? 0) + 1 },
+		golden: stats.golden + (kill.lucky ? 1 : 0),
+		bosses: stats.bosses + (kill.boss ? 1 : 0),
+		flawless: stats.flawless + (kill.flawless ? 1 : 0),
+		bestMs: ms > 0 && (best === undefined || ms < best) ? { ...stats.bestMs, [kill.type]: ms } : stats.bestMs,
+	};
+};
+
+/** The monster `type` beat the player (a defeat; a timeout or a retreat does not count). */
+export const recordDeath = (stats: LifetimeStats, type: string): LifetimeStats => ({ ...stats, deaths: { ...stats.deaths, [type]: (stats.deaths[type] ?? 0) + 1 } });
+
+/** `n` crafts were delivered (a claim, a Collect all or an instant craft). */
+export const recordCraft = (stats: LifetimeStats, n: number): LifetimeStats => (n > 0 ? { ...stats, crafted: stats.crafted + Math.floor(n) } : stats);
+
+/** A respec was bought. */
+export const recordRespec = (stats: LifetimeStats): LifetimeStats => ({ ...stats, respecs: stats.respecs + 1 });
+
+/** The merchant bought `units` of a resource for `gold` (the server's trade step, IDL-319). */
+export const recordSale = (stats: LifetimeStats, units: number, gold: number): LifetimeStats =>
+	units > 0 ? { ...stats, unitsSold: stats.unitsSold + Math.floor(units), goldFromSales: stats.goldFromSales + Math.max(0, gold) } : stats;
 
 /**
  * The first fight with a monster type discovers it (the "?" silhouette becomes the monster, on the map and in the combat window). Later fights keep the first time, so the same
@@ -163,6 +232,8 @@ export interface SaveCount {
 	rates: Record<string, number> | null;
 	/** A rebirth or a New Game: the land and play time start over, so the baselines are reset and nothing is added */
 	newRun: boolean;
+	/** The gold the accepted save holds: the lifetime peak (Hoarder) only ever rises. Absent: not counted. */
+	gold?: number;
 }
 
 /** Whether enough time has passed since the last count for the save path to write the ledger for it. */
@@ -174,7 +245,7 @@ export const statsDue = (stats: LifetimeStats, nowMs: number): boolean => stats.
  * as both away pay and income). The first count of a player, and the first after a rebirth or New Game, only set the baselines.
  */
 export const countSave = (stats: LifetimeStats, save: SaveCount): LifetimeStats => {
-	const base = { ...stats, at: save.nowMs, playAt: save.playSeconds, tilesAt: save.tilesOwned };
+	const base = { ...stats, at: save.nowMs, playAt: save.playSeconds, tilesAt: save.tilesOwned, goldPeak: Math.max(stats.goldPeak, num(save.gold)) };
 	if (save.newRun || stats.at === 0) return base;
 	const onlineSec = Math.max(0, Math.min(save.playSeconds - stats.playAt, (save.nowMs - stats.at) / 1000));
 	const income = { ...stats.income };

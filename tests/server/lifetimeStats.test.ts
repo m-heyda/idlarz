@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { countSave, emptyStats, isEmptyStats, readStats, recordChest, recordKill, statsDue, STATS_EVERY_MS } from '../../src/lib/offline/stats';
+import { countSave, emptyStats, isEmptyStats, readStats, recordChest, recordCraft, recordDeath, recordKill, recordRespec, recordSale, statsDue, statsToJson, STATS_EVERY_MS } from '../../src/lib/offline/stats';
 
 // IDL-69: lifetime counters in player_ledger.stats. Counted by the server from its own events and from accepted saves; nothing reads them yet.
 
@@ -67,4 +67,43 @@ test('a season restart wipes the tutorial progress and keeps the other counters;
 	assert.deepEqual(wiped?.achievements, ['tutorial']);
 	assert.equal(statsWithoutTutorial({ tutorial: { done: ['build'], lessons: [], skipped: false } }), null, 'only tutorial progress: nothing left to store');
 	assert.equal(statsWithoutTutorial(null), null);
+});
+
+// IDL-307: the counters the deeds and the bestiary need
+
+test('a kill keeps the fastest win per monster type and counts flawless wins', () => {
+	let s = recordKill(emptyStats(), { type: 'wolf', lucky: false, boss: false, ms: 9000, flawless: true });
+	s = recordKill(s, { type: 'wolf', lucky: false, boss: false, ms: 12_000, flawless: false });
+	s = recordKill(s, { type: 'wolf', lucky: false, boss: false, ms: 7500.4, flawless: true });
+	assert.equal(s.bestMs.wolf, 7500);
+	assert.equal(s.flawless, 2);
+	assert.equal(recordKill(emptyStats(), { type: 'wolf', lucky: false, boss: false }).bestMs.wolf, undefined, 'no duration: nothing recorded');
+});
+
+test('defeats, crafts and respecs are counted; a craft of zero changes nothing', () => {
+	const s = recordRespec(recordCraft(recordDeath(recordDeath(emptyStats(), 'wolf'), 'bear'), 3));
+	assert.deepEqual(s.deaths, { wolf: 1, bear: 1 });
+	assert.deepEqual([s.crafted, s.respecs], [3, 1]);
+	const same = emptyStats();
+	assert.equal(recordCraft(same, 0), same);
+	const sold = recordSale(emptyStats(), 40, 120);
+	assert.deepEqual([sold.unitsSold, sold.goldFromSales], [40, 120]);
+});
+
+test('the gold peak only rises, across a rebirth too', () => {
+	const first = countSave(emptyStats(), { nowMs: 1000, playSeconds: 10, tilesOwned: 1, rates: null, newRun: false, gold: 500 });
+	assert.equal(first.goldPeak, 500);
+	const lower = countSave(first, { nowMs: 2000, playSeconds: 20, tilesOwned: 1, rates: null, newRun: false, gold: 100 });
+	assert.equal(lower.goldPeak, 500);
+	const reborn = countSave(lower, { nowMs: 3000, playSeconds: 1, tilesOwned: 1, rates: null, newRun: true, gold: 900 });
+	assert.equal(reborn.goldPeak, 900);
+});
+
+test('the new counters stay out of the stored form while empty, and read back tolerantly', () => {
+	assert.deepEqual(Object.keys(statsToJson(emptyStats())).filter((k) => ['goldPeak', 'crafted', 'deaths', 'bestMs', 'flawless', 'respecs', 'unitsSold'].includes(k)), []);
+	const filled = recordKill(recordCraft(emptyStats(), 2), { type: 'wolf', lucky: false, boss: false, ms: 5000, flawless: true });
+	const back = readStats(JSON.parse(JSON.stringify(statsToJson(filled))));
+	assert.deepEqual([back.crafted, back.flawless, back.bestMs], [2, 1, { wolf: 5000 }]);
+	assert.equal(isEmptyStats(filled), false);
+	assert.deepEqual(readStats({ deaths: { a: -2, b: 'x', c: 4 }, goldPeak: 'lots' }).deaths, { c: 4 });
 });

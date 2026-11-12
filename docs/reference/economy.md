@@ -1233,7 +1233,7 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 
 ### `dailyInfo` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:19`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts)
 
 The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).
 
@@ -1241,7 +1241,7 @@ The daily first-login bonus as it stands: claimable when today (UTC) has not bee
 
 ### `applySpend` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:71`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:72`](../../src/lib/offline/gems.ts)
 
 One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed
 when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.

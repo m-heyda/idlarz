@@ -2160,7 +2160,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 73,
+  "line": 74,
   "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.",
   "see": []
  },
@@ -2171,7 +2171,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 94,
+  "line": 95,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -2182,7 +2182,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 124,
+  "line": 126,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -2232,7 +2232,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 19,
+  "line": 20,
   "summary": "The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).",
   "see": []
  },
@@ -2243,7 +2243,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 71,
+  "line": 72,
   "summary": "One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.",
   "see": []
  },

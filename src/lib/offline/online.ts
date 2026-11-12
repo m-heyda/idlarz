@@ -15,7 +15,7 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
-import { recordChest } from '@/lib/offline/stats';
+import { recordChest, recordCraft } from '@/lib/offline/stats';
 import {
 	UNCLAIMED_SEC,
 	bankContext,
@@ -298,7 +298,7 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			craft: result.craft,
 			serverNowSec: ctx.nowSec,
 		};
-		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft } : ledger, value };
+		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft, stats: recordCraft(ledger.stats, result.crafted ?? 0) } : ledger, value };
 	});
 
 /**

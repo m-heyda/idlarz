@@ -441,6 +441,7 @@ export const acceptSave = async (
 				tilesOwned: summary.tilesOwned,
 				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
 				newRun: newRun || !current,
+				gold: summary.gold,
 			});
 			// the attribute record, and the gem shop's allowance for a save that was on its way when something was bought (this save has been accepted: it is used up)
 			const settledShop = { ...ledger?.gemShop, spentSinceSave: 0 } as Ledger['gemShop'];
