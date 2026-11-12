@@ -4,8 +4,7 @@ import { requestGems } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber, formatPercent } from '@/utils/formatters';
-import { MerchantItemsSection } from './MerchantItemsSection';
-import { MerchantGoods, MerchantUpgradeCards } from './MerchantShop';
+import { MerchantUpgradeCards } from './MerchantShop';
 import { CLICK_LADDER } from '@/config/economy';
 import { cn } from '@/lib/utils';
 import ResourceIcon from '../../ResourceIcon';
@@ -43,7 +42,7 @@ const PlaceholderTabContent: React.FC<PlaceholderTabContentProps> = ({ title, em
 };
 
 /**
- * The Goods, Upgrades, Quests and Gambling tabs of the Merchant window, still in their own look while they are rebuilt one by one inside the new window (the Resources tab is `MerchantResourcesTab`).
+ * The Upgrades, Quests and Gambling tabs of the Merchant window, still in their own look while they are rebuilt one by one inside the new window (the Resources tab is `MerchantResourcesTab`).
  */
 const MerchantOverlay: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
@@ -82,18 +81,6 @@ const MerchantOverlay: React.FC = () => {
 	// Render tab content based on active tab
 	const renderTabContent = () => {
 		switch (activeTab) {
-			case 'goods':
-				return (
-					<>
-						<h2 className='px-h text-center'>Goods</h2>
-
-						{/* The shuffling shelf and the supplies */}
-						<MerchantGoods onBought={announcePurchase} />
-
-						{/* Sell bag items */}
-						<MerchantItemsSection />
-					</>
-				);
 			case 'upgrades':
 				return (
 					<>

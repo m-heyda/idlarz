@@ -108,3 +108,25 @@ test('the Merchant Resources tab: ledger, trade ticket with the 1K / 1M / 1B / M
 	assert.match(out, /placeholder="Custom"/, 'and a typed amount field');
 	assert.match(out, /ds-range/, 'and the slider');
 });
+
+test('the Merchant Goods tab: the shelf with its restock, your bag with the filters, and Quick sell with Sell junk, the rarity buttons and auto-sell', async () => {
+	const { default: MerchantGoodsTab } = await import('../../src/components/game/merchant/MerchantGoodsTab');
+	reset();
+	const out = renderToStaticMarkup(h(MerchantGoodsTab));
+	for (const word of [
+		'Today’s goods',
+		'Restock',
+		'New stock in',
+		'Your bag',
+		'Gear',
+		'Potions',
+		'Quick sell',
+		'Sell junk',
+		'Sell common',
+		'Up to uncommon',
+		'Sell everything shown',
+		'Auto-sell new gear up to',
+	]) {
+		assert.ok(out.includes(word), `the tab shows "${word}"`);
+	}
+});
