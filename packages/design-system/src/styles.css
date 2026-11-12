@@ -4860,7 +4860,7 @@ button.ds-income-head:hover {
 
 .ds-rank-row {
 	display: grid;
-	grid-template-columns: 48px 84px minmax(0, 1fr) 56px 96px 58px;
+	grid-template-columns: 40px 84px minmax(0, 1fr) 96px 58px 48px;
 	align-items: center;
 	gap: 12px;
 	min-height: 96px;
@@ -4909,8 +4909,8 @@ button.ds-income-head:hover {
 .ds-rank-name {
 	display: flex;
 	align-items: center;
-	gap: 8px;
-	font-size: 19px;
+	gap: 10px;
+	font-size: 23px;
 	white-space: nowrap;
 }
 
@@ -4925,6 +4925,13 @@ button.ds-income-head:hover {
 .ds-rank-nobadge {
 	width: 48px;
 	height: 48px;
+}
+
+/* the trophy column at the right end of the row (empty after the third place) */
+.ds-rank-podium {
+	display: grid;
+	place-items: center;
+	min-height: 44px;
 }
 
 /* the places on the podium: one gold trophy, the second and third place recoloured with filters (no extra pictures) */

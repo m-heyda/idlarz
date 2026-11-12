@@ -42,22 +42,15 @@ const Move: React.FC<{ row: RankingRow }> = ({ row }) => {
 
 const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board }) => (
 	<li className='ds-listrow ds-listrow-line ds-rank-row' data-me={row.me} data-top={row.rank <= 3 ? row.rank : undefined}>
-		<span className='ds-rank-pos'>
-			{row.rank <= 3 ? (
-				// eslint-disable-next-line @next/next/no-img-element
-				<img className='ds-rank-trophy' data-place={row.rank} src={pixelIconSrc('rank_trophy')} alt={`Place ${row.rank}`} width={44} height={44} />
-			) : (
-				row.rank
-			)}
-		</span>
+		<span className='ds-rank-pos'>{row.rank}</span>
 		<AvatarArt id={row.avatarId} playerClass={row.playerClass} className='ds-rank-avatar' scale={1.8} />
 		<span className='ds-rank-who'>
 			<span className='ds-rank-name'>
 				<NickName color={nickColorValue(row.nameColor)}>{row.name}</NickName>
+				{row.badge && <BadgePic src={badgePicSrc(row.badge)} size={32} label={row.badgeName ?? ''} />}
 			</span>
 			{row.title && <span className='ds-rank-title'>{row.title}</span>}
 		</span>
-		{row.badge ? <BadgePic src={badgePicSrc(row.badge)} size={48} label={row.badgeName ?? ''} /> : <span className='ds-rank-nobadge' />}
 		<span className='ds-rank-value'>
 			{valueText(board, row.value)}
 			{row.paragon > 0 && (
@@ -67,6 +60,12 @@ const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board 
 			)}
 		</span>
 		<Move row={row} />
+		<span className='ds-rank-podium'>
+			{row.rank <= 3 && (
+				// eslint-disable-next-line @next/next/no-img-element
+				<img className='ds-rank-trophy' data-place={row.rank} src={pixelIconSrc('rank_trophy')} alt={`Place ${row.rank}`} width={44} height={44} />
+			)}
+		</span>
 	</li>
 );
 
