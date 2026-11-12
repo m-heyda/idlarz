@@ -21441,6 +21441,22 @@
 		]
 	},
 	{
+		"usedBy": [
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/RankingsWindow.tsx"
+		],
+		"name": "menu_rankings",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_rankings.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "menu_settings",
 		"category": "ui",

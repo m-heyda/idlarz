@@ -4293,11 +4293,104 @@ button.ds-income-head:hover {
 	color: var(--ds-gold-lt);
 }
 
+/* the name preview: a black stage with a gold frame (like the resource chips of the top bar) and a slow galaxy behind the name */
+.ds-nick-stage {
+	position: relative;
+	overflow: hidden;
+	margin: 0 auto 16px;
+	max-width: 520px;
+	background: #000;
+	border: 2px solid var(--ds-gold, #e0a93a);
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 14px rgba(224, 169, 58, 0.25),
+		inset 0 0 18px rgba(0, 0, 0, 0.9);
+}
+
+.ds-nick-stage .ds-nick-preview {
+	position: relative;
+	z-index: 1;
+	margin: 0;
+	padding: 14px 16px;
+	min-height: 64px;
+}
+
+/* nebula clouds that drift, and two star layers (one drifts, one twinkles); all pure CSS */
+.ds-galaxy {
+	position: absolute;
+	inset: -20%;
+	background: radial-gradient(ellipse 40% 55% at 22% 40%, rgba(176, 64, 255, 0.42), transparent 70%),
+		radial-gradient(ellipse 45% 50% at 72% 58%, rgba(60, 90, 255, 0.4), transparent 70%),
+		radial-gradient(ellipse 30% 40% at 52% 22%, rgba(255, 70, 200, 0.28), transparent 70%);
+	animation: ds-galaxy-drift 24s ease-in-out infinite alternate;
+}
+
+.ds-galaxy::before,
+.ds-galaxy::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-repeat: repeat;
+}
+
+.ds-galaxy::before {
+	background-image: radial-gradient(1px 1px at 12px 18px, #fff, transparent 60%), radial-gradient(1px 1px at 58px 52px, #cfd8ff, transparent 60%),
+		radial-gradient(1.4px 1.4px at 96px 14px, #fff, transparent 60%), radial-gradient(1px 1px at 140px 70px, #e8d4ff, transparent 60%),
+		radial-gradient(1px 1px at 33px 88px, #fff, transparent 60%), radial-gradient(1.2px 1.2px at 118px 104px, #bcd0ff, transparent 60%);
+	background-size: 160px 120px;
+	animation: ds-galaxy-stars 60s linear infinite;
+}
+
+.ds-galaxy::after {
+	background-image: radial-gradient(1.6px 1.6px at 40px 30px, #fff, transparent 60%), radial-gradient(1.6px 1.6px at 130px 90px, #fff, transparent 60%),
+		radial-gradient(1.4px 1.4px at 80px 70px, #ffe9ff, transparent 60%);
+	background-size: 190px 130px;
+	animation: ds-galaxy-twinkle 3.2s ease-in-out infinite alternate;
+}
+
+@keyframes ds-galaxy-drift {
+	from {
+		transform: translate(-3%, -2%) rotate(0deg) scale(1);
+	}
+	to {
+		transform: translate(3%, 2%) rotate(6deg) scale(1.08);
+	}
+}
+
+@keyframes ds-galaxy-stars {
+	to {
+		background-position: -160px 120px;
+	}
+}
+
+@keyframes ds-galaxy-twinkle {
+	from {
+		opacity: 0.25;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-galaxy,
+	.ds-galaxy::before,
+	.ds-galaxy::after {
+		animation: none;
+	}
+}
+
 .ds-badge-cols {
 	display: grid;
 	grid-template-columns: 372px minmax(0, 1fr);
-	gap: 24px;
-	align-items: start;
+	gap: 32px;
+	align-items: stretch;
+}
+
+/* a thin line between the two columns */
+.ds-badge-cols > section + section {
+	padding-left: 32px;
+	border-left: 1px solid rgba(224, 169, 58, 0.22);
 }
 
 .ds-swatch-grid {

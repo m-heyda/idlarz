@@ -13,8 +13,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:243`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `allocatePoints` | Progression / Levels | [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts) | Puts points into attributes: |
-| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:250`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
-| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:265`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
+| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:251`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
+| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:266`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyPets` | Progression / Pets | [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts) | Applies one pets request to the ledger. |

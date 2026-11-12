@@ -118,22 +118,23 @@ const BadgeDialog: React.FC = () => {
 	/** The effect tried on the preview that is still locked: it gets the unlock bar under the tiles */
 	const triedEffect = tried ? nickEffectById(tried) : null;
 	const triedEffectLocked = triedEffect !== null && !badge.effectsUnlocked.includes(triedEffect.id);
+	const effectBasePrice = gemItemById(NICK_EFFECTS[0].item)?.price ?? 0;
 	const effectPrice = triedEffect ? (gemItemById(triedEffect.item)?.price ?? 0) : 0;
 	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
 		<GameModal title='Name, badge and title' width={972} onClose={close}>
-			<div className='ds-nick-preview' data-testid='nick-preview'>
-				<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>
-				{title && <span className='ds-nick-preview-title'>({title})</span>}
-				{shown && (
-					// eslint-disable-next-line @next/next/no-img-element
-					<img src={`/pixel/new_assets/achievements/${shown.badge}.png`} alt={shown.title} width={28} height={28} className='pixelated' />
-				)}
+			<div className='ds-nick-stage' data-testid='nick-preview'>
+				<span className='ds-galaxy' aria-hidden='true' />
+				<div className='ds-nick-preview'>
+					<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>
+					{title && <span className='ds-nick-preview-title'>({title})</span>}
+					{shown && (
+						// eslint-disable-next-line @next/next/no-img-element
+						<img src={`/pixel/new_assets/achievements/${shown.badge}.png`} alt={shown.title} width={28} height={28} className='pixelated' />
+					)}
+				</div>
 			</div>
-			<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px' }}>
-				Shown next to your name in the game, on the landing page and in the rankings.
-			</p>
 
 			<div className='ds-badge-cols'>
 				<section data-testid='color-section'>
@@ -214,8 +215,8 @@ const BadgeDialog: React.FC = () => {
 							</Button>
 						</div>
 					) : (
-						<p className='ds-dim' style={{ fontSize: 12, margin: '8px 0 0' }}>
-							Effects are animated names, 500 gems each. Click one to try it on.
+						<p className='ds-dim' style={{ fontSize: 12, margin: '16px 0 0' }}>
+							Hover to see the effect, click to buy: {effectBasePrice} <GemIcon /> each.
 						</p>
 					)}
 				</section>

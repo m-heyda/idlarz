@@ -256,6 +256,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
+- [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The Rankings:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
