@@ -193,7 +193,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:232`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
 | `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:454`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
-| Movement arrows | Progression / Rankings | [`src/lib/rankings.ts:81`](../../src/lib/rankings.ts) | The change since the refresh before: |
+| Movement arrows | Progression / Rankings | [`src/lib/rankings.ts:86`](../../src/lib/rankings.ts) | The change since the refresh before: |
 | `nextWanderStep` | Progression / Pets | [`src/lib/pets.ts:29`](../../src/lib/pets.ts) | The pet's next step: |
 | `NICK_COLORS` | Progression / Badges | [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts) | The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). |
 | `NICK_EFFECTS` | Progression / Badges | [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts) | The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): |
@@ -271,7 +271,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:167`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
-| The boards | Progression / Rankings | [`src/lib/rankings.ts:35`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
+| The boards | Progression / Rankings | [`src/lib/rankings.ts:39`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
 | The browser's half of the data epoch | Saves & Server / Browser state | [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
 | The class picker acceptance | Pacing / The sim | [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts) | `npm run sim:classes`: |

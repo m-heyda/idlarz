@@ -4233,7 +4233,7 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Rankings</h2><article><p><a id="ranking-boards"></a></p>
 <h3>The boards</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:35</code></a></p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:39</code></a></p>
 <p>The tabs of the Rankings window, in order. A board with <code>soon</code> is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).</p>
 <p>Every board lists the first 50 places of the trusted players, plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:</p>
@@ -4242,10 +4242,11 @@ Ties are broken in this order:</p>
 <li>Rebirths: rebirths, then Embers ever earned.</li>
 <li>Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.</li>
 <li>Tiles: the most tiles the player ever owned in one run (<code>player_stats.best_tiles</code>), so a rebirth does not lower it.</li>
+<li>Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).</li>
 </ul>
 </article><article><p><a id="movement"></a></p>
 <h3>Movement arrows</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:81</code></a></p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:86</code></a></p>
 <p>The change since the refresh before: a lower number is a better place, so a smaller rank is <code>up</code>; no earlier place is <code>new</code>.</p>
 </article><h2>Avatars</h2><article><p><a id="unlockedavatarids"></a></p>
 <h3><code>unlockedAvatarIds</code> <small>function</small></h3>
@@ -6365,7 +6366,7 @@ and its gold is paid in the browser.</p>
 </article><article><p><a id="get"></a></p>
 <h3>GET /api/rankings</h3>
 <p>Source: <a href="../../src/app/api/rankings/route.ts"><code>src/app/api/rankings/route.ts:18</code></a></p>
-<p>The Rankings: <code>GET /api/rankings?board=level|rebirths|crafting|tiles</code>. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
+<p>The Rankings: <code>GET /api/rankings?board=level|rebirths|crafting|tiles|kills</code>. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
 asking player&#39;s own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (<code>refresh_rankings()</code>, a single
 SQL call, so no scheduled job is needed); the cosmetics are read live. The <code>quests</code> and <code>deeds</code> boards are not built and are a 400.</p>
 </article><h2>Away time</h2><article><p><a id="computeofflinegrant"></a></p>

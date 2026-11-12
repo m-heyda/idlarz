@@ -542,7 +542,7 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### The boards
 
-Source: [`src/lib/rankings.ts:35`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:39`](../../src/lib/rankings.ts)
 
 The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
 
@@ -552,12 +552,13 @@ Ties are broken in this order:
 - Rebirths: rebirths, then Embers ever earned.
 - Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
 - Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
+- Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
 
 <a id="movement"></a>
 
 ### Movement arrows
 
-Source: [`src/lib/rankings.ts:81`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:86`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 

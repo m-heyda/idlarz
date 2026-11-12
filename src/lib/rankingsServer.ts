@@ -6,6 +6,7 @@ import {
 	buildRankingRows,
 	craftLevelValue,
 	refreshArgs,
+	type LiveBoardId,
 	type RankingBoardAnswer,
 	type RankingBoardId,
 	type RankingEntry,
@@ -15,11 +16,12 @@ import {
 // SERVER ONLY. Reads the ranking tables (`player_rankings`, `ranking_meta`; no player may read them directly) and the profile of each listed player, with the service-role client.
 
 /** What a board orders by: the stored columns of `player_rankings`, and the filter that keeps a player with nothing to show off the board */
-const BOARDS: Readonly<Record<'level' | 'rebirths' | 'crafting' | 'tiles', { rank: string; prev: string; value: string; min: number }>> = {
+const BOARDS: Readonly<Record<LiveBoardId, { rank: string; prev: string; value: string; min: number }>> = {
 	level: { rank: 'rank_level', prev: 'prev_rank_level', value: 'level', min: 0 },
 	rebirths: { rank: 'rank_rebirths', prev: 'prev_rank_rebirths', value: 'rebirths', min: 1 },
 	crafting: { rank: 'rank_crafting', prev: 'prev_rank_crafting', value: 'craft_xp', min: 1 },
-	tiles: { rank: 'rank_tiles', prev: 'prev_rank_tiles', value: 'best_tiles', min: 1 },
+	tiles: { rank: 'rank_tiles', prev: 'prev_rank_tiles, prev_rank_kills', value: 'best_tiles', min: 1 },
+	kills: { rank: 'rank_kills', prev: 'prev_rank_kills', value: 'kills', min: 1 },
 };
 
 type Stored = Record<string, unknown>;
@@ -27,7 +29,7 @@ type Stored = Record<string, unknown>;
 const num = (value: unknown): number =>
 	typeof value === 'number' && Number.isFinite(value) ? value : typeof value === 'string' && Number.isFinite(Number(value)) ? Number(value) : 0;
 
-const toEntry = (board: 'level' | 'rebirths' | 'crafting' | 'tiles', row: Stored): RankingEntry => {
+const toEntry = (board: LiveBoardId, row: Stored): RankingEntry => {
 	const def = BOARDS[board];
 	const raw = num(row[def.value]);
 	return {
@@ -88,18 +90,13 @@ const loadPeople = async (db: SupabaseClient, ids: readonly string[]) => {
 };
 
 const COLUMNS =
-	'user_id, level, xp, rebirths, craft_xp, best_tiles, rank_level, rank_rebirths, rank_crafting, rank_tiles, prev_rank_level, prev_rank_rebirths, prev_rank_crafting, prev_rank_tiles';
+	'user_id, level, xp, rebirths, craft_xp, best_tiles, kills, rank_level, rank_rebirths, rank_crafting, rank_tiles, rank_kills, prev_rank_level, prev_rank_rebirths, prev_rank_crafting, prev_rank_tiles';
 
 /**
  * One board: the first `RANKING_LIMIT` places and, when the asking player is ranked further down, their own place. The cosmetics are read now (not at the last rebuild), so a new colour or avatar shows at once.
  * A failed read throws.
  */
-export const loadBoard = async (
-	db: SupabaseClient,
-	board: 'level' | 'rebirths' | 'crafting' | 'tiles',
-	meId: string | null,
-	nowMs = Date.now(),
-): Promise<RankingBoardAnswer> => {
+export const loadBoard = async (db: SupabaseClient, board: LiveBoardId, meId: string | null, nowMs = Date.now()): Promise<RankingBoardAnswer> => {
 	const refreshedAt = await refreshIfDue(db, nowMs);
 	const def = BOARDS[board];
 	const top = await db

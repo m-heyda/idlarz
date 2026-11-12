@@ -43,9 +43,9 @@ const draw = (answer?: RankingBoardAnswer) => {
 	return renderToStaticMarkup(h(QueryClientProvider, { client }, h(RankingsWindow)));
 };
 
-test('the tabs are Level, Rebirths, Crafting, Tiles, Quests and Deeds, and the first load shows skeleton rows', () => {
+test('the tabs are Level, Rebirths, Crafting, Tiles, Kills, Quests and Deeds, and the first load shows skeleton rows', () => {
 	const html = draw();
-	for (const label of ['Level', 'Rebirths', 'Crafting', 'Tiles', 'Quests', 'Deeds']) assert.ok(html.includes(`>${label}`), label);
+	for (const label of ['Level', 'Rebirths', 'Crafting', 'Tiles', 'Kills', 'Quests', 'Deeds']) assert.ok(html.includes(`>${label}`), label);
 	assert.ok(html.includes('aria-busy="true"'));
 	assert.ok(html.includes('ds-rank-sk-art'));
 });

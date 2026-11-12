@@ -645,7 +645,7 @@ and its gold is paid in the browser.
 
 Source: [`src/app/api/rankings/route.ts:18`](../../src/app/api/rankings/route.ts)
 
-The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
+The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
 asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single
 SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.
 

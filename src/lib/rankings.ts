@@ -8,7 +8,10 @@ import { craftCumulativeXp, craftLevelOf } from '@/lib/crafting';
 // Pure rules of the Rankings (no store, no server): the boards, the 24-hour movement arrows and how a stored row becomes what the window shows. The database side is
 // `refresh_rankings()` (supabase/migrations/player_rankings.sql); the route is /api/rankings.
 
-export type RankingBoardId = 'level' | 'rebirths' | 'crafting' | 'tiles' | 'quests' | 'deeds';
+export type RankingBoardId = 'level' | 'rebirths' | 'crafting' | 'tiles' | 'kills' | 'quests' | 'deeds';
+
+/** The boards that have data */
+export type LiveBoardId = Exclude<RankingBoardId, 'quests' | 'deeds'>;
 
 export interface RankingBoardInfo {
 	id: RankingBoardId;
@@ -28,6 +31,7 @@ export interface RankingBoardInfo {
  * - Rebirths: rebirths, then Embers ever earned.
  * - Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
  * - Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
+ * - Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
  *
  * @category Progression/Rankings
  * @title The boards
@@ -37,14 +41,15 @@ export const RANKING_BOARDS: readonly RankingBoardInfo[] = [
 	{ id: 'rebirths', label: 'Rebirths', valueLabel: 'Rebirths', soon: false },
 	{ id: 'crafting', label: 'Crafting', valueLabel: 'Crafting level', soon: false },
 	{ id: 'tiles', label: 'Tiles', valueLabel: 'Most tiles', soon: false },
+	{ id: 'kills', label: 'Kills', valueLabel: 'Monsters killed', soon: false },
 	{ id: 'quests', label: 'Quests', valueLabel: 'Quests', soon: true },
 	{ id: 'deeds', label: 'Deeds', valueLabel: 'Deed points', soon: true },
 ];
 
 /** The boards that have data, the only ones the route answers */
-export const LIVE_BOARD_IDS: readonly RankingBoardId[] = RANKING_BOARDS.filter((board) => !board.soon).map((board) => board.id);
+export const LIVE_BOARD_IDS: readonly LiveBoardId[] = RANKING_BOARDS.filter((board) => !board.soon).map((board) => board.id as LiveBoardId);
 
-export const isLiveBoard = (value: unknown): value is RankingBoardId => typeof value === 'string' && (LIVE_BOARD_IDS as readonly string[]).includes(value);
+export const isLiveBoard = (value: unknown): value is LiveBoardId => typeof value === 'string' && (LIVE_BOARD_IDS as readonly string[]).includes(value);
 
 /** How many places a board lists (the player's own place is added below it when it is further down) */
 export const RANKING_LIMIT = 50;

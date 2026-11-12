@@ -573,7 +573,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`potionBelt.ts`](../../src/lib/potionBelt.ts) — ~ The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s, -50 %).
 - [`pushLock.ts`](../../src/lib/pushLock.ts) — ~ One upload at a time per browser.
 - [`queryClient.ts`](../../src/lib/queryClient.ts) — ~ The browser's one cache for server reads that several windows share (TanStack Query).
-- [`rankings.ts`](../../src/lib/rankings.ts) — ~ What the number on a row means (the window's column heading)
+- [`rankings.ts`](../../src/lib/rankings.ts) — ~ The boards that have data
 - [`rankingsQuery.ts`](../../src/lib/rankingsQuery.ts) — ~ One board of the Rankings (`GET /api/rankings?board=…`); null on any failure or a body of the wrong shape, so the window shows its error state rather than a half-drawn list.
 - [`rankingsServer.ts`](../../src/lib/rankingsServer.ts) — ~ What a board orders by:
 - [`rateLimit.ts`](../../src/lib/rateLimit.ts) — A small in-memory sliding-window limiter for routes that must not be hammered (password reset requests).
@@ -1035,6 +1035,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
 - [`player_rankings.sql`](../../supabase/migrations/player_rankings.sql)
+- [`player_rankings_kills.sql`](../../supabase/migrations/player_rankings_kills.sql)
+- [`player_rankings_kills_rollback.sql`](../../supabase/migrations/player_rankings_kills_rollback.sql)
 - [`player_rankings_rollback.sql`](../../supabase/migrations/player_rankings_rollback.sql)
 - [`profile_badge_title.sql`](../../supabase/migrations/profile_badge_title.sql)
 - [`profile_badge_title_rollback.sql`](../../supabase/migrations/profile_badge_title_rollback.sql)

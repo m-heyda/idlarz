@@ -304,20 +304,24 @@ create table if not exists public.player_rankings (
   craft_xp             numeric     not null default 0,  -- crafting XP, capped at the XP of the maximum crafting level
   craft_maxed_at       timestamptz,                -- first refresh that saw the maximum crafting level
   best_tiles           integer     not null default 0,
+  kills                bigint      not null default 0,   -- every monster killed: the sum of player_ledger.stats.kills (migration player_rankings_kills)
   rank_level           integer,
   rank_rebirths        integer,
   rank_crafting        integer,
   rank_tiles           integer,
+  rank_kills           integer,
   prev_rank_level      integer,                    -- the rank at the refresh before (null = new on the board)
   prev_rank_rebirths   integer,
   prev_rank_crafting   integer,
   prev_rank_tiles      integer,
+  prev_rank_kills      integer,
   updated_at           timestamptz not null default now()
 );
 create index if not exists player_rankings_rank_level    on public.player_rankings (rank_level);
 create index if not exists player_rankings_rank_rebirths on public.player_rankings (rank_rebirths);
 create index if not exists player_rankings_rank_crafting on public.player_rankings (rank_crafting);
 create index if not exists player_rankings_rank_tiles    on public.player_rankings (rank_tiles);
+create index if not exists player_rankings_rank_kills    on public.player_rankings (rank_kills);
 
 create table if not exists public.ranking_meta (
   id            boolean primary key default true check (id),   -- one row
@@ -350,14 +354,19 @@ begin
    where not exists (select 1 from public.player_stats s where s.user_id = r.user_id and s.trusted);
 
   update public.player_rankings set
-    prev_rank_level = rank_level, prev_rank_rebirths = rank_rebirths, prev_rank_crafting = rank_crafting, prev_rank_tiles = rank_tiles;
+    prev_rank_level = rank_level, prev_rank_rebirths = rank_rebirths, prev_rank_crafting = rank_crafting, prev_rank_tiles = rank_tiles,
+    prev_rank_kills = rank_kills;
 
-  insert into public.player_rankings (user_id, level, xp, level_maxed_at, rebirths, legacy_earned, craft_xp, craft_maxed_at, best_tiles, updated_at)
+  insert into public.player_rankings (user_id, level, xp, level_maxed_at, rebirths, legacy_earned, craft_xp, craft_maxed_at, best_tiles, kills, updated_at)
   select s.user_id, s.level, coalesce(p.xp, 0), case when s.level >= p_level_cap then now() end,
          s.rebirths, s.legacy_earned,
          least(coalesce((l.craft->>'xp')::numeric, 0), p_craft_max_xp),
          case when coalesce((l.craft->>'xp')::numeric, 0) >= p_craft_max_xp then now() end,
-         greatest(s.best_tiles, s.tiles_owned), now()
+         greatest(s.best_tiles, s.tiles_owned),
+         -- every monster killed: the ledger counts them per monster type, so the board adds the types up
+         coalesce((select sum(e.value::numeric) from jsonb_each_text(case when jsonb_typeof(l.stats->'kills') = 'object' then l.stats->'kills' else '{}'::jsonb end) e
+                    where e.value ~ '^[0-9]+$'), 0)::bigint,
+         now()
     from public.player_stats s
     left join public.player_saves p on p.user_id = s.user_id
     left join public.player_ledger l on l.user_id = s.user_id
@@ -367,17 +376,18 @@ begin
     level_maxed_at = case when excluded.level_maxed_at is null then null else coalesce(public.player_rankings.level_maxed_at, excluded.level_maxed_at) end,
     rebirths = excluded.rebirths, legacy_earned = excluded.legacy_earned, craft_xp = excluded.craft_xp,
     craft_maxed_at = case when excluded.craft_maxed_at is null then null else coalesce(public.player_rankings.craft_maxed_at, excluded.craft_maxed_at) end,
-    best_tiles = excluded.best_tiles, updated_at = now();
+    best_tiles = excluded.best_tiles, kills = excluded.kills, updated_at = now();
 
   with r as (
     select user_id,
       rank() over (order by level desc, xp desc, level_maxed_at asc nulls last)  as rl,
       rank() over (order by rebirths desc, legacy_earned desc)                   as rr,
       rank() over (order by craft_xp desc, craft_maxed_at asc nulls last)        as rc,
-      rank() over (order by best_tiles desc)                                     as rt
+      rank() over (order by best_tiles desc)                                     as rt,
+      rank() over (order by kills desc)                                          as rk
     from public.player_rankings
   )
-  update public.player_rankings p set rank_level = r.rl, rank_rebirths = r.rr, rank_crafting = r.rc, rank_tiles = r.rt
+  update public.player_rankings p set rank_level = r.rl, rank_rebirths = r.rr, rank_crafting = r.rc, rank_tiles = r.rt, rank_kills = r.rk
     from r where p.user_id = r.user_id;
 
   insert into public.ranking_meta (id, refreshed_at) values (true, now())

@@ -41,7 +41,7 @@
   "category": "Saves & Server/Endpoints",
   "file": "src/app/api/rankings/route.ts",
   "line": 18,
-  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Only trusted players are ranked, and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
   "see": []
  },
  {
@@ -2764,7 +2764,7 @@
   "kind": "const",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 35,
+  "line": 39,
   "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
   "see": []
  },
@@ -2775,7 +2775,7 @@
   "kind": "function",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 81,
+  "line": 86,
   "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },

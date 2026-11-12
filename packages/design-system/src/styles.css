@@ -747,6 +747,13 @@
 
 .ds-window-bar > :first-child {
 	min-width: 0;
+	flex: 0 1 auto;
+}
+
+/* the bar and the head are flex items too: without min-width 0 they grow with the tabs and the scroll above never starts */
+.ds-window-bar,
+.ds-window-head {
+	min-width: 0;
 }
 
 .ds-tab::after {
