@@ -361,7 +361,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						<span style={flip && !dead ? { display: 'block', transform: 'scaleX(-1)' } : undefined}>
 							{dead ? (
 								// eslint-disable-next-line @next/next/no-img-element
-								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={48 * 3} height={40 * 3} />
+								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={64 * 2} height={64 * 2} />
 							) : (
 								art
 							)}

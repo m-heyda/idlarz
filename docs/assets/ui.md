@@ -65,7 +65,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `fx_dead` | <img src="../../public/fx/dead.png" width="96" alt="fx_dead"> | 48x40 | used |  | `fx/dead.png` |
+| `fx_dead` | <img src="../../public/fx/dead.png" width="96" alt="fx_dead"> | 64x64 | used |  | `fx/dead.png` |
 | `fx_slash_fire` | <img src="../../public/fx/slash/fire.png" width="96" alt="fx_slash_fire"> | 2880x180 | used |  | `fx/slash/fire.png` |
 | `fx_slash_lightning` | <img src="../../public/fx/slash/lightning.png" width="96" alt="fx_slash_lightning"> | 2880x180 | used |  | `fx/slash/lightning.png` |
 | `fx_slash_poison` | <img src="../../public/fx/slash/poison.png" width="96" alt="fx_slash_poison"> | 5760x180 | used |  | `fx/slash/poison.png` |
