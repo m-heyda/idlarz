@@ -13,7 +13,6 @@ import { useUiStore } from '@/stores/uiStore';
 import { useViewStore } from '@/stores/viewStore';
 import { useWindowStore } from '@/stores/windowStore';
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
-import { PlayerCard } from '../HeaderMenu';
 import PixelIcon from '../PixelIcon';
 
 const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
@@ -112,14 +111,11 @@ const CastleTimer: React.FC = () => {
 };
 
 /**
- * The top bar of the game screen drawn with the design system: the hero's portrait (level, unspent points, opens the character screen), the resource trays, and on the right the castle timer, the Gem shop,
- * Deeds and the game menu (settings, save, export). Everything the old header did is here; the windows themselves sit in the dock.
+ * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the castle timer, Deeds and the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
  */
 const HudTopBar: React.FC = () => {
 	const order = useWindowStore((state) => state.order);
 	const toggleWindow = useWindowStore((state) => state.toggleWindow);
-	const gemShopOpen = useUiStore((state) => state.gemShopOpen);
-	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
 
 	return (
@@ -127,7 +123,6 @@ const HudTopBar: React.FC = () => {
 			right={
 				<>
 					<CastleTimer />
-					<GlyphButton glyph='◆' label='Gem shop' active={gemShopOpen} aria-pressed={gemShopOpen} onClick={toggleGemShop} />
 					{guideLive() && (
 						<GlyphButton
 							glyph='★'
@@ -153,7 +148,6 @@ const HudTopBar: React.FC = () => {
 				</>
 			}
 		>
-			<PlayerCard />
 			<span data-tutorial='top-resources' style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
 				<ResourceTrays />
 			</span>

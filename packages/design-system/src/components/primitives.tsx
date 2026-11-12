@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { gemStates, type Point, type Rarity, type Size } from '../logic';
+import { dockMagnification, gemStates, type Point, type Rarity, type Size } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -196,14 +196,17 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 };
 
 /**
- * A stone menu icon with a caption (the dock). `active` marks an open window, `disabled` dims it (not available yet); the badge is the count of things waiting. Any other button attribute
+ * A stone menu icon with a caption (the dock). `art` draws any node (a portrait) in place of the picture. `active` marks an open window, `disabled` dims it (not available yet); the badge is the count of things waiting. Any other button attribute
  * (a tutorial anchor, aria-label) goes to the button.
  */
 export const IconButton: React.FC<
-	{ icon: string; label: string; badge?: number; small?: boolean; active?: boolean } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>
-> = ({ icon, label, badge, small, active, className, ...rest }) => (
+	{ icon: string; label: string; badge?: number; small?: boolean; active?: boolean; art?: React.ReactNode } & Omit<
+		React.ButtonHTMLAttributes<HTMLButtonElement>,
+		'children'
+	>
+> = ({ icon, label, badge, small, active, art, className, ...rest }) => (
 	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm', className)} data-active={active ? 'true' : undefined} {...rest}>
-		<img src={icon} alt='' />
+		{art ? <span className='ds-iconbtn-art'>{art}</span> : <img src={icon} alt='' />}
 		{badge ? <Badge count={badge} floating /> : null}
 		<span>{label}</span>
 	</button>
@@ -407,8 +410,24 @@ export const TopBar: React.FC<{ right?: React.ReactNode; children: React.ReactNo
 	</div>
 );
 
-/** The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. */
-export const Dock: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-dock'>{children}</div>;
+/**
+ * The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. The icons swell towards the pointer like a macOS dock: the one under it the most, its neighbours a little
+ * (`--ds-mag` on each button, set from the pointer's distance; `magnify` switches it off).
+ */
+export const Dock: React.FC<{ children: React.ReactNode; magnify?: boolean }> = ({ children, magnify = true }) => {
+	const ref = useRef<HTMLDivElement>(null);
+	const set = (x: number | null) => {
+		ref.current?.querySelectorAll<HTMLElement>('.ds-iconbtn').forEach((el) => {
+			const box = el.getBoundingClientRect();
+			el.style.setProperty('--ds-mag', x === null ? '1' : String(dockMagnification(Math.abs(x - (box.left + box.width / 2)))));
+		});
+	};
+	return (
+		<div ref={ref} className='ds-dock' onPointerMove={magnify ? (e) => set(e.clientX) : undefined} onPointerLeave={magnify ? () => set(null) : undefined}>
+			{children}
+		</div>
+	);
+};
 
 export interface TipBox {
 	left: number;

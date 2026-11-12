@@ -21338,7 +21338,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/HeaderMenu.tsx"
+			"src/components/game/HeaderMenu.tsx",
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_gems_pouch",
 		"category": "ui",

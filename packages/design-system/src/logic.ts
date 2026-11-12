@@ -94,3 +94,12 @@ export const clampAmount = (value: number, max: number): number =>
  * The adapter from the game's rarity id (a string that may be anything a save or a future catalog holds) to a design-system `Rarity`: a known id passes, anything else reads as `common`. Wiring code calls it instead of casting.
  */
 export const toRarity = (id: string | undefined | null): Rarity => ((RARITIES as readonly string[]).includes(id ?? '') ? (id as Rarity) : 'common');
+
+/**
+ * How much a dock icon swells while the pointer is `distance` px from its centre: 1 (normal) far away, `peak` right under the pointer, falling off smoothly over `reach` px, so the neighbours of the hovered icon are lifted a little too.
+ */
+export const dockMagnification = (distance: number, peak = 1.5, reach = 110): number => {
+	if (!Number.isFinite(distance) || distance >= reach) return 1;
+	const t = 1 - Math.max(0, distance) / reach;
+	return 1 + (peak - 1) * (0.5 - 0.5 * Math.cos(Math.PI * t));
+};
