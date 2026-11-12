@@ -3123,6 +3123,16 @@
   "see": []
  },
  {
+  "id": "the-local-sim-runner",
+  "name": "The local sim runner",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/sim-local.ts",
+  "line": 1,
+  "summary": "`npm run sim:local`: the long and advanced sims, on your machine only (IDL-276). It runs the local-only profiles of `scripts/sim.ts` (`hardcore-rebirth6-x20`, `hardcore-rebirth8-x10` and the `max-*` optimisers), one child process per profile on all your cores (at most `--jobs=N`, default the cores minus one, at most 6; each needs about 1 GB), and puts their tables into **`local-sims/sim-local.md`**. That folder is git-ignored: nothing here is committed, read by CI, or compared by the pacing guard, and `docs/generated` is never touched (every child runs with `--no-write`). CI does not run these profiles at all, so a long sim never slows a pull request. A full run takes about three minutes on 8 cores (one seed).",
+  "see": []
+ },
+ {
   "id": "the-parallel-sim-runner",
   "name": "The parallel sim runner",
   "kind": "topic",
@@ -3148,7 +3158,7 @@
   "kind": "topic",
   "category": "Pacing/Targets",
   "file": "scripts/sim.ts",
-  "line": 16,
+  "line": 21,
   "summary": "What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/sim-milestones.md` (`npm run sim`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`. Open balance questions are in `docs/plan/ROADMAP.md`.",
   "see": [
    "MAGNITUDE_BANDS",
@@ -3162,7 +3172,7 @@
   "kind": "const",
   "category": "Pacing/Magnitude targets",
   "file": "scripts/sim.ts",
-  "line": 892,
+  "line": 983,
   "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
   "see": []
  },

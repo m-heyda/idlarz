@@ -691,6 +691,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`restore-trust.ts`](../../scripts/restore-trust.ts)
 - [`seed-rehearsal-account.ts`](../../scripts/seed-rehearsal-account.ts) — ~ Stops the run with a reason made of words only (a database error text could name a row or an address).
 - [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
+- [`sim-local.ts`](../../scripts/sim-local.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
 - [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
 - [`spawnMix.ts`](../../scripts/spawnMix.ts) — What a hero of a given level meets on a castle level 1 map that owns all four biomes: the share of new spawns by the hero's chance to beat them,
@@ -842,6 +843,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
 - [`migrateSaves.test.ts`](../../tests/ops/migrateSaves.test.ts) — The pure part of `npm run migrate-saves` (scripts/migrateSaves.ts), run on the frozen fixtures. No network: the script feeds the same functions with database rows.
 - [`rehearsalSeed.test.ts`](../../tests/ops/rehearsalSeed.test.ts)
+- [`simLocal.test.ts`](../../tests/ops/simLocal.test.ts)
 
 **tests/saves/**
 

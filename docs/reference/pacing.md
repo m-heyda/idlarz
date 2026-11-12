@@ -8,7 +8,7 @@ The pace the economy is tuned for, and the bot simulation that checks it.
 
 - Targets: [Pacing targets](#pacing-targets)
 - Magnitude targets: [`MAGNITUDE_BANDS`](#magnitude-bands)
-- The sim: [The bot simulation](#the-bot-simulation), [The parallel sim runner](#the-parallel-sim-runner), [The class picker acceptance](#the-class-picker-acceptance)
+- The sim: [The bot simulation](#the-bot-simulation), [The parallel sim runner](#the-parallel-sim-runner), [The class picker acceptance](#the-class-picker-acceptance), [The local sim runner](#the-local-sim-runner)
 
 ## Targets
 
@@ -16,7 +16,7 @@ The pace the economy is tuned for, and the bot simulation that checks it.
 
 ### Pacing targets
 
-Source: [`scripts/sim.ts:16`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:21`](../../scripts/sim.ts)
 
 What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/sim-milestones.md` (`npm run sim`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`.
 Open balance questions are in `docs/plan/ROADMAP.md`.
@@ -51,7 +51,7 @@ See also: [`MAGNITUDE_BANDS`](pacing.md#magnitude-bands), [`CASTLE_UPGRADE`](eco
 
 ### `MAGNITUDE_BANDS` <small>const</small>
 
-Source: [`scripts/sim.ts:892`](../../scripts/sim.ts)
+Source: [`scripts/sim.ts:983`](../../scripts/sim.ts)
 
 The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.
 
@@ -84,7 +84,12 @@ The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG an
 a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10`
 (ten runs, used to fit the level anchors). "finished" in the milestone table = castle 6 + best click power + the Rebirth territory.
 
-Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
+**Local-only probes (IDL-276, never on CI).** A profile with `localOnly: true` is not in the default run, `--list`, the CI shards, the merge or `docs/generated`: `hardcore-rebirth6-x20` (twenty rebirths at castle 6), `hardcore-rebirth8-x10` and the
+super-hardcore optimisers `max-r6`, `max-r8`, `max-r10`, `max-r6-then-r8`, `max-r8-then-r10`, `max-ramp` (a hardcore player that also buys the merchant's gold upgrades, spends Embers in a strict order and rebirths at the castle level of a schedule; the last
+run is played on to castle 10). Run them with `npm run sim:local` (all of them, on all cores, `scripts/sim-local.ts`); the result goes to `local-sims/sim-local.md`, which is git-ignored and not read by any CI check. `--max-spend` gives any other
+profile the same spending (`npm run sim:local -- --max-spend human-rebirth6`).
+
+Flags: `--seeds=3` (median and min-max over 3 seeds), `--no-write` (print only), `--maxdays=60` (stop early), `--legacy` (approximate the pre-rebalance game), `--except=a,b` (every profile but the named ones), `--list` (print the profile names), `--list-local` (the local-only ones), `--max-spend` (any profile also buys the merchant's gold upgrades and spends Embers in the optimiser's order; local, writes nothing), `--class=mage` (every profile plays that hero class; the default `none` is the neutral baseline, and a class run writes nothing: `npm run sim:classes` measures all four against it, IDL-78),
 `--dump=file.json` (run the profiles and save the raw results only: a CI shard), `--merge=dir` (run nothing: merge the dumps in dir, every profile exactly once, and write the docs), `--set=SCALING_CONFIG.growthLate=1.25` (try a tweak without editing files).
 
 **Rules for a balance change**: change one parameter group, run `npm run sim -- --seeds=3`, compare with the committed `sim-milestones.md`, keep the targets, then `npm run docs:gen` and commit the diff. The pacing guard (`comparePacing`) compares the
@@ -120,3 +125,21 @@ the committed numbers are measured with) and once with each hero class, all at t
   npm run sim:classes -- human --maxdays=60 other profiles and the other flags of sim.ts go through
 
 The sim bots play the real store, so they carry the XP, tile-discount and fight passives; offline efficiency and chest speed act on the server's grants and tickets, which the sim does not model.
+
+<a id="the-local-sim-runner"></a>
+
+### The local sim runner
+
+Source: [`scripts/sim-local.ts:1`](../../scripts/sim-local.ts)
+
+`npm run sim:local`: the long and advanced sims, on your machine only (IDL-276). It runs the local-only profiles of `scripts/sim.ts` (`hardcore-rebirth6-x20`, `hardcore-rebirth8-x10` and the `max-*` optimisers), one child
+process per profile on all your cores (at most `--jobs=N`, default the cores minus one, at most 6; each needs about 1 GB), and puts their tables into **`local-sims/sim-local.md`**. That folder is git-ignored: nothing here is
+committed, read by CI, or compared by the pacing guard, and `docs/generated` is never touched (every child runs with `--no-write`). CI does not run these profiles at all, so a long sim never slows a pull request. A full run takes about
+three minutes on 8 cores (one seed).
+
+  npm run sim:local                                    every local-only profile
+  npm run sim:local -- max-r10 max-ramp                only the named profiles (any profile name works; the output goes to the same file)
+  npm run sim:local -- --max-spend human-rebirth6      the other flags of sim.ts go to every profile; `--max-spend` gives any profile the optimiser's spending
+  npm run sim:local -- --seeds=3 --jobs=4              more seeds (slower), fewer processes
+
+What the `max-*` profiles are and what they showed: see the `scripts/sim.ts` header. Open them in a spreadsheet or paste the file into a Linear comment; run it again after a balance change to compare.

@@ -36,6 +36,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run lint` | `eslint . --max-warnings=0` |
 | `npm run sim` | `tsx scripts/sim.ts` |
 | `npm run sim:parallel` | `tsx scripts/sim-parallel.ts` |
+| `npm run sim:local` | `tsx scripts/sim-local.ts` |
 | `npm run sim:classes` | `tsx scripts/sim-classes.ts` |
 | `npm run perf` | `tsx scripts/perf-world.ts` |
 | `npm run test` | `tsx --test "tests/**/*.test.ts"` |
