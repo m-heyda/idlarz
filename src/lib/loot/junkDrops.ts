@@ -5,7 +5,7 @@ import type { Drop } from '@/types/game';
 // What a kill drops besides gear and potions: junk materials (IDL-312). Cheap ones are always found and scale with how rich the kill was; pricey ones are rare finds; a boss always drops a stack of the pricey ones.
 
 /** Share of the kill's gold that the cheap junk is worth (placeholder, balance pass): a kill that pays more gold drops more junk, so it follows the monster's level and the player's economy. */
-export const JUNK_GOLD_SHARE = 0.3;
+export const JUNK_GOLD_SHARE = 0.2;
 
 /** Cheap junk, found on every kill, picked by weight. */
 const COMMON: readonly { id: string; weight: number }[] = [
@@ -53,7 +53,7 @@ const valueOf = (id: string): number => JUNK_ITEMS.find((i) => i.id === id)?.sel
  * @category Loot/Junk
  * @order 3
  * @formula
- * cheap qty   = max(1, round(gold x 0.3 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
+ * cheap qty   = max(1, round(gold x 0.2 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
  * rare chance = base x (1 + 0.005 x Luck)
  * boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
  */
