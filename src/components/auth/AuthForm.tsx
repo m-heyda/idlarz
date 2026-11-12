@@ -5,6 +5,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
 import { login, register, requestPasswordReset, saveProfile, type AuthResult, type Profile } from '@/lib/authClient';
 import HeroCreator from './HeroCreator';
 import { creatorAvatar } from '@/catalog/avatars';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 
 export type AuthMode = 'login' | 'register' | 'profile' | 'forgot';
 
@@ -90,7 +91,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 				<>
 					<input
 						type='email'
-						className='px-input'
+						className='ds-field'
 						placeholder='Email'
 						autoComplete='email'
 						value={email}
@@ -100,7 +101,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 					{needsPassword && (
 						<input
 							type='password'
-							className='px-input'
+							className='ds-field'
 							placeholder={mode === 'register' ? 'Password (8+ characters)' : 'Password'}
 							autoComplete={mode === 'register' ? 'new-password' : 'current-password'}
 							value={password}
@@ -138,7 +139,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 			)}
 
 			<div className='flex justify-center'>
-				<button type='submit' className='px-btn' disabled={!ready || busy}>
+				<Button type='submit' tone='gold' disabled={!ready || busy}>
 					{busy
 						? 'One moment...'
 						: mode === 'forgot'
@@ -148,7 +149,7 @@ const AuthForm: React.FC<AuthFormProps> = ({ initialMode, onSignedIn, onUnavaila
 								: mode === 'register'
 									? 'Register and play'
 									: 'Save and play'}
-				</button>
+				</Button>
 			</div>
 
 			{mode === 'login' && (

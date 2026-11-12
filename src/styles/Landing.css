@@ -1,177 +1,130 @@
-/* Landing page (`/`): a baked map of the world behind everything (IDLE written in hills), the REALM stamp and crown, two windows (changelog | account) and a row of feature cards. */
+/* Landing page (`/`): the realm picture fills the screen and slowly zooms in and out; two design-system frames stand on it, the changelog (parchment) on the left and the account window on the right. */
 
 .ld-root {
 	position: relative;
-	min-height: 100vh;
+	height: 100vh;
+	min-height: 620px;
 	overflow: hidden;
-	color: var(--px-parch);
-	background: #1f78b8; /* the sea, in case the map is still loading */
+	color: var(--ds-text, #e9e4d6);
+	background: #1f78b8; /* the sea, in case the picture is still loading */
 }
 
-/* the map is wider and taller than most screens and drifts up and down by 75px (the picture is shown at 0.75 of its size); the title block is part of it, so the stamp stays under the letters */
-.ld-mapwrap {
+/* the picture: static, with a slow zoom from 100% to 108% and back (10 s each way, on repeat) */
+.ld-bg {
 	position: absolute;
-	left: 50%;
-	top: 0;
-	width: 0;
-	height: 0;
-	transform: scale(var(--ld-zoom, 1)); /* the whole page is scaled to fit the screen (LandingPage sets --ld-zoom) */
-	transform-origin: 0 0;
-}
-
-.ld-map {
-	position: absolute;
-	top: -75px;
-	left: 0;
+	inset: 0;
+	background-position: center;
+	background-size: cover;
 	background-repeat: no-repeat;
-	background-size: 100% 100%;
 	image-rendering: pixelated;
-	animation: ld-drift 26s ease-in-out infinite alternate;
+	transform-origin: center;
+	animation: ld-zoom 10s ease-in-out infinite alternate;
 }
 
-@keyframes ld-drift {
+@keyframes ld-zoom {
 	from {
-		transform: translateY(0);
+		transform: scale(1);
 	}
 	to {
-		transform: translateY(75px);
+		transform: scale(1.08);
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ld-map {
+	.ld-bg {
 		animation: none;
-		transform: translateY(38px);
 	}
 }
 
-/* in the scaled page (not in the drifting map): the letters end at about y = 395 when the map rests, and the crown and stamp overlap their lower edge */
-.ld-title {
+/* a soft dark edge so the frames and the picture sit together */
+.ld-shade {
 	position: absolute;
-	left: -650px;
-	width: 1300px;
-	top: 243px;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
+	inset: 0;
+	background: radial-gradient(ellipse at 50% 40%, rgba(0, 0, 0, 0) 45%, rgba(4, 6, 12, 0.55) 100%), linear-gradient(rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.28));
+	pointer-events: none;
 }
 
-.ld-title h1 {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.ld-crown {
+/* two columns the full height of the screen, the picture (and its logo) between them */
+.ld-layout {
 	position: relative;
 	z-index: 1;
-	margin-bottom: 10px;
-	filter: drop-shadow(3px 0 0 #0a0605) drop-shadow(-3px 0 0 #0a0605) drop-shadow(0 3px 0 #0a0605) drop-shadow(0 -3px 0 #0a0605)
-		drop-shadow(0 8px 4px rgba(0, 0, 0, 0.5));
+	display: flex;
+	justify-content: space-between;
+	gap: 24px;
+	height: 100%;
+	padding: 28px 32px 56px;
 }
 
-/* REALM as a stamp: a bronze plate with a double border, slightly crooked */
-.ld-stamp {
-	display: block;
-	padding: 6px 26px 6px 40px;
-	font-family: var(--font-pixel);
-	font-weight: 900;
-	font-size: 3.2rem;
-	letter-spacing: 0.5em;
-	line-height: 1.1;
-	color: var(--px-gold);
-	text-shadow: 0 3px 0 #0a0605;
-	background: linear-gradient(rgba(10, 7, 5, 0.9), rgba(10, 7, 5, 0.9)), url('/pixel/bg/crack.png');
-	border: 4px solid #c08a30;
-	outline: 4px solid #0a0605;
-	outline-offset: 0;
-	box-shadow:
-		inset 0 0 0 3px #0a0605,
-		0 10px 24px rgba(0, 0, 0, 0.55);
-	transform: rotate(-2deg);
-}
-
-.ld-tagline {
-	margin-top: 18px;
-	padding: 4px 16px;
-	background: rgba(10, 7, 5, 0.92);
-	border: 3px solid #c08a30;
-	font-size: 1.1rem;
-	color: #fff6dc;
-	text-shadow:
-		0 2px 0 #0a0605,
-		0 0 8px #0a0605;
-}
-
-/* --- content: starts under the title --- */
-.ld-content {
+.ld-col {
 	position: relative;
 	display: flex;
-	flex-direction: column;
-	gap: 28px;
-	padding: 462px 24px 20px;
-	zoom: var(--ld-zoom, 1);
-	min-height: calc(100vh / var(--ld-zoom, 1));
+	min-height: 0;
 }
 
-.ld-columns {
-	display: grid;
-	grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-	gap: 40px;
+.ld-col-log {
+	width: min(470px, 34vw);
+	min-width: 340px;
+}
+
+.ld-col-account {
+	width: min(370px, 27vw);
+	min-width: 320px;
+}
+
+.ld-frame {
+	flex: 1;
+	min-height: 0;
 	width: 100%;
-	max-width: 1060px;
-	margin: 0 auto;
-	align-items: stretch;
 }
 
-.ld-window {
+.ld-frame > .ds-frame-body {
 	display: flex;
 	flex-direction: column;
-	width: 100%;
-	max-width: none;
-	animation: none;
-	overflow: visible; /* the monsters sit on the frame */
+	flex: 1;
+	min-height: 0;
+	padding: 6px 8px 8px;
 }
 
+.ld-head {
+	margin-bottom: 12px;
+}
+
+/* the monsters sit on the edge of the frames */
 .ld-critter {
 	position: absolute;
-	z-index: 2;
+	z-index: 3;
 	pointer-events: none;
 	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.45));
 }
 
 .ld-critter-tl {
-	top: -44px;
-	left: -6px;
+	top: -34px;
+	left: 4px;
 }
 
 .ld-critter-bl {
-	bottom: -22px;
-	left: -22px;
+	bottom: -18px;
+	left: -16px;
 	transform: scaleX(-1);
 }
 
 .ld-critter-tr {
-	top: -46px;
-	right: 8px;
-}
-
-.ld-critter-top {
 	top: -36px;
-	right: 8px;
+	right: 12px;
 }
 
-/* --- changelog: a fixed-height scroll area (the window never grows with the notes), one collapsible row per version --- */
-.ld-log {
+/* --- changelog: parchment, one collapsible row per version, the sheet fills the frame --- */
+.ld-paper {
 	flex: 1;
-	height: 250px;
-	max-height: 250px;
+	min-height: 0;
 	overflow-y: auto;
 	overscroll-behavior: contain;
+	padding: 12px 14px;
+	color: var(--ds-parch-ink, #4a3516);
 }
 
 .ld-log-entry + .ld-log-entry {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 .ld-log-head {
@@ -179,30 +132,34 @@
 	align-items: baseline;
 	gap: 8px;
 	width: 100%;
-	padding: 6px 8px;
+	padding: 8px 6px;
 	font-family: inherit;
 	text-align: left;
 	color: inherit;
-	background: rgba(10, 7, 6, 0.6);
-	border-bottom: 3px solid #3a2810;
+	background: rgba(106, 63, 0, 0.08);
+	border-bottom: 2px solid #a9894f;
 	cursor: pointer;
 }
 
+.ld-log-head:hover {
+	background: rgba(106, 63, 0, 0.14);
+}
+
 .ld-log-head[aria-expanded='true'] {
-	border-bottom-color: #c08a30;
+	border-bottom-color: #6a3f00;
 }
 
 .ld-log-head:focus-visible {
-	outline: 2px solid var(--px-gold);
+	outline: 2px solid #6a3f00;
 	outline-offset: 1px;
 }
 
 .ld-log-caret {
-	color: #a89878;
+	color: #8a6a30;
 }
 
 .ld-log-version {
-	color: var(--px-gold);
+	color: #6a3f00;
 	font-weight: 700;
 }
 
@@ -216,14 +173,14 @@
 
 .ld-log-date {
 	font-size: 0.75rem;
-	color: #a89878;
+	color: #8a6a30;
 }
 
 .ld-log-body {
-	padding: 6px 8px 2px 26px;
-	font-size: 0.9rem;
-	line-height: 1.4;
-	color: #d8ccaa;
+	padding: 8px 8px 4px 24px;
+	font-size: 0.92rem;
+	line-height: 1.45;
+	color: #3a2a10;
 }
 
 .ld-log-body[hidden] {
@@ -233,7 +190,7 @@
 .ld-log-body p + p,
 .ld-log-body p + ul,
 .ld-log-body ul + p {
-	margin-top: 6px;
+	margin-top: 8px;
 }
 
 .ld-log-body ul {
@@ -241,43 +198,61 @@
 	list-style: square;
 }
 
+.ld-log-body li + li {
+	margin-top: 4px;
+}
+
 .ld-log-body strong {
-	color: var(--px-gold);
+	color: #6a3f00;
 }
 
 /* --- account --- */
-.ld-tabs {
-	display: flex;
-	gap: 8px;
-	margin-bottom: 12px;
-}
-
-.ld-tab {
+.ld-account-body {
 	flex: 1;
-	padding: 6px 8px;
-	font-family: inherit;
-	color: #a89878;
-	background: rgba(10, 7, 6, 0.6);
-	border-bottom: 3px solid #3a2810;
-	cursor: pointer;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 4px 8px 8px;
 }
 
-.ld-tab[aria-selected='true'] {
-	color: var(--px-gold);
-	border-bottom-color: #c08a30;
+.ld-form {
+	margin-top: 14px;
+}
+
+.ld-field,
+.ds-field {
+	box-sizing: border-box;
+	width: 100%;
+	height: 38px;
+	padding: 0 12px;
+	font-family: inherit;
+	font-size: 0.95rem;
+	color: var(--ds-text, #e9e4d6);
+	background: #07080d;
+	border: 1px solid #4a3a26;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.ds-field::placeholder {
+	color: #7a7f90;
+}
+
+.ds-field:focus {
+	outline: none;
+	border-color: var(--ds-gold, #e0a93a);
+	box-shadow: 0 0 0 1px var(--ds-gold, #e0a93a);
 }
 
 .ld-link {
 	align-self: center;
-	font-size: 0.75rem;
-	color: #a89878;
+	font-size: 0.78rem;
+	color: #9aa4bd;
 	text-decoration: underline;
 	cursor: pointer;
 }
 
 .ld-hint {
-	font-size: 0.75rem;
-	color: #a89878;
+	font-size: 0.78rem;
+	color: #9aa4bd;
 	text-align: center;
 }
 
@@ -285,7 +260,8 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 8px;
+	gap: 10px;
+	padding-top: 6px;
 	text-align: center;
 }
 
@@ -293,93 +269,64 @@
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	/* no frame of its own: the portrait image already carries its gold border */
 }
 
 .ld-continue-name {
-	font-size: 1.4rem;
-	font-weight: 700;
-	color: var(--px-gold);
+	font-size: 1.5rem;
+	color: var(--ds-gold-lt, #f4d57e);
 }
 
 .ld-away {
-	max-width: 300px;
+	max-width: 320px;
 	margin-top: 4px;
 }
 
 .ld-continue-class,
 .ld-continue-stats {
 	font-size: 0.95rem;
-	color: #d8ccaa;
+	color: #b9bdc9;
+}
+
+.ld-continue-class {
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	font-size: 0.8rem;
 }
 
 .ld-continue-go {
-	margin-top: 6px;
-	min-width: 200px;
+	margin-top: 10px;
+	min-width: 240px;
+	min-height: 48px;
+	font-size: 1rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
 	text-align: center;
+	text-decoration: none;
 }
 
-/* --- features: one row of five, each card a small box with its monster on the top edge --- */
-.ld-features {
-	display: grid;
-	grid-template-columns: repeat(5, minmax(0, 1fr));
-	gap: 34px 18px;
-	width: 100%;
-	max-width: 1200px;
-	margin: 14px auto 0;
-	list-style: none;
-}
-
-.ld-card {
-	position: relative;
+.ld-links {
 	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	padding: 14px 16px 16px;
-	border: 4px solid transparent;
-	border-image: url('/pixel/ui/frame_panel.png') 4 / 4px round;
-	image-rendering: pixelated;
-	background: rgba(10, 7, 5, 0.9);
-}
-
-.ld-card-head {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	min-height: 52px;
-	padding-right: 36px; /* room for the monster on the edge */
-}
-
-.ld-card-art {
-	width: 48px;
-	height: 48px;
-	image-rendering: pixelated;
-}
-
-.ld-card-icon {
-	display: flex;
-	flex: none;
-	align-items: center;
+	gap: 16px;
 	justify-content: center;
-	width: 48px;
-	height: 52px;
 }
 
-.ld-card-title {
-	color: var(--px-gold);
-	font-weight: 700;
-	line-height: 1.15;
-}
-
-.ld-card-text {
-	font-size: 0.82rem;
-	line-height: 1.35;
-	color: #d8ccaa;
-}
-
-/* the account window keeps one height while it looks for a session and when the login form or the hero card arrives */
-.ld-account .px-modal-body {
-	min-height: 330px;
+/* the line at the bottom of the screen */
+.ld-tagline {
+	position: absolute;
+	left: 50%;
+	bottom: 16px;
+	z-index: 1;
+	transform: translateX(-50%);
+	max-width: 90vw;
+	padding: 6px 18px;
+	font-size: 0.95rem;
+	letter-spacing: 0.04em;
+	text-align: center;
+	color: #fff6dc;
+	text-shadow: 0 2px 0 #0a0605;
+	background: rgba(10, 12, 18, 0.82);
+	border: 1px solid #8a5f16;
+	box-shadow: 0 0 0 1px #05060a;
 }
 
 /* the loading state: a ring of eight gold pixels whose brightness chases round in steps (pixel-art spinner), with a line of text under it */
@@ -408,7 +355,7 @@
 
 .ld-skel-text {
 	font-size: 0.9rem;
-	color: #d8ccaa;
+	color: #b9bdc9;
 	letter-spacing: 0.04em;
 }
 
@@ -428,15 +375,40 @@
 	}
 }
 
-.ld-links {
-	display: flex;
-	gap: 16px;
-	justify-content: center;
-}
-
 @media (prefers-reduced-motion: reduce) {
 	.ld-spinner rect {
 		animation: none;
 		opacity: 0.6;
+	}
+}
+
+/* a narrow screen: the frames stack and the page scrolls */
+@media (max-width: 900px) {
+	.ld-root {
+		height: auto;
+		min-height: 100vh;
+		overflow: visible;
+	}
+
+	.ld-bg,
+	.ld-shade {
+		position: fixed;
+	}
+
+	.ld-layout {
+		flex-direction: column;
+		align-items: center;
+		height: auto;
+		padding-bottom: 96px;
+	}
+
+	.ld-col-log,
+	.ld-col-account {
+		width: min(520px, 100%);
+		min-width: 0;
+	}
+
+	.ld-col-log {
+		height: 420px;
 	}
 }

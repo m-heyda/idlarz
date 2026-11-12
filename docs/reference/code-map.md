@@ -143,7 +143,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/app/**
 
-- [`page.tsx`](../../src/app/page.tsx) — ~ Sets the page scale before the first paint (the same formula as `fitZoom`), so the layout does not jump when the page wakes up.
+- [`page.tsx`](../../src/app/page.tsx) — ~ The public landing page (`/`):
 
 **src/app/play/**
 
@@ -372,7 +372,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/config/**
 
-- [`landing.ts`](../../src/config/landing.ts) — The words and art on the landing page (`/`): the five feature cards and the monsters that sit on the edges of the boxes. Pure config; the page (components/landing) only lays them out.
+- [`landing.ts`](../../src/config/landing.ts) — The picture behind the landing page (`/`). Pure config; the page (components/landing) only lays it out.
 - [`limits.ts`](../../src/config/limits.ts) — Bounds and caps that later upgrades and the rebirth system are meant to raise (more bag room, longer monster growth, a bigger
 - [`merchant.ts`](../../src/config/merchant.ts) — The merchant: resource prices, upgrades, shop goods.
 - [`monsterArtSize.ts`](../../src/config/monsterArtSize.ts) — How big a roster monster's picture is drawn on the map, in px (a tile is TILE_SIZE = 48 wide).
