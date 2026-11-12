@@ -82,6 +82,7 @@ import { useCloudSync } from '@/hooks/useCloudSync';
 import { useOfflineClaim } from '@/hooks/useOfflineClaim';
 import { useSpawnSync } from '@/hooks/useSpawnSync';
 import OfflineDialog from '@/components/game/overlays/OfflineDialog';
+import DailyBonusDialog from '@/components/game/overlays/DailyBonusDialog';
 import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
 
 interface GameAppProps {
@@ -198,6 +199,8 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<RebirthDialog />
 			<GemShopDialog />
 			<OfflineDialog />
+			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
+			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<TutorialDialog />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
