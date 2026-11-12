@@ -26,6 +26,7 @@ import audioManager from '@/utils/audioManager';
 import { formatCompact, formatNumber, formatPercent, formatRate } from '@/utils/formatters';
 import { getStatDescriptionGroups } from '@/utils/game/character';
 import { calculateResourceBreakdown, type ResourceBreakdownEntry } from '@/utils/game/income';
+import RebirthsPanel from '../overlays/RebirthsPanel';
 import { emberIncomeBonus } from '@/utils/game/rebirth';
 import { countOwnedTiles } from '@/utils/game/tiles';
 
@@ -325,6 +326,14 @@ const HeroStats: React.FC = () => {
 						);
 					})}
 				</Block>
+
+				{prestige.rebirths >= 1 && (
+					<Block id='rebirth-history' title='Rebirths' defaultOpen={false}>
+						<div className='ds-paper-dark'>
+							<RebirthsPanel />
+						</div>
+					</Block>
+				)}
 			</div>
 		</Panel>
 	);

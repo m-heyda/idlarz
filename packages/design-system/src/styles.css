@@ -3837,3 +3837,11 @@ button.ds-income-head:hover {
 .ds-craft-top .ds-xp {
 	flex: 1;
 }
+
+/* a dark box on the paper for content written for the dark panels (the rebirth run history) */
+.ds-paper-dark {
+	padding: 10px 12px;
+	color: var(--ds-text);
+	background: #0b0d14;
+	border: 1px solid #3a2c1c;
+}
