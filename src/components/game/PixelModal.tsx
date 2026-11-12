@@ -7,6 +7,25 @@ const openModals: symbol[] = [];
 /** True while a real modal (a confirmation, settings ...) is open: Esc belongs to it before it belongs to a window */
 export const hasOpenModal = (): boolean => openModals.length > 0;
 
+/** Registers a modal while it is mounted and closes it on Esc when it is the top one (every modal shell uses this, the old PixelModal and the design-system `GameModal`). */
+export const useModalRegistry = (onClose: () => void): void => {
+	const id = useRef(Symbol('modal')).current;
+	useEffect(() => {
+		openModals.push(id);
+		return () => {
+			const at = openModals.indexOf(id);
+			if (at >= 0) openModals.splice(at, 1);
+		};
+	}, [id]);
+	useEffect(() => {
+		const onKey = (e: KeyboardEvent) => {
+			if (e.key === 'Escape' && openModals[openModals.length - 1] === id) onClose();
+		};
+		window.addEventListener('keydown', onKey);
+		return () => window.removeEventListener('keydown', onKey);
+	}, [onClose, id]);
+};
+
 interface PixelModalProps {
 	title: React.ReactNode;
 	icon?: React.ReactNode;

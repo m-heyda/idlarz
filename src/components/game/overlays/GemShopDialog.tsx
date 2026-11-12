@@ -5,7 +5,8 @@ import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import GemIcon from '../GemIcon';
 import DailyBoard from '../DailyBoard';
 
@@ -84,36 +85,23 @@ const GemShopDialog: React.FC = () => {
 	const current = TABS.find((entry) => entry.id === tab) ?? TABS[0];
 
 	return (
-		<PixelModal title='Gem shop' icon={<GemIcon />} size='md' onClose={close}>
+		<GameModal title='Gem shop' icon={<GemIcon />} size='md' onClose={close}>
 			<div className='flex flex-col gap-4 px-1 pb-1'>
 				<div className='flex items-center justify-between gap-3'>
 					<div className='text-sm text-[#a89878]'>
 						Hero: <span className='text-[#f1e6c8]'>{playerName}</span>
 					</div>
-					<div className='flex items-center gap-1.5 px-2 py-1 border border-[#4a3a26] bg-[#1a140c] text-[#f1e6c8] font-semibold' title='Your gems'>
+					<div className='ds-chip' title='Your gems'>
 						<GemIcon /> <span data-testid='gem-balance'>{formatNumber(balance)}</span>
 					</div>
 				</div>
 
 				<DailyBoard daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />
 
-				<div role='tablist' className='flex gap-2'>
-					{TABS.map((entry) => (
-						<button
-							key={entry.id}
-							role='tab'
-							aria-selected={tab === entry.id}
-							className='px-tab'
-							data-active={tab === entry.id}
-							onClick={() => setTab(entry.id)}
-						>
-							{entry.label}
-						</button>
-					))}
-				</div>
+				<Tabs active={tab} onChange={(id) => setTab(id as GemShopTab)} items={TABS.map((entry) => ({ id: entry.id, label: entry.label }))} />
 
 				{items.length === 0 && (
-					<div className='px-3 py-4 border border-[#4a3a26] bg-[#1a140c] text-center flex flex-col gap-2' data-testid='gem-soon'>
+					<div className='ds-listrow' style={{ textAlign: 'center' }} data-testid='gem-soon'>
 						<div className='text-[#ecdcb4]'>{current.empty}</div>
 						<ul className='text-xs text-[#a89878] flex flex-col gap-1'>
 							{current.soon.map((line) => (
@@ -130,7 +118,7 @@ const GemShopDialog: React.FC = () => {
 							const needsConfirm = price > GEM_CONFIRM_ABOVE;
 							const asking = confirm === item.id;
 							return (
-								<li key={item.id} className='flex flex-col gap-2 px-3 py-2 border border-[#4a3a26] bg-[#2a2012] text-[#ecdcb4]'>
+								<li key={item.id} className='ds-listrow'>
 									<div className='flex items-center justify-between gap-3'>
 										<div className='min-w-0 flex-1'>
 											<div className='font-semibold'>{item.name}</div>
@@ -141,8 +129,7 @@ const GemShopDialog: React.FC = () => {
 												{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
 											</span>
 											{item.id === 'class_change' ? (
-												<button
-													className='px-btn'
+												<Button
 													disabled={busy || blocked !== null}
 													onClick={() => {
 														close();
@@ -150,35 +137,32 @@ const GemShopDialog: React.FC = () => {
 													}}
 												>
 													Choose
-												</button>
+												</Button>
 											) : item.id === 'name_change' ? null : (
-												<button
-													className='px-btn px-btn-gold'
+												<Button
+													tone='gold'
 													disabled={busy || blocked !== null}
 													onClick={() => (needsConfirm && !asking ? setConfirm(item.id) : void buy(item))}
 												>
 													{asking ? 'Confirm' : 'Buy'}
-												</button>
+												</Button>
 											)}
 										</div>
 									</div>
 									{item.id === 'name_change' && (
 										<div className='flex items-center gap-2'>
 											<input
-												className='px-input flex-1'
+												className='ds-amount-field'
+												style={{ flex: 1, width: 'auto' }}
 												placeholder='New name'
 												maxLength={CHARACTER_NAME_MAX}
 												value={name}
 												onChange={(event) => setName(event.target.value)}
 												aria-label='New hero name'
 											/>
-											<button
-												className='px-btn px-btn-gold'
-												disabled={busy || blocked !== null || name.trim() === ''}
-												onClick={() => void buy(item, name.trim())}
-											>
+											<Button tone='gold' disabled={busy || blocked !== null || name.trim() === ''} onClick={() => void buy(item, name.trim())}>
 												Buy
-											</button>
+											</Button>
 										</div>
 									)}
 									{blocked && <div className='text-xs text-[#d98a6a]'>{blocked}</div>}
@@ -194,7 +178,7 @@ const GemShopDialog: React.FC = () => {
 					</p>
 				)}
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

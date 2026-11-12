@@ -4002,7 +4002,35 @@ button.ds-income-head:hover {
 	height: 10px;
 }
 
-/* a flush window body (the farm scene) is the positioning parent of what fills it */
+/* a flush window body (the farm scene) is the positioning parent of what fills it, and starts under a compact header row so the title never lies over the picture */
 .ds-window-body[data-flush='true'] {
 	position: relative;
+	margin: 30px 6px 6px;
+}
+
+/* ===== MVP refresh of the Gem shop and the Deeds list: rows on the dark inset, the same look as the new windows ===== */
+.ds-listrow {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px 12px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid var(--ds-line-dk, #2a2118);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+	color: var(--ds-text, #e9e4d6);
+}
+
+.ds-listrow-line {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ds-listrow[data-dim='true'] {
+	color: #7a7f90;
+}
+
+.ds-listrow[data-dim='true'] img {
+	opacity: 0.5;
 }

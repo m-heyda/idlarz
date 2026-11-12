@@ -4,8 +4,6 @@ import { useWindowStore } from '@/stores/windowStore';
 import audioManager from '@/utils/audioManager';
 import '@idlarz/design-system';
 import GameWindow from '../GameWindow';
-import PixelWindow from '../PixelWindow';
-import PixelIcon from '../PixelIcon';
 import CastleUpgradeDialog from '../CastleUpgradeDialog';
 import HeroWindow from '../hero/HeroWindow';
 import MerchantWindow from '../merchant/MerchantWindow';
@@ -43,17 +41,17 @@ const GameWindows: React.FC = () => {
 			)}
 			{open.includes('farm') && (
 				<WindowErrorBoundary name='Farm'>
-					<GameWindow id='farm' title='Farm' icon={<PixelIcon name='menu_farm' alt='' />} width={1120} height={760} flush>
+					<GameWindow id='farm' title='Farm' width={1120} height={760} flush>
 						<FarmOverlay />
 					</GameWindow>
 				</WindowErrorBoundary>
 			)}
 			{open.includes('achievements') && (
-				<PixelWindow id='achievements' title='Achievements' icon={<PixelIcon name='menu_achievements' alt='' scale={0.5} />} width={560} height={620}>
-					<WindowErrorBoundary name='Achievements'>
+				<WindowErrorBoundary name='Deeds'>
+					<GameWindow id='achievements' title='Deeds' width={620} height={640}>
 						<AchievementsOverlay />
-					</WindowErrorBoundary>
-				</PixelWindow>
+					</GameWindow>
+				</WindowErrorBoundary>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}
 		</>
