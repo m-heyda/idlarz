@@ -26,7 +26,8 @@ import { getTile } from '@/utils/world';
 import audioManager from '@/utils/audioManager';
 import type { Resources } from '@/types/game';
 import CostList from '../CostList';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button, DiamondLevel } from '../../../../packages/design-system/src/components/primitives';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/BuildModal.css';
 
@@ -96,7 +97,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	};
 
 	return (
-		<PixelModal title={def.label} size='md' onClose={close}>
+		<GameModal title={def.label} size='md' onClose={close}>
 			<div className='flex flex-col gap-4 px-1 pb-1'>
 				<div className='flex gap-4 items-start'>
 					<span className='build-art shrink-0' style={{ width: 96, height: 96 }}>
@@ -111,11 +112,15 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<div className='text-[#f0d27a] text-lg'>
 							Level {level} <span className='text-[#a89878] text-sm'>of {top}</span>
 						</div>
+						{/* the level as gems, one per level the building can reach */}
+						<div title={`Level ${level} of ${top}`}>
+							<DiamondLevel level={level} max={top} />
+						</div>
 						<p className='text-sm italic text-[#c8b898]'>{BUILDING_LORE[def.id] ?? def.blurb}</p>
 					</div>
 				</div>
 
-				<div className='px-card flex flex-col gap-2'>
+				<div className='ds-listrow'>
 					<div className='text-[#a89878] text-sm'>{def.kind === 'idol' ? 'Its bonus' : 'Produces now'}</div>
 					{def.kind === 'idol' && idol ? (
 						<>
@@ -139,7 +144,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					)}
 				</div>
 
-				<div className='px-card flex flex-col gap-2'>
+				<div className='ds-listrow'>
 					{running ? (
 						<>
 							<div className='text-[#a89878] text-sm'>Upgrading</div>
@@ -166,16 +171,16 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 									<CostList cost={cost} className='build-cost' />
 									<span className='text-xs text-[#a89878]'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
 								</div>
-								<button className='px-btn px-btn-gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
+								<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
 									Upgrade
-								</button>
+								</Button>
 							</div>
 							{problem && problem !== 'Not enough resources' && <p className='build-problem'>{problem}</p>}
 						</>
 					)}
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

@@ -7,7 +7,8 @@ import { gemItemById } from '@/config/gemShop';
 import { describeClassPassives } from '@/lib/classPassives';
 import audioManager from '@/utils/audioManager';
 import '@/styles/Heroes.css';
-import PixelModal from './PixelModal';
+import GameModal from './GameModal';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 import PixelIcon from './PixelIcon';
 import AvatarArt from './AvatarArt';
 import GemIcon from './GemIcon';
@@ -46,8 +47,8 @@ const ClassPickerDialog: React.FC = () => {
 
 	return (
 		<>
-			<PixelModal title='Choose your hero' icon={<PixelIcon name='menu_character' alt='' />} size='md' onClose={close}>
-				<p className='text-[#a89878] text-sm mb-4 text-center'>
+			<GameModal title='Choose your hero' icon={<PixelIcon name='menu_character' alt='' />} size='md' onClose={close}>
+				<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px' }}>
 					Each hero has its own bonuses. Changing hero costs {price} <GemIcon />.
 				</p>
 				<div className='class-grid'>
@@ -76,13 +77,13 @@ const ClassPickerDialog: React.FC = () => {
 					})}
 				</div>
 				{message && (
-					<p className='mt-3 text-sm text-[#d98a6a] text-center' role='status'>
+					<p style={{ marginTop: 10, textAlign: 'center', color: '#ff9a7a' }} role='status'>
 						{message}
 					</p>
 				)}
-			</PixelModal>
+			</GameModal>
 			{picked && pick && (
-				<PixelModal title={`Become a ${picked.label}?`} size='sm' onClose={() => setPick(null)}>
+				<GameModal title={`Become a ${picked.label}?`} size='sm' onClose={() => setPick(null)}>
 					<div data-testid='class-confirm' className='flex flex-col items-center gap-3 text-center'>
 						<AvatarArt id={null} playerClass={pick} scale={2} />
 						<p className='text-sm text-[#f1e6c8]'>
@@ -104,15 +105,15 @@ const ClassPickerDialog: React.FC = () => {
 							</p>
 						)}
 						<div className='flex gap-3'>
-							<button className='px-btn' disabled={busy} onClick={() => setPick(null)}>
+							<Button disabled={busy} onClick={() => setPick(null)}>
 								Cancel
-							</button>
-							<button className='px-btn px-btn-gold' disabled={busy || missing > 0} onClick={() => void confirm()}>
+							</Button>
+							<Button tone='gold' disabled={busy || missing > 0} onClick={() => void confirm()}>
 								Pay {price} <GemIcon />
-							</button>
+							</Button>
 						</div>
 					</div>
-				</PixelModal>
+				</GameModal>
 			)}
 		</>
 	);

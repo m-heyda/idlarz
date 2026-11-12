@@ -13,7 +13,8 @@ import { useUiStore } from '@/stores/uiStore';
 import audioManager from '@/utils/audioManager';
 import { getTile } from '@/utils/world';
 import CostList from '../CostList';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/BuildModal.css';
 
@@ -127,17 +128,17 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	};
 
 	return (
-		<PixelModal title='Build here' size='md' onClose={close}>
+		<GameModal title='Build here' size='md' onClose={close}>
 			<div className='build-list'>
 				{builds.map((o) => (
-					<div key={o.def.id} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={o.def.id} className={`ds-listrow build-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='build-info'>
 							<div className='build-top'>
 								<Head def={o.def} />
-								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
+								<Button tone='gold' size='sm' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
 									Build
-								</button>
+								</Button>
 							</div>
 							<p className='build-blurb'>{o.def.blurb}</p>
 							<EffectLines def={o.def} ownedOfBiome={ownedOfBiome(tiles, o.def.biome)} />
@@ -150,14 +151,14 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					</div>
 				))}
 				{moves.map((o) => (
-					<div key={`move-${o.def.id}`} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={`move-${o.def.id}`} className={`ds-listrow build-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='build-info'>
 							<div className='build-top'>
 								<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
+								<Button tone='gold' size='sm' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
 									Move here
-								</button>
+								</Button>
 							</div>
 							<p className='build-blurb'>Move it here: level kept, half price.</p>
 							<div className='build-foot'>
@@ -168,7 +169,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					</div>
 				))}
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

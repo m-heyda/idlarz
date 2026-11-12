@@ -21269,7 +21269,6 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hero/HeroWindow.tsx",
 			"src/components/game/hero/recipeUi.ts",
 			"src/components/game/hud/HudTopBar.tsx"
 		],

@@ -136,3 +136,17 @@
 .build-free {
 	color: #9be15d;
 }
+
+/* the cards are design-system rows laid out as art + details */
+.ds-listrow.build-row {
+	flex-direction: row;
+	align-items: flex-start;
+	gap: 12px;
+}
+.build-art {
+	border: 1px solid var(--ds-line-dk, #2a2118);
+}
+.build-name {
+	font-size: 1rem;
+	color: var(--ds-gold-lt, #f4d57e);
+}
