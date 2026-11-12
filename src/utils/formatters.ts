@@ -97,6 +97,13 @@ export const formatCompact = (n: number | undefined, decimals = 1): string => {
 	return trimmed(n, decimals);
 };
 
+/** A stack count on a bag slot: plain up to 999, then short in lower case from 1k (1k, 1.5k, 100k, 2.5m) */
+export const formatStack = (n: number): string => {
+	if (!Number.isFinite(n) || n < 1000) return String(Math.max(0, Math.floor(n)));
+	const [div, unit] = n >= 1_000_000 ? [1_000_000, 'm'] : [1000, 'k'];
+	return `${Math.floor((n / div) * 10) / 10}${unit}`;
+};
+
 /** A whole count for counters and costs: 7, 73, 9,999 as is (never 7.00), from 10,000 short (12.3K, 1.23M) */
 export const formatInt = (n: number | undefined): string => {
 	if (n === undefined || n === null || Number.isNaN(n)) return '0';

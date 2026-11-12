@@ -10,15 +10,15 @@ import { rollJunkDrops } from '../../src/lib/loot/junkDrops';
 import { mulberry32 } from '../../src/lib/rng';
 import { plainItem } from '../../src/lib/itemInstance';
 
-// IDL-312: junk materials. Trade goods that stack in 1,000s, drop from kills (bosses guarantee the pricey ones) and are what Sell junk sells.
+// IDL-312: junk materials. Trade goods that stack in the tens of thousands, drop from kills (bosses guarantee the pricey ones) and are what Sell junk sells.
 
 const seeded = (n: number) => mulberry32(n);
 const ctx = { level: 10, gold: 400, luck: 0, boss: false, lucky: false };
 
-test('every junk material is a 1,000-stack consumable with art, lore and a price, and the ladder runs cheap to very pricey', () => {
+test('every junk material is a consumable that stacks by rarity with art, lore and a price, and the ladder runs cheap to very pricey', () => {
 	assert.equal(JUNK_ITEMS.length, 11);
 	for (const item of JUNK_ITEMS) {
-		assert.equal(item.stackMax, 1000, item.id);
+		assert.equal(item.stackMax, { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 }[item.rarity as string], item.id);
 		assert.equal(ITEM_CATALOG[item.id], item, `${item.id} is in the catalog`);
 		assert.ok(item.junk && item.description && item.sellValue > 0, item.id);
 		assert.ok(
@@ -74,7 +74,7 @@ test('Sell junk sells every junk stack at its price (Haggler applies) and leaves
 	bag = addDrop(bag, { kind: 'consumable', id: 'junk_amethyst', qty: 2 }).bag;
 	bag = addDrop(bag, { kind: 'consumable', id: 'potion_minor', qty: 3 }).bag;
 	bag = addDrop(bag, { kind: 'gear', item: plainItem('steel_helm') }).bag;
-	assert.equal(bag.filter((s) => s && 'id' in s && s.id === 'junk_bones').length, 3, '2,500 bones fill three slots of 1,000');
+	assert.equal(bag.filter((s) => s && 'id' in s && s.id === 'junk_bones').length, 1, '2,500 bones fit one stack');
 	assert.equal(countJunk(bag), 2502);
 	const sold = junkSale(bag, {});
 	assert.equal(sold.count, 2502);

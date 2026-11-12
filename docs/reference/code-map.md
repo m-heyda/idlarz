@@ -172,7 +172,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`define.ts`](../../src/catalog/items/define.ts) — ~ The item level window of a material tier.
 - [`grades.ts`](../../src/catalog/items/grades.ts) — ~ Name of the grade in the planning doc
 - [`index.ts`](../../src/catalog/items/index.ts) — ~ Fills `lore` from `lore.ts` (the legendaries' stories) so the item definitions stay as they are.
-- [`junk.ts`](../../src/catalog/items/junk.ts)
+- [`junk.ts`](../../src/catalog/items/junk.ts) — ~ How many of a junk material fit in one bag slot, by rarity:
 - [`ladder.ts`](../../src/catalog/items/ladder.ts) — ~ The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts)
 - [`legendary.ts`](../../src/catalog/items/legendary.ts)
 - [`lore.ts`](../../src/catalog/items/lore.ts) — The longer story of the legendary weapons (IDL-317): one short paragraph each, shown in the item tooltip under the flavour line and in full in the Glossary. Draft text, for the owner to approve. Keyed by item id so the item
@@ -953,6 +953,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
 - [`designSystem.test.ts`](../../tests/ui/designSystem.test.ts)
 - [`designSystemRender.test.ts`](../../tests/ui/designSystemRender.test.ts)
+- [`formatStack.test.ts`](../../tests/ui/formatStack.test.ts)
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)

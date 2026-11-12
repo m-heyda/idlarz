@@ -1,7 +1,10 @@
 import type { ItemDef } from '@/types/game';
 
-// Junk materials (IDL-312): trade goods with no use but the merchant. They stack in 1,000s, drop from monsters (config in `lib/loot/junkDrops.ts`) and are what the Bag's Sell junk button sells (`lib/loot/junk.ts`). The cheap ones are plentiful,
+// Junk materials (IDL-312): trade goods with no use but the merchant. They stack by rarity (`JUNK_STACK_MAX`: 100,000 common, 50,000 uncommon, 25,000 rare, 10,000 epic), drop from monsters (config in `lib/loot/junkDrops.ts`) and are what the Bag's Sell junk button sells (`lib/loot/junk.ts`). The cheap ones are plentiful,
 // the pricey ones are rare finds and the boss guarantees. Prices are placeholders for the balance pass.
+
+/** How many of a junk material fit in one bag slot, by rarity: the cheap ones drop by the thousand, the pricey ones are rare finds */
+export const JUNK_STACK_MAX: Partial<Record<ItemDef['rarity'], number>> = { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 };
 
 const junk = (id: string, name: string, sellValue: number, description: string, rarity: ItemDef['rarity'] = 'common'): ItemDef => ({
 	id: `junk_${id}`,
@@ -9,7 +12,7 @@ const junk = (id: string, name: string, sellValue: number, description: string, 
 	kind: 'consumable',
 	rarity,
 	tier: 0,
-	stackMax: 1000,
+	stackMax: JUNK_STACK_MAX[rarity] ?? 10_000,
 	sellValue,
 	icon: `art_junk_${id}` as ItemDef['icon'],
 	junk: true,
