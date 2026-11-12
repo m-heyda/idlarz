@@ -206,8 +206,10 @@ export const IconButton: React.FC<
 	>
 > = ({ icon, label, badge, small, active, art, className, ...rest }) => (
 	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm', className)} data-active={active ? 'true' : undefined} {...rest}>
-		{art ? <span className='ds-iconbtn-art'>{art}</span> : <img src={icon} alt='' />}
-		{badge ? <Badge count={badge} floating /> : null}
+		<span className='ds-iconbtn-pic'>
+			{art ? <span className='ds-iconbtn-art'>{art}</span> : <img src={icon} alt='' />}
+			{badge ? <Badge count={badge} floating /> : null}
+		</span>
 		<span>{label}</span>
 	</button>
 );

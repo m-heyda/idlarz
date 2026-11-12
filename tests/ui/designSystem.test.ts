@@ -91,11 +91,11 @@ test('toRarity maps a game rarity id onto the design-system one and reads anythi
 });
 
 test('dockMagnification: biggest under the pointer, falling off to normal, neighbours lifted a little', () => {
-	assert.equal(dockMagnification(0), 1.5);
-	assert.equal(dockMagnification(110), 1);
+	assert.equal(dockMagnification(0), 1.25);
+	assert.equal(dockMagnification(100), 1);
 	assert.equal(dockMagnification(500), 1);
 	const near = dockMagnification(74); // the next icon of a 72 px dock
-	assert.ok(near > 1 && near < 1.5, `a neighbour swells less than the hovered icon (${near})`);
+	assert.ok(near > 1 && near < 1.25, `a neighbour swells less than the hovered icon (${near})`);
 	assert.ok(dockMagnification(30) > dockMagnification(60), 'the closer, the bigger');
 	assert.equal(dockMagnification(Number.NaN), 1);
 });

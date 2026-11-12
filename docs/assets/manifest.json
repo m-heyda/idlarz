@@ -21288,8 +21288,8 @@
 	{
 		"usedBy": [
 			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/hud/HudDock.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx"
+			"src/components/game/overlays/CraftingOverlay.tsx",
+			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_crafting",
 		"category": "ui",

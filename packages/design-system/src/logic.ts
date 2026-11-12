@@ -98,7 +98,7 @@ export const toRarity = (id: string | undefined | null): Rarity => ((RARITIES as
 /**
  * How much a dock icon swells while the pointer is `distance` px from its centre: 1 (normal) far away, `peak` right under the pointer, falling off smoothly over `reach` px, so the neighbours of the hovered icon are lifted a little too.
  */
-export const dockMagnification = (distance: number, peak = 1.5, reach = 110): number => {
+export const dockMagnification = (distance: number, peak = 1.25, reach = 100): number => {
 	if (!Number.isFinite(distance) || distance >= reach) return 1;
 	const t = 1 - Math.max(0, distance) / reach;
 	return 1 + (peak - 1) * (0.5 - 0.5 * Math.cos(Math.PI * t));
