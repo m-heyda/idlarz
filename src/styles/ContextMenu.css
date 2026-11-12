@@ -86,8 +86,6 @@
 
 /* the short message of the notice stack (top centre, under the header) */
 .ui-toast {
-	position: relative;
-	padding: 8px 16px;
 	max-width: calc(100vw - 32px);
 	animation: ui-toast-in 0.18s ease-out;
 	pointer-events: none;
@@ -167,8 +165,7 @@
 /* the reward card of an earned achievement (IDL-332): gold frame, a slow glow on the badge, fades out over its 7 seconds */
 .achv-toast {
 	animation: achv-toast 7s ease-in-out both;
-	min-width: 280px;
-	box-shadow: 0 0 18px rgba(240, 210, 122, 0.45);
+	min-width: 260px;
 }
 
 .achv-congrats {

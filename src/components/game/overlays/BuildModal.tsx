@@ -13,30 +13,10 @@ import { useUiStore } from '@/stores/uiStore';
 import audioManager from '@/utils/audioManager';
 import { getTile } from '@/utils/world';
 import CostList from '../CostList';
-import PixelModal from '../PixelModal';
-import ResourceIcon from '../ResourceIcon';
+import GameModal from '../GameModal';
+import { Button, HoverTip } from '../../../../packages/design-system/src/components/primitives';
+import { TipLine, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import '@/styles/BuildModal.css';
-
-/** What a building makes, in plain words: the amount per hour now, what a level adds, what the tile count means and that levels exist. */
-const EffectLines: React.FC<{ def: BuildOption['def']; ownedOfBiome: number }> = ({ def, ownedOfBiome }) => {
-	const text = buildingEffectText(def, ownedOfBiome);
-	if (!text) return null;
-	return (
-		<div className='build-output'>
-			<span className='build-output-icons'>
-				{def.produces.map((resource) => (
-					<ResourceIcon key={resource} resource={resource} />
-				))}
-			</span>
-			<div className='build-effect'>
-				<p className='build-effect-main'>{text.produces}</p>
-				<p>{text.perLevel}</p>
-				<p className='build-effect-note'>{text.scale}</p>
-				<p className='build-effect-note'>{text.levels}</p>
-			</div>
-		</div>
-	);
-};
 
 const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 	<span className='build-art'>
@@ -45,11 +25,16 @@ const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 	</span>
 );
 
-const Head: React.FC<{ def: BuildOption['def']; extra?: string }> = ({ def, extra }) => (
+const Head: React.FC<{ def: BuildOption['def']; extra?: string; details?: React.ReactNode }> = ({ def, extra, details }) => (
 	<div className='build-head'>
 		<span className='build-name'>{def.label}</span>
 		<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
 		{extra && <span className='build-extra'>{extra}</span>}
+		{details && (
+			<HoverTip tip={details} placement='above' align='center'>
+				<span className='bh-details'>Details</span>
+			</HoverTip>
+		)}
 	</div>
 );
 
@@ -126,49 +111,91 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		close();
 	};
 
+	/** The key line of an option: what it makes per hour and per level (an Idol: its effect per level), kept to one line; the rest is in the hover card */
+	const keyLine = (def: BuildOption['def']) => {
+		if (def.kind === 'idol') {
+			const idol = idolDef(def.id);
+			if (!idol) return null;
+			const effect = idol.effect === 'luck' ? `+${IDOL_RULES.luckPerLevel} Luck per level` : `+${IDOL_RULES.perLevel} % ${idol.effectText} per level`;
+			return (
+				<div className='bh-key'>
+					<span style={{ color: '#c9a6ff' }}>{effect}</span>
+					<span className='bh-key-more'>
+						{' '}
+						· level {limitOf('idolMaxLevel')} = {idolValueText(idol, limitOf('idolMaxLevel'))}
+					</span>
+					{!idol.applied && <span className='build-soon'> (coming soon: not applied yet)</span>}
+				</div>
+			);
+		}
+		const text = buildingEffectText(def, ownedOfBiome(tiles, def.biome));
+		if (!text) return null;
+		return (
+			<div className='bh-key'>
+				<span style={{ color: '#5ee07a' }}>{text.produces.replace(/\.$/, '')}</span>
+				<span className='bh-key-more'> · {text.perLevel.replace(/\.$/, '')}</span>
+			</div>
+		);
+	};
+
+	/** The long explanation that used to fill the card, on hover now */
+	const details = (def: BuildOption['def'], remembered?: number) => {
+		const text = buildingEffectText(def, ownedOfBiome(tiles, def.biome));
+		return (
+			<Tooltip title={def.label} subtitle={def.kind === 'idol' ? 'Idol' : def.kind === 'extractor' ? 'Extractor' : 'Producer'} className='ds-tip-compact'>
+				{text && (
+					<>
+						<TipLine>{text.scale}</TipLine>
+						<TipLine>{text.levels}</TipLine>
+					</>
+				)}
+				{def.kind === 'idol' && <IdolInfo id={def.id} remembered={remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
+			</Tooltip>
+		);
+	};
+
 	return (
-		<PixelModal title='Build here' size='md' onClose={close}>
-			<div className='build-list'>
+		<GameModal title='Build here' width={780} onClose={close}>
+			<div className='build-list' style={{ gap: 12 }}>
 				{builds.map((o) => (
-					<div key={o.def.id} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={o.def.id} className={`ds-listrow bh-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
-						<div className='build-info'>
-							<div className='build-top'>
-								<Head def={o.def} />
-								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
-									Build
-								</button>
-							</div>
+						<div className='bh-info'>
+							<Head def={o.def} details={details(o.def, o.remembered)} />
 							<p className='build-blurb'>{o.def.blurb}</p>
-							<EffectLines def={o.def} ownedOfBiome={ownedOfBiome(tiles, o.def.biome)} />
-							{o.def.kind === 'idol' && <IdolInfo id={o.def.id} remembered={o.remembered ?? 0} buildTimePct={buildTimePct} prestige={prestige} />}
+							{keyLine(o.def)}
 							<div className='build-foot'>
 								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} className='build-cost' />}
 							</div>
 							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>
+						<div className='bh-side'>
+							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
+								Build
+							</Button>
+						</div>
 					</div>
 				))}
 				{moves.map((o) => (
-					<div key={`move-${o.def.id}`} className={`px-card build-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={`move-${o.def.id}`} className={`ds-listrow bh-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
-						<div className='build-info'>
-							<div className='build-top'>
-								<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-								<button className='px-btn build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
-									Move here
-								</button>
-							</div>
+						<div className='bh-info'>
+							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
 							<p className='build-blurb'>Move it here: level kept, half price.</p>
 							<div className='build-foot'>
 								<CostList cost={o.cost} className='build-cost' />
 							</div>
 							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>
+						<div className='bh-side'>
+							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
+								Move here
+							</Button>
+						</div>
 					</div>
 				))}
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

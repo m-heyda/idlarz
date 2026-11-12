@@ -382,3 +382,124 @@
 		display: none;
 	}
 }
+
+/* ===== the same celebration in the design system's look: the crimson ribbon becomes a dark slate plate with a gold rim; rays, orb, rings and sparks stay ===== */
+.lu-cap {
+	display: none;
+}
+
+.lu-banner {
+	height: auto;
+	filter: drop-shadow(0 0 22px rgba(224, 169, 58, 0.55));
+}
+
+.lu-mid {
+	padding: 14px 44px 12px;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 2px solid var(--ds-gold, #e0a93a);
+	box-shadow:
+		0 0 0 2px #05060a,
+		inset 0 0 0 1px rgba(224, 169, 58, 0.35),
+		inset 0 0 30px rgba(224, 169, 58, 0.12);
+}
+
+.lu-mid::before,
+.lu-mid::after {
+	pointer-events: none;
+}
+
+.lu-title {
+	color: #ffe9a0;
+	letter-spacing: 0.22em;
+	text-shadow:
+		0 3px 0 #3a2504,
+		0 0 18px rgba(255, 200, 70, 0.85);
+}
+
+.lu-sub {
+	color: #e9e4d6;
+}
+
+.lu-reward {
+	padding: 6px 18px;
+	font-size: 0.9rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #ffe9a0;
+	text-shadow: none;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 16px rgba(224, 169, 58, 0.35);
+}
+
+.lu-hint {
+	color: #b9bdc9;
+	text-shadow: 0 2px 0 #000;
+}
+
+/* ===== second pass: the text sits on design-system plates so it reads over the rays ===== */
+.lu-banner {
+	position: relative;
+	margin-bottom: 6px;
+}
+
+.lu-banner::before,
+.lu-banner::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	width: 16px;
+	height: 16px;
+	margin-top: -8px;
+	background: var(--ds-gold, #e0a93a);
+	border: 2px solid #05060a;
+	box-shadow: 0 0 12px rgba(255, 200, 70, 0.8);
+	transform: rotate(45deg);
+}
+
+.lu-banner::before {
+	left: -26px;
+}
+
+.lu-banner::after {
+	right: -26px;
+}
+
+.lu-mid {
+	padding: 18px 56px 16px;
+	box-shadow:
+		0 0 0 2px #05060a,
+		0 0 0 4px var(--ds-gold-dk, #8a5f16),
+		inset 0 0 0 1px rgba(224, 169, 58, 0.35),
+		inset 0 0 36px rgba(224, 169, 58, 0.14);
+}
+
+.lu-title {
+	font-size: clamp(2.2rem, 6vw, 3.6rem);
+	letter-spacing: 0.18em;
+}
+
+.lu-sub {
+	padding: 6px 22px;
+	font-size: 1.15rem;
+	letter-spacing: 0.06em;
+	color: #fff;
+	text-shadow: none;
+	background: rgba(10, 12, 18, 0.85);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: 0 0 0 1px #05060a;
+}
+
+.lu-sub em {
+	color: var(--ds-gold-lt, #f4d57e);
+	text-shadow: none;
+}
+
+.lu-hint {
+	padding: 3px 14px;
+	font-size: 0.75rem;
+	color: #d6d9e4;
+	background: rgba(10, 12, 18, 0.7);
+}

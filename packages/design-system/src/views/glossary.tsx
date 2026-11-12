@@ -647,6 +647,7 @@ export const BestiaryView: React.FC = () => {
 									{waiting > 0 && !none ? <span className='ds-mon-ready' title='Reward ready' /> : null}
 									<span className='ds-mon-art'>
 										<img src={none ? '/pixel/enemies/placeholder/silhouette.png' : x.icon} alt='' />
+										{none ? <b className='ds-mon-q'>?</b> : null}
 									</span>
 									<span className='ds-mon-name'>{none ? '???' : x.name}</span>
 									<DiamondLevel level={tt} max={GOALS.length} />
@@ -660,7 +661,8 @@ export const BestiaryView: React.FC = () => {
 					<Panel parchment className='ds-ledger ds-detail'>
 						<div className='ds-detail-head'>
 							<span className='ds-deed-icon ds-deed-icon-lg'>
-								<img src={unk ? '/pixel/enemies/placeholder/silhouette.png' : m.icon} alt='' />
+								<img src={unk ? '/pixel/enemies/placeholder/silhouette.png' : m.icon} alt='' className={unk ? 'ds-unk-sil' : undefined} />
+								{unk ? <b className='ds-mon-q'>?</b> : null}
 							</span>
 							<div>
 								<div className='ds-paper-title'>{unk ? '???' : m.name}</div>

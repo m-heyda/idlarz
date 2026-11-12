@@ -1033,7 +1033,7 @@ See also: `deedState`, `deedPoints`
 
 ### `badgeOptions` <small>function</small>
 
-Source: [`src/catalog/badges.ts:23`](../../src/catalog/badges.ts)
+Source: [`src/catalog/badges.ts:26`](../../src/catalog/badges.ts)
 
 Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
 The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

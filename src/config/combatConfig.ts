@@ -40,6 +40,7 @@ export const COMBAT = {
 	// What the server does for a player in a fight, and when it starts one. Fixed on purpose: players only switch auto-battle and auto-use on or off.
 	auto: {
 		minRebirths: 1, // auto-battle is locked until the player has rebirthed this many times (clicking a monster to fight it never is)
+		useMinRebirths: 1, // auto-use (potions and skills) is locked the same way: it does nothing and is not shown before this many rebirths
 		resumeHpPct: 80, // auto-battle only starts a fight with HP at this share of max or more (after a knockout it rests up to it)
 		pauseAfterDefeats: 3, // auto-battle stays on after a defeat and switches itself off after this many defeats in a row (one win resets the count)
 		safeWinChance: 0.8, // the Next strip calls a monster Safe from this win chance up, Risky from minWinChance up, Unlikely below it

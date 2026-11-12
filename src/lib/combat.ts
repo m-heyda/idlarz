@@ -45,6 +45,15 @@ export const maxHp = (characterStats: CharacterStats, equipment: Equipment): num
  */
 export const autoBattleUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.minRebirths;
 
+/**
+ * Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
+ * the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.
+ *
+ * @category Combat/A fight
+ * @order 5
+ */
+export const autoUseUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.useMinRebirths;
+
 /** The bucket the Next strip shows for a queued monster. */
 export type WinBucket = 'safe' | 'risky' | 'unlikely';
 

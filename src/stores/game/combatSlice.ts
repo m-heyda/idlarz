@@ -1,7 +1,7 @@
 // combatSlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { autoBattleUnlocked } from '@/lib/combat';
+import { autoBattleUnlocked, autoUseUnlocked } from '@/lib/combat';
 import type { SkillId } from '@/catalog/skills';
 import type { FightReply } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
@@ -97,6 +97,10 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 		},
 
 		setAutoUse: (on: boolean) => {
+			if (!autoUseUnlocked(get().prestige.rebirths)) {
+				toast('Auto-use unlocks after your first rebirth.');
+				return;
+			}
 			set((state) => ({ combat: { ...state.combat, autoUse: on } }));
 			void requestAuto({ autoUse: on }, sinceNow()).then((reply) => settleFight(reply));
 		},

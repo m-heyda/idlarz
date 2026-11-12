@@ -1,6 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef } from 'react';
 import { monsterNameOf } from '@/stores/bestiaryStore';
-import { formatCompact, formatNumber } from '@/utils/formatters';
+import { formatCompact, formatNumber, tidy } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
@@ -182,6 +182,8 @@ export interface CombatPanelProps {
 	autoBattle: boolean;
 	autoLocked: boolean;
 	autoUse: boolean;
+	/** Auto-use is a reward for the first rebirth: its switch is not shown before */
+	autoUseLocked: boolean;
 	/** The server's reason Auto-battle is idle, when it is */
 	autoNote?: string | null;
 	numbers: FloatNumber[];
@@ -287,9 +289,11 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						Waiting: no monster looks winnable
 					</span>
 				)}
-				<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
-					<input type='checkbox' checked={p.autoUse} onChange={(e) => p.onAutoUse(e.target.checked)} /> Auto-use
-				</label>
+				{!p.autoUseLocked && (
+					<label title={`Drinks a potion below ${COMBAT.auto.potionBelowHpPct}% HP, casts Heal below ${COMBAT.auto.healBelowHpPct}%, Stun when ready`}>
+						<input type='checkbox' checked={p.autoUse} onChange={(e) => p.onAutoUse(e.target.checked)} /> Auto-use
+					</label>
+				)}
 			</div>
 		</>
 	);
@@ -313,7 +317,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	);
 
 	return (
-		<section className='combat-widget px-card' aria-label='Combat' onMouseEnter={p.onMouseEnter} onMouseLeave={p.onMouseLeave}>
+		<section className='ds-root combat-widget' aria-label='Combat' onMouseEnter={p.onMouseEnter} onMouseLeave={p.onMouseLeave}>
 			<header className='combat-head'>
 				<b>{`${boss ? '☠ ' : ''}${label} - Lv ${monster.level}`}</b>
 				<span className='flex gap-1'>
@@ -357,7 +361,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						<span style={flip && !dead ? { display: 'block', transform: 'scaleX(-1)' } : undefined}>
 							{dead ? (
 								// eslint-disable-next-line @next/next/no-img-element
-								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={48 * 3} height={40 * 3} />
+								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={64 * 2} height={64 * 2} />
 							) : (
 								art
 							)}
@@ -373,7 +377,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 							))}
 						</span>
 					)}
-					{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {fight.stunLeft.toFixed(1)} s</div>}
+					{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {tidy(fight.stunLeft.toFixed(1))} s</div>}
 					{p.slashes?.map((fx) => (
 						<span
 							key={fx.id}

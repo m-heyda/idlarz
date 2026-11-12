@@ -26,24 +26,12 @@ import { getTile } from '@/utils/world';
 import audioManager from '@/utils/audioManager';
 import type { Resources } from '@/types/game';
 import CostList from '../CostList';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button, DiamondLevel } from '../../../../packages/design-system/src/components/primitives';
 import ResourceIcon from '../ResourceIcon';
 import '@/styles/BuildModal.css';
 
 const HOUR = 3600;
-
-/** "+1.2K" per hour for each resource of an output (per second in, per hour out). */
-const OutputRows: React.FC<{ output: Partial<Resources>; muted?: boolean }> = ({ output, muted }) => (
-	<span className={`inline-flex flex-wrap items-center gap-x-4 gap-y-1 ${muted ? 'text-[#a89878]' : 'text-[#f1e6c8]'}`}>
-		{Object.entries(output)
-			.filter(([, amount]) => (amount ?? 0) > 0)
-			.map(([key, amount]) => (
-				<span key={key} className='inline-flex items-center gap-1 tabular-nums' title={RESOURCES[key as keyof Resources]?.label}>
-					<ResourceIcon resource={key as keyof Resources} />+{formatNumber((amount ?? 0) * HOUR)}/h
-				</span>
-			))}
-	</span>
-);
 
 /**
  * The building window: a left click on a building opens it. Art and lore, the kind and the level, what it makes now (per hour, before the castle and Ember bonuses) with the biome bonus, then the next level: what it adds, its price and timer
@@ -95,87 +83,108 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		void upgradeBuilding?.(x, y);
 	};
 
+	const keys = Array.from(new Set([...Object.keys(now ?? {}), ...Object.keys(next ?? {})])).filter(
+		(key) => (now?.[key as keyof Resources] ?? 0) > 0 || (next?.[key as keyof Resources] ?? 0) > 0,
+	) as (keyof Resources)[];
+	const perHour = (o: Partial<Resources> | null, key: keyof Resources) => formatNumber((o?.[key] ?? 0) * HOUR);
+	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct) : 0;
+	const progress = running && total > 0 ? Math.min(1, Math.max(0, 1 - running.remainingSec / total)) : 0;
+
 	return (
-		<PixelModal title={def.label} size='md' onClose={close}>
-			<div className='flex flex-col gap-4 px-1 pb-1'>
-				<div className='flex gap-4 items-start'>
-					<span className='build-art shrink-0' style={{ width: 96, height: 96 }}>
+		<GameModal title={def.label} width={780} onClose={close}>
+			<div className='bw'>
+				<div className='bw-side'>
+					<span className='build-art' style={{ width: '100%', height: 150 }}>
 						{/* eslint-disable-next-line @next/next/no-img-element */}
-						<img src={def.art} alt={def.label} style={{ imageRendering: 'pixelated' }} />
+						<img src={def.art} alt={def.label} style={{ imageRendering: 'pixelated', width: 130, height: 130 }} />
 					</span>
-					<div className='min-w-0 flex-1 flex flex-col gap-1'>
-						<div className='build-head'>
-							<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
-							<span className='build-extra'>{biomeLabel}</span>
-						</div>
-						<div className='text-[#f0d27a] text-lg'>
-							Level {level} <span className='text-[#a89878] text-sm'>of {top}</span>
-						</div>
-						<p className='text-sm italic text-[#c8b898]'>{BUILDING_LORE[def.id] ?? def.blurb}</p>
+					<div className='build-head'>
+						<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
+						<span className='build-extra'>{biomeLabel}</span>
 					</div>
+					<div>
+						<div className='bw-level'>
+							Level {level} <span>of {top}</span>
+						</div>
+						<div title={`Level ${level} of ${top}`} style={{ marginTop: 6 }}>
+							<DiamondLevel level={level} max={top} />
+						</div>
+					</div>
+					<p className='bw-lore'>{BUILDING_LORE[def.id] ?? def.blurb}</p>
 				</div>
 
-				<div className='px-card flex flex-col gap-2'>
-					<div className='text-[#a89878] text-sm'>{def.kind === 'idol' ? 'Its bonus' : 'Produces now'}</div>
-					{def.kind === 'idol' && idol ? (
-						<>
-							<div className='text-[#f1e6c8]'>
-								{idolValueText(idol, level)}
-								{!idol.applied && <span className='build-soon'> (coming soon: not applied yet)</span>}
-							</div>
-							<div className='text-xs text-[#a89878]'>Its level is kept when you rebirth; rebuild it free on any {biomeLabel.toLowerCase()} tile.</div>
-						</>
-					) : (
-						now && (
+				<div className='bw-main'>
+					<div className='ds-listrow'>
+						{def.kind === 'idol' && idol ? (
 							<>
-								<OutputRows output={now} />
-								<div className='text-xs text-[#a89878]'>
+								<div className='bw-label'>Its bonus</div>
+								<div>
+									{idolValueText(idol, level)}
+									{!idol.applied && <span className='build-soon'> (coming soon: not applied yet)</span>}
+								</div>
+								{!atTop && !running && (
+									<div className='bw-up'>
+										Level {nextLevel}: {idolValueText(idol, nextLevel)}
+									</div>
+								)}
+								<div className='bw-note'>Its level is kept when you rebirth; rebuild it free on any {biomeLabel.toLowerCase()} tile.</div>
+							</>
+						) : (
+							<>
+								<div className='bw-table'>
+									<span className='bw-label'>Produces per hour</span>
+									<span className='bw-col'>Now</span>
+									<span className='bw-col'>{atTop ? '' : `Level ${nextLevel}`}</span>
+									<span className='bw-col'>{atTop ? '' : 'Change'}</span>
+									{keys.map((key) => (
+										<React.Fragment key={key}>
+											<span className='bw-res'>
+												<ResourceIcon resource={key} />
+												{RESOURCES[key]?.label ?? key}
+											</span>
+											<span className='bw-num'>{perHour(now, key)}</span>
+											<span className='bw-num'>{atTop ? '' : perHour(next, key)}</span>
+											<span className='bw-num bw-gain'>{atTop ? '' : `+${formatNumber((gain[key] ?? 0) * HOUR)}`}</span>
+										</React.Fragment>
+									))}
+								</div>
+								<div className='bw-note'>
 									{biomeLabel} bonus: +{bonusPct} % from your {owned} {biomeLabel.toLowerCase()} tile{owned === 1 ? '' : 's'} (each adds +
 									{Math.round(BUILDING_RULES.producer.perOwnedTile * 100)} %, up to +{Math.round(BUILDING_RULES.producer.bonusCap * 100)} %). Before the castle
 									and Ember bonuses.
 								</div>
 							</>
-						)
-					)}
-				</div>
+						)}
+					</div>
 
-				<div className='px-card flex flex-col gap-2'>
-					{running ? (
-						<>
-							<div className='text-[#a89878] text-sm'>Upgrading</div>
-							<div className='text-[#f1e6c8]'>
-								Level {running.toLevel} in {formatTime(Math.max(1, Math.ceil(running.remainingSec)))}
-							</div>
-						</>
-					) : atTop ? (
-						<div className='text-[#f0d27a]'>Highest level reached.</div>
-					) : (
-						<>
-							<div className='text-[#a89878] text-sm'>Next: level {nextLevel}</div>
-							<div className='text-sm text-[#f1e6c8]'>
-								{def.kind === 'idol' && idol ? (
-									<>Gives {idolValueText(idol, nextLevel)}</>
-								) : (
-									<span className='inline-flex flex-wrap items-center gap-2'>
-										Adds <OutputRows output={gain} />
-									</span>
-								)}
-							</div>
-							<div className='flex items-center justify-between gap-3 flex-wrap'>
-								<div className='flex flex-col gap-1'>
-									<CostList cost={cost} className='build-cost' />
-									<span className='text-xs text-[#a89878]'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
+					<div className='ds-listrow bw-upgrade'>
+						{running ? (
+							<>
+								<div className='bw-label'>Upgrading to level {running.toLevel}</div>
+								<div className='bw-bar'>
+									<div className='bw-bar-fill' style={{ width: `${Math.round(progress * 100)}%` }} />
 								</div>
-								<button className='px-btn px-btn-gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
-									Upgrade
-								</button>
-							</div>
-							{problem && problem !== 'Not enough resources' && <p className='build-problem'>{problem}</p>}
-						</>
-					)}
+								<div className='bw-note'>{formatTime(Math.max(1, Math.ceil(running.remainingSec)))} left</div>
+							</>
+						) : atTop ? (
+							<div className='bw-up'>Highest level reached.</div>
+						) : (
+							<>
+								<div className='bw-label'>Upgrade to level {nextLevel}</div>
+								<CostList cost={cost} className='build-cost' />
+								<div className='bw-foot'>
+									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
+									<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
+										Upgrade
+									</Button>
+								</div>
+								{problem && problem !== 'Not enough resources' && <p className='build-problem'>{problem}</p>}
+							</>
+						)}
+					</div>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

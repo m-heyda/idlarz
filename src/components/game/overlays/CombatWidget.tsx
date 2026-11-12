@@ -8,7 +8,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { SKILL_IDS } from '@/catalog/skills';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
-import { autoBattleUnlocked } from '@/lib/combat';
+import { autoBattleUnlocked, autoUseUnlocked } from '@/lib/combat';
 import { aggregateStats } from '@/lib/inventory';
 import { potionCooldownSec, potionSlotCount } from '@/lib/potionBelt';
 import { monsterDef, monsterStats } from '@/lib/monsters';
@@ -68,6 +68,7 @@ const CombatWidget: React.FC = () => {
 	const equipment = useGameStore((state) => state.equipment);
 	const level = useGameStore((state) => state.level.level);
 	const autoLocked = useGameStore((state) => !autoBattleUnlocked(state.prestige.rebirths));
+	const autoUseLocked = useGameStore((state) => !autoUseUnlocked(state.prestige.rebirths));
 	const requestPotion = useGameStore((state) => state.requestPotion);
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const setAutoBattle = useGameStore((state) => state.setAutoBattle);
@@ -309,6 +310,7 @@ const CombatWidget: React.FC = () => {
 			autoBattle={combat.autoBattle}
 			autoLocked={autoLocked}
 			autoUse={combat.autoUse}
+			autoUseLocked={autoUseLocked}
 			autoNote={combat.autoNote}
 			numbers={numbers}
 			slashes={slashes}

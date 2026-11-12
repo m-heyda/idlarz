@@ -22,6 +22,7 @@
 		"restore-trust": "tsx scripts/restore-trust.ts",
 		"migrate-saves": "tsx scripts/migrate-saves.ts",
 		"seed-rehearsal": "tsx scripts/seed-rehearsal-account.ts",
+		"seed-dev-world": "tsx scripts/seed-dev-world.ts",
 		"gen-save-fixtures": "tsx scripts/gen-save-fixtures.ts",
 		"fight-sim": "tsx scripts/fight-sim.ts",
 		"perk-caps": "tsx scripts/perk-caps.ts",
@@ -47,7 +48,7 @@
 		"prepare": "git config core.hooksPath .githooks && chmod +x .githooks/pre-commit .githooks/pre-push || exit 0",
 		"assets:catalog": "tsx scripts/assets-catalog.ts",
 		"assets:catalog:check": "tsx scripts/assets-catalog.ts --check",
-		"storybook": "storybook dev -p 6006",
+		"storybook": "storybook dev -p 6007",
 		"build-storybook": "storybook build"
 	},
 	"dependencies": {

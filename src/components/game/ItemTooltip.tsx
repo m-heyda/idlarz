@@ -141,11 +141,11 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 			{def.kind === 'weapon' && def.attackSpeed && (
 				<div className='px-tip-swing'>
 					<div>
-						<b>{def.attackSpeed}</b> Attacks per Second
+						<b>{def.attackSpeed}</b> ATK SPD
 						{withDiff && swing && <Diff delta={swing.speed.delta} text={signed(swing.speed.delta, 2)} />}
 					</div>
 					<div>
-						<b>{formatCompact(weaponDps({ stats, attackSpeed: def.attackSpeed }), 2)}</b> Weapon damage per second
+						<b>{formatCompact(weaponDps({ stats, attackSpeed: def.attackSpeed }), 2)}</b> DPS
 						{withDiff && swing && <Diff delta={swing.dps.delta} text={signed(swing.dps.delta, 2)} />}
 					</div>
 				</div>

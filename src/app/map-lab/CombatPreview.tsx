@@ -105,6 +105,7 @@ const CombatPreview: React.FC = () => {
 				autoBattle={false}
 				autoLocked
 				autoUse={false}
+				autoUseLocked={false}
 				numbers={numbers}
 				slashes={slashes}
 				hitTick={tick}

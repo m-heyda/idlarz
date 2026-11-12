@@ -27,12 +27,37 @@ export type UpgradeState = 'maxed' | 'ready' | 'short';
 export const upgradeState = (level: number, max: number, cost: number, have: number): UpgradeState =>
 	level >= max ? 'maxed' : have >= cost ? 'ready' : 'short';
 
-/** Short number format used in the mocks: 1.2K, 3.40M. */
+/** Drops the zeros a fixed-decimals number carries at the end: "7.00" is "7", "1.50K" is "1.5K", "1.00M" is "1M". */
+export const tidy = (text: string): string => {
+	const isDigit = (ch: string | undefined) => ch !== undefined && ch >= '0' && ch <= '9';
+	let out = text;
+	// the first number whose decimals end in zeros loses them (a linear scan: no regular expression, so a long run of zeros costs nothing extra)
+	for (let dot = out.indexOf('.'); dot >= 0; dot = out.indexOf('.', dot + 1)) {
+		let end = dot + 1;
+		while (isDigit(out[end])) end++;
+		let keep = end;
+		while (keep > dot + 1 && out[keep - 1] === '0') keep--;
+		if (keep < end) {
+			out = out.slice(0, keep) + out.slice(end);
+			break;
+		}
+	}
+	// then a point with no digits after it goes too: "7." is "7"
+	for (let dot = out.indexOf('.'); dot >= 0; dot = out.indexOf('.', dot + 1)) {
+		if (!isDigit(out[dot + 1])) {
+			out = out.slice(0, dot) + out.slice(dot + 1);
+			break;
+		}
+	}
+	return out;
+};
+
+/** Short number format: 1.2K, 3.4M, 1K (never 1.0K or 3.40M). */
 export const compact = (n: number): string => {
 	const abs = Math.abs(n);
-	if (abs >= 1e9) return `${(n / 1e9).toFixed(2)}B`;
-	if (abs >= 1e6) return `${(n / 1e6).toFixed(2)}M`;
-	if (abs >= 1e3) return `${(n / 1e3).toFixed(abs >= 1e5 ? 0 : 1)}K`;
+	if (abs >= 1e9) return `${tidy((n / 1e9).toFixed(2))}B`;
+	if (abs >= 1e6) return `${tidy((n / 1e6).toFixed(2))}M`;
+	if (abs >= 1e3) return `${tidy((n / 1e3).toFixed(abs >= 1e5 ? 0 : 1))}K`;
 	return String(Math.round(n));
 };
 
@@ -94,3 +119,12 @@ export const clampAmount = (value: number, max: number): number =>
  * The adapter from the game's rarity id (a string that may be anything a save or a future catalog holds) to a design-system `Rarity`: a known id passes, anything else reads as `common`. Wiring code calls it instead of casting.
  */
 export const toRarity = (id: string | undefined | null): Rarity => ((RARITIES as readonly string[]).includes(id ?? '') ? (id as Rarity) : 'common');
+
+/**
+ * How much a dock icon swells while the pointer is `distance` px from its centre: 1 (normal) far away, `peak` right under the pointer, falling off smoothly over `reach` px, so the neighbours of the hovered icon are lifted a little too.
+ */
+export const dockMagnification = (distance: number, peak = 1.25, reach = 100): number => {
+	if (!Number.isFinite(distance) || distance >= reach) return 1;
+	const t = 1 - Math.max(0, distance) / reach;
+	return 1 + (peak - 1) * (0.5 - 0.5 * Math.cos(Math.PI * t));
+};

@@ -83,17 +83,17 @@ test('levels: terminate for any XP, including absurd and non-finite values', () 
 });
 
 test('big numbers are shown with suffixes up to Sx, then scientific, and never as Infinity text by accident', () => {
-	assert.equal(formatNumber(1_500_000), '1.50M');
-	assert.equal(formatNumber(2.5e9), '2.50B');
-	assert.equal(formatNumber(3e12), '3.00T');
-	assert.equal(formatNumber(4e15), '4.00Qa');
-	assert.equal(formatNumber(5e18), '5.00Qi');
-	assert.equal(formatNumber(6e21), '6.00Sx');
-	assert.equal(formatNumber(7e24), '7.00e24');
+	assert.equal(formatNumber(1_500_000), '1.5M');
+	assert.equal(formatNumber(2.5e9), '2.5B');
+	assert.equal(formatNumber(3e12), '3T');
+	assert.equal(formatNumber(4e15), '4Qa');
+	assert.equal(formatNumber(5e18), '5Qi');
+	assert.equal(formatNumber(6e21), '6Sx');
+	assert.equal(formatNumber(7e24), '7e24');
 	assert.equal(formatNumber(12_345), '12.35K');
-	assert.equal(formatRate(2e15), '+2.00Qa/s');
-	assert.equal(formatRate(-3e6), '-3.00M/s');
-	assert.equal(formatRate(1234.5), '+1234.50/s');
+	assert.equal(formatRate(2e15), '+2Qa/s');
+	assert.equal(formatRate(-3e6), '-3M/s');
+	assert.equal(formatRate(1234.5), '+1234.5/s');
 });
 
 test('stats and percentages use the same short notation: plain below 10,000 (5,000 for a percentage), then K / M / B / T', () => {
@@ -102,14 +102,14 @@ test('stats and percentages use the same short notation: plain below 10,000 (5,0
 	assert.equal(formatCompact(6.004), '6');
 	assert.equal(formatCompact(2.456, 2), '2.46');
 	assert.equal(formatCompact(9999), '9999');
-	assert.equal(formatCompact(174_198_138), '174.20M');
-	assert.equal(formatCompact(2.5e9), '2.50B');
+	assert.equal(formatCompact(174_198_138), '174.2M');
+	assert.equal(formatCompact(2.5e9), '2.5B');
 	assert.equal(formatCompact(undefined), '0');
 	assert.equal(formatPct(27.34), '27.3%');
 	assert.equal(formatPct(4999), '4999%');
 	assert.equal(formatPct(14_080), '14.08K%');
-	assert.equal(formatPct(3e6), '3.00M%');
+	assert.equal(formatPct(3e6), '3M%');
 	assert.equal(formatPercent(4999), '4999%');
-	assert.equal(formatPercent(5000), '5.00K%');
+	assert.equal(formatPercent(5000), '5K%');
 	assert.equal(formatPercent(450), '450%');
 });

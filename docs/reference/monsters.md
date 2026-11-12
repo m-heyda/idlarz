@@ -17,7 +17,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:453`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:454`](../../src/config/combatConfig.ts)
 
 The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
@@ -234,7 +234,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:401`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:402`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 

@@ -9,8 +9,9 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { monsterNameOf } from '@/stores/bestiaryStore';
 import PixelIcon from './PixelIcon';
-import PixelModal from './PixelModal';
+import GameModal from './GameModal';
 import { itemIconName } from './itemUi';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 
 /** "Dismiss this monster?": removes it from the map for good, no fight and no loot. */
 const DismissBody: React.FC<{ id: number }> = ({ id }) => {
@@ -29,8 +30,8 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 	const label = `${name} (level ${formatCompact(monster.level)})`;
 
 	return (
-		<PixelModal title='Dismiss monster?' size='sm' onClose={done}>
-			<div className='px-card text-sm'>
+		<GameModal title='Dismiss monster?' size='sm' onClose={done}>
+			<div className='ds-listrow text-sm' style={{ marginBottom: 10 }}>
 				<p className='text-[#ecdcb4] mb-2'>
 					Remove the <span className='text-[#f0d27a]'>{label}</span> from the map?
 				</p>
@@ -38,11 +39,9 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 					It disappears for good and you get no loot or XP for it. Use it when a monster is too strong and the map is full, so a new one can appear.
 				</p>
 				<div className='flex justify-between'>
-					<button className='px-btn' onClick={done}>
-						Cancel
-					</button>
-					<button
-						className='px-btn px-btn-red'
+					<Button onClick={done}>Cancel</Button>
+					<Button
+						tone='danger'
 						onClick={() => {
 							if (dismissMonster(id)) {
 								audioManager.playSound('click');
@@ -52,10 +51,10 @@ const DismissBody: React.FC<{ id: number }> = ({ id }) => {
 						}}
 					>
 						Dismiss
-					</button>
+					</Button>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 
@@ -88,8 +87,8 @@ const DiscardBody: React.FC<{ index: number }> = ({ index }) => {
 	};
 
 	return (
-		<PixelModal title='Discard item?' size='sm' onClose={done}>
-			<div className='px-card text-sm'>
+		<GameModal title='Discard item?' size='sm' onClose={done}>
+			<div className='ds-listrow text-sm' style={{ marginBottom: 10 }}>
 				<div className='flex items-center gap-3 mb-2'>
 					<PixelIcon name={itemIconName(def)} alt='' />
 					<span style={{ color }}>
@@ -99,22 +98,20 @@ const DiscardBody: React.FC<{ index: number }> = ({ index }) => {
 				</div>
 				<p className='text-[#a89878] mb-3'>It is destroyed for good, not sold: you get no gold. To get gold for it, sell it to the merchant.</p>
 				<div className='flex justify-between gap-2 flex-wrap'>
-					<button className='px-btn' onClick={done}>
-						Cancel
-					</button>
+					<Button onClick={done}>Cancel</Button>
 					<div className='flex gap-2'>
 						{qty > 1 && (
-							<button className='px-btn px-btn-red' onClick={() => discard(1)}>
+							<Button tone='danger' onClick={() => discard(1)}>
 								Discard 1
-							</button>
+							</Button>
 						)}
-						<button className='px-btn px-btn-red' onClick={() => discard(qty)}>
+						<Button tone='danger' onClick={() => discard(qty)}>
 							{qty > 1 ? `Discard all (${formatCompact(qty)})` : 'Discard'}
-						</button>
+						</Button>
 					</div>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

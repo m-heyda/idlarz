@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { formatHeaderAmount, formatInt, formatRateAuto, parseAmount, pickRateUnit } from '../../src/utils/formatters';
+import { formatHeaderAmount, formatInt, formatRateAuto, parseAmount, pickRateUnit, tidy } from '../../src/utils/formatters';
 import { castleTimerLabel } from '../../src/lib/castleTimer';
 
 test('header amounts below 1,000 are whole numbers, so they never grow decimals', () => {
@@ -13,25 +13,25 @@ test('header amounts below 1,000 are whole numbers, so they never grow decimals'
 });
 
 test('header amounts from 1,000 use three significant digits and a suffix', () => {
-	assert.equal(formatHeaderAmount(1000), '1.00K');
+	assert.equal(formatHeaderAmount(1000), '1K');
 	assert.equal(formatHeaderAmount(1234), '1.23K');
-	assert.equal(formatHeaderAmount(9999), '10.0K');
+	assert.equal(formatHeaderAmount(9999), '10K');
 	assert.equal(formatHeaderAmount(12345), '12.3K');
 	assert.equal(formatHeaderAmount(123456), '123K');
-	assert.equal(formatHeaderAmount(1e6), '1.00M');
+	assert.equal(formatHeaderAmount(1e6), '1M');
 	assert.equal(formatHeaderAmount(2.39e6), '2.39M');
 	assert.equal(formatHeaderAmount(4.06e9), '4.06B');
-	assert.equal(formatHeaderAmount(5e12), '5.00T');
+	assert.equal(formatHeaderAmount(5e12), '5T');
 });
 
 test('header amounts carry into the next suffix instead of printing 1000', () => {
-	assert.equal(formatHeaderAmount(999_960), '1.00M');
+	assert.equal(formatHeaderAmount(999_960), '1M');
 	assert.equal(formatHeaderAmount(999_499), '999K');
-	assert.equal(formatHeaderAmount(999_999_999), '1.00B');
+	assert.equal(formatHeaderAmount(999_999_999), '1B');
 });
 
 test('header amounts stay short past the suffix table, and survive odd input', () => {
-	assert.equal(formatHeaderAmount(1e24), '1.0e24');
+	assert.equal(formatHeaderAmount(1e24), '1e24');
 	assert.equal(formatHeaderAmount(1.23e30), '1.2e30');
 	assert.equal(formatHeaderAmount(Infinity), '∞');
 	assert.equal(formatHeaderAmount(NaN), '0');
@@ -39,13 +39,16 @@ test('header amounts stay short past the suffix table, and survive odd input', (
 	assert.equal(formatHeaderAmount(-1234), '-1.23K');
 });
 
-test('a ticking counter keeps its length inside one suffix step', () => {
-	const lengths = new Set<number>();
-	for (let n = 1000; n < 9990; n += 7) lengths.add(formatHeaderAmount(n).length);
-	assert.deepEqual([...lengths], [5]); // 1.00K .. 9.99K
-	const wide = new Set<number>();
-	for (let n = 100_000; n < 999_000; n += 997) wide.add(formatHeaderAmount(n).length);
-	assert.deepEqual([...wide], [4]); // 100K .. 998K
+test('a number never carries a zero at the end of its decimals (1K, not 1.0K or 1.00K)', () => {
+	for (let n = 1000; n < 9_999_999; n += 997) assert.doesNotMatch(formatHeaderAmount(n), /\.\d*0[A-Za-z]*$/, String(n));
+	assert.equal(formatHeaderAmount(2000), '2K');
+	assert.equal(formatHeaderAmount(2500), '2.5K');
+	assert.equal(tidy('7.00'), '7');
+	assert.equal(tidy('0.90'), '0.9');
+	assert.equal(tidy('1.50K'), '1.5K');
+	assert.equal(tidy('10.00M'), '10M');
+	assert.equal(tidy('100'), '100');
+	assert.equal(tidy('1,000'), '1,000');
 });
 
 test('the rate unit follows how much there is', () => {
@@ -63,9 +66,9 @@ test('the rate unit follows how much there is', () => {
 });
 
 test('rate text names its unit and sign', () => {
-	assert.equal(formatRateAuto(0.1), '+6.00/min');
-	assert.equal(formatRateAuto(12.5), '+12.50/s');
-	assert.equal(formatRateAuto(0.001), '+3.60/h');
+	assert.equal(formatRateAuto(0.1), '+6/min');
+	assert.equal(formatRateAuto(12.5), '+12.5/s');
+	assert.equal(formatRateAuto(0.001), '+3.6/h');
 	assert.equal(formatRateAuto(0), null);
 });
 

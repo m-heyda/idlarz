@@ -64,7 +64,6 @@ import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
 import GemShopDialog from '@/components/game/overlays/GemShopDialog';
-import TutorialDialog from '@/components/game/overlays/TutorialDialog';
 import { useSettingsStore } from '@/stores/settingsStore';
 import TabLockOverlay from '@/components/game/overlays/TabLockOverlay';
 import { useSingleTab } from '@/hooks/useSingleTab';
@@ -85,7 +84,7 @@ import { useSpawnSync } from '@/hooks/useSpawnSync';
 import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 import DailyBonusDialog from '@/components/game/overlays/DailyBonusDialog';
 import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
-import PetWelcomeDialog from '@/components/game/overlays/PetWelcomeDialog';
+import { usePetStore } from '@/stores/petStore';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
@@ -168,6 +167,14 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 		applyProfileToFreshGame(profile.characterName, profile.playerClass);
 	}, [profile, isHydrated, tabStatus, applyProfileToFreshGame]);
 
+	// the pets: asked once per start of the game (this is where the special pet is granted and which pets the castle shows)
+	const petsAsked = useRef(false);
+	useEffect(() => {
+		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done' || petsAsked.current) return;
+		petsAsked.current = true;
+		void usePetStore.getState().sync();
+	}, [isHydrated, tabStatus, claim]);
+
 	useEffect(() => {
 		// Only the owning tab runs the game, and only once the saved game has been loaded
 		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done') return;
@@ -186,10 +193,8 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 
 	return (
 		<main className='h-screen w-screen overflow-hidden relative'>
-			{/* z-50 puts the header above the window backdrop (z-45): resources stay visible and the Menu button toggles */}
-			<div className='fixed top-0 left-0 right-0 z-50 bg-gray-900/80 backdrop-blur-sm'>
-				<GameHeader />
-			</div>
+			{/* the top bar is z-50, above the window backdrop (z-45): resources stay visible and the menu button toggles. No wrapper with a blur: it would become the containing block of the dock's fixed position */}
+			<GameHeader />
 			<Grid />
 			<FloatingText />
 			<GameWindows />
@@ -205,9 +210,7 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<OfflineDialog />
 			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<TutorialDialog />
 			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<PetWelcomeDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
 			<ConfirmDialogs />
 			<BuildModal />
 			<BuildingModal />

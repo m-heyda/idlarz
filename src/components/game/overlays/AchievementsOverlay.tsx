@@ -3,6 +3,7 @@ import { ACHIEVEMENTS, LOCKED_LABEL, type AchievementDef } from '@/catalog/achie
 import { achievementRowState, claimableIds, type AchievementRowState, type AchievementViewInput } from '@/lib/achievementView';
 import { useAchievementStore } from '@/stores/achievementStore';
 import GemIcon from '../GemIcon';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 
 /**
  * One row: an earned achievement shows its title, text, what it gives and a gold Claim button until it is claimed (then a muted 'Claimed' tag); a locked one shows '???' but still the gems it pays,
@@ -17,11 +18,7 @@ export const AchievementRow: React.FC<{ def: AchievementDef; state: AchievementR
 	const { earned } = state;
 	const log = [state.earnedText, state.claimedText].filter(Boolean).join(' · ');
 	return (
-		<li
-			className={`flex items-center justify-between gap-3 px-3 py-2 border border-[#4a3a26] ${earned ? 'bg-[#2a2012] text-[#ecdcb4]' : 'bg-[#1a140c] text-[#7a6a52]'}`}
-			data-earned={earned}
-			data-claimed={state.claimed}
-		>
+		<li className='ds-listrow ds-listrow-line' data-dim={!earned} data-earned={earned} data-claimed={state.claimed}>
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img
 				src={`/pixel/new_assets/achievements/${def.badge}.png`}
@@ -50,9 +47,9 @@ export const AchievementRow: React.FC<{ def: AchievementDef; state: AchievementR
 					<GemIcon />
 				</div>
 				{state.canClaim && (
-					<button type='button' className='px-btn px-btn-gold' disabled={busy || !onClaim} onClick={onClaim}>
+					<Button tone='gold' size='sm' disabled={busy || !onClaim} onClick={onClaim}>
 						Claim
-					</button>
+					</Button>
 				)}
 				{state.claimed && <span className='text-xs text-[#7a6a52]'>Claimed</span>}
 			</div>
@@ -76,21 +73,21 @@ export const AchievementList: React.FC<{ report: AchievementViewInput; busy?: st
 	const claimAll = () => useAchievementStore.getState().claimAll();
 	return (
 		<div className='text-sm space-y-2'>
-			<div className='flex items-center justify-between gap-2 text-[#d8c8a0]'>
-				<span>
-					{count} of {ACHIEVEMENTS.length} earned · {claimable.length} to claim
-				</span>
-				{claimable.length >= 2 && onClaim && (
-					<button type='button' className='px-btn px-btn-gold' disabled={busy !== null} onClick={() => void claimAll()}>
-						Claim all
-					</button>
-				)}
+			<div className='ds-dim' style={{ padding: '2px 2px 4px' }}>
+				{count} of {ACHIEVEMENTS.length} earned · {claimable.length} to claim
 			</div>
 			<ul className='space-y-1'>
 				{states.map(({ def, state }) => (
 					<AchievementRow key={def.id} def={def} state={state} busy={busy !== null} onClaim={onClaim ? () => onClaim(def.id) : undefined} />
 				))}
 			</ul>
+			{claimable.length >= 2 && onClaim && (
+				<div className='ds-sticky-foot'>
+					<Button tone='gold' disabled={busy !== null} onClick={() => void claimAll()}>
+						Claim all ({claimable.length})
+					</Button>
+				</div>
+			)}
 		</div>
 	);
 };

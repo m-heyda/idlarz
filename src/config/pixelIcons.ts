@@ -64,6 +64,7 @@ const BASE_ICON_SIZES = {
 	menu_glossary: [64, 64],
 	menu_gems_pouch: [64, 64],
 	menu_bag_scroll: [64, 64],
+	menu_bestiary: [64, 64], // the stone slab with a stag silhouette (the Bestiary button)
 	comp_glass_vial: [40, 40],
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
 	water_ripple_swamp: [96, 5], // 8 frames of 12x5
@@ -270,7 +271,14 @@ export const animalIcon = (kind: string, seed?: string): PixelIconName => {
 };
 
 /** The farm sprites whose art looks to the right (head on the right); every other animal sprite looks left. The farm mirrors an animal so it always walks the way it looks. */
-const FACES_RIGHT: ReadonlySet<PixelIconName> = new Set<PixelIconName>(['animal_cow_1', 'animal_pig', 'animal_sheep', 'animal_duck', 'animal_rooster']);
+const FACES_RIGHT: ReadonlySet<PixelIconName> = new Set<PixelIconName>([
+	'animal_cow_1',
+	'animal_cow_2',
+	'animal_pig',
+	'animal_sheep',
+	'animal_duck',
+	'animal_rooster',
+]);
 
 /** Whether this animal sprite looks to the right without a flip (see {@link FACES_RIGHT}). */
 export const facesRight = (icon: PixelIconName): boolean => FACES_RIGHT.has(icon);

@@ -367,7 +367,6 @@
 }
 
 .ds-iconbtn:hover img {
-	transform: translateY(-2px);
 	filter: drop-shadow(0 0 6px rgba(244, 213, 126, 0.7));
 }
 
@@ -1668,7 +1667,7 @@
 
 /* ===== container queries: slots scale with the window; columns stack when narrow ===== */
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-baggrid {
 		--ds-slot-size: 44px;
 	}
@@ -1680,7 +1679,7 @@
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-baggrid {
 		--ds-slot-size: 32px;
 	}
@@ -1738,7 +1737,7 @@
 	min-height: 0;
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-doll {
 		flex: none;
 		height: 340px;
@@ -1754,7 +1753,7 @@
 
 /* Short or narrow window: drop the silhouette and lay the equipment slots out in its place, two rows of squares, with the bars and hands below */
 
-@container ds-win (max-height: 780px), ds-win (max-width: 720px) {
+@container ds-win (max-height: 780px) or (max-width: 720px) {
 	.ds-doll {
 		display: flex;
 		flex-direction: column;
@@ -2309,13 +2308,13 @@
 	border-width: 1px;
 }
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
 	}
@@ -2412,6 +2411,9 @@
 		0 0 0 1px #05060a,
 		0 8px 18px rgba(0, 0, 0, 0.6);
 	min-width: 150px;
+	max-width: min(320px, calc(100vw - 16px));
+	max-height: calc(100vh - 16px);
+	overflow-y: auto;
 	padding: 3px;
 	font-size: 12px;
 }
@@ -2482,7 +2484,7 @@
 	gap: 10px;
 	height: 100%;
 	min-height: 0;
-	grid-template-columns: minmax(250px, 312px) 1fr;
+	grid-template-columns: minmax(318px, 352px) 1fr;
 }
 
 .ds-hero > .ds-hero-left {
@@ -2491,10 +2493,10 @@
 
 .ds-equip {
 	display: grid;
-	--ds-slot-size: 44px;
+	--ds-slot-size: 48px;
 	grid-template-columns: auto 1fr;
 	justify-items: start;
-	gap: 8px 18px;
+	gap: 6px 14px;
 }
 
 .ds-equip > .ds-eqgroup:nth-child(1),
@@ -2518,13 +2520,13 @@
 	display: none;
 }
 
-@container ds-win (max-width: 900px), ds-win (max-height: 620px) {
+@container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-equip {
 		--ds-slot-size: 40px;
 	}
 }
 
-@container ds-win (max-width: 720px), ds-win (max-height: 520px) {
+@container ds-win (max-width: 720px) or (max-height: 520px) {
 	.ds-equip {
 		--ds-slot-size: 32px;
 	}
@@ -3468,4 +3470,923 @@
 	height: 6px;
 	background: var(--ds-gold);
 	box-shadow: 0 0 0 1px #05060a;
+}
+
+/* ===== HUD wiring (IDL-325): clickable chips, open window marks, a dimmed dock icon, steady chip widths ===== */
+.ds-chip-link {
+	cursor: pointer;
+}
+
+.ds-chip-link:hover {
+	filter: brightness(1.25);
+}
+
+.ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 3.4em;
+	font-variant-numeric: tabular-nums;
+}
+
+.ds-iconbtn[data-active='true'] img,
+.ds-iconbtn[data-active='true'] .ds-iconbtn-art {
+	filter: drop-shadow(0 0 6px rgba(244, 213, 126, 0.9));
+}
+
+.ds-iconbtn[data-active='true'] > span:last-child {
+	color: #f0d27a;
+}
+
+.ds-iconbtn[aria-disabled='true'] {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.ds-glyphbtn[data-active='true'] {
+	filter: brightness(1.2);
+	box-shadow: inset 0 0 0 2px #fff3c4;
+}
+
+/* dock magnification (--ds-mag is set from the pointer's distance by Dock): the picture and its badge swell together, upwards from the base */
+.ds-iconbtn-pic {
+	position: relative;
+	display: grid;
+	place-items: center;
+	transform-origin: 50% 100%;
+	transform: scale(var(--ds-mag, 1));
+	transition: transform 0.09s ease-out;
+}
+
+.ds-iconbtn-art {
+	display: grid;
+	place-items: center;
+	width: 60px;
+	height: 60px;
+}
+
+.ds-iconbtn-pic .ds-badge-float,
+.ds-dock .ds-iconbtn-pic .ds-badge-float {
+	top: -3px;
+	right: -5px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-iconbtn-pic {
+		transition: none;
+	}
+}
+
+/* the top bar: the trays sit in the middle of the bar, the buttons hold the right edge */
+.ds-topbar {
+	position: relative;
+	justify-content: center;
+}
+
+.ds-topbar-right {
+	position: absolute;
+	right: 14px;
+	top: 0;
+	bottom: 0;
+	margin-left: 0;
+	align-items: center;
+}
+
+/* ===== Hero window wiring (IDL-323): the junk mark of a bag slot, the class line as a button ===== */
+.ds-slot-junk {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 8px;
+	height: 8px;
+	background: #8a5a2a;
+	border: 1px solid var(--ds-gold-lt);
+	pointer-events: none;
+}
+
+.ds-identity-class {
+	font: inherit;
+	font-size: 11px;
+	padding: 0;
+	background: none;
+	border: 0;
+	cursor: pointer;
+	text-align: left;
+}
+
+.ds-identity-class:hover {
+	color: var(--ds-gold-lt);
+}
+
+/* a hover tip around a bar: the bar keeps the full width (the XP, HP and MP bars of the Hero window) */
+.ds-hovertip[data-fill='true'] {
+	display: flex;
+	width: 100%;
+}
+
+.ds-hovertip[data-fill='true'] > :first-child {
+	flex: 1;
+	min-width: 0;
+}
+
+/* Hero window: the armor and jewelry rows stretch their six slots to the full width of the panel (no gap at the right edge); hands and skills use a slightly bigger slot too */
+.ds-hero-left .ds-equip {
+	--ds-slot-size: 52px;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) {
+	align-items: stretch;
+	width: 100%;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-eqgrid {
+	grid-template-columns: repeat(6, 1fr) !important;
+	width: 100%;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-slot {
+	width: 100%;
+	height: auto;
+}
+
+.ds-hero-left .ds-equip > .ds-eqgroup:nth-child(-n + 2) .ds-slot img {
+	width: 62%;
+	height: 62%;
+}
+
+/* ===== Stats tab of the Hero window: the attribute strip stays, the ledger scrolls, sections fold ===== */
+.ds-stats {
+	display: flex;
+	flex-direction: column;
+	gap: 0;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.ds-attrstrip {
+	flex: none;
+	padding-bottom: 6px;
+	border-bottom: 2px solid #a9894f;
+}
+
+.ds-attrstrip .ds-attrs {
+	margin: 8px 0 4px;
+}
+
+.ds-stats-scroll {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	padding: 8px 4px 4px 0;
+}
+
+.ds-attr .ds-hovertip {
+	flex: 1;
+	min-width: 0;
+}
+
+.ds-psec {
+	margin-bottom: 12px;
+}
+
+.ds-psec-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 0 0 3px;
+	font: inherit;
+	font-size: 13px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #6a3f00;
+	text-align: left;
+	background: none;
+	border: 0;
+	border-bottom: 2px solid #a9894f;
+	cursor: pointer;
+}
+
+.ds-psec-title {
+	flex: 1;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-psec-summary {
+	font-size: 13px;
+	letter-spacing: 0;
+	text-transform: none;
+}
+
+.ds-psec-caret {
+	width: 0;
+	height: 0;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+	border-top: 6px solid currentColor;
+	transition: transform 0.12s;
+}
+
+.ds-psec[data-open='false'] .ds-psec-caret {
+	transform: rotate(-90deg);
+}
+
+.ds-psec-body {
+	padding-top: 4px;
+}
+
+.ds-psec-compact {
+	margin: 2px 0 0;
+}
+
+.ds-psec-compact .ds-psec-head {
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: none;
+	border-bottom: 1px solid #c8ad74;
+	padding: 2px 0;
+}
+
+.ds-paper-row[data-muted='true'] {
+	padding-left: 18px;
+	color: #8a7a5a;
+	height: 20px;
+}
+
+.ds-paper-cols-flow {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 0 26px;
+	align-items: start;
+}
+
+.ds-income-table {
+	display: grid;
+	grid-template-columns: minmax(0, 1.4fr) repeat(3, minmax(0, 1fr));
+	gap: 2px 12px;
+	font-size: 13px;
+	width: 100%;
+}
+
+.ds-income-table > span {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.ds-income-table > .ds-income-name {
+	text-align: left;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	color: #5a4326;
+}
+
+.ds-income-table img {
+	width: 16px;
+	height: 16px;
+	image-rendering: pixelated;
+}
+
+.ds-income-table > .ds-income-head {
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #8a7a5a;
+	border-bottom: 1px solid #c8ad74;
+	padding-bottom: 2px;
+}
+
+.ds-paper-note {
+	margin: 4px 0 8px;
+	font-size: 12px;
+	color: #6a4b24;
+}
+
+@container ds-win (max-width: 900px) {
+	.ds-paper-cols-flow {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+/* the income table's headers are buttons that sort the rows */
+button.ds-income-head {
+	font: inherit;
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #6a4b24;
+	background: none;
+	border: 0;
+	border-bottom: 1px solid #c8ad74;
+	padding: 0 0 2px;
+	text-align: right;
+	cursor: pointer;
+}
+
+button.ds-income-head.ds-income-name {
+	text-align: left;
+}
+
+button.ds-income-head:hover {
+	color: #2b1d0e;
+}
+
+.ds-sort-mark {
+	margin-left: 4px;
+	font-style: normal;
+	font-size: 9px;
+}
+
+/* ===== Crafting tab of the Hero window ===== */
+.ds-paper-input {
+	width: 6.5em;
+	height: 26px;
+	padding: 0 6px;
+	font: inherit;
+	font-size: 13px;
+	text-align: right;
+	color: #2b1d0e;
+	background: rgba(255, 255, 255, 0.45);
+	border: 1px solid #a9894f;
+}
+
+.ds-paper-input:disabled {
+	opacity: 0.5;
+}
+
+.ds-odds-rows {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px 14px;
+	padding: 6px 0 2px;
+	font-size: 13px;
+}
+
+.ds-odds-row {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-odds-row i {
+	width: 10px;
+	height: 10px;
+	border: 1px solid #2b1d0e;
+}
+
+.ds-craft-top .ds-xp {
+	flex: 1;
+}
+
+/* a dark box on the paper for content written for the dark panels (the rebirth run history) */
+.ds-paper-dark {
+	padding: 10px 12px;
+	color: var(--ds-text);
+	background: #0b0d14;
+	border: 1px solid #3a2c1c;
+}
+
+/* ===== Crafting tab: a narrower sidebar with the level, the queue and the blacksmith ===== */
+.ds-hero[data-tab='craft'] {
+	grid-template-columns: minmax(250px, 280px) 1fr;
+}
+
+.ds-hero > .ds-craft-side {
+	align-self: stretch;
+	overflow: hidden;
+}
+
+.ds-craft-level {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	padding: 8px 10px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line-dk);
+}
+
+.ds-craft-level-line {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	gap: 8px;
+	white-space: nowrap;
+}
+
+.ds-craft-smith {
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+}
+
+.ds-craft-smith img {
+	display: block;
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	image-rendering: pixelated;
+}
+
+/* the queue in the narrow sidebar: two lines per batch */
+.ds-queue[data-stacked='true'] .ds-queue-head .ds-btn {
+	width: 100%;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-head {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 4px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row {
+	grid-template-columns: 18px 1fr 52px 70px;
+	grid-template-areas:
+		'icon name cancel collect'
+		'bar bar bar bar';
+	row-gap: 3px;
+	padding-bottom: 4px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-icon {
+	grid-area: icon;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-name {
+	grid-area: name;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-bar {
+	grid-area: bar;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row > .ds-btn:nth-of-type(1) {
+	grid-area: cancel;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-row > .ds-btn:nth-of-type(2) {
+	grid-area: collect;
+}
+
+/* Crafting tab: a gray track under the green crafting XP, a wider recipe list, air under Collect all */
+.ds-craft-level .ds-bar {
+	height: 22px;
+	background: #4a4e5a;
+}
+
+.ds-hero .ds-craft-list {
+	width: 360px;
+	--ds-slot-size: 48px;
+}
+
+.ds-queue[data-stacked='true'] .ds-queue-head {
+	margin-bottom: 8px;
+}
+
+/* ===== Merchant: red Sell and green Buy, the chosen one outlined; the typed amount as tall as its buttons ===== */
+.ds-mode-sell,
+.ds-mode-buy {
+	color: #fff;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+	opacity: 0.72;
+}
+
+.ds-mode-sell {
+	background: linear-gradient(#d4604f, #8e2a1d);
+	border-color: #4a120a;
+}
+
+.ds-mode-buy {
+	background: linear-gradient(#4cb35f, #1f6c33);
+	border-color: #0d3a1a;
+}
+
+.ds-mode-sell[data-selected='true'],
+.ds-mode-buy[data-selected='true'] {
+	opacity: 1;
+	outline: 2px solid #fff3c4;
+	outline-offset: 1px;
+}
+
+.ds-mode-sell:disabled,
+.ds-mode-buy:disabled {
+	opacity: 0.35;
+}
+
+.ds-amount-row {
+	align-items: stretch;
+}
+
+.ds-amount-row .ds-amount-label {
+	align-self: center;
+}
+
+.ds-amount-chip,
+.ds-amount-field {
+	box-sizing: border-box;
+	height: 32px;
+}
+
+.ds-amount-field {
+	min-width: 0;
+}
+
+/* the small diamond level: for tiles packed tight (the farm upgrades) */
+.ds-gems[data-size='sm'] {
+	gap: 2px;
+}
+
+.ds-gems[data-size='sm'] .ds-gem {
+	width: 8px;
+	height: 10px;
+}
+
+/* a flush window body (the farm scene) is the positioning parent of what fills it, and starts under a compact header row so the title never lies over the picture */
+.ds-window-body[data-flush='true'] {
+	position: relative;
+	margin: 30px 6px 6px;
+}
+
+/* ===== MVP refresh of the Gem shop and the Deeds list: rows on the dark inset, the same look as the new windows ===== */
+.ds-listrow {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 8px 12px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid var(--ds-line-dk, #2a2118);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+	color: var(--ds-text, #e9e4d6);
+}
+
+.ds-listrow-line {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+
+.ds-listrow[data-dim='true'] {
+	color: #7a7f90;
+}
+
+.ds-listrow[data-dim='true'] img {
+	opacity: 0.5;
+}
+
+/* tooltips on the map: sized by their content (the map places and scales them) */
+.ds-tip.map-ds-tip {
+	width: max-content;
+	min-width: 190px;
+	max-width: 300px;
+}
+
+/* the key hints of an item tooltip: key caps with what they do, pushed to the two ends */
+.ds-tip-keys {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+	margin-top: 8px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 11px;
+	color: var(--ds-text-dim);
+}
+
+/* the top bar, tightened: narrower chips, less air between the trays */
+.ds-topbar {
+	gap: 6px;
+}
+
+.ds-chipgroup .ds-chip {
+	padding: 0 5px 0 3px;
+	gap: 3px;
+}
+
+.ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 2.6em;
+}
+
+.ds-chipgroup .ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	min-width: 0;
+}
+
+/* picker cards (badge and title): dark tiles with a gold rim when chosen */
+.ds-pick-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+	gap: 8px;
+	margin-top: 6px;
+}
+
+.ds-pick {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	min-height: 64px;
+	padding: 8px 6px;
+	font-family: inherit;
+	font-size: 12px;
+	text-align: center;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+	color: var(--ds-text, #e9e4d6);
+	cursor: pointer;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid var(--ds-line-dk, #2a2118);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.ds-pick:hover {
+	filter: brightness(1.2);
+}
+
+.ds-pick[data-selected='true'] {
+	border-color: var(--ds-gold, #e0a93a);
+	background: rgba(224, 169, 58, 0.14);
+}
+
+.ds-pick-none {
+	display: grid;
+	place-items: center;
+	width: 40px;
+	height: 40px;
+	border: 1px dashed #6c6a60;
+	color: #8a8676;
+}
+
+/* notices (chest rewards, achievements, short messages): small dark cards with a gold rim */
+.ds-toast {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 6px 14px;
+	font-size: 12px;
+	line-height: 1.3;
+	color: var(--ds-text, #e9e4d6);
+	text-align: center;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 2px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 14px rgba(224, 169, 58, 0.3),
+		0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+.ds-toast-line {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-toast-title {
+	font-size: 14px;
+	color: var(--ds-gold-lt, #f4d57e);
+	white-space: nowrap;
+}
+
+.ds-toast-sub {
+	color: var(--ds-gold-lt, #f4d57e);
+}
+
+.ds-toast-hint {
+	font-size: 11px;
+	color: var(--ds-text-dim, #9aa4bd);
+}
+
+.ds-toast.ds-toast-row {
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	text-align: left;
+}
+
+.ds-toast-kicker {
+	font-size: 10px;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--ds-gold, #e0a93a);
+}
+
+/* crafting list: slightly bigger icons */
+.ds-hero .ds-craft-list {
+	--ds-slot-size: 52px;
+}
+
+/* the number in a tab badge sits in the middle of the circle */
+.ds-tab .ds-badge {
+	padding: 0;
+	min-width: 16px;
+	line-height: 16px;
+	letter-spacing: 0;
+	text-indent: 0;
+	text-align: center;
+	font-variant-numeric: tabular-nums;
+}
+
+/* a tooltip that is only a head (the chest) has no rule under it */
+.ds-tip-head:last-child {
+	padding-bottom: 0;
+	border-bottom: 0;
+}
+
+/* the merchant trade ticket: more air between its blocks */
+.ds-ticket {
+	gap: 20px;
+}
+
+.ds-ticket .ds-amount {
+	gap: 14px;
+}
+
+.ds-ticket .ds-inset {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 16px;
+}
+
+.ds-ticket > .ds-btn:last-child {
+	min-height: 44px;
+}
+
+/* a golden monster's picture in a tooltip */
+.ds-tip-lucky {
+	filter: sepia(1) saturate(4) hue-rotate(-10deg) brightness(1.15) drop-shadow(0 0 4px #ffd54a);
+}
+
+/* sliders never push their row wider than the window */
+.ds-slider {
+	min-width: 0;
+}
+
+.ds-range {
+	min-width: 0;
+	width: 100%;
+}
+
+.ds-modal .ds-frame {
+	overflow-x: hidden;
+}
+
+/* an action bar pinned to the bottom of a scrolling window body */
+.ds-sticky-foot {
+	position: sticky;
+	bottom: 0;
+	z-index: 2;
+	display: flex;
+	justify-content: flex-end;
+	margin: 8px -4px -4px;
+	padding: 10px 8px;
+	background: linear-gradient(transparent, #0a0c12 40%);
+}
+
+/* a slider whose value is shown elsewhere */
+.ds-slider-bare .ds-slider-out {
+	display: none;
+}
+
+/* an undiscovered monster: a dark shape with a gold question mark over it */
+.ds-mon-art,
+.ds-deed-icon-lg {
+	position: relative;
+}
+
+.ds-mon[data-unk='true'] .ds-mon-art img,
+.ds-unk-sil {
+	filter: brightness(0) drop-shadow(0 0 1px #5a5f78);
+	opacity: 0.9;
+}
+
+.ds-mon-q {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font-size: 26px;
+	font-weight: 400;
+	color: var(--ds-gold-lt, #f4d57e);
+	text-shadow:
+		0 0 4px #000,
+		0 2px 0 #000;
+	pointer-events: none;
+}
+
+/* the welcome-back report and the daily bonus board */
+.wb-hours {
+	font-size: 2.2rem;
+	line-height: 1.1;
+	color: var(--ds-gold-lt, #f4d57e);
+	font-variant-numeric: tabular-nums;
+	text-shadow: 0 2px 0 #000;
+}
+
+.wb-earned {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px 28px;
+	margin-top: 4px;
+}
+
+.wb-earned-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+	padding-bottom: 4px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.wb-res {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+
+.wb-gain {
+	color: #5ee07a;
+	font-variant-numeric: tabular-nums;
+}
+
+.wb-events {
+	list-style: none;
+	margin: 0;
+	gap: 8px;
+}
+
+.wb-events li {
+	text-align: center;
+}
+
+.wb-events b {
+	color: var(--ds-gold-lt, #f4d57e);
+	font-weight: 400;
+}
+
+.dd-days {
+	display: grid;
+	grid-template-columns: repeat(7, minmax(0, 1fr));
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.dd-day {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 10px 4px;
+	text-align: center;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 1px solid #3a4258;
+	box-shadow: inset 0 0 0 1px #05060a;
+}
+
+.dd-day[data-state='today'] {
+	border-color: var(--ds-gold, #e0a93a);
+	background: linear-gradient(rgba(224, 169, 58, 0.2), #0a0c12);
+	box-shadow:
+		inset 0 0 0 1px #05060a,
+		0 0 12px rgba(224, 169, 58, 0.35);
+}
+
+.dd-day[data-last='true'] {
+	border-color: #b05cf5;
+	background: linear-gradient(rgba(176, 92, 245, 0.18), #0a0c12);
+}
+
+.dd-day[data-state='done'] {
+	opacity: 0.5;
+}
+
+.dd-day-name {
+	font-size: 10px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #9aa4bd;
+}
+
+.dd-day-gems {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 14px;
+	font-variant-numeric: tabular-nums;
+}
+
+.dd-day-note {
+	font-size: 10px;
+	color: #7a7f90;
+}
+
+/* the login and register tabs of the landing page sit in the middle */
+.ld-form-tabs .ds-tabs {
+	justify-content: center;
 }

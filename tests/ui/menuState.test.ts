@@ -24,12 +24,12 @@ test('several windows can be open at once, the last opened is in front', () => {
 test('clicking a window brings it to the front, and opening an open one does the same', () => {
 	closeAll();
 	win().openWindow('equipment');
-	win().openWindow('character');
+	win().openWindow('achievements');
 	win().openWindow('merchant');
 	win().focusWindow('equipment');
-	assert.deepEqual(win().order, ['character', 'merchant', 'equipment']);
-	win().openWindow('character');
-	assert.deepEqual(win().order, ['merchant', 'equipment', 'character']);
+	assert.deepEqual(win().order, ['achievements', 'merchant', 'equipment']);
+	win().openWindow('achievements');
+	assert.deepEqual(win().order, ['merchant', 'equipment', 'achievements']);
 	win().focusWindow('farm'); // a closed window is not opened by a click
 	assert.equal(win().order.includes('farm'), false);
 	closeAll();
@@ -93,8 +93,8 @@ test('an affordable farm upgrade lights the dot even when no animal is', () => {
 
 test('the crafting window opens and closes like the others', () => {
 	closeAll();
-	win().toggleWindow('crafting');
-	assert.deepEqual(win().order, ['crafting']);
-	win().toggleWindow('crafting');
+	win().toggleWindow('achievements');
+	assert.deepEqual(win().order, ['achievements']);
+	win().toggleWindow('achievements');
 	assert.deepEqual(win().order, []);
 });

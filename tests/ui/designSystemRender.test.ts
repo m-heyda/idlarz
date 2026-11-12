@@ -62,7 +62,7 @@ test('AmountInput: a typed amount wins over a preset, unknown text is invalid, t
 	const bad = html(h(AmountInput, { ...base, text: '12x' }));
 	assert.match(bad, /data-invalid="true"/);
 	assert.match(bad, /ds-amount-error/);
-	assert.match(html(h(AmountInput, { ...base, text: '', onSlider: () => undefined })), /1\.0K \/ 5\.0K/);
+	assert.match(html(h(AmountInput, { ...base, text: '', onSlider: () => undefined })), /1K \/ 5K/);
 });
 
 test('tooltip lines: diffs colour by better or worse, costs by affordable or not, an unexplored tile lists its cost', () => {
@@ -105,4 +105,19 @@ test('ItemTooltip shows the set block, lost properties, the Equipped mark and th
 		assert.ok(full.includes(text), text);
 	const bare = html(h(ItemTooltip, { rarity: 'common', icon: '/x.png', name: 'Stick', type: 'Common' }));
 	assert.doesNotMatch(bare, /Equipped|ds-tip-set|Shift/);
+});
+
+test('AttributeStrip: points to spend with enabled + buttons, then a Respec button at 0 points with the + buttons off', async () => {
+	const { AttributeStrip, PaperSection } = await import('../../packages/design-system/src/components/composites');
+	const attrs = [{ id: 'str', label: 'Strength', value: 17 }];
+	const some = html(h(AttributeStrip, { attrs, points: 2, onAdd: () => undefined }));
+	assert.match(some, /2 points to spend/);
+	assert.doesNotMatch(some, /Respec/);
+	assert.doesNotMatch(some, /ds-plus"[^>]*disabled/);
+	const none = html(h(AttributeStrip, { attrs, points: 0, onAdd: () => undefined, onRespec: () => undefined }));
+	assert.match(none, /Respec/);
+	assert.match(none, /disabled/);
+	const shut = html(h(PaperSection, { title: 'Combat', open: false, onToggle: () => undefined, children: h('p', null, 'inside') }));
+	assert.doesNotMatch(shut, /inside/, 'a folded block hides its body');
+	assert.match(shut, /aria-expanded="false"/);
 });

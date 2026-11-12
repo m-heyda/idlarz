@@ -8,7 +8,7 @@ The player's numbers, the server's fight engine, auto-battle, skills and win cha
 
 - Overview: [Combat overview and tunables](#combat)
 - Player numbers: [`maxHp`](#maxhp), [`armorReduction`](#armorreduction), [`WEAPON_ATTACK_SPEED`](#weapon-attack-speed), [`damagePerHit`](#damageperhit), [`attacksPerSecond`](#attackspersecond), [`critOdds`](#critodds), [`swing`](#swing), [`armorOf`](#armorof), [`dodgeChance`](#dodgechance), [`lifeLeechPercent`](#lifeleechpercent), [`regen`](#regen), [`mitigate`](#mitigate)
-- A fight: [`runCombat`](#runcombat), [`pickTarget`](#picktarget), [`queueTicket`](#queueticket), [`autoBattleUnlocked`](#autobattleunlocked), [`playerProfile`](#playerprofile), [`fightStep`](#fightstep), [`endFight`](#endfight), [`engage`](#engage), [`dismissTicket`](#dismissticket), [`projectFight`](#projectfight), [`payKill`](#paykill), [`rngFor`](#rngfor)
+- A fight: [`runCombat`](#runcombat), [`pickTarget`](#picktarget), [`queueTicket`](#queueticket), [`autoBattleUnlocked`](#autobattleunlocked), [`autoUseUnlocked`](#autouseunlocked), [`playerProfile`](#playerprofile), [`fightStep`](#fightstep), [`endFight`](#endfight), [`engage`](#engage), [`dismissTicket`](#dismissticket), [`projectFight`](#projectfight), [`payKill`](#paykill), [`rngFor`](#rngfor)
 - Win chance: [`winBucketOf`](#winbucketof), [`estimateWin`](#estimatewin)
 - Potions and skills: [`healAmount`](#healamount), [`autoUse`](#autouse), [`potionCooldownSec`](#potioncooldownsec), [`potionPower`](#potionpower), [`potionSlotCount`](#potionslotcount), [`SKILLS`](#skills)
 - Results and rest: [`restThrough`](#restthrough), [`UNCLAIMED_SEC`](#unclaimed-sec)
@@ -63,7 +63,7 @@ See also: [`armorReduction`](combat.md#armorreduction), [`damagePerHit`](combat.
 
 ### `armorReduction` <small>function</small>
 
-Source: [`src/lib/combat.ts:210`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:219`](../../src/lib/combat.ts)
 
 The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,
 so no amount of armor makes anything unkillable (the asymptote is 75 %).
@@ -95,7 +95,7 @@ Attacks per second of each weapon type: dagger 1.6, wand 1.3, sword 1.2, spear 1
 
 ### `damagePerHit` <small>function</small>
 
-Source: [`src/lib/combat.ts:110`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:119`](../../src/lib/combat.ts)
 
 Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.
 
@@ -103,7 +103,7 @@ Damage of one swing (before crits): the gear's total damage times the attribute 
 
 ### `attacksPerSecond` <small>function</small>
 
-Source: [`src/lib/combat.ts:121`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:130`](../../src/lib/combat.ts)
 
 Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.
 
@@ -111,7 +111,7 @@ Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and 
 
 ### `critOdds` <small>function</small>
 
-Source: [`src/lib/combat.ts:140`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:149`](../../src/lib/combat.ts)
 
 Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.
 
@@ -119,7 +119,7 @@ Chance (0-1) that a swing crits, and that a crit becomes a super crit: character
 
 ### `swing` <small>function</small>
 
-Source: [`src/lib/combat.ts:158`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:167`](../../src/lib/combat.ts)
 
 One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never
 does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.
@@ -135,7 +135,7 @@ critExtra = 1 + (Str-5 x 1 + Dex-5 x 0.5 + Cha-5 x 0.5) / 100
 
 ### `armorOf` <small>function</small>
 
-Source: [`src/lib/combat.ts:177`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:186`](../../src/lib/combat.ts)
 
 Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.
 
@@ -143,7 +143,7 @@ Armor against monster hits: the gear's plus (when the attributes are given) what
 
 ### `dodgeChance` <small>function</small>
 
-Source: [`src/lib/combat.ts:242`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:251`](../../src/lib/combat.ts)
 
 Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
@@ -151,7 +151,7 @@ Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
 ### `lifeLeechPercent` <small>function</small>
 
-Source: [`src/lib/combat.ts:193`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:202`](../../src/lib/combat.ts)
 
 The Life Leech in %, the gear's and the merchant's together, never above the cap.
 
@@ -159,7 +159,7 @@ The Life Leech in %, the gear's and the merchant's together, never above the cap
 
 ### `regen` <small>function</small>
 
-Source: [`src/lib/combat.ts:231`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:240`](../../src/lib/combat.ts)
 
 HP regeneration outside fights: the base rate plus the gear's regen stat.
 
@@ -167,7 +167,7 @@ HP regeneration outside fights: the base rate plus the gear's regen stat.
 
 ### `mitigate` <small>function</small>
 
-Source: [`src/lib/combat.ts:223`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:232`](../../src/lib/combat.ts)
 
 Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.
 
@@ -239,6 +239,15 @@ See also: [`engage`](combat.md#engage), [`endFight`](combat.md#endfight)
 Source: [`src/lib/combat.ts:46`](../../src/lib/combat.ts)
 
 Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start.
+
+<a id="autouseunlocked"></a>
+
+### `autoUseUnlocked` <small>function</small>
+
+Source: [`src/lib/combat.ts:55`](../../src/lib/combat.ts)
+
+Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
+the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.
 
 <a id="playerprofile"></a>
 
@@ -320,7 +329,7 @@ The next random stream of a fight: sealed on the secret, the user, the run and t
 
 ### `winBucketOf` <small>function</small>
 
-Source: [`src/lib/combat.ts:62`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:71`](../../src/lib/combat.ts)
 
 The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it):
 Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red).

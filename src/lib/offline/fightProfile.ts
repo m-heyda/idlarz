@@ -1,6 +1,7 @@
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { COMBAT } from '@/config/combatConfig';
+import { autoUseUnlocked } from '@/lib/combat';
 import { levelAtAge, monsterDef, monsterStats } from '@/lib/monsters';
 import { pushEvent, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatState, PlayerProfile } from '@/lib/offline/fightTypes';
@@ -14,9 +15,9 @@ import type { MonsterType } from '@/types/game';
 // SERVER ONLY. The numbers a fight is judged on: the player's profile (frozen into a fight when it starts), the monster's stats at its level,
 // the HP the hero must be back at before auto-battle or the queue starts the next fight, and the win estimate auto-battle gates on.
 
-/** The potions auto-use would drink (none with auto-use off), for the win estimate. */
-export const potionsForEstimate = (inv: Inventory, c: CombatState): PotionStock[] =>
-	c.autoUse
+/** The potions auto-use would drink (none with auto-use off or still locked before the first rebirth), for the win estimate. */
+export const potionsForEstimate = (inv: Inventory, c: CombatState, rebirths: number): PotionStock[] =>
+	c.autoUse && autoUseUnlocked(rebirths)
 		? Object.keys(ITEM_CATALOG)
 				.filter((id) => quickHealOf(ITEM_CATALOG[id]) > 0)
 				.map((id) => ({ healHp: quickHealOf(ITEM_CATALOG[id]), count: bagCountOf(inv, id) }))
@@ -41,7 +42,7 @@ export const winPctBy =
 		Math.round(estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions).chance * 100);
 
 /** What auto-battle checks a monster against: the numbers it would fight with and the potions auto-use would drink. */
-export const winnable = (ctx: FightCtx) => winnableBy(ctx.profileNow, ctx.c.hp, potionsForEstimate(ctx.ledger.inv!, ctx.c));
+export const winnable = (ctx: FightCtx) => winnableBy(ctx.profileNow, ctx.c.hp, potionsForEstimate(ctx.ledger.inv!, ctx.c, ctx.ledger.rebirths));
 
 /** The HP at which a rested hero starts the next fight (auto-battle's pick or the queue's head). */
 export const resumeHpOf = (profile: PlayerProfile): number => (profile.maxHp * COMBAT.auto.resumeHpPct) / 100;

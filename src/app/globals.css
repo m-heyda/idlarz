@@ -51,115 +51,11 @@ body {
 	image-rendering: pixelated;
 }
 
-.pixel-header {
-	background: #0a0605 url('/pixel/bg/crack.png') repeat;
-	image-rendering: pixelated;
-	font-family: var(--font-pixel);
-	padding-bottom: 6px;
-
-	&::after {
-		content: '';
-		position: absolute;
-		left: 0;
-		right: 0;
-		bottom: 0;
-		height: 10px;
-		background: url('/pixel/ui/header_edge.png') repeat-x;
-		image-rendering: pixelated;
-		pointer-events: none;
-	}
-}
-
-.pixel-divider-right {
-	background: url('/pixel/ui/header_divider.png') no-repeat right center;
-	image-rendering: pixelated;
-}
-
-.pixel-slot {
-	position: relative;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-shrink: 0;
-	width: 40px;
-	height: 40px;
-	background: url('/pixel/ui/slot_frame_s.png') no-repeat;
-	image-rendering: pixelated;
-	cursor: pointer;
-	user-select: none;
-	transition: filter 0.15s;
-
-	&:hover {
-		filter: brightness(1.3);
-	}
-
-	&[data-active='true'] {
-		background-image: url('/pixel/ui/slot_frame_s_active.png');
-	}
-}
-
 /* the header's own size: the 40px frame drawn at 32px */
-.pixel-slot-sm {
-	width: 32px;
-	height: 32px;
-	background-size: 32px 32px;
-}
 
 /* a header button that cannot be used yet: greyed, with the tooltip saying why */
-.pixel-slot.is-disabled {
-	cursor: not-allowed;
-	filter: grayscale(1) brightness(0.65);
-
-	&:hover {
-		filter: grayscale(1) brightness(0.8);
-	}
-}
-
-.pixel-profile {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	padding: 0 3px;
-	border: 1px solid transparent;
-	border-radius: 2px;
-	cursor: pointer;
-	user-select: none;
-	transition:
-		background-color 0.15s,
-		border-color 0.15s;
-
-	&:hover {
-		border-color: #7a5224;
-		background: rgba(60, 38, 16, 0.45);
-	}
-
-	/* open: no box around the whole button (it doubled the portrait's own frame); the portrait itself glows gold */
-	&[data-active='true'] {
-		background: rgba(90, 56, 20, 0.3);
-	}
-
-	&[data-active='true'] .pixel-avatar {
-		filter: drop-shadow(0 0 3px rgba(240, 210, 122, 0.9));
-	}
-}
-
-.pixel-avatar {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	position: relative;
-	flex-shrink: 0;
-	/* as big as the portrait, so the level badge sits on the portrait's own corner */
-	line-height: 0;
-	/* no frame of its own: the portrait art already has one (a second border made a double edge) */
-	image-rendering: pixelated;
-}
 
 /* the attention dot sits on the top edge of the portrait */
-.pixel-avatar .notify-dot {
-	top: -4px;
-	right: -3px;
-}
 
 .character-portrait {
 	display: inline-flex;
@@ -170,123 +66,15 @@ body {
 	font-weight: 700;
 }
 
-.pixel-xp {
-	position: relative;
-	width: 80px;
-	height: 10px;
-	background: url('/pixel/ui/header_xp_frame.png') no-repeat;
-	image-rendering: pixelated;
-}
-
-.pixel-xp-fill {
-	position: absolute;
-	left: 3px;
-	top: 3px;
-	height: 4px;
-	background: url('/pixel/ui/header_xp_fill.png') repeat-x;
-	background-size: 2px 4px;
-	image-rendering: pixelated;
-	transition: width 0.3s ease-out;
-}
-
 /* --- header currencies: a bronze-edged group holds a few pills (icon + amount), everything else is in the tooltip --- */
-.hdr-group {
-	display: flex;
-	align-items: center;
-	cursor: pointer;
-	user-select: none;
-	padding: 2px;
-	background: rgba(8, 5, 3, 0.78);
-	border: 2px solid #4a3014;
-	box-shadow:
-		inset 0 1px 0 rgba(217, 168, 80, 0.35),
-		0 1px 0 rgba(0, 0, 0, 0.6);
-	border-radius: 3px; /* no clip-path here: it would clip the tooltips */
-}
-
-.hdr-group:hover,
-.hdr-group[data-pinned='true'] {
-	border-color: #7a5224;
-}
 
 /* one resource in a group: its icon, and a small fixed-width amount (hidden by the cog menu's compact header) */
-.hdr-chip {
-	position: relative;
-	display: flex;
-	align-items: center;
-	gap: 5px;
-	height: 26px;
-	padding: 0 7px;
-
-	& + & {
-		border-left: 1px solid #2b1d0e;
-		box-shadow: inset 1px 0 0 rgba(217, 168, 80, 0.12);
-	}
-
-	&.is-link {
-		cursor: pointer;
-	}
-
-	&:hover {
-		background: rgba(90, 56, 20, 0.45);
-	}
-}
 
 /* the group's dropdown lists every resource of the tier */
-.hdr-rows {
-	display: grid;
-	grid-template-columns: 20px minmax(0, 1fr) auto auto;
-	align-items: center;
-	column-gap: 8px;
-	row-gap: 3px;
-	max-height: 60vh;
-	overflow-y: auto;
-}
 
 /* a header control with a hover card (.hdr-tip, see HeaderTip.tsx); a click can pin it open with data-pinned="true" */
-.hdr-has-tip {
-	position: relative;
-}
-
-.hdr-tip {
-	position: absolute;
-	top: 100%;
-	left: 50%;
-	z-index: 60;
-	/* padding (not margin) so the pointer can cross from the control onto the card without it closing */
-	padding-top: 8px;
-	opacity: 0;
-	visibility: hidden;
-	pointer-events: none;
-	transform: translateX(-50%);
-	/* lingers a moment after the pointer leaves, so its text can be reached and copied */
-	transition:
-		opacity 0.12s 0.3s,
-		visibility 0s 0.42s;
-	user-select: text;
-}
 
 /* lined up with an edge instead of centred, so the card never runs off the screen */
-.hdr-tip--start {
-	left: 0;
-	transform: none;
-}
-
-.hdr-tip--end {
-	left: auto;
-	right: 0;
-	transform: none;
-}
-
-.hdr-has-tip:hover > .hdr-tip,
-.hdr-has-tip[data-pinned='true'] > .hdr-tip {
-	opacity: 1;
-	visibility: visible;
-	pointer-events: auto;
-	transition:
-		opacity 0.12s,
-		visibility 0s;
-}
 
 /* Stepped sprite-sheet player: twinkling resources (gold, gems, crystals) and the map chest. Frame size, count, loop
    length and the sheet come from CSS variables set by PixelSheet. */
@@ -1302,27 +1090,23 @@ body {
 
 .away-bar-track {
 	position: relative;
-	height: 28px;
-	border: 8px solid transparent;
-	border-image: url('/pixel/ui/bar_frame.png') 4 / 8px round;
-	background: #0a0706;
-	background-clip: padding-box;
-	image-rendering: pixelated;
+	height: 16px;
+	overflow: hidden;
+	background: #07080d;
+	border: 1px solid #05060a;
+	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.3);
 }
 
 .away-bar-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
 	width: calc(var(--pct, 0) * 1%);
-	background: url('/pixel/ui/bar_fill.png') 0 0 / 16px 12px repeat-x;
-	image-rendering: pixelated;
-	box-shadow:
-		2px 0 0 rgba(212, 255, 150, 0.9),
-		0 0 8px rgba(130, 255, 90, 0.55);
+	background: linear-gradient(#ffe08a, #c58d28);
+	box-shadow: 0 0 8px rgba(255, 210, 100, 0.6);
 }
 
 .away-bar.is-capped .away-bar-fill {
-	filter: sepia(1) saturate(2.2) hue-rotate(-18deg);
+	background: linear-gradient(#ffb060, #c0561c);
 }
 
 .away-bar-capped {
@@ -1333,40 +1117,6 @@ body {
 
 /* --- Hero card: the stony XP bar (the alcove scene and the potion flasks are gone) --- */
 /* stony XP bar: 9-slice chiselled frame, emerald fill that flows, tick marks every 10% */
-.hero-xp {
-	position: absolute;
-	left: 14px;
-	right: 14px;
-	bottom: 10px;
-	height: 28px;
-	border: 8px solid transparent;
-	border-image: url('/pixel/ui/bar_frame.png') 4 / 8px round;
-	background: #0a0706;
-	background-clip: padding-box;
-	image-rendering: pixelated;
-}
-
-.hero-xp-fill {
-	position: absolute;
-	inset: 0 auto 0 0;
-	width: calc(var(--pct, 0) * 1%);
-	min-width: 0;
-	background: url('/pixel/ui/bar_fill.png') 0 0 / 16px 12px repeat-x;
-	image-rendering: pixelated;
-	transition: width 0.6s cubic-bezier(0.3, 0.8, 0.3, 1);
-	animation: bar-flow 1.6s steps(8) infinite;
-	box-shadow:
-		2px 0 0 rgba(212, 255, 150, 0.9),
-		0 0 8px rgba(130, 255, 90, 0.55);
-}
-
-.hero-xp::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgba(0, 0, 0, 0.4) calc(10% - 2px) 10%);
-}
 
 @keyframes bar-flow {
 	to {
@@ -1374,37 +1124,7 @@ body {
 	}
 }
 
-.hero-xp-text {
-	position: absolute;
-	inset: 0;
-	z-index: 1;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 0.8125rem;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	color: #fff;
-	text-shadow:
-		0 1px 0 #0a1a06,
-		1px 0 0 #0a1a06,
-		-1px 0 0 #0a1a06,
-		0 -1px 0 #0a1a06;
-}
-
 /* name plate hanging at the top of the alcove */
-.hero-class {
-	font-size: 0.6875rem;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	color: #a89878;
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.hero-xp-fill {
-		animation: none;
-	}
-}
 
 /* --- Level orb: 6-frame glass sprite (24px frames), stepped; the level number sits in its dark socket --- */
 .level-orb {
@@ -1798,10 +1518,6 @@ body {
 }
 
 /* sits inside the corner of a header slot frame */
-.pixel-slot .notify-dot {
-	top: 4px;
-	right: 4px;
-}
 
 @media (prefers-reduced-motion: reduce) {
 	.notify-dot {
@@ -1838,22 +1554,3 @@ body {
 }
 
 /* the level as a plain purple square on the avatar's corner (components/game/LevelBadge.tsx) */
-.level-badge {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	box-sizing: border-box;
-	min-width: var(--lb, 28px);
-	height: var(--lb, 28px);
-	padding: 0 3px;
-	font-size: calc(var(--lb, 28px) * 0.5);
-	font-weight: 700;
-	line-height: 1;
-	color: #fff;
-	text-shadow: 0 1px 0 #1c0f36;
-	background: linear-gradient(#7a48d0, #5a2fa0);
-	border: 2px solid #1c0f36;
-	box-shadow:
-		inset 0 0 0 1px rgba(200, 170, 255, 0.45),
-		0 1px 3px rgba(0, 0, 0, 0.55);
-}

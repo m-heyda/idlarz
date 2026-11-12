@@ -1,5 +1,5 @@
 import React from 'react';
-import type { Rarity } from '../logic';
+import { tidy, type Rarity } from '../logic';
 import { HoverTip, ResourceChip } from './primitives';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -53,7 +53,7 @@ export const TipDiff: React.FC<{ value: React.ReactNode; diff?: number; lowerIsB
 				<span className='ds-tip-diff' data-tone={good ? 'green' : 'red'}>
 					{' '}
 					({diff! > 0 ? '+' : ''}
-					{diff!.toFixed(digits)})
+					{tidy(diff!.toFixed(digits))})
 				</span>
 			) : null}
 		</span>
@@ -118,17 +118,26 @@ export const TipSection: React.FC<{ children: React.ReactNode }> = ({ children }
 export interface TooltipProps {
 	rarity?: Rarity;
 	icon?: string;
+	/** A class on the header picture (a tint) */
+	iconClassName?: string;
 	title: string;
 	subtitle?: React.ReactNode;
 	children?: React.ReactNode;
 	footer?: Footer;
 	className?: string;
+	/** A solid band across the top of the card ("Equipped" in green, "Comparing" in grey) */
+	banner?: { text: string; tone: 'equipped' | 'comparing' };
 }
 /** The base tooltip: dark slate body, rim in the rarity colour, and a glow for uncommon and up. Icon + title header, free content, optional two-part footer. */
-export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, title, subtitle, children, footer, className }) => (
+export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, iconClassName, title, subtitle, children, footer, className, banner }) => (
 	<div className={cx('ds-root', 'ds-tip', className)} data-rarity={rarity} role='tooltip'>
+		{banner ? (
+			<div className='ds-tip-banner' data-tone={banner.tone}>
+				{banner.text}
+			</div>
+		) : null}
 		<div className='ds-tip-head'>
-			{icon ? <img src={icon} alt='' /> : null}
+			{icon ? <img src={icon} alt='' className={iconClassName} /> : null}
 			<div>
 				<div className='ds-tip-title'>{title}</div>
 				{subtitle ? <div className='ds-tip-sub'>{subtitle}</div> : null}
@@ -177,13 +186,17 @@ export interface ItemTooltipProps {
 	lore?: string;
 	/** Marks the card of the piece currently worn ("Equipped") */
 	equippedLabel?: boolean;
-	/** The old compare block (a list of differences) */
+	/** A solid band over the card: green "Equipped" for the worn piece, grey "Comparing" for the hovered one */
+	banner?: { text: string; tone: 'equipped' | 'comparing' };
+	/** The difference block: what changes against the worn piece, one row per change (tone green for a gain, red for a loss), under the heading `compareWith` (default "Difference") */
 	compareWith?: string;
 	compare?: TipRow[];
 	/** Shows the Drink button of a potion */
 	onDrink?: () => void;
-	/** The key hints line ("Dbl-click equip - Shift + click sell") */
-	hints?: string;
+	/** The key hints line: a key cap and what it does (`{ key: 'Dbl-click', text: 'equip' }`), or plain text */
+	hints?: string | { key: string; text: string }[];
+	/** Anything more, drawn after the set changes (the gained and lost set bonuses, the net change) */
+	extra?: React.ReactNode;
 	footer?: Footer;
 }
 
@@ -208,13 +221,15 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	flavor,
 	lore,
 	equippedLabel,
+	banner,
 	compareWith,
 	compare,
 	onDrink,
 	hints,
+	extra,
 	footer,
 }) => (
-	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer}>
+	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer} banner={banner}>
 		{equippedLabel ? <div className='ds-tip-equipped'>Equipped</div> : null}
 		{levelLine ? <TipLine tone='muted'>{levelLine}</TipLine> : null}
 		{primary ? (
@@ -255,6 +270,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 				{c.label} {c.from} → {c.to} / {c.size}
 			</TipLine>
 		))}
+		{extra}
 		{set ? <TipSetBlock {...set} /> : null}
 		{onDrink ? (
 			<button type='button' className='ds-btn ds-btn-sm' onClick={onDrink}>
@@ -269,11 +285,22 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 		) : null}
 		{compare ? (
 			<div className='ds-tip-compare'>
-				<TipSection>vs worn · {compareWith}</TipSection>
+				<div className='ds-tip-compare-head'>{compareWith ?? 'Difference'}</div>
 				<TipRows rows={compare} />
 			</div>
 		) : null}
-		{hints ? <TipLine tone='muted'>{hints}</TipLine> : null}
+		{Array.isArray(hints) ? (
+			<div className='ds-tip-keys'>
+				{hints.map((h) => (
+					<span key={h.key + h.text}>
+						<span className='ds-kbd'>{h.key}</span>
+						{h.text}
+					</span>
+				))}
+			</div>
+		) : hints ? (
+			<TipLine tone='muted'>{hints}</TipLine>
+		) : null}
 	</Tooltip>
 );
 
@@ -309,28 +336,56 @@ export const MonsterTooltip: React.FC<{
 	subtitle: string;
 	hp: string;
 	rows: TipRow[];
-	drops: TipRow[];
+	drops?: TipRow[];
+	/** The heading over `drops` (default "Drops") */
+	dropsTitle?: string;
 	footer?: Footer;
 	boss?: boolean;
+	/** A golden (lucky) monster: gold card, gold-tinted picture and a star */
+	lucky?: boolean;
 	defeated?: number;
 	growth?: string;
 	bossLine?: string;
 	cta?: string;
 	wip?: boolean;
-}> = ({ icon, name, subtitle, hp, rows, drops, footer, boss, defeated, growth, bossLine, cta, wip }) => (
-	<Tooltip rarity={boss ? 'legendary' : 'epic'} icon={icon} title={name} subtitle={subtitle} footer={footer}>
+}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, lucky, defeated, growth, bossLine, cta, wip }) => (
+	<Tooltip
+		rarity={lucky ? 'legendary' : boss ? 'epic' : 'common'}
+		icon={icon}
+		iconClassName={lucky ? 'ds-tip-lucky' : undefined}
+		title={lucky ? `★ ${name}` : name}
+		subtitle={subtitle}
+		footer={
+			footer ??
+			(cta || defeated !== undefined
+				? [
+						<span key='cta' style={{ color: '#f0d27a' }}>
+							{cta ?? ''}
+						</span>,
+						defeated !== undefined ? `Defeated: ${defeated}` : '',
+					]
+				: undefined)
+		}
+	>
 		{boss ? <div className='ds-tip-boss'>BOSS</div> : null}
+		{lucky ? <TipLine tone='gold'>★ Golden monster: bigger rewards</TipLine> : null}
 		<TipRows rows={[{ label: 'HP', value: hp }]} />
 		<div className='ds-bar' style={{ height: 10 }}>
 			<div className='ds-bar-fill' style={{ width: '100%' }} />
 		</div>
 		<TipRows rows={rows} />
-		{defeated !== undefined ? <TipLine tone='muted'>Defeated: {defeated}</TipLine> : null}
-		{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
-		{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
-		<TipSection>Drops</TipSection>
-		<TipRows rows={drops} />
-		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
+		{growth || bossLine ? (
+			<div className='ds-tip-sep'>
+				{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
+				{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
+			</div>
+		) : null}
+		{drops && drops.length > 0 ? (
+			<>
+				<TipSection>{dropsTitle}</TipSection>
+				<TipRows rows={drops} />
+			</>
+		) : null}
 		{wip ? <TipLine tone='muted'>Work in progress: art preview only</TipLine> : null}
 	</Tooltip>
 );
@@ -341,9 +396,12 @@ export const BuildingTooltip: React.FC<{
 	name: string;
 	subtitle: string;
 	rows: TipRow[];
-	nextLevel: number;
-	next: TipRow[];
+	/** The level the upgrade section is about; leave out (with `next`) at the top level */
+	nextLevel?: number;
+	next?: TipRow[];
 	footer?: Footer;
+	/** More lines about the tile the building stands on (its own output and bonuses), under a "Tile" heading */
+	tileExtra?: React.ReactNode;
 	/** "Forest bonus: +12% (owned tiles)" */
 	biomeBonus?: string;
 	/** The Idol text, with "(coming soon: not applied yet)" when it is not live */
@@ -351,13 +409,23 @@ export const BuildingTooltip: React.FC<{
 	/** "Its level is kept when you rebirth; rebuild it free" */
 	rebirthNote?: string;
 	cta?: string;
-}> = ({ icon, name, subtitle, rows, nextLevel, next, footer, biomeBonus, idolText, rebirthNote, cta }) => (
+}> = ({ icon, name, subtitle, rows, nextLevel, next, footer, tileExtra, biomeBonus, idolText, rebirthNote, cta }) => (
 	<Tooltip rarity='rare' icon={icon} title={name} subtitle={subtitle} footer={footer}>
 		<TipRows rows={rows} />
 		{biomeBonus ? <TipLine tone='green'>{biomeBonus}</TipLine> : null}
 		{idolText ? <TipLine tone='purple'>{idolText}</TipLine> : null}
-		<TipSection>Upgrade to level {nextLevel}</TipSection>
-		<TipRows rows={next} />
+		{nextLevel !== undefined && next ? (
+			<>
+				<TipSection>Upgrade to level {nextLevel}</TipSection>
+				<TipRows rows={next} />
+			</>
+		) : null}
+		{tileExtra ? (
+			<div className='ds-tip-sep'>
+				<TipSection>Tile</TipSection>
+				{tileExtra}
+			</div>
+		) : null}
 		{rebirthNote ? <TipLine tone='muted'>{rebirthNote}</TipLine> : null}
 		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 	</Tooltip>
@@ -430,10 +498,10 @@ export const TileTooltip: React.FC<{
 );
 
 /** A chest standing on the map: what it may hold and how to open it. */
-export const ChestTooltip: React.FC<{ icon: string; rows?: TipRow[]; cta?: string }> = ({ icon, rows, cta = 'Click to open' }) => (
-	<Tooltip rarity='uncommon' icon={icon} title='Treasure chest' subtitle='Opens with a click'>
+export const ChestTooltip: React.FC<{ icon: string; rows?: TipRow[]; subtitle?: string; cta?: string }> = ({ icon, rows, subtitle = 'Click to open', cta }) => (
+	<Tooltip rarity='uncommon' icon={icon} title='Treasure chest' subtitle={subtitle}>
 		{rows ? <TipRows rows={rows} /> : null}
-		<TipLine tone='gold'>{cta}</TipLine>
+		{cta ? <TipLine tone='gold'>{cta}</TipLine> : null}
 	</Tooltip>
 );
 
@@ -449,16 +517,17 @@ export const HintTooltip: React.FC<{ title: string; text?: string; tone?: 'norma
 	</div>
 );
 
-/** A top-bar resource: the chip plus its hover tooltip (stock, income, sources). Props only; the caller supplies the live numbers. */
-export const ResourceStat: React.FC<{ icon: string; name: string; value: string; rows: TipRow[]; sources?: TipRow[]; footer?: Footer }> = ({
-	icon,
-	name,
-	value,
-	rows,
-	sources,
-	footer,
-}) => (
+/** A top-bar resource: the chip plus its hover tooltip (stock, income, sources). Props only; the caller supplies the live numbers. `chip` makes the chip a button and carries its extra attributes. */
+export const ResourceStat: React.FC<{
+	icon: string;
+	name: string;
+	value: string;
+	rows: TipRow[];
+	sources?: TipRow[];
+	footer?: Footer;
+	chip?: { onClick?: () => void; title?: string } & Record<`data-${string}`, string | undefined>;
+}> = ({ icon, name, value, rows, sources, footer, chip }) => (
 	<HoverTip tip={<ResourceTooltip icon={icon} name={name} rows={rows} sources={sources} footer={footer} />}>
-		<ResourceChip icon={icon} value={value} />
+		<ResourceChip icon={icon} value={value} {...chip} />
 	</HoverTip>
 );

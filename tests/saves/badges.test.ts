@@ -39,3 +39,15 @@ test('checkBadgeChoice accepts earned picks, none and null, and refuses the rest
 	assert.equal(checkBadgeChoice({ badgeId: null, titleId: 'early-tester' }, []).ok, false);
 	assert.equal(checkBadgeChoice({ badgeId: 5, titleId: null }, earned).ok, false);
 });
+
+test('only the short badge list can be worn: an earned achievement outside it is not a badge', () => {
+	const all = ['early_tester', 'first_rebirth', 'chicken_keeper_1'];
+	assert.deepEqual(
+		badgeOptions(all)
+			.map((a) => a.id)
+			.sort(),
+		['early_tester', 'first_rebirth'],
+	);
+	assert.equal(shownBadge('chicken_keeper_1', all), null);
+	assert.equal(checkBadgeChoice({ badgeId: 'chicken_keeper_1', titleId: null }, all).ok, false);
+});

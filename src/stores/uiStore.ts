@@ -44,9 +44,6 @@ const ACHIEVEMENT_NOTICE_MS = 7000;
 const noticeTimers = new Map<number, ReturnType<typeof setTimeout>>();
 let flashTimer: ReturnType<typeof setTimeout> | null = null;
 
-export type CharacterTab = 'combat' | 'income' | 'rebirths';
-const CHARACTER_TABS: readonly CharacterTab[] = ['combat', 'income', 'rebirths'];
-
 /** How much one Sell / Buy click moves in the Merchant window: a preset number of units, or all of it */
 type MerchantAmount = number | 'max';
 const MERCHANT_PRESETS: readonly MerchantAmount[] = [1_000, 1_000_000, 1_000_000_000, 'max'];
@@ -124,9 +121,6 @@ interface UiState {
 	toggleGemShop: () => void;
 	closeGemShop: () => void;
 	closeRebirth: () => void;
-	tutorialOpen: boolean;
-	openTutorial: () => void;
-	closeTutorial: () => void;
 	saveMenuOpen: boolean;
 	toggleSaveMenu: () => void;
 	closeSaveMenu: () => void;
@@ -177,9 +171,6 @@ interface UiState {
 	farmAnimalsOpen: boolean;
 	farmHudOpen: boolean;
 	farmUpgradesOpen: boolean;
-	/** The Character window's lower tab: its combat figures, the income, or the rebirth history */
-	characterTab: CharacterTab;
-	setCharacterTab: (tab: CharacterTab) => void;
 	/** The Merchant window remembers its tab and the amount you set (also across visits): the typed value is not lost when you switch windows */
 	merchantTab: MerchantTab;
 	setMerchantTab: (tab: MerchantTab) => void;
@@ -191,6 +182,8 @@ interface UiState {
 	merchantSelect: string | null;
 	/** Opens the Merchant on `resource`: the window comes to the front on the Resources tab with that row selected (gold opens the Upgrades tab, where gold is spent) */
 	openMerchantOn: (resource: string) => void;
+	/** Like openMerchantOn, but a second press on the same chip, with the Merchant in front, closes the window */
+	toggleMerchantOn: (resource: string) => void;
 	clearMerchantSelect: () => void;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
@@ -219,9 +212,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	rebirthOpen: false,
 	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
 	closeRebirth: () => set({ rebirthOpen: false }),
-	tutorialOpen: false,
-	openTutorial: () => set({ tutorialOpen: true }),
-	closeTutorial: () => set({ tutorialOpen: false }),
 	saveMenuOpen: false,
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),
@@ -300,11 +290,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 		schedule(-id, CHEST_NOTICE_MS, () => get().dismissChestNotice(id));
 	},
 	dismissChestNotice: (id) => set((state) => ({ chestNotices: state.chestNotices.filter((n) => n.id !== id) })),
-	characterTab: 'combat',
-	setCharacterTab: (tab) => {
-		writeStringPref('characterTab', tab);
-		set({ characterTab: tab });
-	},
 	merchantTab: 'resources',
 	setMerchantTab: (tab) => {
 		writeStringPref('merchantTab', tab);
@@ -322,6 +307,13 @@ export const useUiStore = create<UiState>((set, get) => ({
 		set({ merchantTab: tab, merchantSelect: tab === 'resources' ? resource : null });
 		useWindowStore.getState().openWindow('merchant');
 	},
+	toggleMerchantOn: (resource) => {
+		const windows = useWindowStore.getState();
+		const tab: MerchantTab = resource === 'gold' ? 'upgrades' : 'resources';
+		const sameView = get().merchantTab === tab && (tab === 'upgrades' || get().merchantSelect === resource);
+		if (sameView && windows.order[windows.order.length - 1] === 'merchant') windows.closeWindow('merchant');
+		else get().openMerchantOn(resource);
+	},
 	clearMerchantSelect: () => set({ merchantSelect: null }),
 	merchantCustom: '',
 	setMerchantCustom: (text) => {
@@ -337,7 +329,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	// read after mount (the server render has no localStorage): keeps hydration identical
 	loadPrefs: () =>
 		set({
-			characterTab: CHARACTER_TABS.find((tab) => tab === readStringPref('characterTab')) ?? 'combat',
 			merchantTab: readMerchantTab(),
 			merchantPreset: readMerchantPreset(),
 			merchantCustom: (readStringPref('merchantCustom') ?? '').slice(0, MERCHANT_CUSTOM_MAX),

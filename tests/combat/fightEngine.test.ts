@@ -439,3 +439,25 @@ test('the auto-sell filter of the ledger sells matching gear on the spot', () =>
 		'some of it was sold',
 	);
 });
+
+test('auto-use is locked before the first rebirth: a player with it on still drinks and casts nothing by themselves, and gets it once they rebirth', () => {
+	const s = setup({
+		equipment: STARTER_EQUIPMENT,
+		level: 30,
+		potions: [{ id: 'potion_minor', qty: 2 }],
+		monsters: [{ type: 'bossGreatAuroch', level: 15 }],
+		seed: 'auto-use-lock',
+	});
+	const started = runCombat(s.ledger, s.env(s.start), { autoUse: true, commands: [{ kind: 'fight', n: 1 }] }).ledger;
+	const hurt = { ...started, combat: { ...started.combat!, hp: 30, autoUse: true } };
+	const run = (rebirths: number) => runCombat({ ...hurt, rebirths }, s.env(s.start + 4)).ledger;
+	const locked = run(0);
+	assert.equal(left(locked, 'potion_minor'), 2, 'no potion drunk on its own');
+	assert.ok(!locked.combat!.log.some((e) => e.kind === 'potion' || e.kind === 'heal'), 'no Heal either');
+	assert.equal(locked.combat!.autoUse, true, 'the switch the player had is kept');
+	const unlocked = run(COMBAT.auto.useMinRebirths);
+	assert.ok(
+		unlocked.combat!.log.some((e) => e.kind === 'potion' || e.kind === 'heal'),
+		'after the first rebirth the same fight is helped',
+	);
+});

@@ -180,5 +180,8 @@ export const ANIMAL_MOTION: Record<string, { speed: number }> = {
  */
 export const ANCHOR = { x: 24, y: 42 };
 
-/** How an animal icon sits in the 48 x 48 box: its scale (96 px art: half) and its offset (native px) */
-export const spriteFit = (iconWidth: number) => ({ scale: 48 / iconWidth, dx: 0, dy: 0 });
+/** How big an animal is drawn inside its 48 x 48 box (the art used to fill it: too big against the pen) */
+export const ANIMAL_SIZE = 0.75;
+
+/** How an animal icon sits in the 48 x 48 box: its scale (96 px art: 36 px) and its offset (native px): centred sideways, standing on the bottom edge so the feet stay where they were */
+export const spriteFit = (iconWidth: number) => ({ scale: (48 * ANIMAL_SIZE) / iconWidth, dx: (48 - 48 * ANIMAL_SIZE) / 2, dy: 48 - 48 * ANIMAL_SIZE });

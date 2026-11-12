@@ -1,4 +1,3 @@
-import { autoBattleUnlocked } from '@/lib/combat';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import { pickPersisted } from '@/lib/sanitizeSave';
@@ -18,20 +17,13 @@ const exportGame = async () => {
 };
 
 /**
- * The entries every menu ends with: saving and the view options. The header dropdown (`full`) also lists Settings and the
- * Guide, the right-click menu stays short.
+ * The entries every menu ends with: saving and the view options. The header dropdown (`full`) also lists Settings, the
+ * right-click menu stays short.
  */
 export const globalMenuItems = (full = false): ContextMenuItem[] => {
 	const ui = useUiStore.getState();
-	const { combat, prestige } = useGameStore.getState();
-	const locked = !autoBattleUnlocked(prestige.rebirths);
 	const items: ContextMenuItem[] = [
-		...(full
-			? [
-					{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings },
-					{ id: 'guide', label: 'Guide', onSelect: ui.openTutorial },
-				]
-			: []),
+		...(full ? [{ id: 'settings', label: 'Settings', onSelect: ui.toggleSettings }] : []),
 		{
 			id: 'organize',
 			label: 'Organize bag',
@@ -40,28 +32,9 @@ export const globalMenuItems = (full = false): ContextMenuItem[] => {
 		{ id: 'save', label: 'Save game', separator: full, liveHint: () => cloudHint(Date.now()), onSelect: () => void saveGame() },
 		{ id: 'export', label: 'Export game save', onSelect: () => void exportGame() },
 		{ id: 'import', label: 'Import / backup...', onSelect: ui.toggleSaveMenu },
-		// the battle switches are a section of their own, at the bottom above the view options (the combat window only shows during a fight;
-		// a click on a monster starts a fight either way)
-		{
-			id: 'autoBattle',
-			label: 'Auto-battle',
-			separator: true,
-			hint: locked ? 'after your first rebirth' : 'monsters one by one',
-			checked: combat.autoBattle,
-			disabled: locked,
-			onSelect: () => useGameStore.getState().setAutoBattle(!combat.autoBattle),
-		},
-		{
-			id: 'autoUse',
-			label: 'Auto-use potions',
-			hint: 'and skills',
-			checked: combat.autoUse,
-			onSelect: () => useGameStore.getState().setAutoUse(!combat.autoUse),
-		},
 		{
 			id: 'minimap',
 			label: 'Show minimap',
-			separator: true,
 			checked: ui.showMinimap,
 			onSelect: () => ui.setPref('showMinimap', !ui.showMinimap),
 		},

@@ -49,6 +49,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run restore-trust` | `tsx scripts/restore-trust.ts` |
 | `npm run migrate-saves` | `tsx scripts/migrate-saves.ts` |
 | `npm run seed-rehearsal` | `tsx scripts/seed-rehearsal-account.ts` |
+| `npm run seed-dev-world` | `tsx scripts/seed-dev-world.ts` |
 | `npm run gen-save-fixtures` | `tsx scripts/gen-save-fixtures.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |
@@ -74,7 +75,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run prepare` | `git config core.hooksPath .githooks && chmod +x .githooks/pre-commit .githooks/pre-push || exit 0` |
 | `npm run assets:catalog` | `tsx scripts/assets-catalog.ts` |
 | `npm run assets:catalog:check` | `tsx scripts/assets-catalog.ts --check` |
-| `npm run storybook` | `storybook dev -p 6006` |
+| `npm run storybook` | `storybook dev -p 6007` |
 | `npm run build-storybook` | `storybook build` |
 
 ## CI

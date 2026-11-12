@@ -305,3 +305,187 @@
 .combat-switches label[data-locked='true'] input {
 	cursor: not-allowed;
 }
+
+/* ===== The combat window in the design system's look: dark slate, gold rim, flat bars and slots. The fight effects (slashes, numbers, sprite hit) are unchanged. ===== */
+.combat-widget {
+	padding: 16px 18px 18px;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 2px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow:
+		0 0 0 2px #05060a,
+		0 10px 24px rgba(0, 0, 0, 0.6);
+	backdrop-filter: none;
+}
+
+.combat-head {
+	padding: 0 0 8px;
+	margin-bottom: 8px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 0.95rem;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--ds-gold-lt, #f4d57e);
+}
+
+.combat-min,
+.combat-flee {
+	height: 24px;
+	min-width: 26px;
+	padding: 0 8px;
+	font-family: inherit;
+	font-size: 0.75rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #e9e4d6;
+	background: linear-gradient(#2b3350, #1b2136);
+	border: 1px solid #4a5688;
+	box-shadow: inset 0 0 0 1px #05060a;
+}
+
+.combat-min:hover {
+	filter: brightness(1.2);
+}
+
+.combat-flee {
+	color: #ffd8d0;
+	background: linear-gradient(#a8382c, #6a1c14);
+	border-color: #c7503f;
+}
+
+.combat-flee:hover {
+	background: linear-gradient(#c04434, #7a2018);
+}
+
+.combat-stage {
+	background: radial-gradient(closest-side, rgba(224, 169, 58, 0.14), transparent);
+	border: 1px solid #2a2118;
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+	background-color: rgba(0, 0, 0, 0.35);
+}
+
+.combat-widget .fight-bar {
+	height: 22px;
+	background: #07080d;
+	border: 1px solid #05060a;
+	box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.25);
+}
+
+.combat-widget .fight-bar[data-kind='mana'] {
+	height: 16px;
+}
+
+.combat-widget .fight-bar-text {
+	font-size: 0.72rem;
+	letter-spacing: 0.04em;
+}
+
+.combat-widget .fight-bar-fill {
+	background: linear-gradient(#e0584a, #a02a20);
+	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.combat-widget .fight-bar[data-kind='player'] .fight-bar-fill {
+	background: linear-gradient(#58d47a, #2a8a44);
+}
+
+.combat-widget .fight-bar[data-kind='mana'] .fight-bar-fill {
+	background: linear-gradient(#5aa8f0, #2a5fb0);
+}
+
+.combat-widget .fight-skill {
+	padding: 6px 6px 6px 22px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: inset 0 0 0 1px #05060a;
+}
+
+.combat-widget .fight-skill[data-locked='true'] {
+	border-color: #2a2118;
+}
+
+.combat-widget .fight-skill-name {
+	font-size: 0.85rem;
+	letter-spacing: 0.04em;
+	color: #e9e4d6;
+}
+
+.combat-switches {
+	padding-top: 4px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	color: #9aa4bd;
+}
+
+.combat-widget .fight-boss {
+	background: rgba(176, 92, 245, 0.16);
+	border: 1px solid #b05cf5;
+	color: #e3c8ff;
+}
+
+/* getting hit: a quicker, smaller shake, a red vignette that fades, and the hero's bar flashes */
+.fight-body[data-shake='true'] {
+	animation: fight-shake-soft 0.26s ease-out 1;
+}
+
+@keyframes fight-shake-soft {
+	0% {
+		transform: translate(0, 0);
+	}
+	15% {
+		transform: translate(-4px, 1px);
+	}
+	35% {
+		transform: translate(4px, -1px);
+	}
+	55% {
+		transform: translate(-2px, 1px);
+	}
+	100% {
+		transform: translate(0, 0);
+	}
+}
+
+.combat-widget .fight-hurt-flash {
+	inset: -6px;
+	box-shadow: inset 0 0 36px 6px rgba(220, 30, 20, 0.6);
+}
+
+.fight-body[data-shake='true'] .fight-bar[data-kind='player'] {
+	animation: fight-bar-hit 0.4s ease-out 1;
+}
+
+@keyframes fight-bar-hit {
+	0% {
+		box-shadow:
+			inset 0 0 0 1px #ff6a5a,
+			0 0 10px 2px rgba(255, 70, 50, 0.9);
+	}
+	100% {
+		box-shadow: inset 0 0 0 1px rgba(224, 169, 58, 0.25);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.fight-body[data-shake='true'],
+	.fight-body[data-shake='true'] .fight-bar[data-kind='player'] {
+		animation: none;
+	}
+}
+
+/* more air inside the combat window */
+.combat-widget .fight-body {
+	gap: 10px;
+}
+
+.combat-head {
+	padding-bottom: 12px;
+	margin-bottom: 12px;
+}
+
+.combat-widget .fight-skill {
+	padding: 10px 8px 10px 24px;
+}
+
+.combat-switches {
+	padding-top: 10px;
+	margin-top: 2px;
+}

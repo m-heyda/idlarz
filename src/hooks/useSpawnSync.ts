@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import { COMBAT } from '@/config/combatConfig';
 import { useGameStore } from '@/stores/gameStore';
-import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import { readCursor, setCursorUser } from '@/lib/combatCursor';
 import { requestSync } from '@/lib/rewardsClient';
@@ -51,8 +50,6 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 					if (!attrsSynced) {
 						attrsSynced = true;
 						void useGameStore.getState().syncServerAttrs();
-						// the daily first-login bonus: claimed once when the game is up (the server decides if today's is still free)
-						void useGemStore.getState().claimDaily();
 					}
 					const { combat, nextInSec } = reply.value;
 					const spawnWait = Math.min(MAX_WAIT_SEC, Math.max(MIN_WAIT_SEC, (nextInSec ?? MAX_WAIT_SEC) + 2));

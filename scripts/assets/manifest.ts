@@ -12,7 +12,6 @@
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { basename, join, relative, resolve, sep } from 'node:path';
-import { MERCHANT_PORTRAIT } from '../../src/config/npcPortraits';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
@@ -389,19 +388,16 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'public/fx',
 		});
 
-	// 5b. NPC portraits (public/pixel/portraits, picked per merchant tab by src/config/npcPortraits.ts)
-	const portraitUsers = new Map<string, string[]>();
-	for (const [tab, name] of Object.entries(MERCHANT_PORTRAIT)) portraitUsers.set(name, [...(portraitUsers.get(name) ?? []), `merchant:${tab}`]);
+	// 5b. NPC portraits (public/pixel/portraits, listed in src/config/npcPortraits.ts): ready faces, none wired into the game yet
 	for (const f of walk(join(PUBLIC, 'pixel', 'portraits'))) {
 		const id = basename(f, '.png');
-		const users = portraitUsers.get(id) ?? [];
 		add({
 			name: `portrait_${id.replace(/^npc_/, '')}`,
 			category: 'portraits',
 			subcategory: 'NPC busts 48px',
 			src: url(f),
-			status: users.length ? 'used' : 'reuse',
-			usedBy: users,
+			status: 'reuse',
+			usedBy: [],
 			source: 'public/pixel/portraits',
 		});
 	}
@@ -541,6 +537,18 @@ export const buildManifest = (): AssetEntry[] => {
 		usedBy: ['tutorial:guide'],
 		source: 'scripts/guide-sprite.ts',
 	});
+	// The blacksmith beside the Crafting tab of the Hero window (supplied art, background cut out and mirrored to face right)
+	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'crafting')))
+		if (f.endsWith('.png'))
+			add({
+				name: `crafting_${snake(basename(f))}`,
+				category: 'ui',
+				subcategory: 'crafting',
+				src: url(f),
+				status: 'used',
+				usedBy: ['hero:crafting-tab'],
+				source: 'new_assets/crafting',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'idols')))
 		if (f.endsWith('.png'))
 			add({

@@ -20,7 +20,8 @@ import { copyText } from '@/lib/clipboard';
 import { formatTime } from '@/utils/formatters';
 import { castleLevelOf } from '@/lib/castleWard';
 import { countOwnedTiles } from '@/utils/game/tiles';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 
 const MAX_FILE_BYTES = 3_000_000;
 
@@ -131,8 +132,8 @@ const SaveDialogBody: React.FC = () => {
 	const ok = parsed.kind === 'ok' ? parsed.state : null;
 
 	return (
-		<PixelModal title='Save & Backup' size='sm' onClose={close}>
-			<div className='px-card mb-3 text-sm'>
+		<GameModal title='Save & Backup' size='sm' onClose={close}>
+			<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
 				<div className='text-[#ecdcb4]'>
 					Autosaved in this browser: <span className='text-green-400'>{ago(info?.savedAt ?? null)}</span>
 					{info && info.bytes > 0 && <span className='text-[#a89878]'> ({Math.max(1, Math.round(info.bytes / 1024))} KB)</span>}
@@ -149,35 +150,39 @@ const SaveDialogBody: React.FC = () => {
 			</div>
 
 			{info?.loadProblem && (
-				<div className='px-card mb-3 text-sm'>
+				<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
 					<div className='text-amber-300'>{info.loadProblem}</div>
 					{getDamagedSave() && (
-						<button className='px-btn px-btn-sm mt-2' onClick={copyDamaged}>
+						<Button size='sm' className='mt-2' onClick={copyDamaged}>
 							Copy damaged save
-						</button>
+						</Button>
 					)}
 				</div>
 			)}
 
-			{note && <div className='px-card mb-3 text-sm text-green-400'>{note}</div>}
+			{note && (
+				<div className='ds-listrow mb-3 text-sm text-green-400' style={{ marginBottom: 10 }}>
+					{note}
+				</div>
+			)}
 
 			{confirmReset ? (
-				<div className='px-card mb-3 text-sm'>
-					<div className='px-h'>Delete all progress?</div>
+				<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
+					<SectionLabel>Delete all progress?</SectionLabel>
 					<div className='text-[#d8c8a0] mb-3'>This cannot be undone. Copy your save first if you might want it back.</div>
 					<div className='flex justify-between'>
-						<button className='px-btn' disabled={busy} onClick={() => setConfirmReset(false)}>
+						<Button disabled={busy} onClick={() => setConfirmReset(false)}>
 							Cancel
-						</button>
-						<button className='px-btn px-btn-red' disabled={busy} onClick={confirmResetGame}>
+						</Button>
+						<Button tone='danger' disabled={busy} onClick={confirmResetGame}>
 							Delete and restart
-						</button>
+						</Button>
 					</div>
 				</div>
 			) : (
 				<>
-					<div className='px-card mb-3 text-sm'>
-						<div className='px-h'>Export</div>
+					<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
+						<SectionLabel>Export</SectionLabel>
 						<p className='text-[#a89878] mb-2'>Your whole game as one line of text. Paste it back here to restore it, on this or another browser.</p>
 						<textarea
 							ref={exportRef}
@@ -189,17 +194,17 @@ const SaveDialogBody: React.FC = () => {
 							className='px-input text-xs break-all resize-none mb-2'
 						/>
 						<div className='flex gap-2'>
-							<button className='px-btn px-btn-sm' onClick={handleCopy}>
+							<Button size='sm' onClick={handleCopy}>
 								Copy
-							</button>
-							<button className='px-btn px-btn-sm' onClick={handleDownload}>
+							</Button>
+							<Button size='sm' onClick={handleDownload}>
 								Download file
-							</button>
+							</Button>
 						</div>
 					</div>
 
-					<div className='px-card mb-3 text-sm'>
-						<div className='px-h'>Import</div>
+					<div className='ds-listrow mb-3 text-sm' style={{ marginBottom: 10 }}>
+						<SectionLabel>Import</SectionLabel>
 						<textarea
 							rows={3}
 							value={importText}
@@ -208,37 +213,37 @@ const SaveDialogBody: React.FC = () => {
 							aria-label='Paste a save'
 							className='px-input text-xs break-all resize-none mb-2'
 						/>
-						<button className='px-btn px-btn-sm' disabled={busy} onClick={() => fileRef.current?.click()}>
+						<Button size='sm' disabled={busy} onClick={() => fileRef.current?.click()}>
 							Open file…
-						</button>
+						</Button>
 						<input ref={fileRef} type='file' accept='.sav,.txt,text/plain' className='hidden' onChange={handleFile} />
 
 						{parsed.kind === 'error' && <div className='text-red-400 mt-2'>{parsed.reason}</div>}
 						{ok && (
 							<div className='mt-3'>
-								<div className='px-h'>Replace current progress?</div>
+								<SectionLabel>Replace current progress?</SectionLabel>
 								<div className='text-[#d8c8a0] mb-3'>
 									Level {ok.level.level}, castle {castleLevelOf(ok.tiles)}, {countOwnedTiles(ok.tiles)} tiles, {formatTime(ok.playSeconds)} played
 									{parsed.kind === 'ok' && parsed.savedAt ? `, saved ${new Date(parsed.savedAt).toLocaleString()}` : ''}.
 								</div>
 								<div className='flex justify-between'>
-									<button className='px-btn px-btn-red' disabled={busy} onClick={() => setImportText('')}>
+									<Button tone='danger' disabled={busy} onClick={() => setImportText('')}>
 										Cancel
-									</button>
-									<button className='px-btn' disabled={busy} onClick={confirmImport}>
+									</Button>
+									<Button disabled={busy} onClick={confirmImport}>
 										Import and reload
-									</button>
+									</Button>
 								</div>
 							</div>
 						)}
 					</div>
 
-					<button className='px-btn px-btn-red w-full' disabled={busy} onClick={() => setConfirmReset(true)}>
+					<Button tone='danger' className='w-full' disabled={busy} onClick={() => setConfirmReset(true)}>
 						Reset game
-					</button>
+					</Button>
 				</>
 			)}
-		</PixelModal>
+		</GameModal>
 	);
 };
 

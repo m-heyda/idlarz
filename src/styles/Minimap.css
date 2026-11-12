@@ -1,12 +1,13 @@
 /* The map overview (Minimap.tsx): a framed canvas with the visible part outlined on top */
-.minimap {
+.minimap.ds-minimap {
 	box-sizing: content-box; /* the canvas inside is exactly the box size: its pixels map 1:1 */
 	position: relative;
 	overflow: hidden;
 	background: #0a0e1c;
-	border: 2px solid #8a6a2c;
+	/* the design system's frame: a dark edge with a thin gold line inside */
+	border: 2px solid #1d1007;
 	box-shadow:
-		0 0 0 1px #2a1a08,
+		inset 0 0 0 1px rgba(224, 169, 58, 0.45),
 		0 3px 10px rgba(0, 0, 0, 0.55);
 	image-rendering: pixelated;
 	cursor: crosshair;
@@ -39,29 +40,14 @@
 	}
 }
 
-/* the counts of enemies and chests, top left over the picture */
-.minimap-legend {
-	position: absolute;
-	left: 3px;
-	top: 3px;
-	display: flex;
-	gap: 6px;
-	padding: 1px 4px;
-	font-size: 10px;
-	line-height: 12px;
-	color: #e8dcc0;
-	background: rgba(10, 14, 28, 0.72);
+/* the counts of enemies, chests and tiles sit on a dark strip along the bottom of the picture (the design system's .ds-minimap-stats) */
+.minimap .ds-minimap-stats {
 	pointer-events: none;
+	line-height: 12px;
 }
 
-.minimap-legend span {
-	display: flex;
-	align-items: center;
-	gap: 3px;
-}
-
-.minimap-legend i {
-	display: block;
+.minimap-dot {
+	display: inline-block;
 	width: 6px;
 	height: 6px;
 	outline: 1px solid #15091f;

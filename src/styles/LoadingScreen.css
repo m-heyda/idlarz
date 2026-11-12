@@ -19,10 +19,10 @@
 
 .loading-stage {
 	position: relative;
-	width: 400px;
-	height: 400px;
-	max-width: 90vw;
-	max-height: 90vw;
+	width: 320px;
+	height: 320px;
+	max-width: 80vw;
+	max-height: 80vw;
 }
 
 .loading-runes {
@@ -36,7 +36,7 @@
 /* rings turn inside the filter, so the pixels re-form every frame */
 .rune-ring {
 	transform-box: view-box;
-	transform-origin: 50% 50%;
+	transform-origin: 200px 200px; /* the centre of the rings (they are drawn at 400 units and scaled by 0.8 inside a 320 grid) */
 }
 
 .rune-a {
@@ -58,10 +58,10 @@
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: 192px;
-	height: 192px;
-	margin: -106px 0 0 -96px;
-	background: url('/pixel/castles/castle_loading.png') 0 0 / 1920px 192px no-repeat;
+	width: 128px;
+	height: 128px;
+	margin: -70px 0 0 -64px;
+	background: url('/pixel/castles/castle_loading.png') 0 0 / 1280px 128px no-repeat;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 6px 0 rgba(0, 0, 0, 0.4)) drop-shadow(0 0 14px rgba(255, 210, 100, 0.55));
 	animation: castle-grow 6s steps(10) infinite;
@@ -69,13 +69,13 @@
 
 @keyframes castle-grow {
 	to {
-		background-position-x: -1920px;
+		background-position-x: -1280px;
 	}
 }
 
 .loading-sparks i {
 	position: absolute;
-	bottom: 22%;
+	bottom: 26%;
 	width: 6px;
 	height: 6px;
 	background: #fff6c0;
@@ -133,17 +133,35 @@
 	}
 }
 
-/* stone bar with an emerald block sweeping through */
+.loading-title {
+	display: flex;
+	align-items: center;
+	gap: 18px;
+}
+
+.loading-rule {
+	display: block;
+	width: clamp(40px, 10vw, 120px);
+	height: 2px;
+	background: linear-gradient(90deg, transparent, #e0a93a);
+}
+
+.loading-rule.flip {
+	transform: scaleX(-1);
+}
+
+/* a flat dark track with a gold block sweeping through (the design system's bar) */
 .loading-bar {
 	position: relative;
-	width: 320px;
+	width: 360px;
 	max-width: 80vw;
-	height: 28px;
+	height: 14px;
 	overflow: hidden;
-	border: 8px solid transparent;
-	border-image: url('/pixel/ui/bar_frame.png') 4 / 8px round;
-	background: #0a0706;
-	background-clip: padding-box;
+	background: #07080d;
+	border: 1px solid #05060a;
+	box-shadow:
+		0 0 0 1px #8a5f16,
+		0 0 16px rgba(224, 169, 58, 0.25);
 }
 
 .loading-bar-fill {
@@ -152,13 +170,9 @@
 	bottom: 0;
 	left: -40%;
 	width: 40%;
-	background: url('/pixel/ui/bar_fill.png') 0 0 / 16px 12px repeat-x;
-	box-shadow:
-		2px 0 0 rgba(212, 255, 150, 0.9),
-		0 0 8px rgba(130, 255, 90, 0.55);
-	animation:
-		loading-sweep 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite,
-		bar-flow 1.6s steps(8) infinite;
+	background: linear-gradient(#ffe08a, #c58d28);
+	box-shadow: 0 0 10px rgba(255, 210, 100, 0.8);
+	animation: loading-sweep 1.8s cubic-bezier(0.5, 0, 0.5, 1) infinite;
 }
 
 @keyframes loading-sweep {
@@ -167,41 +181,86 @@
 	}
 }
 
-.loading-tips {
-	position: relative;
-	height: 1.4em;
-	width: 90vw;
-	text-align: center;
+/* the card: a monster and a hint, both swap every few seconds */
+.loading-card {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	width: 480px;
+	max-width: 90vw;
+	min-height: 96px;
+	padding: 12px 18px 12px 12px;
+	background: linear-gradient(#10131c, #0a0c12);
+	border: 2px solid #8a5f16;
+	box-shadow:
+		0 0 0 2px #05060a,
+		0 10px 24px rgba(0, 0, 0, 0.55);
+	font-family: var(--font-pixel);
+}
+
+.loading-card-art {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 84px;
+	height: 84px;
+	background: radial-gradient(circle, rgba(224, 169, 58, 0.2), rgba(0, 0, 0, 0.5) 75%);
+	border: 1px solid #2a2118;
+	animation: loading-pop 0.5s ease-out both;
+}
+
+.loading-card-art img {
+	width: 72px;
+	height: 72px;
+	object-fit: contain;
+	image-rendering: pixelated;
+	animation: loading-bob 1.2s steps(4) infinite alternate;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.5));
+}
+
+.loading-card-text {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
 	font-size: 0.95rem;
-	color: #a89878;
+	line-height: 1.35;
+	color: #e9e4d6;
+	text-align: left;
+	animation: loading-rise 0.5s ease-out both;
 }
 
-.loading-tips span {
-	position: absolute;
-	inset: 0;
-	opacity: 0;
-	animation: loading-tip 9s infinite;
+.loading-card-kicker {
+	font-size: 0.7rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #e0a93a;
 }
 
-.loading-tips span:nth-child(2) {
-	animation-delay: 3s;
-}
-
-.loading-tips span:nth-child(3) {
-	animation-delay: 6s;
-}
-
-@keyframes loading-tip {
-	0% {
+@keyframes loading-pop {
+	from {
+		transform: scale(0.6);
 		opacity: 0;
 	}
-	6%,
-	30% {
+	to {
+		transform: scale(1);
 		opacity: 1;
 	}
-	36%,
-	100% {
+}
+
+@keyframes loading-rise {
+	from {
+		transform: translateY(8px);
 		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
+}
+
+@keyframes loading-bob {
+	to {
+		transform: translateY(-4px);
 	}
 }
 
@@ -210,7 +269,10 @@
 	.rune-b,
 	.loading-castle,
 	.loading-sparks i,
-	.loading-bar-fill {
+	.loading-bar-fill,
+	.loading-card-art,
+	.loading-card-art img,
+	.loading-card-text {
 		animation: none;
 	}
 }

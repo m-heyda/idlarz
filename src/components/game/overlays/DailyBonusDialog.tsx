@@ -4,7 +4,8 @@ import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import DailyBoard from '../DailyBoard';
 import GemIcon from '../GemIcon';
-import PixelModal from '../PixelModal';
+import GameModal from '../GameModal';
+import { Button } from '../../../../packages/design-system/src/components/primitives';
 
 /**
  * The daily bonus window: a small window with the 7-day board and a Claim button that opens by itself once per start of the game, **after** the welcome-back window (it waits until that one is closed), and only when today's bonus can be claimed
@@ -46,7 +47,7 @@ const DailyBonusDialog: React.FC<{ ready: boolean }> = ({ ready }) => {
 	};
 
 	return (
-		<PixelModal title='Daily bonus' icon={<GemIcon />} size='md' onClose={close}>
+		<GameModal title='Daily bonus' icon={<GemIcon />} size='md' onClose={close}>
 			<div className='flex flex-col gap-4 px-1 pb-1' data-testid='daily-dialog'>
 				<DailyBoard daily={info?.daily} busy={busy} onClaim={() => void claim()} />
 				<div className='flex items-center justify-between gap-3'>
@@ -54,12 +55,10 @@ const DailyBonusDialog: React.FC<{ ready: boolean }> = ({ ready }) => {
 						<input type='checkbox' checked={skipToday} onChange={(event) => setSkipToday(event.target.checked)} />
 						Don&apos;t show again today
 					</label>
-					<button className='px-btn' onClick={close}>
-						Later
-					</button>
+					<Button onClick={close}>Later</Button>
 				</div>
 			</div>
-		</PixelModal>
+		</GameModal>
 	);
 };
 

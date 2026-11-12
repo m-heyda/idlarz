@@ -11375,8 +11375,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/CraftStash.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx"
+			"src/components/game/hero/HeroWindow.tsx",
+			"src/components/game/hero/recipeUi.ts"
 		],
 		"name": "comp_glass_vial",
 		"category": "resources",
@@ -20602,6 +20602,21 @@
 		]
 	},
 	{
+		"usedBy": [
+			"hero:crafting-tab"
+		],
+		"name": "crafting_blacksmith",
+		"category": "ui",
+		"subcategory": "crafting",
+		"src": "/pixel/new_assets/crafting/blacksmith.png",
+		"status": "used",
+		"source": "new_assets/crafting",
+		"size": [
+			142,
+			242
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "fx_dead",
 		"category": "ui",
@@ -20610,8 +20625,8 @@
 		"status": "used",
 		"source": "public/fx",
 		"size": [
-			48,
-			40
+			64,
+			64
 		]
 	},
 	{
@@ -21238,8 +21253,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/merchant/MerchantPlaceholders.tsx"
 		],
 		"name": "menu_achievements",
 		"category": "ui",
@@ -21253,11 +21268,69 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts",
+			"src/components/game/hud/HudTopBar.tsx"
+		],
 		"name": "menu_bag_scroll",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_bag_scroll.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/BestiaryWindow.tsx",
+			"src/components/game/hud/HudDock.tsx"
+		],
+		"name": "menu_bestiary",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_bestiary.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_character",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_character.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_crafting",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_crafting.png",
+		"status": "unused",
+		"source": "public/pixel/icons",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "menu_equipment",
+		"category": "ui",
+		"subcategory": "menu",
+		"src": "/pixel/icons/menu_equipment.png",
 		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
@@ -21267,57 +21340,7 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/AvatarDialog.tsx",
-			"src/components/game/ClassPickerDialog.tsx"
-		],
-		"name": "menu_character",
-		"category": "ui",
-		"subcategory": "menu",
-		"src": "/pixel/icons/menu_character.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			40,
-			40
-		]
-	},
-	{
-		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/CraftingOverlay.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
-		],
-		"name": "menu_crafting",
-		"category": "ui",
-		"subcategory": "menu",
-		"src": "/pixel/icons/menu_crafting.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
-		],
-		"name": "menu_equipment",
-		"category": "ui",
-		"subcategory": "menu",
-		"src": "/pixel/icons/menu_equipment.png",
-		"status": "used",
-		"source": "public/pixel/icons",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_farm",
 		"category": "ui",
@@ -21332,7 +21355,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/HeaderMenu.tsx"
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/merchant/MerchantPlaceholders.tsx"
 		],
 		"name": "menu_gems_pouch",
 		"category": "ui",
@@ -21360,8 +21384,7 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/RebirthDialog.tsx"
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_legacy",
 		"category": "ui",
@@ -21389,8 +21412,7 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/GameWindows.tsx"
+			"src/components/game/hud/HudDock.tsx"
 		],
 		"name": "menu_merchant",
 		"category": "ui",
@@ -21404,15 +21426,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/HeaderMenu.tsx",
-			"src/components/game/overlays/SettingsDialog.tsx"
-		],
+		"usedBy": [],
 		"name": "menu_settings",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_settings.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			64,
@@ -21420,14 +21439,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/overlays/GameWindows.tsx"
-		],
+		"usedBy": [],
 		"name": "menu_stats",
 		"category": "ui",
 		"subcategory": "menu",
 		"src": "/pixel/icons/menu_stats.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			40,
@@ -21832,14 +21849,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:upgrades"
-		],
+		"usedBy": [],
 		"name": "portrait_blacksmith",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_blacksmith.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21925,14 +21940,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:gambling"
-		],
+		"usedBy": [],
 		"name": "portrait_jester",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_jester.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21940,15 +21953,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:resources",
-			"merchant:goods"
-		],
+		"usedBy": [],
 		"name": "portrait_merchant",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_merchant.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,
@@ -21956,14 +21966,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"merchant:quests"
-		],
+		"usedBy": [],
 		"name": "portrait_quest_giver",
 		"category": "portraits",
 		"subcategory": "NPC busts 48px",
 		"src": "/pixel/portraits/npc_quest_giver.png",
-		"status": "used",
+		"status": "reuse",
 		"source": "public/pixel/portraits",
 		"size": [
 			48,

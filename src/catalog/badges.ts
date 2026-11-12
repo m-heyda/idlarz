@@ -6,6 +6,9 @@ export const BADGE_NONE = 'none';
 /** The badges shown when the player never chose, best first: the tester medals (Beta, then Early), for the accounts that hold one. */
 export const DEFAULT_BADGE_IDS: readonly string[] = ['beta_tester', 'early_tester'];
 
+/** The achievements that can be worn as a badge: the tester medals and a few milestones. Not every achievement medal is a badge; a set of real badges comes later. */
+export const BADGE_CHOICE_IDS: readonly string[] = ['beta_tester', 'early_tester', 'first_rebirth', 'castle_10', 'boss_auroch', 'golden_kill'];
+
 /** One title a player can wear: the achievement that grants it and the words shown. */
 export interface TitleOption {
 	/** The `rewards.titleId` that is stored on the profile */
@@ -20,7 +23,8 @@ export interface TitleOption {
  * The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.
  * @category Progression/Badges
  */
-export const badgeOptions = (earned: readonly string[]): AchievementDef[] => ACHIEVEMENTS.filter((a) => earned.includes(a.id));
+export const badgeOptions = (earned: readonly string[]): AchievementDef[] =>
+	ACHIEVEMENTS.filter((a) => BADGE_CHOICE_IDS.includes(a.id) && earned.includes(a.id));
 
 export const titleOptions = (earned: readonly string[]): TitleOption[] =>
 	ACHIEVEMENTS.filter((a) => a.rewards.titleId && earned.includes(a.id)).map((a) => ({ id: a.rewards.titleId as string, name: a.title, achievementId: a.id }));
@@ -29,7 +33,7 @@ export const titleOptions = (earned: readonly string[]): TitleOption[] =>
 export const shownBadge = (choice: string | null | undefined, earned: readonly string[]): AchievementDef | null => {
 	if (choice === BADGE_NONE) return null;
 	const id = choice ?? DEFAULT_BADGE_IDS.find((candidate) => earned.includes(candidate));
-	return id && earned.includes(id) ? (achievementById(id) ?? null) : null;
+	return id && BADGE_CHOICE_IDS.includes(id) && earned.includes(id) ? (achievementById(id) ?? null) : null;
 };
 
 /** The title text for a stored title id, or null when it is not set or not earned. */
@@ -44,7 +48,8 @@ export const checkBadgeChoice = (
 	const { badgeId, titleId } = input;
 	if (badgeId !== null && typeof badgeId !== 'string') return { ok: false, error: 'Pick one of your badges.' };
 	if (titleId !== null && typeof titleId !== 'string') return { ok: false, error: 'Pick one of your titles.' };
-	if (badgeId !== null && badgeId !== BADGE_NONE && !earned.includes(badgeId)) return { ok: false, error: 'You have not earned that badge.' };
+	if (badgeId !== null && badgeId !== BADGE_NONE && !(BADGE_CHOICE_IDS.includes(badgeId) && earned.includes(badgeId)))
+		return { ok: false, error: 'You have not earned that badge.' };
 	if (titleId !== null && !titleOptions(earned).some((t) => t.id === titleId)) return { ok: false, error: 'You have not earned that title.' };
 	return { ok: true, badgeId, titleId };
 };

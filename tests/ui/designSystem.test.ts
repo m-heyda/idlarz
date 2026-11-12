@@ -1,6 +1,15 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { clamp, clampWindowPosition, clampWindowSize, compact, gemStates, hasGlow, upgradeState } from '../../packages/design-system/src/logic';
+import {
+	clamp,
+	clampWindowPosition,
+	clampWindowSize,
+	compact,
+	dockMagnification,
+	gemStates,
+	hasGlow,
+	upgradeState,
+} from '../../packages/design-system/src/logic';
 
 test('gemStates: yellow gems for the level, dim for the rest, purple once maxed', () => {
 	assert.deepEqual(gemStates(0, 3), ['off', 'off', 'off']);
@@ -29,7 +38,7 @@ test('hasGlow: every rarity above common glows', () => {
 test('compact short numbers', () => {
 	assert.equal(compact(950), '950');
 	assert.equal(compact(1500), '1.5K');
-	assert.equal(compact(2_800_000), '2.80M');
+	assert.equal(compact(2_800_000), '2.8M');
 });
 
 test('clamp: an empty range keeps the minimum', () => {
@@ -79,4 +88,14 @@ test('toRarity maps a game rarity id onto the design-system one and reads anythi
 	assert.equal(toRarity('mythic'), 'common');
 	assert.equal(toRarity(undefined), 'common');
 	assert.equal(toRarity(''), 'common');
+});
+
+test('dockMagnification: biggest under the pointer, falling off to normal, neighbours lifted a little', () => {
+	assert.equal(dockMagnification(0), 1.25);
+	assert.equal(dockMagnification(100), 1);
+	assert.equal(dockMagnification(500), 1);
+	const near = dockMagnification(74); // the next icon of a 72 px dock
+	assert.ok(near > 1 && near < 1.25, `a neighbour swells less than the hovered icon (${near})`);
+	assert.ok(dockMagnification(30) > dockMagnification(60), 'the closer, the bigger');
+	assert.equal(dockMagnification(Number.NaN), 1);
 });

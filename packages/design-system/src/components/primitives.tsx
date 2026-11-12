@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { gemStates, type Point, type Rarity, type Size } from '../logic';
+import { dockMagnification, gemStates, type Point, type Rarity, type Size } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -73,6 +73,8 @@ export interface TabItem {
 	disabled?: boolean;
 	/** Hover text (why a tab is locked) */
 	title?: string;
+	/** A tutorial anchor (`data-tutorial`) for the game's guide to point at */
+	anchor?: string;
 }
 /** A row of wooden tabs, the active one in gold. */
 export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: string) => void }> = ({ items, active, onChange }) => (
@@ -87,6 +89,7 @@ export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: 
 				className='ds-tab'
 				disabled={t.disabled}
 				title={t.title}
+				data-tutorial={t.anchor}
 				onClick={() => !t.disabled && onChange?.(t.id)}
 			>
 				{t.label}
@@ -96,9 +99,28 @@ export const Tabs: React.FC<{ items: TabItem[]; active: string; onChange?: (id: 
 	</div>
 );
 
-/** A resource in the top bar: icon, amount, optional income per second. */
-export const ResourceChip: React.FC<{ icon: string; value: string; rate?: string; title?: string }> = ({ icon, value, rate, title }) => (
-	<span className='ds-chip' title={title}>
+/** A resource in the top bar: icon, amount, optional income per second. With `onClick` it is a button (a resource that opens something); extra attributes (a tutorial anchor) go to the chip itself. */
+export const ResourceChip: React.FC<
+	{ icon: string; value: string; rate?: string; title?: string; onClick?: () => void } & Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClick' | 'title'>
+> = ({ icon, value, rate, title, onClick, ...rest }) => (
+	<span
+		className={cx('ds-chip', onClick && 'ds-chip-link')}
+		title={title}
+		role={onClick ? 'button' : undefined}
+		tabIndex={onClick ? 0 : undefined}
+		onClick={onClick}
+		onKeyDown={
+			onClick
+				? (e) => {
+						if (e.key === 'Enter' || e.key === ' ') {
+							e.preventDefault();
+							onClick();
+						}
+					}
+				: undefined
+		}
+		{...rest}
+	>
 		<img src={icon} alt='' />
 		<span>{value}</span>
 		{rate ? <span className='ds-chip-rate'>{rate}</span> : null}
@@ -138,6 +160,8 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	locked?: boolean;
 	/** The item is worn (drawn with a gold corner mark) */
 	equipped?: boolean;
+	/** The piece would be sold by Sell junk (a small brown mark in the top right corner) */
+	junk?: boolean;
 	large?: boolean;
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
@@ -150,7 +174,7 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
  * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
  * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
  */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, large, active, label, sub, className, style, ...rest }) => {
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, junk, large, active, label, sub, className, style, ...rest }) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -172,28 +196,33 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 				</span>
 			) : null}
 			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>
 	);
 };
 
-/** A stone menu icon with a caption (the middle bar of the HUD). */
-export const IconButton: React.FC<{ icon: string; label: string; badge?: number; small?: boolean; onClick?: () => void }> = ({
-	icon,
-	label,
-	badge,
-	small,
-	onClick,
-}) => (
-	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm')} onClick={onClick}>
-		<img src={icon} alt='' />
-		{badge ? <Badge count={badge} floating /> : null}
+/**
+ * A stone menu icon with a caption (the dock). `art` draws any node (a portrait) in place of the picture. `active` marks an open window, `disabled` dims it (not available yet); the badge is the count of things waiting. Any other button attribute
+ * (a tutorial anchor, aria-label) goes to the button.
+ */
+export const IconButton: React.FC<
+	{ icon: string; label: string; badge?: number; small?: boolean; active?: boolean; art?: React.ReactNode } & Omit<
+		React.ButtonHTMLAttributes<HTMLButtonElement>,
+		'children'
+	>
+> = ({ icon, label, badge, small, active, art, className, ...rest }) => (
+	<button type='button' className={cx('ds-iconbtn', small && 'ds-iconbtn-sm', className)} data-active={active ? 'true' : undefined} {...rest}>
+		<span className='ds-iconbtn-pic'>
+			{art ? <span className='ds-iconbtn-art'>{art}</span> : <img src={icon} alt='' />}
+			{badge ? <Badge count={badge} floating /> : null}
+		</span>
 		<span>{label}</span>
 	</button>
 );
 
 /** Diamond-shaped level gems: yellow for levels bought, dim for the rest, purple once the upgrade is maxed. */
-export const DiamondLevel: React.FC<{ level: number; max: number }> = ({ level, max }) => (
-	<span className='ds-gems' role='img' aria-label={`Level ${level} of ${max}`}>
+export const DiamondLevel: React.FC<{ level: number; max: number; small?: boolean }> = ({ level, max, small }) => (
+	<span className='ds-gems' data-size={small ? 'sm' : undefined} role='img' aria-label={`Level ${level} of ${max}`}>
 		{gemStates(level, max).map((s, i) => (
 			<i key={i} className='ds-gem' data-state={s} />
 		))}
@@ -372,9 +401,11 @@ export const AddSlot: React.FC<{ tip: React.ReactNode; onClick?: () => void }> =
 );
 
 export type GlyphTone = 'gold' | 'wood' | 'stone';
-/** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. */
-export const GlyphButton: React.FC<{ glyph: string; label: string; tone?: GlyphTone; onClick?: () => void }> = ({ glyph, label, tone = 'gold', onClick }) => (
-	<button type='button' className='ds-glyphbtn' data-tone={tone} aria-label={label} title={label} onClick={onClick}>
+/** A small square button with one engraved character (Deeds, Settings). Tones: `gold` (the default plate), `wood`, `stone`. `active` marks an open window; extra button attributes pass through. */
+export const GlyphButton: React.FC<
+	{ glyph: string; label: string; tone?: GlyphTone; active?: boolean } & Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children'>
+> = ({ glyph, label, tone = 'gold', active, ...rest }) => (
+	<button type='button' className='ds-glyphbtn' data-tone={tone} data-active={active ? 'true' : undefined} aria-label={label} title={label} {...rest}>
 		<span>{glyph}</span>
 	</button>
 );
@@ -387,8 +418,24 @@ export const TopBar: React.FC<{ right?: React.ReactNode; children: React.ReactNo
 	</div>
 );
 
-/** The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. */
-export const Dock: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-dock'>{children}</div>;
+/**
+ * The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. The icons swell towards the pointer like a macOS dock: the one under it the most, its neighbours a little
+ * (`--ds-mag` on each button, set from the pointer's distance; `magnify` switches it off).
+ */
+export const Dock: React.FC<{ children: React.ReactNode; magnify?: boolean }> = ({ children, magnify = true }) => {
+	const ref = useRef<HTMLDivElement>(null);
+	const set = (x: number | null) => {
+		ref.current?.querySelectorAll<HTMLElement>('.ds-iconbtn').forEach((el) => {
+			const box = el.getBoundingClientRect();
+			el.style.setProperty('--ds-mag', x === null ? '1' : String(dockMagnification(Math.abs(x - (box.left + box.width / 2)))));
+		});
+	};
+	return (
+		<div ref={ref} className='ds-dock' onPointerMove={magnify ? (e) => set(e.clientX) : undefined} onPointerLeave={magnify ? () => set(null) : undefined}>
+			{children}
+		</div>
+	);
+};
 
 export interface TipBox {
 	left: number;
@@ -410,6 +457,8 @@ export interface HoverTipProps {
 	interactive?: boolean;
 	/** Replace the built-in placement: gets the anchor's box, the tip's size and the viewport, returns the tip's top-left (the game's `placeTip` fits here) */
 	place?: (anchor: TipBox, tip: Size, viewport: Size) => Point;
+	/** The wrapped element fills the width of its container (a bar) instead of shrinking to its content */
+	fill?: boolean;
 	children: React.ReactNode;
 }
 /**
@@ -426,6 +475,7 @@ export const HoverTip: React.FC<HoverTipProps> = ({
 	closeDelayMs = 0,
 	interactive,
 	place,
+	fill,
 	children,
 }) => {
 	const host = useRef<HTMLSpanElement>(null);
@@ -471,6 +521,7 @@ export const HoverTip: React.FC<HoverTipProps> = ({
 		<span
 			ref={host}
 			className='ds-hovertip'
+			data-fill={fill ? 'true' : undefined}
 			onMouseEnter={() => setOpen(true)}
 			onMouseLeave={() => setOpen(false)}
 			onFocus={() => setOpen(true)}

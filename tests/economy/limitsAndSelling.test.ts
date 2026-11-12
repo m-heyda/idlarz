@@ -68,24 +68,19 @@ test('a new sell bonus applies to resources, bag gear, junk, auto-sold drops and
 
 // ---- Organize is a bag function, in the global menu too -------------------------------------------------------------------------
 
-test('the auto-battle entry is greyed out until the first rebirth', () => {
+test('the battle switches are not in the global menu at all: they live in the combat window (Auto-battle and Auto-use, both after the first rebirth)', () => {
 	freshGame();
-	const locked = globalMenuItems().find((entry) => entry.id === 'autoBattle')!;
-	assert.equal(locked.disabled, true);
-	assert.match(locked.hint ?? '', /rebirth/);
-	store.setState({ prestige: { ...api().prestige, rebirths: 1 } } as never);
-	assert.equal(globalMenuItems().find((entry) => entry.id === 'autoBattle')!.disabled, false);
-});
-
-test('the global menu keeps the battle switches apart: a section of their own, at the bottom, above the view options', () => {
-	freshGame();
-	const ids = globalMenuItems().map((entry) => entry.id);
-	assert.ok(ids.indexOf('autoBattle') > ids.indexOf('import'), 'after the save and bag entries');
-	assert.equal(ids.indexOf('autoUse'), ids.indexOf('autoBattle') + 1);
-	assert.equal(ids.indexOf('minimap'), ids.indexOf('autoUse') + 1, 'right above the view options');
+	for (const rebirths of [0, 1]) {
+		store.setState({ prestige: { ...api().prestige, rebirths } } as never);
+		const ids = globalMenuItems().map((entry) => entry.id);
+		assert.ok(!ids.includes('autoBattle') && !ids.includes('autoUse'), `no battle switch with ${rebirths} rebirths`);
+	}
 	const items = globalMenuItems();
-	assert.equal(items.find((entry) => entry.id === 'autoBattle')?.separator, true, 'a rule above the battle section');
-	assert.equal(items.find((entry) => entry.id === 'minimap')?.separator, true, 'and one below it');
+	assert.ok(
+		items.some((entry) => entry.id === 'minimap'),
+		'the view options stay',
+	);
+	assert.equal(items.find((entry) => entry.id === 'minimap')?.separator, undefined, 'with no rule above them');
 });
 
 test('the global menu has an Organize bag entry that tidies the bag', () => {

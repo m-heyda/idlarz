@@ -18,7 +18,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 
 ### The tick loop and persistence
 
-Source: [`src/app/GameApp.tsx:121`](../../src/app/GameApp.tsx)
+Source: [`src/app/GameApp.tsx:120`](../../src/app/GameApp.tsx)
 
 The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done.
 Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps
@@ -155,11 +155,11 @@ get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow re
 
 ### `NPC_PORTRAITS` <small>const</small>
 
-Source: [`src/config/npcPortraits.ts:12`](../../src/config/npcPortraits.ts)
+Source: [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts)
 
 The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of
 the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
-The merchant window shows one face per tab (`MERCHANT_PORTRAIT`); every other portrait stays in the asset library (category Portraits) as a ready face for
+None is shown in the game right now (the Merchant window dropped its per-tab face); they stay in the asset library (category Portraits) as ready faces for
 a future quest giver, innkeeper, blacksmith or dialogue.
 
 <a id="biome-art"></a>
@@ -176,7 +176,7 @@ The file name is `biome_<name>.png`; change the value here to use another one.
 
 ### `ANIMAL_PIXEL_ICONS` <small>const</small>
 
-Source: [`src/config/pixelIcons.ts:249`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:250`](../../src/config/pixelIcons.ts)
 
 Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
 
@@ -184,7 +184,7 @@ Farm animal id -> its sprites. Chickens and cows come in two looks, the others i
 
 ### `animalIcon` <small>function</small>
 
-Source: [`src/config/pixelIcons.ts:264`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:265`](../../src/config/pixelIcons.ts)
 
 The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).

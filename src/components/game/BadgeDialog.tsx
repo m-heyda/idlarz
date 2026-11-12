@@ -3,7 +3,8 @@ import { useUiStore } from '@/stores/uiStore';
 import { chooseBadge, fetchBadges } from '@/lib/authClient';
 import { BADGE_NONE, badgeOptions, shownBadge, titleOptions } from '@/catalog/badges';
 import audioManager from '@/utils/audioManager';
-import PixelModal from './PixelModal';
+import GameModal from './GameModal';
+import { SectionLabel } from '../../../packages/design-system/src/components/primitives';
 import AchievementBadge from './AchievementBadge';
 
 /** Loads the badge choice into the store once per session (the Character window and this dialog both call it). */
@@ -18,7 +19,7 @@ export const useBadgeChoice = (): void => {
 };
 
 /**
- * The badge and title picker (Equipment window, "Badge" button). The badge is any achievement badge the account has earned, or none at all ("Hide badge"); the title is one of the earned titles. A pick shows at once and is saved on the profile
+ * The badge and title picker (Equipment window, "Badge" button). The badge is one of a few badges the account has earned (the tester medals and some milestones), or none at all ("Hide badge"); the title is one of the earned titles. A pick shows at once and is saved on the profile
  * (`POST /api/auth/badge`), which is what the landing and the rankings read; a refusal puts the previous choice back and shows why.
  */
 const BadgeDialog: React.FC = () => {
@@ -36,11 +37,16 @@ const BadgeDialog: React.FC = () => {
 
 	if (!open) return null;
 
-	const save = async (next: { badgeId: string | null; titleId: string | null }) => {
+	const save = async (next: { badgeId?: string | null; titleId?: string | null }) => {
 		const before = badge;
 		audioManager.playSound('click');
 		setError(null);
-		setBadge({ ...next, earned: before.earned });
+		setBadge({
+			badgeId: next.badgeId === undefined ? before.badgeId : next.badgeId,
+			titleId: next.titleId === undefined ? before.titleId : next.titleId,
+			earned: before.earned,
+		});
+		// only the part that changed is sent: the other keeps what the server has stored
 		const result = await chooseBadge(next.badgeId, next.titleId);
 		if (!result.ok) {
 			setBadge(before);
@@ -53,64 +59,50 @@ const BadgeDialog: React.FC = () => {
 	const shown = shownBadge(badge.badgeId, badge.earned);
 
 	return (
-		<PixelModal title='Badge and title' size='md' onClose={close}>
-			<p className='text-[#a89878] text-sm mb-4 text-center'>Shown next to your name in the game and in the rankings. You can hide the badge completely.</p>
+		<GameModal title='Badge and title' size='md' onClose={close}>
+			<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 10px' }}>
+				Shown next to your name in the game and in the rankings. You can hide the badge completely.
+			</p>
 
-			<div className='px-h text-center mb-2'>Badge</div>
-			<div className='avatar-grid' data-testid='badge-grid'>
+			<SectionLabel>Badge</SectionLabel>
+			<div className='ds-pick-grid' data-testid='badge-grid'>
 				{badges.map((a) => (
-					<button
-						key={a.id}
-						type='button'
-						className='avatar-card'
-						data-selected={shown?.id === a.id}
-						onClick={() => void save({ badgeId: a.id, titleId: badge.titleId })}
-					>
+					<button key={a.id} type='button' className='ds-pick' data-selected={shown?.id === a.id} onClick={() => void save({ badgeId: a.id })}>
 						<AchievementBadge achievement={a} size={40} />
-						<span className='avatar-card-name'>{a.title}</span>
+						<span>{a.title}</span>
 					</button>
 				))}
-				<button
-					type='button'
-					className='avatar-card'
-					data-selected={badge.badgeId === BADGE_NONE}
-					onClick={() => void save({ badgeId: BADGE_NONE, titleId: badge.titleId })}
-				>
-					<span className='avatar-card-soon-art'>✕</span>
-					<span className='avatar-card-name'>Hide badge</span>
+				<button type='button' className='ds-pick' data-selected={badge.badgeId === BADGE_NONE} onClick={() => void save({ badgeId: BADGE_NONE })}>
+					<span className='ds-pick-none'>✕</span>
+					<span>Hide badge</span>
 				</button>
 			</div>
-			{badges.length === 0 && <p className='text-xs text-[#a89878] text-center mt-2'>Earn achievements to unlock badges.</p>}
+			{badges.length === 0 && (
+				<p className='ds-dim' style={{ fontSize: 12, textAlign: 'center' }}>
+					Earn achievements to unlock badges.
+				</p>
+			)}
 
-			<div className='px-h text-center mt-5 mb-2'>Title</div>
-			<div className='avatar-grid' data-testid='title-grid'>
-				<button
-					type='button'
-					className='avatar-card'
-					data-selected={badge.titleId === null}
-					onClick={() => void save({ badgeId: badge.badgeId, titleId: null })}
-				>
-					<span className='avatar-card-name'>No title</span>
+			<div style={{ marginTop: 14 }}>
+				<SectionLabel>Title</SectionLabel>
+			</div>
+			<div className='ds-pick-grid' data-testid='title-grid'>
+				<button type='button' className='ds-pick' data-selected={badge.titleId === null} onClick={() => void save({ titleId: null })}>
+					<span>No title</span>
 				</button>
 				{titles.map((t) => (
-					<button
-						key={t.id}
-						type='button'
-						className='avatar-card'
-						data-selected={badge.titleId === t.id}
-						onClick={() => void save({ badgeId: badge.badgeId, titleId: t.id })}
-					>
-						<span className='avatar-card-name'>{t.name}</span>
+					<button key={t.id} type='button' className='ds-pick' data-selected={badge.titleId === t.id} onClick={() => void save({ titleId: t.id })}>
+						<span>{t.name}</span>
 					</button>
 				))}
 			</div>
 
 			{error && (
-				<p role='alert' className='text-sm text-center text-[#e07a6a] mt-3'>
+				<p role='alert' style={{ textAlign: 'center', color: '#ff7a6a', margin: '10px 0 0' }}>
 					{error}
 				</p>
 			)}
-		</PixelModal>
+		</GameModal>
 	);
 };
 
