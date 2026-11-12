@@ -25,7 +25,7 @@ test('gear has a slot, potions have effects and stackMax, trade goods are slotle
 			assert.ok(def.effects.length > 0, def.id);
 			assert.ok((def.stackMax ?? 0) > 1, def.id);
 			assert.equal(def.slot, undefined, def.id);
-		} else if (TRADE_GOODS.includes(def)) {
+		} else if (TRADE_GOODS.includes(def) || def.junk) {
 			assert.ok((def.stackMax ?? 0) > 1 && !def.slot, def.id);
 		} else {
 			assert.ok(def.slot, `${def.id} needs a slot`);
