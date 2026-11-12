@@ -1,4 +1,5 @@
-import React, { useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { gemStates, type Rarity } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
@@ -112,10 +113,12 @@ export const ProgressBar: React.FC<{ value: number; max: number; tone?: 'hp' | '
 );
 
 /** A label with a big number under it (Damage 106.6). */
-export const Stat: React.FC<{ label: string; value: React.ReactNode }> = ({ label, value }) => (
+export const Stat: React.FC<{ label: string; value: React.ReactNode; tone?: 'damage' | 'armor' | 'crit' | 'plain' }> = ({ label, value, tone = 'plain' }) => (
 	<div className='ds-stat'>
 		<span className='ds-stat-label'>{label}</span>
-		<span className='ds-stat-value'>{value}</span>
+		<span className='ds-stat-value' data-tone={tone}>
+			{value}
+		</span>
 	</div>
 );
 
@@ -130,10 +133,14 @@ export interface SlotProps {
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
 	title?: string;
+	/** Text inside an icon-less slot (a skill name) */
+	label?: string;
+	sub?: string;
 	onClick?: () => void;
+	onContextMenu?: (e: React.MouseEvent) => void;
 }
 /** An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, active, title, onClick }) => {
+export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, large, active, title, label, sub, onClick, onContextMenu }) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -146,8 +153,15 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 			data-active={active}
 			title={title}
 			onClick={onClick}
+			onContextMenu={onContextMenu}
 		>
 			{icon ? <img src={icon} alt='' /> : null}
+			{label ? (
+				<span className='ds-slot-text'>
+					{label}
+					{sub ? <small>{sub}</small> : null}
+				</span>
+			) : null}
 			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
 		</button>
 	);
@@ -290,20 +304,51 @@ export const TopBar: React.FC<{ right?: React.ReactNode; children: React.ReactNo
 /** The stone bar of menu icons along the bottom of the game screen, framed in gold. Children are IconButtons. */
 export const Dock: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-dock'>{children}</div>;
 
-/** Shows `tip` under (or above) the wrapped element while it is hovered or focused. Purely presentational; the tip is any node, usually a Tooltip. */
+/**
+ * Shows `tip` under (or above) the wrapped element while it is hovered or focused. The tip is drawn in a portal on `document.body` with fixed positioning, so no scrolling list, clipped panel
+ * or window can hide it, it always sits on top, and it is kept inside the screen. Purely presentational; the tip is any node, usually a Tooltip.
+ */
 export const HoverTip: React.FC<{ tip: React.ReactNode; placement?: 'below' | 'above'; align?: 'start' | 'center'; children: React.ReactNode }> = ({
 	tip,
 	placement = 'below',
 	align = 'start',
 	children,
-}) => (
-	<span className='ds-hovertip' data-placement={placement} data-align={align}>
-		{children}
-		<span className='ds-hovertip-pop' role='presentation'>
-			{tip}
+}) => {
+	const host = useRef<HTMLSpanElement>(null);
+	const pop = useRef<HTMLDivElement>(null);
+	const [open, setOpen] = useState(false);
+	const [at, setAt] = useState<{ left: number; top: number } | null>(null);
+	useLayoutEffect(() => {
+		if (!open || !host.current || !pop.current) return;
+		const r = host.current.getBoundingClientRect();
+		const w = pop.current.offsetWidth;
+		const h = pop.current.offsetHeight;
+		let left = align === 'center' ? r.left + r.width / 2 - w / 2 : r.left;
+		let top = placement === 'above' ? r.top - h - 8 : r.bottom + 8;
+		if (top < 4) top = r.bottom + 8;
+		if (top + h > window.innerHeight - 4) top = Math.max(4, r.top - h - 8);
+		left = Math.max(4, Math.min(left, window.innerWidth - w - 4));
+		setAt({ left, top });
+	}, [open, placement, align]);
+	const show = () => setOpen(true);
+	const hide = () => {
+		setOpen(false);
+		setAt(null);
+	};
+	return (
+		<span ref={host} className='ds-hovertip' onMouseEnter={show} onMouseLeave={hide} onFocus={show} onBlur={hide} onPointerDown={hide} onContextMenu={hide}>
+			{children}
+			{open && typeof document !== 'undefined'
+				? createPortal(
+						<div ref={pop} className='ds-root ds-hovertip-pop' role='presentation' style={{ left: at?.left ?? -9999, top: at?.top ?? -9999 }}>
+							{tip}
+						</div>,
+						document.body,
+					)
+				: null}
 		</span>
-	</span>
-);
+	);
+};
 
 /** A map preview with its event counters and tile count laid over the bottom of the map itself (saves the strip underneath). */
 export const MiniMap: React.FC<{ stats: { tone: 'bad' | 'gold' | 'dim'; text: string }[]; width?: number; height?: number; children?: React.ReactNode }> = ({

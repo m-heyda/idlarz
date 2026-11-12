@@ -7,6 +7,15 @@ import {
 	AvatarGrid,
 	BadgeTitlePicker,
 	XpBar,
+	CraftStash,
+	type StashEntry,
+	ContextMenu,
+	EquipGroup,
+	type MenuState,
+	Slider,
+	CollapsibleGroup,
+	CraftQueue,
+	type CraftQueueEntry,
 	TipRows,
 	type AvatarCard,
 	type BadgeOption,
@@ -16,6 +25,7 @@ import {
 	TopBar,
 	Dock,
 	ResourceStat,
+	HoverTip,
 	MiniMap,
 	compact,
 	DsRoot,
@@ -217,32 +227,99 @@ export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ wid
 	);
 };
 
-/** Placeholder hero figure: a dark human silhouette that fills the height beside the equipment slots, until class art is chosen. */
-const Silhouette: React.FC = () => (
-	<div className='ds-doll-figure'>
-		<svg viewBox='0 0 120 260' preserveAspectRatio='xMidYMid meet' aria-label='Hero silhouette'>
-			<path
-				d='M60 8C50 8 46 16 46 25C46 33 50 40 54 43L54 49C40 51 31 54 28 64L22 112C21 118 25 121 29 120L36 118L38 98L40 130L40 142C40 160 42 190 44 214L42 246C42 250 46 252 52 252L58 252L58 222L60 196L62 222L62 252L68 252C74 252 78 250 78 246L76 214C78 190 80 160 80 142L80 130L82 98L84 118L91 120C95 121 99 118 98 112L92 64C89 54 80 51 66 49L66 43C70 40 74 33 74 25C74 16 70 8 60 8Z'
-				fill='#07060a'
-				stroke='#2a2433'
-				strokeWidth='1.5'
-				strokeLinejoin='round'
-			/>
-		</svg>
-	</div>
-);
+const STASH_START: StashEntry[] = [
+	{ id: 'vial', name: 'Glass Vial', icon: I('comp_glass_vial'), qty: 3470, kind: 'component' },
+	{ id: 'scraps', name: 'Bound scraps', icon: I('item_bound_scraps'), qty: 214, kind: 'component' },
+	{ id: 'hp2', name: 'Greater Potion', icon: I('item_potion_greater'), qty: 36, kind: 'potion', stack: 20 },
+	{ id: 'cloth', name: 'Cloth bolt', icon: R('cloth'), qty: 12, kind: 'good', stack: 20 },
+	{ id: 'dye', name: 'Dye', icon: R('dye'), qty: 3, kind: 'good', stack: 20 },
+	{ id: 'bone', name: 'Bone token', icon: I('item_bone_token'), qty: 5, kind: 'special' },
+	{ id: 'acorn', name: 'Acorn charm', icon: I('item_acorn_charm'), qty: 1, kind: 'special' },
+];
 
-const EQUIP_LEFT = ['head', 'neck', 'shoulder', 'hands', 'chest', 'legs'];
-const EQUIP_RIGHT = ['cape', 'belt', 'ring', 'charm', 'feet', 'ring'];
+const ARMOR_SLOTS = ['head', 'shoulder', 'chest', 'hands', 'legs', 'feet'];
+const JEWELRY_SLOTS = ['neck', 'ring', 'charm', 'belt', 'cape'];
 
-const bagItems: { icon: string; rarity?: Rarity; count?: number }[] = [
-	{ icon: I('item_potion_hp'), count: 88 },
-	{ icon: I('item_wooden_sword'), rarity: 'uncommon' },
-	{ icon: I('item_bronze_hammer'), rarity: 'rare' },
-	{ icon: I('item_cloth_robe'), rarity: 'epic' },
-	{ icon: I('item_emberbrand'), rarity: 'legendary' },
-	{ icon: I('item_wooden_ring') },
-	{ icon: I('item_cloth_hat'), rarity: 'uncommon' },
+interface BagItem {
+	icon: string;
+	name: string;
+	type: string;
+	rarity?: Rarity;
+	count?: number;
+	/** potions are drunk, everything else is equipped */
+	drink?: boolean;
+	sell: number;
+	rows: { label: string; value: string }[];
+}
+const BAG_START: BagItem[] = [
+	{
+		icon: I('item_potion_hp'),
+		name: 'Health Potion',
+		type: 'Common · Potion',
+		count: 88,
+		drink: true,
+		sell: 12,
+		rows: [
+			{ label: 'Restores', value: '120 HP' },
+			{ label: 'Cooldown', value: '8 s' },
+		],
+	},
+	{
+		icon: I('item_wooden_sword'),
+		name: 'Wooden Sword',
+		type: 'Uncommon · One-handed',
+		rarity: 'uncommon',
+		sell: 40,
+		rows: [
+			{ label: 'Damage', value: '12 - 18' },
+			{ label: 'Attack speed', value: '0.9/s' },
+		],
+	},
+	{
+		icon: I('item_bronze_hammer'),
+		name: 'Warden’s Maul',
+		type: 'Rare · Two-handed',
+		rarity: 'rare',
+		sell: 4200,
+		rows: [
+			{ label: 'Damage', value: '84 - 112' },
+			{ label: 'Strength', value: '+6' },
+		],
+	},
+	{
+		icon: I('item_cloth_robe'),
+		name: 'Dusk Robe',
+		type: 'Epic · Chest',
+		rarity: 'epic',
+		sell: 9800,
+		rows: [
+			{ label: 'Armor', value: '34' },
+			{ label: 'Intelligence', value: '+9' },
+		],
+	},
+	{
+		icon: I('item_emberbrand'),
+		name: 'Emberbrand',
+		type: 'Legendary · Sword',
+		rarity: 'legendary',
+		sell: 40000,
+		rows: [
+			{ label: 'Damage', value: '210 - 260' },
+			{ label: 'Fire damage', value: '+18%' },
+		],
+	},
+	{ icon: I('item_wooden_ring'), name: 'Wooden Ring', type: 'Common · Ring', sell: 8, rows: [{ label: 'Luck', value: '+1' }] },
+	{
+		icon: I('item_cloth_hat'),
+		name: 'Pointed Hat',
+		type: 'Uncommon · Head',
+		rarity: 'uncommon',
+		sell: 90,
+		rows: [
+			{ label: 'Armor', value: '6' },
+			{ label: 'Mana', value: '+12' },
+		],
+	},
 ];
 
 const H = (n: string) => `/pixel/new_assets/heroes/${n}.png`;
@@ -361,9 +438,7 @@ const StatsTab: React.FC<{ pts: number; attrs: Record<string, number>; onSpend: 
 						<small>{a.n}</small>
 						<b style={{ color: a.c }}>{attrs[a.k]}</b>
 					</span>
-					<button type='button' className='ds-plus' aria-label={`Add point to ${a.n}`} disabled={pts < 1} onClick={() => onSpend(a.k)}>
-						+
-					</button>
+					<button type='button' className='ds-plus' aria-label={`Add point to ${a.n}`} disabled={pts < 1} onClick={() => onSpend(a.k)} />
 				</div>
 			))}
 		</div>
@@ -380,9 +455,20 @@ const StatsTab: React.FC<{ pts: number; attrs: Record<string, number>; onSpend: 
 	</Panel>
 );
 
-const RECIPES = [
+interface Recipe {
+	id: string;
+	name: string;
+	kind: string;
+	hold: string;
+	text: string;
+	icon: string;
+	secEach: number;
+	cost: [string, number][];
+}
+const RECIPE_GROUPS: { id: string; title: string; sub?: string; items: Recipe[] }[] = [
 	{
-		group: 'Components',
+		id: 'components',
+		title: 'Components',
 		items: [
 			{
 				id: 'vial',
@@ -391,15 +477,17 @@ const RECIPES = [
 				hold: '3,470',
 				text: 'A small flask of fire-blown glass. Every potion needs one.',
 				icon: I('comp_glass_vial'),
+				secEach: 10,
 				cost: [
 					['stone', 10],
 					['coal', 5],
-				] as [string, number][],
+				],
 			},
 		],
 	},
 	{
-		group: 'Potions',
+		id: 'potions',
+		title: 'Potions',
 		items: [
 			{
 				id: 'hp',
@@ -408,10 +496,11 @@ const RECIPES = [
 				hold: '88',
 				text: 'Restores 120 HP over 3 seconds.',
 				icon: I('item_potion_hp'),
+				secEach: 20,
 				cost: [
 					['food', 12],
 					['coal', 4],
-				] as [string, number][],
+				],
 			},
 			{
 				id: 'hp2',
@@ -420,15 +509,50 @@ const RECIPES = [
 				hold: '6',
 				text: 'Restores 340 HP over 3 seconds.',
 				icon: I('item_potion_greater'),
+				secEach: 40,
 				cost: [
 					['food', 40],
 					['coal', 20],
-				] as [string, number][],
+				],
 			},
 		],
 	},
 	{
-		group: 'Gear',
+		id: 'goods',
+		title: 'Trade goods',
+		items: [
+			{
+				id: 'cloth',
+				name: 'Cloth bolt',
+				kind: 'Trade good',
+				hold: '12',
+				text: 'Woven cloth, sells well at the merchant.',
+				icon: R('cloth'),
+				secEach: 15,
+				cost: [
+					['hide', 6],
+					['food', 4],
+				],
+			},
+			{
+				id: 'dye',
+				name: 'Dye',
+				kind: 'Trade good',
+				hold: '3',
+				text: 'Bright dye for cloth and banners.',
+				icon: R('dye'),
+				secEach: 15,
+				cost: [
+					['coal', 8],
+					['food', 6],
+				],
+			},
+		],
+	},
+	{
+		id: 'gear',
+		title: 'Gear',
+		sub: 'Starter · from crafting level 1',
 		items: [
 			{
 				id: 'sw',
@@ -437,10 +561,11 @@ const RECIPES = [
 				hold: '1',
 				text: 'Starter gear, from crafting level 1.',
 				icon: I('item_wooden_sword'),
+				secEach: 30,
 				cost: [
 					['wood', 30],
 					['stone', 8],
-				] as [string, number][],
+				],
 			},
 			{
 				id: 'rg',
@@ -449,18 +574,58 @@ const RECIPES = [
 				hold: '0',
 				text: 'A plain ring carved from oak.',
 				icon: I('item_wooden_ring'),
+				secEach: 30,
 				cost: [
 					['wood', 20],
 					['stone', 5],
-				] as [string, number][],
+				],
 			},
 		],
 	},
 ];
+const ALL_RECIPES = RECIPE_GROUPS.flatMap((g) => g.items);
 
-/** Crafting tab: level bar on top, a dark picker (grouped slots) at the left, a paper ticket with cost, amount and Craft at the right. */
-const CraftTab: React.FC<{ sel: string; onSel: (id: string) => void; amt: number; onAmt: (n: number) => void }> = ({ sel, onSel, amt, onAmt }) => {
-	const item = RECIPES.flatMap((g) => g.items).find((i) => i.id === sel) ?? RECIPES[0].items[0];
+interface MockBatch {
+	id: number;
+	recipeId: string;
+	count: number;
+	done: number;
+	secEach: number;
+}
+
+/**
+ * Crafting tab: level bar, then the queue (running batches with progress; Collect all sits at the top and lights up when something has finished), then the recipe picker (collapsible
+ * groups, small icons) next to a paper ticket with cost, amount and Queue/Craft. Mock: batches tick once a second so Collect can be tested.
+ */
+const CraftTab: React.FC = () => {
+	const [sel, setSel] = useState('vial');
+	const [amt, setAmt] = useState(1);
+	const [open, setOpen] = useState<Record<string, boolean>>({ components: true, potions: true, goods: false, gear: true });
+	const [batches, setBatches] = useState<MockBatch[]>([
+		{ id: 1, recipeId: 'hp', count: 6, done: 6, secEach: 20 },
+		{ id: 2, recipeId: 'vial', count: 40, done: 12, secEach: 10 },
+	]);
+	const [next, setNext] = useState(3);
+	useEffect(() => {
+		const t = setInterval(() => setBatches((b) => b.map((x) => (x.done < x.count ? { ...x, done: x.done + 1 } : x))), 1000);
+		return () => clearInterval(t);
+	}, []);
+	const item = ALL_RECIPES.find((i) => i.id === sel) ?? ALL_RECIPES[0];
+	const slots = 3;
+	const collect = (id: number) =>
+		setBatches((b) => b.flatMap((x) => (x.id !== id ? [x] : x.count - x.done <= 0 ? [] : [{ ...x, count: x.count - x.done, done: 0 }])));
+	const collectAll = () => setBatches((b) => b.flatMap((x) => (x.count - x.done <= 0 ? [] : [{ ...x, count: x.count - x.done, done: 0 }])));
+	const entries: CraftQueueEntry[] = batches.map((x) => {
+		const r = ALL_RECIPES.find((i) => i.id === x.recipeId) as Recipe;
+		return {
+			id: x.id,
+			name: r.name,
+			icon: r.icon,
+			count: x.count,
+			done: x.done,
+			status: x.done >= x.count ? 'done' : `${(x.count - x.done) * x.secEach}s left`,
+		};
+	});
 	return (
 		<div className='ds-craft'>
 			<div className='ds-craft-top'>
@@ -470,19 +635,24 @@ const CraftTab: React.FC<{ sel: string; onSel: (id: string) => void; amt: number
 					415 / 3,901 XP
 				</span>
 			</div>
+			<CraftQueue
+				entries={entries}
+				slots={slots}
+				onCollect={(id) => collect(Number(id))}
+				onCollectAll={collectAll}
+				onCancel={(id) => setBatches((b) => b.filter((x) => x.id !== Number(id)))}
+			/>
 			<div className='ds-craft-body'>
 				<Inset className='ds-craft-list'>
-					{RECIPES.map((g) => (
-						<div key={g.group}>
-							<SectionLabel>
-								{g.group} · {g.items.length}
-							</SectionLabel>
-							<div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
+					{RECIPE_GROUPS.map((g) => (
+						<CollapsibleGroup key={g.id} title={g.title} count={g.items.length} open={open[g.id]} onToggle={() => setOpen({ ...open, [g.id]: !open[g.id] })}>
+							{g.sub ? <div className='ds-craft-sub'>{g.sub}</div> : null}
+							<div className='ds-craft-grid'>
 								{g.items.map((i) => (
-									<Slot key={i.id} icon={i.icon} title={i.name} active={i.id === sel} onClick={() => onSel(i.id)} />
+									<Slot key={i.id} icon={i.icon} title={i.name} active={i.id === sel} onClick={() => setSel(i.id)} />
 								))}
 							</div>
-						</div>
+						</CollapsibleGroup>
 					))}
 				</Inset>
 				<Panel parchment className='ds-ledger ds-craft-ticket'>
@@ -511,19 +681,26 @@ const CraftTab: React.FC<{ sel: string; onSel: (id: string) => void; amt: number
 						<label className='ds-capi' htmlFor='ds-amt' style={{ display: 'block' }}>
 							Amount
 						</label>
-						<div style={{ display: 'flex', alignItems: 'center', gap: 12, paddingTop: 6 }}>
-							<input id='ds-amt' className='ds-range' type='range' min={1} max={500} value={amt} onChange={(e) => onAmt(Number(e.target.value))} />
-							<span className='ds-paper-cost' style={{ minWidth: 70, textAlign: 'right' }}>
-								{amt} / 500
-							</span>
+						<div style={{ paddingTop: 8 }}>
+							<Slider id='ds-amt' tone='paper' min={1} max={500} value={amt} onChange={setAmt} />
 						</div>
 					</div>
 					<div style={{ display: 'flex', gap: 16, fontSize: 13 }}>
 						<span style={{ color: GREEN, fontWeight: 600 }}>+{2 * amt} XP</span>
-						<span style={{ color: '#5a4326' }}>10s each · {amt * 10}s total</span>
+						<span style={{ color: '#5a4326' }}>
+							{item.secEach}s each · {amt * item.secEach}s total
+						</span>
 					</div>
-					<Button tone='gold' style={{ marginTop: 'auto', minHeight: 40 }}>
-						Craft {amt}
+					<Button
+						tone='gold'
+						style={{ marginTop: 'auto', minHeight: 40 }}
+						disabled={batches.length >= slots}
+						onClick={() => {
+							setBatches((b) => [...b, { id: next, recipeId: item.id, count: amt, done: 0, secEach: item.secEach }]);
+							setNext(next + 1);
+						}}
+					>
+						{batches.length >= slots ? 'Queue full' : `Queue ${amt}`}
 					</Button>
 				</Panel>
 			</div>
@@ -540,12 +717,74 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 	const [tab, setTab] = useState<string>(initialTab);
 	const [pts, setPts] = useState(1);
 	const [attrs, setAttrs] = useState<Record<string, number>>({ str: 17, dex: 15, int: 15, vit: 15, cha: 50 });
-	const [sel, setSel] = useState('vial');
-	const [amt, setAmt] = useState(1);
 	const [avatarId, setAvatarId] = useState('scout');
 	const [badgeId, setBadgeId] = useState<string | null>('castle_10');
 	const [titleId, setTitleId] = useState<string | null>('architect');
 	const [dialog, setDialog] = useState<'avatar' | 'badge' | null>(null);
+	const [bag, setBag] = useState<(BagItem | null)[]>(() => Array.from({ length: 40 }, (_, i) => BAG_START[i] ?? null));
+	const [menu, setMenu] = useState<MenuState | null>(null);
+	const [bagView, setBagView] = useState<'bag' | 'craft'>('bag');
+	const [stash, setStash] = useState<StashEntry[]>(STASH_START);
+	const [note, setNote] = useState<string | null>(null);
+	const say = (t: string) => {
+		setNote(t);
+		setTimeout(() => setNote(null), 3500);
+	};
+	const patch = (i: number, n: number) =>
+		setBag((b) => b.map((x, k) => (k !== i || !x ? x : (x.count ?? 1) - n <= 0 ? null : { ...x, count: (x.count ?? 1) - n })));
+	const openMenu = (e: React.MouseEvent, i: number) => {
+		e.preventDefault();
+		const it = bag[i];
+		if (!it) return;
+		const qty = it.count ?? 1;
+		setMenu({
+			x: e.clientX,
+			y: e.clientY,
+			title: it.name,
+			items: [
+				{
+					id: 'use',
+					label: it.drink ? 'Drink' : 'Equip',
+					onSelect: () => {
+						patch(i, it.drink ? 1 : qty);
+						say(`${it.drink ? 'Drank' : 'Equipped'} ${it.name}`);
+					},
+				},
+				{
+					id: 'sell',
+					label: qty > 1 ? 'Sell one' : 'Sell',
+					hint: `${compact(it.sell)} gold`,
+					onSelect: () => {
+						patch(i, 1);
+						say(`Sold ${it.name} for ${compact(it.sell)} gold`);
+					},
+				},
+				...(qty > 1
+					? [
+							{
+								id: 'sellAll',
+								label: `Sell all (${qty})`,
+								hint: `${compact(it.sell * qty)} gold`,
+								onSelect: () => {
+									patch(i, qty);
+									say(`Sold ${qty} x ${it.name} for ${compact(it.sell * qty)} gold`);
+								},
+							},
+						]
+					: []),
+				{
+					id: 'discard',
+					label: 'Discard...',
+					danger: true,
+					separator: true,
+					onSelect: () => {
+						patch(i, qty);
+						say(`Discarded ${it.name}`);
+					},
+				},
+			],
+		});
+	};
 	const hints: Record<string, string> = { bag: '', stats: 'Spend points to grow stronger', craft: 'Recipes unlock with crafting level' };
 	return (
 		<DsRoot style={{ padding: 24, background: '#0b1022', minHeight: '100vh', boxSizing: 'border-box' }}>
@@ -578,36 +817,34 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 							onBadge={() => setDialog('badge')}
 						/>
 						<Divider />
-						<div className='ds-doll'>
-							<div className='ds-doll-col'>
-								{EQUIP_LEFT.map((s) => (
-									<Slot key={s} icon={I(`equip_${s}`)} empty />
-								))}
-							</div>
-							<div className='ds-doll-center'>
-								<Silhouette />
-								<ProgressBar value={278} max={278} label='HP 278 / 278' />
-								<ProgressBar value={101} max={101} tone='mana' label='MP 101 / 101' />
-							</div>
-							<div className='ds-doll-col'>
-								{EQUIP_RIGHT.map((s, i) => (
-									<Slot key={i} icon={I(`equip_${s}`)} empty />
-								))}
-							</div>
-							<div className='ds-doll-hands'>
-								<SectionLabel>Hands and skills</SectionLabel>
-								<div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
-									<Slot icon={I('equip_mainHand')} rarity='rare' />
-									<Slot icon={I('equip_offHand')} rarity='epic' />
-									<Slot title='Heal' />
-									<Slot title='Stun' />
-								</div>
-							</div>
+						<div className='ds-eq-bars'>
+							<XpBar level={31} value={66} max={100} label='Level 31 · 66% · 20.07M / 30.10M' />
+							<ProgressBar value={278} max={278} label='HP 278 / 278' />
+							<ProgressBar value={101} max={101} tone='mana' label='MP 101 / 101' />
 						</div>
-						<XpBar level={31} value={66} max={100} label='Level 31 · 66% · 20.07M / 30.10M' />
+						<div className='ds-equip'>
+							<EquipGroup title='Armor' cols={6}>
+								{ARMOR_SLOTS.map((s) => (
+									<Slot key={s} icon={I(`equip_${s}`)} empty title={s} />
+								))}
+							</EquipGroup>
+							<EquipGroup title='Jewelry' cols={5}>
+								{JEWELRY_SLOTS.map((s) => (
+									<Slot key={s} icon={I(`equip_${s}`)} empty title={s} />
+								))}
+							</EquipGroup>
+							<EquipGroup title='Hands' cols={2} gap={14}>
+								<Slot icon={I('equip_mainHand')} rarity='rare' title='Main hand' />
+								<Slot icon={I('equip_offHand')} rarity='epic' title='Off hand' />
+							</EquipGroup>
+							<EquipGroup title='Skills' cols={2} gap={14}>
+								<Slot label='Heal' sub='80 MP' title='Heal' />
+								<Slot label='Stun' sub='19 MP' title='Stun' />
+							</EquipGroup>
+						</div>
 						<Inset style={{ display: 'flex', justifyContent: 'space-around' }}>
-							<Stat label='Damage' value='106.6' />
-							<Stat label='Armor' value='85' />
+							<Stat label='Damage' value='106.6' tone='damage' />
+							<Stat label='Armor' value='85' tone='armor' />
 							<Stat label='Crit' value='36.6%' />
 							<Stat label='Item lvl' value='19.8' />
 						</Inset>
@@ -615,32 +852,72 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 					<Panel className='ds-hero-right'>
 						{tab === 'bag' ? (
 							<>
-								<Inset className='ds-baggrid'>
-									{Array.from({ length: 40 }, (_, i) => {
-										const it = bagItems[i];
-										return <Slot key={i} icon={it?.icon} rarity={it?.rarity} count={it?.count} />;
-									})}
-									<AddSlot
-										tip={
-											<Tooltip className='ds-tip-compact' title='More bag space' icon={I('menu_bag_scroll')} subtitle='Merchant upgrade: Pack Rat'>
-												<TipRows
-													rows={[
-														{ label: 'Next level', value: '+4 slots' },
-														{ label: 'Cost', value: <span className='ds-gold-text'>1.90M gold</span> },
-													]}
-												/>
-											</Tooltip>
-										}
-									/>
-								</Inset>
-								<div className='ds-bag-foot'>
-									<span className='ds-dim'>9 of 40 slots used</span>
-									<span className='ds-bag-actions'>
-										<Button>Organise</Button>
-										<Button tone='danger'>Sell junk</Button>
-									</span>
-									<span className='ds-dim ds-bag-hint'>Double-click to equip or drink. Right-click for more. Drag to rearrange.</span>
+								<div className='ds-subtabs' role='tablist'>
+									<button type='button' role='tab' aria-selected={bagView === 'bag'} data-active={bagView === 'bag'} onClick={() => setBagView('bag')}>
+										Bag
+									</button>
+									<button type='button' role='tab' aria-selected={bagView === 'craft'} data-active={bagView === 'craft'} onClick={() => setBagView('craft')}>
+										Crafting bag
+									</button>
 								</div>
+								{bagView === 'bag' ? (
+									<>
+										<Inset className='ds-baggrid'>
+											{bag.map((it, i) =>
+												it ? (
+													<HoverTip
+														key={i}
+														tip={
+															<ItemTooltip
+																rarity={it.rarity ?? 'common'}
+																icon={it.icon}
+																name={it.name}
+																type={it.type}
+																rows={it.rows}
+																footer={['Right-click for more', `Sell ${compact(it.sell)}`]}
+															/>
+														}
+													>
+														<Slot icon={it.icon} rarity={it.rarity} count={it.count} onContextMenu={(e) => openMenu(e, i)} />
+													</HoverTip>
+												) : (
+													<Slot key={i} />
+												),
+											)}
+											<AddSlot
+												tip={
+													<Tooltip className='ds-tip-compact' title='More bag space' icon={I('menu_bag_scroll')} subtitle='Merchant upgrade: Pack Rat'>
+														<TipRows
+															rows={[
+																{ label: 'Next level', value: '+4 slots' },
+																{ label: 'Cost', value: <span className='ds-gold-text'>1.90M gold</span> },
+															]}
+														/>
+													</Tooltip>
+												}
+											/>
+										</Inset>
+										<div className='ds-bag-foot'>
+											<span className='ds-dim'>{bag.filter(Boolean).length} of 40 slots used</span>
+											<span className='ds-bag-actions'>
+												<Button>Organise</Button>
+												<Button tone='danger'>Sell junk</Button>
+											</span>
+											<span className='ds-dim ds-bag-hint'>{note ?? 'Right-click an item for more.'}</span>
+										</div>
+									</>
+								) : (
+									<Inset className='ds-stash-wrap'>
+										<CraftStash
+											entries={stash}
+											onTake={(id, n) => {
+												const it = stash.find((x) => x.id === id);
+												setStash((st) => st.map((x) => (x.id === id ? { ...x, qty: x.qty - Math.min(n, x.qty) } : x)));
+												say(`Took ${Math.min(n, it?.qty ?? n)} x ${it?.name} into the bag`);
+											}}
+										/>
+									</Inset>
+								)}
 							</>
 						) : tab === 'stats' ? (
 							<StatsTab
@@ -654,11 +931,12 @@ export const HeroWindowView: React.FC<{ initialTab?: 'bag' | 'stats' | 'craft' }
 								}}
 							/>
 						) : (
-							<CraftTab sel={sel} onSel={setSel} amt={amt} onAmt={setAmt} />
+							<CraftTab />
 						)}
 					</Panel>
 				</div>
 			</WindowShell>
+			<ContextMenu menu={menu} onClose={() => setMenu(null)} />
 			{dialog === 'avatar' ? (
 				<Modal title='Choose your avatar' width={620} onClose={() => setDialog(null)}>
 					<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px', fontSize: 13 }}>

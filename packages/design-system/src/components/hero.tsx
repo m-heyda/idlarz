@@ -1,5 +1,5 @@
 import React from 'react';
-import { Frame } from './primitives';
+import { Button, Frame } from './primitives';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -49,17 +49,17 @@ export const HeroIdentity: React.FC<{
 	onBadge?: () => void;
 }> = ({ avatar, name, classLabel, badge, title, onAvatar, onBadge }) => (
 	<div className='ds-identity'>
-		<AvatarFrame src={avatar} size={68} onClick={onAvatar} />
+		<AvatarFrame src={avatar} size={61} onClick={onAvatar} />
 		<div className='ds-identity-text'>
 			<div className='ds-identity-name'>
 				<span>{name}</span>
+				<button type='button' className='ds-identity-title' title='Change badge and title' onClick={onBadge}>
+					({title ?? 'No title'})
+				</button>
 				<button type='button' className='ds-identity-badge' title='Change badge and title' onClick={onBadge}>
 					{badge ? <img src={badge} alt='' /> : <span className='ds-dim'>＋</span>}
 				</button>
 			</div>
-			<button type='button' className='ds-identity-title' title='Change badge and title' onClick={onBadge}>
-				{title ?? 'No title'}
-			</button>
 			<div className='ds-caps ds-dim' style={{ fontSize: 11 }}>
 				{classLabel}
 			</div>
@@ -189,3 +189,171 @@ export const XpBar: React.FC<{ level: number; value: number; max: number; label?
 		</div>
 	</div>
 );
+
+/** A pixel slider: dark notched track, gold fill up to the value, gold thumb, and a readout. `tone="paper"` is for use on parchment. */
+export const Slider: React.FC<{
+	value: number;
+	min?: number;
+	max: number;
+	onChange: (n: number) => void;
+	id?: string;
+	readout?: React.ReactNode;
+	tone?: 'dark' | 'paper';
+	disabled?: boolean;
+}> = ({ value, min = 0, max, onChange, id, readout, tone = 'dark', disabled }) => (
+	<div className={cx('ds-slider', tone === 'paper' && 'ds-slider-paper')}>
+		<input
+			id={id}
+			className='ds-range'
+			type='range'
+			min={min}
+			max={max}
+			value={value}
+			disabled={disabled}
+			style={{ '--p': `${((value - min) / Math.max(1, max - min)) * 100}%` } as React.CSSProperties}
+			onChange={(e) => onChange(Number(e.target.value))}
+		/>
+		<span className='ds-slider-out'>{readout ?? `${value} / ${max}`}</span>
+	</div>
+);
+
+/** A header row that opens and closes its content (recipe groups, settings sections): chevron, title, count. Presentational; the caller owns `open`. */
+export const CollapsibleGroup: React.FC<{ title: string; count?: number; open: boolean; onToggle: () => void; children: React.ReactNode }> = ({
+	title,
+	count,
+	open,
+	onToggle,
+	children,
+}) => (
+	<section className='ds-acc'>
+		<button type='button' className='ds-acc-head' aria-expanded={open} onClick={onToggle}>
+			<span className='ds-acc-chev'>{open ? '▾' : '▸'}</span>
+			<span className='ds-acc-title'>{title}</span>
+			{count !== undefined ? <span className='ds-acc-count'>{count}</span> : null}
+		</button>
+		{open ? <div className='ds-acc-body'>{children}</div> : null}
+	</section>
+);
+
+export interface CraftQueueEntry {
+	id: string | number;
+	name: string;
+	icon: string;
+	count: number;
+	done: number;
+	/** "40s left", "done", "waiting for you" */
+	status: string;
+}
+/**
+ * The crafting queue: "Queue 2 / 3" with a Collect all button at the top that lights up as soon as anything has finished, then one row per batch (icon, name, progress, Cancel, Collect N).
+ * Idle line when empty. Mirrors the game's queue panel; only props, the caller does the collecting.
+ */
+export const CraftQueue: React.FC<{
+	entries: CraftQueueEntry[];
+	slots: number;
+	onCollect?: (id: string | number) => void;
+	onCancel?: (id: string | number) => void;
+	onCollectAll?: () => void;
+}> = ({ entries, slots, onCollect, onCancel, onCollectAll }) => {
+	const ready = entries.reduce((n, e) => n + (e.done >= 1 ? 1 : 0), 0);
+	if (entries.length === 0)
+		return (
+			<div className='ds-queue' data-ready='false'>
+				<span className='ds-dim' style={{ fontSize: 12 }}>
+					Queue 0 / {slots} · idle
+				</span>
+			</div>
+		);
+	return (
+		<div className='ds-queue' data-ready={ready > 0}>
+			<div className='ds-queue-head'>
+				<span className='ds-dim' style={{ fontSize: 12 }}>
+					Queue {entries.length} / {slots}
+				</span>
+				<Button tone={ready > 0 ? 'gold' : 'stone'} className={ready > 0 ? 'ds-collect-glow' : undefined} disabled={ready === 0} onClick={onCollectAll}>
+					{ready > 0 ? `Collect all (${ready})` : 'Collect all'}
+				</Button>
+			</div>
+			{entries.map((e) => (
+				<div className='ds-queue-row' key={e.id}>
+					<img src={e.icon} alt='' className='ds-queue-icon' />
+					<span className='ds-queue-name'>{e.name}</span>
+					<div className='ds-xp ds-xp-compact ds-queue-bar'>
+						<div className='ds-xp-track'>
+							<div className='ds-xp-fill' style={{ width: `${(e.done / Math.max(1, e.count)) * 100}%` }} />
+							<span className='ds-xp-label'>
+								{e.done} / {e.count} · {e.status}
+							</span>
+						</div>
+					</div>
+					<Button onClick={() => onCancel?.(e.id)}>Cancel</Button>
+					<Button tone={e.done >= 1 ? 'gold' : 'stone'} disabled={e.done < 1} onClick={() => onCollect?.(e.id)}>
+						Collect{e.done > 0 ? ` ${e.done}` : ''}
+					</Button>
+				</div>
+			))}
+		</div>
+	);
+};
+
+/** One labelled group of equipment slots in a fixed number of columns (Armor, Jewelry, Hands, Skills), as in the game's character window. */
+export const EquipGroup: React.FC<{ title: string; cols: number; gap?: number; children: React.ReactNode }> = ({ title, cols, gap = 4, children }) => (
+	<div className='ds-eqgroup'>
+		<div className='ds-section-label'>{title}</div>
+		<div className='ds-eqgrid' style={{ gridTemplateColumns: `repeat(${cols}, var(--ds-slot-size))`, gap }}>
+			{children}
+		</div>
+	</div>
+);
+
+export interface StashEntry {
+	id: string;
+	name: string;
+	icon: string;
+	qty: number;
+	/** component: only for recipes; potion / good: can be taken into the bag; special: quest and event items */
+	kind: 'component' | 'potion' | 'good' | 'special';
+	/** biggest stack the bag holds (the "Stack" button takes this many) */
+	stack?: number;
+}
+const STASH_TITLES: Record<StashEntry['kind'], string> = { component: 'Components', potion: 'Potions', good: 'Trade goods', special: 'Special items' };
+/**
+ * The bag's Crafting tab: what crafting made and the ingredients, kept outside the bag's slots (no slots, only a cap). Components and special items stay for recipes; potions and trade goods can
+ * be taken into the bag with "1" or "Stack". Rows are grouped by kind. Props only: the caller moves the items.
+ */
+export const CraftStash: React.FC<{ entries: StashEntry[]; onTake?: (id: string, n: number) => void }> = ({ entries, onTake }) => {
+	const shown = entries.filter((e) => e.qty > 0);
+	if (shown.length === 0)
+		return (
+			<p className='ds-dim' style={{ fontSize: 13 }}>
+				Nothing crafted yet. Finished potions, goods and components collect here.
+			</p>
+		);
+	const kinds = (Object.keys(STASH_TITLES) as StashEntry['kind'][]).filter((k) => shown.some((e) => e.kind === k));
+	return (
+		<div className='ds-stash'>
+			{kinds.map((k) => (
+				<div key={k}>
+					<div className='ds-section-label'>{STASH_TITLES[k]}</div>
+					{shown
+						.filter((e) => e.kind === k)
+						.map((e) => (
+							<div className='ds-stash-row' key={e.id}>
+								<img src={e.icon} alt='' />
+								<span className='ds-stash-name'>{e.name}</span>
+								<span className='ds-stash-qty'>{e.qty.toLocaleString('en-US')}</span>
+								{e.kind === 'potion' || e.kind === 'good' ? (
+									<>
+										<Button onClick={() => onTake?.(e.id, 1)}>1</Button>
+										<Button onClick={() => onTake?.(e.id, Math.min(e.qty, e.stack ?? 20))}>Stack</Button>
+									</>
+								) : (
+									<span className='ds-dim ds-stash-note'>{e.kind === 'component' ? 'for recipes' : 'kept safe'}</span>
+								)}
+							</div>
+						))}
+				</div>
+			))}
+		</div>
+	);
+};

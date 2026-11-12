@@ -82,7 +82,6 @@ for _ in range(26):                                            # sparse speckles
 tile[S // 2 - 1 : S // 2, :] -= 3                              # a hairline "course" line so it reads as stone without cobble noise
 tile[:, S // 4 : S // 4 + 1] += 2
 save('tex-slate', Image.fromarray(np.clip(tile, 0, 255).astype(np.uint8)).convert('RGBA'))
-save('tex-parchment', cut((372, 415, 492, 520), 1.0, dim=0.97).crop((8, 8, 100, 90)))
 
 
 def wood(dim=1.0, seed=11):
@@ -149,6 +148,23 @@ def planks(dim=1.0, seed=3):
 	return Image.fromarray(np.clip(img * dim, 0, 255).astype(np.uint8)).convert('RGBA')
 
 
+def parchment(seed=21):
+	"""Light, quiet paper: a pale cream base with very faint fibres and a few pin-prick specks. 64x64, periodic."""
+	r = np.random.default_rng(seed)
+	W = H = 64
+	base = np.array([240, 229, 200])
+	img = np.zeros((H, W, 3), int)
+	img[:] = base
+	for _ in range(46):  # fibres
+		x, y, ln = int(r.integers(0, W)), int(r.integers(0, H)), int(r.integers(4, 12))
+		k = r.choice([0.975, 1.02])
+		for i in range(ln):
+			img[(y + i // 4) % H, (x + i) % W] = np.clip(base * k, 0, 255)
+	for _ in range(14):  # specks
+		img[int(r.integers(0, H)), int(r.integers(0, W))] = np.clip(base * 0.93, 0, 255)
+	return Image.fromarray(img.astype(np.uint8)).convert('RGBA')
+
+
 def stone(seed=4):
 	"""Cobblestone: wrapped voronoi cells (so it tiles), each its own warm grey, dark mortar between cells and a light edge on the top-left of each stone."""
 	r = np.random.default_rng(seed)
@@ -180,3 +196,4 @@ def stone(seed=4):
 save('tex-wood', planks(1.0))
 save('tex-wood-dark', planks(0.55, seed=5))
 save('tex-stone', stone())
+save('tex-parchment', parchment())
