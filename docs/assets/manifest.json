@@ -21254,6 +21254,7 @@
 	{
 		"usedBy": [
 			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/merchant/MerchantPlaceholders.tsx",
 			"src/components/game/overlays/GameWindows.tsx"
 		],
 		"name": "menu_achievements",
@@ -21344,7 +21345,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hud/HudDock.tsx"
+			"src/components/game/hud/HudDock.tsx",
+			"src/components/game/merchant/MerchantPlaceholders.tsx"
 		],
 		"name": "menu_gems_pouch",
 		"category": "ui",

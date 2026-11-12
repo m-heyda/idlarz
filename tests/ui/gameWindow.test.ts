@@ -140,3 +140,14 @@ test('the Merchant Upgrades tab: the groups, the Click Power tile and diamond le
 	}
 	assert.match(out, /ds-gem/, 'the level is drawn as gems');
 });
+
+test('the Merchant window with all five tabs, and the Quests and Gambling coming-soon pages', async () => {
+	const { default: MerchantWindow } = await import('../../src/components/game/merchant/MerchantWindow');
+	const { MerchantGamblingTab, MerchantQuestsTab } = await import('../../src/components/game/merchant/MerchantPlaceholders');
+	reset();
+	put({ order: ['merchant'] });
+	const out = renderToStaticMarkup(h(MerchantWindow));
+	for (const word of ['Merchant', 'Resources', 'Goods', 'Upgrades', 'Quests', 'Gambling']) assert.ok(out.includes(word), `the window shows "${word}"`);
+	assert.match(renderToStaticMarkup(h(MerchantQuestsTab)), /Coming soon/);
+	assert.match(renderToStaticMarkup(h(MerchantGamblingTab)), /Coming soon/);
+});

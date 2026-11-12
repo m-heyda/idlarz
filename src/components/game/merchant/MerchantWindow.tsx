@@ -9,8 +9,8 @@ import { useUiStore } from '@/stores/uiStore';
 import type { MerchantTab } from '@/types/game';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/game/merchant';
 import GameWindow from '../GameWindow';
-import MerchantOverlay from '../overlays/Merchant/MerchantOverlay';
 import MerchantGoodsTab from './MerchantGoodsTab';
+import { MerchantGamblingTab, MerchantQuestsTab } from './MerchantPlaceholders';
 import MerchantResourcesTab from './MerchantResourcesTab';
 import MerchantUpgradesTab from './MerchantUpgradesTab';
 
@@ -36,8 +36,7 @@ const useAffordableUpgrades = (): number =>
 	});
 
 /**
- * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top and the gold purse. Resources is the new ledger and trade ticket, Goods the shelf and quick sell, Upgrades the tiles with diamond levels; Quests and Gambling keep their own
- * look inside the new window until they are rebuilt, one tab at a time.
+ * The Merchant window (design system `WindowShell`, window id `merchant`): tabs along the top and the gold purse. Resources is the new ledger and trade ticket, Goods the shelf and quick sell, Upgrades the tiles with diamond levels, and Quests and Gambling are coming-soon pages (Gambling still reports the visit for its deed).
  */
 const MerchantWindow: React.FC = () => {
 	const tab = useUiStore((state) => state.merchantTab);
@@ -65,8 +64,10 @@ const MerchantWindow: React.FC = () => {
 				<MerchantGoodsTab />
 			) : tab === 'upgrades' ? (
 				<MerchantUpgradesTab />
+			) : tab === 'quests' ? (
+				<MerchantQuestsTab />
 			) : (
-				<MerchantOverlay />
+				<MerchantGamblingTab />
 			)}
 		</GameWindow>
 	);
