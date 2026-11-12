@@ -150,3 +150,97 @@
 	font-size: 1rem;
 	color: var(--ds-gold-lt, #f4d57e);
 }
+
+/* the building window: an info column and the production and upgrade boxes */
+.bw {
+	display: grid;
+	grid-template-columns: 190px minmax(0, 1fr);
+	gap: 16px;
+}
+.bw-side {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+.bw-main {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
+.bw-level {
+	font-size: 1.15rem;
+	color: var(--ds-gold-lt, #f4d57e);
+}
+.bw-level span {
+	font-size: 0.8rem;
+	color: #9aa4bd;
+}
+.bw-lore {
+	margin: 0;
+	font-size: 0.8rem;
+	font-style: italic;
+	color: #9aa4bd;
+	line-height: 1.45;
+}
+.bw-label {
+	font-size: 0.72rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--ds-gold, #e0a93a);
+}
+.bw-table {
+	display: grid;
+	grid-template-columns: 1fr auto auto auto;
+	gap: 6px 22px;
+	align-items: center;
+}
+.bw-col {
+	font-size: 0.72rem;
+	color: #9aa4bd;
+	text-align: right;
+}
+.bw-res {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+}
+.bw-num {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+.bw-gain {
+	color: #5ee07a;
+}
+.bw-note {
+	margin-top: 4px;
+	padding-top: 6px;
+	border-top: 1px solid rgba(255, 255, 255, 0.1);
+	font-size: 0.75rem;
+	color: #9aa4bd;
+}
+.bw-up {
+	color: var(--ds-gold-lt, #f4d57e);
+}
+.bw-upgrade {
+	border-color: var(--ds-gold-dk, #8a5f16);
+}
+.bw-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+.bw-time {
+	font-size: 0.8rem;
+	color: #ffb24a;
+}
+.bw-bar {
+	height: 14px;
+	background: #1c2030;
+	border: 1px solid #05060a;
+}
+.bw-bar-fill {
+	height: 100%;
+	background: linear-gradient(#5ee07a, #2a9a4a);
+}
