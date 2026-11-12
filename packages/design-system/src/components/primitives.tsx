@@ -457,6 +457,8 @@ export interface HoverTipProps {
 	interactive?: boolean;
 	/** Replace the built-in placement: gets the anchor's box, the tip's size and the viewport, returns the tip's top-left (the game's `placeTip` fits here) */
 	place?: (anchor: TipBox, tip: Size, viewport: Size) => Point;
+	/** The wrapped element fills the width of its container (a bar) instead of shrinking to its content */
+	fill?: boolean;
 	children: React.ReactNode;
 }
 /**
@@ -473,6 +475,7 @@ export const HoverTip: React.FC<HoverTipProps> = ({
 	closeDelayMs = 0,
 	interactive,
 	place,
+	fill,
 	children,
 }) => {
 	const host = useRef<HTMLSpanElement>(null);
@@ -518,6 +521,7 @@ export const HoverTip: React.FC<HoverTipProps> = ({
 		<span
 			ref={host}
 			className='ds-hovertip'
+			data-fill={fill ? 'true' : undefined}
 			onMouseEnter={() => setOpen(true)}
 			onMouseLeave={() => setOpen(false)}
 			onFocus={() => setOpen(true)}

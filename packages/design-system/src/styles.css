@@ -2484,7 +2484,7 @@
 	gap: 10px;
 	height: 100%;
 	min-height: 0;
-	grid-template-columns: minmax(250px, 312px) 1fr;
+	grid-template-columns: minmax(318px, 352px) 1fr;
 }
 
 .ds-hero > .ds-hero-left {
@@ -2493,10 +2493,10 @@
 
 .ds-equip {
 	display: grid;
-	--ds-slot-size: 44px;
+	--ds-slot-size: 48px;
 	grid-template-columns: auto 1fr;
 	justify-items: start;
-	gap: 8px 18px;
+	gap: 6px 14px;
 }
 
 .ds-equip > .ds-eqgroup:nth-child(1),
@@ -3573,4 +3573,15 @@
 
 .ds-identity-class:hover {
 	color: var(--ds-gold-lt);
+}
+
+/* a hover tip around a bar: the bar keeps the full width (the XP, HP and MP bars of the Hero window) */
+.ds-hovertip[data-fill='true'] {
+	display: flex;
+	width: 100%;
+}
+
+.ds-hovertip[data-fill='true'] > :first-child {
+	flex: 1;
+	min-width: 0;
 }

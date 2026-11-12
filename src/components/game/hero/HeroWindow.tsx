@@ -176,6 +176,7 @@ const HeroLeft: React.FC = () => {
 			<Divider />
 			<div className='ds-eq-bars'>
 				<HoverTip
+					fill
 					tip={
 						<Tooltip title='Experience'>
 							<LevelUpTimer resourceRates={resourceRates} resources={resources} level={level} />
@@ -185,6 +186,7 @@ const HeroLeft: React.FC = () => {
 					<XpBar level={level.level} value={needed > 0 ? into : 1} max={needed > 0 ? needed : 1} label={xpText} />
 				</HoverTip>
 				<HoverTip
+					fill
 					tip={
 						<Tooltip title='Health'>
 							<TipRows
@@ -204,22 +206,22 @@ const HeroLeft: React.FC = () => {
 				<ProgressBar value={Math.floor(playerMp)} max={mpMax} tone='mana' label={`MP ${formatCompact(Math.floor(playerMp))} / ${formatCompact(mpMax)}`} />
 			</div>
 			<div className='ds-equip'>
-				<EquipGroup title='Armor' cols={6}>
+				<EquipGroup title='Armor' cols={6} gap={3}>
 					{EQUIPMENT_LAYOUT.left.map((slot) => (
 						<WornSlot key={slot} slot={slot} wornLevel={wornLevel} />
 					))}
 				</EquipGroup>
-				<EquipGroup title='Jewelry' cols={6}>
+				<EquipGroup title='Jewelry' cols={6} gap={3}>
 					{EQUIPMENT_LAYOUT.right.map((slot) => (
 						<WornSlot key={slot} slot={slot} wornLevel={wornLevel} />
 					))}
 				</EquipGroup>
-				<EquipGroup title='Hands' cols={2} gap={14}>
+				<EquipGroup title='Hands' cols={2} gap={8}>
 					{EQUIPMENT_LAYOUT.bottom.map((slot) => (
 						<WornSlot key={slot} slot={slot} wornLevel={wornLevel} />
 					))}
 				</EquipGroup>
-				<EquipGroup title='Skills' cols={2} gap={14}>
+				<EquipGroup title='Skills' cols={2} gap={8}>
 					{SKILL_IDS.map((id) => (
 						<SkillSlot key={id} id={id} />
 					))}
