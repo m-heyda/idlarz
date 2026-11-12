@@ -17,6 +17,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
+- Deeds: [Deeds](#deeds)
 - Badges: [`badgeOptions`](#badgeoptions)
 
 ## Levels
@@ -651,7 +652,7 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:156`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:122`](../../src/lib/offline/achievements.ts)
 
 Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
@@ -667,7 +668,7 @@ See also: `achievementsDue`, `earnAchievements`
 
 ### `claimAchievement` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:106`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:72`](../../src/lib/offline/achievements.ts)
 
 The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time.
 Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.
@@ -676,13 +677,13 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:57`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:71`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (13, 800 gems in total)** _(computed from the code)_
+**The launch achievements (41, 3005 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -699,6 +700,34 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
 | 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early_tester / early-tester |
 | 13 | `beta_tester` | Beta tester | granted by the new chapter reset | 200 | beta_tester / beta-tester |
+| 14 | `slayer_100` | Slayer I | kills >= 100 | 25 | - |
+| 15 | `slayer_500` | Slayer II | kills >= 500 | 50 | - |
+| 16 | `slayer_2500` | Slayer III | kills >= 2500 | 100 | - |
+| 17 | `slayer_10000` | Slayer IV | kills >= 10000 | 200 | - |
+| 18 | `wolfsbane_50` | Wolfsbane I | 50 x `mossbackWolf` | 20 | - |
+| 19 | `wolfsbane_200` | Wolfsbane II | 200 x `mossbackWolf` | 40 | - |
+| 20 | `wolfsbane_1000` | Wolfsbane III | 1000 x `mossbackWolf` | 80 | - |
+| 21 | `untouched_1` | Untouched I | flawless >= 1 | 20 | - |
+| 22 | `untouched_25` | Untouched II | flawless >= 25 | 50 | - |
+| 23 | `untouched_100` | Untouched III | flawless >= 100 | 100 | - |
+| 24 | `landlord_50` | Landlord I | tiles >= 50 | 20 | - |
+| 25 | `landlord_200` | Landlord II | tiles >= 200 | 50 | - |
+| 26 | `landlord_500` | Landlord III | tiles >= 500 | 100 | - |
+| 27 | `landlord_1000` | Landlord IV | tiles >= 1000 | 200 | - |
+| 28 | `hoarder_100k` | Hoarder I | goldPeak >= 100000 | 20 | - |
+| 29 | `hoarder_1m` | Hoarder II | goldPeak >= 1000000 | 50 | - |
+| 30 | `hoarder_10m` | Hoarder III | goldPeak >= 10000000 | 120 | - |
+| 31 | `market_1m` | Market Day I | unitsSold >= 1000000 | 20 | - |
+| 32 | `market_10m` | Market Day II | unitsSold >= 10000000 | 50 | - |
+| 33 | `market_100m` | Market Day III | unitsSold >= 100000000 | 120 | - |
+| 34 | `smith_100` | Apprentice Smith I | crafted >= 100 | 20 | - |
+| 35 | `smith_1000` | Apprentice Smith II | crafted >= 1000 | 50 | - |
+| 36 | `smith_10000` | Apprentice Smith III | crafted >= 10000 | 120 | - |
+| 37 | `reborn_5` | Reborn II | rebirths >= 5 | 100 | - |
+| 38 | `reborn_20` | Reborn III | rebirths >= 20 | 250 | - |
+| 39 | `scholar_5` | Scholar I | entries >= 5 | 20 | - |
+| 40 | `scholar_15` | Scholar II | entries >= 15 | 60 | - |
+| 41 | `scholar_30` | Scholar III | entries >= 30 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -805,6 +834,19 @@ The guided tutorial (IDL-74): **Brother Alder**, a monk drawn on the left of the
 | `auto-battle` | Auto-battle | none |
 
 See also: [`applyTutorial`](progression.md#applytutorial), [`buildNumbers`](progression.md#buildnumbers), [`guideVisibleFor`](progression.md#guidevisiblefor)
+
+## Deeds
+
+<a id="deeds"></a>
+
+### Deeds
+
+Source: [`src/catalog/achievements.ts:415`](../../src/catalog/achievements.ts)
+
+The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
+unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).
+
+See also: `deedState`, `deedPoints`
 
 ## Badges
 

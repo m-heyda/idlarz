@@ -424,6 +424,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
+- [`deeds.ts`](../../src/lib/deeds.ts) — ~ The numbers the conditions read.
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
@@ -465,7 +466,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **src/lib/offline/**
 
-- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read.
+- [`achievements.ts`](../../src/lib/offline/achievements.ts) — ~ The numbers the conditions read (see `lib/deeds.ts`).
 - [`apply.ts`](../../src/lib/offline/apply.ts) — ~ What the welcome-back window shows besides the income.
 - [`attrs.ts`](../../src/lib/offline/attrs.ts) — ~ The most points one request may add to one attribute (a sanity bound on the body; the budget is the real limit).
 - [`away.ts`](../../src/lib/offline/away.ts) — ~ The landing card's away bar:
@@ -880,6 +881,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`deeds.test.ts`](../../tests/server/deeds.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)

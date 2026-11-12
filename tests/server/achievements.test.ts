@@ -36,14 +36,15 @@ const facts = (patch: Partial<AchievementFacts> = {}, stats: Partial<LifetimeSta
 });
 const ids = (f: AchievementFacts) => achievementsDue(f).map((a) => a.id);
 
-test('the catalog is the launch set plus the Beta tester: 13 achievements, 800 gems, 5 avatars, unique ids', () => {
-	assert.equal(ACHIEVEMENTS.length, 13);
-	assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, 13);
+test('the catalog is the launch set plus the Beta tester (13 achievements, 800 gems, 5 avatars) with the deed tiers appended after it, unique ids', () => {
+	const launch = ACHIEVEMENTS.slice(0, 13);
+	assert.equal(launch[12].id, 'beta_tester', 'the launch ids keep their places');
+	assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, ACHIEVEMENTS.length);
 	assert.equal(
-		ACHIEVEMENTS.reduce((sum, a) => sum + a.rewards.gems, 0),
+		launch.reduce((sum, a) => sum + a.rewards.gems, 0),
 		800,
 	);
-	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 25 && a.rewards.gems <= 200));
+	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 250));
 	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.rewards.gems, 200);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.withAchievement, 'early_tester');
@@ -77,9 +78,13 @@ test('the testers are never checked by the lazy evaluator', () => {
 		{ castleLevel: 99, rebirths: 9, buildings: 9 },
 		{ tiles: 9, chests: 9, golden: 9, kills: { bossGreatAuroch: 1 }, tutorial: { done: [LAST_STEP], lessons: [], skipped: false } },
 	);
+	const due = ids(everything);
+	assert.ok(!due.includes('early_tester') && !due.includes('beta_tester'));
 	assert.deepEqual(
-		ids(everything),
-		ACHIEVEMENTS.filter((a) => a.when.kind !== 'manual').map((a) => a.id),
+		due.filter((id) => ACHIEVEMENTS.slice(0, 13).some((a) => a.id === id)),
+		ACHIEVEMENTS.slice(0, 13)
+			.filter((a) => a.when.kind !== 'manual')
+			.map((a) => a.id),
 	);
 });
 
@@ -195,7 +200,7 @@ const player = async () => {
 	const m = memory();
 	api().resetGame();
 	growTo(8);
-	store.setState({ playSeconds: 1000 } as never);
+	store.setState({ playSeconds: 1000, resources: { ...api().resources, gold: 100 } } as never);
 	const state: PersistedGame = structuredClone(pickPersisted(api()));
 	await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(state), 0, T0, false, m.ledgerRepo);
 	return m;

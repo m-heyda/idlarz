@@ -190,7 +190,10 @@ export const recordKill = (stats: LifetimeStats, kill: { type: string; lucky: bo
 };
 
 /** The monster `type` beat the player (a defeat; a timeout or a retreat does not count). */
-export const recordDeath = (stats: LifetimeStats, type: string): LifetimeStats => ({ ...stats, deaths: { ...stats.deaths, [type]: (stats.deaths[type] ?? 0) + 1 } });
+export const recordDeath = (stats: LifetimeStats, type: string): LifetimeStats => ({
+	...stats,
+	deaths: { ...stats.deaths, [type]: (stats.deaths[type] ?? 0) + 1 },
+});
 
 /** `n` crafts were delivered (a claim, a Collect all or an instant craft). */
 export const recordCraft = (stats: LifetimeStats, n: number): LifetimeStats => (n > 0 ? { ...stats, crafted: stats.crafted + Math.floor(n) } : stats);

@@ -1,6 +1,20 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { countSave, emptyStats, isEmptyStats, readStats, recordChest, recordCraft, recordDeath, recordKill, recordRespec, recordSale, statsDue, statsToJson, STATS_EVERY_MS } from '../../src/lib/offline/stats';
+import {
+	countSave,
+	emptyStats,
+	isEmptyStats,
+	readStats,
+	recordChest,
+	recordCraft,
+	recordDeath,
+	recordKill,
+	recordRespec,
+	recordSale,
+	statsDue,
+	statsToJson,
+	STATS_EVERY_MS,
+} from '../../src/lib/offline/stats';
 
 // IDL-69: lifetime counters in player_ledger.stats. Counted by the server from its own events and from accepted saves; nothing reads them yet.
 
@@ -100,7 +114,10 @@ test('the gold peak only rises, across a rebirth too', () => {
 });
 
 test('the new counters stay out of the stored form while empty, and read back tolerantly', () => {
-	assert.deepEqual(Object.keys(statsToJson(emptyStats())).filter((k) => ['goldPeak', 'crafted', 'deaths', 'bestMs', 'flawless', 'respecs', 'unitsSold'].includes(k)), []);
+	assert.deepEqual(
+		Object.keys(statsToJson(emptyStats())).filter((k) => ['goldPeak', 'crafted', 'deaths', 'bestMs', 'flawless', 'respecs', 'unitsSold'].includes(k)),
+		[],
+	);
 	const filled = recordKill(recordCraft(emptyStats(), 2), { type: 'wolf', lucky: false, boss: false, ms: 5000, flawless: true });
 	const back = readStats(JSON.parse(JSON.stringify(statsToJson(filled))));
 	assert.deepEqual([back.crafted, back.flawless, back.bestMs], [2, 1, { wolf: 5000 }]);

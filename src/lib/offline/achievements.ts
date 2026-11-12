@@ -1,22 +1,15 @@
-import { ACHIEVEMENTS, achievementById, type AchievementCondition, type AchievementDef } from '@/catalog/achievements';
-import { TUTORIAL_PATH } from '@/catalog/tutorial';
+import { ACHIEVEMENTS, achievementById, type AchievementDef } from '@/catalog/achievements';
 import { GEMS_CAP } from '@/config/economy';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
+import { conditionHolds, type DeedFacts } from '@/lib/deeds';
 import { guideLive } from '@/lib/tutorial/live';
-import type { LifetimeStats } from '@/lib/offline/stats';
 
 // SERVER ONLY. Achievements (IDL-73, gem rewards IDL-194): pure functions of numbers the server already holds. Nothing here reads a request; the browser cannot name an
 // achievement, so a forged claim has nowhere to go. Called from `withLedger` after every online step (spawn poll, chest, fight, tutorial, offline claim).
 
-/** The numbers the conditions read. All of them come from the ledger or the last accepted save. */
-export interface AchievementFacts {
-	stats: LifetimeStats;
-	castleLevel: number;
-	rebirths: number;
-	/** Buildings built, lifetime. The building system has no counter yet, so this is 0 until it reports one. */
-	buildings: number;
-}
+/** The numbers the conditions read (see `lib/deeds.ts`). */
+export type AchievementFacts = DeedFacts;
 
 export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): AchievementFacts => ({
 	stats: ledger.stats,
@@ -25,34 +18,7 @@ export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): Achieve
 	buildings: 0,
 });
 
-const lastStepId = TUTORIAL_PATH[TUTORIAL_PATH.length - 1]?.id;
-const totalKills = (stats: LifetimeStats): number => Object.values(stats.kills).reduce((sum, n) => sum + n, 0);
-
-/** Whether one condition holds for these facts. */
-export const conditionHolds = (when: AchievementCondition, f: AchievementFacts): boolean => {
-	switch (when.kind) {
-		case 'tutorial':
-			return !!lastStepId && f.stats.tutorial.done.includes(lastStepId);
-		case 'tiles':
-			return f.stats.tiles >= when.min;
-		case 'buildings':
-			return f.buildings >= when.min;
-		case 'kills':
-			return totalKills(f.stats) >= when.min;
-		case 'chests':
-			return f.stats.chests >= when.min;
-		case 'castle':
-			return f.castleLevel >= when.level;
-		case 'rebirths':
-			return f.rebirths >= when.min;
-		case 'kill':
-			return (f.stats.kills[when.monster] ?? 0) >= when.min;
-		case 'golden':
-			return f.stats.golden >= when.min;
-		case 'manual':
-			return false;
-	}
-};
+export { conditionHolds };
 
 /**
  * The achievements whose condition holds now and that are not paid yet, in catalog order. A paid one never comes back, however the numbers move later
