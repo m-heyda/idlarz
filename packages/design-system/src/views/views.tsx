@@ -232,7 +232,7 @@ export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ wid
 
 const STASH_START: StashEntry[] = [
 	{ id: 'vial', name: 'Glass Vial', icon: I('comp_glass_vial'), qty: 3470, kind: 'component' },
-	{ id: 'scraps', name: 'Bound scraps', icon: I('item_bound_scraps'), qty: 214, kind: 'component' },
+	{ id: 'scraps', name: 'Bound scraps', icon: '/pixel/items/offHand/bound_scraps.png', qty: 214, kind: 'component' },
 	{ id: 'hp2', name: 'Greater Potion', icon: I('item_potion_greater'), qty: 36, kind: 'potion', stack: 20 },
 	{ id: 'cloth', name: 'Cloth bolt', icon: R('cloth'), qty: 12, kind: 'good', stack: 20 },
 	{ id: 'dye', name: 'Dye', icon: R('dye'), qty: 3, kind: 'good', stack: 20 },
@@ -290,7 +290,7 @@ const BAG_START: BagItem[] = [
 		],
 	},
 	{
-		icon: I('item_cloth_robe'),
+		icon: '/pixel/items/chest/cloth_robe.png',
 		name: 'Dusk Robe',
 		type: 'Epic · Chest',
 		rarity: 'epic',
@@ -313,7 +313,7 @@ const BAG_START: BagItem[] = [
 	},
 	{ icon: I('item_wooden_ring'), name: 'Wooden Ring', type: 'Common · Ring', sell: 8, rows: [{ label: 'Luck', value: '+1' }] },
 	{
-		icon: I('item_cloth_hat'),
+		icon: '/pixel/items/head/cloth_hat.png',
 		name: 'Pointed Hat',
 		type: 'Uncommon · Head',
 		rarity: 'uncommon',
@@ -1042,7 +1042,7 @@ const SHELF_START: Offer[] = [
 	},
 	{
 		id: 'o2',
-		icon: I('item_cloth_mantle'),
+		icon: '/pixel/items/shoulder/cloth_mantle.png',
 		name: 'Cloth Mantle',
 		type: 'Uncommon · Shoulder · ilvl 17',
 		rarity: 'uncommon',
@@ -1064,7 +1064,14 @@ const SHELF_START: Offer[] = [
 			{ label: 'Strength', value: '+5' },
 		],
 	},
-	{ id: 'o4', icon: I('item_cloth_gloves'), name: 'Cloth Gloves', type: 'Common · Hands · ilvl 12', price: 6000, rows: [{ label: 'Armor', value: '4' }] },
+	{
+		id: 'o4',
+		icon: '/pixel/items/hands/cloth_gloves.png',
+		name: 'Cloth Gloves',
+		type: 'Common · Hands · ilvl 12',
+		price: 6000,
+		rows: [{ label: 'Armor', value: '4' }],
+	},
 	{ id: 'o5', icon: I('item_cloth_ring'), name: 'Plain Ring', type: 'Common · Ring · ilvl 13', price: 5000, rows: [{ label: 'Luck', value: '+2' }] },
 	{
 		id: 'o6',
@@ -1093,10 +1100,10 @@ interface BagSell {
 const SELL_BAG_START: BagSell[] = [
 	{ id: 'b1', icon: I('item_potion_hp'), name: 'Health Potion', kind: 'potion', count: 88, value: 12 },
 	{ id: 'b2', icon: I('item_wooden_sword'), name: 'Wooden Sword', kind: 'gear', rarity: 'uncommon', value: 40 },
-	{ id: 'b3', icon: I('item_cloth_robe'), name: 'Dusk Robe', kind: 'gear', rarity: 'epic', value: 9800 },
+	{ id: 'b3', icon: '/pixel/items/chest/cloth_robe.png', name: 'Dusk Robe', kind: 'gear', rarity: 'epic', value: 9800 },
 	{ id: 'b4', icon: I('item_wooden_ring'), name: 'Wooden Ring', kind: 'gear', value: 8 },
-	{ id: 'b5', icon: I('item_cloth_hat'), name: 'Pointed Hat', kind: 'gear', rarity: 'uncommon', value: 90 },
-	{ id: 'b6', icon: I('item_bone_knife'), name: 'Bone Knife', kind: 'gear', value: 14 },
+	{ id: 'b5', icon: '/pixel/items/head/cloth_hat.png', name: 'Pointed Hat', kind: 'gear', rarity: 'uncommon', value: 90 },
+	{ id: 'b6', icon: '/pixel/items/mainHand/bone_knife.png', name: 'Bone Knife', kind: 'gear', value: 14 },
 ];
 
 /** Resources tab: stock ledger (big rows) and the trade ticket with a slider. */

@@ -150,7 +150,7 @@ const LabPanel: React.FC = () => {
 								aria-label='Combat preview'
 								onClick={() => lab.setCombatPreview(wipId)}
 							>
-								<PixelIcon name='item_iron_sword' alt='' scale={0.5} />
+								<PixelIcon name='art_iron_sword' alt='' scale={0.5} />
 								Fight
 							</button>
 						</div>
