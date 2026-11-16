@@ -119,6 +119,15 @@ const HudDock: React.FC = () => {
 							onClick={() => (status.canRebirth || rebirthOpen) && toggleRebirth()}
 						/>
 					</HoverTip>
+					{/* the last button: the world boss window (coming soon) */}
+					<IconButton
+						icon={icon('menu_boss')}
+						label='Boss'
+						active={order.includes('boss')}
+						aria-pressed={order.includes('boss')}
+						data-tutorial='tab-boss'
+						onClick={() => toggleWindow('boss')}
+					/>
 				</Dock>
 			</div>
 		</div>

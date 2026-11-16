@@ -39,6 +39,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rot Heron | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Rot Heron | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 20% |
 | Rot Heron | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Scrap Golem | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Scrap Golem | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 90% | 100% |
 | The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 75% | 100% |
 | The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 50% | 100% |
@@ -51,6 +54,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rime Wraith | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rime Wraith | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rime Wraith | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Frost Moth | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost Moth | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
 | The Winter Wyrm | 38 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 48 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -102,3 +108,54 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 37 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 45 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 55 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 42 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 50 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 60 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 47 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 55 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 65 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 52 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 60 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 70 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

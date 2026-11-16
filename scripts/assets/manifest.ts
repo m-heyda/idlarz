@@ -1,6 +1,7 @@
 /**
  * The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
- * accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, terrain atlases and ground textures are left out on purpose.
+ * accessories, monsters, buildings, resources, map-details, ui, portraits, biomes, map-ground, unsorted). Every picture under `public/` is listed (only the title cards of the village pack are skipped).
+ * Every entry carries one of three tags: `used` (the game loads it), `planned` (picked for a feature that is not built) or `unused` (everything else: pool art, spares, alternatives).
  * Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
  * get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
  * `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
@@ -11,7 +12,7 @@
  * @order 3
  */
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
-import { basename, join, relative, resolve, sep } from 'node:path';
+import { basename, dirname, join, relative, resolve, sep } from 'node:path';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { MONSTER_CATALOG, monsterArtUrl } from '../../src/catalog/monsters';
@@ -38,6 +39,8 @@ export type AssetCategory =
 	| 'ui'
 	| 'portraits'
 	| 'biomes'
+	| 'map-ground'
+	| 'sets'
 	| 'unsorted';
 /**
  * used = live in the game now (enabled item, monster or resource; icon referenced by code); planned = its item/monster/resource exists but is disabled; retired = item no longer drops, old saves keep it; unused = registered art that nothing references (an icon no item uses, an icon no code mentions);
@@ -75,7 +78,7 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 	{
 		id: 'buildings',
 		title: 'Buildings',
-		blurb: 'The 16 map buildings, the 10 castle levels and the 7 castle skins (not wired yet), and the village packs waiting in the reuse pool.',
+		blurb: 'The map buildings, the 10 castle levels and the 14 castle skins (not wired yet), the Idol statues, and the village packs waiting in the pool.',
 	},
 	{ id: 'resources', title: 'Resources', blurb: 'Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.' },
 	{
@@ -87,16 +90,26 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 	{
 		id: 'portraits',
 		title: 'Portraits',
-		blurb:
-			'NPC faces (48px busts): merchant, quest giver, gambler, blacksmith, innkeepers and more. A few stand behind the merchant counter, the rest are ready for quests and dialogue.',
+		blurb: 'The avatar busts for the picker (ui/heroes), the guide and the wireframe early-tester set.',
 	},
 	{
 		id: 'biomes',
 		title: 'Biomes',
-		blurb:
-			'Framed 80px landscape vignettes per biome (Sprite Fusion). One per rebirth biome is shown in the "New land unlocked" window; the rest are alternatives, the older biomes and extras.',
+		blurb: 'Framed 80px landscape vignettes, one per rebirth biome, shown in the "New land unlocked" window.',
 	},
-	{ id: 'unsorted', title: 'Unsorted cuts', blurb: 'Loose cuts in public/pixel/reuse, not classified yet.' },
+	{
+		id: 'sets',
+		title: 'Equipment sets',
+		blurb:
+			'63 matching sets sliced from three 64 px sheets (knight, samurai, shinobi), one folder per set in __reuse/sets. A set has armor pieces, weapons and accessories (belt, neck, mask), and may use fewer pieces than the sheet row: the grouping is in scripts/assets/equipment-sets.json. Effects come later.',
+	},
+	{
+		id: 'map-ground',
+		title: 'Map ground and backdrops',
+		blurb:
+			'Ground textures, shape atlases and shores that TerrainLayer draws, the cracked-stone, fog and meadow backdrops, and the biome, meadow and water icons.',
+	},
+	{ id: 'unsorted', title: 'Unsorted cuts', blurb: 'Loose cuts in public/pixel/__reuse, not classified yet.' },
 ];
 
 const readNames = (): Record<string, string> => {
@@ -162,7 +175,6 @@ const mentionedIn = (name: string): string[] => {
 
 /** Pool pictures picked as art for the Idols (the third building of each biome, docs/plan/18, IDL-96): moved into Buildings as `planned`, under a stable name */
 const IDOL_ART: Record<string, string> = {
-	'/pixel/assets_to_assess_and_use/misc/Objects_separately/128/Dark_totem_dark_shadow2.png': 'idol_dark_totem',
 	'/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png': 'idol_blue_gray_ruins',
 };
 
@@ -378,8 +390,21 @@ export const buildManifest = (): AssetEntry[] => {
 	});
 
 	// 5. UI parts and effects
-	for (const f of walk(join(PUBLIC, 'pixel', 'ui')))
-		add({ name: `ui_${snake(basename(f))}`, category: 'ui', subcategory: 'frames and bars', src: url(f), status: 'used', source: 'public/pixel/ui' });
+	// `ui/` holds the frames, bars and menu icons; its `heroes/` (avatar busts), `blacksmith.png` and `alder_talk.png` are listed with their own entries further down
+	const UI_ELSEWHERE = new Set(['heroes', 'admin', 'biomes', 'blacksmith.png', 'alder_talk.png', 'logo_idler_realm.png']);
+	for (const f of walk(join(PUBLIC, 'pixel', 'ui'))) {
+		const rel = relative(join(PUBLIC, 'pixel', 'ui'), f);
+		if (UI_ELSEWHERE.has(rel.split(sep)[0])) continue;
+		const menu = basename(f).startsWith('menu_');
+		add({
+			name: menu ? basename(f, '.png') : `ui_${snake(basename(f))}`,
+			category: 'ui',
+			subcategory: menu ? 'menu' : 'frames and bars',
+			src: url(f),
+			status: 'used',
+			source: 'public/pixel/ui',
+		});
+	}
 	for (const f of walk(join(PUBLIC, 'fx')))
 		add({
 			name: `fx_${snake(relative(join(PUBLIC, 'fx'), f).split(sep).join('_'))}`,
@@ -498,7 +523,7 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/monsters',
 		});
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'heroes')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'ui', 'heroes')))
 		if (f.endsWith('.png'))
 			add({
 				name: snake(basename(f)),
@@ -507,9 +532,9 @@ export const buildManifest = (): AssetEntry[] => {
 				src: url(f),
 				status: AVATARS.some((a) => a.portrait === basename(f, '.png')) ? 'used' : 'reuse',
 				usedBy: AVATARS.filter((a) => a.portrait === basename(f, '.png')).map((a) => a.id),
-				source: 'new_assets/heroes',
+				source: 'ui/heroes',
 			});
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'achievements')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'achievements')))
 		if (f.endsWith('.png'))
 			add({
 				name: snake(basename(f)),
@@ -517,10 +542,10 @@ export const buildManifest = (): AssetEntry[] => {
 				subcategory: 'achievement badges (not wired)',
 				src: url(f),
 				status: 'reuse',
-				source: 'new_assets/achievements',
+				source: 'achievements',
 			});
 	// the admin mark: an 8 frame sprite sheet (32 px frames) drawn by the name of the game admin (`AdminMark` in the design system)
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'admin')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'ui', 'admin')))
 		if (f.endsWith('.png'))
 			add({
 				name: snake(basename(f)),
@@ -529,9 +554,9 @@ export const buildManifest = (): AssetEntry[] => {
 				src: url(f),
 				status: 'used',
 				usedBy: ['AdminMark'],
-				source: 'new_assets/admin',
+				source: 'ui/admin',
 			});
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'wireframe')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'wireframe')))
 		if (f.endsWith('.png'))
 			add({
 				name: snake(basename(f)),
@@ -539,7 +564,7 @@ export const buildManifest = (): AssetEntry[] => {
 				subcategory: 'wireframe early-tester set (sources of the early tester portrait and badge; pets not wired)',
 				src: url(f),
 				status: 'planned',
-				source: 'new_assets/wireframe',
+				source: 'wireframe',
 			});
 	// The tutorial guide, Brother Alder: his one sprite (a cut from the reuse pool) and the two-frame talking sheet drawn from it by scripts/guide-sprite.ts
 	add({
@@ -552,18 +577,17 @@ export const buildManifest = (): AssetEntry[] => {
 		source: 'scripts/guide-sprite.ts',
 	});
 	// The blacksmith beside the Crafting tab of the Hero window (supplied art, background cut out and mirrored to face right)
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'crafting')))
-		if (f.endsWith('.png'))
-			add({
-				name: `crafting_${snake(basename(f))}`,
-				category: 'ui',
-				subcategory: 'crafting',
-				src: url(f),
-				status: 'used',
-				usedBy: ['hero:crafting-tab'],
-				source: 'new_assets/crafting',
-			});
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'idols')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'ui')).filter((x) => basename(x) === 'blacksmith.png'))
+		add({
+			name: `crafting_${snake(basename(f))}`,
+			category: 'ui',
+			subcategory: 'crafting',
+			src: url(f),
+			status: 'used',
+			usedBy: ['hero:crafting-tab'],
+			source: 'ui',
+		});
+	for (const f of walk(join(PUBLIC, 'pixel', 'idols')))
 		if (f.endsWith('.png'))
 			add({
 				name: snake(basename(f)),
@@ -571,9 +595,9 @@ export const buildManifest = (): AssetEntry[] => {
 				subcategory: basename(f).startsWith('idol_alt_') ? 'idol statues (alternatives)' : 'idol statues (primary, planned)',
 				src: url(f),
 				status: basename(f).startsWith('idol_alt_') ? 'reuse' : 'planned',
-				source: 'new_assets/idols',
+				source: 'idols',
 			});
-	for (const f of walk(join(PUBLIC, 'pixel', 'new_assets', 'biomes')))
+	for (const f of walk(join(PUBLIC, 'pixel', 'ui', 'biomes')))
 		if (f.endsWith('.png')) {
 			const name = basename(f, '.png');
 			const biome = name.replace(/^biome_/, '').replace(/_\d+$/, '');
@@ -585,11 +609,12 @@ export const buildManifest = (): AssetEntry[] => {
 				src: url(f),
 				status: inGame ? 'used' : 'reuse',
 				usedBy: inGame ? ['RebirthUnlockModal'] : [],
-				source: 'new_assets/biomes',
+				source: 'ui/biomes',
 			});
 		}
-	for (const f of walk(join(PUBLIC, 'pixel', 'reuse'))) {
-		const kind = relative(join(PUBLIC, 'pixel', 'reuse'), f).split(sep)[0];
+	for (const f of walk(join(PUBLIC, 'pixel', '__reuse'))) {
+		const kind = relative(join(PUBLIC, 'pixel', '__reuse'), f).split(sep)[0];
+		if (kind === 'equipment' || kind === 'sets') continue; // listed below with the armor and weapons
 		if (url(f) === GUIDE_SPRITE) {
 			add({
 				name: 'guide_brother_alder',
@@ -598,7 +623,7 @@ export const buildManifest = (): AssetEntry[] => {
 				src: url(f),
 				status: 'used',
 				usedBy: ['tutorial:guide'],
-				source: 'public/pixel/reuse',
+				source: 'public/pixel/__reuse',
 			});
 			continue;
 		}
@@ -610,9 +635,138 @@ export const buildManifest = (): AssetEntry[] => {
 			subcategory: kind,
 			src: url(f),
 			status: 'reuse',
-			source: 'public/pixel/reuse',
+			source: 'public/pixel/__reuse',
 		});
 	}
+
+	// 6b. Map ground and backdrops: used when the terrain renderer loads it (`terrainAtlas.json` styles and the lake shores), a CSS url or code names it; else unused
+	const atlas = JSON.parse(readFileSync(join(ROOT, 'src', 'config', 'terrainAtlas.json'), 'utf8')) as { styles: string[] };
+	const terrainLoaded = new Set(['props', 'shore_frost', 'shore_bog', ...atlas.styles.flatMap((s) => [`tex_${s}`, `shapes_${s}`])]);
+	const groundDirs = [
+		join(PUBLIC, 'pixel', 'bg'),
+		join(PUBLIC, 'pixel', 'terrain'),
+		join(PUBLIC, 'landing'),
+		...['biome', 'meadow', 'water'].map(() => join(PUBLIC, 'pixel', 'icons')),
+	];
+	for (const dir of [...new Set(groundDirs)])
+		for (const f of walk(dir)) {
+			const id = basename(f, '.png');
+			const sub = relative(PUBLIC, dirname(f)).split(sep).join('/');
+			if (sub === 'pixel/icons' && !/^(biome|meadow|water)_/.test(id)) continue;
+			const users = sub === 'pixel/terrain' ? (terrainLoaded.has(id) ? ['TerrainLayer'] : []) : mentionedIn(id);
+			add({
+				name: `ground_${snake(sub.replace(/^pixel\//, ''))}_${snake(id)}`,
+				category: 'map-ground',
+				subcategory: sub,
+				src: url(f),
+				status: users.length ? 'used' : 'unused',
+				usedBy: users,
+				source: sub,
+			});
+		}
+
+	const CUT_SLOT: Record<string, string> = { cape: 'cape', shoulder: 'shoulder', bow: 'mainHand', axe: 'mainHand', tome: 'offHand' };
+	// 6d. Equipment cut-outs (sheets supplied by the owner on 2026-11-16, one transparent PNG per item, full size): capes and shoulders go to Armor, bows, axes and tomes to Weapons.
+	// `used` when a 64 px copy of it is registered as an item icon (`equipment-used.json`: cut-out -> icon), else `unused` pool art for new items and placeholders.
+	const cutUse = JSON.parse(readFileSync(join(ROOT, 'scripts', 'assets', 'equipment-used.json'), 'utf8')) as Record<string, string>;
+	for (const f of walk(join(PUBLIC, 'pixel', '__reuse', 'equipment'))) {
+		const family = basename(dirname(f));
+		const [style, ...rest] = basename(f, '.png').split('_');
+		const icon = cutUse[url(f)];
+		add({
+			name: `cut_${family}_${style}_${rest.join('_')}`,
+			category: family === 'cape' || family === 'shoulder' ? 'armor' : 'weapons',
+			subcategory: `cut-outs: ${family} (${style})`,
+			slot: CUT_SLOT[family],
+			weaponType: family === 'bow' || family === 'axe' ? family : family === 'tome' ? 'tome' : undefined,
+			src: url(f),
+			status: icon ? 'used' : 'unused',
+			usedBy: icon ? [icon] : [],
+			source: '__reuse/equipment',
+		});
+	}
+
+	// The game logo (cut out of the owner's picture on 2026-11-16, background removed): for the landing rework, not drawn yet
+	add({
+		name: 'logo_idler_realm',
+		category: 'ui',
+		subcategory: 'logo',
+		src: '/pixel/ui/logo_idler_realm.png',
+		status: 'planned',
+		usedBy: ['landing rework'],
+		source: 'ui',
+	});
+
+	// 6e. Equipment sets: 64 px sprites sliced from three sheets (public/pixel/__reuse/sets/<set>/<role>.png), one set per sheet row; `equipment-sets.json` says what belongs to which set.
+	// A piece is `used` when it is wired as an item icon (`equipment-used.json`), else `unused`.
+	const SET_ROLE: Record<string, { slot: string; weaponType?: string; group: string }> = {
+		head: { slot: 'head', group: 'armor' },
+		chest: { slot: 'chest', group: 'armor' },
+		legs: { slot: 'legs', group: 'armor' },
+		leg_guards: { slot: 'legs', group: 'armor' },
+		shoulder: { slot: 'shoulder', group: 'armor' },
+		hands: { slot: 'hands', group: 'armor' },
+		feet: { slot: 'feet', group: 'armor' },
+		belt: { slot: 'belt', group: 'accessories' },
+		neck: { slot: 'neck', group: 'accessories' },
+		mask: { slot: 'mask', group: 'accessories' },
+		misc: { slot: 'misc', group: 'accessories' },
+		gourd: { slot: 'consumable', group: 'accessories' },
+	};
+	const equipSets = JSON.parse(readFileSync(join(ROOT, 'scripts', 'assets', 'equipment-sets.json'), 'utf8')) as {
+		id: string;
+		name: string;
+		theme: string;
+		pieces: Record<string, string>;
+	}[];
+	const setUse = JSON.parse(readFileSync(join(ROOT, 'scripts', 'assets', 'equipment-used.json'), 'utf8')) as Record<string, string>;
+	for (const s of equipSets)
+		for (const [role, file] of Object.entries(s.pieces)) {
+			const src = `/pixel/__reuse/sets/${s.id}/${file}`;
+			const info = SET_ROLE[role] ?? { slot: role === 'knuckles' ? 'hands' : 'mainHand', weaponType: role, group: 'weapons' };
+			const icon = setUse[src];
+			add({
+				name: `set_${s.id}_${role}`,
+				category: 'sets',
+				subcategory: `${s.theme}: ${s.name} (${info.group})`,
+				src,
+				status: icon ? 'used' : 'unused',
+				usedBy: icon ? [icon] : [],
+				slot: info.slot,
+				weaponType: info.weaponType,
+				source: `__reuse/sets/${s.id}`,
+			});
+		}
+
+	// 6c. The second farm art set (200 px, isometric), waiting for the farm rework (IDL-346)
+	for (const f of walk(join(PUBLIC, 'pixel', 'farm_rework')))
+		add({
+			name: `farm_rework_${snake(basename(f, '.png'))}`,
+			category: 'map-details',
+			subcategory: 'farm rework (planned)',
+			src: url(f),
+			status: 'planned',
+			usedBy: ['Farm rework 2, IDL-346'],
+			source: 'farm_rework',
+		});
+
+	// 7. Loose drops: pictures put into a folder before they were named or wired (unnamed Sprite Fusion files in enemies/, the new pets/, to_organize/). They show under Unsorted cuts so each can be named, wired or deleted.
+	const listedSrc = new Set(entries.flatMap((e) => [e.src, ...Object.values(e.variants ?? {})]));
+	for (const dir of [join(PUBLIC, 'pixel', 'enemies'), join(PUBLIC, 'pixel', 'pets'), join(PUBLIC, 'to_organize')])
+		for (const f of walk(dir)) {
+			if (listedSrc.has(url(f))) continue;
+			const folder = relative(PUBLIC, dirname(f)).split(sep).join('/');
+			add({
+				name: `loose_${snake(folder.replace(/^pixel\//, ''))}_${snake(basename(f))
+					.replace(/^sprite_fusion_/, 'sf_')
+					.slice(0, 18)}`,
+				category: 'unsorted',
+				subcategory: `${folder} (not named by the code)`,
+				src: url(f),
+				status: 'reuse',
+				source: folder,
+			});
+		}
 
 	// Names: apply overrides (keyed by default src), then make every name unique and sort.
 	const overrides = readNames();
@@ -633,6 +787,20 @@ export const buildManifest = (): AssetEntry[] => {
 		if (e.status === 'reuse' && e.name.startsWith('avatar_horned_'))
 			Object.assign(e, { status: 'planned', usedBy: ['unlockable avatar (gems, achievements), IDL-266'] });
 		if (e.name === 'animal_rooster') Object.assign(e, { status: 'planned', usedBy: ['golden-egg chicken upgrade (late gem purchase), IDL-260'] });
+	}
+	// The three tags. Art that code names by path or quoted file name is `used` whatever it was filed as; `planned` stays only while nothing names the picture; everything else (pool art, spares, alternatives, retired) is `unused`.
+	// A placeholder is drawn in the game, so it is `used`.
+	const codeText = srcFiles.map((f) => f.text).join('\n');
+	for (const e of entries) {
+		const stem = basename(e.src, '.png');
+		const named =
+			codeText.includes(e.src) ||
+			(/^\/pixel\/(achievements|idols|pets|ui\/(heroes|biomes))\//.test(e.src) &&
+				/[_-]/.test(stem) &&
+				stem.length >= 8 &&
+				new RegExp(`['"\`]${stem}['"\`]`).test(codeText));
+		if (named && !e.usedBy.length) e.usedBy = ['code'];
+		e.status = named || e.status === 'used' || e.status === 'placeholder' ? 'used' : e.status === 'planned' ? 'planned' : 'unused';
 	}
 	return entries.sort((a, b) => rank.get(a.category)! - rank.get(b.category)! || a.subcategory.localeCompare(b.subcategory) || a.name.localeCompare(b.name));
 };

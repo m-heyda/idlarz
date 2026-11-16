@@ -3143,8 +3143,8 @@
 }
 
 .ds-soon img {
-	width: 96px;
-	height: 96px;
+	width: 64px;
+	height: 64px;
 	opacity: 0.55;
 	image-rendering: pixelated;
 }

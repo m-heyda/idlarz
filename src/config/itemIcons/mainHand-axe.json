@@ -1,8 +1,8 @@
 [
 	{"icon": "art_reapers_crescent", "item": "reapers_crescent", "file": "legendary/reapers_crescent", "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
 	{"icon": "art_tidecaller_axe", "item": "tidecaller_axe", "file": "legendary/tidecaller_axe", "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "supplied 64 px art, Sprite Fusion; sheet and prompt not recorded (pre-registry)"},
-	{"icon": "item_battle_axe", "item": "battle_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_hatchet", "item": "hatchet", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
-	{"icon": "item_bronze_axe", "item": "bronze_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
-	{"icon": "item_iron_axe", "item": "iron_axe", "file": null, "slot": "mainHand", "weapon": "axe", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
+	{"icon": "art_battle_axe", "item": "battle_axe", "file": "mainHand/battle_axe", "slot": "mainHand", "weapon": "axe", "grade": null, "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon dragon bone tactical battleaxe (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"},
+	{"icon": "art_hatchet", "item": "hatchet", "file": "mainHand/hatchet", "slot": "mainHand", "weapon": "axe", "grade": "G1", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon rusted iron handaxe (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"},
+	{"icon": "art_bronze_axe", "item": "bronze_axe", "file": "mainHand/bronze_axe", "slot": "mainHand", "weapon": "axe", "grade": "G2", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon nature druid antler hatchet (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"},
+	{"icon": "art_iron_axe", "item": "iron_axe", "file": "mainHand/iron_axe", "slot": "mainHand", "weapon": "axe", "grade": "G3", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: Steel Warden halberd (sliced from a 64 px sheet, __reuse/sets/); replaces the built 40 px icon"}
 ]

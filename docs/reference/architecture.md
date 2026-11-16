@@ -161,7 +161,8 @@ Deterministic: the same seed gives the same picture. Pure: no canvas, no store.
 Source: [`scripts/assets/manifest.ts:1`](../../scripts/assets/manifest.ts)
 
 The asset library: `buildManifest()` lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
-accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, terrain atlases and ground textures are left out on purpose.
+accessories, monsters, buildings, resources, map-details, ui, portraits, biomes, map-ground, unsorted). Every picture under `public/` is listed (only the title cards of the village pack are skipped).
+Every entry carries one of three tags: `used` (the game loads it), `planned` (picked for a feature that is not built) or `unused` (everything else: pool art, spares, alternatives).
 Registered art keeps its registry id (item icons, monster and resource rosters, `pixelIcons.ts`); raw pack files in `public/pixel/assets_to_assess_and_use/`
 get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow renderings folded into `variants`; `scripts/assets/names.json` renames any of them.
 `npm run assets:catalog` renders it into `docs/assets/` (manifest.json plus one page per category), which `stories/assets/` shows in Storybook
@@ -184,15 +185,15 @@ a future quest giver, innkeeper, blacksmith or dialogue.
 
 Source: [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts)
 
-The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/new_assets/biomes/`. Today only the "New land
-unlocked" window shows them (`RebirthUnlockModal`); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes.
+The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in `public/pixel/ui/biomes/`. Only the "New land
+unlocked" window shows them (`RebirthUnlockModal`); the five rebirth biomes have one each, the unused vignettes were deleted on 2026-11-16.
 The file name is `biome_<name>.png`; change the value here to use another one.
 
 <a id="animal-pixel-icons"></a>
 
 ### `ANIMAL_PIXEL_ICONS` <small>const</small>
 
-Source: [`src/config/pixelIcons.ts:252`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:245`](../../src/config/pixelIcons.ts)
 
 Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
 
@@ -200,7 +201,7 @@ Farm animal id -> its sprites. Chickens and cows come in two looks, the others i
 
 ### `animalIcon` <small>function</small>
 
-Source: [`src/config/pixelIcons.ts:267`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:260`](../../src/config/pixelIcons.ts)
 
 The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).

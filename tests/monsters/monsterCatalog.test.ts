@@ -8,7 +8,10 @@ import { MONSTERS } from '../../src/config/combatConfig';
 
 // The roster (catalog/monsters.ts) lists every planned monster; only enabled ones may spawn, and those must have real stats in MONSTERS.
 
-test('ids are unique and every biome has three monsters and one boss', () => {
+// the swamp and the tundra got a fourth monster from new art (2026-11-16) and the blight a fourth, elite one
+const FOURTH = new Set(['swamp', 'tundra', 'blight']);
+
+test('ids are unique and every biome has three monsters (four in the swamp, tundra and blight) and one boss', () => {
 	const ids = MONSTER_CATALOG.map((m) => m.id);
 	assert.equal(new Set(ids).size, ids.length);
 	const byBiome = new Map<string, typeof MONSTER_CATALOG>();
@@ -17,16 +20,29 @@ test('ids are unique and every biome has three monsters and one boss', () => {
 	}
 	assert.equal(byBiome.size, 12);
 	for (const [biome, list] of byBiome) {
-		assert.equal(list.filter((m) => m.grade === 'normal').length, 3, `${biome}: 3 monsters`);
+		assert.equal(list.filter((m) => m.grade === 'normal').length, FOURTH.has(biome) ? 4 : 3, `${biome}: monsters`);
 		assert.equal(list.filter((m) => m.grade === 'boss').length, 1, `${biome}: 1 boss`);
 	}
 });
 
-test('the rats are gone: the seven home biomes and the jungle are enabled, and exactly the enabled ones exist in MONSTERS', () => {
+test('the rats are gone: the seven home biomes and the five rebirth biomes are enabled, and exactly the enabled ones exist in MONSTERS', () => {
 	assert.ok(!('rat' in MONSTERS) && !('ratKing' in MONSTERS));
 	const enabledBiomes = new Set(MONSTER_CATALOG.filter((m) => m.enabled).map((m) => m.biomes[0]));
-	assert.deepEqual([...enabledBiomes].sort(), ['coast', 'forest', 'hills', 'jungle', 'lake', 'plains', 'swamp', 'tundra']);
-	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 32);
+	assert.deepEqual([...enabledBiomes].sort(), [
+		'battlefield',
+		'blight',
+		'coast',
+		'fields',
+		'forest',
+		'hills',
+		'jungle',
+		'lake',
+		'orchard',
+		'plains',
+		'swamp',
+		'tundra',
+	]);
+	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 51);
 	assert.deepEqual(
 		Object.keys(MONSTERS).sort(),
 		MONSTER_CATALOG.filter((m) => m.enabled)
@@ -62,14 +78,15 @@ test('monstersInBiome hides disabled monsters unless asked', () => {
 		monstersInBiome('swamp')
 			.map((m) => m.id)
 			.sort(),
-		['bossMireMatriarch', 'dumpback', 'garbageOgre', 'rotHeron'],
+		['bossMireMatriarch', 'dumpback', 'garbageOgre', 'rotHeron', 'scrapGolem'],
 	);
 	assert.equal(monstersInBiome('lake').length, 4, 'the lake roster is enabled');
 	assert.equal(monstersInBiome('hills').length, 4);
 	assert.equal(monstersInBiome('coast').length, 4);
 	assert.equal(monstersInBiome('jungle').length, 4, 'the jungle roster is enabled');
-	assert.equal(monstersInBiome('fields').length, 0, 'the later rebirth biomes have no monster yet');
-	assert.equal(monstersInBiome('fields', false).length, 4);
+	assert.equal(monstersInBiome('fields').length, 4, 'every rebirth biome has its roster');
+	assert.equal(monstersInBiome('blight').length, 5);
+	assert.equal(monstersInBiome('battlefield', false).length, 4);
 });
 
 test('the map lab always has a monster to show, every MONSTERS entry has a catalog entry and a picture, and every spawn biome exists', () => {

@@ -10,7 +10,7 @@
 export interface PetDef {
 	id: string;
 	name: string;
-	/** Path of the pixel icon under `public/` (reuse pool, `public/pixel/reuse/pets/`) */
+	/** Path of the pixel icon under `public/` (`public/pixel/pets/`) */
 	icon: string;
 	/** Which way the artwork faces by default; the sprite is mirrored when the pet walks the other way */
 	facing: 'left' | 'right';
@@ -23,7 +23,7 @@ export const PETS: readonly PetDef[] = [
 	{
 		id: 'yuki',
 		name: 'Yuki',
-		icon: '/pixel/reuse/pets/kaczkawu_dog.png',
+		icon: '/pixel/pets/kaczkawu_dog.png',
 		facing: 'right',
 		speech: [
 			"Woow! We're getting a bigger kingdom! Nie!",

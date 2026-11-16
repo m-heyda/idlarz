@@ -1126,7 +1126,7 @@ body {
 
 /* name plate hanging at the top of the alcove */
 
-/* --- Level orb: 6-frame glass sprite (24px frames), stepped; the level number sits in its dark socket --- */
+/* --- Level orb: a plain purple glass ball drawn in CSS (no picture); the level number sits on it --- */
 .level-orb {
 	--s: 1;
 	position: relative;
@@ -1134,10 +1134,12 @@ body {
 	flex-shrink: 0;
 	width: calc(24px * var(--s));
 	height: calc(24px * var(--s));
-	background: url('/pixel/icons/level_orb_shine.png') 0 0 / calc(144px * var(--s)) calc(24px * var(--s)) no-repeat;
-	image-rendering: pixelated;
-	filter: drop-shadow(0 0 4px rgba(150, 90, 255, 0.75));
-	animation: orb-shine 1.2s steps(6) infinite;
+	border-radius: 50%;
+	background: radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.55) 0, rgba(255, 255, 255, 0) 28%),
+		radial-gradient(circle at 50% 50%, #7a45d8 0, #4a1fa0 62%, #2a0f66 100%);
+	box-shadow:
+		inset 0 0 0 calc(1px * var(--s)) #10042c,
+		0 0 calc(4px * var(--s)) rgba(150, 90, 255, 0.75);
 }
 
 .level-orb-num {
@@ -1167,12 +1169,6 @@ body {
 	letter-spacing: -0.5px;
 }
 
-@keyframes orb-shine {
-	to {
-		background-position-x: calc(-144px * var(--s));
-	}
-}
-
 /* --- Map terrain: ONE canvas behind the tiles (TerrainLayer, dual-grid); tiles are transparent hit areas --- */
 .terrain-canvas {
 	position: absolute;
@@ -1183,7 +1179,7 @@ body {
 	image-rendering: pixelated;
 }
 
-/* ground swatches for dialogs and the farm stage: the 192px terrain texture at native size */
+/* ground swatches for dialogs and the farm stage: the 192px terrain texture (`terrain/tex_<biome>.png`) at native size */
 .tile-ground {
 	background-size: 192px 192px;
 	background-repeat: repeat;
@@ -1191,35 +1187,35 @@ body {
 }
 
 .tile-ground-forest {
-	background-image: url('/pixel/bg/ground_forest.png');
+	background-image: url('/pixel/terrain/tex_forest.png');
 }
 
 .tile-ground-plains {
-	background-image: url('/pixel/bg/ground_plains.png');
+	background-image: url('/pixel/terrain/tex_plains.png');
 }
 
 .tile-ground-hills {
-	background-image: url('/pixel/bg/ground_hills.png');
+	background-image: url('/pixel/terrain/tex_hills.png');
 }
 
 .tile-ground-swamp {
-	background-image: url('/pixel/bg/ground_swamp.png');
+	background-image: url('/pixel/terrain/tex_swamp.png');
 }
 
 .tile-ground-tundra {
-	background-image: url('/pixel/bg/ground_tundra.png');
+	background-image: url('/pixel/terrain/tex_tundra.png');
 }
 
 .tile-ground-lake {
-	background-image: url('/pixel/bg/ground_lake.png');
+	background-image: url('/pixel/terrain/tex_lake.png');
 }
 
 .tile-ground-coast {
-	background-image: url('/pixel/bg/ground_coast.png');
+	background-image: url('/pixel/terrain/tex_coast.png');
 }
 
 .tile-ground-castle {
-	background-image: url('/pixel/bg/ground_castle.png');
+	background-image: url('/pixel/terrain/tex_castle.png');
 }
 
 /* owned tiles light up on hover with an overlay (a filter would wash out the tile's own sprites) */
@@ -1422,7 +1418,6 @@ body {
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.level-orb,
 	.tile-chest,
 	.tile-chest-wrap::before,
 	.tile-chest-ripple::before,

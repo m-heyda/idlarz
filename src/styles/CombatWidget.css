@@ -110,6 +110,7 @@
 }
 
 .combat-icon-skull {
+	image-rendering: pixelated;
 	position: absolute;
 	top: 5px;
 	left: 50%;

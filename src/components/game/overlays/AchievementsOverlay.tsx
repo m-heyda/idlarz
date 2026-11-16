@@ -21,7 +21,7 @@ export const AchievementRow: React.FC<{ def: AchievementDef; state: AchievementR
 		<li className='ds-listrow ds-listrow-line' data-dim={!earned} data-earned={earned} data-claimed={state.claimed}>
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img
-				src={`/pixel/new_assets/achievements/${def.badge}.png`}
+				src={`/pixel/achievements/${def.badge}.png`}
 				alt=''
 				width={40}
 				height={40}

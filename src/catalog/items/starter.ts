@@ -23,7 +23,7 @@ export const WOODEN_ITEMS: ItemDef[] = [
 		'mainHand',
 		'common',
 		{ damage: 7 },
-		{ tier: 1, weaponType: 'bow', icon: 'item_wooden_bow', description: 'A simple training bow. A good first shot is half the hunt.' },
+		{ tier: 1, weaponType: 'bow', icon: 'art_wooden_bow', description: 'A simple training bow. A good first shot is half the hunt.' },
 	),
 	gear(
 		'wooden_staff',
@@ -31,7 +31,7 @@ export const WOODEN_ITEMS: ItemDef[] = [
 		'mainHand',
 		'common',
 		{ damage: 8 },
-		{ tier: 1, weaponType: 'staff', icon: 'item_wooden_staff', description: 'A plain staff for a first spell. It still hums, a little.' },
+		{ tier: 1, weaponType: 'staff', icon: 'art_wooden_staff', description: 'A plain staff for a first spell. It still hums, a little.' },
 	),
 	gear(
 		'wooden_club',
@@ -55,7 +55,7 @@ export const WOODEN_ITEMS: ItemDef[] = [
 		'offHand',
 		'common',
 		{ armor: 2 },
-		{ ...wood, art: false, weaponType: 'shield', icon: 'item_wooden_shield', description: 'Simple defensive gear.' },
+		{ ...wood, art: false, weaponType: 'shield', icon: 'art_wooden_shield', description: 'Simple defensive gear.' },
 	),
 	gear('leather_cap', 'Leather Cap', 'head', 'common', { armor: 1, maxHp: 2 }, { ...wood, description: 'Boiled leather. Better than nothing on your head.' }),
 	gear('leather_pauldrons', 'Leather Shoulderpads', 'shoulder', 'common', { armor: 1, maxHp: 2 }, { ...wood, description: 'Layered hide over the shoulders.' }),

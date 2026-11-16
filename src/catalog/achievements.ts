@@ -74,7 +74,7 @@ export interface AchievementDef {
 	description: string;
 	when: AchievementCondition;
 	rewards: AchievementRewards;
-	/** File name (no extension) in `public/pixel/new_assets/achievements/`; swapping the art later is changing this string */
+	/** File name (no extension) in `public/pixel/achievements/`; swapping the art later is changing this string */
 	badge: string;
 	/** Granted together with another (manual) achievement: the Beta tester comes with the Early tester */
 	withAchievement?: string;
@@ -658,7 +658,7 @@ export interface DeedDef {
 	description: string;
 	category: DeedCategory;
 	tags: readonly string[];
-	/** File name of the badge shown on the deed (`public/pixel/new_assets/achievements/`) */
+	/** File name of the badge shown on the deed (`public/pixel/achievements/`) */
 	badge: string;
 	/** The paper panel: a line of flavour and how to make progress */
 	lore: string;

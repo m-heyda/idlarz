@@ -174,7 +174,7 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 			{isOwned && hasChest && showChestTip && (
 				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
 					<ChestTooltip
-						icon='/pixel/reuse/valuables/treasure_chest.png'
+						icon='/pixel/ui/treasure_chest.png'
 						subtitle={biome === 'lake' ? 'Something glints in the water' : 'Opens with a click'}
 						cta={biome === 'lake' ? 'Click to open' : undefined}
 					/>

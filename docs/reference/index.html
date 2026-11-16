@@ -2527,8 +2527,8 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:454</code></a></p>
-<p>The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:534</code></a></p>
+<p>The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
 <li>Builds (<code>BUILD</code>): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.</li>
@@ -2662,6 +2662,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 </tr>
 <tr>
 <td>swamp</td>
+<td>Scrap Golem</td>
+<td>1</td>
+<td>286</td>
+<td>6</td>
+<td>2</td>
+<td>0.4</td>
+<td>8-10 -&gt; 16-18</td>
+</tr>
+<tr>
+<td>swamp</td>
 <td>The Mire Matriarch (boss)</td>
 <td>25</td>
 <td>2,800</td>
@@ -2698,6 +2708,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>12</td>
 <td>11</td>
 <td>0.45</td>
+<td>12-14 -&gt; 16-18</td>
+</tr>
+<tr>
+<td>tundra</td>
+<td>Frost Moth</td>
+<td>1</td>
+<td>300</td>
+<td>8</td>
+<td>3</td>
+<td>0.5</td>
 <td>12-14 -&gt; 16-18</td>
 </tr>
 <tr>
@@ -2870,6 +2890,176 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>0.33</td>
 <td>32-35 -&gt; 39-42</td>
 </tr>
+<tr>
+<td>fields</td>
+<td>Barn Gargoyle</td>
+<td>1</td>
+<td>320</td>
+<td>13</td>
+<td>5</td>
+<td>0.6</td>
+<td>17-19 -&gt; 21-23</td>
+</tr>
+<tr>
+<td>fields</td>
+<td>Bucket Knight</td>
+<td>1</td>
+<td>520</td>
+<td>8</td>
+<td>5</td>
+<td>0.4</td>
+<td>17-19 -&gt; 21-23</td>
+</tr>
+<tr>
+<td>fields</td>
+<td>Hedge Bandit</td>
+<td>1</td>
+<td>400</td>
+<td>11</td>
+<td>5</td>
+<td>0.5</td>
+<td>17-19 -&gt; 21-23</td>
+</tr>
+<tr>
+<td>fields</td>
+<td>The Harvest Matron (boss)</td>
+<td>37</td>
+<td>12.5 K</td>
+<td>52</td>
+<td>80</td>
+<td>0.33</td>
+<td>37-40 -&gt; 44-47</td>
+</tr>
+<tr>
+<td>orchard</td>
+<td>Greenscale Warden</td>
+<td>1</td>
+<td>611</td>
+<td>10</td>
+<td>6</td>
+<td>0.4</td>
+<td>20-22 -&gt; 24-26</td>
+</tr>
+<tr>
+<td>orchard</td>
+<td>Blossom Ronin</td>
+<td>1</td>
+<td>376</td>
+<td>15</td>
+<td>6</td>
+<td>0.6</td>
+<td>20-22 -&gt; 24-26</td>
+</tr>
+<tr>
+<td>orchard</td>
+<td>Gray Gleaner</td>
+<td>1</td>
+<td>470</td>
+<td>12</td>
+<td>6</td>
+<td>0.5</td>
+<td>20-22 -&gt; 24-26</td>
+</tr>
+<tr>
+<td>orchard</td>
+<td>The Blossom Reaper (boss)</td>
+<td>42</td>
+<td>16.5 K</td>
+<td>64</td>
+<td>98</td>
+<td>0.33</td>
+<td>42-45 -&gt; 49-52</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>Gasket Goblin</td>
+<td>1</td>
+<td>550</td>
+<td>14</td>
+<td>7.5</td>
+<td>0.5</td>
+<td>23-25 -&gt; 27-29</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>Blighted Husk</td>
+<td>1</td>
+<td>715</td>
+<td>11</td>
+<td>7.5</td>
+<td>0.4</td>
+<td>23-25 -&gt; 27-29</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>Mothwing Hexer</td>
+<td>1</td>
+<td>440</td>
+<td>17</td>
+<td>7.5</td>
+<td>0.6</td>
+<td>23-25 -&gt; 27-29</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>Gloom Cerberus</td>
+<td>1</td>
+<td>1,100</td>
+<td>20</td>
+<td>15.5</td>
+<td>0.45</td>
+<td>23-25 -&gt; 27-29</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>The Eyed Maw (boss)</td>
+<td>47</td>
+<td>21.5 K</td>
+<td>78</td>
+<td>118</td>
+<td>0.33</td>
+<td>47-50 -&gt; 54-57</td>
+</tr>
+<tr>
+<td>battlefield</td>
+<td>Bone Cleaver</td>
+<td>1</td>
+<td>640</td>
+<td>15</td>
+<td>9</td>
+<td>0.5</td>
+<td>26-28 -&gt; 30-32</td>
+</tr>
+<tr>
+<td>battlefield</td>
+<td>Frostguard Knight</td>
+<td>1</td>
+<td>832</td>
+<td>12</td>
+<td>9</td>
+<td>0.4</td>
+<td>26-28 -&gt; 30-32</td>
+</tr>
+<tr>
+<td>battlefield</td>
+<td>Gilded Champion</td>
+<td>1</td>
+<td>512</td>
+<td>19</td>
+<td>9</td>
+<td>0.6</td>
+<td>26-28 -&gt; 30-32</td>
+</tr>
+<tr>
+<td>battlefield</td>
+<td>The Cinder Warlord (boss)</td>
+<td>52</td>
+<td>28 K</td>
+<td>95</td>
+<td>140</td>
+<td>0.33</td>
+<td>52-55 -&gt; 59-62</td>
+</tr>
 </tbody></table>
 </article><h2>Level scaling</h2><article><p><a id="monsterstats"></a></p>
 <h3><code>monsterStats</code> <small>function</small></h3>
@@ -2972,7 +3162,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by <a href="#bandof"><code>bandOf</code></a>. No spawn rule reads them yet.</p>
 </article><article><p><a id="boss-min-distance"></a></p>
 <h3><code>BOSS_MIN_DISTANCE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:402</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:482</code></a></p>
 <p>The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts&#39; start (7), and the band is open-ended (<code>BOSS_MAX_DISTANCE</code> is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">boss tile: BOSS_MIN_DISTANCE (8) &lt;= castle distance &lt;= BOSS_MAX_DISTANCE; normal monster tile: 2 &lt;= castle distance &lt;= 9
@@ -3069,6 +3259,34 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>430</td>
 <td>1.08</td>
 </tr>
+<tr>
+<td>fields</td>
+<td>250</td>
+<td>4,000</td>
+<td>560</td>
+<td>1.08</td>
+</tr>
+<tr>
+<td>orchard</td>
+<td>290</td>
+<td>5,200</td>
+<td>720</td>
+<td>1.08</td>
+</tr>
+<tr>
+<td>blight</td>
+<td>330</td>
+<td>6,600</td>
+<td>900</td>
+<td>1.08</td>
+</tr>
+<tr>
+<td>battlefield</td>
+<td>380</td>
+<td>8,400</td>
+<td>1,150</td>
+<td>1.08</td>
+</tr>
 </tbody></table>
 </article></section><section class="cat"><h2 class="cat" id="cat-loot">Loot</h2><p class="blurb">The loot pipeline, rarities, affixes, sets, sell values and how to add content.</p><h2>Pipeline</h2><article><p><a id="generateloot"></a></p>
 <h3><code>generateLoot</code> <small>function</small></h3>
@@ -3135,7 +3353,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 </code></pre>
 </article><h2>Config</h2><article><p><a id="loot-sources"></a></p>
 <h3><code>LOOT_SOURCES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:401</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:410</code></a></p>
 <p>Keyed by the <code>DropSource</code> (a monster type, <code>chest</code> or the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45).</p>
 <p>Sources, keyed by the <code>DropSource</code> (a monster&#39;s biome source <code>monster_&lt;biome&gt;</code>, <code>boss</code>, <code>chest</code>, the merchant&#39;s <code>merchant</code> shelf). A monster&#39;s drops are at its own level (monsters 1-30, bosses 15-45); a chest and the shelf
 start at item level 4 plus 3 per castle level above 1.</p>
@@ -3194,6 +3412,26 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>the caller&#39;s level, range 14-32</td>
 </tr>
 <tr>
+<td>monster_fields</td>
+<td>normal_monster_fields</td>
+<td>the caller&#39;s level, range 17-35</td>
+</tr>
+<tr>
+<td>monster_orchard</td>
+<td>normal_monster_orchard</td>
+<td>the caller&#39;s level, range 20-38</td>
+</tr>
+<tr>
+<td>monster_blight</td>
+<td>normal_monster_blight</td>
+<td>the caller&#39;s level, range 23-41</td>
+</tr>
+<tr>
+<td>monster_battlefield</td>
+<td>normal_monster_battlefield</td>
+<td>the caller&#39;s level, range 26-44</td>
+</tr>
+<tr>
 <td>boss</td>
 <td>boss</td>
 <td>the caller&#39;s level, range 15-45</td>
@@ -3239,6 +3477,26 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>the caller&#39;s level, range 32-52</td>
 </tr>
 <tr>
+<td>boss_fields</td>
+<td>boss_fields</td>
+<td>the caller&#39;s level, range 37-57</td>
+</tr>
+<tr>
+<td>boss_orchard</td>
+<td>boss_orchard</td>
+<td>the caller&#39;s level, range 42-62</td>
+</tr>
+<tr>
+<td>boss_blight</td>
+<td>boss_blight</td>
+<td>the caller&#39;s level, range 47-67</td>
+</tr>
+<tr>
+<td>boss_battlefield</td>
+<td>boss_battlefield</td>
+<td>the caller&#39;s level, range 52-72</td>
+</tr>
+<tr>
 <td>chest</td>
 <td>basic_chest</td>
 <td>own level: 4 + 3 per castle level above 1</td>
@@ -3256,7 +3514,7 @@ start at item level 4 plus 3 per castle level above 1.</p>
 </tbody></table>
 </article><article><p><a id="loot-profiles"></a></p>
 <h3><code>LOOT_PROFILES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:340</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:349</code></a></p>
 <p>Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster&#39;s profile is copied per biome and draws from that biome&#39;s pool. All numbers are STARTING POINTS to be tuned with <code>npm run loot-sim -- --md</code>.</p>
 <p><strong>Loot profiles</strong> <em>(computed from the code)</em></p>
 <table>
@@ -3333,6 +3591,34 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>rat_potion (potions_rat, fixed, 25%)</td>
 </tr>
 <tr>
+<td>normal_monster_fields</td>
+<td>1 x 12% +1%/level from equipment_fields</td>
+<td>source level +0 +-1</td>
+<td>common 70, uncommon 22, rare 7, epic 1, legendary 0.2</td>
+<td>rat_potion (potions_rat, fixed, 25%)</td>
+</tr>
+<tr>
+<td>normal_monster_orchard</td>
+<td>1 x 12% +1%/level from equipment_orchard</td>
+<td>source level +0 +-1</td>
+<td>common 70, uncommon 22, rare 7, epic 1, legendary 0.2</td>
+<td>rat_potion (potions_rat, fixed, 25%)</td>
+</tr>
+<tr>
+<td>normal_monster_blight</td>
+<td>1 x 12% +1%/level from equipment_blight</td>
+<td>source level +0 +-1</td>
+<td>common 70, uncommon 22, rare 7, epic 1, legendary 0.2</td>
+<td>rat_potion (potions_rat, fixed, 25%)</td>
+</tr>
+<tr>
+<td>normal_monster_battlefield</td>
+<td>1 x 12% +1%/level from equipment_battlefield</td>
+<td>source level +0 +-1</td>
+<td>common 70, uncommon 22, rare 7, epic 1, legendary 0.2</td>
+<td>rat_potion (potions_rat, fixed, 25%)</td>
+</tr>
+<tr>
 <td>boss</td>
 <td>1 x 100%, 1 guaranteed from boss_general</td>
 <td>source level +0 +-0</td>
@@ -3396,6 +3682,34 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>king_potions (potions_king, fixed)</td>
 </tr>
 <tr>
+<td>boss_fields</td>
+<td>1 x 100%, 1 guaranteed from boss_general_fields</td>
+<td>source level +0 +-0</td>
+<td>common 20, uncommon 30, rare 30, epic 15, legendary 5</td>
+<td>king_potions (potions_king, fixed)</td>
+</tr>
+<tr>
+<td>boss_orchard</td>
+<td>1 x 100%, 1 guaranteed from boss_general_orchard</td>
+<td>source level +0 +-0</td>
+<td>common 20, uncommon 30, rare 30, epic 15, legendary 5</td>
+<td>king_potions (potions_king, fixed)</td>
+</tr>
+<tr>
+<td>boss_blight</td>
+<td>1 x 100%, 1 guaranteed from boss_general_blight</td>
+<td>source level +0 +-0</td>
+<td>common 20, uncommon 30, rare 30, epic 15, legendary 5</td>
+<td>king_potions (potions_king, fixed)</td>
+</tr>
+<tr>
+<td>boss_battlefield</td>
+<td>1 x 100%, 1 guaranteed from boss_general_battlefield</td>
+<td>source level +0 +-0</td>
+<td>common 20, uncommon 30, rare 30, epic 15, legendary 5</td>
+<td>king_potions (potions_king, fixed)</td>
+</tr>
+<tr>
 <td>basic_chest</td>
 <td>1 x 82% from general_equipment</td>
 <td>source level +0 +-1</td>
@@ -3432,7 +3746,7 @@ The highest live grade is open at the top and takes every rarity (<a href="#grad
 The merchant&#39;s shelf passes <code>maxGrade</code> = the best grade the player wears (<a href="#bestworngrade"><code>bestWornGrade</code></a>).</p>
 </article><article><p><a id="boss-loot"></a></p>
 <h3><code>BOSS_LOOT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:210</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:215</code></a></p>
 <p>Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome&#39;s boss has a source of its own (<code>boss_&lt;biome&gt;</code>, profile <code>boss_&lt;biome&gt;</code>) with</p>
 <ul>
 <li>a guaranteed general roll from its own general pool (<code>boss_general_&lt;biome&gt;</code>: no named item, no set piece; the grades the biome&#39;s monsters drop up to the ceiling, at the boss&#39;s level),</li>
@@ -3510,6 +3824,34 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 <td>none yet</td>
 <td>none yet (open sets still in the general pools: obsidian)</td>
 <td>boss_general_jungle</td>
+</tr>
+<tr>
+<td>boss_fields</td>
+<td>37-57</td>
+<td>none yet</td>
+<td>none yet (open sets still in the general pools: obsidian)</td>
+<td>boss_general_fields</td>
+</tr>
+<tr>
+<td>boss_orchard</td>
+<td>42-62</td>
+<td>none yet</td>
+<td>none yet (open sets still in the general pools: obsidian)</td>
+<td>boss_general_orchard</td>
+</tr>
+<tr>
+<td>boss_blight</td>
+<td>47-67</td>
+<td>none yet</td>
+<td>none yet (open sets still in the general pools: obsidian)</td>
+<td>boss_general_blight</td>
+</tr>
+<tr>
+<td>boss_battlefield</td>
+<td>52-72</td>
+<td>none yet</td>
+<td>none yet (open sets still in the general pools: obsidian)</td>
+<td>boss_general_battlefield</td>
 </tr>
 </tbody></table>
 </article><h2>Items</h2><article><p><a id="rarities"></a></p>
@@ -3636,7 +3978,7 @@ so owned pieces load and work. The starter sword and shield are still what a new
 <p>Test and simulation helper: a full kit of one ladder grade, so fight balance (<code>fight-sim</code>, <code>monster-ladder</code>, <code>fightBalance</code>) is pinned to grades rather than to named legacy sets.</p>
 </article><h2>Adding content</h2><article><p><a id="loot-pools"></a></p>
 <h3>Adding loot content (data only)</h3>
-<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:301</code></a></p>
+<p>Source: <a href="../../src/catalog/lootConfig.ts"><code>src/catalog/lootConfig.ts:310</code></a></p>
 <p>Adding loot content is data only; the generator needs no change.</p>
 <ul>
 <li><strong>A base item</strong>: add <code>gear(id, name, slot, rarity, stats, { tier, ... })</code> (<a href="#gear"><code>gear</code></a>) to a file in <code>src/catalog/items/</code>. Its stats are authored at the first level of its tier&#39;s window (<code>LEVEL_WINDOW_BY_TIER</code>).
@@ -3652,7 +3994,7 @@ It joins the general pool automatically (tags <code>gear</code>, not <code>named
 <p>See also: <a href="#gear"><code>gear</code></a>, <a href="#rarities"><code>RARITIES</code></a>, <a href="#loot-sources"><code>LOOT_SOURCES</code></a></p>
 </article><article><p><a id="gear"></a></p>
 <h3><code>gear</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/items/define.ts"><code>src/catalog/items/define.ts:101</code></a></p>
+<p>Source: <a href="../../src/catalog/items/define.ts"><code>src/catalog/items/define.ts:105</code></a></p>
 <p>The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier&#39;s window (<code>LEVEL_WINDOW_BY_TIER</code>: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).</p>
 </article><h2>Junk</h2><article><p><a id="isjunk"></a></p>
 <h3><code>isJunk</code> <small>function</small></h3>
@@ -4323,7 +4665,7 @@ Ties are broken in this order:</p>
 <p>The change since the refresh before: a lower number is a better place, so a smaller rank is <code>up</code>; no earlier place is <code>new</code>.</p>
 </article><h2>Avatars</h2><article><p><a id="unlockedavatarids"></a></p>
 <h3><code>unlockedAvatarIds</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:163</code></a></p>
+<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:174</code></a></p>
 <p>The avatar ids an account may use: every starter plus each unlockable whose achievement is in <code>earned</code>. Unknown achievement ids are ignored.</p>
 </article><article><p><a id="checkavatar"></a></p>
 <h3><code>checkAvatar</code> <small>function</small></h3>
@@ -4333,7 +4675,7 @@ one needs its achievement among <code>earned</code> (the account&#39;s <code>pla
 Used by register, <code>POST /api/auth/profile</code>, <code>POST /api/auth/avatar</code> and the new-chapter reset. The client&#39;s own idea of what is unlocked is never trusted.</p>
 </article><article><p><a id="class-avatars"></a></p>
 <h3><code>CLASS_AVATARS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:113</code></a></p>
+<p>Source: <a href="../../src/catalog/avatars.ts"><code>src/catalog/avatars.ts:124</code></a></p>
 <p>The two starter avatars each class owns, derived from <code>classId</code> on the catalog entries (warrior: Knight + Miner, paladin: Alchemist + Farmer, ranger: Scout + Bard, mage: Druid + Scholar); every starter belongs to exactly one class.
 Only that class can wear them (<code>checkAvatar</code>). The first of the two is the class&#39;s <strong>default avatar</strong> (<code>CLASS_DEFAULT_AVATAR</code>).</p>
 </article><article><p><a id="avatarinfo"></a></p>
@@ -4344,7 +4686,7 @@ belongs to ONE class (<code>classId</code>; two per class, <a href="#class-avata
 rewards and show the other classes&#39; starters disabled (&quot;Needs the <Class> class&quot;). The <strong>unlockables</strong> are classless rewards of server-side achievements (the id of the achievement is <code>unlockedBy</code>): any class wears them once earned.
 Rules, all enforced on the server (<code>checkAvatar</code> in <code>lib/authValidation.ts</code>, the only place that decides): the id has to be in this catalog, a starter has to belong to the profile&#39;s class, and an unlockable one has to be among the
 achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class&#39;s default (<code>fitAvatar</code>). The chosen id lives in <code>profiles.avatar_id</code> (null = none chosen yet, the hero&#39;s class bust is shown), which only the service role writes.</p>
-<p><strong>Art.</strong> The owner&#39;s framed busts (64x64, <code>public/pixel/new_assets/heroes/&lt;portrait&gt;.png</code>, listed in <code>public/pixel/new_assets/README.md</code>) are the portraits; <code>avatarArtUrl</code> is the only place that
+<p><strong>Art.</strong> The owner&#39;s framed busts (64x64, <code>public/pixel/ui/heroes/&lt;portrait&gt;.png</code>, listed in <code>public/pixel/README.md</code>) are the portraits; <code>avatarArtUrl</code> is the only place that
 builds the path, so a new picture is a change to the <code>portrait</code> field. The horned busts not used here stay in the pool for later unlocks. The <strong>Beta tester</strong> is the reward of the Beta tester achievement (a wireframe bust), which every Early tester gets too. A locked avatar is shown as a black
 cut-out of its own picture (generated in <code>AvatarArt</code>, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.</p>
 </article><article><p><a id="createavatarpicker"></a></p>
@@ -5709,7 +6051,7 @@ The animated <strong>Rainbow</strong> (<code>NICK_RAINBOW</code>) is a separate 
 Stored on <code>profiles.name_color</code> like a plain colour; the look of each is the <code>.ds-nick-&lt;id&gt;</code> class of the design system.</p>
 </article><article><p><a id="badgeoptions"></a></p>
 <h3><code>badgeOptions</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/badges.ts"><code>src/catalog/badges.ts:49</code></a></p>
+<p>Source: <a href="../../src/catalog/badges.ts"><code>src/catalog/badges.ts:56</code></a></p>
 <p>Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the <code>titleId</code> of an earned achievement.
 The choice lives on the profile (<code>badge_id</code>, <code>title_id</code>, written by the server after <code>checkBadgeChoice</code>): <code>null</code> badge = the default, <code>BADGE_NONE</code> = hidden.</p>
 </article><h2>Deeds</h2><article><p><a id="claimallachievements"></a></p>
@@ -6613,7 +6955,8 @@ Deterministic: the same seed gives the same picture. Pure: no canvas, no store.<
 <h3>Asset library</h3>
 <p>Source: <a href="../../scripts/assets/manifest.ts"><code>scripts/assets/manifest.ts:1</code></a></p>
 <p>The asset library: <code>buildManifest()</code> lists every picture the game uses or could reuse under one stable NAME, grouped by category (potions, weapons, armor,
-accessories, monsters, buildings, resources, map-details, ui, portraits, unsorted). Biomes, terrain atlases and ground textures are left out on purpose.
+accessories, monsters, buildings, resources, map-details, ui, portraits, biomes, map-ground, unsorted). Every picture under <code>public/</code> is listed (only the title cards of the village pack are skipped).
+Every entry carries one of three tags: <code>used</code> (the game loads it), <code>planned</code> (picked for a feature that is not built) or <code>unused</code> (everything else: pool art, spares, alternatives).
 Registered art keeps its registry id (item icons, monster and resource rosters, <code>pixelIcons.ts</code>); raw pack files in <code>public/pixel/assets_to_assess_and_use/</code>
 get a generated name (<code>&lt;pack&gt;_&lt;file&gt;</code>, e.g. <code>tree_autumn_tree1</code>), with shadow renderings folded into <code>variants</code>; <code>scripts/assets/names.json</code> renames any of them.
 <code>npm run assets:catalog</code> renders it into <code>docs/assets/</code> (manifest.json plus one page per category), which <code>stories/assets/</code> shows in Storybook
@@ -6628,16 +6971,16 @@ a future quest giver, innkeeper, blacksmith or dialogue.</p>
 </article><article><p><a id="biome-art"></a></p>
 <h3><code>BIOME_ART</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/biomeArt.ts"><code>src/config/biomeArt.ts:11</code></a></p>
-<p>The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in <code>public/pixel/new_assets/biomes/</code>. Today only the &quot;New land
-unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the other vignettes of the folder (alternatives, the older biomes and three extras) wait in the asset library, category Biomes.
+<p>The picture of each rebirth biome: an 80x80 framed landscape vignette (Sprite Fusion, supplied by the owner on 2026-11-10) in <code>public/pixel/ui/biomes/</code>. Only the &quot;New land
+unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the five rebirth biomes have one each, the unused vignettes were deleted on 2026-11-16.
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:252</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:245</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:267</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:260</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>

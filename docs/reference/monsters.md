@@ -17,9 +17,9 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:454`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:534`](../../src/config/combatConfig.ts)
 
-The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
+The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
 
 - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -42,10 +42,12 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | swamp | Garbage Ogre | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
 | swamp | Dumpback | 1 | 220 | 7 | 2 | 0.5 | 8-10 -> 16-18 |
 | swamp | Rot Heron | 1 | 176 | 9 | 2 | 0.6 | 8-10 -> 16-18 |
+| swamp | Scrap Golem | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
 | swamp | The Mire Matriarch (boss) | 25 | 2,800 | 21 | 32 | 0.33 | 25-28 -> 32-35 |
 | tundra | Frost Hare | 1 | 240 | 10 | 3 | 0.6 | 12-14 -> 16-18 |
 | tundra | Icetusk Calf | 1 | 390 | 6 | 3 | 0.4 | 12-14 -> 16-18 |
 | tundra | Rime Wraith | 1 | 600 | 12 | 11 | 0.45 | 12-14 -> 16-18 |
+| tundra | Frost Moth | 1 | 300 | 8 | 3 | 0.5 | 12-14 -> 16-18 |
 | tundra | The Winter Wyrm (boss) | 30 | 7,000 | 36 | 58 | 0.33 | 30-33 -> 37-40 |
 | hills | Granite Ram | 1 | 152 | 8 | 1.5 | 0.6 | 6-8 -> 14-16 |
 | hills | Cave Goblin Miner | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
@@ -63,6 +65,23 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 14-16 -> 18-20 |
 | jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 14-16 -> 18-20 |
 | jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
+| fields | Barn Gargoyle | 1 | 320 | 13 | 5 | 0.6 | 17-19 -> 21-23 |
+| fields | Bucket Knight | 1 | 520 | 8 | 5 | 0.4 | 17-19 -> 21-23 |
+| fields | Hedge Bandit | 1 | 400 | 11 | 5 | 0.5 | 17-19 -> 21-23 |
+| fields | The Harvest Matron (boss) | 37 | 12.5 K | 52 | 80 | 0.33 | 37-40 -> 44-47 |
+| orchard | Greenscale Warden | 1 | 611 | 10 | 6 | 0.4 | 20-22 -> 24-26 |
+| orchard | Blossom Ronin | 1 | 376 | 15 | 6 | 0.6 | 20-22 -> 24-26 |
+| orchard | Gray Gleaner | 1 | 470 | 12 | 6 | 0.5 | 20-22 -> 24-26 |
+| orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 64 | 98 | 0.33 | 42-45 -> 49-52 |
+| blight | Gasket Goblin | 1 | 550 | 14 | 7.5 | 0.5 | 23-25 -> 27-29 |
+| blight | Blighted Husk | 1 | 715 | 11 | 7.5 | 0.4 | 23-25 -> 27-29 |
+| blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
+| blight | Gloom Cerberus | 1 | 1,100 | 20 | 15.5 | 0.45 | 23-25 -> 27-29 |
+| blight | The Eyed Maw (boss) | 47 | 21.5 K | 78 | 118 | 0.33 | 47-50 -> 54-57 |
+| battlefield | Bone Cleaver | 1 | 640 | 15 | 9 | 0.5 | 26-28 -> 30-32 |
+| battlefield | Frostguard Knight | 1 | 832 | 12 | 9 | 0.4 | 26-28 -> 30-32 |
+| battlefield | Gilded Champion | 1 | 512 | 19 | 9 | 0.6 | 26-28 -> 30-32 |
+| battlefield | The Cinder Warlord (boss) | 52 | 28 K | 95 | 140 | 0.33 | 52-55 -> 59-62 |
 
 ## Level scaling
 
@@ -234,7 +253,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:402`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:482`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 
@@ -289,3 +308,7 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 | coast | 100 | 450 | 64 | 1.08 |
 | lake | 160 | 1,800 | 257 | 1.08 |
 | jungle | 210 | 3,000 | 430 | 1.08 |
+| fields | 250 | 4,000 | 560 | 1.08 |
+| orchard | 290 | 5,200 | 720 | 1.08 |
+| blight | 330 | 6,600 | 900 | 1.08 |
+| battlefield | 380 | 8,400 | 1,150 | 1.08 |

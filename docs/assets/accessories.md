@@ -19,7 +19,7 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g1` | <img src="../../public/pixel/items/charm/ph_g1.png" width="96" alt="art_ph_charm_g1"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g1.png` |
+| `art_ph_charm_g1` | <img src="../../public/pixel/items/charm/ph_g1.png" width="96" alt="art_ph_charm_g1"> | 64x64 | used |  | `pixel/items/charm/ph_g1.png` |
 
 ## charm G2
 
@@ -37,63 +37,63 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g4` | <img src="../../public/pixel/items/charm/ph_g4.png" width="96" alt="art_ph_charm_g4"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g4.png` |
+| `art_ph_charm_g4` | <img src="../../public/pixel/items/charm/ph_g4.png" width="96" alt="art_ph_charm_g4"> | 64x64 | used |  | `pixel/items/charm/ph_g4.png` |
 
 ## charm G5
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g5` | <img src="../../public/pixel/items/charm/ph_g5.png" width="96" alt="art_ph_charm_g5"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g5.png` |
+| `art_ph_charm_g5` | <img src="../../public/pixel/items/charm/ph_g5.png" width="96" alt="art_ph_charm_g5"> | 64x64 | used |  | `pixel/items/charm/ph_g5.png` |
 
 ## charm G6
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g6` | <img src="../../public/pixel/items/charm/ph_g6.png" width="96" alt="art_ph_charm_g6"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g6.png` |
+| `art_ph_charm_g6` | <img src="../../public/pixel/items/charm/ph_g6.png" width="96" alt="art_ph_charm_g6"> | 64x64 | used |  | `pixel/items/charm/ph_g6.png` |
 
 ## charm G7
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g7` | <img src="../../public/pixel/items/charm/ph_g7.png" width="96" alt="art_ph_charm_g7"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g7.png` |
+| `art_ph_charm_g7` | <img src="../../public/pixel/items/charm/ph_g7.png" width="96" alt="art_ph_charm_g7"> | 64x64 | used |  | `pixel/items/charm/ph_g7.png` |
 
 ## charm G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g8` | <img src="../../public/pixel/items/charm/ph_g8.png" width="96" alt="art_ph_charm_g8"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g8.png` |
+| `art_ph_charm_g8` | <img src="../../public/pixel/items/charm/ph_g8.png" width="96" alt="art_ph_charm_g8"> | 64x64 | used |  | `pixel/items/charm/ph_g8.png` |
 
 ## charm G9
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_g9` | <img src="../../public/pixel/items/charm/ph_g9.png" width="96" alt="art_ph_charm_g9"> | 64x64 | placeholder |  | `pixel/items/charm/ph_g9.png` |
+| `art_ph_charm_g9` | <img src="../../public/pixel/items/charm/ph_g9.png" width="96" alt="art_ph_charm_g9"> | 64x64 | used |  | `pixel/items/charm/ph_g9.png` |
 
 ## charm S1
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_s1` | <img src="../../public/pixel/items/charm/ph_s1.png" width="96" alt="art_ph_charm_s1"> | 64x64 | placeholder |  | `pixel/items/charm/ph_s1.png` |
+| `art_ph_charm_s1` | <img src="../../public/pixel/items/charm/ph_s1.png" width="96" alt="art_ph_charm_s1"> | 64x64 | used |  | `pixel/items/charm/ph_s1.png` |
 
 ## charm S2
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_s2` | <img src="../../public/pixel/items/charm/ph_s2.png" width="96" alt="art_ph_charm_s2"> | 64x64 | placeholder |  | `pixel/items/charm/ph_s2.png` |
+| `art_ph_charm_s2` | <img src="../../public/pixel/items/charm/ph_s2.png" width="96" alt="art_ph_charm_s2"> | 64x64 | used |  | `pixel/items/charm/ph_s2.png` |
 
 ## charm S3
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ph_charm_s3` | <img src="../../public/pixel/items/charm/ph_s3.png" width="96" alt="art_ph_charm_s3"> | 64x64 | placeholder |  | `pixel/items/charm/ph_s3.png` |
+| `art_ph_charm_s3` | <img src="../../public/pixel/items/charm/ph_s3.png" width="96" alt="art_ph_charm_s3"> | 64x64 | used |  | `pixel/items/charm/ph_s3.png` |
 
 ## neck
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
+| `art_steel_gorget` | <img src="../../public/pixel/items/neck/steel_gorget.png" width="96" alt="art_steel_gorget"> | 64x64 | planned | steel_gorget | `pixel/items/neck/steel_gorget.png` |
 | `item_cloth_amulet` | <img src="../../public/pixel/icons/item_cloth_amulet.png" width="80" alt="item_cloth_amulet"> | 40x40 | planned | cloth_amulet | `pixel/icons/item_cloth_amulet.png` |
 | `item_obsidian_pendant` | <img src="../../public/pixel/icons/item_obsidian_pendant.png" width="80" alt="item_obsidian_pendant"> | 40x40 | used | obsidian_pendant | `pixel/icons/item_obsidian_pendant.png` |
-| `item_steel_gorget` | <img src="../../public/pixel/icons/item_steel_gorget.png" width="80" alt="item_steel_gorget"> | 40x40 | planned | steel_gorget | `pixel/icons/item_steel_gorget.png` |
 | `item_wooden_pendant` | <img src="../../public/pixel/icons/item_wooden_pendant.png" width="80" alt="item_wooden_pendant"> | 40x40 | planned | wooden_pendant | `pixel/icons/item_wooden_pendant.png` |
 
 ## neck G1

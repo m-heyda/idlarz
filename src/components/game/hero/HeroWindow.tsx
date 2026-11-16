@@ -312,7 +312,7 @@ const BagCell: React.FC<{ slot: BagSlot; index: number; wornLevel: number }> = (
 };
 
 /** The picture of "more bag space": a leather pouch from the spare icons. */
-const BAG_ICON = '/pixel/reuse/valuables/coin_pouch.png';
+const BAG_ICON = '/pixel/ui/coin_pouch.png';
 
 /** The end of the bag: a click buys the next Pack Rat level (more bag slots) with gold, and the tooltip shows the level as gems, what the next one gives and what it costs. */
 const MoreSpace: React.FC = () => {

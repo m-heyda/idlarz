@@ -110,10 +110,10 @@ export interface MonsterSpawnRule {
 }
 
 /**
- * The biomes that have a monster roster today (catalog/monsters.ts): the seven home biomes and the jungle (rebirth 1). A monster stands on tiles of its own biome, water included (a coast or lake tile holds
- * a monster like any other owned tile; IDL-58), so there is no shoreline rule. Fields, orchard, blight and battlefield have no roster yet.
+ * The biomes that have a monster roster today (catalog/monsters.ts): the seven home biomes and the five rebirth biomes (jungle 1, fields 2, orchard 3, blight 4, battlefield 5). A monster stands on tiles of its own biome, water included (a coast or lake tile holds
+ * a monster like any other owned tile; IDL-58), so there is no shoreline rule. The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
  */
-type MonsterBiome = 'plains' | 'forest' | 'hills' | 'coast' | 'swamp' | 'lake' | 'tundra' | 'jungle';
+type MonsterBiome = 'plains' | 'forest' | 'hills' | 'coast' | 'swamp' | 'lake' | 'tundra' | 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlefield';
 
 export interface RewardPart {
 	rewardSec: number;
@@ -355,6 +355,86 @@ const BIOME_TIER = {
 			stunResist: 50,
 		},
 	},
+	// fields (rebirth 2): each rebirth biome is a step above the one before, normals and boss alike
+	fields: {
+		hp: 400,
+		attack: 10.5,
+		armor: 5,
+		rewardSec: 250,
+		cap: { gold: 4_000, xp: 560 },
+		window: { base: 17, perCastleLevel: 0.5, spread: 2, cap: 25 },
+		boss: {
+			hp: 12_500,
+			attack: 52,
+			armor: 80,
+			refLevel: 37,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 105,
+			window: { base: 37, perCastleLevel: 0.8, spread: 3, cap: 47 },
+			crit: 15,
+			stunResist: 55,
+		},
+	},
+	// orchard (rebirth 3)
+	orchard: {
+		hp: 470,
+		attack: 12,
+		armor: 6,
+		rewardSec: 290,
+		cap: { gold: 5_200, xp: 720 },
+		window: { base: 20, perCastleLevel: 0.5, spread: 2, cap: 28 },
+		boss: {
+			hp: 16_500,
+			attack: 64,
+			armor: 98,
+			refLevel: 42,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 110,
+			window: { base: 42, perCastleLevel: 0.8, spread: 3, cap: 52 },
+			crit: 16,
+			stunResist: 60,
+		},
+	},
+	// blight (rebirth 4)
+	blight: {
+		hp: 550,
+		attack: 13.5,
+		armor: 7.5,
+		rewardSec: 330,
+		cap: { gold: 6_600, xp: 900 },
+		window: { base: 23, perCastleLevel: 0.5, spread: 2, cap: 31 },
+		boss: {
+			hp: 21_500,
+			attack: 78,
+			armor: 118,
+			refLevel: 47,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 115,
+			window: { base: 47, perCastleLevel: 0.8, spread: 3, cap: 57 },
+			crit: 17,
+			stunResist: 65,
+		},
+	},
+	// battlefield (rebirth 5): the hardest land there is
+	battlefield: {
+		hp: 640,
+		attack: 15,
+		armor: 9,
+		rewardSec: 380,
+		cap: { gold: 8_400, xp: 1150 },
+		window: { base: 26, perCastleLevel: 0.5, spread: 2, cap: 34 },
+		boss: {
+			hp: 28_000,
+			attack: 95,
+			armor: 140,
+			refLevel: 52,
+			cap: { gold: 600_000, xp: 45_000 },
+			timeLimitSec: 120,
+			window: { base: 52, perCastleLevel: 0.8, spread: 3, cap: 62 },
+			crit: 18,
+			stunResist: 70,
+		},
+	},
 } as const satisfies Record<MonsterBiome, Tier>;
 
 /** How a normal monster fights, relative to its biome's tier */
@@ -439,7 +519,7 @@ export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
 /**
- * The roster: 32 monsters in eight biomes, three normal ones and a boss each: plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the jungle (only after the first rebirth). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). Fields, orchard, blight and battlefield have no roster yet.
+ * The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
  * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
  *
  * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -466,11 +546,13 @@ export const MONSTERS = {
 	garbageOgre: normal('swamp', 'Garbage Ogre', 'tough'),
 	dumpback: normal('swamp', 'Dumpback', 'even'),
 	rotHeron: normal('swamp', 'Rot Heron', 'fierce'),
+	scrapGolem: normal('swamp', 'Scrap Golem', 'tough'),
 	bossMireMatriarch: boss('swamp', 'The Mire Matriarch', ['The Matriarch gurgles with laughter.', 'The mire swallows the proud.']),
 	// tundra
 	frostHare: normal('tundra', 'Frost Hare', 'fierce'),
 	icetuskCalf: normal('tundra', 'Icetusk Calf', 'tough'),
 	rimeWraith: normal('tundra', 'Rime Wraith', 'elite'),
+	frostMoth: normal('tundra', 'Frost Moth', 'even'),
 	bossWinterWyrm: boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']),
 	// hills (IDL-201; placeholder art until the real sprites exist)
 	graniteRam: normal('hills', 'Granite Ram', 'fierce'),
@@ -492,4 +574,30 @@ export const MONSTERS = {
 	eyeHorror: normal('jungle', 'Eye Horror', 'fierce', 1),
 	zombieTriceratops: normal('jungle', 'Zombie Triceratops', 'tough', 1),
 	bossHardwoodColossus: boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
+	// fields (rebirth 2)
+	barnGargoyle: normal('fields', 'Barn Gargoyle', 'fierce', 2),
+	bucketKnight: normal('fields', 'Bucket Knight', 'tough', 2),
+	hedgeBandit: normal('fields', 'Hedge Bandit', 'even', 2),
+	bossHarvestMatron: boss('fields', 'The Harvest Matron', ['The Matron ruffles her scarf and clucks.', 'Every egg in the valley is hers.'], 2),
+	// orchard (rebirth 3)
+	greenscaleWarden: normal('orchard', 'Greenscale Warden', 'tough', 3),
+	blossomRonin: normal('orchard', 'Blossom Ronin', 'fierce', 3),
+	grayGleaner: normal('orchard', 'Gray Gleaner', 'even', 3),
+	bossBlossomReaper: boss('orchard', 'The Blossom Reaper', ['The Reaper lifts a scythe of blue fire.', 'Every blossom falls in its own time.'], 3),
+	// blight (rebirth 4)
+	gasketGoblin: normal('blight', 'Gasket Goblin', 'even', 4),
+	blightedHusk: normal('blight', 'Blighted Husk', 'tough', 4),
+	mothwingHexer: normal('blight', 'Mothwing Hexer', 'fierce', 4),
+	gloomCerberus: normal('blight', 'Gloom Cerberus', 'elite', 4),
+	bossEyedMaw: boss('blight', 'The Eyed Maw', ['A dozen eyes open at once.', 'The Blight does not hate you. It only hungers.'], 4),
+	// battlefield (rebirth 5)
+	boneCleaver: normal('battlefield', 'Bone Cleaver', 'even', 5),
+	frostguardKnight: normal('battlefield', 'Frostguard Knight', 'tough', 5),
+	gildedChampion: normal('battlefield', 'Gilded Champion', 'fierce', 5),
+	bossCinderWarlord: boss(
+		'battlefield',
+		'The Cinder Warlord',
+		['The Warlord drags his cleaver through the ash.', 'Kneel, or be the next to fall on this field.'],
+		5,
+	),
 } as const satisfies Record<string, MonsterDef>;

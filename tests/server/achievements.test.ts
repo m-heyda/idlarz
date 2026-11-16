@@ -329,7 +329,7 @@ test('finishing the end of the tutorial path earns the first achievement, once',
 
 test('every achievement names a badge that exists in the asset library', async () => {
 	const { existsSync } = await import('node:fs');
-	for (const a of ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/new_assets/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
+	for (const a of ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
 });
 
 // IDL-308: the Hall of Deeds flow (tiers are achievements, so earning and claiming work per tier)

@@ -1,6 +1,6 @@
 [
-	{"icon": "item_apprentice_tome", "item": "apprentice_tome", "file": null, "slot": "offHand", "weapon": "tome", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_bound_scraps", "item": "bound_scraps", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "art_apprentice_tome", "item": "apprentice_tome", "file": "offHand/apprentice_tome", "slot": "offHand", "weapon": "tome", "grade": null, "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon dragon scale bound spellbook (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"},
+	{"icon": "art_bound_scraps", "item": "bound_scraps", "file": "offHand/bound_scraps", "slot": "offHand", "weapon": "tome", "grade": "G1", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon worn leather apprentice spellbook (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"},
 	{"icon": "item_hide_primer", "item": "hide_primer", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
-	{"icon": "item_iron_codex", "item": "iron_codex", "file": null, "slot": "offHand", "weapon": "tome", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
+	{"icon": "art_iron_codex", "item": "iron_codex", "file": "offHand/iron_codex", "slot": "offHand", "weapon": "tome", "grade": "G3", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: toon blood red demonology book (cut out in __reuse/equipment/, scaled to 64 px); replaces the built 40 px icon"}
 ]

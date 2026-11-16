@@ -54,13 +54,13 @@ export const renderIndex = (m: AssetEntry[]): string => {
 		'',
 		'## Categories',
 		'',
-		'| Category | Assets | In the game | Reuse pool |',
-		'| --- | --- | --- | --- |',
+		'| Category | Assets | Used | Planned | Unused |',
+		'| --- | --- | --- | --- | --- |',
 	);
 	for (const c of CATEGORIES) {
 		const rows = m.filter((e) => e.category === c.id);
 		out.push(
-			`| [${c.title}](${c.id}.md) | ${rows.length} | ${rows.filter((e) => e.status === 'used').length} | ${rows.filter((e) => e.status === 'reuse').length} |`,
+			`| [${c.title}](${c.id}.md) | ${rows.length} | ${rows.filter((e) => e.status === 'used').length} | ${rows.filter((e) => e.status === 'planned').length} | ${rows.filter((e) => e.status === 'unused').length} |`,
 		);
 	}
 	out.push('');

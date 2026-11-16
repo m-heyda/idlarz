@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Badge, Button, DiamondLevel, DsRoot, Inset, Panel, ProgressBar, SectionLabel, WindowShell, compact } from '../index';
 
-const A = (n: string) => `/pixel/new_assets/achievements/${n}.png`;
+const A = (n: string) => `/pixel/achievements/${n}.png`;
 const E = (biome: string, n: string) => `/pixel/enemies/${biome}/${n}.png`;
 const GREEN = '#17561f';
 const INK = '#2b1d0e';
