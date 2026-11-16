@@ -317,7 +317,7 @@ export const CraftingSidebar: React.FC = () => {
 			<Queue />
 			<div className='ds-craft-smith'>
 				{/* eslint-disable-next-line @next/next/no-img-element */}
-				<img src='/pixel/new_assets/crafting/blacksmith.png' alt='' draggable={false} />
+				<img src='/pixel/ui/blacksmith.png' alt='' draggable={false} />
 			</div>
 		</Panel>
 	);

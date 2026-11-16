@@ -31,7 +31,7 @@ test('batch 2 is appended after the first batch, every tier belongs to one deed,
 		for (const id of d.tiers) assert.ok(achievementById(id), id);
 	}
 	const { existsSync } = await import('node:fs');
-	for (const a of BATCH2_ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/new_assets/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
+	for (const a of BATCH2_ACHIEVEMENTS) assert.ok(existsSync(`public/pixel/achievements/${a.badge}.png`), `${a.id}: ${a.badge}`);
 	assert.ok(
 		BATCH2_ACHIEVEMENTS.every((a) => a.id.length <= 40),
 		'ids fit the ledger reader',

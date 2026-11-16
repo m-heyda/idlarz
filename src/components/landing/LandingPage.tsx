@@ -12,7 +12,7 @@ import { nickColorValue } from '@/config/nickColors';
 import { badgePicSrc, type ShownIdentity } from '@/catalog/badges';
 import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
-import { LANDING_BG } from '@/config/landing';
+import { LANDING_BG, LANDING_LOGO } from '@/config/landing';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { fetchCloud, readLink } from '@/lib/cloudClient';
 import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
@@ -293,6 +293,8 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 			<div className='ld-bg' style={{ backgroundImage: `url(${LANDING_BG})` }} aria-hidden='true' />
 			<div className='ld-shade' aria-hidden='true' />
 			<h1 className='sr-only'>{GAME_TITLE}</h1>
+			{/* eslint-disable-next-line @next/next/no-img-element */}
+			<img className='ld-logo' src={LANDING_LOGO} alt='' aria-hidden='true' draggable={false} />
 
 			<div className='ld-layout'>
 				<ChangelogWindow entries={changelog} collapsed={collapsed} canCollapse={wide} onToggle={() => setLogPeek((p) => !p)} />

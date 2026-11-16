@@ -28,10 +28,11 @@ import {
 	Stat,
 	Tabs,
 	UpgradeTile,
+	ComingSoon,
 	WindowShell,
 } from '../index';
 
-const I = (n: string) => `/pixel/icons/${n}.png`;
+const I = (n: string) => `/pixel/${n.startsWith('menu_') ? 'ui' : 'icons'}/${n}.png`;
 
 const meta = {
 	title: 'Design System/Components',
@@ -173,7 +174,7 @@ export const SmallParts: Story = {
 				<Badge count={3} />
 			</div>
 			<div style={{ display: 'flex', gap: 8 }}>
-				<IconButton icon={I('menu_character')} label='Hero' badge={1} />
+				<IconButton icon={I('menu_equipment')} label='Hero' badge={1} />
 				<IconButton icon={I('menu_merchant')} label='Merchant' />
 			</div>
 			<HintTooltip title='Organise bag' text='Stacks potions, sorts gear by slot.' />
@@ -279,8 +280,25 @@ export const MenuDock: Story = {
 		<Dock>
 			<IconButton icon={I('menu_equipment')} label='Hero' badge={1} />
 			<IconButton icon={I('menu_merchant')} label='Merchant' badge={8} />
-			<IconButton icon={I('menu_farm')} label='Realm' />
+			<IconButton icon={I('menu_farm')} label='Farm' badge={1} />
+			<IconButton icon={I('menu_bestiary')} label='Bestiary' />
+			<IconButton icon={I('menu_gems_pouch')} label='Gems' />
+			<IconButton icon={I('menu_achievements')} label='Deeds' badge={1} />
+			<IconButton icon={I('menu_rankings')} label='Rankings' />
+			<IconButton icon={I('menu_legacy')} label='Rebirth' />
+			<IconButton icon={I('menu_boss')} label='Boss' />
 		</Dock>
+	),
+};
+
+/** The Boss window: a coming-soon placeholder for the world boss (players will offer a material to summon it together). The 64 px icon is drawn at its own size so it stays sharp. */
+export const BossWindow: Story = {
+	render: () => (
+		<div style={{ paddingTop: 20 }}>
+			<WindowShell title='Boss' width={560} height={420}>
+				<ComingSoon title='World boss' icon={I('menu_boss')} text='World boss spawns coming soon.' />
+			</WindowShell>
+		</div>
 	),
 };
 

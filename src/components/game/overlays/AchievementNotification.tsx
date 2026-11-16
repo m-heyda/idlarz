@@ -26,7 +26,7 @@ const AchievementNotification: React.FC<Props> = ({ achievementId, onClose }) =>
 		<div className='ds-root ds-toast ds-toast-row achv-toast' role='status' style={{ cursor: 'pointer' }} onClick={onClose}>
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img
-				src={`/pixel/new_assets/achievements/${def.badge}.png`}
+				src={`/pixel/achievements/${def.badge}.png`}
 				alt=''
 				width={44}
 				height={44}

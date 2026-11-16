@@ -19,7 +19,6 @@ import { formatRest, useRestCountdown } from '@/hooks/useRestCountdown';
 import MonsterArt from '../MonsterArt';
 import NotifyDot from '../NotifyDot';
 import CombatPanel, { drainMs, type FloatNumber } from './CombatPanel';
-import PixelIcon from '../PixelIcon';
 import type { FightView } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
 
@@ -266,7 +265,8 @@ const CombatWidget: React.FC = () => {
 				>
 					<span className='combat-icon-art' aria-hidden>
 						<MonsterArt type={type} scale={2} />
-						{slain && <PixelIcon name='skull' scale={0.5} className='combat-icon-skull' />}
+						{/* eslint-disable-next-line @next/next/no-img-element */}
+						{slain && <img src='/fx/dead.png' alt='' width={24} height={24} draggable={false} className='combat-icon-skull' />}
 						{fight && <span className='combat-icon-level'>{monsterLevel}</span>}
 					</span>
 					{monsterPct !== null && (

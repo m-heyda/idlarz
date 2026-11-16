@@ -7,7 +7,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
  * Rules, all enforced on the server (`checkAvatar` in `lib/authValidation.ts`, the only place that decides): the id has to be in this catalog, a starter has to belong to the profile's class, and an unlockable one has to be among the
  * achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
  *
- * **Art.** The owner's framed busts (64x64, `public/pixel/new_assets/heroes/<portrait>.png`, listed in `public/pixel/new_assets/README.md`) are the portraits; `avatarArtUrl` is the only place that
+ * **Art.** The owner's framed busts (64x64, `public/pixel/ui/heroes/<portrait>.png`, listed in `public/pixel/README.md`) are the portraits; `avatarArtUrl` is the only place that
  * builds the path, so a new picture is a change to the `portrait` field. The horned busts not used here stay in the pool for later unlocks. The **Beta tester** is the reward of the Beta tester achievement (a wireframe bust), which every Early tester gets too. A locked avatar is shown as a black
  * cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
  *
@@ -26,7 +26,7 @@ export interface AvatarInfo {
 	unlockedBy?: string;
 	/** How to earn it (shown on the locked card) */
 	how?: string;
-	/** The picture: file name (no extension) of a framed bust in `public/pixel/new_assets/heroes/` */
+	/** The picture: file name (no extension) of a framed bust in `public/pixel/ui/heroes/` */
 	portrait: string;
 	/** One or two lines about this face (the creation screens and the Avatar window) */
 	bio: string;
@@ -101,6 +101,17 @@ export const AVATARS: readonly AvatarInfo[] = [
 		...unlock('admin', 'Admin', ADMIN_UNLOCK, 'Only for the game admin', 'avatar_admin', 'The game itself, keeping an eye on the realm.'),
 		adminOnly: true,
 	},
+	{
+		...unlock(
+			'admin_hooded',
+			'Hooded',
+			ADMIN_UNLOCK,
+			'Only for the game admin',
+			'avatar_admin_hooded',
+			'A hooded stranger with no face. Nobody has seen who is under it.',
+		),
+		adminOnly: true,
+	},
 ];
 
 /**
@@ -148,7 +159,7 @@ export const resolveAvatar = (id: string | null | undefined, playerClass: Player
 export const artAvatar = (id: string | null | undefined, playerClass: PlayerClassId): AvatarInfo => avatarById(id) ?? resolveAvatar(null, playerClass);
 
 /** The served picture of an avatar */
-export const avatarArtUrl = (avatar: AvatarInfo): string => `/pixel/new_assets/heroes/${avatar.portrait}.png`;
+export const avatarArtUrl = (avatar: AvatarInfo): string => `/pixel/ui/heroes/${avatar.portrait}.png`;
 
 export const AVATAR_BY_ID: ReadonlyMap<string, AvatarInfo> = new Map(AVATARS.map((avatar) => [avatar.id, avatar]));
 

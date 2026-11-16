@@ -8,7 +8,7 @@ Builds the old pixel assets.   python scripts/pixel/build.py --legacy [name ...]
   public/pixel/icons/  sprites (resources, menu, equipment, portraits, animals, gold shine strip); the item_* ones are listed in
                        src/config/itemIcons/*.json (the item icon registry, checked by item_registry.py before the build)
   public/pixel/ui/     frames, header chrome, stone XP bar
-  public/pixel/bg/     cracked-stone header tile, fog mist, biome ground swatches (dialogs, farm stage)
+  public/pixel/bg/     cracked-stone header tile, fog mist (the biome ground swatches are `terrain/tex_<biome>.png`)
   public/pixel/terrain/ dual-grid map terrain: textures, shape atlases, sprite atlas (+ src/config/terrainAtlas.json)
   scripts/pixel/previews/  contact sheets for review (git-ignored)
   --refs                   also refresh the curated images in scripts/pixel/reference/
@@ -89,8 +89,6 @@ BG = {
     'crack': fog.crack_tile,
     'fog_a': ground_art.fog,
     'fog_b': lambda: ground_art.fog(size=64, seed=11, tint=(110, 170, 190), thresholds=(0.44, 0.52, 0.60), alphas=(10, 22, 36)),
-    **{f'ground_{name}': (lambda n=name: terrain_art.texture(n))      # swatches for dialogs / the farm stage
-       for name in ('forest', 'plains', 'hills', 'swamp', 'tundra', 'lake', 'coast', 'castle', 'yard')},
 }
 
 

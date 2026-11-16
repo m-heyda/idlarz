@@ -133,6 +133,11 @@ export const BIOME_LOOT = {
 	lake: { ceiling: 5, levels: { min: 10, max: 29 } },
 	// the jungle follows the tundra's band (rebirth 1 players wear the best grades there are)
 	jungle: { ceiling: 7, levels: { min: 14, max: 32 } },
+	// fields to battlefield: the spawn window's base to its cap plus the 10 levels of growth, each a step above the biome before
+	fields: { ceiling: 7, levels: { min: 17, max: 35 } },
+	orchard: { ceiling: 7, levels: { min: 20, max: 38 } },
+	blight: { ceiling: 7, levels: { min: 23, max: 41 } },
+	battlefield: { ceiling: 7, levels: { min: 26, max: 44 } },
 } as const satisfies Record<string, { ceiling: number; levels: { min: number; max: number } }>;
 export type LootBiome = keyof typeof BIOME_LOOT;
 
@@ -217,6 +222,10 @@ export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	hills: { uniques: [], setId: null, levels: { min: 22, max: 42 } },
 	lake: { uniques: [], setId: null, levels: { min: 27, max: 47 } },
 	jungle: { uniques: [], setId: null, levels: { min: 32, max: 52 } },
+	fields: { uniques: [], setId: null, levels: { min: 37, max: 57 } },
+	orchard: { uniques: [], setId: null, levels: { min: 42, max: 62 } },
+	blight: { uniques: [], setId: null, levels: { min: 47, max: 67 } },
+	battlefield: { uniques: [], setId: null, levels: { min: 52, max: 72 } },
 };
 
 /** A boss's chance per kill of its unique, and the bad-luck protection on it (the numbers of the old single boss table: 5 %, +1 % per miss up to +10 %) */

@@ -17,6 +17,7 @@ import { ITEM_ART_SIZE, ITEM_ICON_SIZE, ITEM_ICONS } from './itemIcons';
 const PIXEL_ICON_DIR = '/pixel/icons';
 const ITEM_ART_DIR = '/pixel/items';
 const CASTLE_ART_DIR = '/pixel/castles';
+const UI_ART_DIR = '/pixel/ui';
 
 export { ITEM_ART_SIZE };
 
@@ -50,9 +51,6 @@ const BASE_ICON_SIZES = {
 	// the premium currency
 	diamond: [40, 40],
 	// menu buttons + badges
-	menu_character: [40, 40],
-	menu_main: [40, 40],
-	menu_stats: [40, 40],
 	// Sprite Fusion menu buttons, 64x64 on a stone slab (scripts/pixel/sprites_menu_art.py). The header scales them down until the menu is reworked; achievements, settings and gems_pouch (the Gem shop button) are wired; glossary and bag_scroll are not wired yet
 	menu_equipment: [64, 64],
 	menu_merchant: [64, 64],
@@ -64,6 +62,7 @@ const BASE_ICON_SIZES = {
 	menu_glossary: [64, 64],
 	menu_gems_pouch: [64, 64],
 	menu_bag_scroll: [64, 64],
+	menu_boss: [64, 64], // the purple crystal face in a frame (the Boss button; file in ui/)
 	menu_bestiary: [64, 64], // the stone slab with a stag silhouette (the Bestiary button)
 	rank_trophy: [64, 64], // the gold trophy of the Rankings: first place as it is, second and third place recoloured to silver and bronze with CSS (`.ds-rank-trophy`)
 	menu_rankings: [64, 64], // the stone slab with the red and gold medal (the Rankings button): the clean slab of the other menu buttons with the medal on it
@@ -76,7 +75,6 @@ const BASE_ICON_SIZES = {
 	water_boat: [40, 18], // 2 frames of 20x18: a sailboat; WaterLayer drifts it over open water
 	water_dolphin: [120, 24], // 5 poses of 24x24 of a leaping dolphin; WaterLayer moves the pose along the arc
 	water_splash: [80, 8], // 4 frames of 20x8: the ring where the dolphin leaves and enters the water
-	level_orb: [24, 24],
 	xp: [40, 40],
 	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips
 	chest_map: [48, 40], // the map pickup: chest on a grass patch
@@ -101,14 +99,9 @@ const BASE_ICON_SIZES = {
 	res_mana: [40, 40],
 	res_crystal: [40, 40],
 	res_sapphire: [40, 40],
-	res_shard: [40, 40],
 	res_mystery: [40, 40],
 	unknown: [11, 14],
 	// portraits: full figure per hero class
-	hero_warrior: [56, 80],
-	hero_paladin: [56, 80],
-	hero_ranger: [56, 80],
-	hero_mage: [56, 80],
 	// equipment slots
 	equip_head: [40, 40],
 	equip_shoulder: [40, 40],
@@ -124,7 +117,6 @@ const BASE_ICON_SIZES = {
 	equip_feet: [40, 40],
 	equip_ring: [40, 40],
 	// monsters: 2-frame idle sheets (frame width x 2)
-	skull: [40, 40], // lies over a dead monster in the minimized combat box
 	// castles: castle_1..castle_10 (one per upgrade level) and castle_skin_1..7 (premium skins, not wired yet) live in public/pixel/castles.
 	// 64px, drawn centred on the 48px castle tile so they spill 8px over the neighbours.
 	castle_1: [64, 64],
@@ -186,7 +178,8 @@ export const isItemArt = (name: string): name is ItemArtName => ITEM_ART_FILES.h
 
 export const pixelIconSrc = (name: PixelIconName) => {
 	if (isItemArt(name)) return `${ITEM_ART_DIR}/${ITEM_ART_FILES.get(name)}.png`;
-	return `${name.startsWith('castle_') ? CASTLE_ART_DIR : PIXEL_ICON_DIR}/${name}.png`;
+	const dir = name.startsWith('castle_') ? CASTLE_ART_DIR : name.startsWith('menu_') ? UI_ART_DIR : PIXEL_ICON_DIR;
+	return `${dir}/${name}.png`;
 };
 
 // Resource key -> sprite. Resources without an entry fall back to their emoji.
@@ -308,6 +301,5 @@ export const RESERVED_RESOURCES: Record<string, PixelIconName> = {
 	mana: 'res_mana',
 	crystal: 'res_crystal',
 	sapphire: 'res_sapphire',
-	abilityShard: 'res_shard',
 	randomItem: 'res_mystery',
 };

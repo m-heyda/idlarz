@@ -110,11 +110,7 @@ export const NickName: React.FC<{ children: React.ReactNode; color?: string | nu
 const NICK_EFFECT_IDS = ['gold', 'rainbow', 'aurora', 'ember', 'frost', 'void', 'galaxy'];
 
 /** The admin octopus badge: an 8 frame sprite sheet (`src`, square frames of `size` px) that plays in a loop. It is the Dev badge the game admin's account can pick (`ADMIN_BADGE`), drawn wherever a badge is. */
-export const AdminMark: React.FC<{ src?: string; size?: number; label?: string }> = ({
-	src = '/pixel/new_assets/admin/admin_mark.png',
-	size = 28,
-	label = 'Dev',
-}) => (
+export const AdminMark: React.FC<{ src?: string; size?: number; label?: string }> = ({ src = '/pixel/ui/admin/admin_mark.png', size = 28, label = 'Dev' }) => (
 	<span
 		className='ds-admin-mark'
 		role='img'

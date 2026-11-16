@@ -94,10 +94,10 @@ export interface IntroPage {
 }
 
 export const GUIDE_NAME = 'Brother Alder';
-export const GUIDE_SPRITE = '/pixel/reuse/misc/sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png';
+export const GUIDE_SPRITE = '/pixel/ui/alder.png';
 export const GUIDE_SPRITE_PX = 67;
 /** Two frames side by side (closed mouth | open mouth), drawn from `GUIDE_SPRITE` by `scripts/guide-sprite.ts`; the bubble alternates them while the text is typed. */
-export const GUIDE_TALK_SHEET = '/pixel/guide/alder_talk.png';
+export const GUIDE_TALK_SHEET = '/pixel/ui/alder_talk.png';
 
 /** Shown dimmed, on the first start of a chapter. Recorded in the progress as `INTRO_ID`. */
 export const INTRO_ID = 'intro';

@@ -1,6 +1,6 @@
 # Assets to assess and use
 
-Art that was added for later features and is **not used by the game yet**. Nothing reads these files; they are not registered in `src/config/pixelIcons.ts` or the item icon registry. Each folder has its own README with what is inside, the size, and what to use it for. Assessed 2026-11-09. The game's map tile is 48 px (`TILE_SIZE` in `src/config/biomes.ts`).
+Art that was added for later features and is **not used by the game yet**. Nothing reads these files; they are not registered in `src/config/pixelIcons.ts` or the item icon registry. Each folder has its own README with what is inside, the size, and what to use it for. Assessed 2026-11-09, trimmed 2026-11-16 (the `misc` pack and the `potions` pack were removed from the repository; the registered potion icons live in `items/consumable/`). The game's map tile is 48 px (`TILE_SIZE` in `src/config/biomes.ts`).
 
 | Folder                                                                                                      | What                                                | Files | Use for                                            |
 | ----------------------------------------------------------------------------------------------------------- | --------------------------------------------------- | ----- | -------------------------------------------------- |
@@ -11,12 +11,10 @@ Art that was added for later features and is **not used by the game yet**. Nothi
 | [map_details_3](map_details_3/README.md)                                                                    | rocks, 8 kinds, shadow per ground                   | 164   | hills, tundra, lake shore, quarry look             |
 | [minerals_map_details_or_resources_crafting_etc](minerals_map_details_or_resources_crafting_etc/README.md) | 10 crystal and ore kinds                            | 164   | mine nodes, Extractors, T2/T3 materials, crafting  |
 | [map_details_ruins_buildings](map_details_ruins_buildings/README.md)                                        | 8 ruin themes                                       | 164   | landmarks, Battlefield, Blight, lake ruins         |
-| [misc](misc/README.md)                                                                                      | dark and bone props, crystals, totem, demon skull   | 102   | Blight and Battlefield decor, boss lairs           |
 | [misc_map_details](misc_map_details/README.md)                                                              | fantasy trees, ents, tree idols, mushrooms          | 81    | Jungle and Blossom Orchard, Idol buildings         |
 | [map_details_misc](map_details_misc/README.md)                                                              | temple ruin, gargoyles, graves, ghost, cultist      | 7     | Blight and Battlefield, animations                 |
 | [map_details](map_details/README.md)                                                                        | farm plants and trees sheet                         | 1     | farm crops, Fields and Orchard                     |
-| [potions](potions/README.md)                                                                                | 48 potion icons, 32x32                              | 48    | crafted and bought potions (crafting v0.1+)        |
-| [monsters](monsters/README.md)                                                                              | 11 monster sprites, 64-73 px (added 2026-11-10)     | 11    | monsters and bosses of the new biomes (R9)         |
+| [monsters](monsters/README.md)                                                                              | 9 monster sprites, 64-70 px (2 moved to `enemies/jungle/`)   | 9     | monsters and bosses of the new biomes (R9)         |
 
 ## Before any of this ships (read this)
 

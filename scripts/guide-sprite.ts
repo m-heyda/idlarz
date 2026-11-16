@@ -1,6 +1,6 @@
 /**
  * Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67). The result is a two-frame sprite sheet,
- * `public/pixel/guide/alder_talk.png` (134x67: closed mouth | open mouth), which the guide's bubble alternates while the text is being typed. No library and no smoothing: the PNG is read
+ * `public/pixel/ui/alder_talk.png` (134x67: closed mouth | open mouth), which the guide's bubble alternates while the text is being typed. No library and no smoothing: the PNG is read
  * and written here with `zlib`, every pixel outside the mouth is copied unchanged, and the same input always gives the same bytes.
  *
  *   npx tsx scripts/guide-sprite.ts          write the sheet
@@ -14,7 +14,7 @@ import { dirname, join, resolve } from 'node:path';
 import { deflateSync, inflateSync } from 'node:zlib';
 
 const ROOT = resolve(__dirname, '..');
-const SOURCE = join(ROOT, 'public', 'pixel', 'reuse', 'misc', 'sprite-fusion-374f7430-0e77-437e-8e6a-a0f4c6ac3332.png');
+const SOURCE = join(ROOT, 'public', 'pixel', 'ui', 'alder.png');
 export const SHEET = join(ROOT, 'public', 'pixel', 'guide', 'alder_talk.png');
 
 /** Where the mouth can be: inside the beard, x and y in sprite pixels (inclusive) */
@@ -161,7 +161,7 @@ if (require.main === module) {
 	if (process.argv.includes('--check')) {
 		const same = existsSync(SHEET) && readFileSync(SHEET).equals(bytes);
 		if (!same) {
-			console.error('public/pixel/guide/alder_talk.png is out of date: run npx tsx scripts/guide-sprite.ts');
+			console.error('public/pixel/ui/alder_talk.png is out of date: run npx tsx scripts/guide-sprite.ts');
 			process.exit(1);
 		}
 		console.log('guide sprite sheet is up to date');

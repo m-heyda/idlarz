@@ -1,5 +1,5 @@
-/** Where the Idol statues live: the 64x64 pictures the owner supplied (public/pixel/new_assets/idols/README.md maps each biome to its primary picture). One `art` field per Idol: real art is a file swap. */
-const ART = '/pixel/new_assets/idols/';
+/** Where the Idol statues live: the 64x64 pictures the owner supplied (public/pixel/idols/README.md maps each biome to its primary picture). One `art` field per Idol: real art is a file swap. */
+const ART = '/pixel/idols/';
 
 /** What an Idol changes. `applied: false` marks an effect that is in the catalog and the UI ("coming soon") but not applied by the game yet; none is today. */
 export type IdolEffectKey =

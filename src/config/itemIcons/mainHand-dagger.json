@@ -1,7 +1,7 @@
 [
-	{"icon": "item_steel_dagger", "item": "steel_dagger", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
+	{"icon": "art_steel_dagger", "item": "steel_dagger", "file": "mainHand/steel_dagger", "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: Steel Bushi dagger (sliced from a 64 px sheet, __reuse/sets/); replaces the built 40 px icon"},
 	{"icon": "item_obsidian_kris", "item": "obsidian_kris", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": null, "provenance": "procedural, scripts/pixel/sprites_gear.py"},
-	{"icon": "item_bone_knife", "item": "bone_knife", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G1", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
+	{"icon": "art_bone_knife", "item": "bone_knife", "file": "mainHand/bone_knife", "slot": "mainHand", "weapon": "dagger", "grade": "G1", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: Steel Ashigaru dagger (sliced from a 64 px sheet, __reuse/sets/); replaces the built 40 px icon"},
 	{"icon": "item_bronze_dirk", "item": "bronze_dirk", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G2", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"},
-	{"icon": "item_iron_dagger", "item": "iron_dagger", "file": null, "slot": "mainHand", "weapon": "dagger", "grade": "G3", "provenance": "procedural, scripts/pixel/sprites_gear.py (MVP stand-in, IDL-239)"}
+	{"icon": "art_iron_dagger", "item": "iron_dagger", "file": "mainHand/iron_dagger", "slot": "mainHand", "weapon": "dagger", "grade": "G3", "provenance": "Sprite Fusion sheet by the owner, 2026-11-16: Steel Warden sword (sliced from a 64 px sheet, __reuse/sets/); replaces the built 40 px icon"}
 ]

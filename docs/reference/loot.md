@@ -129,7 +129,7 @@ roll = floor(101 x u ^ (1 / (1 + bias)))        u uniform in [0, 1); bias 0 is a
 
 ### `LOOT_SOURCES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:401`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:410`](../../src/catalog/lootConfig.ts)
 
 Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). A monster's drops are at its own level (monsters 1-30, bosses 15-45).
 
@@ -149,6 +149,10 @@ start at item level 4 plus 3 per castle level above 1.
 | monster_hills | normal_monster_hills | the caller's level, range 6-26 |
 | monster_lake | normal_monster_lake | the caller's level, range 10-29 |
 | monster_jungle | normal_monster_jungle | the caller's level, range 14-32 |
+| monster_fields | normal_monster_fields | the caller's level, range 17-35 |
+| monster_orchard | normal_monster_orchard | the caller's level, range 20-38 |
+| monster_blight | normal_monster_blight | the caller's level, range 23-41 |
+| monster_battlefield | normal_monster_battlefield | the caller's level, range 26-44 |
 | boss | boss | the caller's level, range 15-45 |
 | boss_plains | boss_plains | the caller's level, range 15-35 |
 | boss_forest | boss_forest | the caller's level, range 20-40 |
@@ -158,6 +162,10 @@ start at item level 4 plus 3 per castle level above 1.
 | boss_hills | boss_hills | the caller's level, range 22-42 |
 | boss_lake | boss_lake | the caller's level, range 27-47 |
 | boss_jungle | boss_jungle | the caller's level, range 32-52 |
+| boss_fields | boss_fields | the caller's level, range 37-57 |
+| boss_orchard | boss_orchard | the caller's level, range 42-62 |
+| boss_blight | boss_blight | the caller's level, range 47-67 |
+| boss_battlefield | boss_battlefield | the caller's level, range 52-72 |
 | chest | basic_chest | own level: 4 + 3 per castle level above 1 |
 | merchant | merchant_stock | own level: 4 + 3 per castle level above 1 |
 | craft | craft | the caller's level, range 1-41 |
@@ -166,7 +174,7 @@ start at item level 4 plus 3 per castle level above 1.
 
 ### `LOOT_PROFILES` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:340`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:349`](../../src/catalog/lootConfig.ts)
 
 Profiles: how many rolls, which rarity weights, which pool, which bonus tables. A normal monster's profile is copied per biome and draws from that biome's pool. All numbers are STARTING POINTS to be tuned with `npm run loot-sim -- --md`.
 
@@ -183,6 +191,10 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 | normal_monster_hills | 1 x 12% +1%/level from equipment_hills | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | normal_monster_lake | 1 x 12% +1%/level from equipment_lake | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | normal_monster_jungle | 1 x 12% +1%/level from equipment_jungle | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
+| normal_monster_fields | 1 x 12% +1%/level from equipment_fields | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
+| normal_monster_orchard | 1 x 12% +1%/level from equipment_orchard | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
+| normal_monster_blight | 1 x 12% +1%/level from equipment_blight | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
+| normal_monster_battlefield | 1 x 12% +1%/level from equipment_battlefield | source level +0 +-1 | common 70, uncommon 22, rare 7, epic 1, legendary 0.2 | rat_potion (potions_rat, fixed, 25%) |
 | boss | 1 x 100%, 1 guaranteed from boss_general | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | boss_plains | 1 x 100%, 1 guaranteed from boss_general_plains | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | boss_forest | 1 x 100%, 1 guaranteed from boss_general_forest | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | unique (boss_unique_forest, fixed, 5%); king_potions (potions_king, fixed) |
@@ -192,6 +204,10 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 | boss_hills | 1 x 100%, 1 guaranteed from boss_general_hills | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | boss_lake | 1 x 100%, 1 guaranteed from boss_general_lake | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | boss_jungle | 1 x 100%, 1 guaranteed from boss_general_jungle | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_fields | 1 x 100%, 1 guaranteed from boss_general_fields | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_orchard | 1 x 100%, 1 guaranteed from boss_general_orchard | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_blight | 1 x 100%, 1 guaranteed from boss_general_blight | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
+| boss_battlefield | 1 x 100%, 1 guaranteed from boss_general_battlefield | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | basic_chest | 1 x 82% from general_equipment | source level +0 +-1 | common 62, uncommon 24, rare 9, epic 4, legendary 1 | chest_legendary (legendary_weapons, fixed, 1.9%, replace); chest_potion (potions_chest, fixed, fallback) |
 | craft | 1 x 100%, 1 guaranteed from equipment_craft | source level +0 +-1 | common 70, uncommon 22, rare 6 | - |
 | merchant_stock | 12 x 100%, 12 guaranteed from general_equipment | source level +0 +-2 | common 60, uncommon 40 | - |
@@ -218,7 +234,7 @@ The merchant's shelf passes `maxGrade` = the best grade the player wears ([`best
 
 ### `BOSS_LOOT` <small>const</small>
 
-Source: [`src/catalog/lootConfig.ts:210`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:215`](../../src/catalog/lootConfig.ts)
 
 Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): each biome's boss has a source of its own (`boss_<biome>`, profile `boss_<biome>`) with
 
@@ -245,6 +261,10 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 | boss_hills | 22-42 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_hills |
 | boss_lake | 27-47 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_lake |
 | boss_jungle | 32-52 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_jungle |
+| boss_fields | 37-57 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_fields |
+| boss_orchard | 42-62 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_orchard |
+| boss_blight | 47-67 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_blight |
+| boss_battlefield | 52-72 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_battlefield |
 
 ## Items
 
@@ -390,7 +410,7 @@ Test and simulation helper: a full kit of one ladder grade, so fight balance (`f
 
 ### Adding loot content (data only)
 
-Source: [`src/catalog/lootConfig.ts:301`](../../src/catalog/lootConfig.ts)
+Source: [`src/catalog/lootConfig.ts:310`](../../src/catalog/lootConfig.ts)
 
 Adding loot content is data only; the generator needs no change.
 
@@ -410,7 +430,7 @@ See also: [`gear`](loot.md#gear), [`RARITIES`](loot.md#rarities), [`LOOT_SOURCES
 
 ### `gear` <small>function</small>
 
-Source: [`src/catalog/items/define.ts:101`](../../src/catalog/items/define.ts)
+Source: [`src/catalog/items/define.ts:105`](../../src/catalog/items/define.ts)
 
 The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).
 

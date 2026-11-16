@@ -1,14 +1,12 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
-import { DEFAULT_PLAYER_CLASS, PLAYER_CLASSES } from '@/config/playerClasses';
 import { cn } from '@/lib/utils';
 import { useUiStore } from '@/stores/uiStore';
-import PixelIcon from './PixelIcon';
 import { resolveAvatar } from '@/catalog/avatars';
 import AvatarArt from './AvatarArt';
 
 interface CharacterPortraitProps {
-	/** 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40) */
+	/** Kept for callers: both draw the avatar bust now (the full-figure heroes are gone) */
 	variant?: 'full' | 'bust';
 	scale?: number;
 	className?: string;
@@ -18,18 +16,10 @@ interface CharacterPortraitProps {
 const CharacterPortrait: React.FC<CharacterPortraitProps> = ({ variant = 'full', scale = 1, className }) => {
 	const playerClass = useGameStore((state) => state.playerClass);
 	const avatarId = useUiStore((state) => state.avatarId);
-	const info = PLAYER_CLASSES[playerClass] ?? PLAYER_CLASSES[DEFAULT_PLAYER_CLASS];
 
-	// the head-and-shoulders portrait is the player's avatar (IDL-71), or their class's default avatar until one is chosen; the full figure is always the class hero
-	if (variant === 'bust') {
-		return <AvatarArt id={resolveAvatar(avatarId, playerClass).id} playerClass={playerClass} scale={scale} className={cn('character-portrait', className)} />;
-	}
-
-	return (
-		<span className={cn('character-portrait', className)}>
-			<PixelIcon name={info.full} scale={scale} alt={`${info.race} ${info.label}`} />
-		</span>
-	);
+	// the portrait is the player's avatar (IDL-71), or their class's default avatar until one is chosen (the old full-figure class heroes were removed on 2026-11-16, so `full` draws the same bust)
+	void variant;
+	return <AvatarArt id={resolveAvatar(avatarId, playerClass).id} playerClass={playerClass} scale={scale} className={cn('character-portrait', className)} />;
 };
 
 export default CharacterPortrait;

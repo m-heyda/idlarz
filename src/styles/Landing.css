@@ -13,27 +13,10 @@
 .ld-bg {
 	position: absolute;
 	inset: 0;
-	background-position: center;
+	background-position: center 12%; /* the castle of the picture stays in view under the logo */
 	background-size: cover;
 	background-repeat: no-repeat;
 	image-rendering: pixelated;
-	transform-origin: center;
-	animation: ld-zoom 10s ease-in-out infinite alternate;
-}
-
-@keyframes ld-zoom {
-	from {
-		transform: scale(1);
-	}
-	to {
-		transform: scale(1.08);
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.ld-bg {
-		animation: none;
-	}
 }
 
 /* a soft dark edge so the frames and the picture sit together */
@@ -44,7 +27,22 @@
 	pointer-events: none;
 }
 
-/* two columns in the middle of the screen, under the logo of the picture, down to the bottom */
+/* the game logo, centred at the top over the picture (the frames start under it) */
+.ld-logo {
+	position: absolute;
+	top: clamp(12px, 3vh, 36px);
+	left: 50%;
+	z-index: 1;
+	width: min(320px, 26vw);
+	min-width: 200px;
+	transform: translateX(-50%);
+	image-rendering: pixelated;
+	filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+	pointer-events: none;
+	user-select: none;
+}
+
+/* two columns in the middle of the screen, under the logo, down to the bottom */
 .ld-layout {
 	position: relative;
 	z-index: 1;
@@ -52,7 +50,7 @@
 	justify-content: center;
 	gap: 36px;
 	height: 100%;
-	padding: clamp(190px, 24vh, 300px) 32px 92px; /* the logo of the picture stays free above the frames */
+	padding: clamp(215px, 29vh, 290px) 32px 92px; /* the logo stays free above the frames */
 }
 
 .ld-col {

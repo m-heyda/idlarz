@@ -14,7 +14,7 @@ import {
 	TooltipStack,
 } from '../index';
 
-const I = (n: string) => `/pixel/icons/${n}.png`;
+const I = (n: string) => `/pixel/${n.startsWith('menu_') ? 'ui' : 'icons'}/${n}.png`;
 
 const meta = {
 	title: 'Design System/Tooltips with game data',

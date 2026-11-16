@@ -14,12 +14,17 @@ export const BADGE_CHOICE_IDS: readonly string[] = ['beta_tester', 'early_tester
 /** The admin-only badge: the animated octopus. Held by the game admin's account only (the pseudo id `ADMIN_UNLOCK` that `loadEarnedAchievements` adds for `profiles.is_admin`). */
 export const ADMIN_BADGE = 'admin';
 
+/** The second admin-only badge: a small laptop (a still 32x32 picture, `ui/admin/badge_laptop.png`). Same rule as {@link ADMIN_BADGE}. */
+export const ADMIN_BADGE_LAPTOP = 'admin_laptop';
+export const ADMIN_BADGE_LAPTOP_PIC = '/pixel/ui/admin/badge_laptop.png';
+
 /** The admin-only title ("Dev"): stored as `profiles.title_id` like any other, offered and accepted only to the account that holds `ADMIN_UNLOCK`. */
 export const ADMIN_TITLE_ID = 'dev';
 
 /** The picture of a badge: the 8 frame sprite sheet of the admin octopus (draw it with the design system's `BadgePic`), or the medal of an achievement. */
-export const ADMIN_BADGE_PIC = '/pixel/new_assets/admin/admin_mark.png';
-export const badgePicSrc = (badge: string): string => (badge === ADMIN_BADGE ? ADMIN_BADGE_PIC : `/pixel/new_assets/achievements/${badge}.png`);
+export const ADMIN_BADGE_PIC = '/pixel/ui/admin/admin_mark.png';
+export const badgePicSrc = (badge: string): string =>
+	badge === ADMIN_BADGE ? ADMIN_BADGE_PIC : badge === ADMIN_BADGE_LAPTOP ? ADMIN_BADGE_LAPTOP_PIC : `/pixel/achievements/${badge}.png`;
 
 /** What a badge is as far as the windows need to know (an achievement's medal, or the admin octopus) */
 export interface BadgeInfo {
@@ -31,6 +36,8 @@ export interface BadgeInfo {
 }
 
 const ADMIN_BADGE_INFO: BadgeInfo = { id: ADMIN_BADGE, badge: ADMIN_BADGE, title: 'Dev' };
+const ADMIN_BADGE_LAPTOP_INFO: BadgeInfo = { id: ADMIN_BADGE_LAPTOP, badge: ADMIN_BADGE_LAPTOP, title: 'Dev laptop' };
+const ADMIN_BADGES: readonly BadgeInfo[] = [ADMIN_BADGE_INFO, ADMIN_BADGE_LAPTOP_INFO];
 
 /** One title a player can wear: the achievement that grants it and the words shown. */
 export interface TitleOption {
@@ -48,7 +55,7 @@ export interface TitleOption {
  */
 export const badgeOptions = (earned: readonly string[]): BadgeInfo[] => [
 	...ACHIEVEMENTS.filter((a) => BADGE_CHOICE_IDS.includes(a.id) && earned.includes(a.id)),
-	...(earned.includes(ADMIN_UNLOCK) ? [ADMIN_BADGE_INFO] : []),
+	...(earned.includes(ADMIN_UNLOCK) ? ADMIN_BADGES : []),
 ];
 
 export const titleOptions = (earned: readonly string[]): TitleOption[] => [
@@ -63,7 +70,8 @@ export const titleOptions = (earned: readonly string[]): TitleOption[] => [
 /** The badge to draw for a stored choice, or null when none is shown (hidden, nothing earned, or a choice that is no longer earned). */
 export const shownBadge = (choice: string | null | undefined, earned: readonly string[]): BadgeInfo | null => {
 	if (choice === BADGE_NONE) return null;
-	if (choice === ADMIN_BADGE) return earned.includes(ADMIN_UNLOCK) ? ADMIN_BADGE_INFO : null;
+	const adminBadge = ADMIN_BADGES.find((b) => b.id === choice);
+	if (adminBadge) return earned.includes(ADMIN_UNLOCK) ? adminBadge : null;
 	const id = choice ?? DEFAULT_BADGE_IDS.find((candidate) => earned.includes(candidate));
 	return id && BADGE_CHOICE_IDS.includes(id) && earned.includes(id) ? (achievementById(id) ?? null) : null;
 };
@@ -72,7 +80,7 @@ export const shownBadge = (choice: string | null | undefined, earned: readonly s
 export const shownTitle = (titleId: string | null | undefined, earned: readonly string[]): string | null =>
 	titleOptions(earned).find((t) => t.id === titleId)?.name ?? null;
 
-/** What is drawn by a name: the badge picture (`/pixel/new_assets/achievements/<badge>.png`) with its name, and the title text; each null when not shown. */
+/** What is drawn by a name: the badge picture (`/pixel/achievements/<badge>.png`) with its name, and the title text; each null when not shown. */
 export interface ShownIdentity {
 	badge: string | null;
 	badgeName: string | null;
@@ -134,7 +142,7 @@ export const checkBadgeChoice = (
 	const { badgeId, titleId } = input;
 	if (badgeId !== null && typeof badgeId !== 'string') return { ok: false, error: 'Pick one of your badges.' };
 	if (titleId !== null && typeof titleId !== 'string') return { ok: false, error: 'Pick one of your titles.' };
-	if (badgeId === ADMIN_BADGE) {
+	if (badgeId === ADMIN_BADGE || badgeId === ADMIN_BADGE_LAPTOP) {
 		if (!earned.includes(ADMIN_UNLOCK)) return { ok: false, error: 'That badge is not for sale.' };
 	} else if (badgeId !== null && badgeId !== BADGE_NONE && !(BADGE_CHOICE_IDS.includes(badgeId) && earned.includes(badgeId)))
 		return { ok: false, error: 'You have not earned that badge.' };

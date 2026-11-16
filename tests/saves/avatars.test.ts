@@ -16,15 +16,15 @@ import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-test('the catalog has 8 starters and the 5 unlockables plus the admin-only Admin avatar, each with its portrait file', () => {
+test('the catalog has 8 starters and the 5 unlockables plus the two admin-only avatars, each with its portrait file', () => {
 	assert.equal(STARTER_AVATAR_IDS.length, 8);
 	assert.deepEqual(
 		AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id),
-		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester', 'admin'],
+		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester', 'admin', 'admin_hooded'],
 	);
 	assert.equal(new Set(AVATARS.map((a) => a.id)).size, AVATARS.length);
 	for (const avatar of AVATARS) {
-		assert.ok(existsSync(join(__dirname, '..', '..', 'public', 'pixel', 'new_assets', 'heroes', `${avatar.portrait}.png`)), avatar.id);
+		assert.ok(existsSync(join(__dirname, '..', '..', 'public', 'pixel', 'ui', 'heroes', `${avatar.portrait}.png`)), avatar.id);
 		assert.equal(avatar.kind === 'unlock', Boolean(avatar.unlockedBy && avatar.how), avatar.id);
 	}
 });
@@ -137,4 +137,12 @@ test('the Admin avatar is only ever unlocked by the admin pseudo achievement, an
 	assert.ok(!unlockedAvatarIds([]).includes('admin'));
 	assert.ok(unlockedAvatarIds([ADMIN_UNLOCK]).includes('admin'));
 	for (const cls of PLAYER_CLASS_ORDER) assert.ok(classAvatarIds(cls, [ADMIN_UNLOCK]).includes('admin'), 'any class may wear it once granted');
+});
+
+test('the hooded avatar is a second admin-only face: only an account holding the admin unlock may wear it', () => {
+	const hooded = AVATARS.find((a) => a.id === 'admin_hooded');
+	assert.ok(hooded?.adminOnly);
+	assert.equal(hooded?.unlockedBy, ADMIN_UNLOCK);
+	assert.deepEqual(checkAvatar('admin_hooded', 'mage', [ADMIN_UNLOCK]), { ok: true, value: 'admin_hooded' });
+	assert.equal(checkAvatar('admin_hooded', 'mage', []).ok, false, 'not for a player');
 });

@@ -192,7 +192,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
-- [`pets.ts`](../../src/catalog/pets.ts) — ~ Path of the pixel icon under `public/` (reuse pool, `public/pixel/reuse/pets/`)
+- [`pets.ts`](../../src/catalog/pets.ts) — ~ Path of the pixel icon under `public/` (`public/pixel/pets/`)
 - [`rarity.ts`](../../src/catalog/rarity.ts) — ~ Everything the game knows about a rarity, in one place:
 - [`recipes.ts`](../../src/catalog/recipes.ts) — Crafting recipes (docs/plan/crafting-v0.md).
 - [`resourceArt.ts`](../../src/catalog/resourceArt.ts) — The resource art roster:
@@ -228,6 +228,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
 - [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
+- [`BossWindow.tsx`](../../src/components/game/BossWindow.tsx) — ~ The Boss window:
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
@@ -235,7 +236,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleSprite.tsx`](../../src/components/game/CastleSprite.tsx) — ~ `tile`:
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
-- [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ 'full' = the whole figure (56x80), 'bust' = head and shoulders (40x40)
+- [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ Kept for callers:
 - [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from, shown as their portraits.
 - [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu, drawn by the design system's `ContextMenu`.
@@ -975,6 +976,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`avatarPick.test.ts`](../../tests/ui/avatarPick.test.ts) — ~ A fake client store and server:
 - [`avatarPicker.test.ts`](../../tests/ui/avatarPicker.test.ts)
 - [`biomeArt.test.ts`](../../tests/ui/biomeArt.test.ts)
+- [`bossWindow.test.ts`](../../tests/ui/bossWindow.test.ts)
 - [`buildTimers.test.ts`](../../tests/ui/buildTimers.test.ts)
 - [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)

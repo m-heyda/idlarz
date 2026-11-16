@@ -1,3 +1,4 @@
+import { ITEM_ICONS } from '@/config/itemIcons';
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { EquipmentRarity, EquipmentSlot, ItemDef, ItemKind, WeaponType } from '@/types/game';
 import { MAX_ITEM_LEVEL, type ItemStats } from '../stats';
@@ -92,6 +93,9 @@ export interface GearOptions {
 	levelWindow?: readonly [number, number];
 }
 
+/** The icon each item has in the registry (`config/itemIcons/`): an item whose supplied art replaced its built icon is found here as `art_<id>`; every other art item is `item_<id>` */
+const ICON_OF_ITEM: ReadonlyMap<string, string> = new Map(ITEM_ICONS.flatMap((e) => (e.item ? [[e.item, e.icon] as const] : [])));
+
 /**
  * The builder every piece of gear is authored with. Gear is authored at the first item level of its material tier's window (`LEVEL_WINDOW_BY_TIER`: tier 1 levels 1-20, tier 2 4-50, tier 3 8-100, tier 4 10-100, tier 5 3-100).
  *
@@ -121,6 +125,6 @@ export const gear = (
 	...(KIND_OF_SLOT[slot] === 'weapon' ? { attackSpeed: attackSpeed ?? (rest.weaponType && WEAPON_ATTACK_SPEED[rest.weaponType]) ?? 1 } : {}),
 	stats,
 	sellValue: sellValue ?? RARITIES[rarity].sellValue,
-	...(icon ? { icon } : art ? { icon: `item_${id}` as PixelIconName } : {}),
+	...(icon ? { icon } : art ? { icon: (ICON_OF_ITEM.get(id) ?? `item_${id}`) as PixelIconName } : {}),
 	...rest,
 });

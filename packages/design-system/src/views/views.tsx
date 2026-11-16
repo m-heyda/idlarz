@@ -53,7 +53,7 @@ import {
 	type Rarity,
 } from '../index';
 
-const I = (name: string) => `/pixel/icons/${name}.png`;
+const I = (name: string) => `/pixel/${name.startsWith('menu_') ? 'ui' : 'icons'}/${name}.png`;
 const R = (name: string) => `/pixel/resources/${name}.png`;
 
 interface MockRes {
@@ -210,6 +210,7 @@ export const GameHudView: React.FC<{ width?: number; height?: number }> = ({ wid
 					<IconButton icon={I('menu_glossary')} label='Bestiary' />
 					<IconButton icon={I('menu_achievements')} label='Deeds' badge={8} />
 					<IconButton icon={I('menu_legacy')} label='Rebirth' />
+					<IconButton icon={I('menu_boss')} label='Boss' />
 				</Dock>
 			</div>
 			<div style={{ position: 'absolute', right: 14, bottom: 14 }}>
@@ -324,8 +325,8 @@ const BAG_START: BagItem[] = [
 	},
 ];
 
-const H = (n: string) => `/pixel/new_assets/heroes/${n}.png`;
-const A = (n: string) => `/pixel/new_assets/achievements/${n}.png`;
+const H = (n: string) => `/pixel/ui/heroes/${n}.png`;
+const A = (n: string) => `/pixel/achievements/${n}.png`;
 /** Mock of the game's avatar catalog for an elf ranger: its own two starters open, the other classes' starters dimmed, rewards earned or silhouettes, then empty "soon" cards. */
 const AVATAR_CARDS: AvatarCard[] = [
 	{ id: 'knight', name: 'Knight', portrait: H('avatar_red_haired_knight'), state: 'class', note: 'Needs the Warrior class' },
