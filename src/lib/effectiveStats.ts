@@ -44,12 +44,12 @@ export interface StatContext {
 export const effectiveStats = ({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol = NO_IDOL_ECONOMY }: StatContext) => {
 	const idolPct = (pct: number) => 1 + pct / 100;
 	const gear = aggregateStats(equipment);
-	const bonus = withClassBonus(merchantCombat(merchantUpgrades), playerClass);
+	const bonus = withClassBonus(merchantCombat(merchantUpgrades, prestige), playerClass);
 	const passives = classPassives(playerClass);
 	const odds = critOdds(characterStats, equipment, bonus);
 	const critExtra = 1 + critDamagePercent(characterStats) / 100;
 	const armor = armorOf(equipment, characterStats, playerClass) * idolPct(idol.hpArmorPct);
-	const luck = characterStats.luck + merchantLuck(merchantUpgrades) + gear.luck + idol.luck;
+	const luck = characterStats.luck + merchantLuck(merchantUpgrades, prestige) + gear.luck + idol.luck;
 	const economy = gearEconomy(equipment);
 	const limits = { prestige, merchantUpgrades, gear: { ...economy, offlineEff: economy.offlineEff + idol.offlineEffPts }, playerClass };
 	return {

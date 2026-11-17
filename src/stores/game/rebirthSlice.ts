@@ -1,7 +1,8 @@
 // rebirthSlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { EMBER_UPGRADES, type EmberUpgradeId } from '@/config/rebirth';
+import { EMBER_DISABLED, EMBER_UPGRADES, type EmberUpgradeId } from '@/config/rebirth';
+import { PACKRAT_IDS } from '@/config/merchant';
 import { calculateCombatStats, calculateLevel, totalStatPoints } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { rebirthStatus, emberUpgradeCost } from '@/utils/game/rebirth';
@@ -15,6 +16,9 @@ import type { ChestSync } from './chestSync';
 import type { InventorySync } from './inventorySync';
 import type { CharacterSync } from './characterSync';
 import audioManager from '@/utils/audioManager';
+
+/** Shop upgrades whose effect is part of the income formula */
+const INCOME_UPGRADES: ReadonlySet<string> = new Set(['overseer', 'skinner', 'startgold', 'decree']);
 
 export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySync, chests: ChestSync, character: CharacterSync) => ({
 	resetGame: () => {
@@ -48,7 +52,8 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		// settle the level first: XP bought a moment ago may not have been counted by a tick yet (its points are credited here)
 		const settled = calculateLevel(state.resources.xp);
 		// the other merchant bonuses start again; Pack Rat stays, so the starter bag is as big as the player bought it
-		const merchantUpgrades: Record<string, number> = state.merchantUpgrades.packrat ? { packrat: state.merchantUpgrades.packrat } : {};
+		const merchantUpgrades: Record<string, number> = {};
+		for (const id of PACKRAT_IDS) if (state.merchantUpgrades[id]) merchantUpgrades[id] = state.merchantUpgrades[id] as number;
 		// respec: every attribute goes back to its start and all the points the level has earned are free to spend again
 		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) };
 		Object.assign(characterStats, calculateCombatStats(characterStats));
@@ -95,20 +100,36 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 	buyEmberUpgrade: (id: EmberUpgradeId) => {
 		const state = get();
 		const def = EMBER_UPGRADES[id];
-		if (!def) return false;
+		if (!def || EMBER_DISABLED.has(id)) return false; // the quest upgrades cannot be bought until quests exist
 		const level = state.prestige.upgrades[id] ?? 0;
 		if (level >= def.maxLevel) return false;
+		if (def.maxLevel === 1 && state.prestige.grants?.includes(id)) return false; // a one-time upgrade granted for free is already owned
 		const cost = emberUpgradeCost(id, level);
 		if (state.prestige.legacyPoints < cost) return false;
 		// Deep Pockets: the new slots are in the bag at once (the server pads its bag the same way from the save's level)
 		const grow = id === 'deeppockets' ? Array.from({ length: def.effectPerLevel }, () => null) : [];
+		const prestige: PrestigeState = {
+			...state.prestige,
+			legacyPoints: state.prestige.legacyPoints - cost,
+			upgrades: { ...state.prestige.upgrades, [id]: level + 1 },
+		};
 		set({
-			prestige: {
-				...state.prestige,
-				legacyPoints: state.prestige.legacyPoints - cost,
-				upgrades: { ...state.prestige.upgrades, [id]: level + 1 },
-			},
+			prestige,
 			...(grow.length ? { bag: [...state.bag, ...grow] } : {}),
+			// the shop levels that change the income (Overseer, Master Skinner, Starting Treasury, Imperial Decree) show in the rates at once
+			...(INCOME_UPGRADES.has(id)
+				? {
+						resourceRates: calculateResourceRates(
+							state.tiles,
+							state.characterStats,
+							state.farmLevels,
+							prestige,
+							state.farmUpgrades,
+							state.merchantUpgrades,
+							gearIncomePct(state.equipment),
+						),
+					}
+				: {}),
 		});
 		audioManager.playSound('buysell');
 		return true;

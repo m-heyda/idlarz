@@ -346,9 +346,11 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | Level | gold per click (x gold/s) | price |
 | --- | --- | --- |
 | 0 | 200% | (start) |
-| 1 | 400% | 750.00K |
-| 2 | 800% | 2.50M |
-| 3 | 1500% | 10.00M |
+| 1 | 350% | 500.00K |
+| 2 | 600% | 1.50M |
+| 3 | 1000% | 4.00M |
+| 4 | 1600% | 10.00M |
+| 5 | 2400% | 25.00M |
 
 | Resource | sells for | costs (x2) |
 | --- | --- | --- |
@@ -369,7 +371,8 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | Haggler | +3% gold from everything you sell | 10 | 100.00K | 32.27M |
 | Bulk Discount | -1% tile cost | 8 | 250.00K | 45.03M |
 | Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
-| Pack Rat | +8 bag slots | 6 | 500.00K | 121.50M |
+| Pack Rat (old) | +8 bag slots | 6 | 500.00K | 121.50M |
+| Pack Rat | +4 bag slots | 6 | 500.00K | 121.50M |
 | Foreman | +1% income from every resource, gold included | 10 | 400.00K | 129.08M |
 | Skinner | +5% meat and hide from your animals | 8 | 300.00K | 26.82M |
 | Quick Hands | +2% attack speed | 8 | 250.00K | 22.35M |
@@ -402,10 +405,36 @@ Shop (cost in points of the next level, by current level):
 
 | upgrade | effect per level | max | cost at level 0 | cost at level 1 | cost at level 2 | cost at level 3 | cost at level 5 | cost at level 9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Thrift | 2% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
-| Master Builders | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
-| Click Mastery | 25% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
-| Provisions | 1500 gold + 400 wood + 400 stone | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
-| Night Watch | 100% | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
-| Steward | 5% | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
-| Deep Pockets | +4 bag slots | 3 | 30 | 54 | 98 | 175 | 567 | 5951 |
+| Thrift | 0.02 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Treasury Charter | 5 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Master Builders | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Mason's Guild | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Shrine Keepers | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Click Mastery | 0.5 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Starting Treasury | 1 | 5 | 6 | 12 | 22 | 42 | 149 | 1937 |
+| Provisions | 1500 gold + 400 wood + 400 stone + 200 food + 100 coal | 15 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Night Watch | 1 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Steward | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Eternal Vigil | 1 | 1 | 120 | 120 | 120 | 120 | 120 | 120 |
+| Deep Pockets | +8 bag slots | 5 | 30 | 54 | 98 | 175 | 567 | 5951 |
+| Master Haggler | 0.1 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Fortune | 6 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Artisan's Eye | 3 | 10 | 4 | 6 | 8 | 11 | 22 | 83 |
+| Overseer | 0.03 | 10 | 4 | 6 | 8 | 11 | 22 | 83 |
+| Master Skinner | 0.15 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Eternal Tithe | 0.5 | 5 | 5 | 10 | 20 | 40 | 160 | 2560 |
+| Battle Tempo | 3 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Precision | 1.5 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Execution | 1.5 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Brawn | 4 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Sorcery | 4 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Bloodthirst | 0.75 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Vigor | 0.5 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Potion Reflex | 1 | 1 | 15 | 15 | 15 | 15 | 15 | 15 |
+| Castle Expansion | 1 | 5 | 60 | 132 | 291 | 639 | 3093 | 72437 |
+| Master Masonry | 1 | 5 | 40 | 88 | 194 | 426 | 2062 | 48291 |
+| Idol Mastery | 1 | 10 | 100 | 250 | 625 | 1563 | 9766 | 381470 |
+| Imperial Decree | 1 | 1 | 150 | 150 | 150 | 150 | 150 | 150 |
+| Extra Builder | 1 | 2 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
+| Quest Rarity | 2 | 10 | 5 | 7 | 10 | 14 | 27 | 104 |
+| Quest Slots | 1 | 5 | 25 | 50 | 100 | 200 | 800 | 12800 |

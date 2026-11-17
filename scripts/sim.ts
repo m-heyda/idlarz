@@ -523,7 +523,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 
 		// Merchant economy upgrades with gold (the optimiser only): bought when the gold on hand is twice the price, so tiles and the castle keep their money
 		if (profile.buyMerchant) {
-			const order: MerchantUpgradeId[] = ['foreman', 'bulk', 'haggler', 'charm', 'skinner', 'packrat'];
+			const order: MerchantUpgradeId[] = ['foreman', 'bulk', 'haggler', 'charm', 'skinner', 'packrat2'];
 			for (let guard = 0; guard < 40; guard++) {
 				s = api();
 				const target = order.find((id) => {

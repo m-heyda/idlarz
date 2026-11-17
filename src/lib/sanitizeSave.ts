@@ -3,7 +3,7 @@ import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS, type PlayerClassId } from '@/conf
 import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
-import { BUILDING_RULES, BUILDINGS_FLAG } from '@/config/buildings';
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
 import { IDOLS } from '@/catalog/idols';
 import { idolEconomy } from '@/lib/idolEconomy';
@@ -21,6 +21,7 @@ import { maxHp, maxMana } from '@/lib/combat';
 import { starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
 import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
+import { refundOldShop } from '@/lib/emberShopMigration';
 import { castleUpgradeDuration } from '@/utils/game/castle';
 import { EMPTY_PRESTIGE, emberSpent } from '@/utils/game/rebirth';
 import { STARTER_FREE_TILES } from '@/utils/game/tiles';
@@ -240,10 +241,11 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 		const tile: Tile = { biome: t.biome as Tile['biome'], isOwned: true };
 		if (t.biome === 'castle') {
-			const level = int(t.level, 1, CASTLE_UPGRADE.maxLevel);
+			// up to the hard ceiling here; the cap this save is entitled to (Castle Expansion) is checked once the Embers are read below
+			const level = int(t.level, 1, HARD_LIMITS.castleMaxLevel);
 			if (level === null) return fail('castle level');
 			tile.level = level;
-			if (level < CASTLE_UPGRADE.maxLevel) {
+			if (level < HARD_LIMITS.castleMaxLevel) {
 				tile.upgradeCost = { ...CASTLE_UPGRADE.upgradeCosts[level - 1] };
 			}
 			castleTile = tile;
@@ -259,7 +261,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			// only present while the building system is on (readLand). A building that cannot be valid here is DROPPED, never a reason to refuse the save, so an old save (the removed
 			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
-			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : BUILDING_RULES.maxLevel);
+			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : HARD_LIMITS.buildingMaxLevel);
 			if (def && def.biome === t.biome && !tile.hasChest && !buildingIds.has(def.id) && bl !== null) {
 				buildingIds.add(def.id);
 				tile.building = def.id;
@@ -480,7 +482,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	let castleUpgrade: CastleUpgradeState | null = null;
 	if (raw.castleUpgrade !== null && raw.castleUpgrade !== undefined) {
 		if (!isRecord(raw.castleUpgrade)) return fail('castle upgrade');
-		const toLevel = int(raw.castleUpgrade.toLevel, 2, CASTLE_UPGRADE.maxLevel);
+		const toLevel = int(raw.castleUpgrade.toLevel, 2, HARD_LIMITS.castleMaxLevel);
 		if (toLevel === null || toLevel !== castleLevel + 1) return fail('castle upgrade level');
 		const remaining = num(raw.castleUpgrade.remainingSec, 0, 1e9);
 		if (remaining === null) return fail('castle upgrade time');
@@ -491,8 +493,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	let buildingUpgrade: BuildingUpgradeState | null = null;
 	const idolLevels: Record<string, number> = {};
 	if (BUILDINGS_FLAG.enabled) {
-		// a level the castle does not allow (the gate `min(5, castle level)`) is dropped with its building, like any other building that cannot be valid
-		const cap = buildingLevelCap(castleLevel);
+		// a level the castle does not allow (the gate `min(building cap, castle level)`) is dropped with its building, like any other building that cannot be valid. The building cap the Embers
+		// give is not known yet (the Embers are read below): the ceiling is used here and the real cap is enforced after them
+		const cap = buildingLevelCap(castleLevel, HARD_LIMITS.buildingMaxLevel);
 		// an Idol is exempt: its level is the account's and it is placed again at that level whatever the castle level is (the server's ledger bounds it)
 		for (const { tile } of placed)
 			if (tile.building && buildingDef(tile.building)?.kind !== 'idol' && levelOfTile(tile) > cap) {
@@ -514,7 +517,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				remaining !== null &&
 				at &&
 				levelOfTile(at.tile) === toLevel - 1 &&
-				toLevel <= upgradeCapOf(buildingDef(at.tile.building), castleLevel)
+				toLevel <= upgradeCapOf(buildingDef(at.tile.building), castleLevel, HARD_LIMITS.idolMaxLevel, HARD_LIMITS.buildingMaxLevel)
 			) {
 				buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
 			}
@@ -537,7 +540,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.prestige !== undefined) {
 		if (!isRecord(raw.prestige)) return fail('prestige');
 		const rebirths = int(raw.prestige.rebirths, 0, 10000);
-		let legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
+		const legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
 		const legacyEarned = int(raw.prestige.legacyEarned, 0, 1_000_000);
 		if (rebirths === null || legacyPoints === null || legacyEarned === null) return fail('prestige numbers');
 		const upgrades: PrestigeState['upgrades'] = {};
@@ -551,12 +554,51 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		}
 		// Points are conserved: everything earned is either still unspent or paid for shop levels. The unspent balance absorbs a difference that is not a forgery (an upgrade that was dropped
 		// or cut, a price that changed): it is recomputed as earned minus spent. Only a shop that costs MORE than all the Embers ever earned is refused.
-		const spent = emberSpent(upgrades);
-		if (spent > legacyEarned) return fail('embers do not add up');
-		legacyPoints = legacyEarned - spent;
 		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and embers disagree');
 		if (legacyEarned < rebirths) return fail('too few embers for the rebirths');
-		prestige = { rebirths, legacyPoints, legacyEarned, upgrades };
+		// the shop generation and the free grants ride along
+		const shopVersion = raw.prestige.shopVersion === undefined ? undefined : int(raw.prestige.shopVersion, 0, 1000);
+		if (shopVersion === null) return fail('shop version');
+		const grants: EmberUpgradeId[] = [];
+		if (Array.isArray(raw.prestige.grants))
+			for (const id of raw.prestige.grants)
+				if (
+					typeof id === 'string' &&
+					Object.prototype.hasOwnProperty.call(EMBER_UPGRADES, id) &&
+					EMBER_UPGRADES[id as EmberUpgradeId].maxLevel === 1 &&
+					!grants.includes(id as EmberUpgradeId)
+				)
+					grants.push(id as EmberUpgradeId);
+		// an account from before the reworked shop (no `shopVersion`) gets its Embers back once: the old levels were bought under other numbers (lib/emberShopMigration.ts)
+		const read = refundOldShop({
+			rebirths,
+			legacyPoints,
+			legacyEarned,
+			upgrades,
+			...(shopVersion !== undefined ? { shopVersion } : {}),
+			...(grants.length ? { grants } : {}),
+		});
+		const spent = emberSpent(read.upgrades);
+		if (spent > legacyEarned) return fail('embers do not add up');
+		prestige = { ...read, legacyPoints: legacyEarned - spent };
+	}
+
+	// The caps the Ember shop gives (Castle Expansion, Master Masonry, Idol Mastery): a save above the ones it paid for is refused (castle) or has the excess dropped (buildings)
+	if (castleLevel > limitOf('castleMaxLevel', { prestige })) return fail('castle level above the cap');
+	if (castleUpgrade && castleUpgrade.toLevel > limitOf('castleMaxLevel', { prestige })) return fail('castle upgrade above the cap');
+	if (BUILDINGS_FLAG.enabled) {
+		const idolMax = limitOf('idolMaxLevel', { prestige });
+		const buildingMax = limitOf('buildingMaxLevel', { prestige });
+		for (const { tile } of placed)
+			if (tile.building && buildingDef(tile.building)?.kind !== 'idol' && levelOfTile(tile) > buildingLevelCap(castleLevel, buildingMax)) {
+				delete tile.building;
+				delete tile.buildingLevel;
+			}
+		if (buildingUpgrade) {
+			const { x: ux, y: uy, toLevel: to } = buildingUpgrade;
+			const at = placed.find((p) => p.x === ux && p.y === uy);
+			if (!at?.tile.building || to > upgradeCapOf(buildingDef(at.tile.building), castleLevel, idolMax, buildingMax)) buildingUpgrade = null;
+		}
 	}
 
 	// An older, smaller bag is padded up to what the save is entitled to (base, Pack Rat, Deep Pockets): a bag only ever grows, it is never cut

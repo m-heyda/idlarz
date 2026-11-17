@@ -14,14 +14,16 @@ import type { PrestigeState } from '../../src/types/game';
 
 const prestige = (deeppockets: number): PrestigeState => ({ rebirths: 1, legacyPoints: 0, legacyEarned: 0, upgrades: { deeppockets } });
 
-test('bag size: base 60, Pack Rat +8 x 6, Deep Pockets +4 x 3, all through limitOf with a ceiling', () => {
+test('bag size: base 60, old Pack Rat +8 x 6, new Pack Rat +4 x 6, Deep Pockets +8 x 5, all through limitOf with a ceiling', () => {
 	assert.equal(LIMITS.bagSize, 60);
 	assert.equal(MERCHANT_UPGRADES.packrat.maxLevel, 6);
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 } }), 108);
-	assert.equal(limitOf('bagSize', { prestige: prestige(3) }), 72);
-	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 }, prestige: prestige(3) }), 120);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat2: 6 } }), 84);
+	assert.equal(limitOf('bagSize', { prestige: prestige(3) }), 84);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 }, prestige: prestige(3) }), 132);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6, packrat2: 6 }, prestige: prestige(5) }), 60 + 48 + 24 + 40);
 	assert.equal(limitOf('bagSize', { hardCap: true }), HARD_LIMITS.bagSize);
-	assert.ok(120 < HARD_LIMITS.bagSize, 'room is left for the belt slots');
+	assert.ok(172 < HARD_LIMITS.bagSize, 'room is left for the belt slots');
 });
 
 test('an old 36-slot bag is padded to the new base, not cut; a forged bag above the ceiling is refused', () => {
@@ -47,7 +49,7 @@ test('buying Deep Pockets adds its slots at once, survives a save and a rebirth'
 	freshGame({ gold: 1e12 });
 	growTo(REBIRTH.minTiles);
 	store.setState((st) => ({
-		prestige: { ...st.prestige, rebirths: 0, legacyPoints: 200, legacyEarned: 200 },
+		prestige: { ...st.prestige, rebirths: 0, legacyPoints: 1000, legacyEarned: 1000 },
 		tiles: patchTile(st.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }),
 	}));
 	const base = api().bag.length;
@@ -55,7 +57,7 @@ test('buying Deep Pockets adds its slots at once, survives a save and a rebirth'
 		assert.equal(api().buyEmberUpgrade('deeppockets'), true);
 		assert.equal(api().bag.length, base + level * EMBER_UPGRADES.deeppockets.effectPerLevel);
 	}
-	assert.equal(api().buyEmberUpgrade('deeppockets'), false, 'three levels only');
+	assert.equal(api().buyEmberUpgrade('deeppockets'), false, 'five levels only');
 	const size = api().bag.length;
 
 	assert.equal(api().rebirth(), true);
@@ -65,23 +67,23 @@ test('buying Deep Pockets adds its slots at once, survives a save and a rebirth'
 	assert.equal(saved.ok, true, saved.ok ? '' : saved.reason);
 	if (saved.ok) assert.equal(saved.state.bag.length, size, 'a purchased slot survives a save (after the rebirth too)');
 
-	assert.equal(api().prestige.upgrades.deeppockets, 3);
+	assert.equal(api().prestige.upgrades.deeppockets, 5);
 });
 
 test('the server sizes the bag from Pack Rat and Deep Pockets: fit, stamp and rebirth never cut', () => {
 	const core = { merchantUpgrades: { packrat: 1 }, prestige: prestige(2), bag: [] } as unknown as Record<string, unknown>;
 	const inv = inventoryFromCore(core);
-	const size = LIMITS.bagSize + 8 + 8;
+	const size = LIMITS.bagSize + 8 + 16;
 	assert.equal(inv.bag.length, size);
 	// a Deep Pockets level bought later grows the stored bag
 	const more = fitInventory(inv, { ...core, prestige: prestige(3) });
-	assert.equal(more.bag.length, size + 4);
+	assert.equal(more.bag.length, size + 8);
 	assert.ok(more.ver > inv.ver);
 	// a stale upload without the Embers cannot shrink it
-	assert.equal(fitInventory(more, { merchantUpgrades: {} }).bag.length, size + 4);
+	assert.equal(fitInventory(more, { merchantUpgrades: {} }).bag.length, size + 8);
 	const stamped = stampInventory({ ...(core as object), bag: [], equipment: {}, lootPity: {}, autoSellUpTo: null } as never, more);
-	assert.equal((stamped as { bag: unknown[] }).bag.length, size + 4);
+	assert.equal((stamped as { bag: unknown[] }).bag.length, size + 8);
 	// a rebirth keeps both
-	assert.equal(rebirthInventory(more, { packrat: 1 }, prestige(3)).bag.length, size + 4);
-	assert.equal(rebirthKit({ packrat: 1 }, prestige(3)).bag.length, size + 4);
+	assert.equal(rebirthInventory(more, { packrat: 1 }, prestige(3)).bag.length, size + 8);
+	assert.equal(rebirthKit({ packrat: 1 }, prestige(3)).bag.length, size + 8);
 });

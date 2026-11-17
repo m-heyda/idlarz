@@ -305,7 +305,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`MerchantGoodsTab.tsx`](../../src/components/game/merchant/MerchantGoodsTab.tsx) — ~ The look of an item in a slot:
 - [`MerchantPlaceholders.tsx`](../../src/components/game/merchant/MerchantPlaceholders.tsx) — ~ The Quests tab:
 - [`MerchantResourcesTab.tsx`](../../src/components/game/merchant/MerchantResourcesTab.tsx) — ~ How much one Sell or Buy moves:
-- [`MerchantUpgradesTab.tsx`](../../src/components/game/merchant/MerchantUpgradesTab.tsx) — ~ The Upgrades tab:
+- [`MerchantUpgradesTab.tsx`](../../src/components/game/merchant/MerchantUpgradesTab.tsx) — ~ No longer for sale:
 - [`MerchantWindow.tsx`](../../src/components/game/merchant/MerchantWindow.tsx) — ~ How many upgrades the player can buy right now (the click power step and every merchant upgrade not yet maxed):
 
 **src/components/game/overlays/**
@@ -337,7 +337,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ Whether the away-time hint (Night Watch, Steward) is worth showing:
 - [`RebirthConfirmModal.tsx`](../../src/components/game/overlays/RebirthConfirmModal.tsx) — ~ A piece the player could carry over, with the place it is in.
-- [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ What an Ember shop upgrade gives at level `n` (the same numbers as before; a tile shows it for the level now and for the next one)
+- [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ What an Ember shop upgrade gives at level `n` (a tile shows it for the level now and for the next one)
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
@@ -476,6 +476,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
+- [`emberShopMigration.ts`](../../src/lib/emberShopMigration.ts) — ~ The shop generation and the free grants are the server's, never the upload's:
 - [`epochFetch.ts`](../../src/lib/epochFetch.ts) — ~ `fetch` for the game's own /api routes:
 - [`epochGuard.ts`](../../src/lib/epochGuard.ts) — ~ The browser's half of the data epoch.
 - [`fightSim.ts`](../../src/lib/fightSim.ts) — ~ A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend).
@@ -539,7 +540,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events a deed may be waiting for.
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
-- [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off or still locked before the first rebirth), for the win estimate.
+- [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off or not bought yet), for the win estimate.
 - [`fightProject.ts`](../../src/lib/offline/fightProject.ts) — ~ The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates:
 - [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ The profile a potion is judged on:
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:
@@ -561,6 +562,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`petLetters.ts`](../../src/lib/offline/petLetters.ts) — SERVER ONLY. The welcome letters that come with a special pet. They are kept out of `src/catalog/pets.ts` (which is in the browser bundle for everyone) so the text reaches only the account it is for: `applyPets` puts a letter in the answer for the account that was granted the pet, nobody else.
 - [`pets.ts`](../../src/lib/offline/pets.ts) — ~ The pets this account owns (ids of the catalog)
 - [`placement.ts`](../../src/lib/offline/placement.ts) — ~ What the rules depend on:
+- [`prestigeOfCore.ts`](../../src/lib/offline/prestigeOfCore.ts) — ~ The Embers (shop levels) a stored save holds, as the shared rules read them (`undefined` when the save has none):
 - [`profile.ts`](../../src/lib/offline/profile.ts) — ~ The character's stats with every derived number worked out again (a save only holds the attributes).
 - [`reconcile.ts`](../../src/lib/offline/reconcile.ts) — ~ What changed on the map:
 - [`reward.ts`](../../src/lib/offline/reward.ts) — ~ What the drops became:
@@ -701,6 +703,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`castle.ts`](../../src/utils/game/castle.ts) — The castle's income bonus and upgrade time (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`character.ts`](../../src/utils/game/character.ts) — ~ "+2.5% Stone & Coal production per point / +0.2% XP production per point / +0.2% XP gained per point"
 - [`costs.ts`](../../src/utils/game/costs.ts) — What buying a tile costs, and paying for it (part of the former utils/gameUtils.ts, split in IDL-15).
+- [`emberEffects.ts`](../../src/utils/game/emberEffects.ts) — What the Ember shop levels of a save are worth: the one place a shop effect is read. Kept apart from utils/game/rebirth.ts so the merchant helpers can read Ember effects without an import cycle.
 - [`farm.ts`](../../src/utils/game/farm.ts) — The farm: animal costs and output, pen and upgrades (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`income.ts`](../../src/utils/game/income.ts) — Income per second: what one tile produces, and the full breakdown and rates (part of the former utils/gameUtils.ts, split in IDL-15).
 - [`merchant.ts`](../../src/utils/game/merchant.ts) — The merchant's upgrades, what selling pays and what buying costs (part of the former utils/gameUtils.ts, split in IDL-15).
@@ -942,6 +945,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`cloudAdopt.test.ts`](../../tests/saves/cloudAdopt.test.ts)
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
+- [`emberRefund.test.ts`](../../tests/saves/emberRefund.test.ts)
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
@@ -1049,6 +1053,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
+- [`ember_refund_v2.sql`](../../supabase/migrations/ember_refund_v2.sql)
+- [`ember_refund_v2_rollback.sql`](../../supabase/migrations/ember_refund_v2_rollback.sql)
 - [`gems_attrs_ledger.sql`](../../supabase/migrations/gems_attrs_ledger.sql)
 - [`gems_attrs_ledger_rollback.sql`](../../supabase/migrations/gems_attrs_ledger_rollback.sql)
 - [`identity_server_only.sql`](../../supabase/migrations/identity_server_only.sql)

@@ -1,6 +1,7 @@
 // Rebirth and the Ember shop: effects, costs, gain and the rebirth requirements (part of the former utils/gameUtils.ts, split in IDL-15).
 import { CASTLE_X, CASTLE_Y } from '@/config/castle';
-import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '@/config/rebirth';
+import { EMBER_UPGRADES, REBIRTH, SHOP_VERSION, type EmberUpgradeId } from '@/config/rebirth';
+import { emberEffect, emberLevel } from '@/utils/game/emberEffects';
 import { INITIAL_RESOURCES } from '@/config/economy';
 import { classPassives } from '@/lib/classPassives';
 import type { CharacterStats, GameState, PrestigeState, Resources } from '@/types/game';
@@ -8,12 +9,18 @@ import { getTile } from '@/utils/world';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
 import { economyTiles } from '@/utils/game/tiles';
 
-export const EMPTY_PRESTIGE: PrestigeState = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {} };
+export const EMPTY_PRESTIGE: PrestigeState = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {}, shopVersion: SHOP_VERSION };
 
-const emberLevel = (prestige: PrestigeState | undefined, id: EmberUpgradeId): number => prestige?.upgrades?.[id] ?? 0;
+export { emberDisabled, emberEffect, emberLevel, emberOwned } from '@/utils/game/emberEffects';
 
-/** Effect of a shop upgrade as a fraction (or, for Provisions, as a number of starting bundles). */
-export const emberEffect = (prestige: PrestigeState | undefined, id: EmberUpgradeId): number => emberLevel(prestige, id) * EMBER_UPGRADES[id].effectPerLevel;
+/**
+ * Base gold per second a new run starts with from the Starting Treasury (0 without it): 1, 5, 10, 20, 35 by level. It replaces the realm's base gold (`BASE_GENERATION_RATES.gold`)
+ * when it is higher, and every multiplier (castle, Embers, Foreman, gear) counts from there.
+ */
+export const emberStartGold = (prestige: PrestigeState | undefined): number => {
+	const steps = EMBER_UPGRADES.startgold.steps;
+	return steps[Math.min(emberLevel(prestige, 'startgold'), steps.length - 1)] ?? 0;
+};
 
 /**
  * Cost in Embers of buying the next level of an upgrade, given its current level.
@@ -53,13 +60,13 @@ export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): numb
 /**
  * Percent off tile cost: Charisma plus Thrift, capped.
  *
- * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`).
+ * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
  * Buildings take Thrift only.
  *
  * @category Economy/Tiles
  * @order 4
  * @formula
- * discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
+ * discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
  */
 export const effectiveTileDiscount = (
 	stats: Pick<CharacterStats, 'tileCostDiscount'>,
@@ -69,15 +76,18 @@ export const effectiveTileDiscount = (
 ): number =>
 	Math.min(
 		stats.tileCostDiscount + emberEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk') + classPassives(playerClass).tileDiscountPct,
-		REBIRTH.discountCapPercent,
+		tileDiscountCap(prestige),
 	);
+
+/** The most percent a tile can be cheaper: 45 plus 5 per Treasury Charter level (Ember shop). */
+export const tileDiscountCap = (prestige: PrestigeState | undefined): number => REBIRTH.discountCapPercent + emberEffect(prestige, 'charter');
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {
 	const out: Resources = { ...INITIAL_RESOURCES };
 	const bundles = emberEffect(prestige, 'provisions');
 	Object.entries(EMBER_UPGRADES.provisions.bundle).forEach(([resource, amount]) => {
-		out[resource as keyof Resources] += (amount || 0) * bundles;
+		out[resource as keyof Resources] = (out[resource as keyof Resources] ?? 0) + (amount || 0) * bundles;
 	});
 	return out;
 };
@@ -85,17 +95,17 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
 /**
  * Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.
  *
- * `REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level.
+ * `REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level and the Eternal Tithe Ember upgrade +50% per level (added together).
  *
  * @category Progression/Rebirth
  * @order 2
  * @formula
  * base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
- * gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
+ * gain = floor(base x (1 + 0.05 x Ancestral Tithe level + 0.5 x Eternal Tithe level))
  * @table ember-gain-examples
  */
-export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades, rebirths = 0): number =>
-	Math.floor(REBIRTH.gain(castleLevel, tiles, rebirths) * (1 + merchantEffect(merchant, 'tithe')));
+export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades, rebirths = 0, prestige?: PrestigeState): number =>
+	Math.floor(REBIRTH.gain(castleLevel, tiles, rebirths) * (1 + merchantEffect(merchant, 'tithe') + emberEffect(prestige, 'tithe')));
 
 interface RebirthRequirement {
 	id: 'castle' | 'tiles' | 'idle';
@@ -130,7 +140,7 @@ export const rebirthStatus = (state: Pick<GameState, 'tiles' | 'freeTiles' | 'ca
 	const castleLevel = castleTile && castleTile.biome === 'castle' ? (castleTile.level ?? 1) : 0; // 0: no castle (lost)
 	const ownedTiles = economyTiles(state.tiles, state.freeTiles);
 	const tilesNeeded = REBIRTH.tilesNeeded(state.prestige.rebirths);
-	const gain = emberGain(castleLevel, ownedTiles, state.merchantUpgrades, state.prestige.rebirths);
+	const gain = emberGain(castleLevel, ownedTiles, state.merchantUpgrades, state.prestige.rebirths, state.prestige);
 	const idle = !state.castleUpgrade;
 	const requirements: RebirthRequirement[] = [
 		{

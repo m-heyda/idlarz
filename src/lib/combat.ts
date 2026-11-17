@@ -3,7 +3,7 @@ import { COMBAT, STAT_RULES } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import { classPassives } from '@/lib/classPassives';
 import { atkSpeedPercent, critDamagePercent, magicDamagePercent, physicalDamagePercent, statArmor, statManaRegen, type Attributes } from '@/lib/statBonuses';
-import type { CharacterStats, Equipment } from '@/types/game';
+import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
 
 // Pure combat rules: what a character's gear and attributes make of damage, speed, armor and HP. The server's fight engine
 // (lib/offline/fight.ts) runs fights on them; the character window shows the same numbers.
@@ -46,13 +46,17 @@ export const maxHp = (characterStats: CharacterStats, equipment: Equipment): num
 export const autoBattleUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.minRebirths;
 
 /**
- * Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
- * the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.
+ * Auto-use (the server drinking potions, casting Heal and Stun for the player) is bought in the Ember shop (Potion Reflex, one-time, 15 Embers): before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
+ * the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work. An account from before the reworked shop (no `shopVersion` in its Embers) keeps the old rule: unlocked with the first rebirth;
+ * the shop migration turns that into a free grant.
  *
  * @category Combat/A fight
  * @order 5
  */
-export const autoUseUnlocked = (rebirths: number): boolean => rebirths >= COMBAT.auto.useMinRebirths;
+export const autoUseUnlocked = (rebirths: number, prestige?: Pick<PrestigeState, 'upgrades' | 'grants' | 'shopVersion'>): boolean =>
+	(prestige?.upgrades?.potion ?? 0) > 0 ||
+	(prestige?.grants?.includes('potion') ?? false) ||
+	(prestige?.shopVersion === undefined && rebirths >= COMBAT.auto.useMinRebirths);
 
 /** The bucket the Next strip shows for a queued monster. */
 export type WinBucket = 'safe' | 'risky' | 'unlikely';

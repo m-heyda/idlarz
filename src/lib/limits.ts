@@ -1,6 +1,6 @@
 import { HARD_LIMITS, LIMITS, type LimitKey } from '@/config/limits';
 import { classPassives } from '@/lib/classPassives';
-import { emberEffect } from '@/utils/game/rebirth';
+import { emberEffect, emberOwned } from '@/utils/game/emberEffects';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
 import type { PrestigeState } from '@/types/game';
 
@@ -23,10 +23,28 @@ export interface LimitContext {
  * data so a test can register a bonus and prove that all the places that read the limit react to it.
  */
 export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } = {
-	bagSize: (ctx) => merchantEffect(ctx.merchantUpgrades, 'packrat') + emberEffect(ctx.prestige, 'deeppockets') + Math.max(0, Math.floor(ctx.beltSlots ?? 0)),
-	offlineCapHours: (ctx) => emberEffect(ctx.prestige, 'nightwatch') + (ctx.gear?.offlineCapHours ?? 0),
-	offlineEfficiency: (ctx) => emberEffect(ctx.prestige, 'steward') + ((ctx.gear?.offlineEff ?? 0) + classPassives(ctx.playerClass).offlineEffPct) / 100,
+	bagSize: (ctx) =>
+		merchantEffect(ctx.merchantUpgrades, 'packrat') +
+		merchantEffect(ctx.merchantUpgrades, 'packrat2') +
+		emberEffect(ctx.prestige, 'deeppockets') +
+		Math.max(0, Math.floor(ctx.beltSlots ?? 0)),
+	// Eternal Vigil (one-time) takes the away time to the hard limit and the efficiency to 100%; Night Watch and Steward are the cheaper steps before it
+	offlineCapHours: (ctx) =>
+		emberEffect(ctx.prestige, 'nightwatch') +
+		(emberOwned(ctx.prestige, 'vigil') ? HARD_LIMITS.offlineCapHours - LIMITS.offlineCapHours : 0) +
+		(ctx.gear?.offlineCapHours ?? 0),
+	offlineEfficiency: (ctx) =>
+		emberEffect(ctx.prestige, 'steward') +
+		(emberOwned(ctx.prestige, 'vigil') ? HARD_LIMITS.offlineEfficiency - LIMITS.offlineEfficiency : 0) +
+		((ctx.gear?.offlineEff ?? 0) + classPassives(ctx.playerClass).offlineEffPct) / 100,
+	// the three level caps of the Ember shop (the castle level still gates Producers, Extractors and the first five Idol levels)
+	idolMaxLevel: (ctx) => emberEffect(ctx.prestige, 'idolcap'),
+	buildingMaxLevel: (ctx) => emberEffect(ctx.prestige, 'buildcap'),
+	castleMaxLevel: (ctx) => emberEffect(ctx.prestige, 'castlecap'),
 };
+
+/** The limits `limitOf` cuts at the hard ceiling (the others are cut where they are read, e.g. `craftLimit`, `offlineCapHours`) */
+const CLAMPED: ReadonlySet<string> = new Set(['bagSize', 'idolMaxLevel', 'buildingMaxLevel', 'castleMaxLevel']);
 
 /**
  * The current value of a limit: its base plus the registered bonuses.
@@ -35,11 +53,12 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
  * @order 2
  * @formula
  * limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
- * bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots)
+ * bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat (old +8, new +4 per level) + Deep Pockets (+8 per level) + belt bag slots)
+ * castleMaxLevel = min(15, 10 + Castle Expansion level)      buildingMaxLevel = min(15, 5 + Master Masonry level)      idolMaxLevel = min(100, 5 + Idol Mastery level)
  */
 export const limitOf = (key: LimitKey, ctx: LimitContext = {}): number => {
 	if (ctx.hardCap && key in HARD_LIMITS) return HARD_LIMITS[key as keyof typeof HARD_LIMITS];
 	const value = LIMITS[key] + (LIMIT_BONUSES[key]?.(ctx) ?? 0);
-	// the bag is the one limit whose bonuses come from several uncapped sources (a belt next to Pack Rat and Deep Pockets): it never goes past the ceiling a save may hold
-	return key === 'bagSize' ? Math.min(value, HARD_LIMITS.bagSize) : value;
+	// the bag has several uncapped sources (a belt next to Pack Rat and Deep Pockets) and the level caps come from the Ember shop: they never go past the ceiling a save may hold
+	return CLAMPED.has(key) ? Math.min(value, HARD_LIMITS[key as keyof typeof HARD_LIMITS]) : value;
 };

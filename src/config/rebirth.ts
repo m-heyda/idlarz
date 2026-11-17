@@ -50,8 +50,16 @@ export const REBIRTH = {
 // The Ember shop: permanent upgrades bought with unspent Embers. The N+1-th level costs
 // ceil(baseCost x costGrowth^N) points.
 /**
- * The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
- * The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
+ * The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}). Shop levels are permanent: nothing refunds Embers on a rebirth.
+ * The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).
+ *
+ * - **Permanent twins of the merchant's gold upgrades** (about 3 x the step, kept through every rebirth): Master Haggler, Fortune, Overseer, Master Skinner, Click Mastery, the seven battle upgrades and Eternal Tithe (+50% Embers per level, 5 levels).
+ * - **Caps**: Treasury Charter (+5 points on the 45% tile-discount cap per level), Castle Expansion (castle level 10 to 15), Master Masonry (building level 5 to 10) and Idol Mastery (Idol level 5 up to 15, priced as an end-game goal). They read through `limitOf` (`castleMaxLevel`, `buildingMaxLevel`, `idolMaxLevel`).
+ * - **Build time**: Master Builders (castle), Mason's Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.
+ * - **One-time purchases** (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).
+ * - **Start of a run**: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).
+ * - **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system, Extra Builder for the second builder; they show greyed and cannot be bought.
+ * Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
  *
  * @category Progression/Ember shop
  * @order 1
@@ -65,6 +73,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.4,
 		effectPerLevel: 0.02, // -2% tile and building cost per level
 	},
+	charter: {
+		label: 'Treasury Charter',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 5, // +5 points on the tile-discount cap per level (base 45%), so Charisma, Thrift and Bulk Discount are never wasted
+	},
 	builders: {
 		label: 'Master Builders',
 		maxLevel: 10,
@@ -72,20 +87,42 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.4,
 		effectPerLevel: 0.05, // -5% castle build time per level
 	},
+	buildtime: {
+		label: "Mason's Guild",
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.05, // -5% build time of Producers and Extractors per level
+	},
+	idoltime: {
+		label: 'Shrine Keepers',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.05, // -5% build time of Idols per level
+	},
 	mastery: {
 		label: 'Click Mastery',
 		maxLevel: 10,
 		baseCost: 2,
 		costGrowth: 1.4,
-		effectPerLevel: 0.25, // +25% gold per click per level
+		effectPerLevel: 0.5, // +50% gold per click per level (merchant Click Power is the cheaper, weaker twin)
+	},
+	startgold: {
+		label: 'Starting Treasury',
+		maxLevel: 5,
+		baseCost: 6,
+		costGrowth: 1.9,
+		effectPerLevel: 1, // the level picks a step: base gold per second at the start of every run, see `steps`
+		steps: [0, 1, 5, 10, 20, 35] as readonly number[], // gold per second by level (index = level); it replaces the 0.1 base and every multiplier counts from there
 	},
 	provisions: {
 		label: 'Provisions',
-		maxLevel: 10,
+		maxLevel: 15,
 		baseCost: 2,
 		costGrowth: 1.4,
 		effectPerLevel: 1, // levels of the starting bundle below
-		bundle: { gold: 1500, wood: 400, stone: 400 } as Partial<Resources>, // per level, given at the start of every run
+		bundle: { gold: 1500, wood: 400, stone: 400, food: 200, coal: 100 } as Partial<Resources>, // per level, given at the start of every run
 	},
 	nightwatch: {
 		label: 'Night Watch',
@@ -101,13 +138,176 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.4,
 		effectPerLevel: 0.05, // +5% of the normal income while you are away, per level (base: LIMITS.offlineEfficiency)
 	},
+	vigil: {
+		label: 'Eternal Vigil',
+		maxLevel: 1,
+		baseCost: 120,
+		costGrowth: 1,
+		effectPerLevel: 1, // one-time: away income 100% and the away time up to the hard limit (72 h)
+	},
 	deeppockets: {
 		label: 'Deep Pockets',
-		maxLevel: 3,
+		maxLevel: 5,
 		baseCost: 30,
-		costGrowth: 1.8, // 30 / 54 / 98 Embers
-		effectPerLevel: 4, // +4 bag slots per level (base: LIMITS.bagSize), kept through every rebirth
+		costGrowth: 1.8, // 30 / 54 / 98 / 175 / 315 Embers
+		effectPerLevel: 8, // +8 bag slots per level (base: LIMITS.bagSize), kept through every rebirth
+	},
+	haggler: {
+		label: 'Master Haggler',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.1, // +10% gold from everything you sell, per level (merchant Haggler: +3%)
+	},
+	fortune: {
+		label: 'Fortune',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 6, // +6 Luck per level (merchant Lucky Charm: +2)
+	},
+	artisan: {
+		label: "Artisan's Eye",
+		maxLevel: 10,
+		baseCost: 4,
+		costGrowth: 1.4,
+		effectPerLevel: 3, // +3 Luck on crafted gear only (a better chance of the higher rarities), per level
+	},
+	overseer: {
+		label: 'Overseer',
+		maxLevel: 10,
+		baseCost: 4,
+		costGrowth: 1.4,
+		effectPerLevel: 0.03, // +3% income from every resource but XP per level (merchant Foreman: +1%)
+	},
+	skinner: {
+		label: 'Master Skinner',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.15, // +15% meat and hide from the animals per level (merchant Skinner: +5%)
+	},
+	tithe: {
+		label: 'Eternal Tithe',
+		maxLevel: 5,
+		baseCost: 5,
+		costGrowth: 2, // 5 / 10 / 20 / 40 / 80 Embers
+		effectPerLevel: 0.5, // +50% Embers from every rebirth per level (merchant Ancestral Tithe: +5%)
+	},
+	tempo: {
+		label: 'Battle Tempo',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 3, // +3% attack speed per level
+	},
+	precision: {
+		label: 'Precision',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 1.5, // +1.5 points of crit chance per level (COMBAT.crit.maxCritChance still caps it)
+	},
+	execution: {
+		label: 'Execution',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 1.5, // +1.5 points of super-crit chance per level (COMBAT.crit.maxSuperChance still caps it)
+	},
+	brawn: {
+		label: 'Brawn',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 4, // +4% damage with physical weapons per level
+	},
+	sorcery: {
+		label: 'Sorcery',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 4, // +4% damage with staves and wands per level
+	},
+	bloodthirst: {
+		label: 'Bloodthirst',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.75, // +0.75% life leech per level (STAT_RULES.lifeLeechCap still caps the total)
+	},
+	vigor: {
+		label: 'Vigor',
+		maxLevel: 10,
+		baseCost: 3,
+		costGrowth: 1.4,
+		effectPerLevel: 0.5, // +0.5 HP regenerated per second per level
+	},
+	potion: {
+		label: 'Potion Reflex',
+		maxLevel: 1,
+		baseCost: 15,
+		costGrowth: 1,
+		effectPerLevel: 1, // one-time: the hero drinks potions on their own in fights (auto-potion); saves with a rebirth already done have it
+	},
+	castlecap: {
+		label: 'Castle Expansion',
+		maxLevel: 5,
+		baseCost: 60,
+		costGrowth: 2.2, // 60 / 132 / 290 / 639 / 1405 Embers
+		effectPerLevel: 1, // +1 castle level of cap per level (10 up to 15)
+	},
+	buildcap: {
+		label: 'Master Masonry',
+		maxLevel: 5,
+		baseCost: 40,
+		costGrowth: 2.2,
+		effectPerLevel: 1, // +1 level of cap for Producers and Extractors per level (5 up to 10); the castle level still gates each level
+	},
+	idolcap: {
+		label: 'Idol Mastery',
+		maxLevel: 10,
+		baseCost: 100,
+		costGrowth: 2.5, // the end-game goal: 100 Embers for the first level, about 380,000 for the last
+		effectPerLevel: 1, // +1 Idol level of cap per level (5 up to 15)
+	},
+	decree: {
+		label: 'Imperial Decree',
+		maxLevel: 1,
+		baseCost: 150,
+		costGrowth: 1,
+		effectPerLevel: 1, // one-time: the castle bonus counts double
+	},
+	extrabuilder: {
+		label: 'Extra Builder',
+		maxLevel: 2,
+		baseCost: 40,
+		costGrowth: 3,
+		effectPerLevel: 1, // +1 builder per level (the gem shop sells the second one)
+	},
+	questrarity: {
+		label: 'Quest Rarity',
+		maxLevel: 10,
+		baseCost: 5,
+		costGrowth: 1.4,
+		effectPerLevel: 2, // disabled until quests exist: a better chance of a higher quest rarity, per level
+	},
+	questslots: {
+		label: 'Quest Slots',
+		maxLevel: 5,
+		baseCost: 25,
+		costGrowth: 2,
+		effectPerLevel: 1, // disabled until quests exist: +1 active quest per level
 	},
 } as const;
+
+/**
+ * Shop upgrades that cannot be bought yet: the two quest upgrades (the quest system is not built) and Extra Builder (until the second builder exists in the game; the gem shop sells it first). Shown greyed, refused by `buyEmberUpgrade`, and
+ * `emberEffect` counts them as 0.
+ */
+export const EMBER_DISABLED: ReadonlySet<string> = new Set(['questrarity', 'questslots', 'extrabuilder']);
+
+/** The generation of the Ember shop. New accounts start at it; an account from before the rework has none until the shop migration moves it (refunds its Embers and grants what it had for free). */
+export const SHOP_VERSION = 2;
 
 export type EmberUpgradeId = keyof typeof EMBER_UPGRADES;

@@ -169,9 +169,11 @@ export const BASE_GENERATION_RATES = amounts({ gold: 0.1, xp: 0.25 });
  */
 export const CLICK_LADDER = [
 	{ power: 2, floor: 2, price: 0 },
-	{ power: 4, floor: 6, price: 750000 },
-	{ power: 8, floor: 20, price: 2500000 },
-	{ power: 15, floor: 60, price: 10000000 },
+	{ power: 3.5, floor: 5, price: 500000 },
+	{ power: 6, floor: 12, price: 1500000 },
+	{ power: 10, floor: 30, price: 4000000 },
+	{ power: 16, floor: 70, price: 10000000 },
+	{ power: 24, floor: 150, price: 25000000 },
 ] as const;
 
 /**

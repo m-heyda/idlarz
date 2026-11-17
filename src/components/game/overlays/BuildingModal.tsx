@@ -64,10 +64,19 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const level = levelOfTile(tile);
 	const idol = idolDef(def.id);
 	const ownedTiles = economyTiles(tiles, freeTiles);
-	const ctx: BuildingContext = { tiles, monsters, castleLevel: castleLevelOf(tiles), castleUpgrade, buildingUpgrade: buildingUpgrade ?? null, ownedTiles };
+	const ctx: BuildingContext = {
+		tiles,
+		monsters,
+		castleLevel: castleLevelOf(tiles),
+		castleUpgrade,
+		buildingUpgrade: buildingUpgrade ?? null,
+		ownedTiles,
+		idolMax: limitOf('idolMaxLevel', { prestige }),
+		buildingMax: limitOf('buildingMaxLevel', { prestige }),
+	};
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
-	const top = def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel;
+	const top = def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige });
 	const atTop = level >= top;
 	const running = buildingUpgrade && buildingUpgrade.x === x && buildingUpgrade.y === y ? buildingUpgrade : null;
 	const nextLevel = level + 1;
@@ -90,7 +99,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		(key) => (now?.[key as keyof Resources] ?? 0) > 0 || (next?.[key as keyof Resources] ?? 0) > 0,
 	) as (keyof Resources)[];
 	const perHour = (o: Partial<Resources> | null, key: keyof Resources) => formatNumber((o?.[key] ?? 0) * HOUR);
-	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct) : 0;
+	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct, def.kind === 'idol' ? 'idol' : 'building') : 0;
 	const progress = running && total > 0 ? Math.min(1, Math.max(0, 1 - running.remainingSec / total)) : 0;
 
 	return (
@@ -184,7 +193,9 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>
 								)}
 								<div className='bw-foot'>
-									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
+									<span className='bw-time'>
+										Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct, def.kind === 'idol' ? 'idol' : 'building'))}
+									</span>
 									<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
 										Upgrade
 									</Button>

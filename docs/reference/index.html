@@ -14,7 +14,7 @@ article{background:var(--card);border:1px solid var(--line);border-radius:8px;pa
 small{color:var(--muted);font-weight:400;font-size:12px}table{border-collapse:collapse;display:block;overflow:auto;margin:8px 0}th,td{border:1px solid var(--line);padding:3px 8px;text-align:left;vertical-align:top}th{background:var(--code)}
 .hidden{display:none}.blurb{color:var(--muted)}
 @media (max-width:800px){.layout{display:block}nav{position:static;width:auto;height:auto;max-height:260px}main{padding:8px 16px 60px}}
-</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="rebirth-biome-output" href="#rebirth-biome-output">REBIRTH_BIOME_OUTPUT</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-ward" href="#castle-ward">CASTLE_WARD</a><a data-id="isinward" href="#isinward">isInWard</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="sellresource" href="#sellresource">sellResource</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><a data-id="buyresource" href="#buyresource">buyResource</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><div class="sub">Buildings</div><a data-id="buildings-flag" href="#buildings-flag">BUILDINGS_FLAG</a><a data-id="building-rules" href="#building-rules">BUILDING_RULES</a><a data-id="buildings" href="#buildings">BUILDINGS</a><a data-id="produceroutput" href="#produceroutput">producerOutput</a><a data-id="extractoroutput" href="#extractoroutput">extractorOutput</a><a data-id="buildingupgradeduration" href="#buildingupgradeduration">buildingUpgradeDuration</a><a data-id="idols" href="#idols">IDOLS</a><a data-id="buildinglevelcost" href="#buildinglevelcost">buildingLevelCost</a><a data-id="idol-rules" href="#idol-rules">IDOL_RULES</a><a data-id="idoleconomy" href="#idoleconomy">idolEconomy</a><div class="sub">Gems</div><a data-id="gem-shop" href="#gem-shop">GEM_SHOP</a><a data-id="daily-bonus-gems" href="#daily-bonus-gems">DAILY_BONUS_GEMS</a><a data-id="daily-chest" href="#daily-chest">DAILY_CHEST</a><a data-id="dailyinfo" href="#dailyinfo">dailyInfo</a><a data-id="rolldailychest" href="#rolldailychest">rollDailyChest</a><a data-id="applyspend" href="#applyspend">applySpend</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="autouseunlocked" href="#autouseunlocked">autoUseUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="potioncooldownsec" href="#potioncooldownsec">potionCooldownSec</a><a data-id="potionpower" href="#potionpower">potionPower</a><a data-id="potionslotcount" href="#potionslotcount">potionSlotCount</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><a data-id="boss-loot" href="#boss-loot">BOSS_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><div class="sub">Junk</div><a data-id="isjunk" href="#isjunk">isJunk</a><a data-id="junksale" href="#junksale">junkSale</a><a data-id="selljunkrule" href="#selljunkrule">sellJunkRule</a><a data-id="rolljunkdrops" href="#rolljunkdrops">rollJunkDrops</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="attributebudget" href="#attributebudget">attributeBudget</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="allocatepoints" href="#allocatepoints">allocatePoints</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><a data-id="keepref" href="#keepref">KeepRef</a><a data-id="rebirthunlockintro" href="#rebirthunlockintro">rebirthUnlockIntro</a><a data-id="rebirthrunsummary" href="#rebirthrunsummary">rebirthRunSummary</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><a data-id="beltslotsfor" href="#beltslotsfor">beltSlotsFor</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="craftxpof" href="#craftxpof">craftXpOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><div class="sub">Rankings</div><a data-id="ranking-boards" href="#ranking-boards">The boards</a><a data-id="movement" href="#movement">Movement arrows</a><div class="sub">Avatars</div><a data-id="unlockedavatarids" href="#unlockedavatarids">unlockedAvatarIds</a><a data-id="checkavatar" href="#checkavatar">checkAvatar</a><a data-id="class-avatars" href="#class-avatars">CLASS_AVATARS</a><a data-id="avatarinfo" href="#avatarinfo">Avatars</a><a data-id="createavatarpicker" href="#createavatarpicker">createAvatarPicker</a><div class="sub">Pets</div><a data-id="petdef" href="#petdef">PetDef</a><a data-id="nextwanderstep" href="#nextwanderstep">nextWanderStep</a><a data-id="pickpetphrase" href="#pickpetphrase">pickPetPhrase</a><a data-id="applypets" href="#applypets">applyPets</a><div class="sub">Class passives</div><a data-id="classpassives" href="#classpassives">classPassives</a><a data-id="classxpbucket" href="#classxpbucket">classXpBucket</a><a data-id="starter-equipment-by-class" href="#starter-equipment-by-class">STARTER_EQUIPMENT_BY_CLASS</a><div class="sub">Achievements</div><a data-id="settleachievements" href="#settleachievements">settleAchievements</a><a data-id="claimachievement" href="#claimachievement">claimAchievement</a><a data-id="worldfacts" href="#worldfacts">worldFacts</a><a data-id="recordcuriosity" href="#recordcuriosity">recordCuriosity</a><a data-id="achievements" href="#achievements">Achievements</a><div class="sub">Mastery</div><a data-id="claimmastery" href="#claimmastery">claimMastery</a><a data-id="claimallmastery" href="#claimallmastery">claimAllMastery</a><a data-id="mastery-tiers" href="#mastery-tiers">Bestiary mastery</a><div class="sub">Guided tutorial</div><a data-id="guidevisiblefor" href="#guidevisiblefor">guideVisibleFor</a><a data-id="buildnumbers" href="#buildnumbers">buildNumbers</a><a data-id="readprogress" href="#readprogress">readProgress</a><a data-id="applytutorial" href="#applytutorial">applyTutorial</a><a data-id="tutorialguide" href="#tutorialguide">TutorialGuide</a><a data-id="tutorial-path" href="#tutorial-path">The guided tutorial</a><div class="sub">Badges</div><a data-id="nick-colors" href="#nick-colors">NICK_COLORS</a><a data-id="nick-effects" href="#nick-effects">NICK_EFFECTS</a><a data-id="badgeoptions" href="#badgeoptions">badgeOptions</a><div class="sub">Deeds</div><a data-id="claimallachievements" href="#claimallachievements">claimAllAchievements</a><a data-id="deeds" href="#deeds">Deeds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><a data-id="bodyupgrade" href="#bodyupgrade">BodyUpgrade</a><a data-id="upgradebody" href="#upgradebody">upgradeBody</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="restoretrust" href="#restoretrust">restoreTrust</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="settleidols" href="#settleidols">settleIdols</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><a data-id="finite" href="#finite">finite</a><a data-id="ledgerrowupgrade" href="#ledgerrowupgrade">LedgerRowUpgrade</a><a data-id="statswithouttutorial" href="#statswithouttutorial">statsWithoutTutorial</a><a data-id="loadbootsnapshot" href="#loadbootsnapshot">loadBootSnapshot</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><a data-id="get" href="#get">GET /api/rankings</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="awayblockof" href="#awayblockof">awayBlockOf</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Notifications</div><a data-id="notify" href="#notify">Short notices (notify)</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="npc-portraits" href="#npc-portraits">NPC_PORTRAITS</a><a data-id="biome-art" href="#biome-art">BIOME_ART</a><a data-id="animal-pixel-icons" href="#animal-pixel-icons">ANIMAL_PIXEL_ICONS</a><a data-id="animalicon" href="#animalicon">animalIcon</a><div class="sub">Guest mode</div><a data-id="guest-mode" href="#guest-mode">Guest mode</a><a data-id="guestpage" href="#guestpage">Guest game (/guest)</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><a data-id="the-class-picker-acceptance" href="#the-class-picker-acceptance">The class picker acceptance</a><a data-id="the-local-sim-runner" href="#the-local-sim-runner">The local sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><a data-id="the-generated-docs-inputs-hash" href="#the-generated-docs-inputs-hash">The generated-docs inputs hash</a><a data-id="the-local-verify-script-and-the-pre-push-hook" href="#the-local-verify-script-and-the-pre-push-hook">The local verify script and the pre-push hook</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="giving-a-flagged-account-its-trust-back-restore-trust" href="#giving-a-flagged-account-its-trust-back-restore-trust">Giving a flagged account its trust back (restore-trust)</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a><a data-id="turning-enforcement-and-the-server-run-rebirth-on-together" href="#turning-enforcement-and-the-server-run-rebirth-on-together">Turning enforcement and the server-run rebirth on together</a><a data-id="rehearsal-seeding-seed-rehearsal" href="#rehearsal-seeding-seed-rehearsal">Rehearsal seeding (seed-rehearsal)</a><a data-id="rehearsal-seeding-the-pure-part" href="#rehearsal-seeding-the-pure-part">Rehearsal seeding (the pure part)</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
+</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="rebirth-biome-output" href="#rebirth-biome-output">REBIRTH_BIOME_OUTPUT</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-ward" href="#castle-ward">CASTLE_WARD</a><a data-id="isinward" href="#isinward">isInWard</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="sellresource" href="#sellresource">sellResource</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><a data-id="buyresource" href="#buyresource">buyResource</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><div class="sub">Buildings</div><a data-id="buildings-flag" href="#buildings-flag">BUILDINGS_FLAG</a><a data-id="building-rules" href="#building-rules">BUILDING_RULES</a><a data-id="buildings" href="#buildings">BUILDINGS</a><a data-id="produceroutput" href="#produceroutput">producerOutput</a><a data-id="extractoroutput" href="#extractoroutput">extractorOutput</a><a data-id="buildingupgradeduration" href="#buildingupgradeduration">buildingUpgradeDuration</a><a data-id="idols" href="#idols">IDOLS</a><a data-id="buildinglevelcost" href="#buildinglevelcost">buildingLevelCost</a><a data-id="idol-rules" href="#idol-rules">IDOL_RULES</a><a data-id="idoleconomy" href="#idoleconomy">idolEconomy</a><div class="sub">Gems</div><a data-id="gem-shop" href="#gem-shop">GEM_SHOP</a><a data-id="daily-bonus-gems" href="#daily-bonus-gems">DAILY_BONUS_GEMS</a><a data-id="daily-chest" href="#daily-chest">DAILY_CHEST</a><a data-id="dailyinfo" href="#dailyinfo">dailyInfo</a><a data-id="rolldailychest" href="#rolldailychest">rollDailyChest</a><a data-id="applyspend" href="#applyspend">applySpend</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="autouseunlocked" href="#autouseunlocked">autoUseUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="potioncooldownsec" href="#potioncooldownsec">potionCooldownSec</a><a data-id="potionpower" href="#potionpower">potionPower</a><a data-id="potionslotcount" href="#potionslotcount">potionSlotCount</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><a data-id="boss-loot" href="#boss-loot">BOSS_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><div class="sub">Junk</div><a data-id="isjunk" href="#isjunk">isJunk</a><a data-id="junksale" href="#junksale">junkSale</a><a data-id="selljunkrule" href="#selljunkrule">sellJunkRule</a><a data-id="rolljunkdrops" href="#rolljunkdrops">rollJunkDrops</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="attributebudget" href="#attributebudget">attributeBudget</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="allocatepoints" href="#allocatepoints">allocatePoints</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><a data-id="keepref" href="#keepref">KeepRef</a><a data-id="rebirthunlockintro" href="#rebirthunlockintro">rebirthUnlockIntro</a><a data-id="rebirthrunsummary" href="#rebirthrunsummary">rebirthRunSummary</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><a data-id="beltslotsfor" href="#beltslotsfor">beltSlotsFor</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="craftxpof" href="#craftxpof">craftXpOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><div class="sub">Rankings</div><a data-id="ranking-boards" href="#ranking-boards">The boards</a><a data-id="movement" href="#movement">Movement arrows</a><div class="sub">Avatars</div><a data-id="unlockedavatarids" href="#unlockedavatarids">unlockedAvatarIds</a><a data-id="checkavatar" href="#checkavatar">checkAvatar</a><a data-id="class-avatars" href="#class-avatars">CLASS_AVATARS</a><a data-id="avatarinfo" href="#avatarinfo">Avatars</a><a data-id="createavatarpicker" href="#createavatarpicker">createAvatarPicker</a><div class="sub">Pets</div><a data-id="petdef" href="#petdef">PetDef</a><a data-id="nextwanderstep" href="#nextwanderstep">nextWanderStep</a><a data-id="pickpetphrase" href="#pickpetphrase">pickPetPhrase</a><a data-id="applypets" href="#applypets">applyPets</a><div class="sub">Class passives</div><a data-id="classpassives" href="#classpassives">classPassives</a><a data-id="classxpbucket" href="#classxpbucket">classXpBucket</a><a data-id="starter-equipment-by-class" href="#starter-equipment-by-class">STARTER_EQUIPMENT_BY_CLASS</a><div class="sub">Achievements</div><a data-id="settleachievements" href="#settleachievements">settleAchievements</a><a data-id="claimachievement" href="#claimachievement">claimAchievement</a><a data-id="worldfacts" href="#worldfacts">worldFacts</a><a data-id="recordcuriosity" href="#recordcuriosity">recordCuriosity</a><a data-id="achievements" href="#achievements">Achievements</a><div class="sub">Mastery</div><a data-id="claimmastery" href="#claimmastery">claimMastery</a><a data-id="claimallmastery" href="#claimallmastery">claimAllMastery</a><a data-id="mastery-tiers" href="#mastery-tiers">Bestiary mastery</a><div class="sub">Guided tutorial</div><a data-id="guidevisiblefor" href="#guidevisiblefor">guideVisibleFor</a><a data-id="buildnumbers" href="#buildnumbers">buildNumbers</a><a data-id="readprogress" href="#readprogress">readProgress</a><a data-id="applytutorial" href="#applytutorial">applyTutorial</a><a data-id="tutorialguide" href="#tutorialguide">TutorialGuide</a><a data-id="tutorial-path" href="#tutorial-path">The guided tutorial</a><div class="sub">Badges</div><a data-id="nick-colors" href="#nick-colors">NICK_COLORS</a><a data-id="nick-effects" href="#nick-effects">NICK_EFFECTS</a><a data-id="badgeoptions" href="#badgeoptions">badgeOptions</a><div class="sub">Deeds</div><a data-id="claimallachievements" href="#claimallachievements">claimAllAchievements</a><a data-id="deeds" href="#deeds">Deeds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><a data-id="bodyupgrade" href="#bodyupgrade">BodyUpgrade</a><a data-id="upgradebody" href="#upgradebody">upgradeBody</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="restoretrust" href="#restoretrust">restoreTrust</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="settleidols" href="#settleidols">settleIdols</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><a data-id="finite" href="#finite">finite</a><a data-id="ledgerrowupgrade" href="#ledgerrowupgrade">LedgerRowUpgrade</a><a data-id="statswithouttutorial" href="#statswithouttutorial">statsWithoutTutorial</a><a data-id="loadbootsnapshot" href="#loadbootsnapshot">loadBootSnapshot</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><a data-id="get" href="#get">GET /api/rankings</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="awayblockof" href="#awayblockof">awayBlockOf</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><div class="sub">Migrations</div><a data-id="refundoldshop" href="#refundoldshop">refundOldShop</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Notifications</div><a data-id="notify" href="#notify">Short notices (notify)</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="npc-portraits" href="#npc-portraits">NPC_PORTRAITS</a><a data-id="biome-art" href="#biome-art">BIOME_ART</a><a data-id="animal-pixel-icons" href="#animal-pixel-icons">ANIMAL_PIXEL_ICONS</a><a data-id="animalicon" href="#animalicon">animalIcon</a><div class="sub">Guest mode</div><a data-id="guest-mode" href="#guest-mode">Guest mode</a><a data-id="guestpage" href="#guestpage">Guest game (/guest)</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><a data-id="the-class-picker-acceptance" href="#the-class-picker-acceptance">The class picker acceptance</a><a data-id="the-local-sim-runner" href="#the-local-sim-runner">The local sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><a data-id="the-generated-docs-inputs-hash" href="#the-generated-docs-inputs-hash">The generated-docs inputs hash</a><a data-id="the-local-verify-script-and-the-pre-push-hook" href="#the-local-verify-script-and-the-pre-push-hook">The local verify script and the pre-push hook</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="giving-a-flagged-account-its-trust-back-restore-trust" href="#giving-a-flagged-account-its-trust-back-restore-trust">Giving a flagged account its trust back (restore-trust)</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a><a data-id="turning-enforcement-and-the-server-run-rebirth-on-together" href="#turning-enforcement-and-the-server-run-rebirth-on-together">Turning enforcement and the server-run rebirth on together</a><a data-id="rehearsal-seeding-seed-rehearsal" href="#rehearsal-seeding-seed-rehearsal">Rehearsal seeding (seed-rehearsal)</a><a data-id="rehearsal-seeding-the-pure-part" href="#rehearsal-seeding-the-pure-part">Rehearsal seeding (the pure part)</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
 <h3>The game at a glance</h3>
 <p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:17</code></a></p>
 <p>Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. Everything here describes <strong>only what the code does now</strong>, with the symbol each number comes from.</p>
@@ -332,12 +332,12 @@ ceiling  = RESOURCE_CAP / 100
 <p>See also: <a href="#tileprice"><code>tilePrice</code></a>, <a href="#effectivetilediscount"><code>effectiveTileDiscount</code></a>, <a href="#tile-resource-cost"><code>TILE_RESOURCE_COST</code></a></p>
 </article><article><p><a id="effectivetilediscount"></a></p>
 <h3><code>effectiveTileDiscount</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:64</code></a></p>
+<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:71</code></a></p>
 <p>Percent off tile cost: Charisma plus Thrift, capped.</p>
-<p>The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior&#39;s class passive (3 points), capped at 45% (<code>REBIRTH.discountCapPercent</code>).
+<p>The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior&#39;s class passive (3 points), capped at 45% (<code>REBIRTH.discountCapPercent</code>) plus 5 points per Treasury Charter level (Ember shop).
 Buildings take Thrift only.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
+<pre><code class="language-text">discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
 </code></pre>
 </article><article><p><a id="calculatexpgain"></a></p>
 <h3><code>calculateXpGain</code> <small>function</small></h3>
@@ -505,10 +505,10 @@ plains and never more than <code>maxOfOther</code> of any other biome. Retries w
 </article><h2>Castle</h2><article><p><a id="castle-upgrade"></a></p>
 <h3><code>CASTLE_UPGRADE</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/castle.ts"><code>src/config/castle.ts:60</code></a></p>
-<p>The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.</p>
+<p>The castle: levels 1-10, up to 15 with the Castle Expansion Ember upgrade (<code>maxLevel</code> is the base cap; read the real one with <code>limitOf(&#39;castleMaxLevel&#39;)</code>, and <code>HARD_LIMITS.castleMaxLevel</code> is what a save may hold). An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.</p>
 <ul>
 <li><strong>Modifier</strong> added to every resource: see <a href="#castlemodifier"><code>castleModifier</code></a>. <strong>Flat XP</strong>: +0.5 xp/s per level above 1 (<code>xpBonus</code>).</li>
-<li><strong>Timers</strong> (<code>durationsSec</code>), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d. Master Builders (Ember shop) cuts them 5% per level (<a href="#castleupgradeduration"><code>castleUpgradeDuration</code></a>).</li>
+<li><strong>Timers</strong> (<code>durationsSec</code>), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d, then 4.5 d, 6 d, 8 d, 11 d, 14 d for levels 11 to 15. Master Builders (Ember shop) cuts them 5% per level (<a href="#castleupgradeduration"><code>castleUpgradeDuration</code></a>).</li>
 <li><strong>Costs</strong> per step (<code>upgradeCosts</code>): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in <code>docs/generated/balance-tables.md</code>.</li>
 <li><strong>Range</strong> (violet area), <strong>area bonus</strong> and <strong>ward</strong>: <a href="#castle-range"><code>CASTLE_RANGE</code></a>, <a href="#castle-area-bonus"><code>CASTLE_AREA_BONUS</code></a>, <a href="#castle-ward"><code>CASTLE_WARD</code></a>.</li>
 </ul>
@@ -601,23 +601,24 @@ plains and never more than <code>maxOfOther</code> of any other biome. Retries w
 <td>+1920%</td>
 <td>9x9</td>
 <td>+400%</td>
-<td>-</td>
-<td>-</td>
+<td>4.5 d</td>
+<td>gold 197 M, wood 19.5 M, stone 19.5 M, coal 10.5 M, food 105 M, meat 5.1 M</td>
 </tr>
 </tbody></table>
 <p>See also: <a href="#castlemodifier"><code>castleModifier</code></a>, <a href="#castleupgradeduration"><code>castleUpgradeDuration</code></a></p>
 </article><article><p><a id="castlemodifier"></a></p>
 <h3><code>castleModifier</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/castle.ts"><code>src/utils/game/castle.ts:16</code></a></p>
+<p>Source: <a href="../../src/utils/game/castle.ts"><code>src/utils/game/castle.ts:17</code></a></p>
 <p>Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
 level up to <code>doublingUntil</code>, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">castleModifier(L) = 0.2 x 2^(L-1)                 for L &lt;= 6   (+20%, +40%, +80%, +160%, +320%, +640%)
-                  = 0.2 x 2^5 + 3.2 x (L - 6)     for L &gt; 6    (+960%, +1280%, +1600%, +1920%)
+                  = 0.2 x 2^5 + 3.2 x (L - 6)     for L &gt; 6    (+960%, +1280%, +1600%, +1920%; with the Castle Expansion +2240% to +3520% at levels 11 to 15)
+Imperial Decree (Ember shop, one-time) counts the bonus twice.
 </code></pre>
 </article><article><p><a id="castleupgradeduration"></a></p>
 <h3><code>castleUpgradeDuration</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/castle.ts"><code>src/utils/game/castle.ts:34</code></a></p>
+<p>Source: <a href="../../src/utils/game/castle.ts"><code>src/utils/game/castle.ts:35</code></a></p>
 <p>Seconds the castle needs to go from <code>fromLevel</code> to <code>fromLevel + 1</code>.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
@@ -645,7 +646,7 @@ level up to <code>doublingUntil</code>, then a fixed step per level (so levels 7
 <p>How far (tiles, every side) the violet range area reaches: 1 (3x3) up to level 7, then one more tile per level (5x5 at 8, 9x9 at 10).</p>
 <p>Used by the income (the area bonus pass), the castle range overlay and the save checks.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">radius = 1 + max(0, level - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10: 4 (9x9)
+<pre><code class="language-text">radius = 1 + max(0, min(level, 10) - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10 and above: 4 (9x9; levels 11-15 add the castle bonus, not more range)
 </code></pre>
 </article><article><p><a id="castleareabonus"></a></p>
 <h3><code>castleAreaBonus</code> <small>function</small></h3>
@@ -854,7 +855,7 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 </tbody></table>
 </article><article><p><a id="merchant-goods"></a></p>
 <h3><code>MERCHANT_GOODS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:193</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:202</code></a></p>
 <p>The goods shelf and its refresh rules (<a href="#generatemerchantstock"><code>generateMerchantStock</code></a>). Potions are always in stock at their catalog <code>shop</code> price (<code>MERCHANT_SHOP_ITEMS</code>).</p>
 <ul>
 <li><strong>Shelf</strong>: 6 pieces of gear (<code>LIMITS.merchantOffers</code>) from the loot source <code>merchant</code> (common 60 / uncommon 40, see <a href="#generateloot"><code>generateLoot</code></a>), item level centred at most 3 above the average worn item
@@ -904,9 +905,17 @@ The count is never reset, not even by a rebirth.</li>
 <td>1.9</td>
 </tr>
 <tr>
-<td>packrat (Pack Rat)</td>
+<td>packrat (Pack Rat (old))</td>
 <td>Economy</td>
 <td>+8 bag slots</td>
+<td>6</td>
+<td>500 K</td>
+<td>3</td>
+</tr>
+<tr>
+<td>packrat2 (Pack Rat)</td>
+<td>Economy</td>
+<td>+4 bag slots</td>
 <td>6</td>
 <td>500 K</td>
 <td>3</td>
@@ -994,26 +1003,26 @@ The count is never reset, not even by a rebirth.</li>
 </tbody></table>
 </article><article><p><a id="sellpayout"></a></p>
 <h3><code>sellPayout</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:62</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:65</code></a></p>
 <p>Gold for selling <code>qty</code> of something worth <code>unit</code> each.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
+<pre><code class="language-text">payout = floor(units x unit price x (1 + 0.03 x Haggler level + 0.1 x Master Haggler level + Lighthouse %))
 </code></pre>
 <p>See also: <code>sellMultiplier (src/utils/game/merchant.ts)</code></p>
 </article><article><p><a id="buycost"></a></p>
 <h3><code>buyCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:72</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:75</code></a></p>
 <p>Gold for buying <code>units</code> of a resource from the merchant: twice the selling price, rounded up in the merchant&#39;s favour (the store and the Resources tab use this).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost = ceil(units x sell price x 2)
 </code></pre>
 </article><article><p><a id="merchant-buy-multiplier"></a></p>
 <h3><code>MERCHANT_BUY_MULTIPLIER</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:224</code></a></p>
+<p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:233</code></a></p>
 <p>The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).</p>
 </article><article><p><a id="merchantupgradecost"></a></p>
 <h3><code>merchantUpgradeCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:25</code></a></p>
+<p>Source: <a href="../../src/utils/game/merchant.ts"><code>src/utils/game/merchant.ts:26</code></a></p>
 <p>Gold price of the next level of a merchant upgrade.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost of level N+1 = ceil(baseCost x growth^N)
@@ -1076,31 +1085,43 @@ The ladder is bought from the merchant. Clicking a tile or building pays nothing
 </tr>
 <tr>
 <td>1</td>
-<td>4</td>
-<td>6</td>
-<td>750 K</td>
+<td>3.5</td>
+<td>5</td>
+<td>500 K</td>
 </tr>
 <tr>
 <td>2</td>
-<td>8</td>
-<td>20</td>
-<td>2.5 M</td>
+<td>6</td>
+<td>12</td>
+<td>1.5 M</td>
 </tr>
 <tr>
 <td>3</td>
-<td>15</td>
-<td>60</td>
+<td>10</td>
+<td>30</td>
+<td>4 M</td>
+</tr>
+<tr>
+<td>4</td>
+<td>16</td>
+<td>70</td>
 <td>10 M</td>
+</tr>
+<tr>
+<td>5</td>
+<td>24</td>
+<td>150</td>
+<td>25 M</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="click-limit"></a></p>
 <h3><code>CLICK_LIMIT</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:203</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:205</code></a></p>
 <p>The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day,
 so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (<code>requireTrusted</code>). Implementation: <a href="#createclicklimiter"><code>createClickLimiter</code></a>.</p>
 </article><article><p><a id="clickgold"></a></p>
 <h3><code>clickGold</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:186</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:188</code></a></p>
 <p>Gold of one click at a ladder level: gold/s x power (at least the level&#39;s floor), then the multipliers (Click Mastery, set bonus).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">gold per click = max(gold/s x power, floor) x multiplier        power and floor from CLICK_LADDER[click level]
@@ -1573,7 +1594,7 @@ tiles&#39; worth, so the land under it decides what it is good at. The sprite is
 <p>See also: <a href="#building-rules"><code>BUILDING_RULES</code></a>, <code>producerBonus</code></p>
 </article><article><p><a id="buildingupgradeduration"></a></p>
 <h3><code>buildingUpgradeDuration</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:39</code></a></p>
+<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:45</code></a></p>
 <p>Seconds the next level takes, from <code>fromLevel</code> to <code>fromLevel + 1</code> (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle&#39;s timer.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
@@ -1681,7 +1702,7 @@ An Idol&#39;s level is kept across rebirths (the building is not): see <a href="
 </tbody></table>
 </article><article><p><a id="buildinglevelcost"></a></p>
 <h3><code>buildingLevelCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:59</code></a></p>
+<p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:81</code></a></p>
 <p>The price of reaching <code>level</code> (1 = building it): <code>tilePrices</code> times the price of the next tile at the current tile count (counted up to <code>priceTileCap</code>), times <code>levelGrowth</code> per level above 1. Gold, wood and stone like a tile.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost(level) = floor(tilePrice(min(max(owned tiles, floor(level)), priceTileCap)) x tilePrices x levelGrowth^(level - 1))   per resource
@@ -2215,7 +2236,7 @@ skills in <code>src/catalog/skills.ts</code> and <code>src/lib/skills.ts</code>.
 <p>See also: <a href="#armorreduction"><code>armorReduction</code></a>, <a href="#damageperhit"><code>damagePerHit</code></a>, <a href="#critodds"><code>critOdds</code></a></p>
 </article><article><p><a id="armorreduction"></a></p>
 <h3><code>armorReduction</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:219</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:223</code></a></p>
 <p>The share (0-0.75) of a hit that <code>armor</code> takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,
 so no amount of armor makes anything unkillable (the asymptote is 75 %).</p>
 <p>Armor reduction: <code>r = armor / (armor + 40)</code>; up to 50% the reduction is <code>r</code>, above that every extra point counts half, so the ceiling is 75%
@@ -2234,19 +2255,19 @@ together with each weapon&#39;s damage per hit.</p>
 <p>Attacks per second of each weapon type: dagger 1.6, wand 1.3, sword 1.2, spear 1.1, bow 1, axe 1, staff 0.9, crossbow 0.8, mace 0.8, maul 0.6. Used by the item builders and <a href="#attackspersecond"><code>attacksPerSecond</code></a>.</p>
 </article><article><p><a id="damageperhit"></a></p>
 <h3><code>damagePerHit</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:119</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:123</code></a></p>
 <p>Damage of one swing (before crits): the gear&#39;s total damage times the attribute bonus of the weapon&#39;s type (1 without a weapon) and the set&#39;s percent damage.</p>
 </article><article><p><a id="attackspersecond"></a></p>
 <h3><code>attacksPerSecond</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:130</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:134</code></a></p>
 <p>Attacks per second: the weapon&#39;s speed (1 bare-handed), the Dexterity bonus and the merchant&#39;s. The fight swings at exactly this speed.</p>
 </article><article><p><a id="critodds"></a></p>
 <h3><code>critOdds</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:149</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:153</code></a></p>
 <p>Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.</p>
 </article><article><p><a id="swing"></a></p>
 <h3><code>swing</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:167</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:171</code></a></p>
 <p>One swing: <code>hit</code> damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never
 does). Two random numbers at most (the second only on a crit). The server&#39;s fight engine and <code>rollHit</code> share it.</p>
 <p><strong>Formula</strong></p>
@@ -2255,23 +2276,23 @@ critExtra = 1 + (Str-5 x 1 + Dex-5 x 0.5 + Cha-5 x 0.5) / 100
 </code></pre>
 </article><article><p><a id="armorof"></a></p>
 <h3><code>armorOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:186</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:190</code></a></p>
 <p>Armor against monster hits: the gear&#39;s plus (when the attributes are given) what Dexterity, Vitality and Strength add.</p>
 </article><article><p><a id="dodgechance"></a></p>
 <h3><code>dodgeChance</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:251</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:255</code></a></p>
 <p>Chance (0-1) that a monster&#39;s hit misses: the gear&#39;s Dodge, capped.</p>
 </article><article><p><a id="lifeleechpercent"></a></p>
 <h3><code>lifeLeechPercent</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:202</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:206</code></a></p>
 <p>The Life Leech in %, the gear&#39;s and the merchant&#39;s together, never above the cap.</p>
 </article><article><p><a id="regen"></a></p>
 <h3><code>regen</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:240</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:244</code></a></p>
 <p>HP regeneration outside fights: the base rate plus the gear&#39;s regen stat.</p>
 </article><article><p><a id="mitigate"></a></p>
 <h3><code>mitigate</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:232</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:236</code></a></p>
 <p>Damage of one monster hit after armor: <code>max(1, round(raw x (1 - armorReduction(armor))))</code>.</p>
 </article><h2>A fight</h2><article><p><a id="runcombat"></a></p>
 <h3><code>runCombat</code> <small>function</small></h3>
@@ -2320,21 +2341,22 @@ The queue&#39;s head starts as soon as HP is back at 80%, ignoring retry time an
 <p>Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start.</p>
 </article><article><p><a id="autouseunlocked"></a></p>
 <h3><code>autoUseUnlocked</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:55</code></a></p>
-<p>Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
-the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.</p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:56</code></a></p>
+<p>Auto-use (the server drinking potions, casting Heal and Stun for the player) is bought in the Ember shop (Potion Reflex, one-time, 15 Embers): before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
+the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work. An account from before the reworked shop (no <code>shopVersion</code> in its Embers) keeps the old rule: unlocked with the first rebirth;
+the shop migration turns that into a free grant.</p>
 </article><article><p><a id="playerprofile"></a></p>
 <h3><code>playerProfile</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/profile.ts"><code>src/lib/offline/profile.ts:63</code></a></p>
+<p>Source: <a href="../../src/lib/offline/profile.ts"><code>src/lib/offline/profile.ts:64</code></a></p>
 <p>Freezes everything a fight needs about the player into a <code>PlayerProfile</code> (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt&#39;s potion cooldown, power and slots), from the last accepted save and the ledger&#39;s gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (<code>classPassives</code>).</p>
 </article><article><p><a id="fightstep"></a></p>
 <h3><code>fightStep</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:126</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:127</code></a></p>
 <p>One tick of the open fight. Returns when the fight ended.</p>
 <p>One tick of the open fight, in the order of the numbered list on <a href="#runcombat"><code>runCombat</code></a>.</p>
 </article><article><p><a id="endfight"></a></p>
 <h3><code>endFight</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:95</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:96</code></a></p>
 <p>Closes the open fight as <code>defeated</code>, <code>timeout</code> or <code>retreat</code>: a defeat sets HP to 30% of max, a defeat or timeout starts the monster&#39;s retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.</p>
 <p><strong>Defeat streak</strong>: auto-battle stays on after a defeat. Each defeat adds one to <code>CombatState.defeatStreak</code>; a win resets it; at <code>COMBAT.auto.pauseAfterDefeats</code> (3) defeats in a row auto-battle is switched off, a <code>paused</code> event is logged (the browser says &#39;Auto-battle paused: 3 defeats in a row&#39;) and the count starts again. A timeout or a retreat neither adds nor resets. The player turns the switch back on.</p>
 </article><article><p><a id="engage"></a></p>
@@ -2364,7 +2386,7 @@ it again), and the gold, XP and hide go into what the server has granted. Null w
 <p>The next random stream of a fight: sealed on the secret, the user, the run and the fight&#39;s ordinal, one draw per call.</p>
 </article><h2>Win chance</h2><article><p><a id="winbucketof"></a></p>
 <h3><code>winBucketOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:71</code></a></p>
+<p>Source: <a href="../../src/lib/combat.ts"><code>src/lib/combat.ts:75</code></a></p>
 <p>The Next strip&#39;s win-chance bucket for a queued monster, from the server&#39;s estimate as a whole percent (the client never recomputes it):
 Safe from 80% up (green), Risky from 50% (<code>minWinChance</code>, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red).
 The strip also shows the word and the exact percent on hover, so colour is never the only cue.</p>
@@ -2393,7 +2415,7 @@ chance     = min(logistic(6 x ln(surviveSec / killSec)), logistic(6 x ln(limit /
 </code></pre>
 </article><article><p><a id="autouse"></a></p>
 <h3><code>autoUse</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:74</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:75</code></a></p>
 <p>Auto-use&#39;s rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt&#39;s Potion Power included) and waits out the shared cooldown the belt shortens (<code>profile.potionCooldownSec</code>); it picks among every healing potion in the bag, not only the ones on the hotkey bar.</p>
 </article><article><p><a id="potioncooldownsec"></a></p>
 <h3><code>potionCooldownSec</code> <small>function</small></h3>
@@ -2519,7 +2541,7 @@ buffs: each buff effect through addBuff; a refusal by any of them refuses the po
 </code></pre>
 </article><article><p><a id="withbuffs"></a></p>
 <h3><code>withBuffs</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/profile.ts"><code>src/lib/offline/profile.ts:106</code></a></p>
+<p>Source: <a href="../../src/lib/offline/profile.ts"><code>src/lib/offline/profile.ts:107</code></a></p>
 <p>A profile with the running potion buffs on top (<a href="#bufftotals"><code>buffTotals</code></a>): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
 so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.</p>
 <p><strong>Formula</strong></p>
@@ -4028,7 +4050,7 @@ touches set pieces, epic or legendary pieces or crafted gear (the mark overrides
 so their previews agree. <code>junk</code> is a parameter so a test can flip the gear rule.</p>
 </article><article><p><a id="selljunkrule"></a></p>
 <h3><code>sellJunkRule</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/inventory.ts"><code>src/lib/offline/inventory.ts:250</code></a></p>
+<p>Source: <a href="../../src/lib/offline/inventory.ts"><code>src/lib/offline/inventory.ts:266</code></a></p>
 <p>The &quot;Sell junk&quot; button: sells every piece of gear in the bag that <code>junk</code> names (the junk rule, <code>isJunk</code>), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
 every bag until the rule is decided (IDL-312). <code>junk</code> is a parameter so a test can flip the rule.</p>
 </article><article><p><a id="rolljunkdrops"></a></p>
@@ -4244,12 +4266,12 @@ the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) e
 <p>See also: <a href="#rebirthstatus"><code>rebirthStatus</code></a>, <a href="#embergain"><code>emberGain</code></a></p>
 </article><article><p><a id="embergain"></a></p>
 <h3><code>emberGain</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:97</code></a></p>
+<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:107</code></a></p>
 <p>Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe&#39;s bonus.</p>
-<p><code>REBIRTH.gain</code>: <code>gainScale</code> 3, <code>castleExponent</code> 1.3, <code>tileExponent</code> 0.65, <code>surplusPerTile</code> 0.03. The Ancestral Tithe merchant upgrade adds +5% per level.</p>
+<p><code>REBIRTH.gain</code>: <code>gainScale</code> 3, <code>castleExponent</code> 1.3, <code>tileExponent</code> 0.65, <code>surplusPerTile</code> 0.03. The Ancestral Tithe merchant upgrade adds +5% per level and the Eternal Tithe Ember upgrade +50% per level (added together).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
-gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
+gain = floor(base x (1 + 0.05 x Ancestral Tithe level + 0.5 x Eternal Tithe level))
 </code></pre>
 <p><strong>Embers gained (no Ancestral Tithe)</strong> <em>(computed from the code)</em></p>
 <table>
@@ -4300,7 +4322,7 @@ gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 </tbody></table>
 </article><article><p><a id="emberincomebonus"></a></p>
 <h3><code>emberIncomeBonus</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:49</code></a></p>
+<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:56</code></a></p>
 <p>The income bonus (0.5 = +50 %) that <code>earned</code> Embers ever earned give: linear when <code>incomeExponent</code> is 1, flatter when it is below 1.</p>
 <p>Folded into the income modifier of every resource (<a href="#calculateresourcebreakdown"><code>calculateResourceBreakdown</code></a>). Spending Embers never lowers it, because it counts the Embers ever earned.</p>
 <p><strong>Formula</strong></p>
@@ -4341,7 +4363,7 @@ gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 </tbody></table>
 </article><article><p><a id="rebirthstatus"></a></p>
 <h3><code>rebirthStatus</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:128</code></a></p>
+<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:138</code></a></p>
 <p>Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store&#39;s <code>rebirth</code>
 all read this one function, so what the tooltip promises is what the action checks.</p>
 <p><strong>Formula</strong></p>
@@ -4372,9 +4394,18 @@ and the browser (which builds the same new bag from the same picks).</p>
 (what the player really got, whether the server or the browser named the amount), never recomputed here.</p>
 </article><h2>Ember shop</h2><article><p><a id="ember-upgrades"></a></p>
 <h3><code>EMBER_UPGRADES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:60</code></a></p>
-<p>The Ember shop: level N+1 costs <code>ceil(baseCost x costGrowth^N)</code> Embers (<a href="#emberupgradecost"><code>emberUpgradeCost</code></a>); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through <code>limitOf(&#39;bagSize&#39;)</code>). Shop levels are permanent: nothing refunds Embers.
-The save is valid only if <code>unspent + spent = earned</code> and <code>rebirths = 0</code> implies <code>earned = 0</code> (checked in <code>src/lib/sanitizeSave.ts</code>). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.</p>
+<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:68</code></a></p>
+<p>The Ember shop: level N+1 costs <code>ceil(baseCost x costGrowth^N)</code> Embers (<a href="#emberupgradecost"><code>emberUpgradeCost</code></a>). Shop levels are permanent: nothing refunds Embers on a rebirth.
+The save is valid only if <code>unspent + spent = earned</code> and <code>rebirths = 0</code> implies <code>earned = 0</code> (checked in <code>src/lib/sanitizeSave.ts</code>).</p>
+<ul>
+<li><strong>Permanent twins of the merchant&#39;s gold upgrades</strong> (about 3 x the step, kept through every rebirth): Master Haggler, Fortune, Overseer, Master Skinner, Click Mastery, the seven battle upgrades and Eternal Tithe (+50% Embers per level, 5 levels).</li>
+<li><strong>Caps</strong>: Treasury Charter (+5 points on the 45% tile-discount cap per level), Castle Expansion (castle level 10 to 15), Master Masonry (building level 5 to 10) and Idol Mastery (Idol level 5 up to 15, priced as an end-game goal). They read through <code>limitOf</code> (<code>castleMaxLevel</code>, <code>buildingMaxLevel</code>, <code>idolMaxLevel</code>).</li>
+<li><strong>Build time</strong>: Master Builders (castle), Mason&#39;s Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.</li>
+<li><strong>One-time purchases</strong> (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).</li>
+<li><strong>Start of a run</strong>: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).</li>
+<li><strong>Disabled</strong> (<code>EMBER_DISABLED</code>): Quest Rarity and Quest Slots wait for the quest system, Extra Builder for the second builder; they show greyed and cannot be bought.
+Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.</li>
+</ul>
 <p><strong>The Ember shop</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -4392,22 +4423,46 @@ The save is valid only if <code>unspent + spent = earned</code> and <code>rebirt
 <td>-2% tile and building cost</td>
 </tr>
 <tr>
+<td>charter</td>
+<td>Treasury Charter</td>
+<td>3</td>
+<td>+5 points on the 45% tile-discount cap</td>
+</tr>
+<tr>
 <td>builders</td>
 <td>Master Builders</td>
 <td>3</td>
 <td>-5% castle build time</td>
 </tr>
 <tr>
+<td>buildtime</td>
+<td>Mason&#39;s Guild</td>
+<td>3</td>
+<td>-5% Producer and Extractor build time</td>
+</tr>
+<tr>
+<td>idoltime</td>
+<td>Shrine Keepers</td>
+<td>3</td>
+<td>-5% Idol build time</td>
+</tr>
+<tr>
 <td>mastery</td>
 <td>Click Mastery</td>
 <td>2</td>
-<td>+25% gold per click</td>
+<td>+50% gold per click</td>
+</tr>
+<tr>
+<td>startgold</td>
+<td>Starting Treasury</td>
+<td>6</td>
+<td>base gold per second at the start of a run: 1 / 5 / 10 / 20 / 35 by level</td>
 </tr>
 <tr>
 <td>provisions</td>
 <td>Provisions</td>
 <td>2</td>
-<td>start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400</td>
+<td>start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400, food 200, coal 100</td>
 </tr>
 <tr>
 <td>nightwatch</td>
@@ -4422,15 +4477,147 @@ The save is valid only if <code>unspent + spent = earned</code> and <code>rebirt
 <td>+5% income while away</td>
 </tr>
 <tr>
+<td>vigil</td>
+<td>Eternal Vigil</td>
+<td>120</td>
+<td>one-time: away income 100% and 72 h away time</td>
+</tr>
+<tr>
 <td>deeppockets</td>
 <td>Deep Pockets</td>
 <td>30</td>
-<td>+4 bag slots</td>
+<td>+8 bag slots</td>
+</tr>
+<tr>
+<td>haggler</td>
+<td>Master Haggler</td>
+<td>3</td>
+<td>+10% gold from selling</td>
+</tr>
+<tr>
+<td>fortune</td>
+<td>Fortune</td>
+<td>3</td>
+<td>+6 Luck</td>
+</tr>
+<tr>
+<td>artisan</td>
+<td>Artisan&#39;s Eye</td>
+<td>4</td>
+<td>+3 Luck on crafted gear only</td>
+</tr>
+<tr>
+<td>overseer</td>
+<td>Overseer</td>
+<td>4</td>
+<td>+3% income, every resource but XP</td>
+</tr>
+<tr>
+<td>skinner</td>
+<td>Master Skinner</td>
+<td>3</td>
+<td>+15% meat and hide</td>
+</tr>
+<tr>
+<td>tithe</td>
+<td>Eternal Tithe</td>
+<td>5</td>
+<td>+50% Embers per rebirth</td>
+</tr>
+<tr>
+<td>tempo</td>
+<td>Battle Tempo</td>
+<td>3</td>
+<td>+3% attack speed</td>
+</tr>
+<tr>
+<td>precision</td>
+<td>Precision</td>
+<td>3</td>
+<td>+1.5% crit chance</td>
+</tr>
+<tr>
+<td>execution</td>
+<td>Execution</td>
+<td>3</td>
+<td>+1.5% super-crit chance</td>
+</tr>
+<tr>
+<td>brawn</td>
+<td>Brawn</td>
+<td>3</td>
+<td>+4% physical damage</td>
+</tr>
+<tr>
+<td>sorcery</td>
+<td>Sorcery</td>
+<td>3</td>
+<td>+4% staff and wand damage</td>
+</tr>
+<tr>
+<td>bloodthirst</td>
+<td>Bloodthirst</td>
+<td>3</td>
+<td>+0.75% life leech</td>
+</tr>
+<tr>
+<td>vigor</td>
+<td>Vigor</td>
+<td>3</td>
+<td>+0.5 HP per second</td>
+</tr>
+<tr>
+<td>potion</td>
+<td>Potion Reflex</td>
+<td>15</td>
+<td>one-time: auto-potion</td>
+</tr>
+<tr>
+<td>castlecap</td>
+<td>Castle Expansion</td>
+<td>60</td>
+<td>+1 castle level of cap (10 to 15)</td>
+</tr>
+<tr>
+<td>buildcap</td>
+<td>Master Masonry</td>
+<td>40</td>
+<td>+1 Producer/Extractor level of cap (5 to 10)</td>
+</tr>
+<tr>
+<td>idolcap</td>
+<td>Idol Mastery</td>
+<td>100</td>
+<td>+1 Idol level of cap (5 to 15)</td>
+</tr>
+<tr>
+<td>decree</td>
+<td>Imperial Decree</td>
+<td>150</td>
+<td>one-time: the castle bonus counts double</td>
+</tr>
+<tr>
+<td>extrabuilder</td>
+<td>Extra Builder</td>
+<td>40</td>
+<td>+1 builder</td>
+</tr>
+<tr>
+<td>questrarity</td>
+<td>Quest Rarity</td>
+<td>5</td>
+<td>disabled until quests exist</td>
+</tr>
+<tr>
+<td>questslots</td>
+<td>Quest Slots</td>
+<td>25</td>
+<td>disabled until quests exist</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="emberupgradecost"></a></p>
 <h3><code>emberUpgradeCost</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:26</code></a></p>
+<p>Source: <a href="../../src/utils/game/rebirth.ts"><code>src/utils/game/rebirth.ts:33</code></a></p>
 <p>Cost in Embers of buying the next level of an upgrade, given its current level.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">cost of level N+1 = ceil(baseCost x 1.4^N) Embers
@@ -4490,19 +4677,19 @@ Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the mo
 <td><code>bagSize</code></td>
 <td>60</td>
 <td>200</td>
-<td>Pack Rat +8 per level, Deep Pockets +4 per level</td>
+<td>Pack Rat +4 per level (the retired one +8), Deep Pockets +8 per level, belt slots</td>
 </tr>
 <tr>
 <td><code>offlineCapHours</code></td>
 <td>8</td>
 <td>72</td>
-<td>Night Watch +1 h per level, set bonus hours</td>
+<td>Night Watch +1 h per level, Eternal Vigil (72 h), set bonus hours</td>
 </tr>
 <tr>
 <td><code>offlineEfficiency</code></td>
 <td>0.5</td>
 <td>1</td>
-<td>Steward +0.05 per level, set bonus points</td>
+<td>Steward +0.05 per level, Eternal Vigil (100%), set bonus points</td>
 </tr>
 <tr>
 <td><code>offlineMinGapSec</code></td>
@@ -4538,21 +4725,34 @@ Steward and set bonuses the away efficiency). <code>HARD_LIMITS</code> is the mo
 <td><code>idolMaxLevel</code></td>
 <td>5</td>
 <td>100</td>
-<td>nothing yet</td>
+<td>Idol Mastery +1 per level</td>
+</tr>
+<tr>
+<td><code>buildingMaxLevel</code></td>
+<td>5</td>
+<td>15</td>
+<td>Master Masonry +1 per level</td>
+</tr>
+<tr>
+<td><code>castleMaxLevel</code></td>
+<td>10</td>
+<td>15</td>
+<td>Castle Expansion +1 per level</td>
 </tr>
 </tbody></table>
 <p>See also: <a href="#limitof"><code>limitOf</code></a></p>
 </article><article><p><a id="limitof"></a></p>
 <h3><code>limitOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/limits.ts"><code>src/lib/limits.ts:40</code></a></p>
+<p>Source: <a href="../../src/lib/limits.ts"><code>src/lib/limits.ts:59</code></a></p>
 <p>The current value of a limit: its base plus the registered bonuses.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
-bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots)
+bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat (old +8, new +4 per level) + Deep Pockets (+8 per level) + belt bag slots)
+castleMaxLevel = min(15, 10 + Castle Expansion level)      buildingMaxLevel = min(15, 5 + Master Masonry level)      idolMaxLevel = min(100, 5 + Idol Mastery level)
 </code></pre>
 </article><article><p><a id="beltslotsfor"></a></p>
 <h3><code>beltSlotsFor</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/inventory.ts"><code>src/lib/offline/inventory.ts:65</code></a></p>
+<p>Source: <a href="../../src/lib/offline/inventory.ts"><code>src/lib/offline/inventory.ts:71</code></a></p>
 <p>The belt bag slots the server holds for the player: the most a belt has ever given (<code>Inventory.beltSlots</code>) or the worn belt gives now. Like Pack Rat it only goes up,
 so taking a belt off, or a rebirth, never shrinks the bag below the items in it.</p>
 <p><strong>Formula</strong></p>
@@ -4560,7 +4760,7 @@ so taking a belt off, or a rebirth, never shrinks the bag below the items in it.
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="starting-gems"></a></p>
 <h3><code>STARTING_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:219</code></a></p>
+<p>Source: <a href="../../src/config/economy.ts"><code>src/config/economy.ts:221</code></a></p>
 <p>Gems every player starts with (also granted to saves from before Gems existed).</p>
 <p>Gems: premium currency, not part of <code>Resources</code>. Every player starts with 1,000 (also saves from before gems existed), the cap is 1e9 (<code>GEMS_CAP</code>), a rebirth keeps them and nothing spends them yet.
 The only gem source is the chest bonus roll. The server&#39;s ledger holds the real balance, an upload can never raise it.</p>
@@ -4866,7 +5066,7 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 <p>The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 (<a href="#settleachievements"><code>settleAchievements</code></a>) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. &quot;Rat King defeated&quot; was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial&#39;s starter path ends. Later releases add grind ladders (R6) after these.</p>
-<p><strong>The launch achievements (123, 8130 gems in total)</strong> <em>(computed from the code)</em></p>
+<p><strong>The launch achievements (124, 8280 gems in total)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
 <tr>
@@ -5862,6 +6062,14 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>25</td>
 <td>-</td>
 </tr>
+<tr>
+<td>124</td>
+<td><code>castle_15</code></td>
+<td>Grand Architect</td>
+<td>castle level 15</td>
+<td>150</td>
+<td>-</td>
+</tr>
 </tbody></table>
 <p>See also: <a href="#settleachievements"><code>settleAchievements</code></a>, <code>achievementsDue</code></p>
 </article><h2>Mastery</h2><article><p><a id="claimmastery"></a></p>
@@ -6094,7 +6302,7 @@ The choice lives on the profile (<code>badge_id</code>, <code>title_id</code>, w
 (what the cap cuts off is lost, as with a single claim), and each id is recorded in <code>stats.claimed</code> with the time. Refused when nothing is waiting.</p>
 </article><article><p><a id="deeds"></a></p>
 <h3>Deeds</h3>
-<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:441</code></a></p>
+<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:450</code></a></p>
 <p>The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup&#39;s nine deeds, with placeholder rewards (balance pass: IDL-310).</p>
 <p>See also: <code>deedState</code>, <code>deedPoints</code></p>
@@ -6219,7 +6427,7 @@ and on hide/close; the backup rotates every 10 minutes. A read goes through <cod
 One tab owns the game at a time (<code>src/hooks/useSingleTab.ts</code>, a Web Lock).</p>
 </article><article><p><a id="sanitizesave"></a></p>
 <h3><code>sanitizeSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:218</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:219</code></a></p>
 <p>Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
 pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle
@@ -6230,7 +6438,7 @@ What a later release can change it degrades instead of refusing: an id it does n
 stat points are credited when the level pays more and a free respec when it pays fewer; XP below what the tiles paid for is lifted; the Ember balance is recomputed as earned minus spent; a piece of gear or a stack that is no longer valid leaves an empty slot (<code>instanceProblem</code> in <code>src/lib/itemInstance.ts</code>). Gear stats are derived, never read from the save.</p>
 </article><article><p><a id="persisted-keys"></a></p>
 <h3><code>PERSISTED_KEYS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:64</code></a></p>
+<p>Source: <a href="../../src/lib/sanitizeSave.ts"><code>src/lib/sanitizeSave.ts:65</code></a></p>
 <p>The part of the game state that is saved. Rates, window flags and the like are recomputed on load.</p>
 <p><strong>How to extend the save safely.</strong></p>
 <ul>
@@ -6381,7 +6589,7 @@ revision it left, instead of sending the one it read before. Without Web Locks t
 still happens is resolved by <code>resolveConflict</code>. The lock dies with the page, so a closing tab never holds it up.</p>
 </article><h2>Accepting a save</h2><article><p><a id="acceptsave"></a></p>
 <h3><code>acceptSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:208</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:210</code></a></p>
 <p>Accepts a save from a client that says it was based on revision <code>baseRev</code> (0 = this account has no save yet).</p>
 <ul>
 <li>the text must decode (checksum, schema, <code>sanitizeSave</code>), otherwise <code>invalid</code></li>
@@ -6548,7 +6756,7 @@ browser still does, so the server bounds what two consecutive saves can explain,
 (buying shop levels lowers the unspent points, never the Embers ever earned).</li>
 <li>A rebirth is believable when the previous save was at castle level 6 or more (a running upgrade counts) with the territory the
 next rebirth needs, give or take the tiles bought since; at most one rebirth fits between two saves.</li>
-<li>The gain is at most what the previous save&#39;s castle and territory pay, with the Ancestral Tithe at its maximum (the merchant
+<li>The gain is at most what the previous save&#39;s castle and territory pay, with the Ancestral Tithe and the Eternal Tithe at their maximum (the merchant
 upgrades bought without gold are put back by the trusted economy, IDL-168, but a Tithe bought since the last upload is not known here).</li>
 <li>A first save (nothing to compare with) holds a whole history: its rebirths are bounded by the play time and its Embers by the
 best rebirth the game can pay.</li>
@@ -6557,7 +6765,7 @@ best rebirth the game can pay.</li>
 <code>requireServerRebirth</code> is off; it is turned on together with <code>ENFORCEMENT.enabled</code>, after the new chapter flip (checklist: &quot;Turning enforcement and the server-run rebirth on together&quot;, Ops/Operator guides).</p>
 </article><article><p><a id="min-save-interval-ms"></a></p>
 <h3><code>MIN_SAVE_INTERVAL_MS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:89</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:91</code></a></p>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
@@ -6588,7 +6796,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:81</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:83</code></a></p>
 <p>True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>
@@ -6887,6 +7095,16 @@ game with a fresh link. The server sends <code>epoch</code> and <code>needsReset
 never ran; <code>archiveForNewGame</code> still finds it under the old names and keeps it, <code>resetSave</code> then removes them.</p>
 <p>What this cannot do: a tab that is already open when the epoch flips never asks <code>/api/auth/me</code> again. That tab is stopped by the server: every game request carries the epoch
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
+</article><h2>Migrations</h2><article><p><a id="refundoldshop"></a></p>
+<h3><code>refundOldShop</code> <small>function</small></h3>
+<p>Source: <a href="../../src/lib/emberShopMigration.ts"><code>src/lib/emberShopMigration.ts:37</code></a></p>
+<p>The Ember shop was reworked (new ids, costs and effects). An account from before it has no <code>shopVersion</code>: its spent shop levels were bought under other numbers, so they are refunded once.</p>
+<ul>
+<li>every shop level is cleared and every Ember ever earned is unspent again (<code>legacyPoints = legacyEarned</code>), so the player spends them in the new shop; <code>legacyEarned</code> and <code>rebirths</code> stay, so the income bonus does not change;</li>
+<li>the account moves to <code>SHOP_VERSION</code>, which marks it done: running it again changes nothing (a stale tab or an old client cannot undo it, and the SQL in <code>supabase/migrations/ember_refund_v2.sql</code> is the same step run on the stored saves);</li>
+<li>a player who already had auto-potion (the old rule: unlocked with the first rebirth) gets Potion Reflex for free as a grant, so nobody loses a feature.</li>
+</ul>
+<p>Pure, idempotent, and part of reading a save (<code>sanitizeSave</code>), so every path that loads or accepts a save applies it.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
 <h3>The tick loop and persistence</h3>
 <p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:124</code></a></p>
@@ -6920,7 +7138,7 @@ so <code>state.tiles</code> changes exactly when the map does; the owned / chest
 </ul>
 </article><article><p><a id="gamestate"></a></p>
 <h3><code>GameState</code> <small>interface</small></h3>
-<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:368</code></a></p>
+<p>Source: <a href="../../src/types/game.ts"><code>src/types/game.ts:372</code></a></p>
 <p>State. The persisted keys are <code>PERSISTED_KEYS</code> (<a href="#persisted-keys"><code>PERSISTED_KEYS</code></a>), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.</p>
 <p>Not saved: <code>monsters</code> and the open fight (<code>combat</code>) are the server&#39;s picture and arrive with each <code>/api/spawn</code> answer. Rebuilt on load: <code>resourceRates</code>, derived combat stats, castle upgrade cost, every window/dialog flag, <code>isHydrated</code>.
 The stores: <code>gameStore.ts</code> (every action: buyTile, tick, upgradeCastle, clickForGold, startFight, rebirth, buyEmberUpgrade, merchant actions ...), <code>uiStore.ts</code> (transient UI flags), <code>viewStore.ts</code> (where the map is on the screen),

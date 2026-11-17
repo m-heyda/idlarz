@@ -3,6 +3,7 @@ import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, t
 import type { PrestigeState } from '@/types/game';
 import type { CombatBonus } from '@/lib/combat';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { emberEffect } from '@/utils/game/emberEffects';
 import type { World } from '@/utils/world';
 
 // Merchant upgrades
@@ -43,6 +44,8 @@ export interface SellContext {
  */
 export const SELL_BONUSES: ((ctx: SellContext) => number)[] = [
 	(ctx) => merchantEffect(ctx.merchantUpgrades, 'haggler'),
+	// Master Haggler (Ember shop): +10% per level, kept through every rebirth
+	(ctx) => emberEffect(ctx.prestige, 'haggler'),
 	// the Lighthouse: +2 % per level of the coast Idol on every sale
 	(ctx) => (ctx.idolSellPct ?? (ctx.tiles ? idolEconomy(ctx.tiles, ctx.idolLevels).merchantSellPct : 0)) / 100,
 ];
@@ -56,7 +59,7 @@ export const sellMultiplier = (ctx: SellContext | undefined): number => 1 + SELL
  * @category Economy/Merchant
  * @order 4
  * @formula
- * payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
+ * payout = floor(units x unit price x (1 + 0.03 x Haggler level + 0.1 x Master Haggler level + Lighthouse %))
  * @see sellMultiplier (src/utils/game/merchant.ts)
  */
 export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefined): number => Math.floor(unit * qty * sellMultiplier(ctx));
@@ -72,19 +75,28 @@ export const sellPayout = (unit: number, qty: number, ctx: SellContext | undefin
 export const buyCost = (resource: keyof typeof MERCHANT_RESOURCE_PRICES, units: number): number =>
 	Math.ceil(units * MERCHANT_RESOURCE_PRICES[resource] * MERCHANT_BUY_MULTIPLIER);
 
-/** Luck from the Lucky Charm, added to the character's Luck for chests and kills. */
-export const merchantLuck = (upgrades: MerchantUpgrades | undefined): number => merchantEffect(upgrades, 'charm');
+/** Luck from the Lucky Charm (merchant) and Fortune (Ember shop), added to the character's Luck for chests and kills. */
+export const merchantLuck = (upgrades: MerchantUpgrades | undefined, prestige?: PrestigeState): number =>
+	merchantEffect(upgrades, 'charm') + emberEffect(prestige, 'fortune');
 
-/** The Foreman's multiplier on the income of every resource but XP (1 = none). */
-export const merchantIncomeMultiplier = (upgrades: MerchantUpgrades | undefined): number => 1 + merchantEffect(upgrades, 'foreman');
+/** Luck that counts for crafted gear only: the Artisan's Eye (Ember shop), a better chance of the higher rarities on top of the character's Luck. */
+export const craftLuckBonus = (prestige: PrestigeState | undefined): number => emberEffect(prestige, 'artisan');
 
-/** What the merchant's combat upgrades add to the fight: one place, read by the readouts (effectiveStats), the server's fights and the regeneration. */
-export const merchantCombat = (upgrades: MerchantUpgrades | undefined): CombatBonus => ({
-	atkSpeedPct: merchantEffect(upgrades, 'swift'),
-	critPct: merchantEffect(upgrades, 'keen'),
-	superCritPct: merchantEffect(upgrades, 'deadly'),
-	physPct: merchantEffect(upgrades, 'might'),
-	magicPct: merchantEffect(upgrades, 'arcana'),
-	leechPct: merchantEffect(upgrades, 'fang'),
-	regen: merchantEffect(upgrades, 'wind'),
+/** The multiplier on the income of every resource but XP (1 = none): the Foreman (merchant, +1% per level) and the Overseer (Ember shop, +3% per level) added. */
+export const merchantIncomeMultiplier = (upgrades: MerchantUpgrades | undefined, prestige?: PrestigeState): number =>
+	1 + merchantEffect(upgrades, 'foreman') + emberEffect(prestige, 'overseer');
+
+/** The meat and hide multiplier of the animals: the Skinner (merchant, +5% per level) and the Master Skinner (Ember shop, +15% per level) added. */
+export const skinnerMultiplier = (upgrades: MerchantUpgrades | undefined, prestige?: PrestigeState): number =>
+	1 + merchantEffect(upgrades, 'skinner') + emberEffect(prestige, 'skinner');
+
+/** What the merchant's combat upgrades (and their Ember twins: Battle Tempo, Precision, Execution, Brawn, Sorcery, Bloodthirst, Vigor) add to the fight: one place, read by the readouts (effectiveStats), the server's fights and the regeneration. */
+export const merchantCombat = (upgrades: MerchantUpgrades | undefined, prestige?: PrestigeState): CombatBonus => ({
+	atkSpeedPct: merchantEffect(upgrades, 'swift') + emberEffect(prestige, 'tempo'),
+	critPct: merchantEffect(upgrades, 'keen') + emberEffect(prestige, 'precision'),
+	superCritPct: merchantEffect(upgrades, 'deadly') + emberEffect(prestige, 'execution'),
+	physPct: merchantEffect(upgrades, 'might') + emberEffect(prestige, 'brawn'),
+	magicPct: merchantEffect(upgrades, 'arcana') + emberEffect(prestige, 'sorcery'),
+	leechPct: merchantEffect(upgrades, 'fang') + emberEffect(prestige, 'bloodthirst'),
+	regen: merchantEffect(upgrades, 'wind') + emberEffect(prestige, 'vigor'),
 });

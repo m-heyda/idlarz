@@ -13,6 +13,7 @@ import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { CharacterStats, Equipment } from '@/types/game';
 import { calculateCombatStats, calculateLevel } from '@/utils/game/character';
 import { merchantCombat } from '@/utils/game/merchant';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 
 // What the server knows about the player's fighting strength: worked out from the last accepted save with the same functions the game's
 // own readouts use, so the numbers in the character window are the numbers the fight runs on.
@@ -65,7 +66,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 	const equipment = equipmentOf(core);
 	// the class comes from the stored save, where the save route stamps it from the profile row (never from the upload)
 	const playerClass = core.playerClass;
-	const bonus = withClassBonus(merchantCombat(merchantOf(core)), playerClass);
+	const bonus = withClassBonus(merchantCombat(merchantOf(core), prestigeOfCore(core)), playerClass);
 	const odds = critOdds(stats, equipment, bonus);
 	const gear = aggregateStats(equipment);
 	// the Idols' combat bonuses (Maw Idol: damage, War Memorial: max HP and armor), stamped into the stored save by the save pipeline from the standing Idols (`idolFx`)

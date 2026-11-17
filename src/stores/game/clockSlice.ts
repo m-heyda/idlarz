@@ -120,7 +120,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 							state.playerHp,
 							playerMaxHp,
 							secondsElapsed,
-							aggregateStats(state.equipment).regen + withClassBonus(merchantCombat(state.merchantUpgrades), state.playerClass).regen,
+							aggregateStats(state.equipment).regen + withClassBonus(merchantCombat(state.merchantUpgrades, state.prestige), state.playerClass).regen,
 						),
 		);
 		// mana follows the plan too (it has the spell costs and the regen the server counted), else it just fills

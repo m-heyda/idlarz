@@ -1,6 +1,7 @@
 import React, { memo, useState } from 'react';
 import { TileProps, type MonsterType } from '@/types/game';
-import { CASTLE_X, CASTLE_Y, CASTLE_UPGRADE } from '@/config/castle';
+import { CASTLE_X, CASTLE_Y } from '@/config/castle';
+import { limitOf } from '@/lib/limits';
 import { TILE_SIZE } from '@/config/biomes';
 import { useMapSource } from './mapSource';
 import { castleLevelOf, inCastleRange, MAX_CASTLE_RANGE_RADIUS } from '@/lib/castleWard';
@@ -70,6 +71,8 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	const isAdjacent = !isOwned;
 
 	const castleLevel = game((state) => (biome === 'castle' ? castleLevelOf(state.tiles) : 1));
+	// the castle is at its top level: 10, up to 15 with the Castle Expansion (Ember shop)
+	const castleAtMax = game((state) => biome === 'castle' && castleLevelOf(state.tiles) >= limitOf('castleMaxLevel', { prestige: state.prestige }));
 
 	// Owned tiles around the castle get gold sparkles: they are inside the castle's range (it grows from castle level 8). A tile
 	// farther than the biggest range never reads the castle level.
@@ -114,7 +117,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 			// Castle tile: the upgrade dialog; a castle that cannot be upgraded any further opens the rebirth (Embers) window
 			if (biome === 'castle') {
 				audioManager.playSound('click');
-				if (castleLevel >= CASTLE_UPGRADE.maxLevel) useUiStore.getState().toggleRebirth();
+				if (castleAtMax) useUiStore.getState().toggleRebirth();
 				else useWindowStore.getState().openWindow('castle');
 				return;
 			}
@@ -169,7 +172,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					'hover:z-10 cursor-pointer border border-transparent': !isOwned && isAdjacent,
 					'hover:border-green-700': !isOwned && isAdjacent && canAfford,
 					'hover:border-red-700 cursor-not-allowed': !isOwned && isAdjacent && !canAfford,
-					'border-2 border-amber-300': castleLevel >= CASTLE_UPGRADE.maxLevel && biome === 'castle',
+					'border-2 border-amber-300': castleAtMax,
 					'group hover:z-20': true,
 					'opacity-75 border-2 border-red-500': isShaking,
 					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey || !!building),

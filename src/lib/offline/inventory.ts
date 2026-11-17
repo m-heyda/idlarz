@@ -43,6 +43,12 @@ const packratOf = (merchantUpgrades: unknown): number => {
 	return typeof level === 'number' && Number.isFinite(level) && level > 0 ? Math.floor(level) : 0;
 };
 
+/** The level of the new Pack Rat (`packrat2`, +4 slots per level) a save holds. The old one (`packrat`, +8 per level, retired) rides with the bag; this one is read from the save like the Deep Pockets level. */
+const packrat2Of = (merchantUpgrades: unknown): number => {
+	const level = isRecord(merchantUpgrades) ? merchantUpgrades.packrat2 : 0;
+	return typeof level === 'number' && Number.isFinite(level) && level > 0 ? Math.floor(level) : 0;
+};
+
 /**
  * The Pack Rat level the server holds for the player rides with their bag (`Inventory.packrat`): it only ever goes up, a rebirth keeps it, a New Game
  * starts it again. The bag is as big as THIS level entitles it to, whatever level an upload (a stale or another browser's save) claims, and the
@@ -69,8 +75,12 @@ export const beltSlotsFor = (inv: Pick<Inventory, 'beltSlots' | 'equipment'> | n
  * The bag size the server entitles a player to, always through `limitOf('bagSize', ctx)`: the base, the Pack Rat level, the Deep Pockets level the
  * save's Embers hold and the belt's bag slots, all under `HARD_LIMITS.bagSize`. The one place the server's bag sizes come from.
  */
-const sizeAt = (packrat: number, prestige: unknown, beltSlots = 0): number =>
-	limitOf('bagSize', { merchantUpgrades: packrat > 0 ? { packrat } : {}, prestige: prestigeOf(prestige), beltSlots });
+const sizeAt = (packrat: number, prestige: unknown, beltSlots = 0, packrat2 = 0): number =>
+	limitOf('bagSize', {
+		merchantUpgrades: { ...(packrat > 0 ? { packrat } : {}), ...(packrat2 > 0 ? { packrat2 } : {}) },
+		prestige: prestigeOf(prestige),
+		beltSlots,
+	});
 
 /** A bag brought to `size` slots: it only ever grows (Pack Rat, Deep Pockets, a raised base), never loses an item. */
 const padBag = (bag: BagSlot[], size: number): BagSlot[] => (bag.length >= size ? bag : [...bag, ...Array.from({ length: size - bag.length }, () => null)]);
@@ -88,7 +98,7 @@ export const inventoryFromCore = (core: Core): Inventory => {
 		ver: 1,
 		packrat,
 		...(beltSlots > 0 ? { beltSlots } : {}),
-		bag: padBag(bag, sizeAt(packrat, core.prestige, beltSlots)),
+		bag: padBag(bag, sizeAt(packrat, core.prestige, beltSlots, packrat2Of(core.merchantUpgrades))),
 		equipment,
 		lootPity,
 		autoSellUpTo: typeof core.autoSellUpTo === 'string' ? core.autoSellUpTo : null,
@@ -105,7 +115,13 @@ export const rebirthInventory = (
 ): Inventory => {
 	const packrat = packratFor(before, merchantUpgrades);
 	const beltSlots = beltSlotsFor(before);
-	const kit = rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots, typeof playerClass === 'string' ? playerClass : undefined);
+	const packrat2 = packrat2Of(merchantUpgrades);
+	const kit = rebirthKit(
+		packrat > 0 || packrat2 > 0 ? { ...(packrat > 0 ? { packrat } : {}), ...(packrat2 > 0 ? { packrat2 } : {}) } : undefined,
+		prestigeOf(prestige),
+		beltSlots,
+		typeof playerClass === 'string' ? playerClass : undefined,
+	);
 	return {
 		ver: before.ver + 1,
 		packrat,
@@ -121,7 +137,7 @@ export const rebirthInventory = (
 export const fitInventory = (inv: Inventory, core: Core): Inventory => {
 	const packrat = packratFor(inv, core.merchantUpgrades);
 	const beltSlots = beltSlotsFor(inv);
-	const size = sizeAt(packrat, core.prestige, beltSlots);
+	const size = sizeAt(packrat, core.prestige, beltSlots, packrat2Of(core.merchantUpgrades));
 	return inv.bag.length >= size && (inv.packrat ?? 0) === packrat && (inv.beltSlots ?? 0) === beltSlots
 		? inv
 		: { ...inv, packrat, ...(beltSlots > 0 ? { beltSlots } : {}), bag: padBag(inv.bag, size), ver: inv.ver + 1 };
@@ -137,7 +153,7 @@ export const stampInventory = <T extends Pick<PersistedGame, 'bag' | 'equipment'
 		...state,
 		// the server's Pack Rat level wins over a lower one in the upload (the bag is sized by it)
 		merchantUpgrades: packrat > packratOf(state.merchantUpgrades) ? { ...state.merchantUpgrades, packrat } : state.merchantUpgrades,
-		bag: padBag(inv.bag, sizeAt(packrat, state.prestige, beltSlotsFor(inv))),
+		bag: padBag(inv.bag, sizeAt(packrat, state.prestige, beltSlotsFor(inv), packrat2Of(state.merchantUpgrades))),
 		equipment: inv.equipment,
 		lootPity: inv.lootPity,
 		autoSellUpTo: inv.autoSellUpTo,

@@ -352,6 +352,10 @@ export interface PrestigeState {
 	legacyPoints: number; // unspent
 	legacyEarned: number; // ever earned; drives the income bonus. earned = unspent + cost of all shop levels
 	upgrades: Partial<Record<EmberUpgradeId, number>>;
+	/** The shop generation the account was moved to (absent on an account from before the reworked shop; new accounts start at the current one). Old accounts keep Potion Reflex for free, see `autoUseUnlocked` */
+	shopVersion?: number;
+	/** One-time shop upgrades given for free (a player who already had them before the shop was reworked); they count as owned and cost nothing */
+	grants?: EmberUpgradeId[];
 }
 
 /**

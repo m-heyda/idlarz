@@ -1,7 +1,7 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
 import { builtBuildings, buildingMinGold } from '@/lib/buildings';
-import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
+import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES, PACKRAT_IDS, type MerchantUpgradeId } from '@/config/merchant';
 import { MAX_OWNED_TILES } from '@/utils/world';
 import { calculateTileCost } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
@@ -43,7 +43,7 @@ const castleGoldSpent = (level: number): number => {
 export const merchantGoldSpent = (upgrades: Record<string, number> | undefined): number => {
 	let spent = 0;
 	for (const id of Object.keys(MERCHANT_UPGRADES) as MerchantUpgradeId[]) {
-		if (id === 'packrat') continue;
+		if (PACKRAT_IDS.includes(id)) continue;
 		for (let level = 0; level < merchantLevel(upgrades, id); level++) spent += merchantUpgradeCost(id, level);
 	}
 	return spent;

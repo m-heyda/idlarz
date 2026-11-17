@@ -11,7 +11,8 @@ import { buildTimeReduction } from '@/lib/buildings';
  * @order 2
  * @formula
  * castleModifier(L) = 0.2 x 2^(L-1)                 for L <= 6   (+20%, +40%, +80%, +160%, +320%, +640%)
- *                   = 0.2 x 2^5 + 3.2 x (L - 6)     for L > 6    (+960%, +1280%, +1600%, +1920%)
+ *                   = 0.2 x 2^5 + 3.2 x (L - 6)     for L > 6    (+960%, +1280%, +1600%, +1920%; with the Castle Expansion +2240% to +3520% at levels 11 to 15)
+ * Imperial Decree (Ember shop, one-time) counts the bonus twice.
  */
 export const castleModifier = (level: number): number => {
 	const lvl = Math.max(1, Math.floor(level));

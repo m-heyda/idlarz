@@ -63,7 +63,7 @@ See also: [`armorReduction`](combat.md#armorreduction), [`damagePerHit`](combat.
 
 ### `armorReduction` <small>function</small>
 
-Source: [`src/lib/combat.ts:219`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:223`](../../src/lib/combat.ts)
 
 The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,
 so no amount of armor makes anything unkillable (the asymptote is 75 %).
@@ -95,7 +95,7 @@ Attacks per second of each weapon type: dagger 1.6, wand 1.3, sword 1.2, spear 1
 
 ### `damagePerHit` <small>function</small>
 
-Source: [`src/lib/combat.ts:119`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:123`](../../src/lib/combat.ts)
 
 Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.
 
@@ -103,7 +103,7 @@ Damage of one swing (before crits): the gear's total damage times the attribute 
 
 ### `attacksPerSecond` <small>function</small>
 
-Source: [`src/lib/combat.ts:130`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:134`](../../src/lib/combat.ts)
 
 Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.
 
@@ -111,7 +111,7 @@ Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and 
 
 ### `critOdds` <small>function</small>
 
-Source: [`src/lib/combat.ts:149`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:153`](../../src/lib/combat.ts)
 
 Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.
 
@@ -119,7 +119,7 @@ Chance (0-1) that a swing crits, and that a crit becomes a super crit: character
 
 ### `swing` <small>function</small>
 
-Source: [`src/lib/combat.ts:167`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:171`](../../src/lib/combat.ts)
 
 One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never
 does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.
@@ -135,7 +135,7 @@ critExtra = 1 + (Str-5 x 1 + Dex-5 x 0.5 + Cha-5 x 0.5) / 100
 
 ### `armorOf` <small>function</small>
 
-Source: [`src/lib/combat.ts:186`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:190`](../../src/lib/combat.ts)
 
 Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.
 
@@ -143,7 +143,7 @@ Armor against monster hits: the gear's plus (when the attributes are given) what
 
 ### `dodgeChance` <small>function</small>
 
-Source: [`src/lib/combat.ts:251`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:255`](../../src/lib/combat.ts)
 
 Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
@@ -151,7 +151,7 @@ Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.
 
 ### `lifeLeechPercent` <small>function</small>
 
-Source: [`src/lib/combat.ts:202`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:206`](../../src/lib/combat.ts)
 
 The Life Leech in %, the gear's and the merchant's together, never above the cap.
 
@@ -159,7 +159,7 @@ The Life Leech in %, the gear's and the merchant's together, never above the cap
 
 ### `regen` <small>function</small>
 
-Source: [`src/lib/combat.ts:240`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:244`](../../src/lib/combat.ts)
 
 HP regeneration outside fights: the base rate plus the gear's regen stat.
 
@@ -167,7 +167,7 @@ HP regeneration outside fights: the base rate plus the gear's regen stat.
 
 ### `mitigate` <small>function</small>
 
-Source: [`src/lib/combat.ts:232`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:236`](../../src/lib/combat.ts)
 
 Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.
 
@@ -244,16 +244,17 @@ Auto-battle (the server picking the next monster) is a reward for the first rebi
 
 ### `autoUseUnlocked` <small>function</small>
 
-Source: [`src/lib/combat.ts:55`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:56`](../../src/lib/combat.ts)
 
-Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
-the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.
+Auto-use (the server drinking potions, casting Heal and Stun for the player) is bought in the Ember shop (Potion Reflex, one-time, 15 Embers): before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again
+the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work. An account from before the reworked shop (no `shopVersion` in its Embers) keeps the old rule: unlocked with the first rebirth;
+the shop migration turns that into a free grant.
 
 <a id="playerprofile"></a>
 
 ### `playerProfile` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:63`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:64`](../../src/lib/offline/profile.ts)
 
 Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).
 
@@ -261,7 +262,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:126`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:127`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -271,7 +272,7 @@ One tick of the open fight, in the order of the numbered list on [`runCombat`](c
 
 ### `endFight` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:95`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:96`](../../src/lib/offline/fightSteps.ts)
 
 Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
 
@@ -329,7 +330,7 @@ The next random stream of a fight: sealed on the secret, the user, the run and t
 
 ### `winBucketOf` <small>function</small>
 
-Source: [`src/lib/combat.ts:71`](../../src/lib/combat.ts)
+Source: [`src/lib/combat.ts:75`](../../src/lib/combat.ts)
 
 The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it):
 Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red).
@@ -382,7 +383,7 @@ heal = 25% of max HP x (1 + magic damage% / 100) x (1 + (gear Spell Power + clas
 
 ### `autoUse` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:74`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:75`](../../src/lib/offline/fightSteps.ts)
 
 Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.
 
@@ -561,7 +562,7 @@ buffs: each buff effect through addBuff; a refusal by any of them refuses the po
 
 ### `withBuffs` <small>function</small>
 
-Source: [`src/lib/offline/profile.ts:106`](../../src/lib/offline/profile.ts)
+Source: [`src/lib/offline/profile.ts:107`](../../src/lib/offline/profile.ts)
 
 A profile with the running potion buffs on top ([`buffTotals`](combat.md#bufftotals)): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object),
 so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.

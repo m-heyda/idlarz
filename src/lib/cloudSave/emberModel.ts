@@ -1,6 +1,6 @@
-import { CASTLE_UPGRADE } from '@/config/castle';
+import { HARD_LIMITS } from '@/config/limits';
 import { MERCHANT_UPGRADES } from '@/config/merchant';
-import { REBIRTH } from '@/config/rebirth';
+import { EMBER_UPGRADES, REBIRTH } from '@/config/rebirth';
 import { emberGain, emberSpent } from '@/utils/game/rebirth';
 import type { PrestigeState } from '@/types/game';
 import type { Snapshot } from './verify';
@@ -15,7 +15,7 @@ import type { Snapshot } from './verify';
  *    (buying shop levels lowers the unspent points, never the Embers ever earned).
  *  - A rebirth is believable when the previous save was at castle level 6 or more (a running upgrade counts) with the territory the
  *    next rebirth needs, give or take the tiles bought since; at most one rebirth fits between two saves.
- *  - The gain is at most what the previous save's castle and territory pay, with the Ancestral Tithe at its maximum (the merchant
+ *  - The gain is at most what the previous save's castle and territory pay, with the Ancestral Tithe and the Eternal Tithe at their maximum (the merchant
  *    upgrades bought without gold are put back by the trusted economy, IDL-168, but a Tithe bought since the last upload is not known here).
  *  - A first save (nothing to compare with) holds a whole history: its rebirths are bounded by the play time and its Embers by the
  *    best rebirth the game can pay.
@@ -40,8 +40,10 @@ export const EMBER_MODEL = {
 	requireServerRebirth: false as boolean,
 } as const;
 
-const MAX_CASTLE_LEVEL = CASTLE_UPGRADE.durationsSec.length + 1;
+const MAX_CASTLE_LEVEL = HARD_LIMITS.castleMaxLevel;
 const MAX_TITHE = { tithe: MERCHANT_UPGRADES.tithe.maxLevel };
+/** The Eternal Tithe (Ember shop) at its maximum: +50% Embers per level, so the bound below counts the most a save could have bought since the last upload. */
+const MAX_EMBER_TITHE: PrestigeState = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: { tithe: EMBER_UPGRADES.tithe.maxLevel } };
 
 export interface EmberClaim {
 	rebirths: number;
@@ -58,7 +60,7 @@ export interface EmberVerdict {
 }
 
 /** The most Embers one rebirth can pay with the previous save's castle and territory (Tithe maxed, the territory margin included). */
-const maxGainFrom = (castleLevel: number, tiles: number, rebirths: number): number => emberGain(castleLevel, tiles, MAX_TITHE, rebirths);
+const maxGainFrom = (castleLevel: number, tiles: number, rebirths: number): number => emberGain(castleLevel, tiles, MAX_TITHE, rebirths, MAX_EMBER_TITHE);
 
 const settled = (claim: EmberClaim, rebirths: number, legacyEarned: number): EmberVerdict => {
 	// the pair stays consistent (sanitizeSave refuses 0 rebirths with Embers, or rebirths with none, or fewer Embers than rebirths)

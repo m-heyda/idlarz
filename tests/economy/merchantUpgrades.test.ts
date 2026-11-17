@@ -22,7 +22,7 @@ import { patchTile } from '../../src/utils/world';
 import type { CharacterStats, Equipment, MerchantStock } from '../../src/types/game';
 
 const IDS = Object.keys(MERCHANT_UPGRADES) as MerchantUpgradeId[];
-const RESETTING = IDS.filter((id) => id !== 'packrat');
+const RESETTING = IDS.filter((id) => id !== 'packrat' && id !== 'packrat2');
 const ladder = (id: MerchantUpgradeId) => Array.from({ length: MERCHANT_UPGRADES[id].maxLevel }, (_, level) => merchantUpgradeCost(id, level));
 const total = (ids: MerchantUpgradeId[]) => ids.reduce((sum, id) => sum + ladder(id).reduce((a, b) => a + b, 0), 0);
 
@@ -41,7 +41,7 @@ test('gold sink: every ladder gets dearer with each level and its first levels a
 		const costs = ladder(id);
 		costs.forEach((cost, i) => i > 0 && assert.ok(cost > costs[i - 1], `${id} level ${i + 1}`));
 		assert.ok(costs[0] <= 750_000, `${id} starts cheap (${costs[0]})`);
-		if (id !== 'packrat') assert.ok(costs[Math.min(2, costs.length - 1)] <= 3_000_000, `${id} level 3`);
+		if (id !== 'packrat' && id !== 'packrat2') assert.ok(costs[Math.min(2, costs.length - 1)] <= 3_000_000, `${id} level 3`);
 	}
 });
 
@@ -220,7 +220,8 @@ test('every new upgrade can be bought up to its maximum, costs gold, and starts 
 	freshGame({ gold: 1e12 });
 	growTo(REBIRTH.minTiles);
 	store.setState((st) => ({ tiles: patchTile(st.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }) }));
-	for (const id of IDS) {
+	for (const id of IDS.filter((i) => i !== 'packrat')) {
+		// the old Pack Rat is retired: it cannot be bought any more
 		for (let level = 0; level < MERCHANT_UPGRADES[id].maxLevel; level++) {
 			const gold = api().resources.gold;
 			assert.equal(api().buyMerchantUpgrade(id), true, `${id} ${level + 1}`);
@@ -232,7 +233,7 @@ test('every new upgrade can be bought up to its maximum, costs gold, and starts 
 	const saved = sanitizeSave(rawSnapshot());
 	assert.equal(saved.ok, true, saved.ok ? '' : `the save with everything maxed is valid: ${saved.reason}`);
 	assert.equal(api().rebirth(), true);
-	assert.deepEqual(api().merchantUpgrades, { packrat: MERCHANT_UPGRADES.packrat.maxLevel });
+	assert.deepEqual(api().merchantUpgrades, { packrat2: MERCHANT_UPGRADES.packrat2.maxLevel });
 });
 
 test('saves: a level above the maximum is cut, an unknown upgrade dropped, a negative level refused, a normal level accepted', () => {
