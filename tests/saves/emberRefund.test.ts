@@ -6,7 +6,13 @@ import { autoUseUnlocked } from '../../src/lib/combat';
 import { emberOwned } from '../../src/utils/game/rebirth';
 import type { PrestigeState } from '../../src/types/game';
 
-const old = (over: Partial<PrestigeState> = {}): PrestigeState => ({ rebirths: 3, legacyPoints: 5, legacyEarned: 60, upgrades: { thrift: 4, mastery: 6 }, ...over });
+const old = (over: Partial<PrestigeState> = {}): PrestigeState => ({
+	rebirths: 3,
+	legacyPoints: 5,
+	legacyEarned: 60,
+	upgrades: { thrift: 4, mastery: 6 },
+	...over,
+});
 
 test('the old shop is refunded once: levels cleared, every earned Ember unspent, the income bonus untouched', () => {
 	const refunded = refundOldShop(old());
