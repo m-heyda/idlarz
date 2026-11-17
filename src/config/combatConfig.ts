@@ -75,7 +75,8 @@ export const COMBAT = {
 	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
 	// A kill pays seconds of income: gold and XP as `rewardSec` x the rate, hide as that x `hideShare` (hide only comes from the farm, so
 	// a rat's pelts are a share of it: they help with the hide the big territories cost, see TILE_RESOURCE_COST)
-	rewards: { minGold: 10, minXp: 5, hideShare: 0.6 },
+	// `xpScale`: kills pay this many times the XP their income share gives (2026-11-17: buying tiles pays less XP now, the levels come from fighting)
+	rewards: { minGold: 10, minXp: 5, hideShare: 0.6, xpScale: 3 },
 };
 
 /**

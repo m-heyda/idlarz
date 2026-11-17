@@ -362,6 +362,13 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | eggs | 2 | not for sale |
 | milk | 3 | not for sale |
 | hide | 2 | not for sale |
+| herbs | 5 | not for sale |
+| sap | 5 | not for sale |
+| ironOre | 5 | not for sale |
+| spores | 5 | not for sale |
+| frostshard | 5 | not for sale |
+| pearls | 5 | not for sale |
+| salt | 5 | not for sale |
 | wool | 2 | not for sale |
 
 ### Merchant bonuses and gear shop
@@ -372,7 +379,7 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | Bulk Discount | -1% tile cost | 8 | 250.00K | 45.03M |
 | Lucky Charm | +2 Luck for chests and kills | 10 | 150.00K | 48.40M |
 | Pack Rat (old) | +8 bag slots | 6 | 500.00K | 121.50M |
-| Pack Rat | +4 bag slots | 6 | 500.00K | 121.50M |
+| Pack Rat | +4 bag slots | 10 | 500.00K | 9.84B |
 | Foreman | +1% income from every resource, gold included | 10 | 400.00K | 129.08M |
 | Skinner | +5% meat and hide from your animals | 8 | 300.00K | 26.82M |
 | Quick Hands | +2% attack speed | 8 | 250.00K | 22.35M |

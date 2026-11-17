@@ -247,7 +247,7 @@ Tile XP is small on purpose: levels come from passive XP, kills and rebirth-pace
 **Formula**
 
 ```text
-xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
+xp(k) = 45 x 1.016^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
 ```
 
 <a id="economytiles"></a>

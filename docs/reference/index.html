@@ -347,7 +347,7 @@ The more tiles owned, the more XP gained</p>
 <p>XP a tile purchase gives, for the <code>k</code>-th purchase (<code>BASE_XP_PER_TILE</code> 45, <code>XP_TILE</code> in <code>src/config/economy.ts</code>); multiplied by <code>1 + XP gain %</code> of the character.
 Tile XP is small on purpose: levels come from passive XP, kills and rebirth-paced play, see <a href="#leveling"><code>LEVELING</code></a>.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
+<pre><code class="language-text">xp(k) = 45 x 1.016^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
 </code></pre>
 </article><article><p><a id="economytiles"></a></p>
 <h3><code>economyTiles</code> <small>function</small></h3>
@@ -2615,7 +2615,7 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:534</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:535</code></a></p>
 <p>The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
@@ -3250,7 +3250,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by <a href="#bandof"><code>bandOf</code></a>. No spawn rule reads them yet.</p>
 </article><article><p><a id="boss-min-distance"></a></p>
 <h3><code>BOSS_MIN_DISTANCE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:482</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:483</code></a></p>
 <p>The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts&#39; start (7), and the band is open-ended (<code>BOSS_MAX_DISTANCE</code> is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">boss tile: BOSS_MIN_DISTANCE (8) &lt;= castle distance &lt;= BOSS_MAX_DISTANCE; normal monster tile: 2 &lt;= castle distance &lt;= 9
@@ -3270,7 +3270,7 @@ Items: see <a href="#generateloot"><code>generateLoot</code></a>. Measured share
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
 gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%))
-xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel)) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xp/s includes the XP gain %)
+xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
 hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
 </code></pre>
 <p><strong>Kill rewards per biome</strong> <em>(computed from the code)</em></p>
