@@ -211,57 +211,57 @@
 	color: #e4e7ef;
 }
 
-/* ===== Equipment tooltips, compact: a narrower card, smaller type, tight lines and little air between them (the class is set by ItemTooltip) ===== */
+/* ===== Equipment tooltips, compact: a narrow card with small type, but with a little air between the lines (the class is set by ItemTooltip) ===== */
 .ds-tip.ds-tip-gear {
-	width: 232px;
-	padding: 7px 9px 7px;
+	width: 252px;
+	padding: 8px 10px;
 	font-size: 11.5px;
-	line-height: 1.2;
+	line-height: 1.3;
 }
 .ds-tip-gear .ds-tip-head {
-	gap: 7px;
-	padding-bottom: 5px;
+	gap: 8px;
+	padding-bottom: 7px;
 }
 .ds-tip-gear .ds-tip-head img {
-	width: 34px;
-	height: 34px;
+	width: 37px;
+	height: 37px;
 	padding: 1px;
 }
 .ds-tip-gear .ds-tip-title {
 	font-size: 14px;
 }
 .ds-tip-gear .ds-tip-sub {
-	margin-top: 1px;
+	margin-top: 2px;
 	font-size: 10px;
 }
 .ds-tip-gear .ds-tip-line {
-	margin-top: 2px;
+	margin-top: 3px;
 	font-size: 11px;
-	line-height: 1.2;
+	line-height: 1.3;
 }
 .ds-tip-gear .ds-tip-primary {
-	margin: 2px 0;
+	margin: 3px 0;
 	font-size: 15px;
 }
 .ds-tip-gear .ds-tip-primary > span:last-child {
 	font-size: 11px;
 }
 .ds-tip-gear .ds-tip-rows {
-	padding: 2px 0 0;
-	gap: 1px;
+	padding: 4px 0 0;
+	gap: 3px;
 }
 .ds-tip-gear .ds-tip-row {
 	gap: 8px;
 	font-size: 11px;
-	line-height: 1.2;
+	line-height: 1.3;
 }
 .ds-tip-gear .ds-tip-group {
-	margin-top: 3px;
+	margin-top: 5px;
 }
 .ds-tip-gear .ds-tip-group-head,
 .ds-tip-gear .ds-tip-section,
 .ds-tip-gear .ds-tip-equipped {
-	margin: 4px 0 1px;
+	margin: 6px 0 2px;
 	font-size: 9.5px;
 	letter-spacing: 0.08em;
 }
@@ -269,37 +269,46 @@
 	font-size: 10px;
 }
 .ds-tip-gear .ds-tip-note {
-	padding-top: 3px;
+	padding-top: 4px;
 	font-size: 10.5px;
-	line-height: 1.25;
+	line-height: 1.3;
 }
 .ds-tip-gear .ds-tip-compare {
-	margin-top: 4px;
-	padding: 1px 6px 3px;
+	margin-top: 6px;
+	padding: 2px 6px 4px;
 }
 .ds-tip-gear .ds-tip-compare-head {
 	font-size: 9.5px;
 }
 .ds-tip-gear .ds-tip-set {
-	margin-top: 4px;
-	padding-top: 3px;
+	margin-top: 6px;
+	padding-top: 4px;
 }
 .ds-tip-gear .ds-tip-set-title,
 .ds-tip-gear .ds-tip-set-piece,
 .ds-tip-gear .ds-tip-set-bonus {
 	font-size: 10.5px;
-	line-height: 1.2;
+	line-height: 1.3;
 }
 .ds-tip-gear .ds-tip-keys {
-	margin-top: 4px;
+	margin-top: 6px;
 	font-size: 10px;
 }
 .ds-tip-gear .ds-tip-foot {
-	margin-top: 4px;
-	padding-top: 4px;
+	margin-top: 6px;
+	padding-top: 5px;
 	font-size: 10px;
 }
 .ds-tip-gear .ds-kbd {
 	padding: 0 4px;
 	font-size: 9px;
+}
+
+/* Monster tooltip: the stat lines sit a little closer together */
+.ds-tip-mon .ds-tip-rows {
+	padding: 5px 0 1px;
+	gap: 2px;
+}
+.ds-tip-mon .ds-tip-section {
+	margin: 5px 0 1px;
 }

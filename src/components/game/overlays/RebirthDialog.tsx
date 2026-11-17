@@ -7,11 +7,12 @@ import { CASTLE_UPGRADE } from '@/config/castle';
 import { castleModifier } from '@/utils/game/castle';
 import { economyTiles } from '@/utils/game/tiles';
 import { emberIncomeBonus, emberIncomeMultiplier, emberUpgradeCost, rebirthStatus } from '@/utils/game/rebirth';
+import { biomeArtUrl } from '@/config/biomeArt';
 import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent, tidy } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
-import { rebirthRunSummary, rebirthUnlockIntro, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
+import { rebirthRunSummary, rebirthUnlockIntro, rebirthUnlockList, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
 import GameModal from '../GameModal';
 import { Button, SectionLabel, Tabs } from '../../../../packages/design-system/src/components/primitives';
@@ -37,6 +38,17 @@ const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 };
 
 type RebirthTab = 'rebirth' | 'shop';
+
+/**
+ * The Ember shop's sections, in display order. A section lists the upgrades (ids of `EMBER_UPGRADES`) that belong to it; this is presentation only. To add a bonus, add it to `EMBER_UPGRADES`
+ * and put its id in a section here; an empty section shows `empty` until the first upgrade of that kind exists.
+ */
+const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly EmberUpgradeId[]; empty?: string }[] = [
+	{ id: 'economy', label: 'Economy', ids: ['thrift', 'mastery', 'provisions'] },
+	{ id: 'time', label: 'Building and away time', ids: ['builders', 'nightwatch', 'steward'] },
+	{ id: 'battle', label: 'Battle', ids: [], empty: 'Battle bonuses will come here.' },
+	{ id: 'utility', label: 'Utility', ids: ['deeppockets'] },
+];
 
 /**
  * Rebirth and the Ember shop, in two tabs. A rebirth restarts the run (map, resources, castle, farm, level) in exchange for Embers: permanent income and shop upgrades.
@@ -66,6 +78,7 @@ const RebirthDialog: React.FC = () => {
 	const status = rebirthStatus({ tiles, freeTiles, castleUpgrade, merchantUpgrades, prestige });
 	const { castleLevel, gain, canRebirth } = status;
 	const nextUnlock = rebirthUnlockIntro(prestige.rebirths + 1);
+	const unlocks = rebirthUnlockList(prestige.rebirths + 1);
 	const incomeNow = emberIncomeMultiplier(prestige) - 1;
 	const incomeGain = emberIncomeBonus(prestige.legacyEarned + gain) - emberIncomeBonus(prestige.legacyEarned);
 
@@ -169,10 +182,17 @@ const RebirthDialog: React.FC = () => {
 									<span className='rb-req-label'>
 										{req.id === 'castle' ? `Castle level ${req.needed}+` : req.id === 'tiles' ? `At least ${req.needed} tiles` : req.label}
 									</span>
-									{req.id !== 'idle' && (
-										<span className='rb-req-now'>
-											{formatHeaderAmount(req.current)} / {formatHeaderAmount(req.needed)}
-										</span>
+									{req.id !== 'idle' ? (
+										<>
+											<span className='rb-req-now'>
+												{formatHeaderAmount(req.current)} / {formatHeaderAmount(req.needed)}
+											</span>
+											<span className='rb-req-bar' aria-hidden>
+												<i style={{ width: `${Math.min(100, Math.max(0, (req.current / Math.max(1, req.needed)) * 100))}%` }} />
+											</span>
+										</>
+									) : (
+										<span className='rb-req-now'>{req.met ? 'Done' : 'Wait for it to finish'}</span>
 									)}
 									<span className='sr-only'>{req.met ? 'done' : 'not done yet'}</span>
 								</li>
@@ -203,10 +223,26 @@ const RebirthDialog: React.FC = () => {
 							A higher castle level and more tiles give more Embers (castle level {CASTLE_UPGRADE.maxLevel} is the best you can do). The castle bonus today is +
 							{pct(castleModifier(castleLevel))}; it starts again from level 1.
 						</p>
-						{nextUnlock && (
-							<p className='rb-note' style={{ color: '#f0d27a' }}>
-								This rebirth unlocks a new land: <b>{nextUnlock.label}</b> (x{nextUnlock.multiplier} output).
-							</p>
+						{unlocks.length > 0 && (
+							<div className='rb-unlocks'>
+								<span className='rb-stat-label'>You also unlock</span>
+								<ul className='rb-unlock-list'>
+									{unlocks.map((line) => (
+										<li key={line.id} className='rb-unlock'>
+											{line.art && biomeArtUrl(line.art) ? (
+												// eslint-disable-next-line @next/next/no-img-element
+												<img className='rb-unlock-art' src={biomeArtUrl(line.art)} alt='' />
+											) : (
+												<span className='rb-unlock-dot' aria-hidden>
+													<i />
+												</span>
+											)}
+											<b>{line.label}</b>
+											{line.detail && <span className='ds-dim'>{line.detail}</span>}
+										</li>
+									))}
+								</ul>
+							</div>
 						)}
 						<div className='flex justify-center'>
 							<Button tone='gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
@@ -231,44 +267,53 @@ const RebirthDialog: React.FC = () => {
 				</span>
 				<span className='ds-dim'>Next rebirth: +{formatHeaderAmount(gain)}</span>
 			</div>
-			<div className='ds-ups'>
-				<div className='ds-ups-grid'>
-					{(Object.keys(EMBER_UPGRADES) as EmberUpgradeId[]).map((id) => {
-						const def = EMBER_UPGRADES[id];
-						const level = prestige.upgrades[id] ?? 0;
-						const maxed = level >= def.maxLevel;
-						const cost = emberUpgradeCost(id, level);
-						return (
-							<UpgradeTile
-								key={id}
-								name={def.label}
-								level={level}
-								maxLevel={def.maxLevel}
-								now={level > 0 ? levelText[id](level) : undefined}
-								next={maxed ? undefined : levelText[id](level + 1)}
-								cost={cost}
-								costText={formatHeaderAmount(cost)}
-								costNode={
-									<span className='ds-cost'>
-										<EmberIcon /> {formatHeaderAmount(cost)}
-									</span>
-								}
-								have={prestige.legacyPoints}
-								shortText={`Need ${formatHeaderAmount(Math.max(0, cost - prestige.legacyPoints))} more`}
-								maxLabel='Max level'
-								onBuy={() => {
-									buyEmberUpgrade(id);
-								}}
-							/>
-						);
-					})}
+			{EMBER_CATEGORIES.map((cat) => (
+				<div className='rb-shop-cat' key={cat.id}>
+					<SectionLabel>{cat.label}</SectionLabel>
+					{cat.ids.length === 0 ? (
+						<p className='rb-note'>{cat.empty ?? 'More upgrades will come here.'}</p>
+					) : (
+						<div className='ds-ups'>
+							<div className='ds-ups-grid'>
+								{cat.ids.map((id) => {
+									const def = EMBER_UPGRADES[id];
+									const level = prestige.upgrades[id] ?? 0;
+									const maxed = level >= def.maxLevel;
+									const cost = emberUpgradeCost(id, level);
+									return (
+										<UpgradeTile
+											key={id}
+											name={def.label}
+											level={level}
+											maxLevel={def.maxLevel}
+											now={level > 0 ? levelText[id](level) : undefined}
+											next={maxed ? undefined : levelText[id](level + 1)}
+											cost={cost}
+											costText={formatHeaderAmount(cost)}
+											costNode={
+												<span className='ds-cost'>
+													<EmberIcon /> {formatHeaderAmount(cost)}
+												</span>
+											}
+											have={prestige.legacyPoints}
+											shortText={`Need ${formatHeaderAmount(Math.max(0, cost - prestige.legacyPoints))} more`}
+											maxLabel='Max level'
+											onBuy={() => {
+												buyEmberUpgrade(id);
+											}}
+										/>
+									);
+								})}
+							</div>
+						</div>
+					)}
 				</div>
-			</div>
+			))}
 		</div>
 	);
 
 	return (
-		<GameModal title='Rebirth' size='md' onClose={handleClose}>
+		<GameModal title='Rebirth' size='lg' onClose={handleClose}>
 			<div className='rb-root'>
 				<Tabs
 					active={tab}

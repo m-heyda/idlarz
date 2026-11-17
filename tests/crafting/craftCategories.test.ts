@@ -16,10 +16,10 @@ test('every shown recipe sits in exactly one section; trade goods are the only o
 	);
 });
 
-test('the categories are Weapons, Armor, Potions, Jewelry, Components and Legendary, and "Other" is gone', () => {
+test('the categories are Components, Weapons, Armor, Potions, Jewelry and Legendary, and "Other" is gone', () => {
 	assert.deepEqual(
 		CRAFT_CATEGORIES.map((c) => c.id),
-		['weapons', 'armor', 'potions', 'jewelry', 'components', 'legendary'],
+		['components', 'weapons', 'armor', 'potions', 'jewelry', 'legendary'],
 	);
 	const groups = craftGroups(SHOWN);
 	const armor = groups.find((g) => g.id === 'armor');

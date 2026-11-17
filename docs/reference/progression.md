@@ -302,7 +302,7 @@ The biome a rebirth unlocks, with what its tiles make, for the small modal shown
 
 ### `rebirthRunSummary` <small>function</small>
 
-Source: [`src/utils/game/rebirthUnlocks.ts:102`](../../src/utils/game/rebirthUnlocks.ts)
+Source: [`src/utils/game/rebirthUnlocks.ts:125`](../../src/utils/game/rebirthUnlocks.ts)
 
 The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states
 (what the player really got, whether the server or the browser named the amount), never recomputed here.

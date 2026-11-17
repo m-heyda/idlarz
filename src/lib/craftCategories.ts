@@ -32,7 +32,15 @@ const kindIs =
 
 /** The categories of the recipe list, in display order */
 export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
-	{ id: 'weapons', label: 'Weapons', has: slotIs('mainHand', 'offHand') },
+	{ id: 'components', label: 'Components', has: kindIs('component') },
+	{
+		id: 'weapons',
+		label: 'Weapons',
+		children: [
+			{ id: 'main-hand', label: 'Main-hand weapons', has: slotIs('mainHand') },
+			{ id: 'off-hand', label: 'Off hands', has: slotIs('offHand') },
+		],
+	},
 	{
 		id: 'armor',
 		label: 'Armor',
@@ -57,7 +65,6 @@ export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
 			{ id: 'charms', label: 'Charms', has: slotIs('charm') },
 		],
 	},
-	{ id: 'components', label: 'Components', has: kindIs('component') },
 	{ id: 'legendary', label: 'Legendary', has: kindIs('legendary') },
 ];
 

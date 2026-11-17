@@ -729,6 +729,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
 - [`gen-save-fixtures.ts`](../../scripts/gen-save-fixtures.ts) — Writes the frozen save fixtures of `tests/fixtures/saves/` from the CURRENT code.
+- [`grant-test-items.ts`](../../scripts/grant-test-items.ts) — Gives ONE development account a legendary item in its bag and a boss waiting on its map, so tooltips, the boss fight and the new windows can be tried by hand.
 - [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 

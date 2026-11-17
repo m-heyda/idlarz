@@ -354,6 +354,7 @@ export const MonsterTooltip: React.FC<{
 	wip?: boolean;
 }> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, lucky, defeated, growth, cta, wip }) => (
 	<Tooltip
+		className='ds-tip-mon'
 		rarity={lucky ? 'legendary' : boss ? 'unique' : 'common'}
 		icon={icon}
 		iconClassName={lucky ? 'ds-tip-lucky' : undefined}

@@ -525,6 +525,7 @@
 
 .fight-skill-group {
 	display: flex;
+	align-items: flex-start;
 	gap: 8px;
 	margin-left: auto;
 }
@@ -592,4 +593,23 @@
 /* the loot of a won fight, about 10% smaller than a bag slot */
 .victory-loot .inv-slot {
 	zoom: 0.9;
+}
+
+/* a skill with its mana cost under the icon */
+.fight-skill-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+}
+
+.fight-skill-cost {
+	font-size: 0.62rem;
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: #7fb8ff;
+}
+
+.fight-skill-cost[data-short='true'] {
+	color: #ff7a6a;
 }

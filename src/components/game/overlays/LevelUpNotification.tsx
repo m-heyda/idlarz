@@ -3,7 +3,6 @@ import { useGameStore } from '@/stores/gameStore';
 import { useHydration } from '@/hooks/useHydration';
 import audioManager from '@/utils/audioManager';
 import '@/styles/LevelUpNotification.css';
-import LevelOrb from '../LevelOrb';
 
 const AUTO_CLOSE_MS = 9000;
 const RAYS = Array.from({ length: 16 }, (_, i) => i * 22.5);
@@ -19,7 +18,7 @@ const PARTICLES = Array.from({ length: 30 }, (_, i) => ({
 }));
 
 /**
- * Level-up celebration: a white flash, pixelated god-rays turning behind a big purple orb that pops in with the
+ * Level-up celebration: a white flash, pixelated god-rays turning behind a big purple number that pops in with the
  * new level, shockwave rings, a crimson banner whose letters drop in, a burst of sparks and the points earned.
  */
 const LevelUpNotification: React.FC = () => {
@@ -110,7 +109,7 @@ const LevelUpNotification: React.FC = () => {
 
 			<div className='lu-stage'>
 				<div className='lu-orb'>
-					<LevelOrb level={shown.level} scale={6} />
+					<span className='lu-num'>{shown.level}</span>
 				</div>
 
 				<div className='lu-banner'>

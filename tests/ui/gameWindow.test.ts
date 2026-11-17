@@ -136,7 +136,7 @@ test('the Merchant Goods tab: the shelf with its restock, your bag with the filt
 		'Quick sell',
 		'Sell junk',
 		'Sell common',
-		'Up to uncommon',
+		'Sell up to uncommon',
 		'Sell everything shown',
 		'Auto-sell new gear up to',
 	]) {

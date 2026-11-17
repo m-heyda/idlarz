@@ -7,7 +7,7 @@ import { castleModifier, castleUpgradeDuration } from '@/utils/game/castle';
 import { castleAreaBonus, castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import audioManager from '@/utils/audioManager';
 import GameWindow from './GameWindow';
-import { Button, Tabs } from '../../../packages/design-system/src/components/primitives';
+import { Button, DiamondLevel, Tabs } from '../../../packages/design-system/src/components/primitives';
 import '@/styles/BuildModal.css';
 import { useWindowStore } from '@/stores/windowStore';
 import CostGrid from './CostGrid';
@@ -96,7 +96,7 @@ const CastleUpgradeDialog: FC = () => {
 		<GameWindow
 			id='castle'
 			title={`Castle ${castleLevel}/${CASTLE_UPGRADE.maxLevel}`}
-			width={600}
+			width={700}
 			height={700}
 			bar={
 				<Tabs
@@ -117,7 +117,7 @@ const CastleUpgradeDialog: FC = () => {
 				/>
 			) : (
 				<div className='bw-main' style={{ gap: 14 }}>
-					<div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 28, minHeight: 96 }}>
+					<div className='bw-castle-sprites'>
 						<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
 							<CastleSprite level={castleLevel} variant='inline' />
 							<span className='ds-dim' style={{ fontSize: 12 }}>
@@ -126,7 +126,16 @@ const CastleUpgradeDialog: FC = () => {
 						</div>
 						{!isMaxLevel && (
 							<>
-								<span style={{ fontSize: 26, color: '#f4d57e', paddingBottom: 26 }}>→</span>
+								<div className='bw-arrow'>
+									<span className='bw-arrow-time' title='How long the upgrade takes'>
+										<svg viewBox='0 0 16 16' width='15' height='15' fill='none' stroke='currentColor' strokeWidth='1.6' aria-hidden>
+											<circle cx='8' cy='8' r='6.2' />
+											<path d='M8 4.2 V8 L10.6 9.6' strokeLinecap='round' />
+										</svg>
+										{formatTime(duration)}
+									</span>
+									<span className='bw-arrow-sign'>→</span>
+								</div>
 								<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.85 }}>
 									<CastleSprite level={castleLevel + 1} variant='inline' />
 									<span style={{ fontSize: 12, color: '#f4d57e' }}>Level {castleLevel + 1}</span>
@@ -136,7 +145,7 @@ const CastleUpgradeDialog: FC = () => {
 					</div>
 
 					{castleUpgrade && (
-						<div className='ds-listrow bw-upgrade'>
+						<div className='bw-sec bw-upgrade'>
 							<div className='bw-label'>Upgrading to level {castleUpgrade.toLevel}</div>
 							<div className='bw-bar'>
 								<div className='bw-bar-fill' style={{ width: `${Math.round(progress * 100)}%` }} />
@@ -145,8 +154,8 @@ const CastleUpgradeDialog: FC = () => {
 						</div>
 					)}
 
-					<div className='ds-listrow'>
-						<div className='bw-table'>
+					<div className='bw-sec'>
+						<div className='bw-table bw-table-3'>
 							<span className='bw-label'>Castle bonus</span>
 							<span className='bw-col'>Now</span>
 							<span className='bw-col'>{isMaxLevel ? '' : `Level ${castleLevel + 1}`}</span>
@@ -162,27 +171,26 @@ const CastleUpgradeDialog: FC = () => {
 								</React.Fragment>
 							))}
 						</div>
-						{!isMaxLevel && !isNextToMaxLevel && afterNextLevelCosts && (
-							<div className='bw-note'>
-								Level {castleLevel + 2}: +{formatPercent(afterNextMultiplier * 100)} to all resources, +{formatCompact(afterNextXpBonus)} XP/s
-							</div>
-						)}
 					</div>
 
 					{!isMaxLevel && nextLevelCosts ? (
 						<>
-							<div className='ds-listrow bw-upgrade'>
-								<div className='bw-label'>Upgrade to level {castleLevel + 1}</div>
-								<CostGrid cost={nextLevelCosts} />
-								<div className='bw-foot'>
-									<span className='bw-time'>Takes {formatTime(duration)}</span>
+							<div className='bw-card bw-card-main'>
+								<div className='bw-sechead'>
+									<span className='bw-label'>Upgrade to level {castleLevel + 1}</span>
+									<DiamondLevel level={castleLevel} max={CASTLE_UPGRADE.maxLevel} />
 								</div>
+								<div className='bw-gets'>
+									You get: <b>+{formatPercent(nextMultiplier * 100)}</b> to all resources, <b>+{formatCompact(nextXpBonus)}</b> castle XP / s
+								</div>
+								<CostGrid cost={nextLevelCosts} />
 							</div>
 
 							{!isNextToMaxLevel && afterNextLevelCosts && (
-								<div className='ds-listrow'>
-									<div className='bw-label' style={{ color: '#7a7f90' }}>
-										Next upgrade cost
+								<div className='bw-card bw-card-dim'>
+									<div className='bw-label'>Then: level {castleLevel + 2}</div>
+									<div className='bw-gets'>
+										+{formatPercent(afterNextMultiplier * 100)} to all resources, +{formatCompact(afterNextXpBonus)} castle XP / s
 									</div>
 									<CostGrid cost={afterNextLevelCosts} muted />
 								</div>
@@ -196,7 +204,7 @@ const CastleUpgradeDialog: FC = () => {
 							</div>
 						</>
 					) : (
-						<div className='ds-listrow' style={{ textAlign: 'center' }}>
+						<div className='bw-sec' style={{ textAlign: 'center' }}>
 							<div className='bw-up'>Your castle has reached its maximum level!</div>
 							<div style={{ display: 'flex', justifyContent: 'center', marginTop: 6 }}>
 								<Button onClick={onClose}>Close</Button>

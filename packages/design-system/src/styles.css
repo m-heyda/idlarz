@@ -3457,64 +3457,66 @@
 	--ds-flame-b: 255, 40, 20;
 }
 
-.ds-tip-flames::before,
-.ds-tip-flames i {
+/* the glow: a soft warm light along the bottom edge that slowly breathes */
+.ds-tip-flames::before {
 	content: '';
 	position: absolute;
-	left: -10%;
-	width: 120%;
-	height: 64px;
-	bottom: -22px;
-	background: radial-gradient(ellipse 14% 90% at 12% 100%, rgba(var(--ds-flame-b), 0.55), transparent 70%),
-		radial-gradient(ellipse 18% 110% at 34% 100%, rgba(var(--ds-flame-a), 0.5), transparent 70%),
-		radial-gradient(ellipse 14% 80% at 58% 100%, rgba(var(--ds-flame-b), 0.55), transparent 70%),
-		radial-gradient(ellipse 18% 105% at 80% 100%, rgba(var(--ds-flame-a), 0.5), transparent 70%),
-		radial-gradient(ellipse 12% 75% at 96% 100%, rgba(var(--ds-flame-b), 0.5), transparent 70%);
-	filter: blur(4px);
-	opacity: 0.45;
-	transform-origin: 50% 100%;
-	animation: ds-flame-rise 1.7s ease-in-out infinite alternate;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 55px;
+	background: radial-gradient(ellipse 70% 100% at 50% 100%, rgba(var(--ds-flame-b), 0.5), transparent 75%),
+		linear-gradient(to top, rgba(var(--ds-flame-a), 0.22), transparent);
+	opacity: 0.8;
+	animation: ds-flame-breathe 2.6s ease-in-out infinite alternate;
 }
 
+/* the sparks: a few small embers drifting up and fading, one layer that loops */
 .ds-tip-flames i {
-	animation-duration: 1.2s;
-	animation-delay: -0.5s;
-	opacity: 0.3;
-	bottom: -30px;
-	height: 52px;
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 90px;
+	background: radial-gradient(circle 1.5px at 12% 80%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 27% 55%, rgb(var(--ds-flame-b)), transparent), radial-gradient(circle 1.5px at 41% 90%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 58% 62%, rgb(var(--ds-flame-b)), transparent), radial-gradient(circle 1.5px at 73% 85%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 88% 58%, rgb(var(--ds-flame-b)), transparent);
+	animation: ds-flame-sparks 3.4s linear infinite;
 }
 
-.ds-tip[data-rarity='unique'] .ds-tip-flames::before,
-.ds-tip[data-rarity='unique'] .ds-tip-flames i {
-	opacity: 0.6;
+/* unique: the same, mirrored, along the top edge too */
+.ds-tip[data-rarity='unique'] .ds-tip-flames::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 40px;
+	background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(var(--ds-flame-b), 0.3), transparent 75%);
+	animation: ds-flame-breathe 3.1s ease-in-out infinite alternate-reverse;
 }
 
-/* unique only: a row of flames falling from the top edge, so the flames wrap the card */
-.ds-tip[data-rarity='unique'] .ds-tip-flames i {
-	bottom: auto;
-	top: -30px;
-	transform-origin: 50% 0;
-	transform: scaleY(-1);
-	animation-name: ds-flame-fall;
-}
-
-@keyframes ds-flame-rise {
+@keyframes ds-flame-breathe {
 	from {
-		transform: scaleY(0.8) translateX(-1%);
-		opacity: 0.32;
-	}
-	to {
-		transform: scaleY(1.15) translateX(1%);
 		opacity: 0.55;
 	}
+	to {
+		opacity: 1;
+	}
 }
 
-@keyframes ds-flame-fall {
+@keyframes ds-flame-sparks {
 	from {
-		transform: scaleY(-0.8) translateX(1%);
+		transform: translateY(18px);
+		opacity: 0;
+	}
+	20% {
+		opacity: 0.9;
 	}
 	to {
-		transform: scaleY(-1.15) translateX(-1%);
+		transform: translateY(-22px);
+		opacity: 0;
 	}
 }
 
@@ -3525,6 +3527,7 @@
 	.ds-tip[data-rarity='unique']::before,
 	.ds-tip[data-rarity='unique'] .ds-tip-title,
 	.ds-tip-flames::before,
+	.ds-tip-flames::after,
 	.ds-tip-flames i {
 		animation: none;
 	}
@@ -5447,4 +5450,15 @@ button.ds-income-head:hover {
 /* the level in a monster tooltip's header once it cannot grow any more */
 .ds-tip-grown {
 	color: #5ee07a;
+}
+
+.ds-quick-grades {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.ds-quick-grade {
+	white-space: nowrap;
+	border-left: 6px solid var(--grade, transparent);
 }

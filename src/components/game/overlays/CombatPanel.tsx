@@ -246,10 +246,13 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 								<ItemSlot {...slotProps(slot)} />
 								<span className='fight-hotkey'>{i + 1}</span>
 								{cd.potion > 0 && (
-									<span
-										className='fight-cooldown'
-										style={{ height: `${Math.min(100, (cd.potion / (p.potionCooldownSec ?? COMBAT.potionCooldownSec)) * 100)}%` }}
-									/>
+									<>
+										<span
+											className='fight-cooldown'
+											style={{ height: `${Math.min(100, (cd.potion / (p.potionCooldownSec ?? COMBAT.potionCooldownSec)) * 100)}%` }}
+										/>
+										<b className='fight-cd-num'>{Math.ceil(cd.potion)}</b>
+									</>
 								)}
 							</button>
 						))}
@@ -263,22 +266,32 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 									? `Unlocks at level ${skill.unlockLevel}.`
 									: `Costs ${skill.manaCost} mana, cooldown ${skill.cooldownSec} s. Press ${key} or click.`;
 								return (
-									<HoverTip key={id} placement='above' align='center' tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} ${detail}`} />}>
-										<button
-											type='button'
-											disabled={locked}
-											onClick={() => p.onSkill?.(id)}
-											className='fight-skill'
-											data-locked={locked}
-											data-nomana={!locked && player.mp < skill.manaCost}
-											aria-label={`${skill.name}. ${detail}`}
-										>
-											{/* eslint-disable-next-line @next/next/no-img-element */}
-											<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
-											<span className='fight-hotkey'>{key}</span>
-											{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
-										</button>
-									</HoverTip>
+									<span key={id} className='fight-skill-wrap'>
+										<HoverTip placement='above' align='center' tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} ${detail}`} />}>
+											<button
+												type='button'
+												disabled={locked}
+												onClick={() => p.onSkill?.(id)}
+												className='fight-skill'
+												data-locked={locked}
+												data-nomana={!locked && player.mp < skill.manaCost}
+												aria-label={`${skill.name}. ${detail}`}
+											>
+												{/* eslint-disable-next-line @next/next/no-img-element */}
+												<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
+												<span className='fight-hotkey'>{key}</span>
+												{!locked && left > 0 && (
+													<>
+														<span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />
+														<b className='fight-cd-num'>{Math.ceil(left)}</b>
+													</>
+												)}
+											</button>
+										</HoverTip>
+										<span className='fight-skill-cost' data-short={!locked && player.mp < skill.manaCost}>
+											{skill.manaCost} MP
+										</span>
+									</span>
 								);
 							})}
 						</span>

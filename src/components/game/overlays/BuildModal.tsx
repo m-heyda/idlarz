@@ -161,7 +161,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		<GameModal title='Build here' width={780} onClose={close}>
 			<div className='build-list' style={{ gap: 12 }}>
 				{builds.map((o) => (
-					<div key={o.def.id} className={`ds-listrow bh-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={o.def.id} className={`bh-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} details={details(o.def, o.remembered)} />
@@ -180,7 +180,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					</div>
 				))}
 				{moves.map((o) => (
-					<div key={`move-${o.def.id}`} className={`ds-listrow bh-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={`move-${o.def.id}`} className={`bh-row${o.problem ? ' build-row-off' : ''}`}>
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />

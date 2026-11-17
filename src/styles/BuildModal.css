@@ -249,12 +249,16 @@
 }
 
 /* Build here, new layout: art, a short card, and the action on the right */
-.ds-listrow.bh-row {
+.bh-row {
 	display: grid;
 	grid-template-columns: 96px minmax(0, 1fr) auto;
 	align-items: center;
 	gap: 16px;
-	padding: 14px;
+	padding: 16px 0;
+	border-bottom: 1px solid rgba(240, 210, 122, 0.16);
+}
+.bh-row:last-child {
+	border-bottom: 0;
 }
 .bh-row .build-art {
 	width: 96px;
@@ -300,11 +304,11 @@
 	text-decoration: underline dotted;
 }
 
-/* CostGrid: the resource costs as chips that wrap (as many columns as fit), so a level with many resource types never leaves the window */
+/* CostGrid: the resource costs in one wrapping row, an icon and an amount each with no box around them (green: enough, red: missing) */
 .cost-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
-	gap: 6px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 20px;
 	min-width: 0;
 }
 .cost-chip {
@@ -312,9 +316,7 @@
 	align-items: center;
 	gap: 6px;
 	min-width: 0;
-	padding: 4px 8px;
-	background: rgba(0, 0, 0, 0.28);
-	border: 1px solid rgba(255, 255, 255, 0.06);
+	font-size: 0.95rem;
 	font-variant-numeric: tabular-nums;
 	color: #a89878;
 }
@@ -323,14 +325,11 @@
 }
 .cost-chip[data-ok='false'] {
 	color: #ff7a6a;
-	border-color: rgba(255, 122, 106, 0.3);
 }
 .cost-grid[data-muted='true'] .cost-chip {
 	color: #7a7f90;
 }
 .cost-chip-num {
-	overflow: hidden;
-	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
@@ -339,9 +338,6 @@
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
-	padding: 8px 10px;
-	background: rgba(0, 0, 0, 0.3);
-	border: 1px solid var(--ds-line, #3a2c1c);
 }
 
 /* narrow windows: the info column goes on top, the Build and Move buttons go under their card, and nothing is wider than the window */
@@ -349,7 +345,7 @@
 	.bw {
 		grid-template-columns: minmax(0, 1fr);
 	}
-	.ds-listrow.bh-row {
+	.bh-row {
 		grid-template-columns: 72px minmax(0, 1fr);
 		gap: 12px;
 	}
@@ -367,4 +363,100 @@
 	.bw-table {
 		gap: 6px 12px;
 	}
+}
+
+/* open sections (castle and building windows): a heading line and the content under it, a thin rule between sections, no box */
+.bw-sec {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding-top: 14px;
+	border-top: 1px solid rgba(240, 210, 122, 0.2);
+}
+.bw-sec:first-child {
+	padding-top: 0;
+	border-top: 0;
+}
+.bw-sechead {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+}
+.bw-sec.bw-upgrade {
+	border-top-color: var(--ds-gold-dk, #8a5f16);
+}
+.bw-sec-dim .bw-label {
+	color: #7a7f90;
+}
+.bw-sec .bw-note {
+	margin-top: 0;
+	padding-top: 0;
+	border-top: 0;
+}
+.bw-castle-sprites {
+	display: flex;
+	align-items: flex-end;
+	justify-content: center;
+	gap: 28px;
+	min-height: 96px;
+}
+
+/* the castle bonus table has three columns (the building one has four) */
+.bw-table.bw-table-3 {
+	grid-template-columns: 1fr auto auto;
+}
+
+/* castle: this upgrade is a bright card, the one after it a greyed-out card */
+.bw-card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 14px 16px;
+}
+.bw-card-main {
+	background: linear-gradient(rgba(240, 210, 122, 0.1), rgba(240, 210, 122, 0.03));
+	border: 1px solid var(--ds-gold-dk, #8a5f16);
+	box-shadow: 0 0 14px rgba(240, 210, 122, 0.12);
+}
+.bw-card-dim {
+	background: rgba(255, 255, 255, 0.03);
+	border: 1px dashed rgba(255, 255, 255, 0.14);
+	opacity: 0.7;
+}
+.bw-card-dim .bw-label {
+	color: #7a7f90;
+}
+.bw-gets {
+	font-size: 0.85rem;
+	color: #b9bdc9;
+}
+.bw-gets b {
+	color: #5ee07a;
+	font-weight: 400;
+}
+.bw-card-dim .bw-gets b {
+	color: #8a9a8e;
+}
+
+/* castle: the arrow between the two castles carries the upgrade time (a clock and the duration) */
+.bw-arrow {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding-bottom: 22px;
+}
+.bw-arrow-sign {
+	font-size: 26px;
+	line-height: 1;
+	color: #f4d57e;
+}
+.bw-arrow-time {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	font-size: 0.95rem;
+	color: #ffb24a;
+	white-space: nowrap;
 }

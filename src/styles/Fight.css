@@ -306,17 +306,18 @@
 .fight-stunned {
 	position: absolute;
 	left: 50%;
-	top: 6%;
-	transform: translateX(-50%);
+	top: 50%;
+	transform: translate(-50%, -50%);
 	z-index: 6;
-	padding: 2px 8px;
-	font-size: 0.8rem;
+	padding: 4px 12px;
+	font-size: 0.95rem;
 	font-weight: 700;
 	letter-spacing: 1px;
 	text-transform: uppercase;
 	color: #101010;
 	background: #8ac0ff;
 	border: 2px solid #0a0605;
+	box-shadow: 0 0 14px rgba(138, 192, 255, 0.7);
 	pointer-events: none;
 }
 
@@ -325,7 +326,27 @@
 	left: 0;
 	right: 0;
 	bottom: 0;
-	background: rgba(0, 0, 0, 0.6);
+	background: linear-gradient(rgba(70, 140, 255, 0.78), rgba(20, 60, 170, 0.88));
+	border-top: 2px solid #9fd0ff;
+	box-shadow: 0 -2px 8px rgba(110, 180, 255, 0.7);
+	pointer-events: none;
+}
+
+/* the seconds left, big and centred over the whole icon while the blue fill shrinks under it */
+.fight-cd-num {
+	position: absolute;
+	inset: 0;
+	display: grid;
+	place-items: center;
+	font-size: 1.25rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #fff;
+	text-shadow:
+		2px 0 0 #0a1a40,
+		-2px 0 0 #0a1a40,
+		0 2px 0 #0a1a40,
+		0 -2px 0 #0a1a40;
 	pointer-events: none;
 }
 

@@ -117,7 +117,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 				</div>
 
 				<div className='bw-main'>
-					<div className='ds-listrow'>
+					<div className='bw-sec'>
 						{def.kind === 'idol' && idol ? (
 							<>
 								<div className='bw-label'>Its bonus</div>
@@ -160,7 +160,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						)}
 					</div>
 
-					<div className='ds-listrow bw-upgrade'>
+					<div className='bw-sec bw-upgrade'>
 						{running ? (
 							<>
 								<div className='bw-label'>Upgrading to level {running.toLevel}</div>
@@ -173,7 +173,12 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<div className='bw-up'>Highest level reached.</div>
 						) : (
 							<>
-								<div className='bw-label'>Upgrade to level {nextLevel}</div>
+								<div className='bw-sechead'>
+									<span className='bw-label'>Upgrade to level {nextLevel}</span>
+									<span title={`Level ${level} of ${top}`} data-testid='building-upgrade-gems'>
+										<DiamondLevel level={level} max={top} small />
+									</span>
+								</div>
 								<CostGrid cost={cost} />
 								{def.kind === 'idol' && ownedTiles < idolFloorTiles(nextLevel) && (
 									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>

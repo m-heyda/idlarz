@@ -291,12 +291,22 @@ const MerchantGoodsTab: React.FC = () => {
 							Sell junk{junkCount > 0 ? ` (${formatNumber(junkCount)})` : ''}
 						</Button>
 					</HoverTip>
-					<div style={{ display: 'flex', gap: 6 }}>
-						<Button style={{ flex: 1 }} disabled={fighting} onClick={() => sellRarity('common')}>
+					<div className='ds-quick-grades'>
+						<Button
+							className='ds-quick-grade'
+							style={{ '--grade': 'var(--ds-r-common)' } as React.CSSProperties}
+							disabled={fighting}
+							onClick={() => sellRarity('common')}
+						>
 							Sell common
 						</Button>
-						<Button style={{ flex: 1 }} disabled={fighting || plainWorth <= 0} onClick={() => sellRarity('uncommon')}>
-							Up to uncommon
+						<Button
+							className='ds-quick-grade'
+							style={{ '--grade': 'var(--ds-r-uncommon)' } as React.CSSProperties}
+							disabled={fighting || plainWorth <= 0}
+							onClick={() => sellRarity('uncommon')}
+						>
+							Sell up to uncommon
 						</Button>
 					</div>
 					<Button tone={confirm ? 'danger' : 'stone'} disabled={fighting || entries.length === 0} onClick={sellShown} onBlur={() => setConfirm(false)}>
