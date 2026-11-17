@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 124,
+  "line": 125,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -557,7 +557,7 @@
   "kind": "const",
   "category": "Economy/Buildings",
   "file": "src/config/buildings.ts",
-  "line": 57,
+  "line": 58,
   "summary": "The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.",
   "see": []
  },
@@ -896,7 +896,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 55,
+  "line": 58,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -907,7 +907,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 148,
+  "line": 166,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -918,7 +918,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 157,
+  "line": 175,
   "summary": "The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom), never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.",
   "see": []
  },
@@ -1203,8 +1203,19 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 45,
-  "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.",
+  "line": 48,
+  "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5 (`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.",
+  "see": []
+ },
+ {
+  "id": "buildercount",
+  "name": "builderCount",
+  "symbol": "builderCount",
+  "kind": "function",
+  "category": "Economy/Buildings",
+  "file": "src/lib/buildings.ts",
+  "line": 71,
+  "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.",
   "see": []
  },
  {
@@ -1214,7 +1225,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 81,
+  "line": 102,
   "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
   "see": []
  },
@@ -1393,7 +1404,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 83,
+  "line": 84,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -1404,7 +1415,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 91,
+  "line": 92,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -1415,7 +1426,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 210,
+  "line": 211,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1448,7 +1459,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 96,
+  "line": 97,
   "summary": "The flags and what the server does with each. Meaning of each flag:",
   "see": []
  },
@@ -1458,7 +1469,7 @@
   "kind": "topic",
   "category": "Ops/Operator guides",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 115,
+  "line": 116,
   "summary": "**Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).** Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:",
   "see": [
    "ENFORCEMENT",
@@ -1472,7 +1483,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 140,
+  "line": 141,
   "summary": "The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject` in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.",
   "see": []
  },
@@ -1483,7 +1494,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 155,
+  "line": 156,
   "summary": "Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.",
   "see": []
  },
@@ -1494,7 +1505,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 247,
+  "line": 258,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
@@ -1839,7 +1850,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/limits.ts",
-  "line": 59,
+  "line": 62,
   "summary": "The current value of a limit: its base plus the registered bonuses.",
   "see": []
  },
@@ -2460,7 +2471,7 @@
   "kind": "const",
   "category": "Combat/Results and rest",
   "file": "src/lib/offline/grant.ts",
-  "line": 51,
+  "line": 52,
   "summary": "The longest gap the server treats as the same session: past it an online call is refused with `claim_first`, and the hero rests (heals fully) through the gap. The client uses the same number, so the picture never jumps back.",
   "see": []
  },
@@ -2471,8 +2482,8 @@
   "kind": "function",
   "category": "Saves & Server/Away time",
   "file": "src/lib/offline/grant.ts",
-  "line": 75,
-  "summary": "The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the castle upgrade (or a building's, they share one builder) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.",
+  "line": 76,
+  "summary": "The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the castle upgrade (or any building upgrade, they share the builders) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.",
   "see": []
  },
  {
@@ -2990,7 +3001,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 372,
+  "line": 374,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

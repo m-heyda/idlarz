@@ -46,6 +46,8 @@ export const LIMITS = {
 	buildingMaxLevel: 5,
 	/** The highest castle level (the Castle Expansion Ember upgrade raises it, one level per upgrade level) */
 	castleMaxLevel: 10,
+	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Builder #2 and the Ember shop's Extra Builder add to it, see `builderCount`) */
+	builders: 1,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -72,4 +74,6 @@ export const HARD_LIMITS = {
 	buildingMaxLevel: 15,
 	/** Castle levels a save may hold (base 10, the Ember shop adds up to 5 more) */
 	castleMaxLevel: 15,
+	/** Builders a save may hold timers for: 1 + the Gem shop's one + the Ember shop's, with room to grow */
+	builders: 8,
 } as const;

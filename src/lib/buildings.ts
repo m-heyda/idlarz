@@ -1,7 +1,8 @@
 import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES, BUILDINGS_FLAG, IDOL_RULES } from '@/config/buildings';
 import { HARD_LIMITS } from '@/config/limits';
-import { limitOf } from '@/lib/limits';
+import { busyBuilders } from '@/lib/builders';
+import { limitOf, type LimitContext } from '@/lib/limits';
 import { BUILDINGS, buildingDef, type BuildingDef } from '@/catalog/buildings';
 import { calculateTileCost, tileCostAsResources } from '@/utils/game/costs';
 import { emberEffect } from '@/utils/game/rebirth';
@@ -35,19 +36,39 @@ export const upgradeCapOf = (
 };
 
 /**
- * Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.
+ * Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5
+ * (`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.
  *
  * @category Economy/Buildings
  * @order 5
  * @formula
- * seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
+ * seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))          Producer, Extractor
+ * seconds = floor(IDOL_RULES.durationsSec[fromLevel] x (1 - ...))          Idol; above level 5: last x 1.35^(levels past 5), at most 7 days
  */
 export const buildingUpgradeDuration = (fromLevel: number, prestige?: PrestigeState, idolBuildTimePct = 0, kind: BuildKind = 'building'): number => {
-	const table = BUILDING_RULES.durationsSec;
+	const idol = kind === 'idol';
+	const table = idol ? IDOL_RULES.durationsSec : BUILDING_RULES.durationsSec;
+	const at = idol ? fromLevel : fromLevel - 1;
 	// past the base ladder (an Idol raised above level 5 by the Ember shop): the last timer x1.35 per level, at most 7 days
-	const base = table[fromLevel - 1] ?? Math.min(7 * 86400, (table[table.length - 1] ?? 0) * Math.pow(1.35, fromLevel - table.length));
+	const base = table[at] ?? Math.min(7 * 86400, (table[table.length - 1] ?? 0) * Math.pow(1.35, at - table.length + 1));
 	return Math.floor(base * (1 - buildTimeReduction(prestige, idolBuildTimePct, kind)));
 };
+
+/**
+ * The shortest a timer to `toLevel` can be (no build-time cuts): the server's floor for a new upgrade; `idol` says the job's building is an Idol (longer timers). The first build (level 1) only exists for Idols.
+ */
+export const shortestUpgradeSec = (toLevel: number, idol = false): number =>
+	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, 'idol') : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol ? 'idol' : 'building');
+
+/**
+ * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.
+ *
+ * @category Economy/Buildings
+ * @order 8
+ * @formula
+ * builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
+ */
+export const builderCount = (ctx: LimitContext = {}): number => Math.min(HARD_LIMITS.builders, limitOf('builders', ctx));
 
 /** What a build timer belongs to: the castle, a Producer or Extractor (`building`) or an Idol. Each has its own Ember upgrade for the cut. */
 export type BuildKind = 'castle' | 'building' | 'idol';
@@ -153,7 +174,10 @@ export interface BuildingContext {
 	monsters: readonly Monster[];
 	castleLevel: number;
 	castleUpgrade: CastleUpgradeState | null;
-	buildingUpgrade: BuildingUpgradeState | null;
+	/** The building upgrades running (a first Idol build is one: it holds a builder) */
+	buildingUpgrades: readonly BuildingUpgradeState[];
+	/** Builders in all ({@link builderCount}); absent = 1 */
+	builders?: number;
 	/** Tiles counted for prices (`economyTiles`) */
 	ownedTiles: number;
 	/** The Idol level cap in force ({@link limitOf} `idolMaxLevel` with the Ember shop's raises); absent = the base */
@@ -168,15 +192,28 @@ const tileProblem = (ctx: BuildingContext, x: number, y: number, def: BuildingDe
 	if (!tile || !tile.isOwned) return 'Not your land';
 	if (tile.biome === 'castle') return 'Not on the castle';
 	if (tile.building) return 'Already has a building';
+	if (upgradeAt(ctx, x, y)) return 'Under construction';
 	if (tile.hasChest) return 'A chest is here';
 	if (monsterAt(ctx.monsters as Monster[], x, y)) return 'A monster is here';
 	if (tile.biome !== def.biome) return `Needs ${BIOMES[def.biome]?.label ?? def.biome}`;
 	return null;
 };
 
-/** Why the builder is busy, or null when it is free (the castle and the buildings share one). */
-export const builderBusy = (ctx: Pick<BuildingContext, 'castleUpgrade' | 'buildingUpgrade'>): string | null =>
-	ctx.castleUpgrade ? 'The builder is upgrading the castle' : ctx.buildingUpgrade ? 'The builder is busy with a building' : null;
+/** Why no builder is free, or null when one is (the castle and the buildings share the builders: one timer each, at most {@link builderCount} at once). */
+export const builderBusy = (ctx: Pick<BuildingContext, 'castleUpgrade' | 'buildingUpgrades' | 'builders'>): string | null => {
+	const builders = Math.max(1, ctx.builders ?? 1);
+	if (busyBuilders(ctx.castleUpgrade, ctx.buildingUpgrades) < builders) return null;
+	if (builders > 1) return 'All builders are busy';
+	return ctx.castleUpgrade ? 'The builder is upgrading the castle' : 'The builder is busy with a building';
+};
+
+/** The running upgrade of the building on (x, y), or the first Idol build waiting on that tile. */
+export const upgradeAt = (ctx: Pick<BuildingContext, 'buildingUpgrades'>, x: number, y: number): BuildingUpgradeState | undefined =>
+	ctx.buildingUpgrades.find((u) => u.x === x && u.y === y);
+
+/** Whether placing this building takes a builder and a timer: an Idol the account has not learned yet (its first build). Everything else is placed at once. */
+export const needsConstruction = (def: BuildingDef | undefined, idolLevels: Record<string, number> | undefined): boolean =>
+	def?.kind === 'idol' && rememberedIdolLevel(idolLevels, def.biome) === 0;
 
 /**
  * Why `id` cannot be built on tile (x, y) now, or null when it can: the system is on, the type exists, **one of each type per map**, and the tile fits.
@@ -186,7 +223,7 @@ export const buildProblem = (ctx: BuildingContext, x: number, y: number, id: str
 	if (!buildingsEnabled()) return 'Buildings are not available yet';
 	const def = buildingDef(id);
 	if (!def) return 'Unknown building';
-	if (builtBuildings(ctx.tiles).some((b) => b.id === id)) return `The ${def.label} is already built`;
+	if (builtBuildings(ctx.tiles).some((b) => b.id === id) || ctx.buildingUpgrades.some((u) => u.building === id)) return `The ${def.label} is already built`;
 	return tileProblem(ctx, x, y, def);
 };
 
@@ -203,6 +240,7 @@ export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): stri
 		def?.kind === 'idol' ? Math.min(ctx.idolMax ?? limitOf('idolMaxLevel'), HARD_LIMITS.idolMaxLevel) : Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel);
 	if (level >= top) return 'Highest level';
 	if (level >= upgradeCapOf(def, ctx.castleLevel, ctx.idolMax, buildingMax)) return `Needs castle level ${level + 1}`;
+	if (upgradeAt(ctx, x, y)) return 'It is being upgraded';
 	return builderBusy(ctx);
 };
 
@@ -214,7 +252,7 @@ export const moveProblem = (ctx: BuildingContext, fromX: number, fromY: number, 
 	if (!from || !def) return 'No building here';
 	if (fromX === toX && fromY === toY) return 'Already here';
 	if (monsterAt(ctx.monsters as Monster[], fromX, fromY)) return 'Defeat the monster on the building first';
-	if (ctx.buildingUpgrade && ctx.buildingUpgrade.x === fromX && ctx.buildingUpgrade.y === fromY) return 'It is being upgraded';
+	if (upgradeAt(ctx, fromX, fromY)) return 'It is being upgraded';
 	return tileProblem(ctx, toX, toY, def);
 };
 
@@ -232,9 +270,19 @@ export const rememberedIdolLevel = (idolLevels: Record<string, number> | undefin
 export const completeUpgrade = (
 	tiles: World,
 	idolLevels: Record<string, number>,
-	job: { x: number; y: number; toLevel: number },
+	job: { x: number; y: number; toLevel: number; building?: string },
 ): { tiles: World; idolLevels: Record<string, number>; reached: boolean } => {
 	const tile = getTile(tiles, job.x, job.y);
+	// the first build of an Idol: the tile is still empty, the timer's end puts the building there
+	if (job.building && tile && !tile.building) {
+		const idol = buildingDef(job.building);
+		if (idol?.kind !== 'idol') return { tiles, idolLevels, reached: false };
+		return {
+			tiles: setTile(tiles, job.x, job.y, { ...tile, building: job.building, buildingLevel: job.toLevel }),
+			idolLevels: { ...idolLevels, [idol.biome]: Math.max(idolLevels[idol.biome] ?? 0, job.toLevel) },
+			reached: true,
+		};
+	}
 	if (!tile?.building) return { tiles, idolLevels, reached: false };
 	const def = buildingDef(tile.building);
 	return {

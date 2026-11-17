@@ -43,6 +43,7 @@
  */
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';
+import { useGemStore } from '@/stores/gemStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useCraftStore } from '@/stores/craftStore';
 import { takeBootSnapshot } from '@/lib/bootSnapshot';
@@ -180,6 +181,14 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done' || petsAsked.current) return;
 		petsAsked.current = true;
 		void usePetStore.getState().sync();
+	}, [isHydrated, tabStatus, claim]);
+
+	// the Gem shop's record is read once per start: it holds Builder #2, which decides how many upgrades the game lets run at once (`gemBuilders`)
+	const gemsAsked = useRef(false);
+	useEffect(() => {
+		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done' || gemsAsked.current) return;
+		gemsAsked.current = true;
+		void useGemStore.getState().refresh();
 	}, [isHydrated, tabStatus, claim]);
 
 	useEffect(() => {

@@ -343,7 +343,7 @@ The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies 
 - **Build time**: Master Builders (castle), Mason's Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.
 - **One-time purchases** (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).
 - **Start of a run**: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).
-- **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system, Extra Builder for the second builder; they show greyed and cannot be bought.
+- **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system; they show greyed and cannot be bought.
 Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
 
 **The Ember shop** _(computed from the code)_
@@ -430,6 +430,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `idolMaxLevel` | 5 | 100 | Idol Mastery +1 per level |
 | `buildingMaxLevel` | 5 | 15 | Master Masonry +1 per level |
 | `castleMaxLevel` | 10 | 15 | Castle Expansion +1 per level |
+| `builders` | 1 | 8 | nothing yet |
 
 See also: [`limitOf`](progression.md#limitof)
 
@@ -437,7 +438,7 @@ See also: [`limitOf`](progression.md#limitof)
 
 ### `limitOf` <small>function</small>
 
-Source: [`src/lib/limits.ts:59`](../../src/lib/limits.ts)
+Source: [`src/lib/limits.ts:62`](../../src/lib/limits.ts)
 
 The current value of a limit: its base plus the registered bonuses.
 

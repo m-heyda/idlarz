@@ -338,6 +338,8 @@ export interface BuildingUpgradeState {
 	y: number;
 	toLevel: number;
 	remainingSec: number;
+	/** The catalog id of the building the job belongs to (the server binds a finished upgrade to it and reads an Idol's longer timers from it). For a first Idol build (`toLevel` 1) the tile stays empty until the timer ends. Absent on jobs from older saves. */
+	building?: string;
 }
 
 // What buying the next tile costs
@@ -401,8 +403,10 @@ export interface GameState {
 	prestige: PrestigeState;
 	clickLevel: number; // Index into CLICK_LADDER (gold per click = gold/s x power)
 	castleUpgrade: CastleUpgradeState | null;
-	/** The building level being built (null with none, and always null while `BUILDINGS_FLAG` is off) */
-	buildingUpgrade: BuildingUpgradeState | null;
+	/** The building levels being built, one per busy builder (empty with none, and always empty while `BUILDINGS_FLAG` is off); the castle's upgrade takes a builder too. See `builderCount` (lib/builders.ts). */
+	buildingUpgrades: BuildingUpgradeState[];
+	/** Builders the Gem shop's "Builder #2" gave this account (0 or 1; transient: the server's ledger is the record, the gem store sets it from its answers) */
+	gemBuilders: number;
 	/** The level of each Idol the account has reached, by biome (kept across rebirths; the server's ledger holds the trusted copy, `legacy.idols`). A standing Idol works at the lower of this and its tile's level; placing a learned Idol again is free at this level. */
 	idolLevels: Record<string, number>;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks

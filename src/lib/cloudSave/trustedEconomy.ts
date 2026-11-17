@@ -1,6 +1,6 @@
 import { MERCHANT_UPGRADES, PACKRAT_IDS, type MerchantUpgradeId } from '@/config/merchant';
 import type { Resources } from '@/types/game';
-import type { SaveSummary } from './summary';
+import { derivedJobs, type SaveSummary } from './summary';
 
 /**
  * What the server pays a save from when the save's own economy cannot be believed (IDL-167). A save flagged `castle_jump` (a castle level its
@@ -53,15 +53,16 @@ export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, r
 					? { ...prev.derived.castleUpgrade, remainingSec: Math.max(0, prev.derived.castleUpgrade.remainingSec - Math.max(0, elapsedSec)) }
 					: null,
 				ratesAfterCastle: prev.derived.ratesAfterCastle ? { ...prev.derived.ratesAfterCastle } : null,
-				// the building timer and the levels it paid for are kept the same way (absent while the building system is off)
+				// the building timers and the levels they paid for are kept the same way (absent while the building system is off)
 				...(prev.derived.buildings
-					? {
-							buildings: { ...prev.derived.buildings },
-							ratesAfterBuilding: prev.derived.ratesAfterBuilding ? { ...prev.derived.ratesAfterBuilding } : null,
-							buildingUpgrade: prev.derived.buildingUpgrade
-								? { ...prev.derived.buildingUpgrade, remainingSec: Math.max(0, prev.derived.buildingUpgrade.remainingSec - Math.max(0, elapsedSec)) }
-								: null,
-						}
+					? (() => {
+							const { jobs, ratesAfter } = derivedJobs(prev.derived);
+							return {
+								buildings: { ...prev.derived.buildings },
+								buildingUpgrades: jobs.map((job) => ({ ...job, remainingSec: Math.max(0, job.remainingSec - Math.max(0, elapsedSec)) })),
+								ratesAfterBuildings: jobs.map((_, i) => (ratesAfter[i] ? { ...ratesAfter[i]! } : null)),
+							};
+						})()
 					: {}),
 			},
 		};

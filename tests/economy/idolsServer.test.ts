@@ -307,7 +307,7 @@ test('server: build time (Dwarf Statue) is derived, capped at 60 % with Master B
 	// the same for a building upgrade (10 min to level 2: 540 s with the Statue at the cap)
 	const bstart = (remainingSec: number) => ({
 		...before,
-		derived: { ...before.derived, buildings: { lumberyard: 1 }, buildingUpgrade: { x: 1, y: 1, toLevel: 2, remainingSec } },
+		derived: { ...before.derived, buildings: { lumberyard: 1 }, buildingUpgrades: [{ x: 1, y: 1, toLevel: 2, remainingSec }] },
 	});
 	const withBuilding = { ...before, derived: { ...before.derived, buildings: { lumberyard: 1 } } };
 	const bflags = (next: typeof before, at = 5000) => verifyTransition({ summary: withBuilding, serverSavedAt: 0 }, next, at, undefined, { hills: CAP });

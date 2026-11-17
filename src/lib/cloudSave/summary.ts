@@ -1,7 +1,7 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { worldFacts, type WorldFacts } from '@/lib/worldFacts';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
-import { builtBuildings, maxBuildTimeReduction } from '@/lib/buildings';
+import { builderCount, builtBuildings, maxBuildTimeReduction } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
@@ -40,12 +40,17 @@ export interface SaveSummary {
 }
 
 export interface SaveDerived {
-	/** The building level being built (absent while the building system is off, and on rows from before it) */
-	buildingUpgrade?: BuildingUpgradeState | null;
-	/** Level of each building type on the map (absent while the building system is off): the server judges level changes against `buildingUpgrade` (`timer_jump` in verify.ts) */
+	/** The building levels being built, one per busy builder (absent while the building system is off, and on rows from before it; see `derivedJobs` for rows that hold the older single `buildingUpgrade`) */
+	buildingUpgrades?: BuildingUpgradeState[];
+	/** Level of each building type on the map (absent while the building system is off): the server judges level changes against `buildingUpgrades` (`timer_jump` in verify.ts) */
 	buildings?: Record<string, number>;
-	/** The per-second rates once the running building upgrade is done (absent while the building system is off; null with none running) */
+	/** For each of `buildingUpgrades`, the per-second rates once that upgrade alone is done (absent while the building system is off) */
+	ratesAfterBuildings?: (Resources | null)[];
+	/** Rows from before several builders: the one running building upgrade and the rates once it is done. Read only (through `derivedJobs`), never written. */
+	buildingUpgrade?: BuildingUpgradeState | null;
 	ratesAfterBuilding?: Resources | null;
+	/** Builders the save's own upgrades give (1 + the Ember shop's); the Gem shop's one is the ledger's. Absent on rows from before (read as 1). */
+	builders?: number;
 	/** The castle upgrade that was running, and the per-second rates once it is done (null with none running) */
 	castleUpgrade: CastleUpgradeState | null;
 	ratesAfterCastle: Resources | null;
@@ -89,12 +94,23 @@ export const DEFAULT_DERIVED: SaveDerived = {
 	offlineEfficiency: offlineEfficiency(),
 };
 
-/** The per-second rates the kingdom will have once the running building upgrade is done (null with none running). */
-const ratesAfterBuildingUpgrade = (state: PersistedGame): Resources | null => {
-	const job = state.buildingUpgrade;
-	const tile = job ? getTile(state.tiles, job.x, job.y) : undefined;
-	if (!job || !tile?.building) return null;
-	const tiles = setTile(state.tiles, job.x, job.y, { ...tile, buildingLevel: job.toLevel });
+/** The running building upgrades of a stored row and the rates once each is done: the list, or the one `buildingUpgrade` an older row holds. */
+export const derivedJobs = (derived: SaveDerived): { jobs: BuildingUpgradeState[]; ratesAfter: (Resources | null)[] } => {
+	if (derived.buildingUpgrades) return { jobs: derived.buildingUpgrades, ratesAfter: derived.ratesAfterBuildings ?? [] };
+	if (derived.buildingUpgrade) return { jobs: [derived.buildingUpgrade], ratesAfter: [derived.ratesAfterBuilding ?? null] };
+	return { jobs: [], ratesAfter: [] };
+};
+
+/** The per-second rates the kingdom will have once this one building upgrade is done (a first Idol build puts the building on its empty tile). */
+const ratesAfterBuildingUpgrade = (state: PersistedGame, job: BuildingUpgradeState): Resources | null => {
+	const tile = getTile(state.tiles, job.x, job.y);
+	if (!tile) return null;
+	if (!tile.building && !job.building) return null;
+	const tiles = setTile(state.tiles, job.x, job.y, {
+		...tile,
+		...(job.building && !tile.building ? { building: job.building } : {}),
+		buildingLevel: job.toLevel,
+	});
 	return calculateResourceRates(
 		tiles,
 		state.characterStats,
@@ -173,8 +189,9 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			deedWorld: worldFacts(state.tiles, state.farmLevels, BUILDINGS_FLAG.enabled),
 			...(BUILDINGS_FLAG.enabled
 				? {
-						buildingUpgrade: state.buildingUpgrade ? { ...state.buildingUpgrade } : null,
-						ratesAfterBuilding: ratesAfterBuildingUpgrade(state),
+						buildingUpgrades: (state.buildingUpgrades ?? []).map((job) => ({ ...job })),
+						ratesAfterBuildings: (state.buildingUpgrades ?? []).map((job) => ratesAfterBuildingUpgrade(state, job)),
+						builders: builderCount({ prestige: state.prestige }),
 						buildings: Object.fromEntries(builtBuildings(state.tiles).map((b) => [b.id, b.level])),
 					}
 				: {}),

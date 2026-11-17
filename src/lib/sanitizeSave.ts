@@ -91,9 +91,9 @@ export const PERSISTED_KEYS = [
 	'merchantRefresh',
 ] as const;
 
-/** The saved slice of the game. `buildingUpgrade` is outside {@link PERSISTED_KEYS} on purpose: it exists only while BUILDINGS_FLAG is on, so a flag-off save is byte-identical to one from before the building system. */
+/** The saved slice of the game. `buildingUpgrades` is outside {@link PERSISTED_KEYS} on purpose: it exists only while BUILDINGS_FLAG is on, so a flag-off save is byte-identical to one from before the building system. */
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]> & {
-	buildingUpgrade?: GameState['buildingUpgrade'];
+	buildingUpgrades?: GameState['buildingUpgrades'];
 	idolLevels?: GameState['idolLevels'];
 };
 
@@ -103,7 +103,7 @@ export const pickPersisted = (state: GameState): PersistedGame => {
 		out[key] = state[key];
 	});
 	if (BUILDINGS_FLAG.enabled) {
-		out.buildingUpgrade = state.buildingUpgrade;
+		out.buildingUpgrades = state.buildingUpgrades;
 		out.idolLevels = state.idolLevels;
 	}
 	return out as unknown as PersistedGame;
@@ -490,7 +490,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 
 	// ---- Building system (only read while BUILDINGS_FLAG is on; absent means none) --------------------------
-	let buildingUpgrade: BuildingUpgradeState | null = null;
+	const buildingUpgrades: BuildingUpgradeState[] = [];
 	const idolLevels: Record<string, number> = {};
 	if (BUILDINGS_FLAG.enabled) {
 		// a level the castle does not allow (the gate `min(building cap, castle level)`) is dropped with its building, like any other building that cannot be valid. The building cap the Embers
@@ -502,24 +502,39 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				delete tile.building;
 				delete tile.buildingLevel;
 			}
-		// the running upgrade must belong to a building one level below it, with a timer that fits; anything else is dropped (the server derives and judges the timer anyway)
-		const b = raw.buildingUpgrade;
-		if (isRecord(b) && !castleUpgrade) {
+		// the running upgrades must each belong to a building one level below them (a first Idol build to an empty tile of its biome), with a timer that fits; anything else is dropped (the server derives and judges the timers anyway).
+		// A save from before several builders holds one `buildingUpgrade`: it is read as a list of one. The castle's upgrade takes a builder too, and no more timers are kept than the hard limit of builders.
+		const rawJobs: unknown[] = Array.isArray(raw.buildingUpgrades) ? raw.buildingUpgrades : isRecord(raw.buildingUpgrade) ? [raw.buildingUpgrade] : [];
+		const room = HARD_LIMITS.builders - (castleUpgrade ? 1 : 0);
+		for (const b of rawJobs) {
+			if (!isRecord(b) || buildingUpgrades.length >= room) continue;
 			const bx = int(b.x, -16000, 16000);
 			const by = int(b.y, -16000, 16000);
-			const toLevel = int(b.toLevel, 2, HARD_LIMITS.idolMaxLevel);
-			const at = bx === null || by === null ? undefined : placed.find((p) => p.x === bx && p.y === by);
-			const remaining = toLevel === null ? null : num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1));
+			const toLevel = int(b.toLevel, 1, HARD_LIMITS.idolMaxLevel);
+			if (bx === null || by === null || toLevel === null) continue;
+			if (buildingUpgrades.some((u) => u.x === bx && u.y === by)) continue;
+			const at = placed.find((p) => p.x === bx && p.y === by);
+			if (!at) continue;
+			if (toLevel === 1) {
+				// the first build of an Idol: the tile is empty and of its biome, the same Idol is not standing or being built elsewhere
+				const id = typeof b.building === 'string' ? b.building : '';
+				const idol = buildingDef(id);
+				const remaining = num(b.remainingSec, 0, buildingUpgradeDuration(0, undefined, 0, 'idol'));
+				const standing = placed.some((p) => p.tile.building === id) || buildingUpgrades.some((u) => u.building === id);
+				if (idol?.kind === 'idol' && remaining !== null && !at.tile.building && at.tile.biome === idol.biome && !standing) {
+					buildingUpgrades.push({ x: bx, y: by, toLevel, remainingSec: remaining, building: id });
+				}
+				continue;
+			}
+			const def = buildingDef(at.tile.building);
+			const remaining = num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1, undefined, 0, def?.kind === 'idol' ? 'idol' : 'building'));
 			if (
-				bx !== null &&
-				by !== null &&
-				toLevel !== null &&
 				remaining !== null &&
-				at &&
+				def &&
 				levelOfTile(at.tile) === toLevel - 1 &&
-				toLevel <= upgradeCapOf(buildingDef(at.tile.building), castleLevel, HARD_LIMITS.idolMaxLevel, HARD_LIMITS.buildingMaxLevel)
+				toLevel <= upgradeCapOf(def, castleLevel, HARD_LIMITS.idolMaxLevel, HARD_LIMITS.buildingMaxLevel)
 			) {
-				buildingUpgrade = { x: bx, y: by, toLevel, remainingSec: remaining };
+				buildingUpgrades.push({ x: bx, y: by, toLevel, remainingSec: remaining, building: at.tile.building });
 			}
 		}
 		// the levels the account remembers for its Idols: known biomes, whole levels up to the hard limit; a standing Idol is never above what is remembered (a tile that says more raises the record, the server's ledger bounds it)
@@ -594,10 +609,11 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				delete tile.building;
 				delete tile.buildingLevel;
 			}
-		if (buildingUpgrade) {
-			const { x: ux, y: uy, toLevel: to } = buildingUpgrade;
+		// the Ember caps the save really holds cut the running upgrades too (a first Idol build has no level to cut)
+		for (let i = buildingUpgrades.length - 1; i >= 0; i--) {
+			const { x: ux, y: uy, toLevel: to } = buildingUpgrades[i];
 			const at = placed.find((p) => p.x === ux && p.y === uy);
-			if (!at?.tile.building || to > upgradeCapOf(buildingDef(at.tile.building), castleLevel, idolMax, buildingMax)) buildingUpgrade = null;
+			if (to > 1 && (!at?.tile.building || to > upgradeCapOf(buildingDef(at.tile.building), castleLevel, idolMax, buildingMax))) buildingUpgrades.splice(i, 1);
 		}
 	}
 
@@ -674,7 +690,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			merchantStock,
 			merchantRefreshes,
 			merchantRefresh,
-			...(BUILDINGS_FLAG.enabled ? { buildingUpgrade, idolLevels } : {}),
+			...(BUILDINGS_FLAG.enabled ? { buildingUpgrades, idolLevels } : {}),
 		},
 	};
 };

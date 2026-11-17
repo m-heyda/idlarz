@@ -63,12 +63,12 @@ test('grants and the shop generation come from the server, so an upload cannot g
 	assert.equal(stampShopFromServer(forged, undefined).grants, undefined);
 });
 
-test('a granted one-time upgrade cannot be bought again, and Extra Builder is disabled until the second builder exists', () => {
+test('a granted one-time upgrade cannot be bought again, and Extra Builder is for sale', () => {
 	freshGame();
 	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 500, legacyEarned: 500, grants: ['potion'] } }));
 	assert.equal(api().buyEmberUpgrade('potion'), false);
 	assert.equal(api().prestige.legacyPoints, 500, 'nothing is charged');
-	assert.equal(api().buyEmberUpgrade('extrabuilder'), false);
+	assert.equal(api().buyEmberUpgrade('extrabuilder'), true);
 	assert.equal(api().buyEmberUpgrade('vigil'), true, 'other one-time upgrades are still for sale');
 });
 

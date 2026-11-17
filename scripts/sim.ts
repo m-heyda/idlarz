@@ -561,7 +561,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 				!!castleNow.upgradeCost &&
 				(castleNow.level ?? 1) < cfg.CASTLE_UPGRADE.maxLevel &&
 				Object.entries(castleNow.upgradeCost).every(([r, v]) => s.resources[r as keyof typeof s.resources] >= (v ?? 0) * 0.95);
-			if (!s.castleUpgrade && !s.buildingUpgrade && !castleNear) {
+			if (!s.castleUpgrade && s.buildingUpgrades.length === 0 && !castleNear) {
 				const built = bld.builtBuildings(s.tiles);
 				const owned = utils.economyTiles(s.tiles, s.freeTiles);
 				const castleLvl = castleNow.level ?? 1;
@@ -587,7 +587,7 @@ function runProfile(name: string, profile: Profile, ctx: Ctx, legacy: boolean, s
 									monsters: s.monsters,
 									castleLevel: castleLvl,
 									castleUpgrade: s.castleUpgrade,
-									buildingUpgrade: s.buildingUpgrade,
+									buildingUpgrades: s.buildingUpgrades,
 									ownedTiles: owned,
 								},
 								x,

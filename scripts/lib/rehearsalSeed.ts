@@ -98,8 +98,8 @@ export const buildSeedGame = (nowMs: number, tutorialStepIds: readonly string[] 
 		const at = biomeTile(biome);
 		if (!at) throw new Error(`no ${biome} tile on the seed map`);
 		setResources({ gold: 1e9, wood: 1e9, stone: 1e9, coal: 1e9, food: 1e9, hide: 1e9, xp: api().resources.xp });
-		if (!api().buildBuilding(at[0], at[1], `idol_${biome}`)) throw new Error(`the ${biome} Idol could not be built`);
-		patchTileAt(at[0], at[1], { buildingLevel: REHEARSAL_SEED.idols[biome] });
+		// placed directly: a first Idol build is a timer on a builder now, and the seed is a finished game
+		patchTileAt(at[0], at[1], { building: `idol_${biome}`, buildingLevel: REHEARSAL_SEED.idols[biome] });
 	}
 	// the building money was a cheat: the save holds a modest purse, and the gem balance the ledger will hold (a save can never raise it)
 	setResources({ gold: 5000, wood: 0, stone: 0, coal: 0, food: 0, hide: 0, xp: api().resources.xp });

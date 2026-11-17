@@ -7,6 +7,7 @@ import { BIOMES } from '@/config/biomes';
 import {
 	buildingLevelCost,
 	buildingOutput,
+	builderCount,
 	buildingUpgradeDuration,
 	idolFloorTiles,
 	levelOfTile,
@@ -45,7 +46,8 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const resources = useGameStore((state) => state.resources);
 	const monsters = useGameStore((state) => state.monsters);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
-	const buildingUpgrade = useGameStore((state) => state.buildingUpgrade);
+	const buildingUpgrades = useGameStore((state) => state.buildingUpgrades);
+	const gemBuilders = useGameStore((state) => state.gemBuilders);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const idolLevels = useGameStore((state) => state.idolLevels);
 	const prestige = useGameStore((state) => state.prestige);
@@ -69,7 +71,8 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		monsters,
 		castleLevel: castleLevelOf(tiles),
 		castleUpgrade,
-		buildingUpgrade: buildingUpgrade ?? null,
+		buildingUpgrades,
+		builders: builderCount({ prestige, gemBuilders }),
 		ownedTiles,
 		idolMax: limitOf('idolMaxLevel', { prestige }),
 		buildingMax: limitOf('buildingMaxLevel', { prestige }),
@@ -78,7 +81,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
 	const top = def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige });
 	const atTop = level >= top;
-	const running = buildingUpgrade && buildingUpgrade.x === x && buildingUpgrade.y === y ? buildingUpgrade : null;
+	const running = buildingUpgrades.find((u) => u.x === x && u.y === y) ?? null;
 	const nextLevel = level + 1;
 	const cost = atTop ? {} : buildingLevelCost(nextLevel, ownedTiles, def);
 	const problem = atTop ? null : (upgradeProblem(ctx, x, y) ?? (canAffordBundle(resources, cost) ? null : 'Not enough resources'));

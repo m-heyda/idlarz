@@ -18,7 +18,7 @@ import { gearIncomePct } from '@/lib/gearEconomy';
 import { starterBag } from '@/lib/inventory';
 import { useUiStore } from '@/stores/uiStore';
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
-import type { CombatClientState, Equipment, GameState, MerchantRefresh, MerchantStock, Monster, PrestigeState } from '@/types/game';
+import type { BuildingUpgradeState, CombatClientState, Equipment, GameState, MerchantRefresh, MerchantStock, Monster, PrestigeState } from '@/types/game';
 import { getTile, type World } from '@/utils/world';
 
 export type GameSet = (partial: Partial<GameState> | ((state: GameState) => Partial<GameState>)) => void;
@@ -40,9 +40,10 @@ export const ratesWithGear = (
 	);
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
-export const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'>): LimitContext => ({
+export const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'> & Partial<Pick<GameState, 'gemBuilders'>>): LimitContext => ({
 	merchantUpgrades: state.merchantUpgrades,
 	prestige: state.prestige,
+	gemBuilders: state.gemBuilders,
 });
 
 // Shared by the gold click and the tile tap: one token per physical click
@@ -109,7 +110,8 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		prestige: { ...prestige, upgrades: { ...prestige.upgrades } },
 		clickLevel: 0,
 		castleUpgrade: null,
-		buildingUpgrade: null,
+		buildingUpgrades: [] as BuildingUpgradeState[],
+		gemBuilders: 0,
 		idolLevels: {} as Record<string, number>,
 		playSeconds: 0,
 		activeChests: 0,

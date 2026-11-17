@@ -17,7 +17,7 @@ const MAX_ROWS = 4;
  */
 const BuildTimers: React.FC = () => {
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
-	const buildingUpgrade = useGameStore((state) => state.buildingUpgrade);
+	const buildingUpgrades = useGameStore((state) => state.buildingUpgrades);
 	const tiles = useGameStore((state) => state.tiles);
 	const prestige = useGameStore((state) => state.prestige);
 	const idolLevels = useGameStore((state) => state.idolLevels);
@@ -26,7 +26,7 @@ const BuildTimers: React.FC = () => {
 
 	const timers = activeBuildTimers({
 		castleUpgrade,
-		buildingUpgrades: buildingUpgrade ? [buildingUpgrade] : [],
+		buildingUpgrades,
 		buildingAt: (x, y) => getTile(tiles, x, y)?.building,
 		prestige,
 		buildTimePct,

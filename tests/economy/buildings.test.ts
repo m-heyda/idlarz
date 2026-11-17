@@ -13,8 +13,11 @@ import {
 	buildingLevelCap,
 	buildingLevelCost,
 	buildingTotalCost,
+	builderBusy,
+	builderCount,
 	buildingUpgradeDuration,
 	builtBuildings,
+	completeUpgrade,
 	producerBonus,
 	producerOutput,
 	extractorOutput,
@@ -23,8 +26,8 @@ import {
 } from '../../src/lib/buildings';
 import { buildingMenuItems } from '../../src/lib/buildingMenu';
 import { calculateResourceRates } from '../../src/utils/game/income';
-import { decodeSave, encodeSave } from '../../src/lib/saveFormat';
-import { pickPersisted } from '../../src/lib/sanitizeSave';
+import { decodeSave, encodeSave, packBody, unpackBody } from '../../src/lib/saveFormat';
+import { pickPersisted, sanitizeSave } from '../../src/lib/sanitizeSave';
 import { summarize } from '../../src/lib/cloudSave/summary';
 import { verifyTransition } from '../../src/lib/cloudSave/verify';
 import { checkNetWorth, minimumSpend } from '../../src/lib/cloudSave/netWorth';
@@ -134,7 +137,7 @@ test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 
 	);
 	// Mason's Guild shortens a building's timer 5% per level, Shrine Keepers an Idol's, Master Builders the castle's: each only its own
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { buildtime: 2 } }), 540);
-	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }, 0, 'idol'), 540);
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }, 0, 'idol'), 3240, 'an Idol level 2 takes 1 h, less 10 %');
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }), 600, 'a Producer does not take the Idol upgrade');
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 600, 'the castle upgrade does not shorten a building');
 });
@@ -156,7 +159,7 @@ test('with the flag off every action refuses and nothing changes', () => {
 		const before = api().tiles;
 		assert.equal(api().buildBuilding(spot.x, spot.y, 'lumberyard'), false);
 		assert.equal(api().tiles, before);
-		assert.equal(api().buildingUpgrade, null);
+		assert.deepEqual(api().buildingUpgrades, []);
 	});
 });
 
@@ -219,7 +222,7 @@ test('a monster standing on a building blocks its upgrade, its move and its menu
 		assert.ok(buildingMenuItems(store, a.x, a.y).length > 0, 'no monster: the menu offers the building');
 		store.setState({ monsters: [{ id: 1, type: 'thistleBoar', x: a.x, y: a.y, level: 1 } as never] });
 		assert.equal(api().upgradeBuilding(a.x, a.y), false, 'no upgrade under a monster');
-		assert.equal(api().buildingUpgrade, null);
+		assert.deepEqual(api().buildingUpgrades, []);
 		assert.equal(api().moveBuilding(a.x, a.y, a.x + 1, a.y), false, 'no move from under a monster');
 		assert.deepEqual(buildingMenuItems(store, a.x, a.y), [], 'no menu entries under a monster');
 		store.setState({ monsters: [] });
@@ -236,7 +239,7 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 		const gold = api().resources.gold;
 		assert.equal(api().upgradeBuilding(a.x, a.y), true);
 		assert.ok(api().resources.gold < gold);
-		assert.deepEqual(api().buildingUpgrade, { x: a.x, y: a.y, toLevel: 2, remainingSec: 600 });
+		assert.deepEqual(api().buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 600, building: 'lumberyard' }]);
 		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 1, 'not yet');
 		// the builder is taken
 		assert.equal(api().upgradeBuilding(a.x, a.y), false);
@@ -244,7 +247,7 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 		assert.equal(api().moveBuilding(a.x, a.y, a.x + 1, a.y), false, 'it cannot move while it is being upgraded');
 		const before = api().resourceRates.total.wood;
 		for (let t = 0; t < 700; t += 10) api().tick(10_000);
-		assert.equal(api().buildingUpgrade, null);
+		assert.deepEqual(api().buildingUpgrades, []);
 		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 2);
 		assert.ok(api().resourceRates.total.wood > before, 'the new level makes more');
 		// and now the castle can take the builder, which blocks the building
@@ -254,13 +257,113 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 	});
 });
 
+test('builders: 1 for everyone, +1 with the Gem shop Builder #2; the castle takes a builder like a building does', () => {
+	withBuildings(() => {
+		assert.equal(builderCount(), 1);
+		assert.equal(builderCount({ gemBuilders: 1 }), 2);
+		assert.equal(builderCount({ gemBuilders: 9 }), 2, 'the Gem shop gives one, whatever a forged number says');
+		const [a, b] = gameWith('forest', 2, 5);
+		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
+		assert.equal(api().buildBuilding(b.x, b.y, 'saptapper'), true);
+		assert.equal(api().upgradeBuilding(a.x, a.y), true);
+		assert.equal(api().upgradeBuilding(b.x, b.y), false, 'one builder: the second building waits');
+		assert.match(builderBusy({ castleUpgrade: null, buildingUpgrades: api().buildingUpgrades, builders: 1 }) ?? '', /busy/);
+
+		// Builder #2: the second upgrade runs beside the first
+		store.setState({ gemBuilders: 1 });
+		assert.equal(api().upgradeBuilding(b.x, b.y), true);
+		assert.equal(api().buildingUpgrades.length, 2);
+		assert.equal(api().upgradeCastle(), false, 'both builders are at work: the castle waits too');
+		assert.match(builderBusy({ castleUpgrade: null, buildingUpgrades: api().buildingUpgrades, builders: 2 }) ?? '', /All builders are busy/);
+		// they run side by side and each lands its level
+		for (let t = 0; t < 700; t += 10) api().tick(10_000);
+		assert.deepEqual(api().buildingUpgrades, []);
+		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 2);
+		assert.equal(tileAt(api().tiles, b.x, b.y).buildingLevel, 2);
+
+		// a castle upgrade and a building upgrade at once
+		setResources(RICH);
+		assert.equal(api().upgradeCastle(), true);
+		assert.equal(api().upgradeBuilding(a.x, a.y), true);
+		assert.equal(api().upgradeBuilding(b.x, b.y), false, 'the castle holds the other builder');
+		// a rebirth keeps the builder: it belongs to the account
+		assert.equal(api().gemBuilders, 1);
+	});
+});
+
+test('the save keeps several timers; a save from before holds one `buildingUpgrade`, which still loads', () => {
+	withBuildings(() => {
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		store.setState({ gemBuilders: 1 });
+		api().upgradeBuilding(a.x, a.y);
+		api().upgradeBuilding(b.x, b.y);
+		const back = decodeSave(encodeSave(pickPersisted(api())));
+		assert.ok(back.ok, back.ok ? '' : back.reason);
+		if (!back.ok) return;
+		assert.equal(back.state.buildingUpgrades?.length, 2);
+		// the old shape: one `buildingUpgrade` object becomes a list of one (the reader is tolerant, no schema bump)
+		const body = { ...packBody(pickPersisted(api())) } as Record<string, unknown>;
+		delete body.buildingUpgrades;
+		body.buildingUpgrade = { x: a.x, y: a.y, toLevel: 2, remainingSec: 300 };
+		const unpacked = unpackBody(body as never);
+		assert.ok('raw' in unpacked);
+		if (!('raw' in unpacked)) return;
+		const old = sanitizeSave(unpacked.raw);
+		assert.ok(old.ok, old.ok ? '' : old.reason);
+		if (old.ok) assert.deepEqual(old.state.buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 300, building: 'lumberyard' }]);
+	});
+});
+
+test('the server allows two timers only with the second builder from the Gem shop (timer_jump)', () => {
+	withBuildings(() => {
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		const first = summarize(pickPersisted(api()));
+		store.setState({ gemBuilders: 1 });
+		api().upgradeBuilding(a.x, a.y);
+		api().upgradeBuilding(b.x, b.y);
+		const two = summarize(pickPersisted(api()));
+		assert.equal(two.derived.buildingUpgrades?.length, 2);
+		const T0 = 1_000_000;
+		const flags = (gem: number) => verifyTransition({ summary: first, serverSavedAt: T0 }, two, T0 + 5000, undefined, {}, gem);
+		assert.equal(flags(0).includes('timer_jump'), true, 'two timers with one builder');
+		assert.equal(flags(1).includes('timer_jump'), false, 'Builder #2 bought');
+		// an older stored row with the single `buildingUpgrade` is read as a list of one
+		const oldRow = { ...first, derived: { ...first.derived, buildingUpgrades: undefined, buildingUpgrade: { x: a.x, y: a.y, toLevel: 2, remainingSec: 600 } } };
+		assert.equal(
+			verifyTransition({ summary: oldRow, serverSavedAt: T0 }, summarize(pickPersisted(api())), T0 + 5000, undefined, {}, 1).includes('timer_jump'),
+			false,
+		);
+	});
+});
+
+test('a first Idol build is a timer on an empty tile: 30 min, the building appears when it ends, and it survives the save', () => {
+	withBuildings(() => {
+		const [a] = gameWith('forest', 1, 5);
+		assert.equal(api().buildBuilding(a.x, a.y, 'idol_forest'), true);
+		assert.equal(api().buildBuilding(a.x, a.y, 'idol_forest'), false, 'not twice on the tile');
+		assert.equal(tileAt(api().tiles, a.x, a.y).building, undefined);
+		const job = api().buildingUpgrades[0];
+		assert.deepEqual(job, { x: a.x, y: a.y, toLevel: 1, remainingSec: 1800, building: 'idol_forest' });
+		const back = decodeSave(encodeSave(pickPersisted(api())));
+		assert.ok(back.ok, back.ok ? '' : back.reason);
+		if (back.ok) assert.deepEqual(back.state.buildingUpgrades, [job]);
+		const done = completeUpgrade(api().tiles, {}, job);
+		assert.equal(tileAt(done.tiles, a.x, a.y).building, 'idol_forest');
+		assert.equal(done.idolLevels.forest, 1);
+	});
+});
+
 test('the timer runs at most one tick catch-up per call, like the castle', () => {
 	withBuildings(() => {
 		const [a] = gameWith('forest', 1, 5);
 		api().buildBuilding(a.x, a.y, 'lumberyard');
 		api().upgradeBuilding(a.x, a.y);
 		api().tick(1e9); // a huge delta is bounded
-		const left = api().buildingUpgrade;
+		const left = api().buildingUpgrades[0];
 		assert.ok(left === null || left.remainingSec > 0);
 		assert.ok(MAX_CATCHUP_SEC >= 1);
 	});
@@ -293,8 +396,8 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.ok(back.ok, back.ok ? '' : back.reason);
 		if (!back.ok) return;
 		assert.equal(tileAt(back.state.tiles, a.x, a.y).building, 'lumberyard');
-		assert.equal(back.state.buildingUpgrade?.toLevel, 2);
-		assert.equal(Math.round(back.state.buildingUpgrade!.remainingSec), 540);
+		assert.equal(back.state.buildingUpgrades?.[0]?.toLevel, 2);
+		assert.equal(Math.round(back.state.buildingUpgrades![0].remainingSec), 540);
 
 		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a second of its type, a level the castle does not allow
 		const loads = (tiles: typeof wrongBiome) => {
@@ -310,7 +413,7 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		const tooHigh = patchTile(api().tiles, a.x, a.y, { buildingLevel: 5 });
 		const high = loads(tooHigh)!;
 		assert.equal(tileAt(high.tiles, a.x, a.y).building, undefined, 'castle level 3 does not allow level 5');
-		assert.equal(high.buildingUpgrade, null, 'and the upgrade that belonged to it goes too');
+		assert.deepEqual(high.buildingUpgrades, [], 'and the upgrade that belonged to it goes too');
 	});
 });
 
@@ -330,7 +433,7 @@ test('a save written with the flag on still loads with it off, minus its buildin
 		assert.ok(back.ok, back.ok ? '' : back.reason);
 		if (!back.ok) return;
 		assert.equal(builtBuildings(back.state.tiles).length, 0);
-		assert.equal('buildingUpgrade' in back.state, false);
+		assert.equal('buildingUpgrades' in back.state, false);
 	});
 });
 
@@ -340,7 +443,7 @@ test('the server derives the buildings and judges their timer (timer_jump)', () 
 		api().buildBuilding(a.x, a.y, 'lumberyard');
 		const first = summarize(pickPersisted(api()));
 		assert.deepEqual(first.derived.buildings, { lumberyard: 1 });
-		assert.equal(first.derived.buildingUpgrade, null);
+		assert.deepEqual(first.derived.buildingUpgrades, []);
 		const snapshot = (summary: typeof first, at: number) => ({ summary, serverSavedAt: at });
 		const T0 = 1_000_000;
 
@@ -360,7 +463,7 @@ test('the server derives the buildings and judges their timer (timer_jump)', () 
 		const forged = { ...first, derived: { ...first.derived, buildings: { lumberyard: 1, granary: 3 } } };
 		assert.equal(verifyTransition(snapshot(first, T0), forged, T0 + 1000).includes('timer_jump'), true);
 		// a timer that ran faster than the clock
-		const faster = { ...running, derived: { ...running.derived, buildingUpgrade: { ...running.derived.buildingUpgrade!, remainingSec: 0.5 } } };
+		const faster = { ...running, derived: { ...running.derived, buildingUpgrades: [{ ...running.derived.buildingUpgrades![0], remainingSec: 0.5 }] } };
 		assert.equal(verifyTransition(snapshot(running, T0), faster, T0 + 1000).includes('timer_jump'), true);
 	});
 });
@@ -370,7 +473,7 @@ test('flag off: the server never raises timer_jump and the summary carries no bu
 		freshGame();
 		const first = summarize(pickPersisted(api()));
 		assert.equal('buildings' in first.derived, false);
-		assert.equal('buildingUpgrade' in first.derived, false);
+		assert.equal('buildingUpgrades' in first.derived, false);
 		const forged = { ...first, derived: { ...first.derived, buildings: { lumberyard: 5 } } };
 		assert.equal(verifyTransition({ summary: first, serverSavedAt: 0 }, forged, 1000).includes('timer_jump'), false);
 	});
@@ -384,7 +487,7 @@ test('saves from before the building system load with the flag on, and old ones 
 	assert.ok(decodeSave(text).ok, 'a flag-off save loads with the flag on');
 	const on = decodeSave(withBuildings(() => encodeSave(state)));
 	assert.ok(on.ok);
-	if (on.ok) assert.equal(on.state.buildingUpgrade, null);
+	if (on.ok) assert.deepEqual(on.state.buildingUpgrades, []);
 });
 
 test('net worth: buildings add a gold floor, only while the system is on', () => {
@@ -464,4 +567,53 @@ test('farm sprites: both cows (the bell cow too), pigs and sheep look right, chi
 	assert.equal(facesRight('animal_sheep'), true);
 	assert.equal(facesRight('animal_chicken_1'), false);
 	assert.equal(facesRight('animal_cow_2'), true);
+});
+
+test('timer_jump: a completion is bound to its own building, an Idol floor is the Idol timer, a finished job still carried is forged', () => {
+	withBuildings(() => {
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		const T0 = 1_000_000;
+		const base = summarize(pickPersisted(api()));
+		const job = (building: string, remainingSec: number, x = a.x) => ({ x, y: a.y, toLevel: 2, remainingSec, building });
+		const was = { ...base, derived: { ...base.derived, buildingUpgrades: [job('idol_forest', 0.5)] } };
+		// the saptapper rises 1 -> 2 on the credit of an Idol's job: refused; on its own job: fine
+		const raised = { ...base, derived: { ...base.derived, buildings: { lumberyard: 1, saptapper: 2 }, buildingUpgrades: [] } };
+		assert.equal(verifyTransition({ summary: was, serverSavedAt: T0 }, raised, T0 + 5000).includes('timer_jump'), true);
+		const own = { ...base, derived: { ...base.derived, buildingUpgrades: [job('saptapper', 0.5)] } };
+		assert.equal(verifyTransition({ summary: own, serverSavedAt: T0 }, raised, T0 + 5000).includes('timer_jump'), false);
+		// a new Idol upgrade of 600 s is under the Idol's 3600 s floor; a Producer's 600 s is honest
+		const idolJob = { ...base, derived: { ...base.derived, buildingUpgrades: [job('idol_forest', 600)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, idolJob, T0 + 1000).includes('timer_jump'), true);
+		const plain = { ...base, derived: { ...base.derived, buildingUpgrades: [job('lumberyard', 600)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, plain, T0 + 1000).includes('timer_jump'), false);
+		// a job with no time left that a save still carries
+		const carried = { ...base, derived: { ...base.derived, buildingUpgrades: [job('lumberyard', 0)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, carried, T0 + 1000).includes('timer_jump'), true);
+	});
+});
+
+test('Extra Builder (Ember shop): each level adds a builder, and two parallel timers pass verify without the Gem shop one', () => {
+	withBuildings(() => {
+		const prestige = (level: number) => ({ ...api().prestige, upgrades: { extrabuilder: level } });
+		assert.equal(builderCount({ prestige: prestige(1) }), 2);
+		assert.equal(builderCount({ prestige: prestige(2) }), 3);
+		assert.equal(builderCount({ prestige: prestige(2), gemBuilders: 1 }), 4, 'with Builder #2 from the Gem shop');
+
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		const first = summarize(pickPersisted(api()));
+		store.setState({ prestige: prestige(1) } as never);
+		assert.equal(api().upgradeBuilding(a.x, a.y), true);
+		assert.equal(api().upgradeBuilding(b.x, b.y), true, 'the Ember builder is the second one');
+		const two = summarize(pickPersisted(api()));
+		assert.equal(two.derived.builders, 2);
+		const T0 = 1_000_000;
+		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, two, T0 + 5000, undefined, {}, 0).includes('timer_jump'), false);
+		// without the Ember level the same two timers are refused
+		const none = { ...two, derived: { ...two.derived, builders: 1 } };
+		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, none, T0 + 5000, undefined, {}, 0).includes('timer_jump'), true);
+	});
 });

@@ -432,6 +432,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildTimers.ts`](../../src/lib/buildTimers.ts) — ~ One running construction as the bottom-left timer list shows it.
+- [`builders.ts`](../../src/lib/builders.ts) — ~ Builders at work:
 - [`buildingMenu.ts`](../../src/lib/buildingMenu.ts) — ~ The entries of the tile menu for the building system (only called while `BUILDINGS_FLAG` is on, see `tileMenuItems`):
 - [`buildingOutput.ts`](../../src/lib/buildingOutput.ts) — ~ The Producer's bonus from the size of its biome, as a fraction (0.5 = +50 %):
 - [`buildingText.ts`](../../src/lib/buildingText.ts) — ~ The plain-language lines of a Producer or Extractor card in the Build window; every number comes from `BUILDING_RULES` and the output formulas (`lib/buildingOutput.ts`).

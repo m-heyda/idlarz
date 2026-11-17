@@ -258,6 +258,7 @@ export const useLabStore = create<LabState>((set, get) => {
 		merchantUpgrades: {},
 		freeTiles: STARTER_FREE_TILES,
 		castleUpgrade: null,
+		buildingUpgrades: [],
 		// the game's own actions never run in the lab: a click goes to `clickTile`
 		buyTile: () => false,
 		collectChest: () => false,

@@ -11,6 +11,7 @@ import audioManager from '@/utils/audioManager';
 import PixelIcon, { PixelSheet } from './PixelIcon';
 import CastleSprite from './CastleSprite';
 import CastleTimerBadge from './CastleTimerBadge';
+import { castleTimerLabel } from '@/lib/castleTimer';
 import PetSprite from './pets/PetSprite';
 import { usePetStore } from '@/stores/petStore';
 import { maxLevelOf, monsterAt } from '@/lib/monsters';
@@ -66,6 +67,14 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	});
 	const [buildingId, buildingLevel] = buildingKey ? buildingKey.split(':') : [];
 	const building = buildingDef(buildingId);
+	// A running upgrade of the building here ("to level 3" = 3) or the first build of an Idol on this empty tile (level 1): the badge shows the level with an up arrow, the first build is drawn faded with its timer
+	const upgradeKey = game((state) => {
+		const job = isOwned ? (state.buildingUpgrades ?? []).find((u) => u.x === x && u.y === y) : undefined;
+		return job ? `${job.toLevel}|${job.building ?? ''}|${castleTimerLabel({ remainingSec: job.remainingSec }) ?? ''}` : '';
+	});
+	const [, upgradeBuildingId, upgradeLabel] = upgradeKey ? upgradeKey.split('|') : [];
+	const constructing = !building && upgradeBuildingId ? buildingDef(upgradeBuildingId) : undefined;
+	const upgrading = !!upgradeKey && !!building;
 
 	// The map only mounts a tile that is not explored when it touches explored land: it can be bought
 	const isAdjacent = !isOwned;
@@ -232,7 +241,33 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 							style={{ width: TILE_SIZE * 1.1, bottom: 2, imageRendering: 'pixelated' }}
 						/>
 					)}
-					{building && <span className='tile-badge'>{buildingLevel}</span>}
+					{building && (
+						<span className='tile-badge' title={upgrading ? 'Being upgraded' : undefined}>
+							{buildingLevel}
+							{upgrading ? '↑' : ''}
+						</span>
+					)}
+					{constructing && (
+						<>
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								src={constructing.art}
+								alt={`${constructing.label}, under construction`}
+								className='absolute pointer-events-none'
+								style={{ width: TILE_SIZE * 1.1, bottom: 2, imageRendering: 'pixelated', opacity: 0.35 }}
+							/>
+							<span className='tile-badge'>1↑</span>
+							{upgradeLabel && (
+								<span
+									className='tile-timer'
+									title={`${constructing.label} under construction`}
+									aria-label={`${constructing.label} under construction: ${upgradeLabel} left`}
+								>
+									{upgradeLabel}
+								</span>
+							)}
+						</>
+					)}
 
 					{isOwned && monsterKey && (
 						<TileMonster

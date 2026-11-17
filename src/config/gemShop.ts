@@ -16,7 +16,8 @@ export type GemItemId =
 	| 'name_ember'
 	| 'name_frost'
 	| 'name_void'
-	| 'name_galaxy';
+	| 'name_galaxy'
+	| 'builder_2';
 
 export interface GemItem {
 	id: GemItemId;
@@ -45,6 +46,8 @@ export const DAY_SEC = 86_400;
  * - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
  *
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
+ *
+ * - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -133,7 +136,22 @@ export const GEM_SHOP: readonly GemItem[] = [
 		price: 500,
 		cooldownSec: 0,
 	},
+	{
+		id: 'builder_2',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Builder #2',
+		blurb: 'A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth.',
+		price: 1000,
+		cooldownSec: 0,
+	},
 ];
+
+/** The id of the Builder #2 purchase (`ledger.gemShop.bought`). */
+export const BUILDER_ITEM: GemItemId = 'builder_2';
+
+/** Builders the Gem shop gave an account: 1 once Builder #2 is in `bought`, else 0 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
+export const gemBuildersOf = (bought: Record<string, number> | undefined): number => ((bought?.[BUILDER_ITEM] ?? 0) > 0 ? 1 : 0);
 
 /** A purchase above this many gems asks for a confirmation in the shop window. */
 export const GEM_CONFIRM_ABOVE = 300;

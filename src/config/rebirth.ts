@@ -58,7 +58,7 @@ export const REBIRTH = {
  * - **Build time**: Master Builders (castle), Mason's Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.
  * - **One-time purchases** (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).
  * - **Start of a run**: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).
- * - **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system, Extra Builder for the second builder; they show greyed and cannot be bought.
+ * - **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system; they show greyed and cannot be bought.
  * Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
  *
  * @category Progression/Ember shop
@@ -305,7 +305,7 @@ export const EMBER_UPGRADES = {
  * Shop upgrades that cannot be bought yet: the two quest upgrades (the quest system is not built) and Extra Builder (until the second builder exists in the game; the gem shop sells it first). Shown greyed, refused by `buyEmberUpgrade`, and
  * `emberEffect` counts them as 0.
  */
-export const EMBER_DISABLED: ReadonlySet<string> = new Set(['questrarity', 'questslots', 'extrabuilder']);
+export const EMBER_DISABLED: ReadonlySet<string> = new Set(['questrarity', 'questslots']);
 
 /** The generation of the Ember shop. New accounts start at it; an account from before the rework has none until the shop migration moves it (refunds its Embers and grants what it had for free). */
 export const SHOP_VERSION = 2;
