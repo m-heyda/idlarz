@@ -13,6 +13,7 @@ import { clickLimiter, createInitialData, type GameGet, type GameSet } from './b
 import type { ChestSync } from './chestSync';
 import type { InventorySync } from './inventorySync';
 import type { CharacterSync } from './characterSync';
+import audioManager from '@/utils/audioManager';
 
 export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySync, chests: ChestSync, character: CharacterSync) => ({
 	resetGame: () => {
@@ -107,6 +108,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			},
 			...(grow.length ? { bag: [...state.bag, ...grow] } : {}),
 		});
+		audioManager.playSound('buysell');
 		return true;
 	},
 

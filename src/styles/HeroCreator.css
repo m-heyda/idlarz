@@ -1,4 +1,4 @@
-/* Hero creation (sign-up, "Finish your hero", "A new chapter"): the name, four text tabs and a detail card: a large avatar portrait (3x native, never scaled down) beside the class's story and bonuses. */
+/* Hero creation (sign-up, "Finish your hero", "A new chapter"): the name, four text tabs and a detail card: a large avatar portrait (3.7x native) beside the class's story and bonuses. */
 
 .hero-creator {
 	display: flex;
@@ -74,7 +74,7 @@
 .hero-detail {
 	--accent: #e0a040;
 	display: grid;
-	grid-template-columns: 228px minmax(0, 1fr);
+	grid-template-columns: 180px minmax(0, 1fr);
 	gap: 22px;
 	padding: 18px;
 	background: radial-gradient(ellipse at 12% 10%, color-mix(in srgb, var(--accent) 20%, transparent), transparent 55%),

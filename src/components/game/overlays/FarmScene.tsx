@@ -130,7 +130,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 		ro.observe(el);
 		return () => ro.disconnect();
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [insets.right, insets.hudOpen]);
+	}, [insets.right]);
 
 	// keep one agent per visible instance; new ones appear at a spot of their own
 	useLayoutEffect(() => {

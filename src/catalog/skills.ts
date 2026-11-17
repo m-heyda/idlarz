@@ -36,6 +36,9 @@ export const SKILLS: Record<SkillId, SkillDef> = {
 	stun: { id: 'stun', name: 'Stun', unlockLevel: 10, manaCost: 15, cooldownSec: 30, fightOnly: true, stunSec: 10 },
 };
 
+/** The picture of each skill (Hero window and fight window): files in public/pixel/icons/ (`skill_heal`, `skill_stun` in config/pixelIcons.ts) */
+export const SKILL_ICONS: Record<SkillId, string> = { heal: '/pixel/icons/skill_heal.png', stun: '/pixel/icons/skill_stun.png' };
+
 /** The order they show in (hotkeys 4 and 5 in a fight). */
 export const SKILL_IDS: readonly SkillId[] = ['heal', 'stun'];
 

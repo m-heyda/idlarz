@@ -7,6 +7,7 @@ import { calculateResourceRates } from '@/utils/game/income';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { type GameGet, type GameSet } from './base';
+import audioManager from '@/utils/audioManager';
 
 export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 	// Buy animals of a kind with food (each one costs more than the last). `count` is a number or 'max' (all you can
@@ -38,6 +39,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			resources: { ...state.resources, food: state.resources.food - cost },
 			resourceRates: newRates,
 		});
+		audioManager.playSound('buysell');
 		return n;
 	},
 
@@ -62,6 +64,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			gearIncomePct(state.equipment),
 		);
 		set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
+		audioManager.playSound('buysell');
 		return true;
 	},
 });

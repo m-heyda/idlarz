@@ -14,6 +14,7 @@ import { toast, type GameGet, type GameSet } from './base';
 import type { CombatSync } from './combatSync';
 import type { InventorySync } from './inventorySync';
 import type { ChestSync } from './chestSync';
+import audioManager from '@/utils/audioManager';
 
 export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync, map: ChestSync, combat: CombatSync) => {
 	const { applyInventory } = inv;
@@ -26,12 +27,19 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 		// to the server, whose answer (not a guess made here) changes the picture.
 		requestPotion: (id: string) => {
 			if (!quickHealOf(ITEM_CATALOG[id])) return false;
-			void requestUse(newClaimId(), { kind: 'potion', id }, sinceNow()).then((reply) => settleFight(reply, 'No potion was drunk.'));
+			void requestUse(newClaimId(), { kind: 'potion', id }, sinceNow()).then((reply) => {
+				settleFight(reply, 'No potion was drunk.');
+				if (reply.status === 'ok' && reply.value.accepted) audioManager.playSound('gulp');
+			});
 			return true;
 		},
 
 		requestSkill: (id: SkillId) => {
-			void requestUse(newClaimId(), { kind: 'skill', id }, sinceNow()).then((reply) => settleFight(reply, 'The skill is not ready.'));
+			void requestUse(newClaimId(), { kind: 'skill', id }, sinceNow()).then((reply) => {
+				settleFight(reply, 'The skill is not ready.');
+				// each skill cast has its own sound, only when the server took the cast
+				if (reply.status === 'ok' && reply.value.accepted) audioManager.playSound(id === 'heal' ? 'heal' : 'stun');
+			});
 			return true;
 		},
 

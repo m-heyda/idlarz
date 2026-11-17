@@ -1,22 +1,25 @@
-/* The running constructions, bottom left: a stack of small stone plates with a gold rim, newest at the bottom. Outside the map's click area, like the bottom-right stack. */
+/* The running constructions, bottom left: a stack of small stone plates with a gold rim, newest at the bottom. Outside the map's click area, like the bottom-right stack.
+   Compact on purpose: a later second and third builder queue stack here, and each plate can collapse to just its icon with the timer on it. */
 .bt-stack {
 	position: fixed;
-	left: 16px;
-	bottom: 16px;
+	left: 12px;
+	bottom: 12px;
 	z-index: 40;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
-	width: 220px;
+	align-items: flex-start;
+	gap: 4px;
+	width: 176px;
 }
 
 .bt-row {
 	position: relative;
 	display: grid;
-	grid-template-columns: 36px 1fr auto;
+	grid-template-columns: 28px 1fr auto;
 	align-items: center;
-	gap: 8px;
-	padding: 6px 8px 9px;
+	gap: 6px;
+	width: 100%;
+	padding: 4px 6px 7px;
 	font-family: inherit;
 	text-align: left;
 	color: #f1e6c8;
@@ -36,33 +39,38 @@
 .bt-art {
 	display: grid;
 	place-items: center;
-	width: 36px;
-	height: 36px;
+	width: 28px;
+	height: 28px;
 	background: rgba(0, 0, 0, 0.45);
 	border: 1px solid rgba(0, 0, 0, 0.7);
+}
+
+.bt-art img {
+	width: 22px;
+	height: 22px;
 }
 
 .bt-text {
 	display: flex;
 	flex-direction: column;
 	min-width: 0;
-	line-height: 1.15;
+	line-height: 1.1;
 }
 
 .bt-title {
 	overflow: hidden;
-	font-size: 13px;
+	font-size: 12px;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
 .bt-sub {
-	font-size: 11px;
+	font-size: 10px;
 	color: #a89878;
 }
 
 .bt-time {
-	font-size: 13px;
+	font-size: 12px;
 	color: #f0d27a;
 	font-variant-numeric: tabular-nums;
 	white-space: nowrap;
@@ -70,9 +78,9 @@
 
 .bt-bar {
 	position: absolute;
-	right: 6px;
-	bottom: 3px;
-	left: 6px;
+	right: 5px;
+	bottom: 2px;
+	left: 5px;
 	height: 3px;
 	background: rgba(0, 0, 0, 0.6);
 }
@@ -84,8 +92,8 @@
 }
 
 .bt-more {
-	padding: 2px 8px;
-	font-size: 11px;
+	padding: 1px 6px;
+	font-size: 10px;
 	color: #a89878;
 	text-align: center;
 }

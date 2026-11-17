@@ -179,6 +179,9 @@ interface UiState {
 	pushAchievementNotice: (achievementId: string) => void;
 	dismissAchievementNotice: (id: number) => void;
 	dismissChestNotice: (id: number) => void;
+	/** The map has what the server put on it (monsters and chests): false while the game starts, so the map shows grey with a spinner; set once by the first answer of the spawn poll (or by a time-out) */
+	mapReady: boolean;
+	setMapReady: (ready: boolean) => void;
 	/** Remembered view options (localStorage, see lib/uiPrefs): the minimap, the compact header and the folded panels */
 	showMinimap: boolean;
 	/** The combat panel is shrunk to its icon (a win or defeat is still announced) */
@@ -344,6 +347,8 @@ export const useUiStore = create<UiState>((set, get) => ({
 		writePref(key, value);
 		set({ [key]: value });
 	},
+	mapReady: false,
+	setMapReady: (ready) => set((state) => (state.mapReady === ready ? state : { mapReady: ready })),
 	// read after mount (the server render has no localStorage): keeps hydration identical
 	loadPrefs: () =>
 		set({

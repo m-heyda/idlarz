@@ -12407,6 +12407,21 @@
 	},
 	{
 		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cured_leather",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cured_leather.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"src/components/game/hero/HeroWindow.tsx",
 			"src/components/game/hero/recipeUi.ts"
 		],
@@ -12414,6 +12429,21 @@
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_glass_vial.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_plank_bundle",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_plank_bundle.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -21048,6 +21078,21 @@
 		"usedBy": [
 			"code"
 		],
+		"name": "ui_daily_chest",
+		"category": "ui",
+		"subcategory": "frames and bars",
+		"src": "/pixel/ui/daily_chest.png",
+		"status": "used",
+		"source": "public/pixel/ui",
+		"size": [
+			62,
+			51
+		]
+	},
+	{
+		"usedBy": [
+			"code"
+		],
 		"name": "ui_frame_modal",
 		"category": "ui",
 		"subcategory": "frames and bars",
@@ -21467,6 +21512,36 @@
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/skills.ts"
+		],
+		"name": "skill_heal",
+		"category": "ui",
+		"subcategory": "skill",
+		"src": "/pixel/icons/skill_heal.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/skills.ts"
+		],
+		"name": "skill_stun",
+		"category": "ui",
+		"subcategory": "skill",
+		"src": "/pixel/icons/skill_stun.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
 		]
 	},
 	{
@@ -38375,19 +38450,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_materials_leather_roll",
-		"category": "unsorted",
-		"subcategory": "materials",
-		"src": "/pixel/__reuse/materials/leather_roll.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "reuse_materials_logs",
 		"category": "unsorted",
 		"subcategory": "materials",
@@ -38397,19 +38459,6 @@
 		"size": [
 			153,
 			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_materials_plank",
-		"category": "unsorted",
-		"subcategory": "materials",
-		"src": "/pixel/__reuse/materials/plank.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
 		]
 	},
 	{
@@ -38841,6 +38890,123 @@
 		"size": [
 			148,
 			148
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_chain_orbs",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/chain_orbs.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_comet",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/comet.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_evil_eye",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/evil_eye.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_flame_hand",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/flame_hand.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_green_swirl",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/green_swirl.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_jade_spire",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/jade_spire.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_starburst",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/starburst.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_void_meteor",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/void_meteor.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_whirlwind",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/whirlwind.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
 		]
 	},
 	{

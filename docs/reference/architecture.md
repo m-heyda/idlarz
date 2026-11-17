@@ -175,7 +175,7 @@ get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow re
 Source: [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts)
 
 The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of
-the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
+the avatars: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
 None is shown in the game right now (the Merchant window dropped its per-tab face); they stay in the asset library (category Portraits) as ready faces for
 a future quest giver, innkeeper, blacksmith or dialogue.
 
@@ -193,7 +193,7 @@ The file name is `biome_<name>.png`; change the value here to use another one.
 
 ### `ANIMAL_PIXEL_ICONS` <small>const</small>
 
-Source: [`src/config/pixelIcons.ts:245`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:249`](../../src/config/pixelIcons.ts)
 
 Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is [`animalIcon`](architecture.md#animalicon).
 
@@ -201,7 +201,7 @@ Farm animal id -> its sprites. Chickens and cows come in two looks, the others i
 
 ### `animalIcon` <small>function</small>
 
-Source: [`src/config/pixelIcons.ts:260`](../../src/config/pixelIcons.ts)
+Source: [`src/config/pixelIcons.ts:264`](../../src/config/pixelIcons.ts)
 
 The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial).

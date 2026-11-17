@@ -12,7 +12,7 @@ const load = (): Record<string, true> => {
 };
 
 /**
- * "Trash" marks shared by every asset gallery and review story. A mark is the asset's repo path (`/pixel/...` under public/, or `art_style_reference/...`) and lives
+ * "Trash" marks shared by every asset gallery and review story. A mark is the asset's repo path (`/pixel/...` under public/) and lives
  * in this browser's localStorage, so the owner can flip through all of Storybook marking what to delete, then copy the list (`copyList`) and hand it over.
  */
 export const useTrashMarks = () => {

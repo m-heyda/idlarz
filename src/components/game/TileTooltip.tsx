@@ -58,22 +58,37 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	const nextLevel = monster ? growthSecondsLeft(monster, growthOpts) : null;
 	const stats = monsterStats(type, level);
 	const boss = isBoss(type);
-	const growth = monster
-		? `Level ${formatCompact(level)} of ${formatCompact(maxLevelOf(monster.spawnLevel, growthOpts, monster.growCap))}${
-				nextLevel !== null ? `, grows in ${Math.max(1, Math.ceil(nextLevel / 60))} min` : ' - fully grown'
-			}`
-		: undefined;
+	const maxLevel = monster ? maxLevelOf(monster.spawnLevel, growthOpts, monster.growCap) : null;
+	const growing = nextLevel !== null;
+	// the header carries the growth: "Lv 14/18 ↑" while it still grows, a green "Lv 15" once fully grown (no second "Level x of y" line below)
+	const levelText = (
+		<span className={growing ? undefined : 'ds-tip-grown'}>
+			Lv {formatCompact(level)}
+			{growing && maxLevel !== null ? `/${formatCompact(maxLevel)} ↑` : ''}
+		</span>
+	);
+	const growth = growing ? `Grows in ${Math.max(1, Math.ceil(nextLevel / 60))} min` : undefined;
+	const perSecond = (value: number) => `${formatCompact(Math.round(value * 100) / 100)}/s`;
+	const rows = [
+		{ label: 'Damage', value: `${formatCompact(stats.attack)} / hit` },
+		{ label: 'Attack speed', value: perSecond(stats.attackSpeed) },
+		{ label: 'DPS', value: formatCompact(Math.round(stats.attack * stats.attackSpeed * 10) / 10) },
+		{ label: 'Armor', value: formatCompact(stats.armor) },
+		...(stats.critChance > 0 ? [{ label: 'Crit', value: `${stats.critChance}% x${stats.critMult}` }] : []),
+		...(stats.stunResist > 0 ? [{ label: 'Stun resist', value: `${stats.stunResist}%` }] : []),
+	];
 	return (
 		<div className={place}>
 			<MonsterTooltip
 				icon={icon}
 				name={MONSTERS[type].label}
-				subtitle={`Lv ${formatCompact(level)} · ${boss ? 'Boss' : biomeLabel || 'Monster'}`}
+				subtitle={
+					<>
+						{levelText} · {boss ? 'Boss' : biomeLabel || 'Monster'}
+					</>
+				}
 				hp={`${formatCompact(stats.maxHp)} HP`}
-				rows={[
-					{ label: 'Damage', value: `${formatCompact(stats.attack)} / hit` },
-					{ label: 'Armor', value: formatCompact(stats.armor) },
-				]}
+				rows={rows}
 				boss={boss}
 				lucky={!!monster?.lucky}
 				defeated={kills}

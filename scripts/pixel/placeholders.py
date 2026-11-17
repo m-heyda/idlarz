@@ -4,7 +4,7 @@
   python scripts/pixel/placeholders.py --gaps     only print the gap list
 
 64 px (the supplied-art size, so the registry treats them as `art_ph_*`), hard alpha, no dither, 1 px coloured outline, no glow.
-Palettes: grade look cues of art_style_reference/equip/README.md section 3, S1-S3 ramps of section 5.1.
+Palettes: the grade look cues and the S1-S3 ramps.
 A placeholder is replaced later by changing ONE line: register the real icon with that grade and delete the placeholder line + file."""
 import json
 import os

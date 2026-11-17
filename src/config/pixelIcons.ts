@@ -67,6 +67,10 @@ const BASE_ICON_SIZES = {
 	rank_trophy: [64, 64], // the gold trophy of the Rankings: first place as it is, second and third place recoloured to silver and bronze with CSS (`.ds-rank-trophy`)
 	menu_rankings: [64, 64], // the stone slab with the red and gold medal (the Rankings button): the clean slab of the other menu buttons with the medal on it
 	comp_glass_vial: [40, 40],
+	comp_cured_leather: [40, 40], // the leather roll (cut from the reuse pool, 40 px)
+	comp_plank_bundle: [40, 40], // the plank (cut from the reuse pool, 40 px)
+	skill_heal: [32, 32], // the green lotus of the Heal skill
+	skill_stun: [32, 32], // the golden fist of the Stun skill
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
 	water_ripple_swamp: [96, 5], // 8 frames of 12x5
 	water_shimmer: [192, 48], // 4 frames of a whole open-water tile: drifting light dashes (WaterLayer)

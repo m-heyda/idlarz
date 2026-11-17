@@ -901,6 +901,17 @@
   "see": []
  },
  {
+  "id": "daily-chest",
+  "name": "DAILY_CHEST",
+  "symbol": "DAILY_CHEST",
+  "kind": "const",
+  "category": "Economy/Gems",
+  "file": "src/config/gemShop.ts",
+  "line": 157,
+  "summary": "The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom), never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.",
+  "see": []
+ },
+ {
   "id": "limits",
   "name": "LIMITS",
   "symbol": "LIMITS",
@@ -987,7 +998,7 @@
   "category": "Architecture/Art",
   "file": "src/config/npcPortraits.ts",
   "line": 10,
-  "summary": "The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`). None is shown in the game right now (the Merchant window dropped its per-tab face); they stay in the asset library (category Portraits) as ready faces for a future quest giver, innkeeper, blacksmith or dialogue.",
+  "summary": "The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of the avatars: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`). None is shown in the game right now (the Merchant window dropped its per-tab face); they stay in the asset library (category Portraits) as ready faces for a future quest giver, innkeeper, blacksmith or dialogue.",
   "see": []
  },
  {
@@ -1007,7 +1018,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 245,
+  "line": 249,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -1018,7 +1029,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 260,
+  "line": 264,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -2384,8 +2395,19 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 20,
+  "line": 21,
   "summary": "The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).",
+  "see": []
+ },
+ {
+  "id": "rolldailychest",
+  "name": "rollDailyChest",
+  "symbol": "rollDailyChest",
+  "kind": "function",
+  "category": "Economy/Gems",
+  "file": "src/lib/offline/gems.ts",
+  "line": 37,
+  "summary": "The materials in the day 7 chest of the daily bonus: `DAILY_CHEST.count` kinds picked at random, each worth a random number of minutes of the player's income of that kind (at least `DAILY_CHEST.floor`). `rates` is the player's income per second.",
   "see": []
  },
  {
@@ -2395,7 +2417,7 @@
   "kind": "function",
   "category": "Economy/Gems",
   "file": "src/lib/offline/gems.ts",
-  "line": 73,
+  "line": 96,
   "summary": "One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.",
   "see": []
  },

@@ -41,6 +41,23 @@ export const Inset: React.FC<{ className?: string; style?: React.CSSProperties; 
 /** Small gold section heading ("ECONOMY", "AMOUNT"). */
 export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => <h4 className='ds-section-label'>{children}</h4>;
 
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'size'> {
+	checked: boolean;
+	onChange: (checked: boolean) => void;
+	/** The text beside the box (clicking it toggles too) */
+	label?: React.ReactNode;
+}
+/** A custom checkbox: a dark square plate that fills gold with a tick when on. It is a real `<input type='checkbox'>` inside a label, so the keyboard, focus ring and screen readers work as usual. */
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange, label, disabled, className, ...rest }) => (
+	<label className={cx('ds-check', className)} data-disabled={disabled ? 'true' : undefined}>
+		<input {...rest} type='checkbox' className='ds-check-input' checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+		<span className='ds-check-box' aria-hidden='true'>
+			✓
+		</span>
+		{label ? <span className='ds-check-label'>{label}</span> : null}
+	</label>
+);
+
 /** Gold rule between groups; `flourish` adds the scrolled centre. */
 export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
 
@@ -172,6 +189,10 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	large?: boolean;
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
+	/** A small level tag in the bottom left corner (the crafting level a recipe needs) */
+	levelBadge?: number | string;
+	/** A short line along the bottom of the slot, over the picture (a skill's mana cost, cooldown or unlock level) */
+	caption?: string;
 	/** Text inside an icon-less slot (a skill name) */
 	label?: string;
 	sub?: string;
@@ -181,7 +202,23 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
  * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
  * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
  */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, junk, large, active, label, sub, className, style, ...rest }) => {
+export const Slot: React.FC<SlotProps> = ({
+	icon,
+	rarity,
+	count,
+	empty,
+	locked,
+	equipped,
+	junk,
+	large,
+	active,
+	levelBadge,
+	label,
+	sub,
+	className,
+	style,
+	...rest
+}) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -203,6 +240,7 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 				</span>
 			) : null}
 			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{levelBadge !== undefined ? <span className='ds-slot-lvl'>{levelBadge}</span> : null}
 			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>
 	);

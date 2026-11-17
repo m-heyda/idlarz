@@ -50,9 +50,9 @@ const BuildTimers: React.FC = () => {
 					<span className='bt-art'>
 						{timer.art ? (
 							// eslint-disable-next-line @next/next/no-img-element
-							<img src={timer.art} alt='' width={28} height={28} className='pixelated' draggable={false} />
+							<img src={timer.art} alt='' width={22} height={22} className='pixelated' draggable={false} />
 						) : (
-							<PixelIcon name='castle_1' alt='' scale={0.6} />
+							<PixelIcon name='castle_1' alt='' scale={0.5} />
 						)}
 					</span>
 					<span className='bt-text'>

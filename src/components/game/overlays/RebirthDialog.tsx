@@ -205,7 +205,7 @@ const RebirthDialog: React.FC = () => {
 									style={{ flexShrink: 0, minWidth: 92, minHeight: 36 }}
 									disabled={maxed || !affordable}
 									onClick={() => {
-										if (buyEmberUpgrade(id)) audioManager.playSound('purchase');
+										buyEmberUpgrade(id);
 									}}
 								>
 									{maxed ? (

@@ -5,8 +5,12 @@ import { requestGems } from '@/lib/rewardsClient';
 import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
 import { notify } from '@/lib/notices';
 import { signalNeedClaim } from '@/lib/serverSession';
+import { RESOURCE_CAP } from '@/config/economy';
+import { RESOURCES } from '@/catalog';
+import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import audioManager from '@/utils/audioManager';
 
 // The browser's side of the gem shop (`POST /api/gems`): what the shop window shows, and the purchases. The balance, the prices, the cooldowns and every rule are the server's; the browser shows what the last answer said and never
 // computes a balance. A purchase carries a fresh key, and a lost answer is asked again with the SAME key (the server replays it, it is never charged twice).
@@ -71,13 +75,28 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 		},
 		claimDaily: async () => {
 			const reply = await run(newClaimId(), { action: 'daily' });
-			if (reply?.ok && reply.paid) useUiStore.getState().showToast(`Daily bonus: +${reply.paid} gems`);
+			if (reply?.ok && reply.paid) {
+				const chest = reply.dailyChest ?? [];
+				if (chest.length > 0) {
+					// the day 7 chest: the server paid these materials, so they go into the game like a chest's loot
+					useGameStore.setState((state) => {
+						const resources = { ...state.resources };
+						for (const item of chest) resources[item.resource] = Math.min(resources[item.resource] + item.amount, RESOURCE_CAP);
+						return { resources };
+					});
+					const text = chest.map((item) => `${formatCompact(item.amount)} ${RESOURCES[item.resource]?.label ?? item.resource}`).join(', ');
+					useUiStore.getState().showToast(`Daily chest: +${reply.paid} gems, ${text}`);
+				} else useUiStore.getState().showToast(`Daily bonus: +${reply.paid} gems`);
+			}
 			return reply;
 		},
 		buy: async (itemId, value) => {
 			if (get().busy) return null;
 			const reply = await run(newClaimId(), { action: 'spend', itemId, ...(value !== undefined ? { value } : {}) });
-			if (reply?.ok) useUiStore.getState().showToast('Done.');
+			if (reply?.ok) {
+				useUiStore.getState().showToast('Done.');
+				audioManager.playSound('buysell');
+			}
 			return reply;
 		},
 		reset: () => set({ info: null, busy: false, message: null }),

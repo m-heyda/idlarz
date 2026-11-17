@@ -17,7 +17,7 @@ The one place to look when planning the next step. It lists only what is **still
 | Monster chests (no keys, 2 % per kill) | [loot](../reference/loot.md) | IDL-163 |
 | Spawn tables per distance band, boss rules, rosters for hills, coast and lake | [20](20-monster-families-and-rewards.md), [12](12-rebirth-biomes.md) | IDL-53, 55, 201 |
 | Five rebirth biomes (names, rosters, tile output rule) | [12](12-rebirth-biomes.md) | IDL-105, 199 |
-| Set bonuses, palettes, accessory themes, new stats, affix tier labels | [28](28-reuse-items-and-stats.md), art README (art_style_reference/equip, removed 2026-11-16) | IDL-39, 23, 164, 176, 45 |
+| Set bonuses, palettes, accessory themes, new stats, affix tier labels | [28](28-reuse-items-and-stats.md), art README (removed 2026-11-16) | IDL-39, 23, 164, 176, 45 |
 | Launch achievements, tutorial steps and bundles | [21](21-classes-avatars-achievements-offline-report.md) | IDL-73, 74, 194 |
 | Crafting unlocks, salvage, War Medal legendary craft | [17](17-crafting.md) | IDL-152, 151, 120 |
 | Ember price book, cosmetics, Monument, autobuyers | [18](18-biome-buildings-and-material-tiers.md) section 6 | IDL-97, 184, 185, 195 |

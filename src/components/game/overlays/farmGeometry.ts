@@ -95,21 +95,14 @@ export interface WalkView {
 	x1: number;
 	y0: number;
 	y1: number;
-	/** Top-left readout: feet left of x1h and above y1h are hidden behind it */
-	x1h: number;
-	y1h: number;
 }
 
 /** Panels laid over the farm window, in CSS px */
 export interface Insets {
 	right: number;
-	/** The stats readout in the top-left corner is unfolded */
-	hudOpen: boolean;
 }
 
-// the stats readout in the top-left corner (CSS px, plus its margin), unfolded and folded up
-const HUD = { open: { w: 285, h: 235 }, closed: { w: 285, h: 48 } };
-// the upgrade drawer's tab along the bottom edge (CSS px, with its margin); the open drawer overlays the scene and reserves nothing
+// the upgrade button along the bottom edge (CSS px, with its margin); the open upgrade window covers the whole scene and reserves nothing
 const UPGRADE_TAB_H = 36;
 const SPRITE = { halfW: 24, above: 42, below: 6 }; // an animal's extent round its feet, native px
 
@@ -119,14 +112,11 @@ export const walkView = (stageW: number, stageH: number, zoom: number, insets: I
 	const top = (stageH - PEN.h * zoom) / 2;
 	const toX = (px: number) => (px - left) / zoom;
 	const toY = (py: number) => (py - top) / zoom;
-	const hud = insets.hudOpen ? HUD.open : HUD.closed;
 	return {
 		x0: toX(0) + SPRITE.halfW,
 		x1: toX(stageW - insets.right) - SPRITE.halfW,
 		y0: toY(0) + SPRITE.above,
 		y1: toY(stageH - UPGRADE_TAB_H) - SPRITE.below,
-		x1h: toX(hud.w) + SPRITE.halfW,
-		y1h: toY(hud.h) + SPRITE.below,
 	};
 };
 
@@ -135,8 +125,7 @@ export const walkable = (x: number, y: number, view?: WalkView | null) => {
 	if (BLOCKED.some(([x0, x1, y0, y1]) => x >= x0 && x <= x1 && y >= y0 && y <= y1)) return false;
 	if (!view) return true;
 	const p = project(x, y);
-	if (p.x < view.x0 || p.x > view.x1 || p.y < view.y0 || p.y > view.y1) return false;
-	return !(p.x < view.x1h && p.y < view.y1h);
+	return !(p.x < view.x0 || p.x > view.x1 || p.y < view.y0 || p.y > view.y1);
 };
 
 export const randomSpot = (rnd: () => number = Math.random, view?: WalkView | null) => {

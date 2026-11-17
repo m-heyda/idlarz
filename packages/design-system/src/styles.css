@@ -307,6 +307,33 @@
 	opacity: 0.55;
 }
 
+.ds-slot-lvl {
+	position: absolute;
+	left: 2px;
+	bottom: 2px;
+	padding: 0 3px;
+	font-size: 10px;
+	line-height: 14px;
+	color: #ffb4a6;
+	background: rgba(8, 4, 4, 0.85);
+	border: 1px solid #8a3a30;
+	pointer-events: none;
+}
+
+.ds-slot-cap {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	padding: 1px 0;
+	font-size: 10px;
+	line-height: 12px;
+	text-align: center;
+	color: #cfe0ff;
+	background: rgba(6, 8, 14, 0.8);
+	pointer-events: none;
+}
+
 .ds-slot-count {
 	position: absolute;
 	right: 2px;
@@ -4737,18 +4764,67 @@ button.ds-income-head:hover {
 
 /* the welcome-back report and the daily bonus board */
 .wb-hours {
-	font-size: 2.2rem;
+	font-size: 1.7rem;
 	line-height: 1.1;
 	color: var(--ds-gold-lt, #f4d57e);
 	font-variant-numeric: tabular-nums;
 	text-shadow: 0 2px 0 #000;
+	white-space: nowrap;
+}
+
+.wb-section {
+	gap: 6px;
+	padding: 6px 10px;
+}
+
+.wb-section-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	width: 100%;
+	padding: 0;
+	font-family: inherit;
+	color: inherit;
+	text-align: left;
+	background: none;
+	border: 0;
+	cursor: pointer;
+}
+
+.wb-section-head .ds-section-label {
+	flex: 1;
+}
+
+.wb-chevron {
+	width: 10px;
+	color: var(--ds-gold, #e0a93a);
+}
+
+.wb-section-sum {
+	order: 3;
+	font-size: 11px;
+	color: #a89878;
+	white-space: nowrap;
+}
+
+.wb-away {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.wb-away-bar {
+	flex: 1;
+	min-width: 0;
+	text-align: center;
 }
 
 .wb-earned {
 	display: grid;
 	grid-template-columns: repeat(2, minmax(0, 1fr));
-	gap: 8px 28px;
-	margin-top: 4px;
+	gap: 2px 24px;
+	margin-top: 2px;
+	font-size: 13px;
 }
 
 .wb-earned-row {
@@ -4756,7 +4832,7 @@ button.ds-income-head:hover {
 	align-items: center;
 	justify-content: space-between;
 	gap: 10px;
-	padding-bottom: 4px;
+	padding-bottom: 2px;
 	border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -4774,7 +4850,11 @@ button.ds-income-head:hover {
 .wb-events {
 	list-style: none;
 	margin: 0;
-	gap: 8px;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	font-size: 13px;
 }
 
 .wb-events li {
@@ -4788,7 +4868,7 @@ button.ds-income-head:hover {
 
 .dd-days {
 	display: grid;
-	grid-template-columns: repeat(7, minmax(0, 1fr));
+	grid-template-columns: repeat(4, minmax(0, 1fr));
 	gap: 8px;
 	margin: 0;
 	padding: 0;
@@ -4796,52 +4876,193 @@ button.ds-income-head:hover {
 }
 
 .dd-day {
+	position: relative;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
-	gap: 6px;
-	padding: 10px 4px;
-	text-align: center;
-	background: linear-gradient(#10131c, #0a0c12);
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 104px;
+	padding: 8px 10px 10px;
+	background: linear-gradient(180deg, rgba(22, 26, 38, 0.95), rgba(9, 11, 17, 0.95));
 	border: 1px solid #3a4258;
 	box-shadow: inset 0 0 0 1px #05060a;
 }
 
-.dd-day[data-state='today'] {
-	border-color: var(--ds-gold, #e0a93a);
-	background: linear-gradient(rgba(224, 169, 58, 0.2), #0a0c12);
-	box-shadow:
-		inset 0 0 0 1px #05060a,
-		0 0 12px rgba(224, 169, 58, 0.35);
-}
-
-.dd-day[data-last='true'] {
-	border-color: #b05cf5;
-	background: linear-gradient(rgba(176, 92, 245, 0.18), #0a0c12);
-}
-
-.dd-day[data-state='done'] {
-	opacity: 0.5;
+.dd-day-top {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 6px;
 }
 
 .dd-day-name {
 	font-size: 10px;
-	letter-spacing: 0.1em;
+	letter-spacing: 0.14em;
 	text-transform: uppercase;
 	color: #9aa4bd;
+}
+
+.dd-day-check {
+	display: grid;
+	place-items: center;
+	width: 16px;
+	height: 16px;
+	font-size: 11px;
+	line-height: 1;
+	color: #0b1a0e;
+	background: #5ee07a;
+	border-radius: 50%;
+}
+
+.dd-day-body {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	flex: 1;
+}
+
+.dd-day-prize {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
 }
 
 .dd-day-gems {
 	display: inline-flex;
 	align-items: center;
-	gap: 4px;
-	font-size: 14px;
+	gap: 5px;
+	font-size: 20px;
 	font-variant-numeric: tabular-nums;
+	color: #f4ecd6;
+	text-shadow: 0 2px 0 #000;
+}
+
+.dd-day-extra {
+	font-size: 11px;
+	color: #d7b6ff;
 }
 
 .dd-day-note {
-	font-size: 10px;
+	font-size: 11px;
+	text-align: center;
 	color: #7a7f90;
+}
+
+.dd-day[data-state='today'] {
+	border-color: var(--ds-gold, #e0a93a);
+	background: linear-gradient(180deg, rgba(224, 169, 58, 0.22), rgba(9, 11, 17, 0.95));
+	box-shadow:
+		inset 0 0 0 1px #05060a,
+		0 0 16px rgba(224, 169, 58, 0.4);
+	animation: dd-pulse 2.4s ease-in-out infinite;
+}
+
+.dd-day[data-state='today'] .dd-day-name {
+	color: var(--ds-gold-lt, #f4d57e);
+}
+
+.dd-day[data-state='done'] {
+	border-color: #2c3a30;
+}
+
+.dd-day[data-state='done'] .dd-day-body,
+.dd-day[data-state='done'] .dd-day-name {
+	opacity: 0.45;
+}
+
+/* the last day is two tiles wide, with the chest beside the prize */
+.dd-day[data-last='true'] {
+	grid-column: span 2;
+	border-color: #b05cf5;
+	background: linear-gradient(180deg, rgba(176, 92, 245, 0.2), rgba(9, 11, 17, 0.95));
+}
+
+.dd-day[data-last='true'] .dd-day-name {
+	color: #d7b6ff;
+}
+
+.dd-day-chest {
+	width: 56px;
+	height: auto;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 0 8px rgba(176, 92, 245, 0.75));
+}
+
+@keyframes dd-pulse {
+	50% {
+		box-shadow:
+			inset 0 0 0 1px #05060a,
+			0 0 24px rgba(224, 169, 58, 0.6);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.dd-day[data-state='today'] {
+		animation: none;
+	}
+}
+
+/* ===== Checkbox: a square plate with a gold tick; the real input stays in the label (keyboard and screen readers) ===== */
+.ds-check {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	cursor: pointer;
+	user-select: none;
+	color: var(--ds-text, #e9e4d6);
+}
+
+.ds-check[data-disabled='true'] {
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+
+.ds-check-input {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	opacity: 0;
+	pointer-events: none;
+}
+
+.ds-check-box {
+	display: grid;
+	place-items: center;
+	width: 18px;
+	height: 18px;
+	flex: none;
+	font-size: 13px;
+	line-height: 1;
+	color: transparent;
+	background: linear-gradient(#0a0c12, #12151f);
+	border: 1px solid #4a5270;
+	box-shadow: inset 0 0 0 1px #05060a;
+	transition:
+		border-color 0.12s,
+		background 0.12s,
+		color 0.12s;
+}
+
+.ds-check:hover .ds-check-box {
+	border-color: var(--ds-gold, #e0a93a);
+}
+
+.ds-check-input:checked + .ds-check-box {
+	color: #2a1a05;
+	background: linear-gradient(#f0c75a, #c28a22);
+	border-color: var(--ds-gold, #e0a93a);
+}
+
+.ds-check-input:focus-visible + .ds-check-box {
+	outline: 2px solid var(--ds-gold-lt, #f4d57e);
+	outline-offset: 2px;
+}
+
+.ds-check-label {
+	font-size: 14px;
+	color: #a89878;
 }
 
 /* the login and register tabs of the landing page sit in the middle */
@@ -5013,4 +5234,9 @@ button.ds-income-head:hover {
 	grid-column: 3 / -1;
 	width: 40%;
 	height: 14px;
+}
+
+/* the level in a monster tooltip's header once it cannot grow any more */
+.ds-tip-grown {
+	color: #5ee07a;
 }

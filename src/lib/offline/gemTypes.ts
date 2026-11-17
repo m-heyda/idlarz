@@ -28,6 +28,12 @@ export type GemsRequest =
 	| { action: 'visit'; id: string }
 	| { action: 'spend'; itemId: string; value?: string };
 
+/** One material of the day 7 chest */
+export interface DailyChestItem {
+	resource: 'gold' | 'wood' | 'stone' | 'coal' | 'food' | 'meat' | 'eggs' | 'milk' | 'hide' | 'wool';
+	amount: number;
+}
+
 export interface DailyInfo {
 	/** Whether today's bonus can be claimed now */
 	available: boolean;
@@ -73,6 +79,8 @@ export interface GemsReply {
 	characterName?: string;
 	/** Gems the request charged (0 for a free respec) or the daily bonus paid */
 	paid?: number;
+	/** The materials the day 7 chest of the daily bonus paid (the browser puts them into the game) */
+	dailyChest?: DailyChestItem[];
 	/** The achievement ids a `claimAll` paid, in the order they were claimed */
 	claimedIds?: string[];
 	attrs?: Attrs;

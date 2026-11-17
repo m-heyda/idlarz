@@ -75,7 +75,7 @@ const HeroCreator: React.FC<HeroCreatorProps> = ({ name, onName, playerClass, on
 			<div className='hero-detail' data-empty={!info} style={info ? ({ '--accent': info.accent } as React.CSSProperties) : undefined} aria-live='polite'>
 				<div className='hero-face'>
 					<div className='hero-portrait'>
-						{shown && info ? <AvatarArt id={shown.id} scale={4.8} /> : <AvatarArt id={SILHOUETTE_AVATAR} scale={4.8} locked />}
+						{shown && info ? <AvatarArt id={shown.id} scale={3.7} /> : <AvatarArt id={SILHOUETTE_AVATAR} scale={3.7} locked />}
 					</div>
 					<div className='hero-face-name'>{info ? shown?.name : '???'}</div>
 					<p className='hero-face-bio'>{info ? shown?.bio : 'Every hero has a face of its own.'}</p>

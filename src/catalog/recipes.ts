@@ -11,7 +11,7 @@ import { GRADE_INFO, type Grade } from '@/catalog/items/grades';
 import type { ItemDef } from '@/types/game';
 import { RESOURCES, type MerchantResourceKey } from './resources';
 
-export type RecipeKind = 'potion' | 'component' | 'good' | 'gear';
+export type RecipeKind = 'potion' | 'component' | 'good' | 'gear' | 'legendary';
 
 export interface ComponentDef {
 	id: string;
@@ -349,5 +349,57 @@ export const GEAR_RECIPES: Recipe[] = CRAFT_GRADES.flatMap((grade) =>
 	),
 );
 RECIPES.push(...GEAR_RECIPES);
+
+/** A crafting level no player reaches (`CRAFTING.maxLevel` is 80): the legendary recipes below are shown but cannot be crafted yet. */
+export const LEGENDARY_UNLOCK = 99;
+
+/**
+ * The legendary recipes: Dawnsplitter (axe), Stormstring (bow) and the Starlight Wand (mage), the strongest weapons in the catalog (grade G9, disabled data). They are **display only**: they are not in `RECIPES`, so the server cannot start them
+ * (and the level they ask for is above the crafting cap), but the Crafting tab lists them under "Legendary" so the chase is visible. Opening them up later is moving them into `RECIPES` and lowering `LEGENDARY_UNLOCK`.
+ */
+export const LEGENDARY_RECIPES: Recipe[] = [
+	{
+		id: 'legendary_dawnsplitter',
+		kind: 'legendary',
+		name: 'Dawnsplitter',
+		inputs: [
+			{ resource: 'wood', qty: 2_000_000_000 },
+			{ resource: 'stone', qty: 1_500_000_000 },
+			{ component: 'plank_bundle', qty: 500 },
+		],
+		output: { item: 'dawnsplitter', qty: 1 },
+		unlock: LEGENDARY_UNLOCK,
+		xp: 100_000,
+		timeSec: 86_400,
+	},
+	{
+		id: 'legendary_stormstring',
+		kind: 'legendary',
+		name: 'Stormstring',
+		inputs: [
+			{ resource: 'wood', qty: 2_000_000_000 },
+			{ resource: 'hide', qty: 1_000_000_000 },
+			{ component: 'cured_leather', qty: 500 },
+		],
+		output: { item: 'stormstring', qty: 1 },
+		unlock: LEGENDARY_UNLOCK,
+		xp: 100_000,
+		timeSec: 86_400,
+	},
+	{
+		id: 'legendary_starlight_wand',
+		kind: 'legendary',
+		name: 'Starlight Wand',
+		inputs: [
+			{ resource: 'stone', qty: 2_000_000_000 },
+			{ resource: 'coal', qty: 1_500_000_000 },
+			{ component: 'plank_bundle', qty: 500 },
+		],
+		output: { item: 'starlight_wand', qty: 1 },
+		unlock: LEGENDARY_UNLOCK,
+		xp: 100_000,
+		timeSec: 86_400,
+	},
+];
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));

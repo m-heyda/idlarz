@@ -17,7 +17,7 @@ Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 
 | 3 | Overview: the releases in order |
 | 4 | The phases P0-P13 with their steps |
 | 5 | The landing page, v1 to v2 |
-| 6 | Asset plan (what is placeholder, what needs art, the `art_style_reference/` folder) |
+| 6 | Asset plan (what is placeholder, what needs art, the removed art reference folder) |
 | 7 | Decisions I need from you |
 | 8 | Risk register (edge cases found while reading the code and docs) |
 
@@ -258,9 +258,9 @@ Item upgrading (replaced by crafting's enchant), the Quests and Gambling merchan
 
 Switching is cheap by design: the background is one baked file and the title lives in `GAME_TITLE`, so v2 is a new file plus a copy edit, with no change to the route or the login flow. Open (❓ D10): final wording of the feature cards, whether the landing shows a public players-online number (not in v1).
 
-## 6. Asset plan and the `art_style_reference/` folder
+## 6. Asset plan
 
-New folder at the repo root: `art_style_reference/` (created with this plan; see its README). Upload samples there; I will recreate them in the procedural pipeline (`scripts/pixel/`) so they match the map. Existing references stay in `scripts/pixel/reference/` (STYLE.md rules apply to all new work).
+New folder at the repo root: the art reference folder (removed 2026-11-16) (created with this plan; see its README). Upload samples there; I will recreate them in the procedural pipeline (`scripts/pixel/`) so they match the map. Existing references stay in `scripts/pixel/reference/` (STYLE.md rules apply to all new work).
 
 **Fixed rules for all new art**: the seven existing biomes stay **unchanged**; new buildings and resources must read as part of the current map (48 px terrain tiles, buildings 48x60 transparent with no ground, 40 px resource icons, coloured 1 px outline, 5-tone ramp lit from the top left, no ground shadows, integer scaling).
 
@@ -279,7 +279,7 @@ New folder at the repo root: `art_style_reference/` (created with this plan; see
 
 **The two special biomes (Blight, Battlefield) brief.** Same tile geometry and outline discipline as every other biome, but richer: an extra animated layer (pulsing slime pools, drifting embers and ash, flapping banners), a deeper interior tier with its own prop set, 2 building pad variants instead of 1, a fuller rim set against every neighbour, a distinct minimap and highlight colour, and building sprites with a **glow on level 3+**, so reaching them feels like arriving somewhere. Keep the palette tied to the established 28-colour discipline so they do not look pasted in. Upload the references you like most for these two and I will build the brief around them.
 
-**Reference material is in `art_style_reference/` (added 2026-10-29).** Each folder has a README with a file index, what we want and what agents must do with it: `biomes/`, `buildings/`, `equip/` (includes the grading plan), `monsters/` (includes the roster plan), `resources/`, `ui-and-portraits/`, and `farm/` (**ignore for now**, future farm update). Licences are unconfirmed and some sheets are watermarked: see the table in its root README; direct cuts need the owner's confirmation first.
+**Reference material is in the art reference folder (removed 2026-11-16) (added 2026-10-29).** Each folder has a README with a file index, what we want and what agents must do with it: `biomes/`, `buildings/`, `equip/` (includes the grading plan), `monsters/` (includes the roster plan), `resources/`, `ui-and-portraits/`, and `farm/` (**ignore for now**, future farm update). Licences are unconfirmed and some sheets are watermarked: see the table in its root README; direct cuts need the owner's confirmation first.
 
 **Equipment track (floating, after P2).** E1 build the 12-per-slot catalog as data with new icon ids (not yet in any drop table); E2 put the nine normal grades into loot profiles and craft tiers, tuned with `loot-sim` and `fight-sim`; E3 add the three special sets (Sunhoney, Ashen Warlord, Blightbound) through bosses, relics and enchanted crafts (P11-P12); E4 delete the old `item_*` icons and gear scripts. The deletion waits for the P2 reset (every bag is empty afterwards); the retired Rattatui pieces are the only items that may still need an icon until then. New weapon types and a belt slot are design decisions, not art, and are not part of E1.
 

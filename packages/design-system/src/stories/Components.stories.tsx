@@ -27,6 +27,7 @@ import {
 	Slot,
 	Stat,
 	Tabs,
+	Checkbox,
 	UpgradeTile,
 	ComingSoon,
 	WindowShell,
@@ -76,6 +77,24 @@ export const Buttons: Story = {
 			</Button>
 		</div>
 	),
+};
+
+/** A custom checkbox: dark plate, gold tick, the label toggles it; a real input underneath. */
+export const CheckboxStory: Story = {
+	name: 'Checkbox',
+	render: () => <CheckboxDemo />,
+};
+
+const CheckboxDemo: React.FC = () => {
+	const [a, setA] = React.useState(true);
+	const [b, setB] = React.useState(false);
+	return (
+		<div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+			<Checkbox checked={a} onChange={setA} label="Don't show again today" />
+			<Checkbox checked={b} onChange={setB} label='Auto-battle' />
+			<Checkbox checked onChange={() => undefined} disabled label='Disabled' />
+		</div>
+	);
 };
 
 /** Tabs with a notification badge; click to switch. */

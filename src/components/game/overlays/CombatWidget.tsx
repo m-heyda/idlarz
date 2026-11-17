@@ -121,7 +121,6 @@ const CombatWidget: React.FC = () => {
 				pushNumber(fx.crit ? `-${formatCompact(fx.amount)}!` : `-${formatCompact(fx.amount)}`, 'hurt');
 			} else if (fx.kind === 'heal') {
 				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
-				audioManager.playSound('purchase');
 			} else if (fx.kind === 'resist') pushNumber('Resisted!', 'resist');
 			else if (fx.kind === 'stun') {
 				pushNumber('Stunned!', 'stun');

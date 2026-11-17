@@ -50,7 +50,7 @@
 	justify-content: center;
 	gap: 36px;
 	height: 100%;
-	padding: clamp(215px, 29vh, 290px) 32px 92px; /* the logo stays free above the frames */
+	padding: clamp(150px, 22vh, 225px) 32px 28px; /* the frames start a little up inside the logo's lower edge */
 }
 
 .ld-col {
@@ -67,7 +67,8 @@
 .ld-col-account {
 	width: min(430px, 29vw);
 	min-width: 320px;
-	align-items: flex-start; /* the window is as tall as its content and sits at the top of the column (more will go under it) */
+	flex-direction: column;
+	align-items: flex-start; /* the window is as tall as its content and sits at the top of the column, the guest button under it */
 }
 
 .ld-col-account .ld-frame {
@@ -319,23 +320,32 @@
 	justify-content: center;
 }
 
-/* the line at the bottom of the screen */
-.ld-tagline {
-	position: absolute;
-	left: 50%;
-	bottom: 16px;
-	z-index: 1;
-	transform: translateX(-50%);
-	max-width: 90vw;
-	padding: 6px 18px;
-	font-size: 0.95rem;
-	letter-spacing: 0.04em;
-	text-align: center;
-	color: #fff6dc;
-	text-shadow: 0 2px 0 #0a0605;
-	background: rgba(10, 12, 18, 0.82);
-	border: 1px solid #8a5f16;
-	box-shadow: 0 0 0 1px #05060a;
+/* the Play as guest button under the account window: full width and easy to read, but not wired to anything yet (a not-allowed cursor over it) */
+.ld-guest {
+	width: 100%;
+	margin-top: 14px;
+}
+
+.ld-guest .ds-hovertip,
+.ld-guest [data-fill] {
+	display: flex;
+	width: 100%;
+	cursor: not-allowed;
+}
+
+.ld-guest .ds-btn {
+	width: 100%;
+	min-height: 52px;
+	font-size: 1.05rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #f4e3b0;
+	background: rgba(12, 10, 8, 0.92);
+	opacity: 1;
+	cursor: not-allowed;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 4px 14px rgba(0, 0, 0, 0.55);
 }
 
 /* the loading state: a ring of eight gold pixels whose brightness chases round in steps (pixel-art spinner), with a line of text under it */

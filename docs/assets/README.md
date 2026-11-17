@@ -6,7 +6,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 
 ## How to use it with an agent
 
-- **Use an asset:** "use `building_village_blacksmith_house` for the Blacksmith". The agent finds the file in `manifest.json` (`src`), copies it into the game folder and registers it (`src/config/pixelIcons.ts` or `src/config/itemIcons/`; rules in `art_style_reference/README.md`).
+- **Use an asset:** "use `building_village_blacksmith_house` for the Blacksmith". The agent finds the file in `manifest.json` (`src`), copies it into the game folder and registers it (`src/config/pixelIcons.ts` or `src/config/itemIcons/`).
 - **Delete an asset:** "delete `potion_pack_07`". Only `reuse` and `spare` assets are safe to delete outright; for a `used`, `planned` or `retired` asset the agent first switches the catalog entry to another picture (never delete a wired file before its replacement is wired).
 - **Rename:** add `"<src as in manifest.json>": "new_name"` to `scripts/assets/names.json` and run `npm run assets:catalog`.
 - **Map details:** pack objects come in up to four renderings of the same object (`none`, `shadow`, `texture`, `texture-dark`); the page lists them as `variants`. Pick the one that sits on your ground.
@@ -31,11 +31,11 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Accessories](accessories.md) | 53 | 41 | 12 | 0 |
 | [Monsters](monsters.md) | 55 | 46 | 0 | 9 |
 | [Buildings](buildings.md) | 259 | 25 | 32 | 202 |
-| [Resources](resources.md) | 101 | 54 | 13 | 34 |
+| [Resources](resources.md) | 103 | 56 | 13 | 34 |
 | [Map details](map-details.md) | 386 | 28 | 18 | 340 |
-| [UI](ui.md) | 102 | 89 | 5 | 8 |
+| [UI](ui.md) | 105 | 92 | 5 | 8 |
 | [Portraits](portraits.md) | 22 | 16 | 6 | 0 |
 | [Biomes](biomes.md) | 5 | 5 | 0 | 0 |
 | [Equipment sets](sets.md) | 990 | 55 | 0 | 935 |
 | [Map ground and backdrops](map-ground.md) | 78 | 70 | 0 | 8 |
-| [Unsorted cuts](unsorted.md) | 130 | 1 | 0 | 129 |
+| [Unsorted cuts](unsorted.md) | 137 | 1 | 0 | 136 |

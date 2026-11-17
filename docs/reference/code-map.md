@@ -254,6 +254,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
+- [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
@@ -313,11 +314,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
 - [`DailyBonusDialog.tsx`](../../src/components/game/overlays/DailyBonusDialog.tsx) — ~ The daily bonus window:
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
-- [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
 - [`FarmProps.tsx`](../../src/components/game/overlays/FarmProps.tsx) — ~ CSS px outside the window that still get drawn, so a part is never seen popping in at the edge
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Moving to the right on screen (the way it last walked)
-- [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
+- [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ The tiles of the upgrade window.
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
 - [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
@@ -407,7 +407,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useRememberedOpen.ts`](../../src/hooks/useRememberedOpen.ts) — ~ Whether a folding block is open, remembered per `id` in this browser (the same keys the old Character window used, so a player's choices carry over).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
-- [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The one poll of the game.
+- [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The longest the map stays grey while it waits for the first answer
 - [`useTipDismiss.ts`](../../src/hooks/useTipDismiss.ts) — ~ Keeps a hover tooltip from outliving its reason:
 
 **src/lib/**

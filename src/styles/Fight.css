@@ -236,12 +236,6 @@
 	}
 }
 
-.fight-potions {
-	display: flex;
-	gap: 8px;
-	align-items: center;
-}
-
 .fight-potion {
 	position: relative;
 	padding: 0;
@@ -271,11 +265,6 @@
 	pointer-events: none;
 }
 
-.fight-skills {
-	display: flex;
-	gap: 8px;
-}
-
 .fight-skill {
 	position: relative;
 	flex: 1;
@@ -303,18 +292,15 @@
 	background: #120a06;
 }
 
-.fight-skill[data-nomana='true'] .fight-skill-cost {
-	color: #ff8a7a;
+.fight-skill-icon {
+	width: 32px;
+	height: 32px;
+	image-rendering: pixelated;
 }
 
-.fight-skill-name {
-	font-weight: 700;
-	font-size: 0.9rem;
-}
-
-.fight-skill-cost {
-	font-size: 0.75rem;
-	color: #8ac0ff;
+.fight-skill[data-locked='true'] .fight-skill-icon {
+	filter: grayscale(1);
+	opacity: 0.5;
 }
 
 .fight-stunned {

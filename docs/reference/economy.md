@@ -17,7 +17,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
 - Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`idolEconomy`](#idoleconomy)
-- Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`dailyInfo`](#dailyinfo), [`applySpend`](#applyspend)
+- Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -1275,19 +1275,42 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 | 6 | 45 |
 | 7 | 50 |
 
+<a id="daily-chest"></a>
+
+### `DAILY_CHEST` <small>const</small>
+
+Source: [`src/config/gemShop.ts:157`](../../src/config/gemShop.ts)
+
+The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
+never less than `floor`. It is rolled by the server when day 7 is claimed ([`rollDailyChest`](economy.md#rolldailychest)), from a sealed random number, and recorded as granted like any chest.
+
 <a id="dailyinfo"></a>
 
 ### `dailyInfo` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:21`](../../src/lib/offline/gems.ts)
 
 The daily first-login bonus as it stands: claimable when today (UTC) has not been claimed; the step it pays is the next one of the ladder when the last claim was yesterday, and day 1 otherwise (a missed day starts again, and so does day 8).
+
+<a id="rolldailychest"></a>
+
+### `rollDailyChest` <small>function</small>
+
+Source: [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts)
+
+The materials in the day 7 chest of the daily bonus: `DAILY_CHEST.count` kinds picked at random, each worth a random number of minutes of the player's income of that kind (at least `DAILY_CHEST.floor`). `rates` is the player's income per second.
+
+**Formula**
+
+```text
+amount = max(floor, floor(income/s x U(30..90 min) x 60))      3 to 5 kinds of material, picked without repeats
+```
 
 <a id="applyspend"></a>
 
 ### `applySpend` <small>function</small>
 
-Source: [`src/lib/offline/gems.ts:73`](../../src/lib/offline/gems.ts)
+Source: [`src/lib/offline/gems.ts:96`](../../src/lib/offline/gems.ts)
 
 One purchase from the gem shop, decided on the ledger: the item must exist, no identity change may be waiting to be written, the balance must cover the price, the cooldown must be over and the item's own rule must hold. Nothing is changed
 when it is refused. A paid purchase takes the gems, counts the purchase and records `spentSinceSave`; a class or name change is left as a `pending` identity change for the caller to write on the profile (and clear), and an attribute respec is done here.

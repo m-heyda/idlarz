@@ -3,7 +3,7 @@ import { monsterNameOf } from '@/stores/bestiaryStore';
 import { formatCompact, formatNumber, tidy } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
-import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
+import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
@@ -13,6 +13,8 @@ import type { Cooldowns, FightView } from '@/lib/offline/fightTypes';
 import type { BagSlot, CombatNotice, MonsterType } from '@/types/game';
 import MonsterArt, { labPreviewOf } from '../MonsterArt';
 import ItemSlot from '../ItemSlot';
+import { HoverTip } from '../../../../packages/design-system/src/components/primitives';
+import { HintTooltip } from '../../../../packages/design-system/src/components/tooltips';
 import ResourceIcon from '../ResourceIcon';
 import { slotProps } from '../itemUi';
 import '@/styles/Fight.css';
@@ -56,7 +58,8 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 			const pct = maxRef.current > 0 ? Math.max(0, Math.min(100, (v / maxRef.current) * 100)) : 0;
 			if (fillRef.current) fillRef.current.style.width = `${pct}%`;
 			if (trailRef.current) trailRef.current.style.width = `${pct}%`;
-			if (textRef.current) textRef.current.textContent = `${label} ${formatCompact(Math.ceil(v))} / ${formatCompact(Math.round(maxRef.current))}`;
+			if (textRef.current)
+				textRef.current.textContent = `${label ? `${label} ` : ''}${formatCompact(Math.ceil(v))} / ${formatCompact(Math.round(maxRef.current))}`;
 		},
 		[label],
 	);
@@ -94,7 +97,7 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 	);
 };
 
-/** What a fight left behind, under the monster on the stage (dead, a skull and crossbones, after a win): the gold, XP and hide, the drops (hover for the item card). */
+/** What a fight left behind, under the monster on the stage (dead: the monster in grey with a skull on it, after a win): the gold, XP and hide, the drops (hover for the item card). */
 /** How a queued monster's win chance is shown in the Next strip: a shape and a word besides the colour, which the stylesheet gives by `data-win`. */
 const WIN_BUCKETS: Record<WinBucket, { word: string; icon: string }> = {
 	safe: { word: 'Safe', icon: '✔' },
@@ -229,32 +232,8 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 		<>
 			{!switchesOnly && (
 				<>
-					{/* Hotkey slots: a click does what the key does */}
-					<div className='fight-skills'>
-						{SKILL_IDS.map((id, i) => {
-							const skill = SKILLS[id];
-							const locked = player.level < skill.unlockLevel;
-							const left = cd[id];
-							return (
-								<button
-									type='button'
-									key={id}
-									disabled={locked}
-									onClick={() => p.onSkill?.(id)}
-									className='fight-skill'
-									data-locked={locked}
-									data-nomana={!locked && player.mp < skill.manaCost}
-									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i} or click.`}
-								>
-									<span className='fight-skill-name'>{skill.name}</span>
-									<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
-									<span className='fight-hotkey'>{(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i}</span>
-									{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
-								</button>
-							);
-						})}
-					</div>
-					<div className='fight-potions'>
+					{/* The hotbar: the potions, then the skills as small icons (a click does what the key does; the details are in the tooltip, the cooldown runs over the icon like a potion's) */}
+					<div className='fight-hotbar'>
 						{p.potions.length === 0 && <span className='px-tip-muted text-xs'>No potions</span>}
 						{p.potions.map(({ slot }, i) => (
 							<button
@@ -274,6 +253,35 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 								)}
 							</button>
 						))}
+						<span className='fight-skill-group'>
+							{SKILL_IDS.map((id, i) => {
+								const skill = SKILLS[id];
+								const locked = player.level < skill.unlockLevel;
+								const left = cd[id];
+								const key = (p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i;
+								const detail = locked
+									? `Unlocks at level ${skill.unlockLevel}.`
+									: `Costs ${skill.manaCost} mana, cooldown ${skill.cooldownSec} s. Press ${key} or click.`;
+								return (
+									<HoverTip key={id} placement='above' align='center' tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} ${detail}`} />}>
+										<button
+											type='button'
+											disabled={locked}
+											onClick={() => p.onSkill?.(id)}
+											className='fight-skill'
+											data-locked={locked}
+											data-nomana={!locked && player.mp < skill.manaCost}
+											aria-label={`${skill.name}. ${detail}`}
+										>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
+											<span className='fight-hotkey'>{key}</span>
+											{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
+										</button>
+									</HoverTip>
+								);
+							})}
+						</span>
 					</div>
 				</>
 			)}
@@ -357,11 +365,19 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 					</div>
 				)}
 				<div className='combat-stage' data-lucky={!!monster.lucky && !dead}>
+					{!dead && (
+						<div className='fight-monster-bar'>
+							<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label='' snapKey={p.snapKey} />
+						</div>
+					)}
 					<span key={hpKey} className='fight-sprite' data-hit={!over && p.hitTick > 0} data-loading={p.loading}>
 						<span style={flip && !dead ? { display: 'block', transform: 'scaleX(-1)' } : undefined}>
 							{dead ? (
-								// eslint-disable-next-line @next/next/no-img-element
-								<img className='fight-dead-art' src='/fx/dead.png' alt={`${label} defeated`} draggable={false} width={48 * 3} height={48 * 3} />
+								<span className='fight-dead' role='img' aria-label={`${label} defeated`}>
+									<span className='fight-dead-monster'>{art}</span>
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img className='fight-dead-skull' src='/fx/dead.png' alt='' draggable={false} width={48} height={48} />
+								</span>
 							) : (
 								art
 							)}
@@ -403,9 +419,10 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 					))}
 				</div>
 				{over && <FightResult notice={over} />}
-				<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label={label} snapKey={p.snapKey} />
-				<Bar value={player.hp} max={player.maxHp} kind='player' label='You' snapKey={p.snapKey} />
-				<Bar value={player.mp} max={player.maxMp} kind='mana' label='Mana' snapKey={p.snapKey} />
+				<div className='fight-bars-row'>
+					<Bar value={player.hp} max={player.maxHp} kind='player' label='You' snapKey={p.snapKey} />
+					<Bar value={player.mp} max={player.maxMp} kind='mana' label='Mana' snapKey={p.snapKey} />
+				</div>
 				{p.queue && p.queue.length > 0 && (
 					<div className='fight-queue' aria-label={`Battle queue: ${p.queue.length} of ${p.queueMax ?? p.queue.length}`}>
 						<span className='fight-queue-title' title='Monsters waiting for their turn (the queue holds this many)'>

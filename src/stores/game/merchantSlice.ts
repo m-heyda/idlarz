@@ -22,6 +22,7 @@ import { ITEM_CATALOG } from '@/catalog';
 import type { Resources } from '@/types/game';
 import { isPositiveNumber, limitCtx, type GameGet, type GameSet } from './base';
 import type { InventorySync } from './inventorySync';
+import audioManager from '@/utils/audioManager';
 
 export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySync) => {
 	const { sendInventoryOp, settlePurchase } = inv;
@@ -61,6 +62,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 					gold: Math.min(state.resources.gold + goldGained, RESOURCE_CAP),
 				},
 			});
+			audioManager.playSound('buysell');
 			return true;
 		},
 
@@ -86,6 +88,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			}
 			sendInventoryOp({ action: 'buyShop', id, qty }, settlePurchase(price));
 			set({ bag, resources: { ...state.resources, gold: state.resources.gold - price } });
+			audioManager.playSound('buysell');
 			return true;
 		},
 
@@ -116,6 +119,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 				merchantStock: { ...stock, offers: stock.offers.filter((_, i) => i !== index) },
 			});
 			emitSaveEvent('buyOffer');
+			audioManager.playSound('buysell');
 			return true;
 		},
 
@@ -174,6 +178,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 						}
 					: {}),
 			});
+			audioManager.playSound('buysell');
 			return true;
 		},
 
@@ -210,6 +215,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 					[resource]: Math.min(state.resources[resource] + units, RESOURCE_CAP),
 				},
 			});
+			audioManager.playSound('buysell');
 			return true;
 		},
 	};
