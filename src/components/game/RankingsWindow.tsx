@@ -43,7 +43,7 @@ const Move: React.FC<{ row: RankingRow }> = ({ row }) => {
 const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board }) => (
 	<li className='ds-listrow ds-listrow-line ds-rank-row' data-me={row.me} data-top={row.rank <= 3 ? row.rank : undefined}>
 		<span className='ds-rank-pos'>{row.rank}</span>
-		<AvatarArt id={row.avatarId} playerClass={row.playerClass} className='ds-rank-avatar' scale={1.8} />
+		<AvatarArt id={row.avatarId} playerClass={row.playerClass} className='ds-rank-avatar' scale={1.68} />
 		<span className='ds-rank-who'>
 			<span className='ds-rank-name'>
 				<NickName color={nickColorValue(row.nameColor)}>{row.name}</NickName>

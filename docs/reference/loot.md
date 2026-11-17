@@ -285,6 +285,7 @@ Rarities: everything the game knows about one, in one place: label, colour, glow
 | Rare | 2 | 3,600 | 2-3 | yes |
 | Epic | 3 | 12 K | 3-4 | yes |
 | Legendary | 4 | 45 K | 4-5 | yes |
+| Unique | 5 | 150 K | 5-6 | no |
 
 <a id="levelscale"></a>
 

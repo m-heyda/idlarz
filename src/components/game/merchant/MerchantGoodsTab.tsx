@@ -169,8 +169,8 @@ const MerchantGoodsTab: React.FC = () => {
 		);
 	};
 
-	// Auto-sell may go up to (but never include) the two rarest tiers: those are never junk
-	const autoChoices = RARITY_ORDER.slice(0, -2);
+	// Auto-sell may go up to (but never include) the two rarest tiers in play (a disabled tier such as Unique does not count): those are never junk
+	const autoChoices = RARITY_ORDER.filter((id) => RARITIES[id].enabled).slice(0, -2);
 
 	return (
 		<div className='ds-goods'>

@@ -92,6 +92,22 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		statMultiplier: 1,
 		enabled: true,
 	},
+	/**
+	 * The rarest tier, for what is one of a kind (the bosses' tooltips show it). It exists as a look first: red, ranked above legendary, and **disabled**, so nothing rolls it and no save or ledger can hold it
+	 * until items of this grade are designed (then: `enabled: true`, affix counts and a weight in the loot profiles that should drop it).
+	 */
+	unique: {
+		id: 'unique',
+		label: 'Unique',
+		color: '#ef4444',
+		order: 5,
+		sellValue: 150000,
+		glow: { blur: 7, alpha: 1, pulse: true },
+		minAffixes: 5,
+		maxAffixes: 6,
+		statMultiplier: 1,
+		enabled: false,
+	},
 };
 
 export const RARITY_ORDER = (Object.keys(RARITIES) as EquipmentRarity[]).sort((a, b) => RARITIES[a].order - RARITIES[b].order);

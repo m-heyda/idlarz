@@ -24,7 +24,7 @@ export interface TileMenuContext {
 }
 
 /**
- * The entries of the right-click menu of an explored tile: what can be done here (dismiss a monster, open a chest, the disabled Buildings
+ * The entries of the right-click menu of an explored tile: what can be done here (fight a monster, open a chest, the disabled Buildings
  * placeholder, highlight the area). Reads the stores when called, so call it when the menu opens, not on render.
  */
 export function tileMenuItems({ x, y, biome, game, monster, queuePos, lineOpen, hasChest }: TileMenuContext): ContextMenuItem[] {
@@ -34,14 +34,11 @@ export function tileMenuItems({ x, y, biome, game, monster, queuePos, lineOpen, 
 	if (monster) {
 		const { id, type } = monster;
 		const name = monsterNameOf(type, MONSTERS[type].label); // "Unknown monster" until the first fight with the type
-		own.push(
-			{
-				id: 'fight',
-				label: lineOpen ? (queuePos > 0 ? 'Remove from the queue' : `Add ${name} to the queue`) : `Fight ${name}`,
-				onSelect: () => void startFight(id),
-			},
-			{ id: 'dismiss', label: `Dismiss ${name}...`, danger: true, onSelect: () => ui.askDismissMonster(id) },
-		);
+		own.push({
+			id: 'fight',
+			label: lineOpen ? (queuePos > 0 ? 'Remove from the queue' : `Add ${name} to the queue`) : `Fight ${name}`,
+			onSelect: () => void startFight(id),
+		});
 	} else if (hasChest) {
 		own.push({ id: 'chest', label: 'Open chest', onSelect: () => void collectChest(x, y) });
 	}

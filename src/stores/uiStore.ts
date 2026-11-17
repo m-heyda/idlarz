@@ -149,9 +149,7 @@ interface UiState {
 	contextMenu: ContextMenuState | null;
 	openContextMenu: (menu: ContextMenuState) => void;
 	closeContextMenu: () => void;
-	/** Confirmations: a monster to dismiss (id) and a bag stack to discard (slot index) */
-	dismissMonsterId: number | null;
-	askDismissMonster: (id: number | null) => void;
+	/** Confirmations: a bag stack to discard (slot index) */
 	discardIndex: number | null;
 	askDiscard: (index: number | null) => void;
 	/** The building window (art, lore, output, level, the next level's price and its Upgrade button): the tile of the building it was opened for (null = closed) */
@@ -242,8 +240,6 @@ export const useUiStore = create<UiState>((set, get) => ({
 	contextMenu: null,
 	openContextMenu: (menu) => set({ contextMenu: menu }),
 	closeContextMenu: () => set((state) => (state.contextMenu ? { contextMenu: null } : state)),
-	dismissMonsterId: null,
-	askDismissMonster: (id) => set({ dismissMonsterId: id, contextMenu: null }),
 	discardIndex: null,
 	askDiscard: (index) => set({ discardIndex: index, contextMenu: null }),
 	buildingModal: null,

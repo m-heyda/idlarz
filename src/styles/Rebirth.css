@@ -1,0 +1,140 @@
+/* The Rebirth window: two tabs (Rebirth, Ember shop), cards for the requirements and the next rebirth, and the Ember shop as upgrade tiles */
+.rb-root {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
+.rb-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+.rb-card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 12px 14px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--ds-line, #3a2c1c);
+}
+.rb-stats {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+}
+.rb-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 10px 8px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--ds-line, #3a2c1c);
+}
+.rb-stat-label {
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #a89878;
+}
+.rb-stat-value {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 1.25rem;
+}
+.rb-text,
+.rb-note {
+	margin: 0;
+	color: #d8c8a0;
+}
+.rb-note {
+	font-size: 0.78rem;
+	color: #a89878;
+}
+.rb-note-center {
+	text-align: center;
+}
+.rb-reqs {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.rb-req {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 8px 10px;
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(255, 122, 106, 0.35);
+	color: #ff9a8c;
+}
+.rb-req[data-met='true'] {
+	border-color: rgba(94, 224, 122, 0.35);
+	color: #5ee07a;
+}
+.rb-check {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 20px;
+	height: 20px;
+	font-size: 0.8rem;
+	line-height: 1;
+	color: #1a1208;
+	background: #e5604f;
+}
+.rb-req[data-met='true'] .rb-check {
+	background: #5ee07a;
+}
+.rb-req-label {
+	flex: 1;
+	min-width: 0;
+	color: #ecdcb4;
+}
+.rb-req-now {
+	flex: none;
+	font-variant-numeric: tabular-nums;
+}
+.rb-gain {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+}
+.rb-gain-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px 12px;
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.rb-gain-value {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 1.3rem;
+}
+.rb-gain-sub {
+	font-size: 0.72rem;
+	color: #a89878;
+}
+.rb-shop-head {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+.rb-embers {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 6px;
+	color: #86efac;
+}

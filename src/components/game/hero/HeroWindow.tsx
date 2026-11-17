@@ -489,7 +489,7 @@ const BagTab: React.FC = () => {
 	);
 };
 
-type HeroTab = 'bag' | 'stats' | 'skills' | 'craft';
+type HeroTab = 'bag' | 'stats' | 'pets' | 'skills' | 'craft';
 
 /** The Skills tab for now: a coming-soon screen (the two skills the hero has, Heal and Stun, are on the left under Skills). */
 const SkillsSoon: React.FC = () => (
@@ -500,8 +500,17 @@ const SkillsSoon: React.FC = () => (
 	/>
 );
 
+/** The Pets tab for now: a coming-soon screen (the pet system itself is not built yet). */
+const PetsSoon: React.FC = () => (
+	<ComingSoon
+		title='Pets'
+		icon={pixelIconSrc('eggs')}
+		text='Hatch a companion and let it walk beside your hero. Pets are on the way: eggs, companions and what they can do.'
+	/>
+);
+
 /**
- * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats, Skills and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
+ * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats, Pets, Skills and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
  */
 const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
@@ -519,6 +528,7 @@ const HeroWindow: React.FC = () => {
 					items={[
 						{ id: 'bag', label: 'Bag' },
 						{ id: 'stats', label: 'Stats', badge: points > 0 ? points : undefined, anchor: tab === 'stats' ? undefined : 'stat-add' },
+						{ id: 'pets', label: 'Pets' },
 						{ id: 'skills', label: 'Skills' },
 						{ id: 'craft', label: 'Crafting' },
 					]}
@@ -528,7 +538,7 @@ const HeroWindow: React.FC = () => {
 			<div className='ds-hero' data-tab={tab}>
 				{tab === 'craft' ? <CraftingSidebar /> : <HeroLeft />}
 				<Panel className='ds-hero-right'>
-					{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : tab === 'skills' ? <SkillsSoon /> : <HeroCrafting />}
+					{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : tab === 'pets' ? <PetsSoon /> : tab === 'skills' ? <SkillsSoon /> : <HeroCrafting />}
 				</Panel>
 			</div>
 		</GameWindow>

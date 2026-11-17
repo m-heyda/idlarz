@@ -1,9 +1,9 @@
 /** Pure helpers behind the design-system components (kept apart so they can be unit tested). */
 
-export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type Rarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'unique';
 
 /** Rarities from weakest to best; uncommon and above get a coloured, glowing rim. */
-export const RARITIES: readonly Rarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+export const RARITIES: readonly Rarity[] = ['common', 'uncommon', 'rare', 'epic', 'legendary', 'unique'];
 
 /** Does this rarity get a glow around its tooltip and slot? Common has none. */
 export const hasGlow = (rarity: Rarity | undefined): boolean => rarity !== undefined && rarity !== 'common';

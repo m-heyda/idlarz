@@ -1056,7 +1056,7 @@ Stored on `profiles.name_color` like a plain colour; the look of each is the `.d
 
 ### `badgeOptions` <small>function</small>
 
-Source: [`src/catalog/badges.ts:56`](../../src/catalog/badges.ts)
+Source: [`src/catalog/badges.ts:50`](../../src/catalog/badges.ts)
 
 Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
 The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

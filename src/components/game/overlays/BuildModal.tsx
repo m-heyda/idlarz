@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { IDOL_RULES } from '@/config/buildings';
+import { BUILDING_RULES, IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
 import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import type { PrestigeState } from '@/types/game';
@@ -12,9 +12,10 @@ import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import audioManager from '@/utils/audioManager';
 import { getTile } from '@/utils/world';
-import CostList from '../CostList';
+import { monsterAt } from '@/lib/monsters';
+import CostGrid from '../CostGrid';
 import GameModal from '../GameModal';
-import { Button, HoverTip } from '../../../../packages/design-system/src/components/primitives';
+import { Button, DiamondLevel, HoverTip } from '../../../../packages/design-system/src/components/primitives';
 import { TipLine, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import '@/styles/BuildModal.css';
 
@@ -84,6 +85,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	// re-evaluate whenever resources or the map change, so prices go green/red live
 	const tiles = useGameStore((state) => state.tiles);
 	useGameStore((state) => state.resources);
+	const monsters = useGameStore((state) => state.monsters);
 	const idolLevels = useGameStore((state) => state.idolLevels);
 	const prestige = useGameStore((state) => state.prestige);
 	const buildTimePct = idolEconomy(tiles, idolLevels).buildTimePct;
@@ -92,10 +94,12 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const { builds, moves } = buildOptions(useGameStore, x, y);
 
 	// the tile got a building, or nothing can be offered anymore: nothing left to choose
+	// a monster standing on the tile closes the window too: it has to be defeated before anything is built here
+	const blocked = !!monsterAt(monsters, x, y);
 	useEffect(() => {
-		if (!free || (builds.length === 0 && moves.length === 0)) close();
-	}, [free, builds.length, moves.length, close]);
-	if (!free) return null;
+		if (!free || blocked || (builds.length === 0 && moves.length === 0)) close();
+	}, [free, blocked, builds.length, moves.length, close]);
+	if (!free || blocked) return null;
 
 	const build = (o: BuildOption) => {
 		if (o.problem) return;
@@ -164,7 +168,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 							<p className='build-blurb'>{o.def.blurb}</p>
 							{keyLine(o.def)}
 							<div className='build-foot'>
-								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostList cost={o.cost} className='build-cost' />}
+								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostGrid cost={o.cost} />}
 							</div>
 							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>
@@ -180,9 +184,12 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
+							<span title={`Level ${o.level} of ${o.def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel}`}>
+								<DiamondLevel level={o.level} max={o.def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel} small />
+							</span>
 							<p className='build-blurb'>Move it here: level kept, half price.</p>
 							<div className='build-foot'>
-								<CostList cost={o.cost} className='build-cost' />
+								<CostGrid cost={o.cost} />
 							</div>
 							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 						</div>

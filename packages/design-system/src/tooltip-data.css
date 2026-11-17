@@ -210,3 +210,96 @@
 	background: linear-gradient(#5a5f6d, #3f4350);
 	color: #e4e7ef;
 }
+
+/* ===== Equipment tooltips, compact: a narrower card, smaller type, tight lines and little air between them (the class is set by ItemTooltip) ===== */
+.ds-tip.ds-tip-gear {
+	width: 232px;
+	padding: 7px 9px 7px;
+	font-size: 11.5px;
+	line-height: 1.2;
+}
+.ds-tip-gear .ds-tip-head {
+	gap: 7px;
+	padding-bottom: 5px;
+}
+.ds-tip-gear .ds-tip-head img {
+	width: 34px;
+	height: 34px;
+	padding: 1px;
+}
+.ds-tip-gear .ds-tip-title {
+	font-size: 14px;
+}
+.ds-tip-gear .ds-tip-sub {
+	margin-top: 1px;
+	font-size: 10px;
+}
+.ds-tip-gear .ds-tip-line {
+	margin-top: 2px;
+	font-size: 11px;
+	line-height: 1.2;
+}
+.ds-tip-gear .ds-tip-primary {
+	margin: 2px 0;
+	font-size: 15px;
+}
+.ds-tip-gear .ds-tip-primary > span:last-child {
+	font-size: 11px;
+}
+.ds-tip-gear .ds-tip-rows {
+	padding: 2px 0 0;
+	gap: 1px;
+}
+.ds-tip-gear .ds-tip-row {
+	gap: 8px;
+	font-size: 11px;
+	line-height: 1.2;
+}
+.ds-tip-gear .ds-tip-group {
+	margin-top: 3px;
+}
+.ds-tip-gear .ds-tip-group-head,
+.ds-tip-gear .ds-tip-section,
+.ds-tip-gear .ds-tip-equipped {
+	margin: 4px 0 1px;
+	font-size: 9.5px;
+	letter-spacing: 0.08em;
+}
+.ds-tip-gear .ds-tip-affix {
+	font-size: 10px;
+}
+.ds-tip-gear .ds-tip-note {
+	padding-top: 3px;
+	font-size: 10.5px;
+	line-height: 1.25;
+}
+.ds-tip-gear .ds-tip-compare {
+	margin-top: 4px;
+	padding: 1px 6px 3px;
+}
+.ds-tip-gear .ds-tip-compare-head {
+	font-size: 9.5px;
+}
+.ds-tip-gear .ds-tip-set {
+	margin-top: 4px;
+	padding-top: 3px;
+}
+.ds-tip-gear .ds-tip-set-title,
+.ds-tip-gear .ds-tip-set-piece,
+.ds-tip-gear .ds-tip-set-bonus {
+	font-size: 10.5px;
+	line-height: 1.2;
+}
+.ds-tip-gear .ds-tip-keys {
+	margin-top: 4px;
+	font-size: 10px;
+}
+.ds-tip-gear .ds-tip-foot {
+	margin-top: 4px;
+	padding-top: 4px;
+	font-size: 10px;
+}
+.ds-tip-gear .ds-kbd {
+	padding: 0 4px;
+	font-size: 9px;
+}

@@ -20,13 +20,14 @@ import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import { limitOf } from '@/lib/limits';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { monsterAt } from '@/lib/monsters';
 import { canAffordBundle } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
 import { formatNumber, formatTime } from '@/utils/formatters';
 import { getTile } from '@/utils/world';
 import audioManager from '@/utils/audioManager';
 import type { Resources } from '@/types/game';
-import CostList from '../CostList';
+import CostGrid from '../CostGrid';
 import GameModal from '../GameModal';
 import { Button, DiamondLevel } from '../../../../packages/design-system/src/components/primitives';
 import ResourceIcon from '../ResourceIcon';
@@ -53,11 +54,12 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const tile = getTile(tiles, x, y);
 	const def: BuildingDef | undefined = buildingDef(tile?.building);
 
-	// the building is gone (moved, rebirth): nothing to show
+	// the building is gone (moved, rebirth), or a monster stands on it now (defeat it first): nothing to show
+	const blocked = !!monsterAt(monsters, x, y);
 	useEffect(() => {
-		if (!def) close();
-	}, [def, close]);
-	if (!tile || !def) return null;
+		if (!def || blocked) close();
+	}, [def, blocked, close]);
+	if (!tile || !def || blocked) return null;
 
 	const level = levelOfTile(tile);
 	const idol = idolDef(def.id);
@@ -103,11 +105,11 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
 						<span className='build-extra'>{biomeLabel}</span>
 					</div>
-					<div>
+					<div className='bw-levelcard'>
 						<div className='bw-level'>
 							Level {level} <span>of {top}</span>
 						</div>
-						<div title={`Level ${level} of ${top}`} style={{ marginTop: 6 }}>
+						<div title={`Level ${level} of ${top}`} data-testid='building-level-gems'>
 							<DiamondLevel level={level} max={top} />
 						</div>
 					</div>
@@ -172,7 +174,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						) : (
 							<>
 								<div className='bw-label'>Upgrade to level {nextLevel}</div>
-								<CostList cost={cost} className='build-cost' />
+								<CostGrid cost={cost} />
 								{def.kind === 'idol' && ownedTiles < idolFloorTiles(nextLevel) && (
 									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>
 								)}

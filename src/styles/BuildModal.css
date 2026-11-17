@@ -73,10 +73,6 @@
 	flex: none;
 	white-space: nowrap;
 }
-.build-cost {
-	flex-wrap: nowrap !important;
-	white-space: nowrap;
-}
 .build-output {
 	display: flex;
 	align-items: flex-start;
@@ -302,4 +298,73 @@
 	color: #7a7f90;
 	cursor: help;
 	text-decoration: underline dotted;
+}
+
+/* CostGrid: the resource costs as chips that wrap (as many columns as fit), so a level with many resource types never leaves the window */
+.cost-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+	gap: 6px;
+	min-width: 0;
+}
+.cost-chip {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	min-width: 0;
+	padding: 4px 8px;
+	background: rgba(0, 0, 0, 0.28);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+	font-variant-numeric: tabular-nums;
+	color: #a89878;
+}
+.cost-chip[data-ok='true'] {
+	color: #5ee07a;
+}
+.cost-chip[data-ok='false'] {
+	color: #ff7a6a;
+	border-color: rgba(255, 122, 106, 0.3);
+}
+.cost-grid[data-muted='true'] .cost-chip {
+	color: #7a7f90;
+}
+.cost-chip-num {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+/* the level card of the building window: the number and the level gems together, on a small plate */
+.bw-levelcard {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 8px 10px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--ds-line, #3a2c1c);
+}
+
+/* narrow windows: the info column goes on top, the Build and Move buttons go under their card, and nothing is wider than the window */
+@media (max-width: 760px) {
+	.bw {
+		grid-template-columns: minmax(0, 1fr);
+	}
+	.ds-listrow.bh-row {
+		grid-template-columns: 72px minmax(0, 1fr);
+		gap: 12px;
+	}
+	.bh-row .build-art {
+		width: 72px;
+		height: 72px;
+	}
+	.bh-row .build-art img {
+		width: 64px;
+		height: 64px;
+	}
+	.bh-side {
+		grid-column: 1 / -1;
+	}
+	.bw-table {
+		gap: 6px 12px;
+	}
 }

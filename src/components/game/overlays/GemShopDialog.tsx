@@ -4,6 +4,7 @@ import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
+import { notify } from '@/lib/notices';
 import { formatNumber } from '@/utils/formatters';
 import GameModal from '../GameModal';
 import { useBadgeChoice } from '../BadgeDialog';
@@ -13,7 +14,13 @@ import DailyBoard from '../DailyBoard';
 
 const DAY = 86_400;
 
-/** The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on). */
+/** The window's tabs: the daily reward first, then one per shop tab of the price book (`GemShopTab`). */
+type ShopView = 'daily' | GemShopTab;
+
+/**
+ * The shop tabs after the daily reward, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
+ * Adding a tab, or items to Cosmetics, is a row here plus rows in `GEM_SHOP` (`config/gemShop.ts`); the list below it is drawn from the price book.
+ */
 const TABS: readonly { id: GemShopTab; label: string; empty: string; soon: readonly string[] }[] = [
 	{ id: 'identity', label: 'Identity', empty: '', soon: [] },
 	{
@@ -24,9 +31,9 @@ const TABS: readonly { id: GemShopTab; label: string; empty: string; soon: reado
 	},
 	{
 		id: 'once',
-		label: 'One-time',
-		empty: 'One-time purchases are on the way.',
-		soon: ['Cosmetics: avatars, badges and titles', 'Name glow and frames', 'Gear'],
+		label: 'Cosmetics',
+		empty: 'More cosmetics are on the way.',
+		soon: ['Avatars, badges and titles', 'Name glow and frames', 'Gear'],
 	},
 ];
 
@@ -40,7 +47,7 @@ const waitText = (sec: number): string => {
 /**
  * The Gem shop window (IDL-230): the header gem chip opens it. It lists what the gems can buy, from the server's price book (`GEM_SHOP`), with the daily bonus on top. Every number comes from the last answer of `POST /api/gems`;
  * nothing here computes a balance. A button is disabled while a request is on its way (a double click cannot buy twice), a short balance says how many gems are missing, and a purchase above {@link GEM_CONFIRM_ABOVE} gems asks first.
- * Three tabs: Identity (services), Upgrades (leveled, later) and One-time (later); an empty one says what is coming.
+ * Four tabs along the top: Daily reward (the default), Identity (services), Upgrades (leveled, later) and Cosmetics (one-time purchases, the name effects now); an empty one says what is coming. A refusal (a short balance, a cooldown) is a notice, not a line in the row.
  */
 const GemShopDialog: React.FC = () => {
 	const open = useUiStore((state) => state.gemShopOpen);
@@ -54,7 +61,7 @@ const GemShopDialog: React.FC = () => {
 	const playerName = useGameStore((state) => state.playerName);
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
-	const [tab, setTab] = useState<GemShopTab>('identity');
+	const [tab, setTab] = useState<ShopView>('daily');
 
 	useEffect(() => {
 		if (open) void useGemStore.getState().refresh();
@@ -85,27 +92,36 @@ const GemShopDialog: React.FC = () => {
 		if (reply?.ok && item.id === 'name_change') setName('');
 	};
 
-	const items = GEM_SHOP.filter((item) => item.tab === tab);
+	const items = tab === 'daily' ? [] : GEM_SHOP.filter((item) => item.tab === tab);
 	const daily = info?.daily;
 	const current = TABS.find((entry) => entry.id === tab) ?? TABS[0];
+	/** A button on a row that cannot be bought now says why in a notice instead of staying silent */
+	const refuse = (blocked: string) => notify(blocked, 'error');
 
 	return (
-		<GameModal title='Gem shop' icon={<GemIcon />} size='md' onClose={close}>
+		<GameModal title='Gem shop' size='md' onClose={close}>
 			<div className='flex flex-col gap-4 px-1 pb-1'>
-				<div className='flex items-center justify-between gap-3'>
-					<div className='text-sm text-[#a89878]'>
+				<Tabs
+					active={tab}
+					onChange={(id) => setTab(id as ShopView)}
+					items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
+				/>
+
+				<div className='flex items-center justify-between gap-3 text-sm text-[#a89878]'>
+					<div>
 						Hero: <span className='text-[#f1e6c8]'>{playerName}</span>
 					</div>
-					<div className='ds-chip' title='Your gems'>
-						<GemIcon /> <span data-testid='gem-balance'>{formatNumber(balance)}</span>
+					<div title='Your gems'>
+						Gems:{' '}
+						<span className='text-[#ffe27a] tabular-nums' data-testid='gem-balance'>
+							{formatNumber(balance)}
+						</span>
 					</div>
 				</div>
 
-				<DailyBoard daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />
+				{tab === 'daily' && <DailyBoard daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />}
 
-				<Tabs active={tab} onChange={(id) => setTab(id as GemShopTab)} items={TABS.map((entry) => ({ id: entry.id, label: entry.label }))} />
-
-				{items.length === 0 && (
+				{tab !== 'daily' && items.length === 0 && (
 					<div className='ds-listrow' style={{ textAlign: 'center' }} data-testid='gem-soon'>
 						<div className='text-[#ecdcb4]'>{current.empty}</div>
 						<ul className='text-xs text-[#a89878] flex flex-col gap-1'>
@@ -142,8 +158,10 @@ const GemShopDialog: React.FC = () => {
 											)}
 											{owned ? null : item.id === 'class_change' ? (
 												<Button
-													disabled={busy || blocked !== null}
+													tone={blocked ? 'dark' : 'stone'}
+													disabled={busy}
 													onClick={() => {
+														if (blocked) return refuse(blocked);
 														close();
 														openClassDialog();
 													}}
@@ -152,9 +170,9 @@ const GemShopDialog: React.FC = () => {
 												</Button>
 											) : item.id === 'name_change' ? null : (
 												<Button
-													tone='gold'
-													disabled={busy || blocked !== null}
-													onClick={() => (needsConfirm && !asking ? setConfirm(item.id) : void buy(item))}
+													tone={blocked ? 'dark' : 'gold'}
+													disabled={busy}
+													onClick={() => (blocked ? refuse(blocked) : needsConfirm && !asking ? setConfirm(item.id) : void buy(item))}
 												>
 													{asking ? 'Confirm' : 'Buy'}
 												</Button>
@@ -172,12 +190,15 @@ const GemShopDialog: React.FC = () => {
 												onChange={(event) => setName(event.target.value)}
 												aria-label='New hero name'
 											/>
-											<Button tone='gold' disabled={busy || blocked !== null || name.trim() === ''} onClick={() => void buy(item, name.trim())}>
+											<Button
+												tone={blocked ? 'dark' : 'gold'}
+												disabled={busy || (blocked === null && name.trim() === '')}
+												onClick={() => (blocked ? refuse(blocked) : void buy(item, name.trim()))}
+											>
 												Buy
 											</Button>
 										</div>
 									)}
-									{blocked && <div className='text-xs text-[#d98a6a]'>{blocked}</div>}
 								</li>
 							);
 						})}

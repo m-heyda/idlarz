@@ -5,7 +5,7 @@ import { autoBattleUnlocked, autoUseUnlocked } from '@/lib/combat';
 import type { SkillId } from '@/catalog/skills';
 import type { FightReply } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
-import { requestAuto, requestDismiss, requestUse } from '@/lib/rewardsClient';
+import { requestAuto, requestUse } from '@/lib/rewardsClient';
 import { signalSyncNow } from '@/lib/serverSession';
 import { useUiStore } from '@/stores/uiStore';
 import { ITEM_CATALOG } from '@/catalog';
@@ -122,14 +122,5 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 
 		// The win or defeat notice has been read
 		clearCombatNotice: () => set((state) => (state.combat.notice ? { combat: { ...state.combat, notice: null } } : {})),
-
-		// Takes a monster off the map without a fight or loot (for a rat too strong to beat); ends the fight against it
-		dismissMonster: (id: number) => {
-			const monster = get().monsters.find((m) => m.id === id);
-			if (!monster) return false;
-			set((state) => ({ monsters: state.monsters.filter((m) => m.id !== id) }));
-			if (monster.ticket !== undefined) void requestDismiss(newClaimId(), monster.ticket, sinceNow()).then((reply) => settleFight(reply));
-			return true;
-		},
 	};
 };

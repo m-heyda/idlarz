@@ -364,7 +364,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						Time left: {Math.ceil(fight.timeLeftSec)} s
 					</div>
 				)}
-				<div className='combat-stage' data-lucky={!!monster.lucky && !dead}>
+				<div className='combat-stage' data-lucky={!!monster.lucky && !dead} data-dead={dead}>
 					{!dead && (
 						<div className='fight-monster-bar'>
 							<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label='' snapKey={p.snapKey} />

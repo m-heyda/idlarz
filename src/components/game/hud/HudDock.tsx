@@ -104,7 +104,9 @@ const HudDock: React.FC = () => {
 						tip={
 							<HintTooltip
 								title='Rebirth'
-								text={status.canRebirth ? 'Ready: start over for a permanent bonus.' : `Locked until: ${missing.join(', ')}`}
+								text={
+									status.canRebirth ? 'Ready: start over for a permanent bonus.' : `Not ready to rebirth yet: ${missing.join(', ')}. The Ember shop is open.`
+								}
 								tone={status.canRebirth ? 'normal' : 'bad'}
 							/>
 						}
@@ -114,9 +116,8 @@ const HudDock: React.FC = () => {
 							label='Rebirth'
 							active={rebirthOpen}
 							aria-pressed={rebirthOpen}
-							aria-disabled={!status.canRebirth}
 							data-tutorial='rebirth-button'
-							onClick={() => (status.canRebirth || rebirthOpen) && toggleRebirth()}
+							onClick={toggleRebirth}
 						/>
 					</HoverTip>
 					{/* the last button: the world boss window (coming soon) */}
