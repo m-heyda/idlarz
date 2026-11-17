@@ -476,6 +476,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
+- [`emberShopMigration.ts`](../../src/lib/emberShopMigration.ts) — ~ The Ember shop was reworked (new ids, costs and effects).
 - [`epochFetch.ts`](../../src/lib/epochFetch.ts) — ~ `fetch` for the game's own /api routes:
 - [`epochGuard.ts`](../../src/lib/epochGuard.ts) — ~ The browser's half of the data epoch.
 - [`fightSim.ts`](../../src/lib/fightSim.ts) — ~ A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend).
@@ -944,6 +945,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`cloudAdopt.test.ts`](../../tests/saves/cloudAdopt.test.ts)
 - [`cloudConflict.test.ts`](../../tests/saves/cloudConflict.test.ts)
 - [`cloudSave.test.ts`](../../tests/saves/cloudSave.test.ts) — ~ The same game with the castle at `level` and an upgrade to `level + 1` with `remaining` seconds left (null:
+- [`emberRefund.test.ts`](../../tests/saves/emberRefund.test.ts)
 - [`epochGuard.test.ts`](../../tests/saves/epochGuard.test.ts) — ~ A fake browser:
 - [`localSaveAccount.test.ts`](../../tests/saves/localSaveAccount.test.ts)
 - [`manualCloudSave.test.ts`](../../tests/saves/manualCloudSave.test.ts)
@@ -1051,6 +1053,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildings_v1_rollback.sql`](../../supabase/migrations/buildings_v1_rollback.sql)
 - [`combat_ledger.sql`](../../supabase/migrations/combat_ledger.sql)
 - [`crafting_ledger.sql`](../../supabase/migrations/crafting_ledger.sql)
+- [`ember_refund_v2.sql`](../../supabase/migrations/ember_refund_v2.sql)
+- [`ember_refund_v2_rollback.sql`](../../supabase/migrations/ember_refund_v2_rollback.sql)
 - [`gems_attrs_ledger.sql`](../../supabase/migrations/gems_attrs_ledger.sql)
 - [`gems_attrs_ledger_rollback.sql`](../../supabase/migrations/gems_attrs_ledger_rollback.sql)
 - [`identity_server_only.sql`](../../supabase/migrations/identity_server_only.sql)

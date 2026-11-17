@@ -92,10 +92,10 @@ export const CHEATS: Cheat[] = [
 	{
 		id: 'ember-shop-unpaid',
 		claim: 'Thrift level 10 without spending the Embers',
-		mutate: (s) => ({ ...s, prestige: { rebirths: 1, legacyPoints: 10, legacyEarned: 10, upgrades: { thrift: 10 } } }),
+		mutate: (s) => ({ ...s, prestige: { rebirths: 1, legacyPoints: 10, legacyEarned: 10, upgrades: { thrift: 10 }, shopVersion: 2 } }),
 	},
 	{ id: 'stat-points', claim: '+100 attribute points', mutate: (s) => ({ ...s, characterStats: { ...s.characterStats, strength: 105 } }) },
-	{ id: 'click-level', claim: 'click ladder maxed', mutate: (s) => ({ ...s, clickLevel: 4 }) as never },
+	{ id: 'click-level', claim: 'click ladder maxed', mutate: (s) => ({ ...s, clickLevel: 5 }) as never },
 	{
 		id: 'xp-inflated',
 		claim: '1e12 XP',

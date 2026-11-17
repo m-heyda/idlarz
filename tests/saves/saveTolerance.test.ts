@@ -106,10 +106,10 @@ test('Embers: an upgrade that is gone gives its Embers back, a changed price is 
 	const id = Object.keys(EMBER_UPGRADES)[0] as keyof typeof EMBER_UPGRADES;
 	const gone = load((r) => (r.prestige = { rebirths: 1, legacyPoints: 0, legacyEarned: 10, upgrades: { retired: 2 } }));
 	assert.equal(gone.prestige.legacyPoints, 10, 'its Embers are unspent again');
-	const priced = load((r) => (r.prestige = { rebirths: 1, legacyPoints: 3, legacyEarned: 10, upgrades: { [id]: 1 } }));
+	const priced = load((r) => (r.prestige = { rebirths: 1, legacyPoints: 3, legacyEarned: 10, upgrades: { [id]: 1 }, shopVersion: 2 }));
 	assert.equal(priced.prestige.legacyPoints + emberSpent(priced.prestige.upgrades), 10, 'earned = unspent + spent');
 	const raw = game();
-	raw.prestige = { rebirths: 1, legacyPoints: 0, legacyEarned: 1, upgrades: { [id]: EMBER_UPGRADES[id].maxLevel } };
+	raw.prestige = { rebirths: 1, legacyPoints: 0, legacyEarned: 1, upgrades: { [id]: EMBER_UPGRADES[id].maxLevel }, shopVersion: 2 };
 	assert.equal(sanitizeSave(raw).ok, false);
 });
 
