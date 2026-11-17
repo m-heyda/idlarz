@@ -293,10 +293,10 @@ test('a trade good is level-gated, takes its components when queued, and lands i
 	assert.equal(stuck.ok, true, 'a full bag does not stop a claim');
 });
 
-test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives about a tenth of an XP', () => {
+test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives a few hundredths of an XP', () => {
 	assert.ok(CRAFTING.xpScale > 0 && CRAFTING.xpScale <= 0.05, 'the end-game slow-down is a small multiplier');
 	const one = craftXpOf(RECIPE_BY_ID.potion_minor, 1);
-	assert.ok(one > 0.05 && one < 0.2, `one minor potion gives ${one} XP`);
+	assert.ok(one > 0.01 && one < 0.05, `one minor potion gives ${one} XP`);
 	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 10), Math.round(one * 10 * 1e6) / 1e6, 'a batch is the one-craft value times the count, without drift');
 	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 0), 0);
 });

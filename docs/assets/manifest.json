@@ -12422,7 +12422,6 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hero/HeroWindow.tsx",
 			"src/components/game/hero/recipeUi.ts"
 		],
 		"name": "comp_glass_vial",

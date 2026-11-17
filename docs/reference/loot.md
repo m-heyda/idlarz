@@ -452,7 +452,7 @@ See also: `isJunkStack`, [`junkSale`](loot.md#junksale)
 
 ### `junkSale` <small>function</small>
 
-Source: [`src/lib/loot/junk.ts:70`](../../src/lib/loot/junk.ts)
+Source: [`src/lib/loot/junk.ts:74`](../../src/lib/loot/junk.ts)
 
 What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run,
 so their previews agree. `junk` is a parameter so a test can flip the gear rule.

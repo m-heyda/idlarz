@@ -4,7 +4,7 @@ import { ITEM_CATALOG } from '../../src/catalog';
 import { JUNK_ITEMS } from '../../src/catalog/items/junk';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
-import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
+import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkGold, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
 import { applyOp, parseOp, sellJunkRule } from '../../src/lib/offline/inventory';
 import { rollJunkDrops } from '../../src/lib/loot/junkDrops';
 import { mulberry32 } from '../../src/lib/rng';
@@ -87,6 +87,8 @@ test('Sell junk sells every junk stack at its price (Haggler applies) and leaves
 	const rich = junkSale(bag, { merchantUpgrades: { haggler: 5 } });
 	assert.ok(rich.gold > sold.gold, 'Haggler pays more');
 	assert.equal(junkSale(emptyBag(), {}).count, 0);
+	assert.equal(junkGold(bag, {}), sold.gold, 'the number on the button is what the sale pays');
+	assert.equal(junkGold(bag, { merchantUpgrades: { haggler: 5 } }), rich.gold);
 });
 
 // IDL-312: the gear rule: a player flag, or an item level well below what is worn

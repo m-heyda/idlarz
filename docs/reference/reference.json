@@ -1935,7 +1935,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 70,
+  "line": 74,
   "summary": "What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run, so their previews agree. `junk` is a parameter so a test can flip the gear rule.",
   "see": []
  },

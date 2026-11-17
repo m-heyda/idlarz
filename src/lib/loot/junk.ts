@@ -60,6 +60,10 @@ export const countJunk = (bag: readonly BagSlot[], junk: (item: ItemInstance) =>
 		return sum + (isJunkStack(slot.id) ? slot.qty : 0);
 	}, 0);
 
+/** The gold the Sell junk button would pay for this bag now (what `junkSale` pays, through the merchant's Haggler and Idol bonuses): the number the button shows. */
+export const junkGold = (bag: BagSlot[], sellCtx: SellContext, junk: (item: ItemInstance) => boolean = (item) => isJunk(item)): number =>
+	junkSale(bag, sellCtx, junk).gold;
+
 /**
  * What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run,
  * so their previews agree. `junk` is a parameter so a test can flip the gear rule.

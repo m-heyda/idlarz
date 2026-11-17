@@ -30,7 +30,7 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `comp_cured_leather` | <img src="../../public/pixel/icons/comp_cured_leather.png" width="80" alt="comp_cured_leather"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_cured_leather.png` |
-| `comp_glass_vial` | <img src="../../public/pixel/icons/comp_glass_vial.png" width="80" alt="comp_glass_vial"> | 40x40 | used | src/components/game/hero/HeroWindow.tsx, src/components/game/hero/recipeUi.ts | `pixel/icons/comp_glass_vial.png` |
+| `comp_glass_vial` | <img src="../../public/pixel/icons/comp_glass_vial.png" width="80" alt="comp_glass_vial"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_glass_vial.png` |
 | `comp_plank_bundle` | <img src="../../public/pixel/icons/comp_plank_bundle.png" width="80" alt="comp_plank_bundle"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_plank_bundle.png` |
 
 ## currency

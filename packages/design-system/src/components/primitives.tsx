@@ -178,7 +178,8 @@ export const Stat: React.FC<{ label: string; value: React.ReactNode; tone?: 'dam
 export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> {
 	icon?: string;
 	rarity?: Rarity;
-	count?: number;
+	/** Stack count in the corner: a number (shown above 1) or a ready-made label such as "46.9K" */
+	count?: number | string;
 	/** Show a faded placeholder icon for an empty equipment slot */
 	empty?: boolean;
 	locked?: boolean;
@@ -239,7 +240,7 @@ export const Slot: React.FC<SlotProps> = ({
 					{sub ? <small>{sub}</small> : null}
 				</span>
 			) : null}
-			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{count && (typeof count === 'string' || count > 1) ? <span className='ds-slot-count'>{count}</span> : null}
 			{levelBadge !== undefined ? <span className='ds-slot-lvl'>{levelBadge}</span> : null}
 			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>

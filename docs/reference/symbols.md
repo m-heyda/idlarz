@@ -164,7 +164,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `isJunk` | Loot / Junk | [`src/lib/loot/junk.ts:30`](../../src/lib/loot/junk.ts) | Whether a piece of **gear** in the bag counts as junk for the "Sell junk" button: |
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
-| `junkSale` | Loot / Junk | [`src/lib/loot/junk.ts:70`](../../src/lib/loot/junk.ts) | What the Sell junk button does to a bag: |
+| `junkSale` | Loot / Junk | [`src/lib/loot/junk.ts:74`](../../src/lib/loot/junk.ts) | What the Sell junk button does to a bag: |
 | `KeepRef` | Progression / Rebirth | [`src/lib/rebirthKeep.ts:20`](../../src/lib/rebirthKeep.ts) | Carrying legendary gear through a rebirth. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:52`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
 | `kit` | Loot / Items | [`src/lib/fightSim.ts:58`](../../src/lib/fightSim.ts) | A full kit of one ladder grade: |

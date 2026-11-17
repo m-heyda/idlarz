@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useShallow } from 'zustand/react/shallow';
 import GameModal from '../GameModal';
 import { nickColorValue } from '@/config/nickColors';
 import {
@@ -14,7 +15,7 @@ import {
 	Stat,
 	Tabs,
 } from '../../../../packages/design-system/src/components/primitives';
-import { ComingSoon, CraftStash, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
+import { ComingSoon, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
 import { HintTooltip, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
@@ -34,7 +35,7 @@ import { idolEconomy } from '@/lib/idolEconomy';
 import { aggregateStats, averageItemLevel, gearOf } from '@/lib/inventory';
 import { setDrag } from '@/lib/inventoryDrag';
 import { resolveItem } from '@/lib/itemInstance';
-import { countJunk, isJunk, junkFor, wornLevelOf } from '@/lib/loot/junk';
+import { countJunk, isJunk, junkFor, junkGold, wornLevelOf } from '@/lib/loot/junk';
 import { healAmount } from '@/lib/skills';
 import { useGameStore } from '@/stores/gameStore';
 import { selectStock, useCraftStore } from '@/stores/craftStore';
@@ -46,6 +47,7 @@ import { xpToNextLevel } from '@/utils/game/character';
 import { useBadgeChoice } from '../BadgeDialog';
 import BuffRow from '../BuffRow';
 import { itemIconName, slotProps } from '../itemUi';
+import { componentIconUrl } from './recipeUi';
 import { LevelUpTimer } from '../LevelUpTimer';
 import GameWindow from '../GameWindow';
 import { activateBagSlot, dropOnBagSlot, dropOnEquipment, openBagMenu, shiftSellBagSlot, takeOffSlot } from './bagActions';
@@ -383,7 +385,14 @@ const MoreSpace: React.FC = () => {
 	);
 };
 
-/** The crafting bag: what crafting made, kept on the server; potions and goods are taken into the bag. */
+/** Empty cells the crafting bag shows at least (it fills the window; more things add rows) */
+const CRAFT_BAG_MIN_CELLS = 84;
+const KIND_LABEL = { component: 'Component', potion: 'Potion', good: 'Trade good', special: 'Special item' } as const;
+
+/**
+ * The crafting bag: what crafting made and the components, kept on the server. It looks like the bag (a grid of slots, one per kind of thing, with the count in the corner) but has no slot limit: past the empty cells it just gets another row.
+ * Things only move one way, out: a click takes a stack of a potion or trade good into the bag, Shift+click takes all that fits; nothing can be put back, and components stay for recipes.
+ */
 const CraftingBag: React.FC = () => {
 	const stock = useCraftStore(selectStock);
 	const withdraw = useCraftStore((state) => state.withdraw);
@@ -400,16 +409,56 @@ const CraftingBag: React.FC = () => {
 						id,
 						qty,
 						name: item?.name ?? COMPONENTS[id]?.name ?? id,
-						icon: pixelIconSrc(item ? itemIconName(item) : 'comp_glass_vial'),
+						icon: item ? pixelIconSrc(itemIconName(item)) : componentIconUrl(id),
 						kind: item ? (item.kind === 'consumable' || item.effects?.length ? ('potion' as const) : ('good' as const)) : ('component' as const),
 						stack: item?.stackMax ?? 1,
 					};
 				}),
 		[stock],
 	);
+	// the crafting bag has no slot limit: it always fills the window with empty cells, and past that the grid just gets another row
+	const cells = Math.max(CRAFT_BAG_MIN_CELLS, entries.length);
 	return (
-		<Inset className='ds-stash-wrap'>
-			<CraftStash entries={entries} onTake={(id, n) => void withdraw(id, n).then(showToast)} />
+		<Inset className='ds-baggrid ds-craftbag'>
+			{entries.map((entry) => {
+				const takeable = entry.kind !== 'component';
+				const take = (n: number) => void withdraw(entry.id, Math.min(entry.qty, n)).then(showToast);
+				return (
+					<HoverTip
+						key={entry.id}
+						tip={
+							<Tooltip className='ds-tip-compact' title={entry.name} icon={entry.icon} subtitle={KIND_LABEL[entry.kind]}>
+								<TipRows rows={[{ label: 'You hold', value: formatNumber(entry.qty) }]} />
+								<div className='ds-tip-keys'>
+									{takeable ? (
+										<>
+											<span>
+												<span className='ds-kbd'>Click</span>take a stack
+											</span>
+											<span>
+												<span className='ds-kbd'>Shift</span>+<span className='ds-kbd'>Click</span>take all
+											</span>
+										</>
+									) : (
+										<span>Kept here for recipes</span>
+									)}
+								</div>
+							</Tooltip>
+						}
+					>
+						<Slot
+							icon={entry.icon}
+							rarity='common'
+							count={entry.qty > 1 ? compact(entry.qty) : undefined}
+							aria-label={entry.name}
+							onClick={(e) => takeable && take(e.shiftKey ? entry.qty : (entry.stack ?? 1))}
+						/>
+					</HoverTip>
+				);
+			})}
+			{Array.from({ length: cells - entries.length }, (_, i) => (
+				<Slot key={`empty-${i}`} />
+			))}
 		</Inset>
 	);
 };
@@ -418,6 +467,9 @@ const CraftingBag: React.FC = () => {
 const BagTab: React.FC = () => {
 	const bag = useGameStore((state) => state.bag);
 	const equipment = useGameStore((state) => state.equipment);
+	const sellCtx = useGameStore(
+		useShallow((state) => ({ merchantUpgrades: state.merchantUpgrades, prestige: state.prestige, tiles: state.tiles, idolLevels: state.idolLevels })),
+	);
 	const fighting = useGameStore((state) => !!state.combat.fight);
 	const organizeBag = useGameStore((state) => state.organizeBag);
 	const sellJunk = useGameStore((state) => state.sellJunk);
@@ -425,6 +477,7 @@ const BagTab: React.FC = () => {
 	const [view, setView] = useState<'bag' | 'craft'>('bag');
 	const wornLevel = wornLevelOf(equipment);
 	const junkCount = countJunk(bag, junkFor(equipment));
+	const junkWorth = junkGold(bag, sellCtx, junkFor(equipment)); // the gold the button pays, shown on it
 	const used = bag.filter(Boolean).length;
 	const gearCount = bag.reduce((n, slot) => n + (gearOf(slot) ? 1 : 0), 0);
 
@@ -460,7 +513,7 @@ const BagTab: React.FC = () => {
 							<HoverTip
 								tip={
 									<HintTooltip
-										title={junkCount > 0 ? `Sell ${formatNumber(junkCount)} junk` : 'No junk yet'}
+										title={junkCount > 0 ? `Sell ${formatNumber(junkCount)} junk for ${formatNumber(junkWorth)} Gold` : 'No junk yet'}
 										text={
 											junkCount > 0
 												? 'Junk materials and the gear marked as junk or well below what you wear. Mark gear from its right-click menu.'
@@ -477,7 +530,7 @@ const BagTab: React.FC = () => {
 										showToast(count > 0 ? `Sold ${formatNumber(count)} junk item${count === 1 ? '' : 's'} for ${formatNumber(gold)} Gold` : 'No junk to sell');
 									}}
 								>
-									Sell junk{junkCount > 0 ? ` (${formatNumber(junkCount)})` : ''}
+									Sell junk{junkCount > 0 ? ` (${formatCompact(junkWorth)} Gold)` : ''}
 								</Button>
 							</HoverTip>
 						</span>
