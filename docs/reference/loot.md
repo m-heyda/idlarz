@@ -210,7 +210,7 @@ Profiles: how many rolls, which rarity weights, which pool, which bonus tables. 
 | boss_battlefield | 1 x 100%, 1 guaranteed from boss_general_battlefield | source level +0 +-0 | common 20, uncommon 30, rare 30, epic 15, legendary 5 | king_potions (potions_king, fixed) |
 | basic_chest | 1 x 82% from general_equipment | source level +0 +-1 | common 62, uncommon 24, rare 9, epic 4, legendary 1 | chest_legendary (legendary_weapons, fixed, 1.9%, replace); chest_potion (potions_chest, fixed, fallback) |
 | craft | 1 x 100%, 1 guaranteed from equipment_craft | source level +0 +-1 | common 70, uncommon 22, rare 6 | - |
-| merchant_stock | 12 x 100%, 12 guaranteed from general_equipment | source level +0 +-2 | common 60, uncommon 40 | - |
+| merchant_stock | 12 x 100%, 12 guaranteed from general_equipment | source level +0 +-2 | common 60, uncommon 40, rare 4 | - |
 
 <a id="biome-loot"></a>
 

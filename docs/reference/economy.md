@@ -574,7 +574,7 @@ The whole farm's output per second: the sum of [`animalOutput`](economy.md#anima
 Source: [`src/config/merchant.ts:18`](../../src/config/merchant.ts)
 
 The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ([`sellPayout`](economy.md#sellpayout)).
-Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ([`MERCHANT_BUY_MULTIPLIER`](economy.md#merchant-buy-multiplier), [`buyCost`](economy.md#buycost)); farm products are never sold to the player.
+Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up ([`MERCHANT_BUY_MULTIPLIER`](economy.md#merchant-buy-multiplier), [`buyCost`](economy.md#buycost)); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.
 
 **Merchant prices (gold per unit)** _(computed from the code)_
 
@@ -588,6 +588,13 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 | eggs | 2 | not sold |
 | milk | 3 | not sold |
 | hide | 2 | not sold |
+| herbs | 5 | not sold |
+| sap | 5 | not sold |
+| ironOre | 5 | not sold |
+| spores | 5 | not sold |
+| frostshard | 5 | not sold |
+| pearls | 5 | not sold |
+| salt | 5 | not sold |
 | wool | 2 | not sold |
 
 <a id="merchant-goods"></a>
@@ -620,7 +627,7 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 | bulk (Bulk Discount) | Economy | -1% tile cost | 8 | 250 K | 2.1 |
 | charm (Lucky Charm) | Economy | +2 Luck for chests and kills | 10 | 150 K | 1.9 |
 | packrat (Pack Rat (old)) | Economy | +8 bag slots | 6 | 500 K | 3 |
-| packrat2 (Pack Rat) | Economy | +4 bag slots | 6 | 500 K | 3 |
+| packrat2 (Pack Rat) | Economy | +4 bag slots | 10 | 500 K | 3 |
 | foreman (Foreman) | Economy | +1% income from every resource, gold included | 10 | 400 K | 1.9 |
 | skinner (Skinner) | Economy | +5% meat and hide from your animals | 8 | 300 K | 1.9 |
 | swift (Quick Hands) | Combat | +2% attack speed | 8 | 250 K | 1.9 |

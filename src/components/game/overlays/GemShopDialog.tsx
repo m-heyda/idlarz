@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
+import { NICK_EFFECTS, nickColorValue } from '@/config/nickColors';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
@@ -9,8 +10,11 @@ import { formatNumber } from '@/utils/formatters';
 import GameModal from '../GameModal';
 import { useBadgeChoice } from '../BadgeDialog';
 import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
+import { NickName } from '../../../../packages/design-system/src/components/composites';
+import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import GemIcon from '../GemIcon';
 import DailyBoard from '../DailyBoard';
+import '@/styles/GemShop.css';
 
 const DAY = 86_400;
 
@@ -47,7 +51,8 @@ const waitText = (sec: number): string => {
 /**
  * The Gem shop window (IDL-230): the header gem chip opens it. It lists what the gems can buy, from the server's price book (`GEM_SHOP`), with the daily bonus on top. Every number comes from the last answer of `POST /api/gems`;
  * nothing here computes a balance. A button is disabled while a request is on its way (a double click cannot buy twice), a short balance says how many gems are missing, and a purchase above {@link GEM_CONFIRM_ABOVE} gems asks first.
- * Four tabs along the top: Daily reward (the default), Identity (services), Upgrades (leveled, later) and Cosmetics (one-time purchases, the name effects now); an empty one says what is coming. A refusal (a short balance, a cooldown) is a notice, not a line in the row.
+ * Four tabs along the top that stay pinned while the content scrolls: Daily reward (the default), Identity (services, as cards), Upgrades (the same tiles as the Merchant's upgrades, so more can be added) and Cosmetics (tiles, with a
+ * preview of your name in the effect before you buy it). A bought item reads "Owned". A refusal (a short balance, a cooldown) is a notice, not a line in the row.
  */
 const GemShopDialog: React.FC = () => {
 	const open = useUiStore((state) => state.gemShopOpen);
@@ -57,10 +62,13 @@ const GemShopDialog: React.FC = () => {
 	const busy = useGemStore((state) => state.busy);
 	const gems = useGameStore((state) => state.gems);
 	const admin = useUiStore((state) => state.badge.admin);
+	const playerName = useGameStore((state) => state.playerName);
 	useBadgeChoice();
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
 	const [tab, setTab] = useState<ShopView>('daily');
+	/** The name effect shown on the preview strip of the Cosmetics tab (an effect id; none = the plain name) */
+	const [previewFx, setPreviewFx] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (open) void useGemStore.getState().refresh();
@@ -82,7 +90,7 @@ const GemShopDialog: React.FC = () => {
 		return { price, blocked: null };
 	};
 
-	/** A one-time item the account already has (bought, or included for an admin account): the row shows MAX and is dimmed. Builder #2 is never free for an admin: it is the ledger's record that adds the builder. */
+	/** A one-time item the account already has (bought, or included for an admin account; Builder #2 is never free): the row reads "Owned" */
 	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && ((admin && item.id !== BUILDER_ITEM) || (info?.bought?.[item.id] ?? 0) > 0);
 
 	const buy = async (item: GemItem, value?: string) => {
@@ -91,28 +99,131 @@ const GemShopDialog: React.FC = () => {
 		if (reply?.ok && item.id === 'name_change') setName('');
 	};
 
+	/** The click on a Buy button: a refusal is a notice, a dear purchase asks once more (the label turns to Confirm), then it is bought */
+	const press = (item: GemItem, blocked: string | null, price: number) => {
+		if (blocked) return notify(blocked, 'error');
+		if (price > GEM_CONFIRM_ABOVE && confirm !== item.id) return setConfirm(item.id);
+		void buy(item);
+	};
+
 	const items = tab === 'daily' ? [] : GEM_SHOP.filter((item) => item.tab === tab);
 	const daily = info?.daily;
 	const current = TABS.find((entry) => entry.id === tab) ?? TABS[0];
-	/** A button on a row that cannot be bought now says why in a notice instead of staying silent */
-	const refuse = (blocked: string) => notify(blocked, 'error');
+
+	/** One service of the Identity tab as a card: name, what it does, its price and the action (a class change opens the class window, a name change has its own field) */
+	const identityCard = (item: GemItem) => {
+		const owned = ownedOf(item);
+		const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
+		const asking = confirm === item.id;
+		return (
+			<div key={item.id} className='gem-card' data-owned={owned}>
+				<div className='gem-card-name'>{item.name}</div>
+				<div className='gem-card-blurb'>{item.blurb}</div>
+				{item.id === 'name_change' && !owned && (
+					<div className='gem-card-name-row'>
+						<input
+							className='ds-amount-field'
+							placeholder='New name'
+							maxLength={CHARACTER_NAME_MAX}
+							value={name}
+							onChange={(event) => setName(event.target.value)}
+							aria-label='New hero name'
+						/>
+					</div>
+				)}
+				<div className='gem-card-foot'>
+					{owned ? (
+						<span className='gem-card-owned'>Owned</span>
+					) : (
+						<>
+							<span className='gem-card-price'>
+								{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
+							</span>
+							{item.id === 'class_change' ? (
+								<Button
+									tone={blocked ? 'dark' : 'stone'}
+									disabled={busy}
+									onClick={() => {
+										if (blocked) return notify(blocked, 'error');
+										close();
+										openClassDialog();
+									}}
+								>
+									Choose
+								</Button>
+							) : item.id === 'name_change' ? (
+								<Button
+									tone={blocked ? 'dark' : 'gold'}
+									disabled={busy || (blocked === null && name.trim() === '')}
+									onClick={() => (blocked ? notify(blocked, 'error') : void buy(item, name.trim()))}
+								>
+									Buy
+								</Button>
+							) : (
+								<Button tone={blocked ? 'dark' : 'gold'} disabled={busy} onClick={() => press(item, blocked, price)}>
+									{asking ? 'Confirm' : 'Buy'}
+								</Button>
+							)}
+						</>
+					)}
+				</div>
+			</div>
+		);
+	};
+
+	/** One upgrade or cosmetic as the same tile the Merchant's upgrades use (one level: not owned, or owned). A cosmetic that is a name effect previews on the strip above when hovered or clicked. */
+	const tile = (item: GemItem) => {
+		const owned = ownedOf(item);
+		const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
+		const effect = NICK_EFFECTS.find((entry) => entry.item === item.id);
+		return (
+			<div
+				key={item.id}
+				className={effect ? 'gem-preview-tile' : undefined}
+				data-on={effect ? previewFx === effect.id : undefined}
+				onMouseEnter={effect ? () => setPreviewFx(effect.id) : undefined}
+				onClick={effect ? () => setPreviewFx(effect.id) : undefined}
+			>
+				<UpgradeTile
+					name={item.name}
+					level={owned ? 1 : 0}
+					maxLevel={1}
+					now={owned ? item.blurb : undefined}
+					next={owned ? undefined : item.blurb}
+					nowLabel='You have'
+					emptyNow='not owned'
+					nextLabel='Get'
+					cost={price}
+					costText={formatNumber(price)}
+					costNode={
+						<span className='ds-cost'>
+							{formatNumber(price)} <GemIcon />
+						</span>
+					}
+					have={balance}
+					shortText={blocked ?? undefined}
+					state={owned ? 'maxed' : blocked ? 'short' : 'ready'}
+					maxLabel='Owned'
+					buyLabel={confirm === item.id ? 'Confirm' : 'Buy'}
+					onBuy={() => press(item, blocked, price)}
+				/>
+			</div>
+		);
+	};
 
 	return (
-		<GameModal title='Gem shop' size='md' onClose={close}>
-			<div className='flex flex-col gap-4 px-1 pb-1'>
-				<Tabs
-					active={tab}
-					onChange={(id) => setTab(id as ShopView)}
-					items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
-				/>
-
-				<div className='flex items-center justify-end gap-3 text-sm text-[#a89878]'>
-					<div title='Your gems'>
-						Gems:{' '}
-						<span className='text-[#ffe27a] tabular-nums' data-testid='gem-balance'>
-							{formatNumber(balance)}
-						</span>
-					</div>
+		<GameModal title='Gem shop' width={920} className='ds-modal-pin' onClose={close}>
+			<Tabs
+				active={tab}
+				onChange={(id) => setTab(id as ShopView)}
+				items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
+			/>
+			<div className='ds-modal-scroll'>
+				<div className='gem-balance-row' title='Your gems'>
+					Gems:&nbsp;
+					<span className='text-[#ffe27a] tabular-nums' data-testid='gem-balance'>
+						{formatNumber(balance)}
+					</span>
 				</div>
 
 				{tab === 'daily' && <DailyBoard daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />}
@@ -128,77 +239,30 @@ const GemShopDialog: React.FC = () => {
 					</div>
 				)}
 
-				{items.length > 0 && (
-					<ul className='flex flex-col gap-2' data-testid={`gem-${tab}`}>
-						{items.map((item) => {
-							const owned = ownedOf(item);
-							const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
-							const needsConfirm = price > GEM_CONFIRM_ABOVE;
-							const asking = confirm === item.id;
-							return (
-								<li key={item.id} className='ds-listrow' data-owned={owned}>
-									<div className='flex items-center justify-between gap-3'>
-										<div className='min-w-0 flex-1'>
-											<div className='font-semibold'>{item.name}</div>
-											<div className='text-xs text-[#a89878]'>{item.blurb}</div>
-										</div>
-										<div className='flex flex-col items-end gap-1 shrink-0'>
-											{owned ? (
-												<Button tone='purple' className='ds-btn-max' aria-disabled='true' tabIndex={-1} title='You have this'>
-													MAX
-												</Button>
-											) : (
-												<span className='flex items-center gap-1 tabular-nums text-[#ffe27a]'>
-													{price === 0 ? 'Free' : formatNumber(price)} {price > 0 && <GemIcon />}
-												</span>
-											)}
-											{owned ? null : item.id === 'class_change' ? (
-												<Button
-													tone={blocked ? 'dark' : 'stone'}
-													disabled={busy}
-													onClick={() => {
-														if (blocked) return refuse(blocked);
-														close();
-														openClassDialog();
-													}}
-												>
-													Choose
-												</Button>
-											) : item.id === 'name_change' ? null : (
-												<Button
-													tone={blocked ? 'dark' : 'gold'}
-													disabled={busy}
-													onClick={() => (blocked ? refuse(blocked) : needsConfirm && !asking ? setConfirm(item.id) : void buy(item))}
-												>
-													{asking ? 'Confirm' : 'Buy'}
-												</Button>
-											)}
-										</div>
+				{tab === 'identity' && items.length > 0 && (
+					<div className='gem-id-grid' data-testid={`gem-${tab}`}>
+						{items.map(identityCard)}
+					</div>
+				)}
+
+				{tab !== 'daily' && tab !== 'identity' && items.length > 0 && (
+					<div data-testid={`gem-${tab}`}>
+						{tab === 'once' && (
+							<>
+								<div className='ds-nick-stage' data-testid='gem-preview'>
+									<div className='ds-nick-preview'>
+										<NickName color={nickColorValue(previewFx)}>{playerName}</NickName>
 									</div>
-									{item.id === 'name_change' && (
-										<div className='flex items-center gap-2'>
-											<input
-												className='ds-amount-field'
-												style={{ flex: 1, width: 'auto' }}
-												placeholder='New name'
-												maxLength={CHARACTER_NAME_MAX}
-												value={name}
-												onChange={(event) => setName(event.target.value)}
-												aria-label='New hero name'
-											/>
-											<Button
-												tone={blocked ? 'dark' : 'gold'}
-												disabled={busy || (blocked === null && name.trim() === '')}
-												onClick={() => (blocked ? refuse(blocked) : void buy(item, name.trim()))}
-											>
-												Buy
-											</Button>
-										</div>
-									)}
-								</li>
-							);
-						})}
-					</ul>
+								</div>
+								<div className='gem-preview-hint'>
+									Hover or click a name effect to preview it on your name. You can also pick them in your character window.
+								</div>
+							</>
+						)}
+						<div className='ds-ups'>
+							<div className='ds-ups-grid'>{items.map(tile)}</div>
+						</div>
+					</div>
 				)}
 			</div>
 		</GameModal>

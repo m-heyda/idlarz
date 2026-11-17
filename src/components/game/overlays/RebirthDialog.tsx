@@ -348,7 +348,7 @@ const RebirthDialog: React.FC = () => {
 	);
 
 	return (
-		<GameModal title='Rebirth' size='lg' onClose={handleClose}>
+		<GameModal title='Rebirth' size='lg' className='ds-modal-pin' onClose={handleClose}>
 			<div className='rb-root'>
 				<Tabs
 					active={tab}
@@ -358,7 +358,7 @@ const RebirthDialog: React.FC = () => {
 						{ id: 'shop', label: 'Ember shop' },
 					]}
 				/>
-				{tab === 'rebirth' ? rebirthTab : shopTab}
+				<div className='ds-modal-scroll'>{tab === 'rebirth' ? rebirthTab : shopTab}</div>
 			</div>
 			{confirmModal}
 		</GameModal>

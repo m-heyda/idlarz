@@ -257,9 +257,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
+- [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the list icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
+- [`MapTip.tsx`](../../src/components/game/MapTip.tsx) — ~ A hover card on the map, kept on screen.
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
@@ -500,6 +502,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
+- [`kingdomSummary.ts`](../../src/lib/kingdomSummary.ts) — ~ What the Kingdom overview reads from the game state
 - [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
 - [`limits.ts`](../../src/lib/limits.ts) — ~ What can raise a limit:
 
@@ -1017,6 +1020,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
+- [`hoverTipPlacement.test.ts`](../../tests/ui/hoverTipPlacement.test.ts)
+- [`kingdomWindow.test.ts`](../../tests/ui/kingdomWindow.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:

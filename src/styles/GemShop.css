@@ -1,0 +1,88 @@
+/* The Gem shop window: the Identity cards, the owned label and the cosmetics preview strip. The Upgrades and Cosmetics tabs reuse the design system's upgrade tiles (`ds-ups-grid`). */
+.gem-balance-row {
+	display: flex;
+	justify-content: flex-end;
+	font-size: 14px;
+	color: #a89878;
+	padding: 0 4px 10px;
+}
+
+.gem-id-grid {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+	padding: 4px;
+}
+
+.gem-card {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 14px 16px;
+	min-width: 0;
+	background: linear-gradient(rgba(10, 12, 18, 0.78), rgba(10, 12, 18, 0.9));
+	border: 1px solid var(--ds-gold-dk);
+}
+
+.gem-card[data-owned='true'] {
+	border-color: var(--ds-r-epic);
+}
+
+.gem-card-name {
+	font-weight: 600;
+	font-size: 15px;
+	color: #f1e6c8;
+}
+
+.gem-card-blurb {
+	flex: 1;
+	font-size: 12px;
+	line-height: 1.4;
+	color: #a89878;
+}
+
+.gem-card-foot {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.gem-card-price {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	color: #ffe27a;
+	font-variant-numeric: tabular-nums;
+}
+
+.gem-card-owned {
+	color: var(--ds-r-epic);
+	font-weight: 600;
+}
+
+.gem-card-name-row {
+	display: flex;
+	gap: 8px;
+}
+
+.gem-card-name-row .ds-amount-field {
+	flex: 1;
+	width: auto;
+	min-width: 0;
+}
+
+.gem-preview-hint {
+	text-align: center;
+	font-size: 12px;
+	color: #a89878;
+	padding: 2px 0 10px;
+}
+
+.gem-preview-tile {
+	cursor: pointer;
+}
+
+.gem-preview-tile[data-on='true'] .ds-upgrade {
+	outline: 1px solid var(--ds-gold);
+}

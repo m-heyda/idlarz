@@ -14,16 +14,16 @@ import type { PrestigeState } from '../../src/types/game';
 
 const prestige = (deeppockets: number): PrestigeState => ({ rebirths: 1, legacyPoints: 0, legacyEarned: 0, upgrades: { deeppockets } });
 
-test('bag size: base 60, old Pack Rat +8 x 6, new Pack Rat +4 x 6, Deep Pockets +8 x 5, all through limitOf with a ceiling', () => {
+test('bag size: base 60, old Pack Rat +8 x 6, new Pack Rat +4 x 10, Deep Pockets +8 x 5, all through limitOf with a ceiling', () => {
 	assert.equal(LIMITS.bagSize, 60);
 	assert.equal(MERCHANT_UPGRADES.packrat.maxLevel, 6);
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 } }), 108);
-	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat2: 6 } }), 84);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat2: 10 } }), 100);
 	assert.equal(limitOf('bagSize', { prestige: prestige(3) }), 84);
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 }, prestige: prestige(3) }), 132);
-	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6, packrat2: 6 }, prestige: prestige(5) }), 60 + 48 + 24 + 40);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6, packrat2: 6 }, prestige: prestige(5) }), 60 + 48 + 40 + 40);
 	assert.equal(limitOf('bagSize', { hardCap: true }), HARD_LIMITS.bagSize);
-	assert.ok(172 < HARD_LIMITS.bagSize, 'room is left for the belt slots');
+	assert.ok(188 < HARD_LIMITS.bagSize, 'room is left for the belt slots');
 });
 
 test('an old 36-slot bag is padded to the new base, not cut; a forged bag above the ceiling is refused', () => {

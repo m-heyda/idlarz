@@ -9,7 +9,7 @@ import { resourceKeys, fromResources } from './resources';
 // Resource pricing constants (gold per unit)
 /**
  * The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}).
- * Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); farm products are never sold to the player.
+ * Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.
  *
  * @category Economy/Merchant
  * @order 1
@@ -81,7 +81,7 @@ export const MERCHANT_UPGRADES = {
 		label: 'Pack Rat',
 		group: 'economy',
 		description: (n: number) => `+${n * 4} bag slots`,
-		maxLevel: 6,
+		maxLevel: 10,
 		effectPerLevel: 4, // bag slots (the Deep Pockets Ember upgrade gives +8 per level)
 		baseCost: 500000,
 		costGrowth: 3,
@@ -209,7 +209,7 @@ export const MERCHANT_GOODS = {
 	// any refresh, free or paid, needs `cooldownSec` since the last one.
 	refreshBase: LIMITS.merchantRefreshBase, // limitOf('merchantRefreshBase', ctx)
 	refresh: { growth: 2, cap: 1_000_000_000, freePerWindow: 3, windowSec: 43_200, cooldownSec: 30 },
-	// What the shelf may hold: never above uncommon (the rarer pieces stay a reward for fights and chests), and never more than
+	// What the shelf may hold: never above rare, and rare only now and then (the weights are in lootConfig `merchant_stock`; epic and better stay a reward for fights and chests), and never more than
 	// `maxAboveAverage` item levels above the average level of the gear the player wears. The shelf is built around the world (castle)
 	// level, held down to `centreAboveAverage` above that average.
 	maxAboveAverage: 5,

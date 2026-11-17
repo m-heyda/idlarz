@@ -242,12 +242,13 @@ test('an Extractor upgrade finishes while away: the old rate until the timer end
 	});
 });
 
-test('the ledger totals and the saved resources know the T3 keys; the merchant has no price for them', async () => {
+test('the ledger totals and the saved resources know the T3 keys; the merchant buys them (sell only)', async () => {
 	const { zeroTotals } = await import('../../src/lib/offline/ledger');
-	const { MERCHANT_RESOURCE_PRICES } = await import('../../src/config/merchant');
+	const { MERCHANT_BUYABLE, MERCHANT_RESOURCE_PRICES } = await import('../../src/config/merchant');
 	for (const key of ['herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt']) {
 		assert.equal(zeroTotals()[key as 'sap'], 0, `${key} is in the ledger totals`);
-		assert.equal(key in MERCHANT_RESOURCE_PRICES, false, `${key} is not sold`);
+		assert.equal(key in MERCHANT_RESOURCE_PRICES, true, `${key} sells to the merchant`);
+		assert.equal((MERCHANT_BUYABLE as readonly string[]).includes(key), false, `${key} cannot be bought back`);
 	}
 });
 

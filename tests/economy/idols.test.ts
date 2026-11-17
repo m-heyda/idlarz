@@ -501,7 +501,22 @@ test('through the save pipeline: the ledger remembers a built Idol, refuses a fo
 	const { ledgers, ledgerRepo } = memoryLedgers();
 	const T = 1_800_000_000_000;
 	const [a] = gameWith('forest', 1, 2, 6);
-	setResources({ gold: 150_000, wood: 20_000, stone: 20_000, coal: 12_000, food: 6_000, hide: 0 });
+	// the extracts count as sellable stock now (the merchant buys them), so the save pipeline's spending check would see a seeded 1e9 of each: levels 1 and 2 of an Idol need none
+	setResources({
+		gold: 150_000,
+		wood: 20_000,
+		stone: 20_000,
+		coal: 12_000,
+		food: 6_000,
+		hide: 0,
+		herbs: 0,
+		sap: 0,
+		ironOre: 0,
+		spores: 0,
+		frostshard: 0,
+		pearls: 0,
+		salt: 0,
+	});
 	store.setState({ playSeconds: 100_000 } as never);
 	// 1: a game with nothing
 	await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, ledgerRepo);

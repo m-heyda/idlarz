@@ -384,13 +384,13 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		bonusTables: [],
 		enabled: true,
 	},
-	// The merchant's shelf: plain pieces of gear (common and uncommon only; the rest stays a reward for fights and chests) at the world
+	// The merchant's shelf: plain pieces of gear (common and uncommon, and now and then a blue rare one, 4 in 104; epic and better stay a reward for fights and chests) at the world
 	// level, held to what the player wears (lib/merchant.ts, MERCHANT_GOODS)
 	merchant_stock: {
 		id: 'merchant_stock',
 		rolls: { min: 12, max: 12, guaranteed: 12, chancePerRoll: 1 }, // the most a shelf may ever hold (HARD_LIMITS); lib/merchant keeps the first `merchantOffers`
 		itemLevel: { offset: 0, variance: 2, min: 1, max: 100 },
-		rarityWeights: { common: 60, uncommon: 40 },
+		rarityWeights: { common: 60, uncommon: 40, rare: 4 },
 		generalPoolId: 'general_equipment',
 		bonusTables: [],
 		enabled: true,

@@ -797,7 +797,7 @@ the others have 10 levels and growth 1.6.</p>
 <h3><code>MERCHANT_RESOURCE_PRICES</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:18</code></a></p>
 <p>The merchant buys resources at these gold prices per unit. Payout is <code>floor(units x price x (1 + 0.03 x Haggler))</code> (<a href="#sellpayout"><code>sellPayout</code></a>).
-Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up (<a href="#merchant-buy-multiplier"><code>MERCHANT_BUY_MULTIPLIER</code></a>, <a href="#buycost"><code>buyCost</code></a>); farm products are never sold to the player.</p>
+Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up (<a href="#merchant-buy-multiplier"><code>MERCHANT_BUY_MULTIPLIER</code></a>, <a href="#buycost"><code>buyCost</code></a>); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.</p>
 <p><strong>Merchant prices (gold per unit)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -845,6 +845,41 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 <tr>
 <td>hide</td>
 <td>2</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>herbs</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>sap</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>ironOre</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>spores</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>frostshard</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>pearls</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>salt</td>
+<td>5</td>
 <td>not sold</td>
 </tr>
 <tr>
@@ -916,7 +951,7 @@ The count is never reset, not even by a rebirth.</li>
 <td>packrat2 (Pack Rat)</td>
 <td>Economy</td>
 <td>+4 bag slots</td>
-<td>6</td>
+<td>10</td>
 <td>500 K</td>
 <td>3</td>
 </tr>
@@ -3780,7 +3815,7 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>merchant_stock</td>
 <td>12 x 100%, 12 guaranteed from general_equipment</td>
 <td>source level +0 +-2</td>
-<td>common 60, uncommon 40</td>
+<td>common 60, uncommon 40, rare 4</td>
 <td>-</td>
 </tr>
 </tbody></table>

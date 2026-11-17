@@ -943,7 +943,7 @@
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
   "line": 18,
-  "summary": "The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}). Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); farm products are never sold to the player.",
+  "summary": "The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}). Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.",
   "see": []
  },
  {

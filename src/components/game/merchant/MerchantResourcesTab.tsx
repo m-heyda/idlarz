@@ -4,13 +4,14 @@ import { AmountInput } from '../../../../packages/design-system/src/components/c
 import { clampAmount, compact } from '../../../../packages/design-system/src/logic';
 import { MERCHANT_BUYABLE, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_INFO, MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
+import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { useGameStore } from '@/stores/gameStore';
 import { MERCHANT_CUSTOM_MAX, useUiStore } from '@/stores/uiStore';
 import { formatNumber, formatRate, parseAmount, tidy } from '@/utils/formatters';
 import { buyCost, sellMultiplier, sellPayout } from '@/utils/game/merchant';
 
 type ResourceKey = keyof typeof MERCHANT_RESOURCE_PRICES;
-const RESOURCES = Object.keys(MERCHANT_RESOURCE_PRICES) as ResourceKey[];
+const ALL_RESOURCES = Object.keys(MERCHANT_RESOURCE_PRICES) as ResourceKey[];
 const isBuyable = (resource: ResourceKey) => (MERCHANT_BUYABLE as readonly string[]).includes(resource);
 const GREEN = '#17561f';
 const BLUE = '#1a3f92';
@@ -45,7 +46,9 @@ const MerchantResourcesTab: React.FC = () => {
 	const setCustom = useUiStore((state) => state.setMerchantCustom);
 	const picked = useUiStore((state) => state.merchantSelect);
 	const clearPicked = useUiStore((state) => state.clearMerchantSelect);
-	const [local, setLocal] = useState<ResourceKey>(RESOURCES[0]);
+	// a biome extract is listed once the player holds or makes some (like the top bar); the rest always
+	const RESOURCES = ALL_RESOURCES.filter((key) => resourceDiscovered(key, resources[key], resourceRates.total[key as keyof typeof resourceRates.total]));
+	const [local, setLocal] = useState<ResourceKey>(ALL_RESOURCES[0]);
 	const [mode, setMode] = useState<'sell' | 'buy'>('sell');
 	const tableRef = useRef<HTMLDivElement>(null);
 

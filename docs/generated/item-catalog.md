@@ -290,11 +290,11 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `xp` | XP |  | The castle, buying tiles and your stats. |
 | `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |
 | `embers` | Embers |  | Rebirthing from castle level 6: the higher your castle and land, the more you get. |
-| `herbs` | Herbs |  | The Herb Garden on a plains tile. Cannot be bought or sold. |
-| `sap` | Sap |  | The Sap Tapper on a forest tile. Cannot be bought or sold. |
-| `ironOre` | Iron Ore |  | The Deep Mine on a hills tile. Cannot be bought or sold. |
-| `spores` | Spores |  | The Spore Cellar on a swamp tile. Cannot be bought or sold. |
-| `frostshard` | Frostshard |  | The Ice Cutter on a tundra tile. Cannot be bought or sold. |
-| `pearls` | Pearls |  | The Pearl Diver on a lake tile. Cannot be bought or sold. |
-| `salt` | Salt |  | The Salt Works on a coast tile. Cannot be bought or sold. |
+| `herbs` | Herbs | 5 | The Herb Garden on a plains tile. Sells to the merchant (he does not sell it back). |
+| `sap` | Sap | 5 | The Sap Tapper on a forest tile. Sells to the merchant (he does not sell it back). |
+| `ironOre` | Iron Ore | 5 | The Deep Mine on a hills tile. Sells to the merchant (he does not sell it back). |
+| `spores` | Spores | 5 | The Spore Cellar on a swamp tile. Sells to the merchant (he does not sell it back). |
+| `frostshard` | Frostshard | 5 | The Ice Cutter on a tundra tile. Sells to the merchant (he does not sell it back). |
+| `pearls` | Pearls | 5 | The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back). |
+| `salt` | Salt | 5 | The Salt Works on a coast tile. Sells to the merchant (he does not sell it back). |
 | `wool` | Wool | 2 | Sheep on the farm. Cannot be bought. |
