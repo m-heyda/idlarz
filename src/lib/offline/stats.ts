@@ -67,6 +67,8 @@ export interface LifetimeStats {
 export interface TradeSince {
 	sold: Record<string, number>;
 	boughtGold: number;
+	/** Server time (s) the record started holding something: a record that no save has accounted for within `TRADE_RECORD_MAX_AGE_SEC` is dropped (`settleTrades`). Additive: absent reads as "start at the next settle". */
+	since?: number;
 }
 
 export const emptyTrade = (): TradeSince => ({ sold: {}, boughtGold: 0 });
@@ -117,7 +119,8 @@ const counts = (value: unknown): Record<string, number> => {
 const tradeOf = (value: unknown): TradeSince => {
 	if (!value || typeof value !== 'object' || Array.isArray(value)) return emptyTrade();
 	const t = value as Record<string, unknown>;
-	return { sold: counts(t.sold), boughtGold: num(t.boughtGold) };
+	const since = num(t.since);
+	return { sold: counts(t.sold), boughtGold: num(t.boughtGold), ...(since > 0 ? { since } : {}) };
 };
 
 const ids = (value: unknown): string[] =>
