@@ -41,6 +41,23 @@ export const Inset: React.FC<{ className?: string; style?: React.CSSProperties; 
 /** Small gold section heading ("ECONOMY", "AMOUNT"). */
 export const SectionLabel: React.FC<{ children: React.ReactNode }> = ({ children }) => <h4 className='ds-section-label'>{children}</h4>;
 
+export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'type' | 'onChange' | 'size'> {
+	checked: boolean;
+	onChange: (checked: boolean) => void;
+	/** The text beside the box (clicking it toggles too) */
+	label?: React.ReactNode;
+}
+/** A custom checkbox: a dark square plate that fills gold with a tick when on. It is a real `<input type='checkbox'>` inside a label, so the keyboard, focus ring and screen readers work as usual. */
+export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange, label, disabled, className, ...rest }) => (
+	<label className={cx('ds-check', className)} data-disabled={disabled ? 'true' : undefined}>
+		<input {...rest} type='checkbox' className='ds-check-input' checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
+		<span className='ds-check-box' aria-hidden='true'>
+			✓
+		</span>
+		{label ? <span className='ds-check-label'>{label}</span> : null}
+	</label>
+);
+
 /** Gold rule between groups; `flourish` adds the scrolled centre. */
 export const Divider: React.FC<{ flourish?: boolean }> = ({ flourish }) => <div className={cx('ds-divider', flourish && 'ds-divider-flourish')} />;
 

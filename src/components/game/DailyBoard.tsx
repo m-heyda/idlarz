@@ -33,16 +33,28 @@ const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClai
 				const last = day === DAILY_BONUS_GEMS.length;
 				return (
 					<li key={day} className='dd-day' data-state={done ? 'done' : today ? 'today' : 'later'} data-last={last}>
-						<span className='dd-day-name'>{last ? 'Day 7 bonus' : `Day ${day}`}</span>
-						{last ? (
-							// eslint-disable-next-line @next/next/no-img-element
-							<img className='dd-day-chest' src='/pixel/icons/bonus_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
-						) : null}
-						<span className='dd-day-gems'>
-							+{gemsPaid} <GemIcon />
-						</span>
+						<div className='dd-day-top'>
+							<span className='dd-day-name'>{last ? 'Day 7 bonus' : `Day ${day}`}</span>
+							{done ? (
+								<span className='dd-day-check' aria-label='Claimed'>
+									✓
+								</span>
+							) : null}
+						</div>
+						<div className='dd-day-body'>
+							{last ? (
+								// eslint-disable-next-line @next/next/no-img-element
+								<img className='dd-day-chest' src='/pixel/icons/bonus_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
+							) : null}
+							<div className='dd-day-prize'>
+								<span className='dd-day-gems'>
+									+{gemsPaid} <GemIcon />
+								</span>
+								{last ? <span className='dd-day-extra'>+ chest of materials</span> : null}
+							</div>
+						</div>
 						{today ? (
-							<Button tone='gold' size='sm' disabled={busy} onClick={onClaim}>
+							<Button tone='gold' size='sm' disabled={busy} onClick={onClaim} style={{ width: '100%' }}>
 								Claim
 							</Button>
 						) : (
