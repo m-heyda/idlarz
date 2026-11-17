@@ -601,7 +601,7 @@ plains and never more than <code>maxOfOther</code> of any other biome. Retries w
 <td>+1920%</td>
 <td>9x9</td>
 <td>+400%</td>
-<td>-</td>
+<td>4.5 d</td>
 <td>gold 197 M, wood 19.5 M, stone 19.5 M, coal 10.5 M, food 105 M, meat 5.1 M</td>
 </tr>
 </tbody></table>
@@ -4403,7 +4403,7 @@ The save is valid only if <code>unspent + spent = earned</code> and <code>rebirt
 <li><strong>Build time</strong>: Master Builders (castle), Mason&#39;s Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.</li>
 <li><strong>One-time purchases</strong> (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).</li>
 <li><strong>Start of a run</strong>: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).</li>
-<li><strong>Disabled</strong> (<code>EMBER_DISABLED</code>): Quest Rarity and Quest Slots wait for the quest system; they show greyed and cannot be bought.
+<li><strong>Disabled</strong> (<code>EMBER_DISABLED</code>): Quest Rarity and Quest Slots wait for the quest system, Extra Builder for the second builder; they show greyed and cannot be bought.
 Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.</li>
 </ul>
 <p><strong>The Ember shop</strong> <em>(computed from the code)</em></p>
@@ -6589,7 +6589,7 @@ revision it left, instead of sending the one it read before. Without Web Locks t
 still happens is resolved by <code>resolveConflict</code>. The lock dies with the page, so a closing tab never holds it up.</p>
 </article><h2>Accepting a save</h2><article><p><a id="acceptsave"></a></p>
 <h3><code>acceptSave</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:208</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:210</code></a></p>
 <p>Accepts a save from a client that says it was based on revision <code>baseRev</code> (0 = this account has no save yet).</p>
 <ul>
 <li>the text must decode (checksum, schema, <code>sanitizeSave</code>), otherwise <code>invalid</code></li>
@@ -6765,7 +6765,7 @@ best rebirth the game can pay.</li>
 <code>requireServerRebirth</code> is off; it is turned on together with <code>ENFORCEMENT.enabled</code>, after the new chapter flip (checklist: &quot;Turning enforcement and the server-run rebirth on together&quot;, Ops/Operator guides).</p>
 </article><article><p><a id="min-save-interval-ms"></a></p>
 <h3><code>MIN_SAVE_INTERVAL_MS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:89</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:91</code></a></p>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
@@ -6796,7 +6796,7 @@ Everything else is cut back to the trusted level, so an edited save cannot grant
 <p>Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.</p>
 </article><article><p><a id="losesprogress"></a></p>
 <h3><code>losesProgress</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:81</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/pipeline.ts"><code>src/lib/cloudSave/pipeline.ts:83</code></a></p>
 <p>True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game&#39;s (<code>PINNED_KEEP</code>).</p>
 </article><article><p><a id="enforcement"></a></p>
@@ -7097,7 +7097,7 @@ never ran; <code>archiveForNewGame</code> still finds it under the old names and
 the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused with 412 <code>staleEpoch</code>, after which the page reloads into this guard. See <code>docs/plan/reset-proof-browsers.md</code>.</p>
 </article><h2>Migrations</h2><article><p><a id="refundoldshop"></a></p>
 <h3><code>refundOldShop</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/emberShopMigration.ts"><code>src/lib/emberShopMigration.ts:16</code></a></p>
+<p>Source: <a href="../../src/lib/emberShopMigration.ts"><code>src/lib/emberShopMigration.ts:37</code></a></p>
 <p>The Ember shop was reworked (new ids, costs and effects). An account from before it has no <code>shopVersion</code>: its spent shop levels were bought under other numbers, so they are refunded once.</p>
 <ul>
 <li>every shop level is cleared and every Ember ever earned is unspent again (<code>legacyPoints = legacyEarned</code>), so the player spends them in the new shop; <code>legacyEarned</code> and <code>rebirths</code> stay, so the income bonus does not change;</li>

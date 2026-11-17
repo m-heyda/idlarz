@@ -66,7 +66,7 @@ export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?:
 				<li>Kept when you rebirth: its level stays, rebuild it free on any {idol.biome} tile.</li>
 				<li>
 					Upgrade up to level {max} as your castle grows; each level takes the shared builder (
-					{[1, 2, 3, 4].map((l) => formatTime(buildingUpgradeDuration(l, prestige, buildTimePct))).join(', ')}).
+					{[1, 2, 3, 4].map((l) => formatTime(buildingUpgradeDuration(l, prestige, buildTimePct, 'idol'))).join(', ')}).
 				</li>
 				<li>The Ember shop&apos;s Idol Mastery raises the cap (coming soon).</li>
 			</ul>

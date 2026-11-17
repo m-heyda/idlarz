@@ -103,6 +103,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		if (!def || EMBER_DISABLED.has(id)) return false; // the quest upgrades cannot be bought until quests exist
 		const level = state.prestige.upgrades[id] ?? 0;
 		if (level >= def.maxLevel) return false;
+		if (def.maxLevel === 1 && state.prestige.grants?.includes(id)) return false; // a one-time upgrade granted for free is already owned
 		const cost = emberUpgradeCost(id, level);
 		if (state.prestige.legacyPoints < cost) return false;
 		// Deep Pockets: the new slots are in the bag at once (the server pads its bag the same way from the save's level)

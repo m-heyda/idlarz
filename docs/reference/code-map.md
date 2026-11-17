@@ -476,7 +476,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
-- [`emberShopMigration.ts`](../../src/lib/emberShopMigration.ts) — ~ The Ember shop was reworked (new ids, costs and effects).
+- [`emberShopMigration.ts`](../../src/lib/emberShopMigration.ts) — ~ The shop generation and the free grants are the server's, never the upload's:
 - [`epochFetch.ts`](../../src/lib/epochFetch.ts) — ~ `fetch` for the game's own /api routes:
 - [`epochGuard.ts`](../../src/lib/epochGuard.ts) — ~ The browser's half of the data epoch.
 - [`fightSim.ts`](../../src/lib/fightSim.ts) — ~ A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend).

@@ -309,7 +309,8 @@ const RebirthDialog: React.FC = () => {
 							<div className='ds-ups-grid'>
 								{cat.ids.map((id) => {
 									const def = EMBER_UPGRADES[id];
-									const level = prestige.upgrades[id] ?? 0;
+									// a one-time upgrade granted for free (an account from before the reworked shop) shows as owned
+									const level = prestige.upgrades[id] ?? (prestige.grants?.includes(id) ? 1 : 0);
 									const maxed = level >= def.maxLevel;
 									const locked = EMBER_DISABLED.has(id); // quests are not in the game yet
 									const cost = emberUpgradeCost(id, level);

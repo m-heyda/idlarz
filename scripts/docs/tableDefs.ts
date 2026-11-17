@@ -137,7 +137,7 @@ TABLES['castle-levels'] = () => ({
 			const L = i + 1;
 			const r = castleRangeRadius(L);
 			const cost = CASTLE_UPGRADE.upgradeCosts[i];
-			return [L, `+${pct(castleModifier(L))}`, `${2 * r + 1}x${2 * r + 1}`, `+${pct(castleAreaBonus(L))}`, L < CASTLE_UPGRADE.maxLevel ? sec(CASTLE_UPGRADE.durationsSec[i]) : '-', cost ? res(cost) : '-'];
+			return [L, `+${pct(castleModifier(L))}`, `${2 * r + 1}x${2 * r + 1}`, `+${pct(castleAreaBonus(L))}`, CASTLE_UPGRADE.durationsSec[i] !== undefined ? sec(CASTLE_UPGRADE.durationsSec[i]) : '-', cost ? res(cost) : '-'];
 		}),
 	),
 });

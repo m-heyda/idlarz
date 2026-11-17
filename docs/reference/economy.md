@@ -373,7 +373,7 @@ The castle: levels 1-10, up to 15 with the Castle Expansion Ember upgrade (`maxL
 | 7 | +960% | 3x3 | +100% | 2 d | gold 48 M, wood 4.8 M, stone 4.8 M, coal 2.6 M, food 25.6 M, meat 1.28 M |
 | 8 | +1280% | 5x5 | +200% | 2.5 d | gold 76.8 M, wood 7.6 M, stone 7.6 M, coal 4 M, food 41 M, meat 2 M |
 | 9 | +1600% | 7x7 | +300% | 3.5 d | gold 123 M, wood 12.2 M, stone 12.2 M, coal 6.6 M, food 65.6 M, meat 3.2 M |
-| 10 | +1920% | 9x9 | +400% | - | gold 197 M, wood 19.5 M, stone 19.5 M, coal 10.5 M, food 105 M, meat 5.1 M |
+| 10 | +1920% | 9x9 | +400% | 4.5 d | gold 197 M, wood 19.5 M, stone 19.5 M, coal 10.5 M, food 105 M, meat 5.1 M |
 
 See also: [`castleModifier`](economy.md#castlemodifier), [`castleUpgradeDuration`](economy.md#castleupgradeduration)
 

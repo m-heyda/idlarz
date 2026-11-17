@@ -326,7 +326,7 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 	assert.equal(EMBER_UPGRADES.buildcap.maxLevel, 5);
 	assert.equal(EMBER_UPGRADES.idolcap.maxLevel, 10);
 	// the quest upgrades are disabled until quests exist
-	assert.deepEqual([...EMBER_DISABLED].sort(), ['questrarity', 'questslots']);
+	assert.deepEqual([...EMBER_DISABLED].sort(), ['extrabuilder', 'questrarity', 'questslots']); // extrabuilder waits for the second builder
 	assert.equal(REBIRTH.discountCapPercent, 45);
 });
 

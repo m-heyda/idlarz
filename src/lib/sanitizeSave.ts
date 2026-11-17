@@ -585,6 +585,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 
 	// The caps the Ember shop gives (Castle Expansion, Master Masonry, Idol Mastery): a save above the ones it paid for is refused (castle) or has the excess dropped (buildings)
 	if (castleLevel > limitOf('castleMaxLevel', { prestige })) return fail('castle level above the cap');
+	if (castleUpgrade && castleUpgrade.toLevel > limitOf('castleMaxLevel', { prestige })) return fail('castle upgrade above the cap');
 	if (BUILDINGS_FLAG.enabled) {
 		const idolMax = limitOf('idolMaxLevel', { prestige });
 		const buildingMax = limitOf('buildingMaxLevel', { prestige });

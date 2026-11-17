@@ -1393,7 +1393,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 81,
+  "line": 83,
   "summary": "True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).",
   "see": []
  },
@@ -1404,7 +1404,7 @@
   "kind": "const",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 89,
+  "line": 91,
   "summary": "Saves from one player are accepted at most this often (an honest client sends every ~90 s).",
   "see": []
  },
@@ -1415,7 +1415,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 208,
+  "line": 210,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1754,7 +1754,7 @@
   "kind": "function",
   "category": "Saves & Server/Migrations",
   "file": "src/lib/emberShopMigration.ts",
-  "line": 16,
+  "line": 37,
   "summary": "The Ember shop was reworked (new ids, costs and effects). An account from before it has no `shopVersion`: its spent shop levels were bought under other numbers, so they are refunded once.",
   "see": []
  },

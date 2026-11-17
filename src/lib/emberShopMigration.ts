@@ -2,6 +2,27 @@ import { SHOP_VERSION } from '@/config/rebirth';
 import type { PrestigeState } from '@/types/game';
 
 /**
+ * The shop generation and the free grants are the server's, never the upload's: a client could otherwise grant itself Potion Reflex (grants cost nothing).
+ *
+ * - the stored save is already on the new shop: its `shopVersion` and `grants` replace whatever the upload says;
+ * - the stored save is from before the rework (no `shopVersion`): the upload is judged by the migration rule (`refundOldShop`) and kept as it is;
+ * - no stored save (a first save): there is nothing to grant from, so the upload keeps no grants.
+ */
+export const stampShopFromServer = (uploaded: PrestigeState, stored: PrestigeState | undefined): PrestigeState => {
+	const stripped = (prestige: PrestigeState): PrestigeState => {
+		if (!prestige.grants) return prestige;
+		const rest = { ...prestige };
+		delete rest.grants;
+		return rest;
+	};
+	if (!stored) return stripped(uploaded);
+	if ((stored.shopVersion ?? 0) < SHOP_VERSION) return uploaded;
+	const same = uploaded.shopVersion === stored.shopVersion && JSON.stringify(uploaded.grants ?? []) === JSON.stringify(stored.grants ?? []);
+	if (same) return uploaded;
+	return { ...stripped(uploaded), shopVersion: stored.shopVersion, ...(stored.grants?.length ? { grants: stored.grants } : {}) };
+};
+
+/**
  * The Ember shop was reworked (new ids, costs and effects). An account from before it has no `shopVersion`: its spent shop levels were bought under other numbers, so they are refunded once.
  *
  * - every shop level is cleared and every Ember ever earned is unspent again (`legacyPoints = legacyEarned`), so the player spends them in the new shop; `legacyEarned` and `rebirths` stay, so the income bonus does not change;
