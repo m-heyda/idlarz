@@ -11,6 +11,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 - Rendering: [Rendering the map](#rendering-the-map)
 - Notifications: [Short notices (notify)](#notify)
 - Art: [Pixel art pipeline](#pixel-art-pipeline), [Map lab](#map-lab), [The landing world](#the-landing-world), [Asset library](#asset-library), [`NPC_PORTRAITS`](#npc-portraits), [`BIOME_ART`](#biome-art), [`ANIMAL_PIXEL_ICONS`](#animal-pixel-icons), [`animalIcon`](#animalicon)
+- Guest mode: [Guest mode](#guest-mode), [Guest game (/guest)](#guestpage)
 - Routes: [The /play route and its redirects](#the-play-route-and-its-redirects)
 
 ## The loop
@@ -19,7 +20,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 
 ### The tick loop and persistence
 
-Source: [`src/app/GameApp.tsx:121`](../../src/app/GameApp.tsx)
+Source: [`src/app/GameApp.tsx:124`](../../src/app/GameApp.tsx)
 
 The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done.
 Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps
@@ -212,6 +213,27 @@ Pure: no random numbers.
 ```text
 look = ANIMAL_PIXEL_ICONS[kind][hash(seed) mod number of looks], hash(s) = fold h = h*31 + charCode, from h = 7
 ```
+
+## Guest mode
+
+<a id="guest-mode"></a>
+
+### Guest mode
+
+Source: [`src/lib/guest/dispatch.ts:43`](../../src/lib/guest/dispatch.ts)
+
+Guest mode: the game's /api calls answered in the browser by the same engine the server runs (`src/lib/offline/*`: spawns, chests, fights, loot, crafting, the gem shop, rebirth, offline claims), against the guest's own
+ledger in `localStorage` and a "saved game" built from the live game. Nothing leaves the browser, nothing is checked against a database, and nothing is ranked: the loot secret is public and the save is never verified, so a guest may cheat, and
+that is why none of it can ever be sent anywhere. It is installed only on `/guest` (`installGuest`) and loaded only there, so a signed-in player's bundle does not contain it.
+
+<a id="guestpage"></a>
+
+### Guest game (/guest)
+
+Source: [`src/app/guest/page.tsx:35`](../../src/app/guest/page.tsx)
+
+`/guest`: the game without an account. A new guest picks a hero (the same creator as sign-up, no email or password), then plays the real game against the guest engine, in this browser only (see `src/lib/guest`). This page is always reached by a full
+page load (a plain link from the landing), so every storage key is the guest's (`storageScope`) from the first line of code. A guest who comes back finds their game where they left it.
 
 ## Routes
 

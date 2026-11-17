@@ -1,5 +1,6 @@
 import { BASELINE_EPOCH, EPOCH_HEADER } from '@/config/epoch';
 import { readSeenEpoch } from '@/lib/seenEpoch';
+import { guestFetch, isGuestSession } from '@/lib/guestMode';
 
 /**
  * `fetch` for the game's own /api routes: it adds the `x-game-epoch` header with the data epoch this browser last saw (`readSeenEpoch`, the baseline when it never recorded one),
@@ -20,6 +21,8 @@ const reloadOnce = (): void => {
 };
 
 export const epochFetch = async (input: RequestInfo | URL, init: RequestInit = {}): Promise<Response> => {
+	// the guest game never talks to the server: the guest engine answers (see guestMode.ts)
+	if (isGuestSession()) return guestFetch(input, init);
 	const headers = new Headers(init.headers);
 	headers.set(EPOCH_HEADER, String(readSeenEpoch() ?? BASELINE_EPOCH));
 	const response = await fetch(input, { ...init, headers });

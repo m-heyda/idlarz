@@ -7,6 +7,7 @@ import { pixelIconSrc } from '@/config/pixelIcons';
 import { notify } from '@/lib/notices';
 import { RANKING_BOARDS, type RankingBoardId, type RankingRow } from '@/lib/rankings';
 import { useRankings } from '@/lib/rankingsQuery';
+import { isGuestSession } from '@/lib/guestMode';
 import AvatarArt from './AvatarArt';
 import GameWindow from './GameWindow';
 
@@ -82,7 +83,11 @@ const SkeletonRows: React.FC = () => (
 	</ul>
 );
 
-const Board: React.FC<{ board: RankingBoardId }> = ({ board }) => {
+/** A guest is never ranked and never asks the server: the board says so instead of loading. */
+const Board: React.FC<{ board: RankingBoardId }> = ({ board }) =>
+	isGuestSession() ? <p className='ds-dim ds-rank-empty'>Guests are not ranked. Register to join the rankings.</p> : <LiveBoard board={board} />;
+
+const LiveBoard: React.FC<{ board: RankingBoardId }> = ({ board }) => {
 	const { data, isError, isPending } = useRankings(board);
 	useEffect(() => {
 		if (isError) notify('The rankings could not be loaded. Try again in a moment.', 'error');

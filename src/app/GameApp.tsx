@@ -86,12 +86,15 @@ import OfflineDialog from '@/components/game/overlays/OfflineDialog';
 import DailyBonusDialog from '@/components/game/overlays/DailyBonusDialog';
 import TutorialGuide from '@/components/game/tutorial/TutorialGuide';
 import { usePetStore } from '@/stores/petStore';
+import GuestChip from '@/components/game/GuestChip';
 
 interface GameAppProps {
 	/** The account's name and hero, given to a brand-new game only (never to one that has been played). */
 	profile: Profile;
 	/** The signed-in account whose cloud save follows this game (the game is played with an account only). */
 	userId: string;
+	/** The guest game (`/guest`): no account behind it, nothing is uploaded, the guest engine answers the game's calls in the browser (see `src/lib/guest`). */
+	guest?: boolean;
 }
 
 /**
@@ -118,7 +121,7 @@ interface GameAppProps {
  * @order 1
  * @see computeOfflineGrant, SAVE_SCHEMA
  */
-export default function GameApp({ profile, userId }: GameAppProps) {
+export default function GameApp({ profile, userId, guest = false }: GameAppProps) {
 	const tick = useGameStore((state) => state.tick);
 	const isHydrated = useGameStore((state) => state.isHydrated);
 	const { status: tabStatus, takeOver } = useSingleTab();
@@ -151,12 +154,15 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 	const dismissChestNotice = useUiStore((state) => state.dismissChestNotice);
 	const achievementNotices = useUiStore((state) => state.achievementNotices);
 	const dismissAchievementNotice = useUiStore((state) => state.dismissAchievementNotice);
+	// the guide comes after the welcome-back and daily bonus windows, never on top of them
+	const dailySettled = useUiStore((state) => state.dailySettled);
 	// Monotonic clock: changing the system clock must not change game speed
 	const lastTickTime = useRef(performance.now());
 
 	// What the absence was worth is claimed before the game starts running and before the first upload (the claim changes the game)
 	const claim = useOfflineClaim(userId, isHydrated && tabStatus === 'owner');
-	useCloudSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
+	// a guest has no cloud save: the game stays in this browser
+	useCloudSync(userId, !guest && isHydrated && tabStatus === 'owner' && claim === 'done');
 	// ... and from then on the server says when a chest or a monster appears (and what is in it), and runs the fights
 	useSpawnSync(userId, isHydrated && tabStatus === 'owner' && claim === 'done');
 	const applyProfileToFreshGame = useGameStore((state) => state.applyProfileToFreshGame);
@@ -211,10 +217,11 @@ export default function GameApp({ profile, userId }: GameAppProps) {
 			<OfflineDialog />
 			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
+			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done' && dailySettled} />
 			<ConfirmDialogs />
 			<BuildModal />
 			<BuildingModal />
+			{guest && <GuestChip />}
 			<BottomRightStack />
 			<BuildTimers />
 			<CastleCompass />

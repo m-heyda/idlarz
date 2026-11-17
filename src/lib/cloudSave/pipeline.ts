@@ -1,7 +1,7 @@
 /**
  * What the browser keeps, what the server keeps, and what the server decides.
  *
- * **The rule of the game.** The game needs an account (there is no guest mode). The browser holds the game state and runs the economy (income, purchases, the map, the farm, the merchant's prices, stat allocation, rebirth bookkeeping).
+ * **The rule of the game.** The game needs an account; the only exception is the guest game (`/guest`), which runs this same engine in the browser against local stand-ins for the database and never talks to the server (`src/lib/guest`). The browser holds the game state and runs the economy (income, purchases, the map, the farm, the merchant's prices, stat allocation, rebirth bookkeeping).
  * The server owns what is worth cheating for: when chests and monsters appear and where they stand, every kill and chest reward, every fight, the gem balance, the bag and worn gear, away-time pay, the XP ceiling and the Ember bound.
  * The server judges the browser's save by plausibility, not by replaying actions.
  *
@@ -42,7 +42,7 @@
  * @see acceptSave, FLAG_POLICY, ENFORCEMENT
  */
 import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
-import { createHash } from 'node:crypto';
+import { sha256Hex } from '@/lib/sha256';
 import { STARTING_GEMS } from '@/config/economy';
 import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
 import { settleTrades } from '@/lib/offline/trade';
@@ -168,10 +168,7 @@ export type SaveOutcome =
 	| { kind: 'invalid'; reason: string }
 	| { kind: 'too_soon'; retryAfterMs: number };
 
-const hashWorld = (land: unknown, extra: unknown): string =>
-	createHash('sha256')
-		.update(JSON.stringify([land, extra]))
-		.digest('hex');
+const hashWorld = (land: unknown, extra: unknown): string => sha256Hex(JSON.stringify([land, extra]));
 
 /** Splits a canonical save body into the small part and the map. */
 export const splitBody = (body: SaveBody, tiles: number): { core: SaveBody; world: WorldPart } => {

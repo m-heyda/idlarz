@@ -143,6 +143,9 @@ interface UiState {
 	closeSaveMenu: () => void;
 	/** The welcome-back window after an absence (what the server paid); null when there is none to show */
 	offlineReport: OfflineReport | null;
+	/** True once the start-of-game windows are done: the welcome-back window closed and the daily bonus window answered (claimed, left, hidden for today or nothing to claim). The tutorial guide waits for it, so it never opens on top of them. */
+	dailySettled: boolean;
+	setDailySettled: (settled: boolean) => void;
 	showOfflineReport: (report: OfflineReport) => void;
 	closeOfflineReport: () => void;
 	/** The one right-click / dropdown menu: opened at a screen position with its entries already worked out */
@@ -235,6 +238,8 @@ export const useUiStore = create<UiState>((set, get) => ({
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),
 	offlineReport: null,
+	dailySettled: false,
+	setDailySettled: (settled) => set({ dailySettled: settled }),
 	showOfflineReport: (report) => set({ offlineReport: report }),
 	closeOfflineReport: () => set({ offlineReport: null }),
 	contextMenu: null,

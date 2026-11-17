@@ -127,6 +127,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/auth/callback/route.ts) — ~ `GET /auth/callback?code=...&next=/reset`:
 
+**src/app/guest/**
+
+- [`page.tsx`](../../src/app/guest/page.tsx) — ~ The guest engine answers the game's /api calls in the browser (`src/lib/guest`); it is installed before the game mounts, so no call ever finds it missing.
+
 **src/app/**
 
 - [`layout.tsx`](../../src/app/layout.tsx)
@@ -249,6 +253,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`GameWindow.tsx`](../../src/components/game/GameWindow.tsx) — ~ Below this screen width windows are laid out one at a time (no room to drag them side by side)
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
+- [`GuestChip.tsx`](../../src/components/game/GuestChip.tsx) — ~ Where "Register" goes:
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
@@ -477,6 +482,16 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
+
+**src/lib/guest/**
+
+- [`dispatch.ts`](../../src/lib/guest/dispatch.ts) — ~ Guest mode:
+- [`index.ts`](../../src/lib/guest/index.ts) — ~ Starts the guest engine:
+- [`localRepos.ts`](../../src/lib/guest/localRepos.ts) — ~ The guest's id:
+
+**src/lib/**
+
+- [`guestMode.ts`](../../src/lib/guestMode.ts) — ~ What the guest engine answers:
 - [`idempotencyKey.ts`](../../src/lib/idempotencyKey.ts) — An idempotency key:
 - [`idolEconomy.ts`](../../src/lib/idolEconomy.ts) — ~ What the standing Idols add to the economy:
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
@@ -593,6 +608,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`seenEpoch.ts`](../../src/lib/seenEpoch.ts) — ~ The epoch this browser last saw, or null when it never recorded one (a browser from before the guard, or a new one).
 - [`serverRebirth.ts`](../../src/lib/serverRebirth.ts) — ~ The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`).
 - [`serverSession.ts`](../../src/lib/serverSession.ts) — A one-function bridge so the game store can say "the server wants an absence claimed first" without importing the code that claims
+- [`sha256.ts`](../../src/lib/sha256.ts) — SHA-256 and HMAC-SHA-256 in plain TypeScript, so the game engine in `src/lib/offline` has no `node:crypto` import and can also run in the browser (guest mode, `src/lib/guest`).
 - [`skills.ts`](../../src/lib/skills.ts) — ~ HP a Heal restores:
 - [`spawnLimits.ts`](../../src/lib/spawnLimits.ts) — ~ Tiles the ward keeps clear (the range area around the castle, without the castle itself:
 - [`startPlan.ts`](../../src/lib/startPlan.ts) — ~ Headline numbers of the account's cloud save (what GET /api/save sends next to the text).
@@ -953,6 +969,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`deedsBatch2.test.ts`](../../tests/server/deedsBatch2.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
+- [`guestMode.test.ts`](../../tests/server/guestMode.test.ts)
 - [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
@@ -968,6 +985,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,
 - [`serverTrust.test.ts`](../../tests/server/serverTrust.test.ts) — Server trust: enforcement (IDL-112), the trusted economy (IDL-167) and paid merchant levels (IDL-168).
+- [`sha256.test.ts`](../../tests/server/sha256.test.ts)
 - [`ticketBankUpgrade.test.ts`](../../tests/server/ticketBankUpgrade.test.ts)
 - [`tutorial.test.ts`](../../tests/server/tutorial.test.ts) — ~ A save of a player who has bought `tiles` tiles (the count the proof reads), then the first request seeds the ledger.
 

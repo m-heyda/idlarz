@@ -1,7 +1,7 @@
-import { createHmac } from 'node:crypto';
+import { hmacSha256, utf8 } from '@/lib/sha256';
 import type { Rng } from '@/lib/rng';
 
-// SERVER ONLY (node:crypto). A reward is a pure function of a secret only the server has and of where the reward sits in the
+// SERVER ONLY (the loot secret never goes to a signed-in player's browser; guest mode, `src/lib/guest`, seals with a public one on purpose). A reward is a pure function of a secret only the server has and of where the reward sits in the
 // player's history, so the browser cannot compute it ahead of time and reloading the page cannot roll it again.
 
 /**
@@ -19,8 +19,12 @@ export const sealedRng = (secret: string, userId: string, runId: number, kind: s
 	if (!secret) throw new Error('the loot secret is not configured');
 	const key = `${userId}|${runId}|${kind}|${ordinal}`;
 	let draw = 0;
+	const secretBytes = utf8(secret);
 	return () => {
-		const digest = createHmac('sha256', secret).update(`${key}|${draw++}`).digest();
-		return digest.readUIntBE(0, 6) / 2 ** 48;
+		const digest = hmacSha256(secretBytes, utf8(`${key}|${draw++}`));
+		// the first six bytes as a big-endian integer
+		let head = 0;
+		for (let i = 0; i < 6; i++) head = head * 256 + digest[i];
+		return head / 2 ** 48;
 	};
 };
