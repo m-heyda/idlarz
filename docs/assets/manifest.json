@@ -21078,6 +21078,21 @@
 		"usedBy": [
 			"code"
 		],
+		"name": "ui_daily_chest",
+		"category": "ui",
+		"subcategory": "frames and bars",
+		"src": "/pixel/ui/daily_chest.png",
+		"status": "used",
+		"source": "public/pixel/ui",
+		"size": [
+			62,
+			51
+		]
+	},
+	{
+		"usedBy": [
+			"code"
+		],
 		"name": "ui_frame_modal",
 		"category": "ui",
 		"subcategory": "frames and bars",
