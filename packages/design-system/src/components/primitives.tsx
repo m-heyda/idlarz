@@ -172,6 +172,8 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	large?: boolean;
 	/** Marks the slot as the selected one (recipe picker) */
 	active?: boolean;
+	/** A small level tag in the bottom left corner (the crafting level a recipe needs) */
+	levelBadge?: number | string;
 	/** Text inside an icon-less slot (a skill name) */
 	label?: string;
 	sub?: string;
@@ -181,7 +183,23 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
  * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
  * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
  */
-export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, equipped, junk, large, active, label, sub, className, style, ...rest }) => {
+export const Slot: React.FC<SlotProps> = ({
+	icon,
+	rarity,
+	count,
+	empty,
+	locked,
+	equipped,
+	junk,
+	large,
+	active,
+	levelBadge,
+	label,
+	sub,
+	className,
+	style,
+	...rest
+}) => {
 	const glow = rarity && rarity !== 'common';
 	return (
 		<button
@@ -203,6 +221,7 @@ export const Slot: React.FC<SlotProps> = ({ icon, rarity, count, empty, locked, 
 				</span>
 			) : null}
 			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{levelBadge !== undefined ? <span className='ds-slot-lvl'>{levelBadge}</span> : null}
 			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>
 	);

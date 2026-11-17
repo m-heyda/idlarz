@@ -15,13 +15,13 @@ const dailyLine = (daily: DailyInfo | undefined): string => {
 
 /**
  * The 7-day daily bonus board, shared by the Gem shop and the daily bonus window: one cell per day of the ladder (`DAILY_BONUS_GEMS`), past days dimmed as claimed, today with a Claim button, later days locked, and day 7 marked as the bonus.
- * It only shows what the server's last answer (`daily`) says; `onClaim` asks the server to pay today's day.
+ * `bare` drops the frame and title (the welcome-back window supplies its own section header). It only shows what the server's last answer (`daily`) says; `onClaim` asks the server to pay today's day.
  */
-const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClaim: () => void }> = ({ daily, busy, onClaim }) => (
-	<div className='ds-listrow' data-testid='gem-daily' style={{ gap: 12 }}>
+const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClaim: () => void; bare?: boolean }> = ({ daily, busy, onClaim, bare }) => (
+	<div className={bare ? 'flex flex-col' : 'ds-listrow'} data-testid='gem-daily' style={{ gap: 12 }}>
 		<div className='min-w-0'>
-			<SectionLabel>Welcome back! Daily bonus</SectionLabel>
-			<div className='ds-dim' style={{ fontSize: 12, marginTop: 4 }}>
+			{!bare && <SectionLabel>Welcome back! Daily bonus</SectionLabel>}
+			<div className='ds-dim' style={{ fontSize: 12, marginTop: bare ? 0 : 4 }}>
 				{dailyLine(daily)}
 			</div>
 		</div>

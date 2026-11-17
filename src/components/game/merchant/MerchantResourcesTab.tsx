@@ -129,10 +129,6 @@ const MerchantResourcesTab: React.FC = () => {
 						);
 					})}
 				</div>
-				<div className='ds-paper-foot'>
-					Prices per unit in gold. Haggler: +{formatNumber((haggle - 1) * 100)}% on sales. Buying costs {MERCHANT_BUY_MULTIPLIER}x base. Goods you do not buy
-					are earned, never bought.
-				</div>
 			</Panel>
 
 			<Panel className='ds-ticket'>

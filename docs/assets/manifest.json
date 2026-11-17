@@ -12407,6 +12407,21 @@
 	},
 	{
 		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cured_leather",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cured_leather.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"src/components/game/hero/HeroWindow.tsx",
 			"src/components/game/hero/recipeUi.ts"
 		],
@@ -12414,6 +12429,21 @@
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_glass_vial.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_plank_bundle",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_plank_bundle.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -38375,19 +38405,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_materials_leather_roll",
-		"category": "unsorted",
-		"subcategory": "materials",
-		"src": "/pixel/__reuse/materials/leather_roll.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "reuse_materials_logs",
 		"category": "unsorted",
 		"subcategory": "materials",
@@ -38397,19 +38414,6 @@
 		"size": [
 			153,
 			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_materials_plank",
-		"category": "unsorted",
-		"subcategory": "materials",
-		"src": "/pixel/__reuse/materials/plank.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
 		]
 	},
 	{

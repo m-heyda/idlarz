@@ -9,7 +9,11 @@ export const outputName = (recipe: Recipe): string =>
 	'item' in recipe.output ? ITEM_CATALOG[recipe.output.item].name : 'component' in recipe.output ? COMPONENTS[recipe.output.component].name : recipe.name;
 
 /** Components have no catalog item, so their sprite is named here. */
-export const COMPONENT_ICONS: Record<string, PixelIconName> = { glass_vial: 'comp_glass_vial' };
+export const COMPONENT_ICONS: Record<string, PixelIconName> = {
+	glass_vial: 'comp_glass_vial',
+	cured_leather: 'comp_cured_leather',
+	plank_bundle: 'comp_plank_bundle',
+};
 
 /** A gear recipe is drawn with the first base of its grade and slot (the result is random, the sprite is the grade's look). */
 const gearIcon = (grade: string, slot: string): PixelIconName => {

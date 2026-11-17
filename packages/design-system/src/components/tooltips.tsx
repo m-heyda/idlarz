@@ -333,7 +333,7 @@ export const ResourceTooltip: React.FC<{ icon: string; name: string; rows: TipRo
 export const MonsterTooltip: React.FC<{
 	icon: string;
 	name: string;
-	subtitle: string;
+	subtitle: React.ReactNode;
 	hp: string;
 	rows: TipRow[];
 	drops?: TipRow[];

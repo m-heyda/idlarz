@@ -85,11 +85,11 @@ test('the Stats tab keeps every figure of the old Character window: attributes, 
 	assert.match(out, /data-tutorial="stat-add"/, 'the guide can point at the first + button');
 });
 
-test('the Crafting tab shows the level bar, the queue, the recipe groups and the ticket with its Queue button', async () => {
+test('the Crafting tab shows the level bar, the queue, the recipe categories and the ticket with its Queue button', async () => {
 	const { default: HeroCrafting } = await import('../../src/components/game/hero/HeroCrafting');
 	reset();
 	const out = renderToStaticMarkup(h(HeroCrafting));
-	for (const word of ['Crafting level', 'Queue 0', 'Components', 'Potions', 'Cost', 'Amount', 'XP']) {
+	for (const word of ['Crafting level', 'Queue 0', 'Weapons', 'Armor', 'Other', 'Legendary', 'Cost', 'Amount', 'XP']) {
 		assert.ok(out.includes(word), `the tab shows "${word}"`);
 	}
 	assert.match(out, /ds-craft-ticket/);

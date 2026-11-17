@@ -21,6 +21,11 @@ const DailyBonusDialog: React.FC<{ ready: boolean }> = ({ ready }) => {
 	const asked = useRef(false);
 
 	useEffect(() => {
+		// the welcome-back window carries the daily bonus itself: no second pop-up for it after that window closes
+		if (offlineReportOpen) {
+			asked.current = true;
+			return;
+		}
 		if (!shouldOpenDaily({ ready, offlineReportOpen, asked: asked.current, hiddenToday: dailyHiddenToday(), claimable: true })) {
 			// asked once the start is done and nothing is in front of it, even when the player hid it today (it must not ask again later this session)
 			if (ready && !offlineReportOpen) asked.current = true;

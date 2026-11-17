@@ -3,8 +3,7 @@ import { Button, HoverTip, Inset, Panel, ProgressBar, Slot } from '../../../../p
 import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-system/src/components/tooltips';
 import { RARITIES, RESOURCES } from '@/catalog';
-import { GRADE_INFO } from '@/catalog/items/grades';
-import { COMPONENTS, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
+import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
 import { gearOdds } from '@/lib/craftGear';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
@@ -26,7 +25,7 @@ interface Have {
 }
 
 /** What a recipe's kind is called in a tooltip (one thing, capitalised). */
-const KIND_NAME: Record<RecipeKind, string> = { component: 'Component', potion: 'Potion', good: 'Trade good', gear: 'Gear' };
+const KIND_NAME: Record<RecipeKind, string> = { component: 'Component', potion: 'Potion', good: 'Trade good', gear: 'Gear', legendary: 'Legendary weapon' };
 
 /** The cost card of a recipe tile: what one craft takes (green when you have it, red when not) and the XP, or the level it unlocks at. */
 const RecipeTip: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
@@ -273,20 +272,31 @@ const Queue: React.FC = () => {
 	);
 };
 
-/** The groups of the recipe list, in display order; a kind with no recipe is not shown. */
-const KIND_LABELS: Record<RecipeKind, string> = { component: 'Components', potion: 'Potions', good: 'Trade goods', gear: 'Gear' };
-/** Gear recipes are shown per grade ("Hide - from crafting level 8"); every other kind is one grid. */
-const groupsOf = (recipes: Recipe[]): { label: string; recipes: Recipe[] }[] => {
-	const groups: { label: string; recipes: Recipe[] }[] = [];
-	for (const recipe of recipes) {
-		const label = 'gear' in recipe.output ? `${GRADE_INFO[recipe.output.gear.grade].label} · from crafting level ${recipe.unlock}` : '';
-		const group = groups.find((g) => g.label === label);
-		if (group) group.recipes.push(recipe);
-		else groups.push({ label, recipes: [recipe] });
-	}
-	return groups;
-};
-const KINDS = (Object.keys(KIND_LABELS) as RecipeKind[]).filter((kind) => RECIPES.some((r) => r.kind === kind));
+/** The weapon and armour slots of the first two categories; every other recipe (components, potions, jewellery) goes to "Other". */
+const WEAPON_SLOTS: readonly string[] = ['mainHand', 'offHand'];
+const ARMOUR_SLOTS: readonly string[] = ['head', 'shoulder', 'chest', 'hands', 'legs', 'feet', 'cape', 'belt'];
+const slotOf = (recipe: Recipe): string | null => ('gear' in recipe.output ? recipe.output.gear.slot : null);
+
+/** The categories of the recipe list, in display order. Inside one, every recipe is listed by the crafting level it needs (locked ones dimmed and tagged with that level). Trade goods are not shown for now (their recipes stay in the data). */
+const CATEGORIES: { id: string; label: string; has: (recipe: Recipe) => boolean }[] = [
+	{ id: 'weapons', label: 'Weapons', has: (r) => WEAPON_SLOTS.includes(slotOf(r) ?? '') },
+	{ id: 'armor', label: 'Armor', has: (r) => ARMOUR_SLOTS.includes(slotOf(r) ?? '') },
+	{
+		id: 'other',
+		label: 'Other',
+		has: (r) => r.kind !== 'good' && r.kind !== 'legendary' && !WEAPON_SLOTS.includes(slotOf(r) ?? '') && !ARMOUR_SLOTS.includes(slotOf(r) ?? ''),
+	},
+	{ id: 'legendary', label: 'Legendary', has: (r) => r.kind === 'legendary' },
+];
+/** Every recipe the tab shows: the craftable ones and the display-only legendaries. */
+const SHOWN: Recipe[] = [...RECIPES, ...LEGENDARY_RECIPES];
+/** Lowest level first; recipes of the same level keep the catalog's order */
+const byLevel = (recipes: Recipe[]): Recipe[] =>
+	recipes
+		.map((recipe, index) => ({ recipe, index }))
+		.sort((a, b) => a.recipe.unlock - b.recipe.unlock || a.index - b.index)
+		.map((e) => e.recipe);
+const GROUPS = CATEGORIES.map((c) => ({ ...c, recipes: byLevel(SHOWN.filter(c.has)) })).filter((c) => c.recipes.length > 0);
 
 /**
  * The left column of the Crafting tab: the crafting level and its XP bar on top, the queue under it (Collect all lights up when something finished), and the blacksmith filling the rest. It stands in for the hero card on this tab, so the recipes
@@ -324,7 +334,7 @@ export const CraftingSidebar: React.FC = () => {
 };
 
 /**
- * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), the recipe list in folding groups (a locked recipe is dimmed, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
+ * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), the recipe list in folding categories (Weapons, Armor, Other, Legendary; each by required level, a locked recipe is dimmed and tagged with the level it needs, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
  * Everything the old Crafting window did: amount by slider or typed text, cost colours, XP and time, gear odds, queue slots, Collect, Cancel.
  */
 const HeroCrafting: React.FC = () => {
@@ -332,13 +342,13 @@ const HeroCrafting: React.FC = () => {
 	const refresh = useCraftStore((state) => state.refresh);
 	const resources = useGameStore((state) => state.resources);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
-	const [closed, setClosed] = useState<ReadonlySet<RecipeKind>>(new Set());
+	const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
 	useEffect(() => void refresh(), [refresh]);
 
 	const { level } = craftLevelOf(craft?.xp ?? 0);
 	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
-	const selected = RECIPES.find((r) => r.id === selectedId) ?? RECIPES.find((r) => r.unlock <= level) ?? RECIPES[0];
-	const toggleKind = (kind: RecipeKind) =>
+	const selected = SHOWN.find((r) => r.id === selectedId) ?? GROUPS[0].recipes.find((r) => r.unlock <= level) ?? GROUPS[0].recipes[0];
+	const toggleKind = (kind: string) =>
 		setClosed((before) => {
 			const out = new Set(before);
 			if (out.has(kind)) out.delete(kind);
@@ -350,34 +360,33 @@ const HeroCrafting: React.FC = () => {
 		<div className='ds-craft'>
 			<div className='ds-craft-body'>
 				<Inset className='ds-craft-list'>
-					{KINDS.map((kind) => {
-						const recipes = RECIPES.filter((r) => r.kind === kind);
-						return (
-							<CollapsibleGroup key={kind} title={KIND_LABELS[kind]} count={recipes.length} open={!closed.has(kind)} onToggle={() => toggleKind(kind)}>
-								{groupsOf(recipes).map((group) => (
-									<React.Fragment key={group.label || kind}>
-										{group.label ? <div className='ds-craft-sub'>{group.label}</div> : null}
-										<div className='ds-craft-grid'>
-											{group.recipes.map((recipe) => {
-												const locked = have.craftLevel < recipe.unlock;
-												return (
-													<HoverTip key={recipe.id} tip={<RecipeTip recipe={recipe} have={have} />}>
-														<Slot
-															icon={recipeIconUrl(recipe)}
-															locked={locked}
-															active={recipe.id === selected.id}
-															aria-label={`${outputName(recipe)}${locked ? `, unlocks at crafting level ${recipe.unlock}` : ''}`}
-															onClick={() => setSelectedId(recipe.id)}
-														/>
-													</HoverTip>
-												);
-											})}
-										</div>
-									</React.Fragment>
-								))}
-							</CollapsibleGroup>
-						);
-					})}
+					{GROUPS.map((group) => (
+						<CollapsibleGroup
+							key={group.id}
+							title={group.label}
+							count={group.recipes.length}
+							open={!closed.has(group.id)}
+							onToggle={() => toggleKind(group.id)}
+						>
+							<div className='ds-craft-grid'>
+								{group.recipes.map((recipe) => {
+									const locked = have.craftLevel < recipe.unlock;
+									return (
+										<HoverTip key={recipe.id} tip={<RecipeTip recipe={recipe} have={have} />}>
+											<Slot
+												icon={recipeIconUrl(recipe)}
+												locked={locked}
+												levelBadge={locked ? recipe.unlock : undefined}
+												active={recipe.id === selected.id}
+												aria-label={`${outputName(recipe)}${locked ? `, unlocks at crafting level ${recipe.unlock}` : ''}`}
+												onClick={() => setSelectedId(recipe.id)}
+											/>
+										</HoverTip>
+									);
+								})}
+							</div>
+						</CollapsibleGroup>
+					))}
 					<p className='ds-craft-sub'>Crafting level never resets. New recipes unlock as it grows.</p>
 				</Inset>
 				<RecipeTicket key={selected.id} recipe={selected} have={have} />

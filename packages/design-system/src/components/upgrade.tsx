@@ -14,6 +14,8 @@ export interface UpgradeTileProps {
 	cost: number;
 	costText: string;
 	costIcon?: string;
+	/** Draws the cost itself (several resources) in place of `costIcon` and `costText` */
+	costNode?: React.ReactNode;
 	/** What the player has, in the same unit as `cost`, to pick ready or short */
 	have: number;
 	/** "Need 148K more" text for the short state */
@@ -21,6 +23,7 @@ export interface UpgradeTileProps {
 	buyLabel?: string;
 	/** Force the state when the game decides it (a rule beyond gold: a locked prerequisite). Default: derived from level, cost and `have`. */
 	state?: 'maxed' | 'ready' | 'short';
+	/** Text shown in the foot of a maxed tile; none by default (the purple gems and rim already say it) */
 	maxLabel?: string;
 	nowLabel?: string;
 	nextLabel?: string;
@@ -30,7 +33,7 @@ export interface UpgradeTileProps {
 
 /**
  * One upgrade (merchant perks, building levels): name with diamond level gems, a Now line and a Next line, then the cost and a Buy button.
- * Three states: ready (gold rim, Buy enabled), short (greyed button saying how much is missing), maxed (purple gems and rim, no cost).
+ * Three states: ready (gold rim, Buy enabled), short (greyed button saying how much is missing), maxed (purple gems and rim, no cost and no text).
  */
 export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 	name,
@@ -42,12 +45,13 @@ export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 	cost,
 	costText,
 	costIcon,
+	costNode,
 	have,
 	shortText,
 	buyLabel = 'Upgrade',
 	onBuy,
 	state: forced,
-	maxLabel = 'MAX',
+	maxLabel,
 	nowLabel = 'Now',
 	nextLabel = 'Next',
 	emptyNow = 'nothing yet',
@@ -70,27 +74,31 @@ export const UpgradeTile: React.FC<UpgradeTileProps> = ({
 					{next}
 				</div>
 			) : null}
-			<div className='ds-upgrade-foot'>
-				{state === 'maxed' ? (
-					<span className='ds-cost' style={{ color: 'var(--ds-r-epic)' }}>
-						{maxLabel}
-					</span>
-				) : (
-					<span className='ds-cost'>
-						{costIcon ? <img src={costIcon} alt='' /> : null}
-						{costText}
-					</span>
-				)}
-				{state === 'ready' ? (
-					<Button tone='gold' onClick={onBuy}>
-						{buyLabel}
-					</Button>
-				) : state === 'short' ? (
-					<Button tone='dark' disabled>
-						{shortText ?? 'Not enough'}
-					</Button>
-				) : null}
-			</div>
+			{state === 'maxed' && !maxLabel ? null : (
+				<div className='ds-upgrade-foot'>
+					{state === 'maxed' ? (
+						<span className='ds-cost' style={{ color: 'var(--ds-r-epic)' }}>
+							{maxLabel}
+						</span>
+					) : (
+						(costNode ?? (
+							<span className='ds-cost'>
+								{costIcon ? <img src={costIcon} alt='' /> : null}
+								{costText}
+							</span>
+						))
+					)}
+					{state === 'ready' ? (
+						<Button tone='gold' onClick={onBuy}>
+							{buyLabel}
+						</Button>
+					) : state === 'short' ? (
+						<Button tone='dark' disabled>
+							{shortText ?? 'Not enough'}
+						</Button>
+					) : null}
+				</div>
+			)}
 		</div>
 	);
 };

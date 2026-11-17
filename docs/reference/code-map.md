@@ -313,11 +313,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CombatWidget.tsx`](../../src/components/game/overlays/CombatWidget.tsx) — ~ "1 min 12 s" or "45 s"
 - [`DailyBonusDialog.tsx`](../../src/components/game/overlays/DailyBonusDialog.tsx) — ~ The daily bonus window:
 - [`FarmAnimalDock.tsx`](../../src/components/game/overlays/FarmAnimalDock.tsx) — ~ Width the scene keeps clear on the right while the panel is open (panel width plus its margin)
-- [`FarmHud.tsx`](../../src/components/game/overlays/FarmHud.tsx) — ~ Corner readout over the farm scene:
 - [`FarmOverlay.tsx`](../../src/components/game/overlays/FarmOverlay.tsx) — ~ The Farm window:
 - [`FarmProps.tsx`](../../src/components/game/overlays/FarmProps.tsx) — ~ CSS px outside the window that still get drawn, so a part is never seen popping in at the edge
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Moving to the right on screen (the way it last walked)
-- [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ How long the drawer takes to slide shut (a little over the transition in Farm.css)
+- [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ The tiles of the upgrade window.
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
 - [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
