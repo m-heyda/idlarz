@@ -37,6 +37,7 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
+import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
 import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
 import { applyTutorial, type TutorialReply, type TutorialRequest } from '@/lib/offline/tutorial';
@@ -339,22 +340,29 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
  * rebirth (another key) neither wipes again nor pays again, it answers with what the first one recorded in `inv.rebirth`.
  * The browser uploads its save first, so the stored save the server judges is the one the player is looking at.
  */
-export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowMs: number): Promise<Online<RebirthReply>> =>
+export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowMs: number, keep: readonly KeepRef[] = []): Promise<Online<RebirthReply>> =>
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: RebirthReply } => {
 		const inv = ctx.ledger.inv!;
 		const judged = judgeRebirth(ctx.stored.summary, ctx.stored.core.merchantUpgrades as Record<string, number> | undefined);
 		// already run for this very rebirth: the record is the answer (the wipe and the gain happen once)
-		if (judged.ok && inv.rebirth?.to === judged.to)
-			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, serverNowSec: ctx.nowSec } };
+		if (judged.ok && inv.rebirth?.to === judged.to) {
+			const kept = keepCandidates(inv.bag, {})
+				.slice(0, inv.rebirth.kept ?? 0)
+				.map((c) => c.item);
+			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, kept, serverNowSec: ctx.nowSec } };
+		}
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
+		// the pieces the player carries over are read from the LEDGER's own bag and gear: the request only names places
+		const picked = resolveKeep(inv, keep, keepSlots(judged.to));
+		if (!picked.ok) return { ledger: ctx.ledger, value: { ok: false, reason: 'bad_keep', to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = {
-			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige, ctx.stored.core.playerClass),
-			rebirth: { to: judged.to, gain: judged.gain },
+			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige, ctx.stored.core.playerClass, picked.items),
+			rebirth: { to: judged.to, gain: judged.gain, ...(picked.items.length ? { kept: picked.items.length } : {}) },
 		};
 		return {
 			// a rebirth gives every attribute point back (the free respec of a rebirth): the allocation starts again, the account's one free paid respec stays as it was
 			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth(), attrs: clearedAttrs(ctx.ledger.attrs) },
-			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, serverNowSec: ctx.nowSec },
+			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, kept: picked.items, serverNowSec: ctx.nowSec },
 		};
 	});
 

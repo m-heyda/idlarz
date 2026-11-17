@@ -331,6 +331,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ Whether the away-time hint (Night Watch, Steward) is worth showing:
+- [`RebirthConfirmModal.tsx`](../../src/components/game/overlays/RebirthConfirmModal.tsx) — ~ A piece the player could carry over, with the place it is in.
 - [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ What an Ember shop upgrade gives at level `n` (the same numbers as before; a tile shows it for the level now and for the next one)
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
@@ -580,6 +581,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`rankingsServer.ts`](../../src/lib/rankingsServer.ts) — ~ What a board orders by:
 - [`rateLimit.ts`](../../src/lib/rateLimit.ts) — A small in-memory sliding-window limiter for routes that must not be hammered (password reset requests).
 - [`rebirthClient.ts`](../../src/lib/rebirthClient.ts) — ~ The player's rebirth history from the server, newest first; null when it could not be read (offline, signed out).
+- [`rebirthKeep.ts`](../../src/lib/rebirthKeep.ts) — ~ Carrying legendary gear through a rebirth.
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
@@ -868,6 +870,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pacingGuard.test.ts`](../../tests/economy/pacingGuard.test.ts)
 - [`rebirth.test.ts`](../../tests/economy/rebirth.test.ts) — ~ A run that has reached the rebirth line.
 - [`rebirthBiomes.test.ts`](../../tests/economy/rebirthBiomes.test.ts)
+- [`rebirthKeep.test.ts`](../../tests/economy/rebirthKeep.test.ts) — Carrying legendary gear through a rebirth: the pure rules (lib/rebirthKeep.ts).
 - [`startPlan.test.ts`](../../tests/economy/startPlan.test.ts) — ~ The account's save of the game that `localSave` just built (same level and tiles), at `playSeconds`.
 - [`unbounded.test.ts`](../../tests/economy/unbounded.test.ts)
 

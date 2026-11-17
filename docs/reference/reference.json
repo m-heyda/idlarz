@@ -1054,7 +1054,7 @@
   "kind": "const",
   "category": "Progression/Ember shop",
   "file": "src/config/rebirth.ts",
-  "line": 58,
+  "line": 60,
   "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
   "see": []
  },
@@ -2450,7 +2450,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/offline/inventory.ts",
-  "line": 64,
+  "line": 65,
   "summary": "The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up, so taking a belt off, or a rebirth, never shrinks the bag below the items in it.",
   "see": []
  },
@@ -2461,7 +2461,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/offline/inventory.ts",
-  "line": 240,
+  "line": 250,
   "summary": "The \"Sell junk\" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.",
   "see": []
  },
@@ -2799,6 +2799,17 @@
   "file": "src/lib/rankings.ts",
   "line": 92,
   "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
+  "see": []
+ },
+ {
+  "id": "keepref",
+  "name": "KeepRef",
+  "symbol": "KeepRef",
+  "kind": "type",
+  "category": "Progression/Rebirth",
+  "file": "src/lib/rebirthKeep.ts",
+  "line": 20,
+  "summary": "Carrying legendary gear through a rebirth. Pure rules shared by the server (`rebirthStep` picks from the LEDGER's inventory, never from items the browser sends) and the browser (which builds the same new bag from the same picks).",
   "see": []
  },
  {

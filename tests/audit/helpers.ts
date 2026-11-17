@@ -84,8 +84,8 @@ export const oracle = {
 				return 0;
 		}
 	},
-	/** 1 + 0.1 x (Embers ever earned)^0.6 */
-	ember: (earned: number) => 1 + 0.1 * Math.max(0, earned) ** 0.6,
+	/** 1 + 0.12 x (Embers ever earned)^0.6 */
+	ember: (earned: number) => 1 + 0.12 * Math.max(0, earned) ** 0.6,
 	foreman: (level: number) => 1 + 0.01 * level,
 	gear: (pct: number) => 1 + pct / 100,
 	plains: (count: number) => 0.05 * count,
@@ -125,7 +125,7 @@ export const oracle = {
 	/** Embers for a rebirth */
 	emberGain: (castle: number, tiles: number, rebirths: number, titheLevel: number) => {
 		const needed = 400 + 50 * rebirths;
-		const base = Math.floor(3 * Math.max(0, castle - 5) ** 1.3 * (Math.sqrt(Math.max(0, tiles) / 10) + 0.02 * Math.max(0, tiles - needed)));
+		const base = Math.floor(3 * Math.max(0, castle - 5) ** 1.3 * ((Math.max(0, tiles) / 10) ** 0.65 + 0.03 * Math.max(0, tiles - needed)));
 		return Math.floor(base * (1 + 0.05 * titheLevel));
 	},
 	/** Cost in Embers of the next level of a shop upgrade */

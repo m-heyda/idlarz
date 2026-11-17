@@ -18,6 +18,7 @@ import {
 import { instanceProblem, plainItem, sellValueOf } from '@/lib/itemInstance';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf } from '@/lib/limits';
+import { placeKept } from '@/lib/rebirthKeep';
 import { isAutoSold } from '@/lib/loot/autoSell';
 import { junkFor, junkSale, withJunkMark } from '@/lib/loot/junk';
 import { receiveDrops, type Received } from '@/lib/loot/receive';
@@ -95,14 +96,23 @@ export const inventoryFromCore = (core: Core): Inventory => {
 };
 
 /** The inventory a rebirth leaves: the starter kit (see `rebirthKit`); only the auto-sell filter, a setting, carries over. A newer `ver`, so the browser takes it. */
-export const rebirthInventory = (before: Inventory, merchantUpgrades: unknown, prestige?: unknown, playerClass?: unknown): Inventory => {
+export const rebirthInventory = (
+	before: Inventory,
+	merchantUpgrades: unknown,
+	prestige?: unknown,
+	playerClass?: unknown,
+	kept: readonly ItemInstance[] = [],
+): Inventory => {
 	const packrat = packratFor(before, merchantUpgrades);
 	const beltSlots = beltSlotsFor(before);
+	const kit = rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots, typeof playerClass === 'string' ? playerClass : undefined);
 	return {
 		ver: before.ver + 1,
 		packrat,
 		...(beltSlots > 0 ? { beltSlots } : {}),
-		...rebirthKit(packrat > 0 ? { packrat } : undefined, prestigeOf(prestige), beltSlots, typeof playerClass === 'string' ? playerClass : undefined),
+		...kit,
+		// the pieces the player chose to carry over (`lib/rebirthKeep.ts`) go into the first free bag slots
+		bag: placeKept(kit.bag, kept),
 		autoSellUpTo: before.autoSellUpTo,
 	};
 };

@@ -8,7 +8,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 
 - Levels: [`LEVELING`](#leveling), [`xpToNextLevel`](#xptonextlevel), [`totalStatPoints`](#totalstatpoints), [`attributeBudget`](#attributebudget), [`cumulativeXp`](#cumulativexp), [`allocatePoints`](#allocatepoints), [`calculateLevel`](#calculatelevel), [`reconcileCharacter`](#reconcilecharacter)
 - Attributes: [`CHARACTER_STAT_CONFIG`](#character-stat-config), [`calculateStatResourceModifiers`](#calculatestatresourcemodifiers), [`calculateCombatStats`](#calculatecombatstats)
-- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`rebirthUnlockIntro`](#rebirthunlockintro), [`rebirthRunSummary`](#rebirthrunsummary)
+- Rebirth: [`REBIRTH`](#rebirth), [`emberGain`](#embergain), [`emberIncomeBonus`](#emberincomebonus), [`rebirthStatus`](#rebirthstatus), [`KeepRef`](#keepref), [`rebirthUnlockIntro`](#rebirthunlockintro), [`rebirthRunSummary`](#rebirthrunsummary)
 - Ember shop: [`EMBER_UPGRADES`](#ember-upgrades), [`emberUpgradeCost`](#emberupgradecost)
 - Limits: [`LIMITS`](#limits), [`limitOf`](#limitof), [`beltSlotsFor`](#beltslotsfor)
 - Gems: [`STARTING_GEMS`](#starting-gems)
@@ -209,7 +209,7 @@ Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIR
 - **Requirements**: castle level >= 6 (`minCastleLevel`), economy tile count >= `400 + 50 x rebirths already done` (`minTiles`, `tilesPerRebirth`), no castle upgrade running, and at least 1 Ember of gain.
 - **Embers gained**: see [`emberGain`](progression.md#embergain). **Income bonus**: see [`emberIncomeBonus`](progression.md#emberincomebonus).
 - **What resets** (`rebirth` in `src/stores/game/rebirthSlice.ts`): map (new start ring), resources, castle, animals, buildings, chests, monsters and any open fight, click level, farm upgrades, all merchant upgrades except Pack Rat,
-  the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
+  the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) except the legendary pieces the player chooses to keep (`keepSlots`: rebirth N keeps up to min(N, 15), they land in the new bag), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
 - **What is kept**: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant's shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).
 - The server runs the rebirth first (`POST /api/rebirth`): it checks the stored save, wipes the ledger's inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.
 - Auto-battle unlocks after the first rebirth (`COMBAT.auto.minRebirths`).
@@ -228,12 +228,12 @@ Source: [`src/utils/game/rebirth.ts:97`](../../src/utils/game/rebirth.ts)
 
 Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.
 
-`REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `surplusPerTile` 0.02. The Ancestral Tithe merchant upgrade adds +5% per level.
+`REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level.
 
 **Formula**
 
 ```text
-base = floor(3 x (castle level - 5)^1.3 x (sqrt(tiles / 10) + 0.02 x max(0, tiles - tilesNeeded)))
+base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
 gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 ```
 
@@ -241,12 +241,12 @@ gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 
 | Castle level | Tiles | Rebirths already done | Embers |
 | --- | --- | --- | --- |
-| 6 | 400 | 0 | 18 |
-| 6 | 450 | 0 | 23 |
-| 8 | 500 | 0 | 113 |
-| 10 | 500 | 0 | 220 |
-| 10 | 1000 | 0 | 534 |
-| 10 | 450 | 1 | 163 |
+| 6 | 400 | 0 | 32 |
+| 6 | 450 | 0 | 40 |
+| 8 | 500 | 0 | 196 |
+| 10 | 500 | 0 | 382 |
+| 10 | 1000 | 0 | 922 |
+| 10 | 450 | 1 | 288 |
 
 <a id="emberincomebonus"></a>
 
@@ -261,19 +261,19 @@ Folded into the income modifier of every resource ([`calculateResourceBreakdown`
 **Formula**
 
 ```text
-income bonus = 0.1 x (Embers ever earned)^0.6          multiplier = 1 + bonus
+income bonus = 0.12 x (Embers ever earned)^0.6          multiplier = 1 + bonus
 ```
 
 **Income bonus from Embers ever earned** _(computed from the code)_
 
 | Embers earned | Income bonus |
 | --- | --- |
-| 10 | +40% |
-| 22 | +64% |
-| 47 | +101% |
-| 76 | +134% |
-| 170 | +218% |
-| 500 | +416% |
+| 10 | +48% |
+| 22 | +77% |
+| 47 | +121% |
+| 76 | +161% |
+| 170 | +261% |
+| 500 | +500% |
 
 <a id="rebirthstatus"></a>
 
@@ -288,6 +288,26 @@ all read this one function, so what the tooltip promises is what the action chec
 
 ```text
 can rebirth = castle level >= 6  and  economyTiles >= 400 + 50 x rebirths  and  no castle upgrade running  and  Embers gained >= 1
+```
+
+<a id="keepref"></a>
+
+### `KeepRef` <small>type</small>
+
+Source: [`src/lib/rebirthKeep.ts:20`](../../src/lib/rebirthKeep.ts)
+
+Carrying legendary gear through a rebirth. Pure rules shared by the server (`rebirthStep` picks from the LEDGER's inventory, never from items the browser sends)
+and the browser (which builds the same new bag from the same picks).
+
+- **Slots**: the rebirth being done is number N (`prestige.rebirths + 1`); it lets the player keep `min(N, REBIRTH.keepSlotsMax)` pieces (1 on the first, 2 on the second, up to 15).
+- **Eligible**: a piece of gear whose rarity ranks at least Legendary (Legendary, or the disabled-for-now Unique), from the bag or worn.
+- **Where it lands**: in the new run's bag (the first free slots); the player equips it again.
+- A pick names a place (`{ from: 'bag', index }` or `{ from: 'equip', slot }`), never an item: instances have no ids.
+
+**Formula**
+
+```text
+keep slots = min(15, rebirth number being done)
 ```
 
 <a id="rebirthunlockintro"></a>
@@ -313,7 +333,7 @@ The numbers of the rebirth result screen, from what the run had reached and the 
 
 ### `EMBER_UPGRADES` <small>const</small>
 
-Source: [`src/config/rebirth.ts:58`](../../src/config/rebirth.ts)
+Source: [`src/config/rebirth.ts:60`](../../src/config/rebirth.ts)
 
 The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
 The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
@@ -396,7 +416,7 @@ bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots
 
 ### `beltSlotsFor` <small>function</small>
 
-Source: [`src/lib/offline/inventory.ts:64`](../../src/lib/offline/inventory.ts)
+Source: [`src/lib/offline/inventory.ts:65`](../../src/lib/offline/inventory.ts)
 
 The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up,
 so taking a belt off, or a rebirth, never shrinks the bag below the items in it.

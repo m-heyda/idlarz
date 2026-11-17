@@ -10,6 +10,7 @@ import { effectiveTileDiscount, emberGain, rebirthStatus, emberSpent, emberUpgra
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
 import { sanitizeSave } from '../../src/lib/sanitizeSave';
 import { patchTile } from '../../src/utils/world';
+import { plainItem } from '../../src/lib/itemInstance';
 
 const setCastleLevel = (level: number) =>
 	store.setState((s) => {
@@ -212,7 +213,7 @@ test('a full reset (not a rebirth) wipes the Embers too', () => {
 });
 
 test('saves: prestige survives validation, forged Embers is rejected', () => {
-	readyToRebirth(9, REBIRTH.minTiles + 10);
+	readyToRebirth(7, REBIRTH.minTiles + 10);
 	assert.equal(api().rebirth(), true);
 	api().buyEmberUpgrade('builders');
 	api().buyEmberUpgrade('thrift');
@@ -286,7 +287,7 @@ test('Gems in saves: a save without them gets the starting purse, a saved balanc
 test('the Ember income bonus flattens: the first rebirth is worth far less than the old +6 % per Ember, and more Embers always help', () => {
 	assert.equal(emberIncomeBonus(0), 0);
 	const first = emberIncomeBonus(22);
-	assert.ok(first > 0.5 && first < 0.8, `a first rebirth gives about +64 %, got ${first}`);
+	assert.ok(first > 0.6 && first < 0.95, `a first rebirth gives about +77 %, got ${first}`);
 	let last = 0;
 	for (const earned of [1, 5, 22, 47, 76, 170, 500, 5000]) {
 		const bonus = emberIncomeBonus(earned);
@@ -298,4 +299,12 @@ test('the Ember income bonus flattens: the first rebirth is worth far less than 
 		emberIncomeBonus(170) - emberIncomeBonus(147) < emberIncomeBonus(22) - emberIncomeBonus(0),
 		'a late stretch of 23 Embers adds less than the first 22',
 	);
+});
+
+test('the browser puts the pieces the server kept into the new bag, and nothing else survives', () => {
+	readyToRebirth(7, REBIRTH.minTiles + 10);
+	const kept = { ...plainItem('emberbrand'), rarity: 'legendary' };
+	assert.equal(api().rebirth(undefined, [kept]), true);
+	const gear = api().bag.filter((slot) => slot && 'item' in slot);
+	assert.deepEqual(gear, [{ item: kept }]);
 });
