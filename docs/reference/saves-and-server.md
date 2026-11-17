@@ -15,6 +15,7 @@ The save, cloud-save checks, the ledger, sealed rolls, away time and the threat 
 - Away time: [`computeOfflineGrant`](#computeofflinegrant), [`awayBlockOf`](#awayblockof), [`ensureSeasonReset`](#ensureseasonreset)
 - Epoch: [`BASELINE_EPOCH`](#baseline-epoch), [`startNewChapter`](#startnewchapter)
 - Browser state: [The browser's half of the data epoch](#the-browser-s-half-of-the-data-epoch)
+- Migrations: [`refundOldShop`](#refundoldshop)
 
 ## Threat model
 
@@ -92,7 +93,7 @@ One tab owns the game at a time (`src/hooks/useSingleTab.ts`, a Web Lock).
 
 ### `sanitizeSave` <small>function</small>
 
-Source: [`src/lib/sanitizeSave.ts:218`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:219`](../../src/lib/sanitizeSave.ts)
 
 Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game
 (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not
@@ -108,7 +109,7 @@ stat points are credited when the level pays more and a free respec when it pays
 
 ### `PERSISTED_KEYS` <small>const</small>
 
-Source: [`src/lib/sanitizeSave.ts:64`](../../src/lib/sanitizeSave.ts)
+Source: [`src/lib/sanitizeSave.ts:65`](../../src/lib/sanitizeSave.ts)
 
 The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
 
@@ -753,3 +754,19 @@ never ran; `archiveForNewGame` still finds it under the old names and keeps it, 
 
 What this cannot do: a tab that is already open when the epoch flips never asks `/api/auth/me` again. That tab is stopped by the server: every game request carries the epoch
 the browser last saw (`lib/epochFetch`) and a lower one is refused with 412 `staleEpoch`, after which the page reloads into this guard. See `docs/plan/reset-proof-browsers.md`.
+
+## Migrations
+
+<a id="refundoldshop"></a>
+
+### `refundOldShop` <small>function</small>
+
+Source: [`src/lib/emberShopMigration.ts:16`](../../src/lib/emberShopMigration.ts)
+
+The Ember shop was reworked (new ids, costs and effects). An account from before it has no `shopVersion`: its spent shop levels were bought under other numbers, so they are refunded once.
+
+- every shop level is cleared and every Ember ever earned is unspent again (`legacyPoints = legacyEarned`), so the player spends them in the new shop; `legacyEarned` and `rebirths` stay, so the income bonus does not change;
+- the account moves to `SHOP_VERSION`, which marks it done: running it again changes nothing (a stale tab or an old client cannot undo it, and the SQL in `supabase/migrations/ember_refund_v2.sql` is the same step run on the stored saves);
+- a player who already had auto-potion (the old rule: unlocked with the first rebirth) gets Potion Reflex for free as a grant, so nobody loses a feature.
+
+Pure, idempotent, and part of reading a save (`sanitizeSave`), so every path that loads or accepts a save applies it.

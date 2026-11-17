@@ -1748,6 +1748,17 @@
   "see": []
  },
  {
+  "id": "refundoldshop",
+  "name": "refundOldShop",
+  "symbol": "refundOldShop",
+  "kind": "function",
+  "category": "Saves & Server/Migrations",
+  "file": "src/lib/emberShopMigration.ts",
+  "line": 16,
+  "summary": "The Ember shop was reworked (new ids, costs and effects). An account from before it has no `shopVersion`: its spent shop levels were bought under other numbers, so they are refunded once.",
+  "see": []
+ },
+ {
   "id": "the-browser-s-half-of-the-data-epoch",
   "name": "The browser's half of the data epoch",
   "kind": "topic",
@@ -2840,7 +2851,7 @@
   "kind": "const",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 64,
+  "line": 65,
   "summary": "The part of the game state that is saved. Rates, window flags and the like are recomputed on load.",
   "see": []
  },
@@ -2851,7 +2862,7 @@
   "kind": "function",
   "category": "Saves & Server/The save",
   "file": "src/lib/sanitizeSave.ts",
-  "line": 218,
+  "line": 219,
   "summary": "Validates and normalises a loaded/imported save. Anything that cannot be produced by playing the game (impossible grid, negative/huge/non-numeric values, more stat points than the level allows, XP that does not pay for the owned tiles ...) is rejected; derived values (rates, level, combat stats, castle cost) are recomputed instead of trusted. Returns the cleaned persisted slice.",
   "see": []
  },

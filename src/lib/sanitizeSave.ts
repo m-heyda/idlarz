@@ -21,6 +21,7 @@ import { maxHp, maxMana } from '@/lib/combat';
 import { starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
 import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
+import { refundOldShop } from '@/lib/emberShopMigration';
 import { castleUpgradeDuration } from '@/utils/game/castle';
 import { EMPTY_PRESTIGE, emberSpent } from '@/utils/game/rebirth';
 import { STARTER_FREE_TILES } from '@/utils/game/tiles';
@@ -539,7 +540,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.prestige !== undefined) {
 		if (!isRecord(raw.prestige)) return fail('prestige');
 		const rebirths = int(raw.prestige.rebirths, 0, 10000);
-		let legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
+		const legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
 		const legacyEarned = int(raw.prestige.legacyEarned, 0, 1_000_000);
 		if (rebirths === null || legacyPoints === null || legacyEarned === null) return fail('prestige numbers');
 		const upgrades: PrestigeState['upgrades'] = {};
@@ -553,12 +554,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		}
 		// Points are conserved: everything earned is either still unspent or paid for shop levels. The unspent balance absorbs a difference that is not a forgery (an upgrade that was dropped
 		// or cut, a price that changed): it is recomputed as earned minus spent. Only a shop that costs MORE than all the Embers ever earned is refused.
-		const spent = emberSpent(upgrades);
-		if (spent > legacyEarned) return fail('embers do not add up');
-		legacyPoints = legacyEarned - spent;
 		if ((rebirths === 0) !== (legacyEarned === 0)) return fail('rebirths and embers disagree');
 		if (legacyEarned < rebirths) return fail('too few embers for the rebirths');
-		// the shop generation and the free grants ride along; an account without a `shopVersion` is from before the reworked shop (it keeps what it had: see `autoUseUnlocked`)
+		// the shop generation and the free grants ride along
 		const shopVersion = raw.prestige.shopVersion === undefined ? undefined : int(raw.prestige.shopVersion, 0, 1000);
 		if (shopVersion === null) return fail('shop version');
 		const grants: EmberUpgradeId[] = [];
@@ -571,7 +569,18 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 					!grants.includes(id as EmberUpgradeId)
 				)
 					grants.push(id as EmberUpgradeId);
-		prestige = { rebirths, legacyPoints, legacyEarned, upgrades, ...(shopVersion !== undefined ? { shopVersion } : {}), ...(grants.length ? { grants } : {}) };
+		// an account from before the reworked shop (no `shopVersion`) gets its Embers back once: the old levels were bought under other numbers (lib/emberShopMigration.ts)
+		const read = refundOldShop({
+			rebirths,
+			legacyPoints,
+			legacyEarned,
+			upgrades,
+			...(shopVersion !== undefined ? { shopVersion } : {}),
+			...(grants.length ? { grants } : {}),
+		});
+		const spent = emberSpent(read.upgrades);
+		if (spent > legacyEarned) return fail('embers do not add up');
+		prestige = { ...read, legacyPoints: legacyEarned - spent };
 	}
 
 	// The caps the Ember shop gives (Castle Expansion, Master Masonry, Idol Mastery): a save above the ones it paid for is refused (castle) or has the excess dropped (buildings)
