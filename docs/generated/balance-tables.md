@@ -276,10 +276,10 @@ Per-second output of one tile before adjacency and modifiers (already multiplied
 | Empty | — |
 | Castle | gold 0.1, wood 0.05, stone 0.1, food 0.05, xp 0.5 |
 | Forest | gold 0.13, wood 0.39 |
-| Plains | gold 0.13, food 0.39 |
+| Plains | gold 0.13, food 0.39, stone 0.065 |
 | Hills | gold 0.065, stone 0.39, coal 0.26 |
 | Swamp | food 0.13, wood 0.26 |
-| Tundra | gold 0.13, coal 0.455 |
+| Tundra | gold 0.13, coal 0.455, stone 0.195 |
 | Lake | gold 0.065, food 0.325 |
 | Coast | gold 0.13, food 0.26 |
 | Jungle | gold 0.195, wood 0.585 |
@@ -324,7 +324,7 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | --- | --- | --- | --- | --- | --- |
 | gold | 0.1 | 0.1 | 1.030 | 45.0% | 1.493 |
 | wood | 0 | 0.05 | 1.245 | 45.0% | 1.805 |
-| stone | 0 | 0.1 | 0.150 | 32.5% | 0.199 |
+| stone | 0 | 0.1 | 0.345 | 32.5% | 0.457 |
 | coal | 0 | 0 | 0.000 | 45.0% | 0.000 |
 | food | 0 | 0.05 | 1.245 | 45.0% | 1.805 |
 | meat | 0 | 0 | 0.000 | 30.0% | 0.000 |

@@ -93,9 +93,10 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceGeneration: {
 			gold: 0.1,
 			food: 0.3,
+			stone: 0.05,
 		},
 		resourceIcons: [RESOURCE_ICONS.food],
-		description: 'Plains provide food and gold',
+		description: 'Plains provide food, gold and a little stone',
 	},
 	hills: {
 		name: 'hills',
@@ -133,9 +134,10 @@ export const BIOMES: Record<string, BiomeInfo> = {
 		resourceGeneration: {
 			gold: 0.1,
 			coal: 0.35,
+			stone: 0.15,
 		},
-		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.coal],
-		description: 'Tundras provide gold and coal',
+		resourceIcons: [RESOURCE_ICONS.gold, RESOURCE_ICONS.coal, RESOURCE_ICONS.stone],
+		description: 'Tundras provide gold, coal and some stone',
 	},
 	lake: {
 		name: 'lake',
