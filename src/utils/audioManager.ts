@@ -93,6 +93,7 @@ if (typeof window !== 'undefined') {
 	audioManager.loadSound('fanfare', '/fanfare.mp3');
 	audioManager.loadSound('buysell', '/buysell.wav', 0.4); // every buy and sell button, when it went through
 	audioManager.loadSound('heal', '/heal.wav', 0.5); // casting the Heal skill
+	audioManager.loadSound('stun', '/stun.wav', 0.5); // casting the Stun skill
 	audioManager.loadSound('gulp', '/gulp.wav', 0.5); // drinking a potion, in a fight or from the bag
 }
 

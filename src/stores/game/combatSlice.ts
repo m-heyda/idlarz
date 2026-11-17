@@ -37,8 +37,8 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 		requestSkill: (id: SkillId) => {
 			void requestUse(newClaimId(), { kind: 'skill', id }, sinceNow()).then((reply) => {
 				settleFight(reply, 'The skill is not ready.');
-				// the Heal cast has its own sound, only when the server took the cast
-				if (id === 'heal' && reply.status === 'ok' && reply.value.accepted) audioManager.playSound('heal');
+				// each skill cast has its own sound, only when the server took the cast
+				if (reply.status === 'ok' && reply.value.accepted) audioManager.playSound(id === 'heal' ? 'heal' : 'stun');
 			});
 			return true;
 		},
