@@ -230,7 +230,7 @@ that is why none of it can ever be sent anywhere. It is installed only on `/gues
 
 ### Guest game (/guest)
 
-Source: [`src/app/guest/page.tsx:34`](../../src/app/guest/page.tsx)
+Source: [`src/app/guest/page.tsx:35`](../../src/app/guest/page.tsx)
 
 `/guest`: the game without an account. A new guest picks a hero (the same creator as sign-up, no email or password), then plays the real game against the guest engine, in this browser only (see `src/lib/guest`). This page is always reached by a full
 page load (a plain link from the landing), so every storage key is the guest's (`storageScope`) from the first line of code. A guest who comes back finds their game where they left it.

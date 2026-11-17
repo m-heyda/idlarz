@@ -150,7 +150,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gradeLegacyItems` | Loot / Items | [`src/catalog/items/ladder.ts:316`](../../src/catalog/items/ladder.ts) | Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: |
 | `gradeLevels` | Loot / Items | [`src/catalog/items/grades.ts:79`](../../src/catalog/items/grades.ts) | The item level window an item of this grade is generated in. |
 | `gradeRarities` | Loot / Items | [`src/catalog/items/grades.ts:94`](../../src/catalog/items/grades.ts) | The rarities an item of this grade may roll as: |
-| Guest game (/guest) | Architecture / Guest mode | [`src/app/guest/page.tsx:34`](../../src/app/guest/page.tsx) | `/guest`: |
+| Guest game (/guest) | Architecture / Guest mode | [`src/app/guest/page.tsx:35`](../../src/app/guest/page.tsx) | `/guest`: |
 | Guest mode | Architecture / Guest mode | [`src/lib/guest/dispatch.ts:43`](../../src/lib/guest/dispatch.ts) | Guest mode: |
 | `guideVisibleFor` | Progression / Guided tutorial | [`src/lib/tutorial/live.ts:35`](../../src/lib/tutorial/live.ts) | Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). |
 | `healAmount` | Combat / Potions and skills | [`src/lib/skills.ts:20`](../../src/lib/skills.ts) | HP a Heal restores: |

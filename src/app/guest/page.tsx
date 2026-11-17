@@ -12,6 +12,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
 import { checkCharacterName, checkPlayerClass } from '@/lib/authValidation';
 import { readGuestHero, writeGuestHero } from '@/lib/guestMode';
 import type { Profile } from '@/lib/authClient';
+import '@idlarz/design-system';
 import '@/styles/Guest.css';
 
 // The game (and the guest engine) are only loaded once the guest is in: a signed-in player's pages never contain them.

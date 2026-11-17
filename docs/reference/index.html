@@ -7028,7 +7028,7 @@ ledger in <code>localStorage</code> and a &quot;saved game&quot; built from the 
 that is why none of it can ever be sent anywhere. It is installed only on <code>/guest</code> (<code>installGuest</code>) and loaded only there, so a signed-in player&#39;s bundle does not contain it.</p>
 </article><article><p><a id="guestpage"></a></p>
 <h3>Guest game (/guest)</h3>
-<p>Source: <a href="../../src/app/guest/page.tsx"><code>src/app/guest/page.tsx:34</code></a></p>
+<p>Source: <a href="../../src/app/guest/page.tsx"><code>src/app/guest/page.tsx:35</code></a></p>
 <p><code>/guest</code>: the game without an account. A new guest picks a hero (the same creator as sign-up, no email or password), then plays the real game against the guest engine, in this browser only (see <code>src/lib/guest</code>). This page is always reached by a full
 page load (a plain link from the landing), so every storage key is the guest&#39;s (<code>storageScope</code>) from the first line of code. A guest who comes back finds their game where they left it.</p>
 </article><h2>Routes</h2><article><p><a id="the-play-route-and-its-redirects"></a></p>

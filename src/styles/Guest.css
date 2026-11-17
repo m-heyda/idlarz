@@ -1,8 +1,8 @@
-/* The guest game's permanent notice (top right, under the header; above windows but below the notice stack) */
+/* The guest game's permanent notice (top left, under the header, clear of the map and the minimap; above windows but below the notice stack) */
 .guest-chip {
 	position: fixed;
 	top: calc(var(--header-h, 76px) + 10px);
-	right: 12px;
+	left: 12px;
 	z-index: 60;
 	display: flex;
 	align-items: center;

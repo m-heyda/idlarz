@@ -21,6 +21,7 @@ import { localForAccount, planStart, savedGameSummary, skipsHub, type GameSummar
 import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { GUEST_PATH, PLAY_PATH, safeNextPath } from '@/lib/playRoute';
+import { hasGuestGame } from '@/lib/guestMode';
 import '@idlarz/design-system';
 import { Button, Frame, HoverTip, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
 import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
@@ -228,6 +229,9 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 	const [mode, setMode] = useState<AuthMode>('login');
 	const [formKey, setFormKey] = useState(0);
 	const [next, setNext] = useState<string>(PLAY_PATH);
+	// a guest game kept in this browser (up to days of play): the button continues it
+	const [guestGame, setGuestGame] = useState(false);
+	useEffect(() => setGuestGame(hasGuestGame()), []);
 
 	const look = useCallback(async () => {
 		const me = await fetchMe();
@@ -381,7 +385,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 								}
 							>
 								<a className='ds-btn ds-btn-gold' href={GUEST_PATH}>
-									Play as guest
+									{guestGame ? 'Continue as guest' : 'Play as guest'}
 								</a>
 							</HoverTip>
 						</div>

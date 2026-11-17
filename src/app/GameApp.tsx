@@ -154,6 +154,8 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 	const dismissChestNotice = useUiStore((state) => state.dismissChestNotice);
 	const achievementNotices = useUiStore((state) => state.achievementNotices);
 	const dismissAchievementNotice = useUiStore((state) => state.dismissAchievementNotice);
+	// the guide comes after the welcome-back and daily bonus windows, never on top of them
+	const dailySettled = useUiStore((state) => state.dailySettled);
 	// Monotonic clock: changing the system clock must not change game speed
 	const lastTickTime = useRef(performance.now());
 
@@ -215,7 +217,7 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 			<OfflineDialog />
 			{/* after the welcome-back window: the daily bonus, once the start of the game is done */}
 			<DailyBonusDialog ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
-			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done'} />
+			<TutorialGuide ready={isHydrated && tabStatus === 'owner' && claim === 'done' && dailySettled} />
 			<ConfirmDialogs />
 			<BuildModal />
 			<BuildingModal />

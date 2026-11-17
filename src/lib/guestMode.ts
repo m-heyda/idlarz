@@ -96,3 +96,16 @@ export const wipeGuestStorage = (): void => {
 		/* nothing readable, nothing to remove */
 	}
 };
+
+/** True when this browser holds a guest game (a hero was picked on `/guest`): the landing then offers to continue it. Reads the guest key from outside the guest page, where `scoped` does not add the suffix. */
+export const hasGuestGame = (): boolean => {
+	try {
+		for (let i = 0; i < window.localStorage.length; i++) {
+			const key = window.localStorage.key(i);
+			if (key && /^idlarz\.guest\.hero\.guest(\.dev)?$/.test(key)) return true;
+		}
+	} catch {
+		/* storage blocked: no guest game to show */
+	}
+	return false;
+};
