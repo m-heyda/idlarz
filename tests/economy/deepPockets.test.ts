@@ -21,7 +21,7 @@ test('bag size: base 60, old Pack Rat +8 x 6, new Pack Rat +4 x 10, Deep Pockets
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat2: 10 } }), 100);
 	assert.equal(limitOf('bagSize', { prestige: prestige(3) }), 84);
 	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6 }, prestige: prestige(3) }), 132);
-	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6, packrat2: 6 }, prestige: prestige(5) }), 60 + 48 + 40 + 40);
+	assert.equal(limitOf('bagSize', { merchantUpgrades: { packrat: 6, packrat2: 10 }, prestige: prestige(5) }), 60 + 48 + 40 + 40);
 	assert.equal(limitOf('bagSize', { hardCap: true }), HARD_LIMITS.bagSize);
 	assert.ok(188 < HARD_LIMITS.bagSize, 'room is left for the belt slots');
 });

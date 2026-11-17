@@ -12,15 +12,23 @@ const MapTip: React.FC<{ className: string; children: React.ReactNode }> = ({ cl
 	useLayoutEffect(() => {
 		const el = inner.current;
 		if (!el) return;
-		const r = el.getBoundingClientRect();
-		const margin = 8;
-		// where the card would be without the nudge it already has
-		const left = r.left - shift.x;
-		const top = r.top - shift.y;
-		const x = Math.max(margin - left, Math.min(0, window.innerWidth - margin - (left + r.width)));
-		const y = Math.max(TIP_TOP_INSET - top, Math.min(0, window.innerHeight - margin - (top + r.height)));
-		if (Math.abs(x - shift.x) > 0.5 || Math.abs(y - shift.y) > 0.5) setShift({ x, y });
-	});
+		const measure = () => {
+			const r = el.getBoundingClientRect();
+			const margin = 8;
+			// where the card would be without the nudge it already has
+			const left = r.left - shift.x;
+			const top = r.top - shift.y;
+			const x = Math.max(margin - left, Math.min(0, window.innerWidth - margin - (left + r.width)));
+			const y = Math.max(TIP_TOP_INSET - top, Math.min(0, window.innerHeight - margin - (top + r.height)));
+			if (Math.abs(x - shift.x) > 0.5 || Math.abs(y - shift.y) > 0.5) setShift({ x, y });
+		};
+		measure();
+		// the card grows or shrinks while it is shown (a timer line appears): measure again
+		if (typeof ResizeObserver === 'undefined') return;
+		const observer = new ResizeObserver(measure);
+		observer.observe(el);
+		return () => observer.disconnect();
+	}, [shift.x, shift.y]);
 	return (
 		<div className={className}>
 			<div ref={inner} style={{ transform: `translate(${shift.x}px, ${shift.y}px)` }}>

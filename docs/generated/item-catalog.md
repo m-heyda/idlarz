@@ -263,7 +263,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **chest** (profile `basic_chest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
-- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 60.0%, Uncommon 40.0%
+- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 57.7%, Uncommon 38.5%, Rare 3.8%
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 - **craft level 41** (profile `craft`, item level 41): 32 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 
