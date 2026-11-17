@@ -3,7 +3,6 @@ import { useGameStore } from '@/stores/gameStore';
 import { FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { canAffordBundle } from '@/utils/game/costs';
 import { farmUpgradeCost, farmUpgradeLevel } from '@/utils/game/farm';
-import audioManager from '@/utils/audioManager';
 import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import { compact } from '../../../../packages/design-system/src/logic';
@@ -57,7 +56,7 @@ const UpgradeTiles: React.FC = () => {
 							</span>
 						}
 						onBuy={() => {
-							if (buy(id)) audioManager.playSound('purchase');
+							buy(id);
 						}}
 					/>
 				);

@@ -12,6 +12,7 @@ import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
 import { ratesWithGear, type GameGet, type GameSet } from './base';
 import type { InventorySync } from './inventorySync';
+import audioManager from '@/utils/audioManager';
 
 export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventorySync) => {
 	const { sendInventoryOp, settleSale } = inv;
@@ -26,7 +27,9 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			const slot = Number.isInteger(bagIndex) ? get().bag[bagIndex] : null;
 			const stack = slot ? stackOf(slot) : null;
 			if (!stack || !hasEffects(ITEM_CATALOG[stack.id])) return false;
-			sendInventoryOp({ action: 'use', index: bagIndex });
+			sendInventoryOp({ action: 'use', index: bagIndex }, (reply) => {
+				if (reply?.ok) audioManager.playSound('gulp');
+			});
 			return true;
 		},
 
@@ -102,6 +105,7 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 				bag: removeFromBag(state.bag, bagIndex, amount),
 				resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) },
 			});
+			audioManager.playSound('buysell');
 			return gold;
 		},
 
@@ -151,6 +155,7 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			if (count === 0) return { gold: 0, count: 0 };
 			sendInventoryOp(maxRarity === undefined ? { action: 'sellJunk', rule: 'junk' } : { action: 'sellJunk', maxRarity }, settleSale(gold));
 			set({ bag, resources: { ...state.resources, gold: Math.min(state.resources.gold + gold, RESOURCE_CAP) } });
+			audioManager.playSound('buysell');
 			return { gold, count };
 		},
 

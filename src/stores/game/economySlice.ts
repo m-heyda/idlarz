@@ -15,6 +15,7 @@ import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
 import { clickLimiter, findCastle, type GameGet, type GameSet } from './base';
+import audioManager from '@/utils/audioManager';
 
 export const createEconomySlice = (set: GameSet, get: GameGet) => {
 	/** Charge, claim the tile, award XP. */
@@ -114,6 +115,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				},
 				clickLevel: state.clickLevel + 1,
 			});
+			audioManager.playSound('buysell');
 			return true;
 		},
 

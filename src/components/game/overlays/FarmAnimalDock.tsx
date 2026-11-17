@@ -6,7 +6,6 @@ import { RESOURCES } from '@/catalog';
 import { ANIMALS, FARM_UPGRADES } from '@/config/farm';
 import { PIXEL_ICON_SIZES, animalIcon } from '@/config/pixelIcons';
 import { useGameStore } from '@/stores/gameStore';
-import audioManager from '@/utils/audioManager';
 import { formatNumber } from '@/utils/formatters';
 import { animalOutput, calculateAnimalCost, farmCap, farmUpgradeLevel } from '@/utils/game/farm';
 import type { Animal } from '@/types/game';
@@ -90,7 +89,6 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 					disabled={!canBuy}
 					onClick={() => {
 						onBuy(1);
-						audioManager.playSound('click');
 					}}
 				>
 					Buy · {compact(cost)} food

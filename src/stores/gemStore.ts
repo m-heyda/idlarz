@@ -10,6 +10,7 @@ import { RESOURCES } from '@/catalog';
 import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import audioManager from '@/utils/audioManager';
 
 // The browser's side of the gem shop (`POST /api/gems`): what the shop window shows, and the purchases. The balance, the prices, the cooldowns and every rule are the server's; the browser shows what the last answer said and never
 // computes a balance. A purchase carries a fresh key, and a lost answer is asked again with the SAME key (the server replays it, it is never charged twice).
@@ -92,7 +93,10 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 		buy: async (itemId, value) => {
 			if (get().busy) return null;
 			const reply = await run(newClaimId(), { action: 'spend', itemId, ...(value !== undefined ? { value } : {}) });
-			if (reply?.ok) useUiStore.getState().showToast('Done.');
+			if (reply?.ok) {
+				useUiStore.getState().showToast('Done.');
+				audioManager.playSound('buysell');
+			}
 			return reply;
 		},
 		reset: () => set({ info: null, busy: false, message: null }),
