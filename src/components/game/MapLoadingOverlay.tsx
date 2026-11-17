@@ -13,7 +13,7 @@ const PIXELS: readonly (readonly [number, number])[] = [
 ];
 
 /**
- * The spinner over the map while the game waits for the monsters and chests the server puts on it. The map itself is grey meanwhile (`.map-root[data-map-ready='false']` in MapLoading.css) and fades back to colour over 1.6 s once `show` turns false;
+ * The spinner over the map while the game waits for the monsters and chests the server puts on it. The map itself is grey meanwhile (`.map-root[data-map-ready='false']` in MapLoading.css) and fades back to colour over 0.8 s once `show` turns false;
  * the spinner fades out at the same moment and is then removed. It never takes a click: the map under it works as usual.
  */
 const MapLoadingOverlay: React.FC<{ show: boolean }> = ({ show }) => {

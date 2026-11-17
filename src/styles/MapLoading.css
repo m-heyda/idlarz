@@ -1,7 +1,7 @@
-/* The map while the game starts: grey, with a pixel spinner on top, until the monsters and chests are on it; then the colour comes back over 1.6 s and the spinner fades out. */
+/* The map while the game starts: grey, with a pixel spinner on top, until the monsters and chests are on it; then the colour comes back over 0.8 s and the spinner fades out. */
 .map-root > :not(.map-loading) {
 	filter: none;
-	transition: filter 1.6s ease-out;
+	transition: filter 0.8s ease-out;
 }
 
 .map-root[data-map-ready='false'] > :not(.map-loading) {

@@ -233,12 +233,6 @@
 	color: #f0e6d0;
 }
 
-.fight-dead-art {
-	display: block;
-	image-rendering: pixelated;
-	filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.5));
-}
-
 /* a slash effect (one-row sprite sheet, stepped) over the stage: blows on the monster in the middle, the monster's own blows low and mirrored */
 .fight-slash {
 	position: absolute;
@@ -404,12 +398,6 @@
 	border-color: #2a2118;
 }
 
-.combat-widget .fight-skill-name {
-	font-size: 0.85rem;
-	letter-spacing: 0.04em;
-	color: #e9e4d6;
-}
-
 .combat-switches {
 	padding-top: 4px;
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -489,4 +477,104 @@
 .combat-switches {
 	padding-top: 10px;
 	margin-top: 2px;
+}
+
+/* ===== the combat window, reworked: the monster's bar on the stage, my HP and mana in one row, one hotbar (potions, then skills as small icons) ===== */
+.combat-widget .combat-stage {
+	min-height: 150px;
+	padding-top: 30px;
+}
+
+.fight-monster-bar {
+	position: absolute;
+	top: 8px;
+	left: 50%;
+	z-index: 4;
+	width: 50%;
+	transform: translateX(-50%);
+}
+
+.fight-monster-bar .fight-bar {
+	height: 18px;
+}
+
+.fight-bars-row {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 6px;
+}
+
+.combat-widget .fight-bars-row .fight-bar,
+.combat-widget .fight-bars-row .fight-bar[data-kind='mana'] {
+	height: 20px;
+}
+
+.fight-hotbar {
+	--ds-slot-size: 42px;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 8px;
+}
+
+.fight-hotbar-sep {
+	align-self: stretch;
+	width: 1px;
+	margin: 2px 2px;
+	background: rgba(224, 169, 58, 0.35);
+}
+
+.combat-widget .fight-skill {
+	flex: none;
+	width: 42px;
+	height: 42px;
+	padding: 0;
+	display: grid;
+	place-items: center;
+}
+
+.fight-skill-icon {
+	width: 28px;
+	height: 28px;
+}
+
+.fight-skill .fight-hotkey,
+.fight-potion .fight-hotkey {
+	font-size: 0.65rem;
+}
+
+.fight-skill[data-nomana='true'] .fight-skill-icon {
+	opacity: 0.55;
+}
+
+.fight-skill[data-nomana='true'] {
+	border-color: #a8382c;
+}
+
+/* a won fight: the monster in grey with the colour skull on top of it */
+.fight-dead {
+	position: relative;
+	display: grid;
+	place-items: center;
+}
+
+.fight-dead-monster {
+	display: block;
+	filter: grayscale(1) brightness(0.7);
+	opacity: 0.85;
+}
+
+.fight-dead-skull {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	width: 48px;
+	height: 48px;
+	transform: translate(-50%, -50%);
+	image-rendering: pixelated;
+	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.55));
+}
+
+.victory-loot {
+	--ds-slot-size: 38px;
 }
