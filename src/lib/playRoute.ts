@@ -12,6 +12,9 @@
 /** The route of the game itself (the gate in front of it, then the game). */
 export const PLAY_PATH = '/play';
 
+/** The guest game (`src/app/guest`): the real game in this browser only, no account. Outside `/play`, so the middleware does not ask for a session. Always opened by a full page load. */
+export const GUEST_PATH = '/guest';
+
 /** The route of the public landing page. */
 export const LANDING_PATH = '/';
 

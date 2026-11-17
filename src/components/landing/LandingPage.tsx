@@ -20,7 +20,7 @@ import { peekSave } from '@/lib/saveStorage';
 import { localForAccount, planStart, savedGameSummary, skipsHub, type GameSummary } from '@/lib/startPlan';
 import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
-import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
+import { GUEST_PATH, PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@idlarz/design-system';
 import { Button, Frame, HoverTip, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
 import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
@@ -258,7 +258,13 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 	}, []);
 
 	useEffect(() => {
-		setNext(safeNextPath(new URLSearchParams(window.location.search).get('next')));
+		const params = new URLSearchParams(window.location.search);
+		setNext(safeNextPath(params.get('next')));
+		// a guest who registers from the guest game lands on the Create account tab (`GuestChip`)
+		if (params.get('register') === '1') {
+			setMode('register');
+			setFormKey((k) => k + 1);
+		}
 		void look();
 	}, [look]);
 
@@ -360,8 +366,8 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 							</>
 						)}
 					</Frame>
-					{/* only for a visitor who is logged out: a limited-features game with no account, not built yet */}
-					{visitor.name === 'guest' && (
+					{/* for a visitor without a session (also while accounts are unavailable: the guest game needs no server): the real game in this browser only. A plain link, on purpose: /guest is a full page load, so every storage key of that page is the guest's from its first line of code. */}
+					{(visitor.name === 'guest' || visitor.name === 'unavailable') && (
 						<div className='ld-guest'>
 							<HoverTip
 								placement='above'
@@ -369,14 +375,14 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 								fill
 								tip={
 									<HintTooltip
-										title='Coming soon'
-										text='A guest game is only for trying the game out. It is not shown in the rankings, and a play that is verified by the server needs an account.'
+										title='Try it without an account'
+										text='A guest game is only for trying the game out. It is saved in this browser only and is not shown in the rankings. Register any time to start a real account.'
 									/>
 								}
 							>
-								<Button disabled aria-disabled='true'>
+								<a className='ds-btn ds-btn-gold' href={GUEST_PATH}>
 									Play as guest
-								</Button>
+								</a>
 							</HoverTip>
 						</div>
 					)}

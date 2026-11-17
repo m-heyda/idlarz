@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 121,
+  "line": 124,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -42,6 +42,17 @@
   "file": "src/app/api/rankings/route.ts",
   "line": 18,
   "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "see": []
+ },
+ {
+  "id": "guestpage",
+  "name": "Guest game (/guest)",
+  "symbol": "GuestPage",
+  "kind": "function",
+  "category": "Architecture/Guest mode",
+  "file": "src/app/guest/page.tsx",
+  "line": 34,
+  "summary": "`/guest`: the game without an account. A new guest picks a hero (the same creator as sign-up, no email or password), then plays the real game against the guest engine, in this browser only (see `src/lib/guest`). This page is always reached by a full page load (a plain link from the landing), so every storage key is the guest's (`storageScope`) from the first line of code. A guest who comes back finds their game where they left it.",
   "see": []
  },
  {
@@ -1404,7 +1415,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/pipeline.ts",
-  "line": 211,
+  "line": 208,
   "summary": "Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid` - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise) - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history",
   "see": []
  },
@@ -1755,6 +1766,16 @@
   "file": "src/lib/fightSim.ts",
   "line": 58,
   "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
+  "id": "guest-mode",
+  "name": "Guest mode",
+  "kind": "topic",
+  "category": "Architecture/Guest mode",
+  "file": "src/lib/guest/dispatch.ts",
+  "line": 43,
+  "summary": "Guest mode: the game's /api calls answered in the browser by the same engine the server runs (`src/lib/offline/*`: spawns, chests, fights, loot, crafting, the gem shop, rebirth, offline claims), against the guest's own ledger in `localStorage` and a \"saved game\" built from the live game. Nothing leaves the browser, nothing is checked against a database, and nothing is ranked: the loot secret is public and the save is never verified, so a guest may cheat, and that is why none of it can ever be sent anywhere. It is installed only on `/guest` (`installGuest`) and loaded only there, so a signed-in player's bundle does not contain it.",
   "see": []
  },
  {

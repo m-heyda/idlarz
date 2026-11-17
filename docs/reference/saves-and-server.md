@@ -26,7 +26,7 @@ Source: [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts)
 
 What the browser keeps, what the server keeps, and what the server decides.
 
-**The rule of the game.** The game needs an account (there is no guest mode). The browser holds the game state and runs the economy (income, purchases, the map, the farm, the merchant's prices, stat allocation, rebirth bookkeeping).
+**The rule of the game.** The game needs an account; the only exception is the guest game (`/guest`), which runs this same engine in the browser against local stand-ins for the database and never talks to the server (`src/lib/guest`). The browser holds the game state and runs the economy (income, purchases, the map, the farm, the merchant's prices, stat allocation, rebirth bookkeeping).
 The server owns what is worth cheating for: when chests and monsters appear and where they stand, every kill and chest reward, every fight, the gem balance, the bag and worn gear, away-time pay, the XP ceiling and the Ember bound.
 The server judges the browser's save by plausibility, not by replaying actions.
 
@@ -288,7 +288,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:211`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:208`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`

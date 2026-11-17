@@ -27,7 +27,7 @@ npm run e2e      # browser smoke test with the test account; you sign in by hand
 
 ## Accounts and server setup (Supabase)
 
-The game sits behind email/password login and **cannot be played without a working server**: there is no guest or offline mode. The browser never talks to Supabase: the `/api/auth/*` route handlers do, with HttpOnly cookies. The account holds the character name and hero (`profiles`), a verified copy of the save (`player_saves`) and the ledger that decides spawns, fights, rewards and gems (`player_ledger`).
+The game sits behind email/password login and **cannot be played without a working server**. The one exception is the **guest game** (`/guest`, the landing's "Play as guest" button): the real game against a local copy of the server engine, saved in the browser only, never ranked and never calling the server (`src/lib/guest`). The browser never talks to Supabase: the `/api/auth/*` route handlers do, with HttpOnly cookies. The account holds the character name and hero (`profiles`), a verified copy of the save (`player_saves`) and the ledger that decides spawns, fights, rewards and gems (`player_ledger`).
 
 1. Supabase → Authentication → Providers: Email on, **Confirm email off**.
 2. Database: on a **fresh** project run [`supabase/schema.sql`](supabase/schema.sql) in the SQL editor (profiles, cloud save and ledger tables, access rules, the atomic save function). A project with an older version runs the files in [`supabase/migrations/`](supabase/migrations) instead, **in this order**: `autosave_history_by_time.sql`, `offline_ledger.sql`, `combat_ledger.sql`, `inventory_ledger.sql`, and before deploying the code that needs them.

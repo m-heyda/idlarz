@@ -3,6 +3,7 @@ import type { BootSnapshot } from '@/lib/offline/types';
 import { scoped } from '@/lib/storageScope';
 import type { AvatarSendResult } from '@/lib/avatarPick';
 import { epochFetch } from '@/lib/epochFetch';
+import { networkFetch } from '@/lib/guestMode';
 import type { ShownIdentity } from '@/catalog/badges';
 
 /** The browser side of /api/auth/*: the page only ever talks to our own routes, never to Supabase. */
@@ -51,7 +52,7 @@ const REQUEST_TIMEOUT_MS = 8000;
 
 const request = async (path: string, init?: RequestInit): Promise<AuthResult> => {
 	try {
-		const response = await fetch(path, { ...init, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		const response = await networkFetch(path, { ...init, credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		const body = (await response.json().catch(() => ({}))) as {
 			user?: { id?: string };
 			profile?: Profile | null;
@@ -119,7 +120,7 @@ export const saveProfile = (characterName: string, playerClass: PlayerClassId, a
 export type ChapterResult = { status: 'ok' } | { status: 'error'; message: string; nameTaken?: boolean } | { status: 'unavailable' };
 export const startChapter = async (characterName: string, playerClass: PlayerClassId, avatarId: string | null = null): Promise<ChapterResult> => {
 	try {
-		const response = await fetch('/api/auth/epoch', {
+		const response = await networkFetch('/api/auth/epoch', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ characterName, playerClass, avatarId }),
@@ -145,7 +146,7 @@ export interface AvatarState {
 }
 export const fetchAvatars = async (): Promise<AvatarState | null> => {
 	try {
-		const response = await fetch('/api/auth/avatar', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		const response = await networkFetch('/api/auth/avatar', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		if (!response.ok) return null;
 		const body = (await response.json().catch(() => null)) as { playerClass?: unknown; avatarId?: unknown; unlocked?: unknown } | null;
 		if (!body || !Array.isArray(body.unlocked) || typeof body.playerClass !== 'string' || !PLAYER_CLASSES[body.playerClass as PlayerClassId]) return null;
@@ -193,7 +194,7 @@ export interface BadgeState {
 /** `null` when the server cannot be reached. */
 export const fetchBadges = async (): Promise<BadgeState | null> => {
 	try {
-		const response = await fetch('/api/auth/badge', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
+		const response = await networkFetch('/api/auth/badge', { credentials: 'same-origin', cache: 'no-store', signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS) });
 		if (!response.ok) return null;
 		const body = (await response.json().catch(() => null)) as {
 			badgeId?: unknown;

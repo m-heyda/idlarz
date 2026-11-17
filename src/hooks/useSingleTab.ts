@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { setSavePaused } from '@/lib/saveStorage';
+import { scoped } from '@/lib/storageScope';
 
-const LOCK_NAME = 'idlarz-game-owner';
+// scoped: a guest game and a signed-in game in two tabs are two different games and must not lock each other out
+const LOCK_NAME = scoped('idlarz-game-owner');
 
 export type TabStatus = 'checking' | 'owner' | 'blocked';
 

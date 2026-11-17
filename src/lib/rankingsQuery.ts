@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { QUERY_KEYS } from '@/lib/queryClient';
+import { networkFetch } from '@/lib/guestMode';
 import { RANKING_BOARDS, type RankingBoardAnswer, type RankingBoardId, type RankingRow } from '@/lib/rankings';
 
 const isRow = (value: unknown): value is RankingRow =>
@@ -12,7 +13,7 @@ const isRow = (value: unknown): value is RankingRow =>
 /** One board of the Rankings (`GET /api/rankings?board=…`); null on any failure or a body of the wrong shape, so the window shows its error state rather than a half-drawn list. */
 export const fetchRankings = async (board: RankingBoardId): Promise<RankingBoardAnswer | null> => {
 	try {
-		const response = await fetch(`/api/rankings?board=${encodeURIComponent(board)}`, { credentials: 'same-origin', signal: AbortSignal.timeout(8000) });
+		const response = await networkFetch(`/api/rankings?board=${encodeURIComponent(board)}`, { credentials: 'same-origin', signal: AbortSignal.timeout(8000) });
 		if (!response.ok) return null;
 		const body = (await response.json().catch(() => null)) as Partial<RankingBoardAnswer> | null;
 		if (!body || !Array.isArray(body.rows) || !body.rows.every(isRow)) return null;
