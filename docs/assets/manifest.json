@@ -20524,14 +20524,12 @@
 		]
 	},
 	{
-		"usedBy": [
-			"src/components/game/DailyBoard.tsx"
-		],
+		"usedBy": [],
 		"name": "bonus_chest",
 		"category": "ui",
 		"subcategory": "bonus",
 		"src": "/pixel/icons/bonus_chest.png",
-		"status": "used",
+		"status": "unused",
 		"source": "public/pixel/icons",
 		"size": [
 			32,

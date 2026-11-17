@@ -44,11 +44,11 @@ const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClai
 						<div className='dd-day-body'>
 							{last ? (
 								// eslint-disable-next-line @next/next/no-img-element
-								<img className='dd-day-chest' src='/pixel/icons/bonus_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
+								<img className='dd-day-chest' src='/pixel/ui/treasure_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
 							) : null}
 							<div className='dd-day-prize'>
 								<span className='dd-day-gems'>
-									+{gemsPaid} <GemIcon />
+									+{gemsPaid} <GemIcon scale={0.75} />
 								</span>
 								{last ? <span className='dd-day-extra'>+ chest of materials</span> : null}
 							</div>
