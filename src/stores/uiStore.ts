@@ -131,10 +131,9 @@ interface UiState {
 	settingsOpen: boolean;
 	toggleSettings: () => void;
 	closeSettings: () => void;
-	rebirthOpen: boolean;
+	/** Rebirth and the Ember shop: a game window (`windowStore`, id `rebirth`), these act on it */
 	toggleRebirth: () => void;
-	/** The Gem shop window (the header gem chip opens it) */
-	gemShopOpen: boolean;
+	/** The Gem shop: a game window (`windowStore`, id `gems`; the header gem chip opens it) */
 	toggleGemShop: () => void;
 	closeGemShop: () => void;
 	closeRebirth: () => void;
@@ -228,12 +227,10 @@ export const useUiStore = create<UiState>((set, get) => ({
 	settingsOpen: false,
 	toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
 	closeSettings: () => set({ settingsOpen: false }),
-	gemShopOpen: false,
-	toggleGemShop: () => set((state) => ({ gemShopOpen: !state.gemShopOpen })),
-	closeGemShop: () => set({ gemShopOpen: false }),
-	rebirthOpen: false,
-	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
-	closeRebirth: () => set({ rebirthOpen: false }),
+	toggleGemShop: () => useWindowStore.getState().toggleWindow('gems'),
+	closeGemShop: () => useWindowStore.getState().closeWindow('gems'),
+	toggleRebirth: () => useWindowStore.getState().toggleWindow('rebirth'),
+	closeRebirth: () => useWindowStore.getState().closeWindow('rebirth'),
 	saveMenuOpen: false,
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),

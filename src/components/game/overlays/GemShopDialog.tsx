@@ -5,9 +5,10 @@ import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
+import { useWindowStore } from '@/stores/windowStore';
 import { notify } from '@/lib/notices';
 import { formatNumber } from '@/utils/formatters';
-import GameModal from '../GameModal';
+import GameWindow from '../GameWindow';
 import { useBadgeChoice } from '../BadgeDialog';
 import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import { NickName } from '../../../../packages/design-system/src/components/composites';
@@ -55,7 +56,7 @@ const waitText = (sec: number): string => {
  * preview of your name in the effect before you buy it). A bought item reads "Owned". A refusal (a short balance, a cooldown) is a notice, not a line in the row.
  */
 const GemShopDialog: React.FC = () => {
-	const open = useUiStore((state) => state.gemShopOpen);
+	const open = useWindowStore((state) => state.order.includes('gems'));
 	const close = useUiStore((state) => state.closeGemShop);
 	const openClassDialog = useUiStore((state) => state.openClassDialog);
 	const info = useGemStore((state) => state.info);
@@ -212,20 +213,28 @@ const GemShopDialog: React.FC = () => {
 	};
 
 	return (
-		<GameModal title='Gem shop' width={920} className='ds-modal-pin' onClose={close}>
-			<Tabs
-				active={tab}
-				onChange={(id) => setTab(id as ShopView)}
-				items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
-			/>
-			<div className='ds-modal-scroll'>
-				<div className='gem-balance-row' title='Your gems'>
+		<GameWindow
+			id='gems'
+			title='Gem shop'
+			width={860}
+			height={620}
+			bar={
+				<Tabs
+					active={tab}
+					onChange={(id) => setTab(id as ShopView)}
+					items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
+				/>
+			}
+			barRight={
+				<span className='gem-balance-row' title='Your gems'>
 					Gems:&nbsp;
 					<span className='text-[#ffe27a] tabular-nums' data-testid='gem-balance'>
 						{formatNumber(balance)}
 					</span>
-				</div>
-
+				</span>
+			}
+		>
+			<div>
 				{tab === 'daily' && <DailyBoard daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />}
 
 				{tab !== 'daily' && items.length === 0 && (
@@ -259,13 +268,13 @@ const GemShopDialog: React.FC = () => {
 								</div>
 							</>
 						)}
-						<div className='ds-ups'>
+						<div className='ds-ups gem-two'>
 							<div className='ds-ups-grid'>{items.map(tile)}</div>
 						</div>
 					</div>
 				)}
 			</div>
-		</GameModal>
+		</GameWindow>
 	);
 };
 

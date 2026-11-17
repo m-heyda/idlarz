@@ -1685,7 +1685,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 37,
+  "line": 40,
   "summary": "The item level a recipe of this grade makes, by crafting level: the grade's window (`gradeLevels`) is climbed from its bottom at the grade's unlock to its top at the next grade's unlock, and the roll is +-1 around that centre, never outside the window.",
   "see": []
  },
@@ -1696,7 +1696,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 57,
+  "line": 60,
   "summary": "Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`.",
   "see": []
  },
@@ -1707,7 +1707,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 78,
+  "line": 81,
   "summary": "The pity multiplier on the grade's best rarity after `misses` crafts that missed it.",
   "see": []
  },
@@ -1718,7 +1718,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 114,
+  "line": 117,
   "summary": "One crafted piece: the `craft` loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe's slot inside the grade's item level window, and the piece is marked `crafted`. Null when nothing is eligible (a configuration error, never silently replaced).",
   "see": [
    "gearOdds",
@@ -1732,7 +1732,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 140,
+  "line": 143,
   "summary": "What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.",
   "see": []
  },

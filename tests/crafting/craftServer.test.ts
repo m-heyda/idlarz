@@ -104,7 +104,7 @@ test('a queued vial batch gives nothing until it is claimed; the claim puts vial
 	assert.deepEqual(p.ledger().craft.queue, []);
 });
 
-test('a potion takes a vial when it is queued and lands in the crafting stash when it is claimed', async () => {
+test('a potion takes a vial when it is queued and goes straight into the bag when it is claimed', async () => {
 	const p = await player();
 	assert.equal((await craft(p, 'potion_minor', 1, 10 * SEC)).reason, 'no_components');
 	assert.equal(p.ledger().craft.xp, 0);
@@ -116,8 +116,8 @@ test('a potion takes a vial when it is queued and lands in the crafting stash wh
 	assert.equal(p.ledger().craft.stock.potion_minor, undefined, 'nothing in the stash yet');
 	const r = await claim(p, (t + 5 + 1 + 28) * SEC);
 	assert.equal(r.crafted, 2);
-	assert.equal(p.ledger().craft.stock.potion_minor, 2);
-	assert.equal(bagCountOf(p.ledger().inv!, 'potion_minor'), before, 'the bag is not touched');
+	assert.equal(p.ledger().craft.stock.potion_minor, undefined, 'nothing waits in the crafting stash');
+	assert.equal(bagCountOf(p.ledger().inv!, 'potion_minor'), before + 2, 'the potions are in the bag');
 	assert.equal(p.ledger().craft.xp, craftXpOf(RECIPE_BY_ID.glass_vial, 2) + craftXpOf(RECIPE_BY_ID.potion_minor, 2));
 });
 
@@ -128,7 +128,7 @@ test('the greater potion is locked until its crafting level', async () => {
 	p.ledger().craft.xp = craftCumulativeXp(5);
 	assert.equal((await craft(p, 'potion_greater', 1, (t + 10) * SEC)).ok, true);
 	await claim(p, (t + 10 + 31) * SEC);
-	assert.equal((p.ledger().craft.stock.potion_greater ?? 0) >= 1, true);
+	assert.equal(bagCountOf(p.ledger().inv!, 'potion_greater') >= 1, true);
 });
 
 test('one request per second: a quicker one is refused with no charge, and three full slots refuse the next batch', async () => {
@@ -145,7 +145,7 @@ test('one request per second: a quicker one is refused with no charge, and three
 	assert.equal(p.ledger().craft.spent, spent3, 'a refused batch charges nothing');
 });
 
-test('a full bag does not stop a claim: crafted potions wait in the stash, and a withdrawal needs bag room', async () => {
+test('a full bag keeps crafted potions waiting in the batch; potions crafted before they went to the bag are still withdrawn from the stash', async () => {
 	const p = await player();
 	const t = await craftAndClaim(p, 'glass_vial', 1, 10);
 	assert.equal((await craft(p, 'potion_minor', 1, (t + 2) * SEC)).ok, true);
@@ -154,9 +154,11 @@ test('a full bag does not stop a claim: crafted potions wait in the stash, and a
 	for (let i = 0; i < full.length; i++) full = addDrop(full, { kind: 'gear', item: plainItem('iron_sword') }).bag as never[];
 	led.inv = { ...led.inv!, bag: full };
 	const r = await claim(p, (t + 2 + 20) * SEC);
-	assert.equal(r.ok, true);
-	assert.equal(p.ledger().craft.stock.potion_minor, 1);
-	assert.deepEqual(p.ledger().craft.queue, []);
+	assert.equal(r.reason, 'bag_full', 'nothing is delivered into a full bag');
+	assert.equal(p.ledger().craft.queue.length, 1, 'the potion waits in the batch');
+	assert.equal(p.ledger().craft.stock.potion_minor, undefined);
+	// an old stash (potions made before they went straight to the bag) is still taken out with a withdrawal, which needs room
+	p.ledger().craft.stock.potion_minor = 1;
 	const withdraw = async (at: number) => ok(await craftStep(p.m.deps, 'u1', key(), { action: 'withdraw', id: 'potion_minor', qty: 1 }, T0 + at * SEC));
 	assert.equal((await withdraw(t + 30)).reason, 'bag_full');
 	assert.equal(p.ledger().craft.stock.potion_minor, 1, 'a refused withdrawal changes nothing');
@@ -167,6 +169,10 @@ test('a full bag does not stop a claim: crafted potions wait in the stash, and a
 	assert.equal(moved.moved, 1);
 	assert.equal(bagCountOf(p.ledger().inv!, 'potion_minor'), 1);
 	assert.equal(p.ledger().craft.stock.potion_minor, undefined);
+	// with room again the waiting batch is delivered into the bag
+	const later = await claim(p, (t + 40) * SEC);
+	assert.equal(later.ok, true);
+	assert.equal(bagCountOf(p.ledger().inv!, 'potion_minor'), 2);
 });
 
 test('the same key replays the same answer and queues once', async () => {
@@ -265,7 +271,7 @@ test('claiming twice with the same key delivers once; cancelling refunds the unf
 	assert.equal((await claim(p, 70 * SEC)).reason, 'no_batch');
 });
 
-test('a trade good is level-gated, takes its components when queued, and lands in the crafting stash when claimed', () => {
+test('a trade good is level-gated, takes its components when queued, and goes straight into the bag when claimed', () => {
 	const inv = { ver: 1, bag: Array.from({ length: 36 }, () => null), equipment: {}, lootPity: {}, autoSellUpTo: null } as unknown as Parameters<
 		typeof applyCraft
 	>[0];
@@ -282,15 +288,15 @@ test('a trade good is level-gated, takes its components when queued, and lands i
 
 	const claimed = applyClaim(queued.inv, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
 	assert.equal(claimed.crafted, 2);
-	assert.equal(claimed.craft.stock.leather_satchel, 2);
-	assert.equal(bagCountOf(claimed.inv, 'leather_satchel'), 0);
+	assert.equal(claimed.craft.stock.leather_satchel, undefined);
+	assert.equal(bagCountOf(claimed.inv, 'leather_satchel'), 2);
 	assert.equal(claimed.craft.xp, rich.xp + craftXpOf(satchel, 2));
 
 	let bag = inv.bag;
 	for (let i = 0; i < 36; i++) bag = addDrop(bag, { kind: 'gear', item: plainItem('iron_sword') }).bag as typeof bag;
 	const full = { ...inv, bag };
 	const stuck = applyClaim(full, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
-	assert.equal(stuck.ok, true, 'a full bag does not stop a claim');
+	assert.equal(stuck.reason, 'bag_full', 'a full bag keeps the goods waiting in the batch');
 });
 
 test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives a few hundredths of an XP', () => {

@@ -427,7 +427,7 @@ const CraftingBag: React.FC = () => {
 					<HoverTip
 						key={entry.id}
 						tip={
-							<Tooltip className='ds-tip-compact' title={entry.name} icon={entry.icon} subtitle={KIND_LABEL[entry.kind]}>
+							<Tooltip className='ds-tip-wide' title={entry.name} icon={entry.icon} subtitle={KIND_LABEL[entry.kind]}>
 								<TipRows rows={[{ label: 'You hold', value: formatNumber(entry.qty) }]} />
 								<div className='ds-tip-keys'>
 									{takeable ? (

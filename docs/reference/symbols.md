@@ -138,8 +138,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `GameState` | Architecture / State | [`src/types/game.ts:374`](../../src/types/game.ts) | State. |
 | `gear` | Loot / Adding content | [`src/catalog/items/define.ts:105`](../../src/catalog/items/define.ts) | The builder every piece of gear is authored with. |
 | `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
-| `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:37`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
-| `gearOdds` | Progression / Crafting | [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts) | What the Crafting window's odds panel shows for a recipe: |
+| `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:40`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
+| `gearOdds` | Progression / Crafting | [`src/lib/craftGear.ts:143`](../../src/lib/craftGear.ts) | What the Crafting window's odds panel shows for a recipe: |
 | `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:58`](../../src/config/gemShop.ts) | The gem shop's price book: |
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts) | Everything one source gives. |
@@ -210,7 +210,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `PetDef` | Progression / Pets | [`src/catalog/pets.ts:10`](../../src/catalog/pets.ts) | A pet of the catalog (pure config). |
 | `pickPetPhrase` | Progression / Pets | [`src/lib/pets.ts:51`](../../src/lib/pets.ts) | Which phrase the pet says next: |
 | `pickTarget` | Combat / A fight | [`src/lib/offline/fightTargets.ts:39`](../../src/lib/offline/fightTargets.ts) | The next monster to engage: |
-| `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:78`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
+| `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:81`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
 | Pixel art pipeline | Architecture / Art | [`src/config/pixelIcons.ts:1`](../../src/config/pixelIcons.ts) | All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: |
 | `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:74`](../../src/lib/offline/placement.ts) | Looks at the land: |
 | `playerProfile` | Combat / A fight | [`src/lib/offline/profile.ts:64`](../../src/lib/offline/profile.ts) | Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, l... |
@@ -220,7 +220,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `potionSlotCount` | Combat / Potions and skills | [`src/lib/potionBelt.ts:38`](../../src/lib/potionBelt.ts) | Potion stacks on the hotkey bar: |
 | `producerOutput` | Economy / Buildings | [`src/lib/buildingOutput.ts:20`](../../src/lib/buildingOutput.ts) | What a Producer of level `level` makes per second, before the global modifiers (castle, Embers, ...): |
 | `projectFight` | Combat / A fight | [`src/lib/offline/fightProject.ts:32`](../../src/lib/offline/fightProject.ts) | The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands someth... |
-| `qualityBiasOf` | Progression / Crafting | [`src/lib/craftGear.ts:57`](../../src/lib/craftGear.ts) | Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`. |
+| `qualityBiasOf` | Progression / Crafting | [`src/lib/craftGear.ts:60`](../../src/lib/craftGear.ts) | Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`. |
 | `queueTicket` | Combat / A fight | [`src/lib/offline/fightTargets.ts:85`](../../src/lib/offline/fightTargets.ts) | A click while a fight is open: |
 | `RARITIES` | Loot / Items | [`src/catalog/rarity.ts:34`](../../src/catalog/rarity.ts) | Rarities: |
 | `rarityLuckMultiplier` | Economy / Chests and Luck | [`src/lib/luck.ts:30`](../../src/lib/luck.ts) | What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear). |
@@ -250,7 +250,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
-| `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts) | One crafted piece: |
+| `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:117`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
 | `rollJunkDrops` | Loot / Junk | [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |

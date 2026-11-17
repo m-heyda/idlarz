@@ -2,9 +2,7 @@
 .rb-root {
 	display: flex;
 	flex-direction: column;
-	gap: 0;
-	flex: 1;
-	min-height: 0;
+	gap: 12px;
 	min-width: 0;
 }
 .rb-stack {
@@ -262,4 +260,9 @@
 	margin: 0;
 	font-size: 0.78rem;
 	color: #f08a7e;
+}
+
+/* the Ember shop keeps three tiles to a row at any window width, so the window can be made smaller without the layout changing */
+.rb-root .ds-ups-grid {
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 }

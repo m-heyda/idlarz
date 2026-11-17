@@ -59,8 +59,8 @@ test('a claim pays the finished part, the XP and shortens the entry; the rest ke
 	const r = applyClaim(inv(), withQueue(e), 0, now);
 	assert.equal(r.ok, true);
 	assert.equal(r.crafted, 3);
-	assert.equal(r.craft.stock.potion_minor, 3, 'potions go to the crafting stash, not the bag');
-	assert.equal(bagCountOf(r.inv, 'potion_minor'), 0);
+	assert.equal(r.craft.stock.potion_minor, undefined, 'potions go straight into the bag, not the crafting stash');
+	assert.equal(bagCountOf(r.inv, 'potion_minor'), 3);
 	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.potion_minor, 3));
 	assert.equal(r.craft.ord, 3);
 	assert.deepEqual(r.craft.queue, [{ ...e, count: 7, startedAt: e.startedAt + 42_000 }]);
@@ -72,15 +72,30 @@ test('a claim pays the finished part, the XP and shortens the entry; the rest ke
 
 test('a stash with room for only some delivers those and the rest waits in the batch (never gold)', () => {
 	const cap = CRAFTING.componentCap;
-	const e = entry({ count: 5 });
-	const c: CraftState = { ...withQueue(e), stock: { potion_minor: cap - 3 } };
-	const r = applyClaim(inv(), c, 0, e.startedAt + 5 * 14_000);
+	const e = entry({ recipeId: 'glass_vial', count: 5, timeSec: 10 });
+	const c: CraftState = { ...withQueue(e), stock: { glass_vial: cap - 3 } };
+	const r = applyClaim(inv(), c, 0, e.startedAt + 5 * 10_000);
 	assert.equal(r.ok, true);
 	assert.equal(r.crafted, 3, 'only the 3 that fit');
-	assert.equal(r.craft.stock.potion_minor, cap);
-	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.potion_minor, 3));
-	assert.deepEqual(r.craft.queue, [{ ...e, count: 2, startedAt: e.startedAt + 3 * 14_000 }]);
-	assert.equal(applyClaim(inv(), r.craft, 0, e.startedAt + 6 * 14_000).reason, 'stock_full');
+	assert.equal(r.craft.stock.glass_vial, cap);
+	assert.equal(r.craft.xp, craftXpOf(RECIPE_BY_ID.glass_vial, 3));
+	assert.deepEqual(r.craft.queue, [{ ...e, count: 2, startedAt: e.startedAt + 3 * 10_000 }]);
+	assert.equal(applyClaim(inv(), r.craft, 0, e.startedAt + 6 * 10_000).reason, 'stock_full');
+});
+
+test('a bag with room for only some potions takes those and the rest waits in the batch; a full bag refuses', () => {
+	const e = entry({ count: 100_000 });
+	// every slot but one holds gear, so the one free slot is all the room there is
+	let bag = inv().bag;
+	for (let i = 0; i < bag.length - 1; i++) bag = addDrop(bag, { kind: 'gear', item: plainItem('iron_sword') }).bag;
+	const room = { ...inv(), bag };
+	const r = applyClaim(room, withQueue(e), 0, e.startedAt + 100_000 * 14_000);
+	assert.equal(r.ok, true);
+	assert.ok(r.crafted! >= 1 && r.crafted! < 100_000, `${r.crafted} fit`);
+	assert.equal(bagCountOf(r.inv, 'potion_minor'), r.crafted);
+	assert.equal(r.craft.queue[0].count, 100_000 - r.crafted!);
+	assert.equal(r.craft.stock.potion_minor, undefined);
+	assert.equal(applyClaim(r.inv, r.craft, 0, e.startedAt + 100_000 * 14_000 + 5000).reason, 'bag_full');
 });
 
 test('the queue holds three batches side by side; a fourth is refused', () => {
@@ -111,7 +126,8 @@ test('Collect all delivers every finished batch in one request and keeps the unf
 	const r = applyClaimAll(inv(), withQueue(a, b, late), now);
 	assert.equal(r.ok, true);
 	assert.equal(r.crafted, 9);
-	assert.equal(r.craft.stock.potion_minor, 4);
+	assert.equal(bagCountOf(r.inv, 'potion_minor'), 4, 'the potions went into the bag');
+	assert.equal(r.craft.stock.potion_minor, undefined);
 	assert.equal(r.craft.stock.glass_vial, 5);
 	assert.deepEqual(r.craft.queue, [late]);
 	assert.equal(applyClaimAll(inv(), r.craft, now + 2000).reason, 'nothing_ready');

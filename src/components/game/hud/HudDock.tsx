@@ -28,14 +28,14 @@ const HudDock: React.FC = () => {
 	const order = useWindowStore((state) => state.order);
 	const level = useGameStore((state) => state.level.level);
 	const points = useGameStore((state) => state.characterStats.availablePoints);
-	const gemShopOpen = useUiStore((state) => state.gemShopOpen);
+	const gemShopOpen = order.includes('gems');
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const { stats: pointsWaiting } = useMenuAttention();
 	const toggleWindow = useWindowStore((state) => state.toggleWindow);
 	const farmWaiting = useGameStore((state) => farmHasPurchase(state.resources, state.farmLevels, state.farmUpgrades));
 	const claimable = useAchievementStore((state) => state.earned.filter((id) => !state.claimed.includes(id)).length);
 
-	const rebirthOpen = useUiStore((state) => state.rebirthOpen);
+	const rebirthOpen = order.includes('rebirth');
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);
 	const tiles = useGameStore((state) => state.tiles);
 	const freeTiles = useGameStore((state) => state.freeTiles);

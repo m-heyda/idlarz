@@ -1,10 +1,15 @@
 /* The Gem shop window: the Identity cards, the owned label and the cosmetics preview strip. The Upgrades and Cosmetics tabs reuse the design system's upgrade tiles (`ds-ups-grid`). */
 .gem-balance-row {
-	display: flex;
-	justify-content: flex-end;
+	display: inline-flex;
+	align-items: baseline;
 	font-size: 14px;
 	color: #a89878;
-	padding: 0 4px 10px;
+	padding: 0 6px;
+}
+
+/* the upgrade and cosmetic tiles sit two to a row, so a price and its button never have to break */
+.gem-two .ds-ups-grid {
+	grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
 .gem-id-grid {

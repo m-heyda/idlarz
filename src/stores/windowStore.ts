@@ -2,11 +2,23 @@ import { create } from 'zustand';
 import { readJsonPref, writeJsonPref } from '@/lib/uiPrefs';
 
 /**
- * The game's windows: Hero, Merchant, Farm, Crafting, Deeds, Bestiary, Boss, Rankings, the Kingdom overview and the castle upgrade. Any number can be open at once, each can be dragged,
+ * The game's windows: Hero, Merchant, Farm, Crafting, Deeds, Bestiary, Boss, Rankings, the Kingdom overview, the Gem shop, Rebirth (with the Ember shop) and the castle upgrade. Any number can be open at once, each can be dragged,
  * and the one you click comes to the front (`order` is back to front: the last id is on top). Where a window was left is remembered.
  */
-export type WinId = 'equipment' | 'merchant' | 'farm' | 'castle' | 'achievements' | 'bestiary' | 'boss' | 'rankings' | 'kingdom';
-export const WIN_IDS: readonly WinId[] = ['equipment', 'merchant', 'farm', 'castle', 'achievements', 'bestiary', 'boss', 'rankings', 'kingdom'];
+export type WinId = 'equipment' | 'merchant' | 'farm' | 'castle' | 'achievements' | 'bestiary' | 'boss' | 'rankings' | 'kingdom' | 'gems' | 'rebirth';
+export const WIN_IDS: readonly WinId[] = [
+	'equipment',
+	'merchant',
+	'farm',
+	'castle',
+	'achievements',
+	'bestiary',
+	'boss',
+	'rankings',
+	'kingdom',
+	'gems',
+	'rebirth',
+];
 
 export interface WinPos {
 	x: number;
@@ -24,6 +36,8 @@ export const DEFAULT_WINDOW_POS: Record<WinId, WinPos> = {
 	boss: { x: 340, y: 244 },
 	rankings: { x: 390, y: 268 },
 	kingdom: { x: 440, y: 120 },
+	gems: { x: 260, y: 130 },
+	rebirth: { x: 200, y: 110 },
 };
 
 export interface WinSize {

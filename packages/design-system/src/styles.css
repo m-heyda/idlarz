@@ -1068,6 +1068,15 @@
 
 /* Compact tooltip (header resources): narrower, smaller type, tighter rows */
 
+.ds-tip-wide {
+	/* a card whose key hints and lines must fit without breaking (the crafting bag, the recipe list) */
+	width: 360px;
+}
+
+.ds-tip-wide .ds-tip-keys span {
+	white-space: nowrap;
+}
+
 .ds-tip-compact {
 	width: 210px;
 	padding: 7px 9px;
@@ -5471,30 +5480,4 @@ button.ds-income-head:hover {
 .ds-quick-grade {
 	white-space: nowrap;
 	border-left: 6px solid var(--grade, transparent);
-}
-
-/* A modal whose title and tabs stay on top while the content scrolls: put `ds-modal-pin` on the Modal and wrap the scrolling part in `ds-modal-scroll` */
-.ds-modal-pin .ds-frame,
-.ds-modal-pin .ds-frame > .ds-frame-body {
-	overflow: hidden;
-}
-
-.ds-modal-pin .ds-modal-title {
-	flex-shrink: 0;
-}
-
-.ds-modal-pin .ds-modal-body {
-	flex: 1;
-	min-height: 0;
-	display: flex;
-	flex-direction: column;
-	overflow: hidden;
-}
-
-.ds-modal-pin .ds-modal-scroll {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto;
-	overflow-x: hidden;
-	padding-top: 12px;
 }

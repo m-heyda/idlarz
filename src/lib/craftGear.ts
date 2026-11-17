@@ -5,6 +5,9 @@ import { GRADE_INFO, gradeLevels } from '@/catalog/items/grades';
 import { GEAR_UNLOCK, type CraftGrade, type GearTarget } from '@/catalog/recipes';
 import { CRAFT_GEAR } from '@/config/crafting';
 import { generateLoot, type LootRequest } from '@/lib/loot/generate';
+import { eligibleCandidates } from '@/lib/loot/pools';
+import { baseStatsAt } from '@/lib/itemInstance';
+import { STAT_KEYS, type StatKey } from '@/catalog/stats';
 import { LOOT_DATA, type LootData } from '@/lib/loot/data';
 import type { Rng } from '@/lib/rng';
 import type { ItemInstance } from '@/types/game';
@@ -149,4 +152,28 @@ export const gearOdds = (target: GearTarget, env: GearEnv, data: LootData = LOOT
 		pityMultiplier: request.rarityBoost?.multiplier ?? 1,
 		qualityBias: request.qualityBias ?? 0,
 	};
+};
+
+/**
+ * The base stats a crafted piece of this slot and grade starts from (before affixes), as a range per stat: the lowest and the highest value any base the craft can roll gives at the item levels it rolls in now, at the middle quality and common rarity
+ * (a better rarity or quality multiplies them). What the Crafting window shows under the odds, so a weapon, shield or armor recipe says what it is about before it is queued.
+ */
+export const gearBaseStats = (target: GearTarget, env: GearEnv, data: LootData = LOOT_DATA): { stat: StatKey; min: number; max: number }[] => {
+	const request = gearRequest(target, env, data);
+	const common = RARITIES.common;
+	const low: Partial<Record<StatKey, number>> = {};
+	const high: Partial<Record<StatKey, number>> = {};
+	for (const level of new Set([request.minItemLevel ?? 1, request.maxItemLevel ?? 1])) {
+		for (const { def } of eligibleCandidates(data, 'equipment_craft', level)) {
+			if (def.slot !== request.slot || def.generation !== 'base') continue;
+			const stats = baseStatsAt(def, level, 50, common);
+			for (const key of STAT_KEYS) {
+				const value = stats[key];
+				if (!value) continue;
+				low[key] = Math.min(low[key] ?? value, value);
+				high[key] = Math.max(high[key] ?? value, value);
+			}
+		}
+	}
+	return STAT_KEYS.filter((key) => key in low).map((key) => ({ stat: key, min: low[key] as number, max: high[key] as number }));
 };

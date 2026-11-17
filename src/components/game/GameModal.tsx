@@ -14,8 +14,6 @@ const GameModal: React.FC<{
 	onClose: () => void;
 	closeOnBackdrop?: boolean;
 	hideClose?: boolean;
-	/** `ds-modal-pin`: the title and the first child (the tabs) stay put and the part wrapped in `ds-modal-scroll` scrolls */
-	className?: string;
 	children: React.ReactNode;
 }> = ({ onClose, ...rest }) => {
 	useModalRegistry(onClose);

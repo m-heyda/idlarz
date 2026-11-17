@@ -4899,7 +4899,7 @@ the loot pipeline (<code>LOOT_SOURCES.craft</code>, profile <code>craft</code>, 
 </tbody></table>
 </article><article><p><a id="gearitemlevels"></a></p>
 <h3><code>gearItemLevels</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:37</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:40</code></a></p>
 <p>The item level a recipe of this grade makes, by crafting level: the grade&#39;s window (<code>gradeLevels</code>) is climbed from its bottom at the grade&#39;s unlock to its top at the next grade&#39;s unlock, and the roll is +-1 around that centre, never outside the window.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">centre = round(window low + (window high - window low) x clamp((crafting level - unlock) / (next unlock - unlock), 0, 1))
@@ -4907,7 +4907,7 @@ item level = centre - 1 .. centre + 1, held inside the grade&#39;s window
 </code></pre>
 </article><article><p><a id="qualitybiasof"></a></p>
 <h3><code>qualityBiasOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:57</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:60</code></a></p>
 <p>Intelligence&#39;s lean on the quality and the affix magnitudes of a craft, for <code>rollLeaning</code>.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">bias = min(1, 0.01 x (Intelligence - 5)), 0 at 5 or less
@@ -4922,14 +4922,14 @@ additions never drift. The server uses this for every craft, claim and queue pay
 </code></pre>
 </article><article><p><a id="pitymultiplier"></a></p>
 <h3><code>pityMultiplier</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:78</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:81</code></a></p>
 <p>The pity multiplier on the grade&#39;s best rarity after <code>misses</code> crafts that missed it.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">multiplier = min(1.5, 1 + 0.05 x misses)        a hit resets the counter; a grade with one rarity has none
 </code></pre>
 </article><article><p><a id="rollgear"></a></p>
 <h3><code>rollGear</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:114</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:117</code></a></p>
 <p>One crafted piece: the <code>craft</code> loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe&#39;s slot inside the grade&#39;s item level window, and the piece is marked <code>crafted</code>. Null when nothing is eligible (a
 configuration error, never silently replaced).</p>
 <p>The roll of one gear craft. The server calls it once per delivered piece with <code>sealedRng(secret, user, 0, &#39;craft&#39;, craft.ord + n)</code>: the lifetime counter, not the run&#39;s, so a rebirth never repeats a sequence and a replayed claim rolls the same pieces.
@@ -4937,7 +4937,7 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>See also: <a href="#gearodds"><code>gearOdds</code></a>, <a href="#craft-gear"><code>CRAFT_GEAR</code></a></p>
 </article><article><p><a id="gearodds"></a></p>
 <h3><code>gearOdds</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:140</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:143</code></a></p>
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Rankings</h2><article><p><a id="ranking-boards"></a></p>
 <h3>The boards</h3>
