@@ -303,10 +303,10 @@ Every biome with its config output per second. Multiply by `BIOME_YIELD.scale` (
 | --- | --- |
 | Castle | gold 0.1, wood 0.05, stone 0.1, food 0.05, xp 0.5 (not scaled) |
 | Forest | gold 0.1, wood 0.3 |
-| Plains | gold 0.1, food 0.3 |
+| Plains | gold 0.1, food 0.3, stone 0.05 |
 | Hills | gold 0.05, stone 0.3, coal 0.2 |
 | Swamp | food 0.1, wood 0.2 |
-| Tundra | gold 0.1, coal 0.35 |
+| Tundra | gold 0.1, coal 0.35, stone 0.15 |
 | Lake | gold 0.05, food 0.25 |
 | Coast | gold 0.1, food 0.2 |
 | Jungle | gold 0.15, wood 0.45 |
