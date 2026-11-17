@@ -5,7 +5,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { castleWorld, character, near, oracle, pinEconomy, prestigeWith, worldWithTiles, PINNED_BASE, type Attr } from './helpers';
-import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
+import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
 import { TILE_RESOURCE_COST } from '../../src/config/economy';
 import { calculateTileCost } from '../../src/utils/game/costs';
 import { calculateResourceBreakdown } from '../../src/utils/game/income';
@@ -247,24 +247,65 @@ test('rebirth gates: castle 6, 400 + 50 per past rebirth in tiles, no upgrade ru
 	assert.equal(status({ castleUpgrade: { toLevel: 7, remainingSec: 10 } }).requirements.find((r) => r.id === 'idle')?.met, false);
 });
 
-test('Ember shop: level N+1 costs ceil(base x 1.4^N), every upgrade stops at level 10, the ladders add up', () => {
+test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladders add up, one-time upgrades have one level', () => {
 	const ids = Object.keys(EMBER_UPGRADES) as EmberUpgradeId[];
-	assert.deepEqual(ids.sort(), ['builders', 'deeppockets', 'mastery', 'nightwatch', 'provisions', 'steward', 'thrift']);
-	for (const id of ids.filter((i) => i !== 'deeppockets')) {
+	assert.deepEqual(ids.sort(), [
+		'artisan',
+		'bloodthirst',
+		'brawn',
+		'buildcap',
+		'builders',
+		'buildtime',
+		'castlecap',
+		'charter',
+		'decree',
+		'deeppockets',
+		'execution',
+		'extrabuilder',
+		'fortune',
+		'haggler',
+		'idolcap',
+		'idoltime',
+		'mastery',
+		'nightwatch',
+		'overseer',
+		'potion',
+		'precision',
+		'provisions',
+		'questrarity',
+		'questslots',
+		'skinner',
+		'sorcery',
+		'startgold',
+		'steward',
+		'tempo',
+		'thrift',
+		'tithe',
+		'vigil',
+		'vigor',
+	]);
+	for (const id of ids) {
 		const def = EMBER_UPGRADES[id];
-		assert.equal(def.maxLevel, 10);
 		let total = 0;
-		for (let level = 0; level < 10; level++) {
-			assert.equal(emberUpgradeCost(id, level), oracle.emberCost(def.baseCost, level), `${id} level ${level + 1}`);
-			total += oracle.emberCost(def.baseCost, level);
+		for (let level = 0; level < def.maxLevel; level++) {
+			const expected = Math.ceil(def.baseCost * Math.pow(def.costGrowth, level));
+			assert.equal(emberUpgradeCost(id, level), expected, `${id} level ${level + 1}`);
+			total += expected;
 		}
-		assert.equal(emberSpent({ [id]: 10 }), total, `${id}: ladder total`);
+		assert.equal(emberSpent({ [id]: def.maxLevel }), total, `${id}: ladder total`);
 	}
-	// Deep Pockets (IDL-162): 3 levels at 30 / 54 / 98 Embers, +4 bag slots each
-	assert.equal(EMBER_UPGRADES.deeppockets.maxLevel, 3);
+	// the classic ladders keep their 1.4 growth and ten levels
+	for (const id of ['thrift', 'builders', 'mastery', 'nightwatch', 'steward'] as const) {
+		assert.equal(EMBER_UPGRADES[id].maxLevel, 10);
+		for (let level = 0; level < 10; level++)
+			assert.equal(emberUpgradeCost(id, level), oracle.emberCost(EMBER_UPGRADES[id].baseCost, level), `${id} level ${level + 1}`);
+	}
+	// Deep Pockets: 5 levels at 30 / 54 / 98 / 175 / 315 Embers, +8 bag slots each
+	assert.equal(EMBER_UPGRADES.deeppockets.maxLevel, 5);
+	assert.equal(EMBER_UPGRADES.deeppockets.effectPerLevel, 8);
 	assert.deepEqual(
-		[0, 1, 2].map((l) => emberUpgradeCost('deeppockets', l)),
-		[30, 54, 98],
+		[0, 1, 2, 3, 4].map((l) => emberUpgradeCost('deeppockets', l)),
+		[30, 54, 98, 175, 315],
 	);
 	assert.deepEqual(
 		[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => emberUpgradeCost('thrift', l)),
@@ -274,6 +315,18 @@ test('Ember shop: level N+1 costs ceil(base x 1.4^N), every upgrade stops at lev
 		[0, 1, 2, 3, 4, 5, 6, 7, 8, 9].map((l) => emberUpgradeCost('steward', l)),
 		[3, 5, 6, 9, 12, 17, 23, 32, 45, 62],
 	);
+	// the one-time purchases have a single level; Potion Reflex is affordable from the first rebirth (about 33 Embers at castle 6 with 400 tiles)
+	for (const id of ['potion', 'vigil', 'decree'] as const) assert.equal(EMBER_UPGRADES[id].maxLevel, 1, id);
+	assert.equal(emberUpgradeCost('potion', 0), 15);
+	assert.ok(emberUpgradeCost('potion', 0) < REBIRTH.gain(6, 400, 0), 'a first rebirth pays for Potion Reflex with Embers to spare');
+	// Eternal Tithe: 5 levels of +50%; the caps: castle 10 to 15, buildings 5 to 10, Idols 5 to 15
+	assert.equal(EMBER_UPGRADES.tithe.maxLevel, 5);
+	assert.equal(EMBER_UPGRADES.tithe.effectPerLevel, 0.5);
+	assert.equal(EMBER_UPGRADES.castlecap.maxLevel, 5);
+	assert.equal(EMBER_UPGRADES.buildcap.maxLevel, 5);
+	assert.equal(EMBER_UPGRADES.idolcap.maxLevel, 10);
+	// the quest upgrades are disabled until quests exist
+	assert.deepEqual([...EMBER_DISABLED].sort(), ['questrarity', 'questslots']);
 	assert.equal(REBIRTH.discountCapPercent, 45);
 });
 

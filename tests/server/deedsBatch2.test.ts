@@ -20,8 +20,10 @@ const facts = (over: Partial<DeedFacts> = {}): DeedFacts => ({ stats: emptyStats
 test('batch 2 is appended after the first batch, every tier belongs to one deed, ids are unique, badges exist', async () => {
 	const ids = ACHIEVEMENTS.map((a) => a.id);
 	assert.equal(new Set(ids).size, ids.length);
+	// batch 2 is one block right after the first batch; later additions (castle_15) are appended after it
+	const start = ids.indexOf(BATCH2_ACHIEVEMENTS[0].id);
 	assert.deepEqual(
-		ids.slice(-BATCH2_ACHIEVEMENTS.length),
+		ids.slice(start, start + BATCH2_ACHIEVEMENTS.length),
 		BATCH2_ACHIEVEMENTS.map((a) => a.id),
 	);
 	assert.ok(BATCH2_ACHIEVEMENTS.length > 70);

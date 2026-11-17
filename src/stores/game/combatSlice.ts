@@ -105,8 +105,8 @@ export const createCombatSlice = (set: GameSet, get: GameGet, inv: InventorySync
 		},
 
 		setAutoUse: (on: boolean) => {
-			if (!autoUseUnlocked(get().prestige.rebirths)) {
-				toast('Auto-use unlocks after your first rebirth.');
+			if (!autoUseUnlocked(get().prestige.rebirths, get().prestige)) {
+				toast('Auto-use is bought in the Ember shop (Potion Reflex).');
 				return;
 			}
 			set((state) => ({ combat: { ...state.combat, autoUse: on } }));

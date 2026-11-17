@@ -3,7 +3,7 @@ import { SectionLabel } from '../../../../packages/design-system/src/components/
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import { compact } from '../../../../packages/design-system/src/logic';
 import { CLICK_LADDER } from '@/config/economy';
-import { MERCHANT_UPGRADES, MERCHANT_UPGRADE_GROUPS, type MerchantUpgradeId } from '@/config/merchant';
+import { MERCHANT_RETIRED, MERCHANT_UPGRADES, MERCHANT_UPGRADE_GROUPS, type MerchantUpgradeId } from '@/config/merchant';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -24,6 +24,8 @@ interface Entry {
 	next?: string;
 	cost: number;
 	buy: () => void;
+	/** No longer for sale: the levels already bought are shown, nothing more can be bought */
+	retired?: boolean;
 }
 
 const power = (p: number) => formatPercent(p * 100);
@@ -58,8 +60,11 @@ const MerchantUpgradesTab: React.FC = () => {
 	for (const id of IDS) {
 		const def = MERCHANT_UPGRADES[id];
 		const level = merchantLevel(merchantUpgrades, id);
+		const retired = MERCHANT_RETIRED.has(id);
+		if (retired && level === 0) continue; // the old Pack Rat shows only for players who bought it
 		const cost = merchantUpgradeCost(id, level);
 		entries.push({
+			retired,
 			id,
 			group: def.group as Group,
 			name: def.label,
@@ -102,6 +107,8 @@ const MerchantUpgradesTab: React.FC = () => {
 									have={gold}
 									shortText={`Need ${compact(e.cost - gold)} more`}
 									onBuy={e.buy}
+									state={e.retired ? 'maxed' : undefined}
+									maxLabel={e.retired ? 'Kept, no longer sold' : undefined}
 								/>
 							))}
 						</div>

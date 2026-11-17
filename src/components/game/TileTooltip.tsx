@@ -1,6 +1,5 @@
 import { buildingDef } from '@/catalog/buildings';
 import { BIOMES } from '@/config/biomes';
-import { BUILDING_RULES } from '@/config/buildings';
 import { buildingOutput, ownedOfBiome, producerBonus } from '@/lib/buildings';
 import { RESOURCES } from '@/catalog';
 import { BuildingTooltip, ChestTooltip, MonsterTooltip, TipLine, Tooltip } from '../../../packages/design-system/src/components/tooltips';
@@ -107,11 +106,13 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 	const idol = idolDef(id);
 	const { game } = useMapSource();
 	const tiles = game((state) => state.tiles);
+	const prestige = game((state) => state.prestige);
 	if (!def) return null;
+	const growthOpts = { prestige };
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
 	const output = idol ? null : buildingOutput(def, level, owned);
-	const top = def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel;
+	const top = def.kind === 'idol' ? limitOf('idolMaxLevel', growthOpts) : limitOf('buildingMaxLevel', growthOpts);
 	const atTop = level >= top;
 	const hourly = (o: Partial<Resources>) => Object.entries(o).filter(([, amount]) => (amount ?? 0) > 0) as [keyof Resources, number][];
 	const rows = output ? hourly(output).map(([key, amount]) => ({ label: RESOURCES[key].label, value: `+${formatNumber(amount * 3600)}/h` })) : [];

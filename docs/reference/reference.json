@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 441,
+  "line": 450,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -602,7 +602,7 @@
   "category": "Economy/Castle",
   "file": "src/config/castle.ts",
   "line": 60,
-  "summary": "The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.",
+  "summary": "The castle: levels 1-10, up to 15 with the Castle Expansion Ember upgrade (`maxLevel` is the base cap; read the real one with `limitOf('castleMaxLevel')`, and `HARD_LIMITS.castleMaxLevel` is what a save may hold). An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.",
   "see": [
    "castleModifier",
    "castleUpgradeDuration"
@@ -828,7 +828,7 @@
   "kind": "function",
   "category": "Economy/Clicks",
   "file": "src/config/economy.ts",
-  "line": 186,
+  "line": 188,
   "summary": "Gold of one click at a ladder level: gold/s x power (at least the level's floor), then the multipliers (Click Mastery, set bonus).",
   "see": [
    "CLICK_LADDER"
@@ -841,7 +841,7 @@
   "kind": "const",
   "category": "Economy/Clicks",
   "file": "src/config/economy.ts",
-  "line": 203,
+  "line": 205,
   "summary": "The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day, so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (`requireTrusted`). Implementation: {@link createClickLimiter}.",
   "see": []
  },
@@ -852,7 +852,7 @@
   "kind": "const",
   "category": "Progression/Gems",
   "file": "src/config/economy.ts",
-  "line": 219,
+  "line": 221,
   "summary": "Gems every player starts with (also granted to saves from before Gems existed).",
   "see": []
  },
@@ -964,7 +964,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 193,
+  "line": 202,
   "summary": "The goods shelf and its refresh rules ({@link generateMerchantStock}). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).",
   "see": []
  },
@@ -975,7 +975,7 @@
   "kind": "const",
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
-  "line": 224,
+  "line": 233,
   "summary": "The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).",
   "see": []
  },
@@ -1065,8 +1065,8 @@
   "kind": "const",
   "category": "Progression/Ember shop",
   "file": "src/config/rebirth.ts",
-  "line": 60,
-  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.",
+  "line": 68,
+  "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}). Shop levels are permanent: nothing refunds Embers on a rebirth. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).",
   "see": []
  },
  {
@@ -1203,7 +1203,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 39,
+  "line": 45,
   "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.",
   "see": []
  },
@@ -1214,7 +1214,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 59,
+  "line": 81,
   "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
   "see": []
  },
@@ -1542,8 +1542,8 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/combat.ts",
-  "line": 55,
-  "summary": "Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work.",
+  "line": 56,
+  "summary": "Auto-use (the server drinking potions, casting Heal and Stun for the player) is bought in the Ember shop (Potion Reflex, one-time, 15 Embers): before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work. An account from before the reworked shop (no `shopVersion` in its Embers) keeps the old rule: unlocked with the first rebirth; the shop migration turns that into a free grant.",
   "see": []
  },
  {
@@ -1553,7 +1553,7 @@
   "kind": "function",
   "category": "Combat/Win chance",
   "file": "src/lib/combat.ts",
-  "line": 71,
+  "line": 75,
   "summary": "The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red). The strip also shows the word and the exact percent on hover, so colour is never the only cue.",
   "see": []
  },
@@ -1564,7 +1564,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 119,
+  "line": 123,
   "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
   "see": []
  },
@@ -1575,7 +1575,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 130,
+  "line": 134,
   "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
   "see": []
  },
@@ -1586,7 +1586,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 149,
+  "line": 153,
   "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
   "see": []
  },
@@ -1597,7 +1597,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 167,
+  "line": 171,
   "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
   "see": []
  },
@@ -1608,7 +1608,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 186,
+  "line": 190,
   "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
   "see": []
  },
@@ -1619,7 +1619,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 202,
+  "line": 206,
   "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
   "see": []
  },
@@ -1630,7 +1630,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 219,
+  "line": 223,
   "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
   "see": []
  },
@@ -1641,7 +1641,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 232,
+  "line": 236,
   "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
   "see": []
  },
@@ -1652,7 +1652,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 240,
+  "line": 244,
   "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
   "see": []
  },
@@ -1663,7 +1663,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 251,
+  "line": 255,
   "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
   "see": []
  },
@@ -1828,7 +1828,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/limits.ts",
-  "line": 40,
+  "line": 59,
   "summary": "The current value of a limit: its base plus the registered bonuses.",
   "see": []
  },
@@ -2344,7 +2344,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 74,
+  "line": 75,
   "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.",
   "see": []
  },
@@ -2355,7 +2355,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 95,
+  "line": 96,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -2366,7 +2366,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 126,
+  "line": 127,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -2471,7 +2471,7 @@
   "kind": "function",
   "category": "Progression/Limits",
   "file": "src/lib/offline/inventory.ts",
-  "line": 65,
+  "line": 71,
   "summary": "The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up, so taking a belt off, or a rebirth, never shrinks the bag below the items in it.",
   "see": []
  },
@@ -2482,7 +2482,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/offline/inventory.ts",
-  "line": 250,
+  "line": 266,
   "summary": "The \"Sell junk\" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.",
   "see": []
  },
@@ -2576,7 +2576,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/profile.ts",
-  "line": 63,
+  "line": 64,
   "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).",
   "see": []
  },
@@ -2587,7 +2587,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/profile.ts",
-  "line": 106,
+  "line": 107,
   "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
@@ -2979,7 +2979,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 368,
+  "line": 372,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"
@@ -3014,7 +3014,7 @@
   "kind": "function",
   "category": "Economy/Castle",
   "file": "src/utils/game/castle.ts",
-  "line": 16,
+  "line": 17,
   "summary": "Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).",
   "see": []
  },
@@ -3025,7 +3025,7 @@
   "kind": "function",
   "category": "Economy/Castle",
   "file": "src/utils/game/castle.ts",
-  "line": 34,
+  "line": 35,
   "summary": "Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`.",
   "see": []
  },
@@ -3212,7 +3212,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 25,
+  "line": 26,
   "summary": "Gold price of the next level of a merchant upgrade.",
   "see": []
  },
@@ -3223,7 +3223,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 62,
+  "line": 65,
   "summary": "Gold for selling `qty` of something worth `unit` each.",
   "see": [
    "sellMultiplier (src/utils/game/merchant.ts)"
@@ -3236,7 +3236,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/utils/game/merchant.ts",
-  "line": 72,
+  "line": 75,
   "summary": "Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).",
   "see": []
  },
@@ -3247,7 +3247,7 @@
   "kind": "function",
   "category": "Progression/Ember shop",
   "file": "src/utils/game/rebirth.ts",
-  "line": 26,
+  "line": 33,
   "summary": "Cost in Embers of buying the next level of an upgrade, given its current level.",
   "see": []
  },
@@ -3258,7 +3258,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 49,
+  "line": 56,
   "summary": "The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: linear when `incomeExponent` is 1, flatter when it is below 1.",
   "see": []
  },
@@ -3269,7 +3269,7 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/utils/game/rebirth.ts",
-  "line": 64,
+  "line": 71,
   "summary": "Percent off tile cost: Charisma plus Thrift, capped.",
   "see": []
  },
@@ -3280,7 +3280,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 97,
+  "line": 107,
   "summary": "Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.",
   "see": []
  },
@@ -3291,7 +3291,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirth.ts",
-  "line": 128,
+  "line": 138,
   "summary": "Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth` all read this one function, so what the tooltip promises is what the action checks.",
   "see": []
  },

@@ -1,4 +1,4 @@
-import { MERCHANT_UPGRADES, type MerchantUpgradeId } from '@/config/merchant';
+import { MERCHANT_UPGRADES, PACKRAT_IDS, type MerchantUpgradeId } from '@/config/merchant';
 import type { Resources } from '@/types/game';
 import type { SaveSummary } from './summary';
 
@@ -81,7 +81,7 @@ export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, r
 export const restoreMerchantLevels = (claimed: Record<string, number>, trusted: Record<string, number> | undefined): Record<string, number> => {
 	const out: Record<string, number> = {};
 	for (const [id, level] of Object.entries(claimed)) {
-		const kept = id === 'packrat' ? level : Math.min(level, trusted?.[id] ?? 0);
+		const kept = (PACKRAT_IDS as readonly string[]).includes(id) ? level : Math.min(level, trusted?.[id] ?? 0);
 		if (kept > 0 && id in MERCHANT_UPGRADES) out[id as MerchantUpgradeId] = kept;
 	}
 	return out;

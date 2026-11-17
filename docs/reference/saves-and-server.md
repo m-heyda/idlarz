@@ -422,7 +422,7 @@ browser still does, so the server bounds what two consecutive saves can explain,
    (buying shop levels lowers the unspent points, never the Embers ever earned).
  - A rebirth is believable when the previous save was at castle level 6 or more (a running upgrade counts) with the territory the
    next rebirth needs, give or take the tiles bought since; at most one rebirth fits between two saves.
- - The gain is at most what the previous save's castle and territory pay, with the Ancestral Tithe at its maximum (the merchant
+ - The gain is at most what the previous save's castle and territory pay, with the Ancestral Tithe and the Eternal Tithe at their maximum (the merchant
    upgrades bought without gold are put back by the trusted economy, IDL-168, but a Tithe bought since the last upload is not known here).
  - A first save (nothing to compare with) holds a whole history: its rebirths are bounded by the play time and its Embers by the
    best rebirth the game can pay.

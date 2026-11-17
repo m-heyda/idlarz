@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BUILDING_RULES, IDOL_RULES } from '@/config/buildings';
+import { IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
 import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import type { PrestigeState } from '@/types/game';
@@ -40,7 +40,7 @@ const Head: React.FC<{ def: BuildOption['def']; extra?: string; details?: React.
 );
 
 /**
- * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks an effect the game does not apply yet (none today). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel')`.
+ * What an Idol is and does, in plain lines: the effect per level with the value now and at the cap, what the rebirth keeps, how it is upgraded. `coming soon` marks an effect the game does not apply yet (none today). The numbers are `IDOL_RULES` and `limitOf('idolMaxLevel', { prestige })`.
  */
 export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?: number; prestige?: PrestigeState }> = ({
 	id,
@@ -50,7 +50,7 @@ export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?:
 }) => {
 	const idol = idolDef(id);
 	if (!idol) return null;
-	const max = limitOf('idolMaxLevel');
+	const max = limitOf('idolMaxLevel', { prestige });
 	const shown = Math.max(1, remembered);
 	return (
 		<div className='build-idol'>
@@ -125,7 +125,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 					<span style={{ color: '#c9a6ff' }}>{effect}</span>
 					<span className='bh-key-more'>
 						{' '}
-						· level {limitOf('idolMaxLevel')} = {idolValueText(idol, limitOf('idolMaxLevel'))}
+						· level {limitOf('idolMaxLevel', { prestige })} = {idolValueText(idol, limitOf('idolMaxLevel', { prestige }))}
 					</span>
 					{!idol.applied && <span className='build-soon'> (coming soon: not applied yet)</span>}
 				</div>
@@ -184,8 +184,12 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-							<span title={`Level ${o.level} of ${o.def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel}`}>
-								<DiamondLevel level={o.level} max={o.def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel} small />
+							<span title={`Level ${o.level} of ${o.def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige })}`}>
+								<DiamondLevel
+									level={o.level}
+									max={o.def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige })}
+									small
+								/>
 							</span>
 							<p className='build-blurb'>Move it here: level kept, half price.</p>
 							<div className='build-foot'>

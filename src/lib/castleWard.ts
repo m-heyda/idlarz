@@ -23,10 +23,10 @@ export const isInWard = (x: number, y: number, castleLevel: number): boolean =>
  * @category Economy/Castle
  * @order 7
  * @formula
- * radius = 1 + max(0, level - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10: 4 (9x9)
+ * radius = 1 + max(0, min(level, 10) - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10 and above: 4 (9x9; levels 11-15 add the castle bonus, not more range)
  */
 export const castleRangeRadius = (castleLevel: number): number =>
-	CASTLE_RANGE.radius + Math.max(0, castleLevel - CASTLE_RANGE.growFromLevel + 1) * CASTLE_RANGE.growPerLevel;
+	CASTLE_RANGE.radius + Math.max(0, Math.min(castleLevel, CASTLE_UPGRADE.maxLevel) - CASTLE_RANGE.growFromLevel + 1) * CASTLE_RANGE.growPerLevel;
 
 /** The biggest the range gets, so far-away tiles can skip looking at the castle at all. */
 export const MAX_CASTLE_RANGE_RADIUS = castleRangeRadius(CASTLE_UPGRADE.maxLevel);

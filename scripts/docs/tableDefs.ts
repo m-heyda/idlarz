@@ -336,6 +336,32 @@ const EMBER_EFFECT: Record<string, (n: number) => string> = {
 	nightwatch: (n) => `+${n} hour of paid away time`,
 	steward: (n) => `+${pct(n)} income while away`,
 	deeppockets: (n) => `+${n} bag slots`,
+	charter: (n) => `+${n} points on the 45% tile-discount cap`,
+	buildtime: (n) => `-${pct(n)} Producer and Extractor build time`,
+	idoltime: (n) => `-${pct(n)} Idol build time`,
+	startgold: () => 'base gold per second at the start of a run: 1 / 5 / 10 / 20 / 35 by level',
+	vigil: () => 'one-time: away income 100% and 72 h away time',
+	haggler: (n) => `+${pct(n)} gold from selling`,
+	fortune: (n) => `+${n} Luck`,
+	artisan: (n) => `+${n} Luck on crafted gear only`,
+	overseer: (n) => `+${pct(n)} income, every resource but XP`,
+	skinner: (n) => `+${pct(n)} meat and hide`,
+	tithe: (n) => `+${pct(n)} Embers per rebirth`,
+	tempo: (n) => `+${n}% attack speed`,
+	precision: (n) => `+${n}% crit chance`,
+	execution: (n) => `+${n}% super-crit chance`,
+	brawn: (n) => `+${n}% physical damage`,
+	sorcery: (n) => `+${n}% staff and wand damage`,
+	bloodthirst: (n) => `+${n}% life leech`,
+	vigor: (n) => `+${n} HP per second`,
+	potion: () => 'one-time: auto-potion',
+	castlecap: (n) => `+${n} castle level of cap (10 to 15)`,
+	buildcap: (n) => `+${n} Producer/Extractor level of cap (5 to 10)`,
+	idolcap: (n) => `+${n} Idol level of cap (5 to 15)`,
+	decree: () => 'one-time: the castle bonus counts double',
+	extrabuilder: (n) => `+${n} builder`,
+	questrarity: () => 'disabled until quests exist',
+	questslots: () => 'disabled until quests exist',
 };
 TABLES['ember-shop'] = () => ({
 	title: 'The Ember shop',
@@ -346,9 +372,12 @@ TABLES['ember-shop'] = () => ({
 });
 
 const RAISED_BY: Record<string, string> = {
-	bagSize: 'Pack Rat +8 per level, Deep Pockets +4 per level',
-	offlineCapHours: 'Night Watch +1 h per level, set bonus hours',
-	offlineEfficiency: 'Steward +0.05 per level, set bonus points',
+	bagSize: 'Pack Rat +4 per level (the retired one +8), Deep Pockets +8 per level, belt slots',
+	idolMaxLevel: 'Idol Mastery +1 per level',
+	buildingMaxLevel: 'Master Masonry +1 per level',
+	castleMaxLevel: 'Castle Expansion +1 per level',
+	offlineCapHours: 'Night Watch +1 h per level, Eternal Vigil (72 h), set bonus hours',
+	offlineEfficiency: 'Steward +0.05 per level, Eternal Vigil (100%), set bonus points',
 };
 TABLES['limits'] = () => ({
 	title: 'Limits (base values and hard caps)',

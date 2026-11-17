@@ -117,14 +117,26 @@ test('the Producer grows +2 % per owned tile of its biome, capped at +100 %', ()
 });
 
 test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 8 h', () => {
-	assert.deepEqual([1, 2, 3, 5, 6, 10].map(buildingLevelCap), [1, 2, 3, 5, 5, 5]);
+	assert.deepEqual(
+		[1, 2, 3, 5, 6, 10].map((castle) => buildingLevelCap(castle)),
+		[1, 2, 3, 5, 5, 5],
+	);
+	// Master Masonry raises the building cap; the castle level still gates each level
+	assert.deepEqual(
+		[3, 6, 10].map((castle) => buildingLevelCap(castle, 10)),
+		[3, 6, 10],
+	);
+	assert.equal(buildingLevelCap(15, 99), 15, 'never above the hard ceiling');
 	assert.deepEqual(BUILDING_RULES.durationsSec, [600, 2700, 10800, 28800]);
 	assert.deepEqual(
 		[1, 2, 3, 4].map((l) => buildingUpgradeDuration(l)),
 		[600, 2700, 10800, 28800],
 	);
-	// Master Builders shortens it like the castle's timer
-	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 540);
+	// Mason's Guild shortens a building's timer 5% per level, Shrine Keepers an Idol's, Master Builders the castle's: each only its own
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { buildtime: 2 } }), 540);
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }, 0, 'idol'), 540);
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }), 600, 'a Producer does not take the Idol upgrade');
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 600, 'the castle upgrade does not shorten a building');
 });
 
 test('prices: x2 per level on the price of 14 tiles; moving costs half of everything the building cost', () => {

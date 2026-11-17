@@ -64,10 +64,19 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const level = levelOfTile(tile);
 	const idol = idolDef(def.id);
 	const ownedTiles = economyTiles(tiles, freeTiles);
-	const ctx: BuildingContext = { tiles, monsters, castleLevel: castleLevelOf(tiles), castleUpgrade, buildingUpgrade: buildingUpgrade ?? null, ownedTiles };
+	const ctx: BuildingContext = {
+		tiles,
+		monsters,
+		castleLevel: castleLevelOf(tiles),
+		castleUpgrade,
+		buildingUpgrade: buildingUpgrade ?? null,
+		ownedTiles,
+		idolMax: limitOf('idolMaxLevel', { prestige }),
+		buildingMax: limitOf('buildingMaxLevel', { prestige }),
+	};
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
-	const top = def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel;
+	const top = def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige });
 	const atTop = level >= top;
 	const running = buildingUpgrade && buildingUpgrade.x === x && buildingUpgrade.y === y ? buildingUpgrade : null;
 	const nextLevel = level + 1;

@@ -6,6 +6,7 @@ import {
 	MERCHANT_MAX_TRADE_QTY,
 	MERCHANT_RESOURCE_PRICES,
 	MERCHANT_SHOP_ITEMS,
+	MERCHANT_RETIRED,
 	MERCHANT_UPGRADES,
 	type MerchantUpgradeId,
 } from '@/config/merchant';
@@ -152,13 +153,13 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 		buyMerchantUpgrade: (id: MerchantUpgradeId) => {
 			const state = get();
 			const def = MERCHANT_UPGRADES[id];
-			if (!def) return false;
+			if (!def || MERCHANT_RETIRED.has(id)) return false; // a retired upgrade (the old Pack Rat) is no longer for sale
 			const level = merchantLevel(state.merchantUpgrades, id);
 			if (level >= def.maxLevel) return false;
 			const cost = merchantUpgradeCost(id, level);
 			if (state.resources.gold < cost) return false;
 			const merchantUpgrades = { ...state.merchantUpgrades, [id]: level + 1 };
-			const grow = id === 'packrat' ? Array.from({ length: def.effectPerLevel }, () => null) : [];
+			const grow = id === 'packrat2' ? Array.from({ length: def.effectPerLevel }, () => null) : [];
 			set({
 				merchantUpgrades,
 				bag: [...state.bag, ...grow],

@@ -461,7 +461,7 @@ so their previews agree. `junk` is a parameter so a test can flip the gear rule.
 
 ### `sellJunkRule` <small>function</small>
 
-Source: [`src/lib/offline/inventory.ts:250`](../../src/lib/offline/inventory.ts)
+Source: [`src/lib/offline/inventory.ts:266`](../../src/lib/offline/inventory.ts)
 
 The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
 every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.

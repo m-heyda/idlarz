@@ -21,7 +21,7 @@ export const MERCHANT_RESOURCE_PRICES = fromResources(
 ) as { [K in MerchantResourceKey]: number };
 
 /**
- * Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat
+ * Merchant upgrades: permanent bonuses bought with gold. Level N+1 costs ceil(baseCost x costGrowth^N). Everything except Pack Rat (both ids)
  * starts again on a rebirth (like click power); Pack Rat's bigger bag stays, because the bag survives a rebirth.
  * They are the game's late gold sink: the first levels are cheap, the last ones are far out of reach before the first rebirth (all the
  * ladders together cost over a billion; tests/economy/merchantUpgrades.test.ts keeps it that way) and are bought over several runs.
@@ -69,11 +69,20 @@ export const MERCHANT_UPGRADES = {
 		costGrowth: 1.9,
 	},
 	packrat: {
-		label: 'Pack Rat',
+		label: 'Pack Rat (old)',
 		group: 'economy',
 		description: (n: number) => `+${n * 8} bag slots`,
 		maxLevel: 6,
-		effectPerLevel: 8, // bag slots
+		effectPerLevel: 8, // bag slots; RETIRED: no longer for sale, the levels a player already bought keep this value (the id stays, saves are append-only)
+		baseCost: 500000,
+		costGrowth: 3,
+	},
+	packrat2: {
+		label: 'Pack Rat',
+		group: 'economy',
+		description: (n: number) => `+${n * 4} bag slots`,
+		maxLevel: 6,
+		effectPerLevel: 4, // bag slots (the Deep Pockets Ember upgrade gives +8 per level)
 		baseCost: 500000,
 		costGrowth: 3,
 	},
@@ -231,3 +240,9 @@ export const MERCHANT_RESOURCE_INFO = fromResources(
 		return { label, description: merchant.description, priceDescription: merchant.pitch };
 	},
 ) as { [K in MerchantResourceKey]: { label: string; description: string; priceDescription: string } };
+
+/** Merchant upgrades that are no longer for sale: levels already owned still count, nobody can buy more (the card is hidden at level 0). */
+export const MERCHANT_RETIRED: ReadonlySet<string> = new Set(['packrat']);
+
+/** The Pack Rat ids: their bigger bag survives a rebirth, so a rebirth keeps them and the server does not judge them against the run's gold. */
+export const PACKRAT_IDS: readonly MerchantUpgradeId[] = ['packrat', 'packrat2'];

@@ -67,7 +67,7 @@ const CombatWidget: React.FC = () => {
 	const equipment = useGameStore((state) => state.equipment);
 	const level = useGameStore((state) => state.level.level);
 	const autoLocked = useGameStore((state) => !autoBattleUnlocked(state.prestige.rebirths));
-	const autoUseLocked = useGameStore((state) => !autoUseUnlocked(state.prestige.rebirths));
+	const autoUseLocked = useGameStore((state) => !autoUseUnlocked(state.prestige.rebirths, state.prestige));
 	const requestPotion = useGameStore((state) => state.requestPotion);
 	const requestSkill = useGameStore((state) => state.requestSkill);
 	const setAutoBattle = useGameStore((state) => state.setAutoBattle);

@@ -219,17 +219,17 @@ See also: [`tilePrice`](economy.md#tileprice), [`effectiveTileDiscount`](economy
 
 ### `effectiveTileDiscount` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:64`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:71`](../../src/utils/game/rebirth.ts)
 
 Percent off tile cost: Charisma plus Thrift, capped.
 
-The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`).
+The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
 Buildings take Thrift only.
 
 **Formula**
 
 ```text
-discount% = min(45, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
+discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
 ```
 
 <a id="calculatexpgain"></a>
@@ -353,10 +353,10 @@ plains and never more than `maxOfOther` of any other biome. Retries with the sam
 
 Source: [`src/config/castle.ts:60`](../../src/config/castle.ts)
 
-The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
+The castle: levels 1-10, up to 15 with the Castle Expansion Ember upgrade (`maxLevel` is the base cap; read the real one with `limitOf('castleMaxLevel')`, and `HARD_LIMITS.castleMaxLevel` is what a save may hold). An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
 
 - **Modifier** added to every resource: see [`castleModifier`](economy.md#castlemodifier). **Flat XP**: +0.5 xp/s per level above 1 (`xpBonus`).
-- **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d. Master Builders (Ember shop) cuts them 5% per level ([`castleUpgradeDuration`](economy.md#castleupgradeduration)).
+- **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d, then 4.5 d, 6 d, 8 d, 11 d, 14 d for levels 11 to 15. Master Builders (Ember shop) cuts them 5% per level ([`castleUpgradeDuration`](economy.md#castleupgradeduration)).
 - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in `docs/generated/balance-tables.md`.
 - **Range** (violet area), **area bonus** and **ward**: [`CASTLE_RANGE`](economy.md#castle-range), [`CASTLE_AREA_BONUS`](economy.md#castle-area-bonus), [`CASTLE_WARD`](economy.md#castle-ward).
 
@@ -373,7 +373,7 @@ The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer co
 | 7 | +960% | 3x3 | +100% | 2 d | gold 48 M, wood 4.8 M, stone 4.8 M, coal 2.6 M, food 25.6 M, meat 1.28 M |
 | 8 | +1280% | 5x5 | +200% | 2.5 d | gold 76.8 M, wood 7.6 M, stone 7.6 M, coal 4 M, food 41 M, meat 2 M |
 | 9 | +1600% | 7x7 | +300% | 3.5 d | gold 123 M, wood 12.2 M, stone 12.2 M, coal 6.6 M, food 65.6 M, meat 3.2 M |
-| 10 | +1920% | 9x9 | +400% | - | - |
+| 10 | +1920% | 9x9 | +400% | - | gold 197 M, wood 19.5 M, stone 19.5 M, coal 10.5 M, food 105 M, meat 5.1 M |
 
 See also: [`castleModifier`](economy.md#castlemodifier), [`castleUpgradeDuration`](economy.md#castleupgradeduration)
 
@@ -381,7 +381,7 @@ See also: [`castleModifier`](economy.md#castlemodifier), [`castleUpgradeDuration
 
 ### `castleModifier` <small>function</small>
 
-Source: [`src/utils/game/castle.ts:16`](../../src/utils/game/castle.ts)
+Source: [`src/utils/game/castle.ts:17`](../../src/utils/game/castle.ts)
 
 Bonus (as a fraction) the castle adds to the modifier of every resource: +20% at level 1, doubling each
 level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a long climb, not an explosion).
@@ -390,14 +390,15 @@ level up to `doublingUntil`, then a fixed step per level (so levels 7-10 stay a 
 
 ```text
 castleModifier(L) = 0.2 x 2^(L-1)                 for L <= 6   (+20%, +40%, +80%, +160%, +320%, +640%)
-                  = 0.2 x 2^5 + 3.2 x (L - 6)     for L > 6    (+960%, +1280%, +1600%, +1920%)
+                  = 0.2 x 2^5 + 3.2 x (L - 6)     for L > 6    (+960%, +1280%, +1600%, +1920%; with the Castle Expansion +2240% to +3520% at levels 11 to 15)
+Imperial Decree (Ember shop, one-time) counts the bonus twice.
 ```
 
 <a id="castleupgradeduration"></a>
 
 ### `castleUpgradeDuration` <small>function</small>
 
-Source: [`src/utils/game/castle.ts:34`](../../src/utils/game/castle.ts)
+Source: [`src/utils/game/castle.ts:35`](../../src/utils/game/castle.ts)
 
 Seconds the castle needs to go from `fromLevel` to `fromLevel + 1`.
 
@@ -453,7 +454,7 @@ Used by the income (the area bonus pass), the castle range overlay and the save 
 **Formula**
 
 ```text
-radius = 1 + max(0, level - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10: 4 (9x9)
+radius = 1 + max(0, min(level, 10) - 8 + 1) x 1          level 1-7: 1 (3x3), 8: 2 (5x5), 9: 3 (7x7), 10 and above: 4 (9x9; levels 11-15 add the castle bonus, not more range)
 ```
 
 <a id="castleareabonus"></a>
@@ -593,7 +594,7 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 
 ### `MERCHANT_GOODS` <small>const</small>
 
-Source: [`src/config/merchant.ts:193`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:202`](../../src/config/merchant.ts)
 
 The goods shelf and its refresh rules ([`generateMerchantStock`](economy.md#generatemerchantstock)). Potions are always in stock at their catalog `shop` price (`MERCHANT_SHOP_ITEMS`).
 
@@ -618,7 +619,8 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 | haggler (Haggler) | Economy | +3% gold from everything you sell | 10 | 100 K | 1.9 |
 | bulk (Bulk Discount) | Economy | -1% tile cost | 8 | 250 K | 2.1 |
 | charm (Lucky Charm) | Economy | +2 Luck for chests and kills | 10 | 150 K | 1.9 |
-| packrat (Pack Rat) | Economy | +8 bag slots | 6 | 500 K | 3 |
+| packrat (Pack Rat (old)) | Economy | +8 bag slots | 6 | 500 K | 3 |
+| packrat2 (Pack Rat) | Economy | +4 bag slots | 6 | 500 K | 3 |
 | foreman (Foreman) | Economy | +1% income from every resource, gold included | 10 | 400 K | 1.9 |
 | skinner (Skinner) | Economy | +5% meat and hide from your animals | 8 | 300 K | 1.9 |
 | swift (Quick Hands) | Combat | +2% attack speed | 8 | 250 K | 1.9 |
@@ -634,14 +636,14 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 
 ### `sellPayout` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:65`](../../src/utils/game/merchant.ts)
 
 Gold for selling `qty` of something worth `unit` each.
 
 **Formula**
 
 ```text
-payout = floor(units x unit price x (1 + 0.03 x Haggler level + Lighthouse %))
+payout = floor(units x unit price x (1 + 0.03 x Haggler level + 0.1 x Master Haggler level + Lighthouse %))
 ```
 
 See also: `sellMultiplier (src/utils/game/merchant.ts)`
@@ -650,7 +652,7 @@ See also: `sellMultiplier (src/utils/game/merchant.ts)`
 
 ### `buyCost` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:72`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:75`](../../src/utils/game/merchant.ts)
 
 Gold for buying `units` of a resource from the merchant: twice the selling price, rounded up in the merchant's favour (the store and the Resources tab use this).
 
@@ -664,7 +666,7 @@ cost = ceil(units x sell price x 2)
 
 ### `MERCHANT_BUY_MULTIPLIER` <small>const</small>
 
-Source: [`src/config/merchant.ts:224`](../../src/config/merchant.ts)
+Source: [`src/config/merchant.ts:233`](../../src/config/merchant.ts)
 
 The merchant sells wood, stone, coal, food and meat at this multiple of the price it pays (so buying and selling can never print gold).
 
@@ -672,7 +674,7 @@ The merchant sells wood, stone, coal, food and meat at this multiple of the pric
 
 ### `merchantUpgradeCost` <small>function</small>
 
-Source: [`src/utils/game/merchant.ts:25`](../../src/utils/game/merchant.ts)
+Source: [`src/utils/game/merchant.ts:26`](../../src/utils/game/merchant.ts)
 
 Gold price of the next level of a merchant upgrade.
 
@@ -764,15 +766,17 @@ The ladder is bought from the merchant. Clicking a tile or building pays nothing
 | Level | Power (x gold/s) | Floor (gold) | Price (gold, merchant) |
 | --- | --- | --- | --- |
 | 0 | 2 | 2 | free |
-| 1 | 4 | 6 | 750 K |
-| 2 | 8 | 20 | 2.5 M |
-| 3 | 15 | 60 | 10 M |
+| 1 | 3.5 | 5 | 500 K |
+| 2 | 6 | 12 | 1.5 M |
+| 3 | 10 | 30 | 4 M |
+| 4 | 16 | 70 | 10 M |
+| 5 | 24 | 150 | 25 M |
 
 <a id="click-limit"></a>
 
 ### `CLICK_LIMIT` <small>const</small>
 
-Source: [`src/config/economy.ts:203`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:205`](../../src/config/economy.ts)
 
 The click rate limit: two token buckets, a click needs a token from both. Burst: 8 clicks refilling 5 per second; stamina: 20,000 clicks refilling 1.5 per second (about 130K paid clicks a day,
 so an auto-clicker is no better than a very dedicated human). Script-dispatched clicks do not pay (`requireTrusted`). Implementation: [`createClickLimiter`](economy.md#createclicklimiter).
@@ -781,7 +785,7 @@ so an auto-clicker is no better than a very dedicated human). Script-dispatched 
 
 ### `clickGold` <small>function</small>
 
-Source: [`src/config/economy.ts:186`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:188`](../../src/config/economy.ts)
 
 Gold of one click at a ladder level: gold/s x power (at least the level's floor), then the multipliers (Click Mastery, set bonus).
 
@@ -1112,7 +1116,7 @@ See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
 
 ### `buildingUpgradeDuration` <small>function</small>
 
-Source: [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:45`](../../src/lib/buildings.ts)
 
 Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.
 
@@ -1152,7 +1156,7 @@ An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`
 
 ### `buildingLevelCost` <small>function</small>
 
-Source: [`src/lib/buildings.ts:59`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:81`](../../src/lib/buildings.ts)
 
 The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
 

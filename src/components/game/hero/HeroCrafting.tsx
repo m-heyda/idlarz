@@ -5,6 +5,7 @@ import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-syste
 import { RARITIES, RESOURCES } from '@/catalog';
 import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
 import { gearOdds } from '@/lib/craftGear';
+import { craftLuckBonus } from '@/utils/game/merchant';
 import { craftGroups } from '@/lib/craftCategories';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
@@ -72,7 +73,7 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 	const pity = useCraftStore((state) => state.craft?.pity);
 	if (!('gear' in recipe.output)) return null;
 	const target = recipe.output.gear;
-	const luck = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades }).luck;
+	const luck = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades }).luck + craftLuckBonus(prestige); // Artisan's Eye counts for crafted gear only
 	const odds = gearOdds(target, { craftLevel, luck, intelligence: characterStats.intelligence, pity: pity?.[target.grade] ?? 0 });
 	const levels = odds.itemLevel.min === odds.itemLevel.max ? `${odds.itemLevel.min}` : `${odds.itemLevel.min}-${odds.itemLevel.max}`;
 	const best = odds.rarities[odds.rarities.length - 1];

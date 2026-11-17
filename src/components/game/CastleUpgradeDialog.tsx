@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import type { FC } from 'react';
 import { CASTLE_UPGRADE } from '@/config/castle';
+import { limitOf } from '@/lib/limits';
 import { useGameStore } from '@/stores/gameStore';
 import { formatCompact, formatPercent, formatTime } from '@/utils/formatters';
 import { castleModifier, castleUpgradeDuration } from '@/utils/game/castle';
@@ -27,8 +28,9 @@ const CastleUpgradeDialog: FC = () => {
 
 	const castleLevel = castleLevelOf(tiles);
 
-	const isMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel;
-	const isNextToMaxLevel = castleLevel >= CASTLE_UPGRADE.maxLevel - 1;
+	const castleCap = limitOf('castleMaxLevel', { prestige }); // 10, up to 15 with the Castle Expansion (Ember shop)
+	const isMaxLevel = castleLevel >= castleCap;
+	const isNextToMaxLevel = castleLevel >= castleCap - 1;
 
 	// Get the required resources for the next level
 	const nextLevelIndex = castleLevel - 1;
@@ -95,7 +97,7 @@ const CastleUpgradeDialog: FC = () => {
 	return (
 		<GameWindow
 			id='castle'
-			title={`Castle ${castleLevel}/${CASTLE_UPGRADE.maxLevel}`}
+			title={`Castle ${castleLevel}/${castleCap}`}
 			width={700}
 			height={700}
 			bar={
@@ -178,7 +180,7 @@ const CastleUpgradeDialog: FC = () => {
 							<div className='bw-card bw-card-main'>
 								<div className='bw-sechead'>
 									<span className='bw-label'>Upgrade to level {castleLevel + 1}</span>
-									<DiamondLevel level={castleLevel} max={CASTLE_UPGRADE.maxLevel} />
+									<DiamondLevel level={castleLevel} max={castleCap} />
 								</div>
 								<div className='bw-gets'>
 									You get: <b>+{formatPercent(nextMultiplier * 100)}</b> to all resources, <b>+{formatCompact(nextXpBonus)}</b> castle XP / s

@@ -2,6 +2,7 @@ import { SKILLS, type SkillId } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
 import { isBoss, monsterStats } from '@/lib/monsters';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
@@ -133,7 +134,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	c.mp = Math.min(p.maxMp, c.mp + p.mpRegen * dt);
 	tickCooldowns(ctx, dt);
 	if (f.timeLeftSec !== null) f.timeLeftSec = Math.max(0, f.timeLeftSec - dt);
-	if (c.autoUse && autoUseUnlocked(ctx.ledger.rebirths)) autoUse(ctx, t);
+	if (c.autoUse && autoUseUnlocked(ctx.ledger.rebirths, prestigeOfCore(ctx.env.stored.core))) autoUse(ctx, t);
 
 	const stunned = Math.min(f.stunLeft, dt);
 	f.stunLeft -= stunned;
