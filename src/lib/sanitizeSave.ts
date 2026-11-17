@@ -540,7 +540,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	if (raw.prestige !== undefined) {
 		if (!isRecord(raw.prestige)) return fail('prestige');
 		const rebirths = int(raw.prestige.rebirths, 0, 10000);
-		let legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
+		const legacyPoints = int(raw.prestige.legacyPoints, 0, 1_000_000);
 		const legacyEarned = int(raw.prestige.legacyEarned, 0, 1_000_000);
 		if (rebirths === null || legacyPoints === null || legacyEarned === null) return fail('prestige numbers');
 		const upgrades: PrestigeState['upgrades'] = {};
@@ -570,7 +570,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 				)
 					grants.push(id as EmberUpgradeId);
 		// an account from before the reworked shop (no `shopVersion`) gets its Embers back once: the old levels were bought under other numbers (lib/emberShopMigration.ts)
-		const read = refundOldShop({ rebirths, legacyPoints, legacyEarned, upgrades, ...(shopVersion !== undefined ? { shopVersion } : {}), ...(grants.length ? { grants } : {}) });
+		const read = refundOldShop({
+			rebirths,
+			legacyPoints,
+			legacyEarned,
+			upgrades,
+			...(shopVersion !== undefined ? { shopVersion } : {}),
+			...(grants.length ? { grants } : {}),
+		});
 		const spent = emberSpent(read.upgrades);
 		if (spent > legacyEarned) return fail('embers do not add up');
 		prestige = { ...read, legacyPoints: legacyEarned - spent };
