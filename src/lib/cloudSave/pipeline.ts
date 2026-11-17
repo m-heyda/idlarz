@@ -45,7 +45,7 @@ import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { sha256Hex } from '@/lib/sha256';
 import { STARTING_GEMS } from '@/config/economy';
 import { countSave, emptyStats, statsDue } from '@/lib/offline/stats';
-import { settleTrades } from '@/lib/offline/trade';
+import { grantedSeenAfterSave, settleTrades } from '@/lib/offline/trade';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
@@ -518,7 +518,7 @@ export const acceptSave = async (
 				await ledgers.commit(userId, ledger.ver, {
 					...ledger,
 					ver: ledger.ver + 1,
-					grantedSeen: ledger.granted,
+					grantedSeen: grantedSeenAfterSave(ledger, counted.tradeSince),
 					inv: ledger.inv ?? inventoryFromCore(split.core),
 					stats: counted,
 					legacy: { ...ledger.legacy, idols: legacyIdols },

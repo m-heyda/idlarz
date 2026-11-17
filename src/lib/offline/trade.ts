@@ -17,7 +17,7 @@ export const TRADE_MAX_AGE_SEC = 24 * 3600;
  * How long a trade stays on the record while saves keep arriving that do not show it (a browser that lost the purchase on a reload, an older picture): after this the record is dropped, so an honest player is never refused for ever.
  * A save is uploaded every few minutes, so a correct one releases the record long before this; it only ends a record that nothing can release.
  */
-export const TRADE_RECORD_MAX_AGE_SEC = 30 * 60;
+export const TRADE_RECORD_MAX_AGE_SEC = 10 * 60;
 /** The bound is this much above the estimate, plus a few units, for the rounding and timing of a browser that is a little ahead of its last save. */
 const SLACK = 1.1;
 const SLACK_UNITS = 25;
@@ -51,7 +51,7 @@ const unexplained = (estimate: number, amount: number, have: number): number => 
  * What the trade record is after a save is accepted. The save is the browser's picture of its stock. A trade leaves the record only as far as that picture accounts for it: what the new stock still holds above what the previous save plus income
  * could explain **after** the trade came off stays as the deduction (all of it for another browser's older picture that still holds the pre-sale stock, none for an honest save). The deduction is measured against the new picture, so when a
  * later, correct save arrives the rest is released and an honest player is never held back for ever. The same goes for the gold a purchase should have cost. A record that no save has released within {@link TRADE_RECORD_MAX_AGE_SEC}
- * (30 minutes since its first trade) is dropped whole: a purchase the browser lost (a reload, a retry that undid it) never shows as a debit in any save, and would otherwise cut the gold bound for ever. A new run (rebirth, New Game) or a first save starts the record again.
+ * (10 minutes since its first trade) is dropped whole: a purchase the browser lost (a reload, a retry that undid it) never shows as a debit in any save, and would otherwise cut the gold bound for ever. A new run (rebirth, New Game) or a first save starts the record again.
  */
 export const settleTrades = (ledger: Ledger, previous: StoredSave | null, newCore: { resources?: unknown }, nowSec: number, newRun: boolean): TradeSince => {
 	const trade = ledger.stats.tradeSince;
@@ -67,6 +67,18 @@ export const settleTrades = (ledger: Ledger, previous: StoredSave | null, newCor
 	}
 	const left: TradeSince = { sold, boughtGold: unexplained(stockEstimate(ledger, previous, nowSec, 'gold'), trade.boughtGold, num(resources.gold)) };
 	return isEmptyTrade(left) ? left : { ...left, since };
+};
+
+/**
+ * What `grantedSeen` becomes when a save is accepted: everything the server granted, except the gold and the merchant stock of a trade the record still holds. A save that was on its way when the merchant paid or sold (its picture is older than the
+ * trade) is accepted after it; if it also marked that payout "seen", the server would forget gold or units the player really holds and refuse the next trade. The grant stays unseen as long as the trade stays on the record, and both go together.
+ */
+export const grantedSeenAfterSave = (ledger: Ledger, trade: TradeSince): GrantTotals => {
+	if (isEmptyTrade(trade)) return ledger.granted;
+	const seen = { ...ledger.granted } as GrantTotals & Record<string, number>;
+	const was = ledger.grantedSeen as GrantTotals & Record<string, number>;
+	for (const key of ['gold', ...MERCHANT_BUYABLE]) seen[key] = was[key] ?? 0;
+	return seen;
 };
 
 /**

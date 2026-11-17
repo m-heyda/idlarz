@@ -673,6 +673,19 @@ test('a purchase the browser lost never shows as a debit: the record is dropped 
 	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 41 * MIN)).ok, true);
 });
 
+test('a save that was on its way when the merchant paid does not make the server forget that gold: the player can spend what they were paid', async () => {
+	const p = await player(hoard());
+	const sold = await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 1000);
+	assert.equal(sold.ok, true);
+	// the browser's save was taken before the sale and is accepted after it: it holds the old purse
+	const rev = p.m.rows.get(p.id)!.rev;
+	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN)).kind, 'ok');
+	// the player really holds 100,000 + the payout now: spending most of it on wood must not be refused
+	const held = 100_000 + sold.gold;
+	const units = Math.floor((held * 0.9) / 1.5);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: units }, T0 + 3 * MIN)).ok, true, `buying ${units} wood with ${held} gold held`);
+});
+
 test('a flagged save keeps the land and farm facts of the save before it, so a cheat cannot unlock a deed', async () => {
 	const p = await player(stocked());
 	const before = p.m.rows.get(p.id)!.summary.derived.deedWorld;
