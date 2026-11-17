@@ -198,3 +198,62 @@ test('a rebirth ends every running potion buff (IDL-155)', async () => {
 	assert.equal(ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000)).ok, true);
 	assert.deepEqual(m.ledgers.get(ID)!.buffs, []);
 });
+
+/** The ready player, with a legendary in the bag and another one worn (and a common piece in the bag). */
+const readyWithLegends = async () => {
+	const r = await ready();
+	const sword = { ...plainItem('emberbrand'), rarity: 'legendary' };
+	const ledger = r.m.ledgers.get(ID)!;
+	const bag = ledger.inv!.bag.map((slot) => slot);
+	bag[0] = { item: sword };
+	bag[1] = { item: plainItem('wooden_sword') };
+	r.m.ledgers.set(ID, {
+		...ledger,
+		inv: { ...ledger.inv!, bag, equipment: { ...ledger.inv!.equipment, offHand: { ...plainItem('emberbrand'), rarity: 'legendary' } as never } },
+	});
+	return { ...r, sword };
+};
+
+test('a legendary the player chose to keep survives the rebirth, in the new bag; the rest is wiped', async () => {
+	const { m, sword } = await readyWithLegends();
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [{ from: 'bag', index: 0 }]));
+	assert.equal(reply.ok, true);
+	assert.deepEqual(reply.kept, [sword]);
+	const inv = m.ledgers.get(ID)!.inv!;
+	assert.ok(
+		inv.bag.some((s) => s && 'item' in s && s.item.base === 'emberbrand'),
+		'the kept piece is in the bag',
+	);
+	assert.equal(inv.bag.filter((s) => s && 'item' in s).length, 1, 'nothing else came along');
+	assert.deepEqual(inv.equipment, rebirthKit(undefined).equipment, 'worn gear is the starter kit again');
+	assert.deepEqual(inv.rebirth, { to: 1, gain: reply.gain, kept: 1 });
+});
+
+test('the first rebirth has one slot: more picks, a common piece or an empty place are refused and nothing is wiped', async () => {
+	const { m } = await readyWithLegends();
+	const before = m.ledgers.get(ID)!.inv;
+	for (const keep of [
+		[
+			{ from: 'bag', index: 0 },
+			{ from: 'equip', slot: 'offHand' },
+		],
+		[{ from: 'bag', index: 1 }],
+		[{ from: 'bag', index: 50 }],
+		[{ from: 'equip', slot: 'head' }],
+	] as const) {
+		const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, keep));
+		assert.equal(reply.ok, false);
+		assert.equal(reply.reason, 'bad_keep');
+	}
+	assert.deepEqual(m.ledgers.get(ID)!.inv, before, 'the inventory is untouched');
+});
+
+test('a worn legendary can be kept too, and the same key replays the answer with the kept piece', async () => {
+	const { m } = await readyWithLegends();
+	const first = key();
+	const a = ok(await rebirthStep(m.deps, ID, first, T0 + 30_000, [{ from: 'equip', slot: 'offHand' }]));
+	assert.equal(a.kept?.length, 1);
+	const replay = ok(await rebirthStep(m.deps, ID, first, T0 + 31_000, [{ from: 'equip', slot: 'offHand' }]));
+	assert.deepEqual(replay.kept, a.kept);
+	assert.equal(m.ledgers.get(ID)!.inv!.ver, a.inv.ver, 'no second wipe');
+});

@@ -43,7 +43,7 @@ export const emberSpent = (upgrades: PrestigeState['upgrades']): number => {
  * @category Progression/Rebirth
  * @order 3
  * @formula
- * income bonus = 0.1 x (Embers ever earned)^0.6          multiplier = 1 + bonus
+ * income bonus = 0.12 x (Embers ever earned)^0.6          multiplier = 1 + bonus
  * @table ember-income-examples
  */
 export const emberIncomeBonus = (earned: number): number => REBIRTH.incomePerPoint * Math.pow(Math.max(0, earned), REBIRTH.incomeExponent);
@@ -85,12 +85,12 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
 /**
  * Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.
  *
- * `REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `surplusPerTile` 0.02. The Ancestral Tithe merchant upgrade adds +5% per level.
+ * `REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level.
  *
  * @category Progression/Rebirth
  * @order 2
  * @formula
- * base = floor(3 x (castle level - 5)^1.3 x (sqrt(tiles / 10) + 0.02 x max(0, tiles - tilesNeeded)))
+ * base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
  * gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
  * @table ember-gain-examples
  */

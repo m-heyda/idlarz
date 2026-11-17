@@ -9,7 +9,7 @@ import { Resources } from '@/types/game';
  * - **Requirements**: castle level >= 6 (`minCastleLevel`), economy tile count >= `400 + 50 x rebirths already done` (`minTiles`, `tilesPerRebirth`), no castle upgrade running, and at least 1 Ember of gain.
  * - **Embers gained**: see {@link emberGain}. **Income bonus**: see {@link emberIncomeBonus}.
  * - **What resets** (`rebirth` in `src/stores/game/rebirthSlice.ts`): map (new start ring), resources, castle, animals, buildings, chests, monsters and any open fight, click level, farm upgrades, all merchant upgrades except Pack Rat,
- *   the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
+ *   the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) except the legendary pieces the player chooses to keep (`keepSlots`: rebirth N keeps up to min(N, 15), they land in the new bag), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
  * - **What is kept**: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant's shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).
  * - The server runs the rebirth first (`POST /api/rebirth`): it checks the stored save, wipes the ledger's inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.
  * - Auto-battle unlocks after the first rebirth (`COMBAT.auto.minRebirths`).
@@ -23,16 +23,18 @@ export const REBIRTH = {
 	minCastleLevel: 6,
 	minTiles: 400, // the first rebirth also needs this much territory (300+ tiles come before castle level 6, so it has to be more than that)
 	tilesPerRebirth: 50, // every rebirth done so far raises the territory the next one needs by this much (was 25: the medium-map decision, IDL-181)
-	surplusPerTile: 0.02, // every tile above the requirement adds this to the tile term of the Embers (times the castle term)
+	tileExponent: 0.65, // the tile term of the Embers is (tiles / 10) ^ tileExponent: more territory pays clearly more than the old square root (0.5)
+	surplusPerTile: 0.03, // every tile above the requirement adds this to the tile term of the Embers (times the castle term)
 	castleExponent: 1.3, // the castle term is (castle level - 5) ^ castleExponent: castle 10 pays about 1.6 x what a linear term did (IDL-183, decision IDL-132)
-	gainScale: 3, // Embers = gainScale x (castle level - 5) ^ castleExponent x (sqrt(tiles / 10) + surplusPerTile x tiles over the requirement), rounded down
+	gainScale: 3, // Embers = gainScale x (castle level - 5) ^ castleExponent x ((tiles / 10) ^ tileExponent + surplusPerTile x tiles over the requirement), rounded down
 	/** Tiles the next rebirth needs, after `rebirths` of them */
 	tilesNeeded: (rebirths: number) => REBIRTH.minTiles + REBIRTH.tilesPerRebirth * Math.max(0, rebirths),
 	// income bonus = incomePerPoint x (Embers ever earned) ^ incomeExponent (spending points never lowers it). It was linear, +6 % per Ember,
-	// which made the first rebirth worth about +130-200 % and every later one snowball. Now about +64 % after 22 Embers, +100 % after 47,
-	// +134 % after 76, +220 % after 170 (balancing pass, measured with the sim; tests/economy/rebirth.test.ts pins the curve)
-	incomePerPoint: 0.1,
+	// which made the first rebirth worth about +130-200 % and every later one snowball. Now about +77 % after 22 Embers, +120 % after 47,
+	// +160 % after 76, +264 % after 170 (a +20 % raise of the old curve; tests/economy/rebirth.test.ts pins it)
+	incomePerPoint: 0.12,
 	incomeExponent: 0.6,
+	keepSlotsMax: 15, // the most legendary pieces one rebirth can carry over (rebirth number N keeps min(N, this); see lib/rebirthKeep.ts)
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
 	// Embers granted for a rebirth with this castle level and territory
 	gain: (castleLevel: number, tiles: number, rebirths = 0) => {
@@ -40,7 +42,7 @@ export const REBIRTH = {
 		return Math.floor(
 			REBIRTH.gainScale *
 				Math.pow(Math.max(0, castleLevel - 5), REBIRTH.castleExponent) *
-				(Math.sqrt(Math.max(0, tiles) / 10) + REBIRTH.surplusPerTile * surplus),
+				(Math.pow(Math.max(0, tiles) / 10, REBIRTH.tileExponent) + REBIRTH.surplusPerTile * surplus),
 		);
 	},
 };

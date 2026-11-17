@@ -36,7 +36,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
 | `BASELINE_EPOCH` | Saves & Server / Epoch | [`src/config/epoch.ts:13`](../../src/config/epoch.ts) | The data epoch: |
 | Basics: tick, caps, start | Economy / Basics | [`src/config/economy.ts:22`](../../src/config/economy.ts) | Game constants the economy runs on: |
-| `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:64`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
+| `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:65`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
 | Bestiary mastery | Progression / Mastery | [`src/catalog/mastery.ts:27`](../../src/catalog/mastery.ts) | The mastery ladder shared by every monster type: |
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_ART` | Architecture / Art | [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts) | The picture of each rebirth biome: |
@@ -118,7 +118,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `effectiveTileDiscount` | Economy / Tiles | [`src/utils/game/rebirth.ts:64`](../../src/utils/game/rebirth.ts) | Percent off tile cost: |
 | `eligibleCandidates` | Loot / Pipeline | [`src/lib/loot/pools.ts:37`](../../src/lib/loot/pools.ts) | Members that exist at this item level (item window and the pool's own minimum), with their weights. |
 | `EMBER_MODEL` | Saves & Server / Accepting a save | [`src/lib/cloudSave/emberModel.ts:29`](../../src/lib/cloudSave/emberModel.ts) | The server's model of how many Embers (and rebirths) an account can hold. |
-| `EMBER_UPGRADES` | Progression / Ember shop | [`src/config/rebirth.ts:58`](../../src/config/rebirth.ts) | The Ember shop: |
+| `EMBER_UPGRADES` | Progression / Ember shop | [`src/config/rebirth.ts:60`](../../src/config/rebirth.ts) | The Ember shop: |
 | `emberGain` | Progression / Rebirth | [`src/utils/game/rebirth.ts:97`](../../src/utils/game/rebirth.ts) | Embers a rebirth gives: |
 | `emberIncomeBonus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:49`](../../src/utils/game/rebirth.ts) | The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: |
 | `emberUpgradeCost` | Progression / Ember shop | [`src/utils/game/rebirth.ts:26`](../../src/utils/game/rebirth.ts) | Cost in Embers of buying the next level of an upgrade, given its current level. |
@@ -162,6 +162,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `isNonProduction` | Saves & Server / Accepting a save | [`src/lib/cloudSave/environment.ts:12`](../../src/lib/cloudSave/environment.ts) | Is this server a production server? Decided from the server's own environment only; |
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `junkSale` | Loot / Junk | [`src/lib/loot/junk.ts:70`](../../src/lib/loot/junk.ts) | What the Sell junk button does to a bag: |
+| `KeepRef` | Progression / Rebirth | [`src/lib/rebirthKeep.ts:20`](../../src/lib/rebirthKeep.ts) | Carrying legendary gear through a rebirth. |
 | `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:52`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
 | `kit` | Loot / Items | [`src/lib/fightSim.ts:58`](../../src/lib/fightSim.ts) | A full kit of one ladder grade: |
 | `Ledger` | Saves & Server / The ledger | [`src/lib/offline/ledger.ts:158`](../../src/lib/offline/ledger.ts) | The ledger: |
@@ -256,7 +257,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `SAVE_SCHEMA` | Saves & Server / The save | [`src/lib/saveFormat.ts:35`](../../src/lib/saveFormat.ts) | The save in the browser. |
 | `sealedRng` | Saves & Server / The ledger | [`src/lib/offline/seal.ts:18`](../../src/lib/offline/seal.ts) | A random source for one reward: |
 | Season restart (reset-players) | Ops / Operator guides | [`scripts/reset-players.ts:1`](../../scripts/reset-players.ts) | Season restart: |
-| `sellJunkRule` | Loot / Junk | [`src/lib/offline/inventory.ts:240`](../../src/lib/offline/inventory.ts) | The "Sell junk" button: |
+| `sellJunkRule` | Loot / Junk | [`src/lib/offline/inventory.ts:250`](../../src/lib/offline/inventory.ts) | The "Sell junk" button: |
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:62`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellResource` | Economy / Merchant | [`src/lib/offline/trade.ts:69`](../../src/lib/offline/trade.ts) | Sells `qty` units of `resource` to the merchant: |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |

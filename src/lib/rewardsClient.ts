@@ -6,6 +6,7 @@ import type { PetsReply, PetsRequest } from '@/lib/offline/pets';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { BestiaryReport } from '@/lib/offline/stats';
 import { epochFetch } from '@/lib/epochFetch';
+import type { KeepRef } from '@/lib/rebirthKeep';
 
 // The browser side of /api/spawn, /api/chest and /api/fight: the server decides what exists, what is inside and how every fight goes; the browser asks.
 
@@ -89,7 +90,7 @@ export const requestCraftWithdraw = (key: string, id: string, qty: number): Prom
 export const requestCraftCancel = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/cancel', { key, slot });
 
 /** Asks the server to run the rebirth (it judges the last stored save, computes the Embers and wipes its bag and gear). One key per rebirth attempt. */
-export const requestRebirth = (key: string): Promise<Reply<RebirthReply>> => post<RebirthReply>('/api/rebirth', { key });
+export const requestRebirth = (key: string, keep: readonly KeepRef[] = []): Promise<Reply<RebirthReply>> => post<RebirthReply>('/api/rebirth', { key, keep });
 
 /** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
 export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> =>

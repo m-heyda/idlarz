@@ -222,3 +222,42 @@
 	flex-direction: column;
 	gap: 8px;
 }
+
+/* the confirmation and the "select legendary to keep" step */
+.rb-lists {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 10px;
+}
+.rb-bullets {
+	margin: 0;
+	padding-left: 18px;
+	list-style: disc outside;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	font-size: 0.85rem;
+	color: #d8c8a0;
+}
+.rb-bullets[data-kind='lose'] li::marker {
+	color: #e0705a;
+}
+.rb-bullets[data-kind='keep'] li::marker {
+	color: #5ee07a;
+}
+.rb-keep-grid,
+.rb-pick-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
+.rb-warn {
+	border-color: #a8403a;
+	background: rgba(168, 64, 58, 0.16);
+	padding: 8px 12px;
+}
+.rb-warn-text {
+	margin: 0;
+	font-size: 0.78rem;
+	color: #f08a7e;
+}

@@ -420,7 +420,7 @@ export interface GameState {
 	buyResource: (resource: keyof Resources, amount: number) => boolean;
 	clickForGold: (input: ClickInput) => number;
 	resetGame: () => void;
-	rebirth: (serverGain?: number) => boolean;
+	rebirth: (serverGain?: number, kept?: readonly ItemInstance[]) => boolean;
 	buyEmberUpgrade: (id: EmberUpgradeId) => boolean;
 	upgradeCastle: () => boolean;
 	/** The building system (flag-gated, config/buildings.ts): build, start the next level of, or move the building of the given tile */

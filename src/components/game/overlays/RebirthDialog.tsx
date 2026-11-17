@@ -19,6 +19,9 @@ import { Button, SectionLabel, Tabs } from '../../../../packages/design-system/s
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import '@/styles/Rebirth.css';
 import RebirthUnlockModal from './RebirthUnlockModal';
+import RebirthConfirmModal, { type KeepCandidate } from './RebirthConfirmModal';
+import { keepCandidates, keepSlots } from '@/lib/rebirthKeep';
+import { notify } from '@/lib/notices';
 import EmberIcon from '../EmberIcon';
 
 const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${tidy((n * 100).toFixed(digits))}%`);
@@ -70,7 +73,8 @@ const RebirthDialog: React.FC = () => {
 	const [asking, setAsking] = useState(false);
 	// what the rebirth just did (the Embers, the run's numbers and anything it unlocked), shown on the result screen before the dialog closes
 	const [result, setResult] = useState<{ run: RebirthRunSummary; intro: RebirthUnlockIntro | null } | null>(null);
-	const showToast = useUiStore((state) => state.showToast);
+	const bag = useGameStore((state) => state.bag);
+	const equipment = useGameStore((state) => state.equipment);
 
 	if (!open) return null;
 
@@ -90,13 +94,18 @@ const RebirthDialog: React.FC = () => {
 
 	// The server runs the rebirth first (it uploads the game, judges it, computes the Embers and wipes its bag and gear); the browser then starts
 	// the new run with the Embers the server named. Without a cloud save this session the browser rebirths on its own, as before.
-	const doRebirth = async () => {
+	const doRebirth = async (keep: KeepCandidate[] = []) => {
 		if (asking) return;
 		setAsking(true);
 		try {
-			const answer = await askServerRebirth();
+			const answer = await askServerRebirth(keep.map((c) => c.ref));
 			if (answer.status === 'refused') {
-				showToast('The server does not see your rebirth yet. Give the game a few seconds to save, then try again.');
+				notify(
+					answer.badKeep
+						? 'Your bag changed, so the chosen pieces could not be kept. Choose again.'
+						: 'The server does not see your rebirth yet. Give the game a few seconds to save, then try again.',
+					'error',
+				);
 				return;
 			}
 			// what the run had reached, read before the rebirth wipes it
@@ -110,7 +119,7 @@ const RebirthDialog: React.FC = () => {
 				kills: Object.values(useBestiaryStore.getState().kills).reduce((sum, n) => sum + n, 0),
 				before: before.prestige,
 			};
-			if (rebirth(answer.status === 'ok' ? answer.gain : undefined)) {
+			if (rebirth(answer.status === 'ok' ? answer.gain : undefined, answer.status === 'ok' ? answer.kept : [])) {
 				audioManager.playSound('fanfare');
 				const after = useGameStore.getState().prestige;
 				setConfirming(false);
@@ -123,26 +132,18 @@ const RebirthDialog: React.FC = () => {
 
 	if (result) return <RebirthUnlockModal run={result.run} intro={result.intro} onClose={handleClose} />;
 
-	const confirmCard = (
-		<div className='rb-card'>
-			<SectionLabel>Rebirth now?</SectionLabel>
-			<p className='rb-text'>
-				You gain <b className='text-green-300'>{formatHeaderAmount(gain)}</b> Embers (+{pct(incomeGain)} income for ever). The map, resources, castle and farm
-				start again. Your name, hero, level, XP, attributes, Embers and shop upgrades stay.
-			</p>
-			{nextUnlock && (
-				<p className='rb-text' style={{ color: '#f0d27a' }}>
-					This rebirth unlocks a new land: <b>{nextUnlock.label}</b> (x{nextUnlock.multiplier} output).
-				</p>
-			)}
-			<div className='flex justify-between'>
-				<Button onClick={() => setConfirming(false)}>Not yet</Button>
-				<Button tone='danger' onClick={doRebirth} disabled={asking}>
-					{asking ? 'Asking the server...' : 'Rebirth'}
-				</Button>
-			</div>
-		</div>
-	);
+	const confirmModal = confirming ? (
+		<RebirthConfirmModal
+			gain={gain}
+			incomeText={`+${pct(incomeGain)}`}
+			unlockLabel={nextUnlock ? `${nextUnlock.label} (x${nextUnlock.multiplier} output)` : undefined}
+			slots={keepSlots(prestige.rebirths + 1)}
+			candidates={keepCandidates(bag, equipment)}
+			asking={asking}
+			onCancel={() => setConfirming(false)}
+			onConfirm={(keep) => void doRebirth(keep)}
+		/>
+	) : null;
 
 	const rebirthTab = (
 		<div className='rb-stack'>
@@ -167,9 +168,7 @@ const RebirthDialog: React.FC = () => {
 				</div>
 			</div>
 
-			{confirming ? (
-				confirmCard
-			) : (
+			{
 				<>
 					<div className='rb-card'>
 						<SectionLabel>Requirements</SectionLabel>
@@ -252,7 +251,7 @@ const RebirthDialog: React.FC = () => {
 						{!canRebirth && <p className='rb-note rb-note-center'>Meet every requirement above to rebirth. The Ember shop is open while you work on it.</p>}
 					</div>
 				</>
-			)}
+			}
 		</div>
 	);
 
@@ -325,6 +324,7 @@ const RebirthDialog: React.FC = () => {
 				/>
 				{tab === 'rebirth' ? rebirthTab : shopTab}
 			</div>
+			{confirmModal}
 		</GameModal>
 	);
 };

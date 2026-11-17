@@ -39,10 +39,10 @@ const snapshot = (b: Before = {}): Snapshot => {
 
 const claim = (rebirths: number, legacyEarned: number, playSeconds = 200_000) => ({ rebirths, legacyEarned, playSeconds });
 
-test('an honest first rebirth (castle 6, 400 tiles, 18 Embers) is untouched', () => {
-	assert.equal(emberGain(6, 400, undefined, 0), 18);
-	const verdict = settleEmbers(snapshot({ castleLevel: 6, purchased: 400 }), claim(1, 18));
-	assert.deepEqual(verdict, { rebirths: 1, legacyEarned: 18, clamped: false });
+test('an honest first rebirth (castle 6, 400 tiles, 32 Embers) is untouched', () => {
+	assert.equal(emberGain(6, 400, undefined, 0), 32);
+	const verdict = settleEmbers(snapshot({ castleLevel: 6, purchased: 400 }), claim(1, 32));
+	assert.deepEqual(verdict, { rebirths: 1, legacyEarned: 32, clamped: false });
 });
 
 test('an honest later rebirth is untouched, tiles bought after the last save included', () => {
@@ -52,7 +52,7 @@ test('an honest later rebirth is untouched, tiles bought after the last save inc
 });
 
 test('an upgrade that is running to castle 6 counts as castle 6', () => {
-	const verdict = settleEmbers(snapshot({ castleLevel: 5, upgradingTo: 6, purchased: 400 }), claim(1, 18));
+	const verdict = settleEmbers(snapshot({ castleLevel: 5, upgradingTo: 6, purchased: 400 }), claim(1, 32));
 	assert.equal(verdict.clamped, false);
 });
 

@@ -114,7 +114,7 @@ test('structure: castle + plains + stat ADD inside one bracket; Embers, Foreman 
 	const gold = breakdown.gold;
 	// the spot check from the audit plan (stat bonus excluded by reading the fields, not by pretending it is zero)
 	near(gold.castleMod, 6.4, 'castle bonus at level 6');
-	near(gold.emberMult, 1 + 0.1 * 40 ** 0.6, 'Ember multiplier');
+	near(gold.emberMult, 1 + 0.12 * 40 ** 0.6, 'Ember multiplier');
 	near(gold.merchantMult, 1.05, 'Foreman x1.05');
 	near(gold.gearMult, 1.2, 'gear x1.2');
 	near(gold.modifier + 1, (1 + gold.castleMod + gold.plainsMod + gold.statMod) * gold.emberMult * gold.merchantMult * gold.gearMult, 'modifier structure');
@@ -124,7 +124,7 @@ test('structure: castle + plains + stat ADD inside one bracket; Embers, Foreman 
 	assert.equal(breakdown.xp.gearMult, 1);
 	// and the hand-calculated headline number, with the real stat bonus of the starting character
 	const attrs = { strength: 5, dexterity: 5, intelligence: 5, vitality: 5, charisma: 5 };
-	near(gold.total, PINNED_BASE * (1 + 6.4 + oracle.stat('gold', attrs)) * (1 + 0.1 * 40 ** 0.6) * 1.05 * 1.2, 'hand calculation');
+	near(gold.total, PINNED_BASE * (1 + 6.4 + oracle.stat('gold', attrs)) * (1 + 0.12 * 40 ** 0.6) * 1.05 * 1.2, 'hand calculation');
 	// two multipliers never add: doubling the Ember bonus does not double the Foreman effect
 	const a = run({ ...o, earned: 0 }).breakdown.gold.total;
 	const b = run({ ...o, earned: 40, foreman: 0, gearPct: 0 }).breakdown.gold.total;
@@ -213,7 +213,7 @@ test('tile cost takes Charisma and Bulk Discount: Charisma 5 alone is 2.5 % (IDL
 // ---------------------------------------------------------------------------
 // Rebirth and Embers
 
-test('Ember gain: 3 x (castle - 5)^1.3 x (sqrt(tiles / 10) + 0.02 x tiles over the requirement), then +5 % per Tithe level', () => {
+test('Ember gain: 3 x (castle - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x tiles over the requirement), then +5 % per Tithe level', () => {
 	for (const castle of [5, 6, 7, 8, 9, 10])
 		for (const tiles of [399, 400, 450, 500, 600, 1000, 3000])
 			for (const rebirths of [0, 1, 5])
@@ -224,14 +224,14 @@ test('Ember gain: 3 x (castle - 5)^1.3 x (sqrt(tiles / 10) + 0.02 x tiles over t
 						`castle ${castle}, ${tiles} tiles, rebirth ${rebirths}, Tithe ${tithe}`,
 					);
 				}
-	// pinned values the plan quotes (castle 6 / 400 tiles = 18, 6 / 500 = 27, 8 / 500 = 113, 10 / 600 = 285; the castle term is (castle - 5)^1.3, IDL-183)
-	assert.equal(emberGain(6, 400), 18);
-	assert.equal(emberGain(6, 500), 27);
-	assert.equal(emberGain(8, 500), 113);
-	assert.equal(emberGain(10, 600), 285);
+	// pinned values the plan quotes (castle 6 / 400 tiles = 32, 6 / 500 = 47, 8 / 500 = 196, 10 / 600 = 493; the castle term is (castle - 5)^1.3, IDL-183)
+	assert.equal(emberGain(6, 400), 32);
+	assert.equal(emberGain(6, 500), 47);
+	assert.equal(emberGain(8, 500), 196);
+	assert.equal(emberGain(10, 600), 493);
 });
 
-test('Ember income bonus: +10 % x earned^0.6, from Embers ever EARNED (spending never lowers it)', () => {
+test('Ember income bonus: +12 % x earned^0.6, from Embers ever EARNED (spending never lowers it)', () => {
 	for (const e of [0, 1, 10, 22, 47, 76, 170, 1000]) near(emberIncomeMultiplier(prestigeWith(e)), oracle.ember(e), `earned ${e}`);
 	const spentSome = { rebirths: 3, legacyPoints: 0, legacyEarned: 47, upgrades: { thrift: 3 } };
 	near(emberIncomeMultiplier(spentSome), oracle.ember(47), 'spent Embers still count');

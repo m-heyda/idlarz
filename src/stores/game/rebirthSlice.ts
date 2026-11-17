@@ -8,7 +8,8 @@ import { rebirthStatus, emberUpgradeCost } from '@/utils/game/rebirth';
 import { maxHp, maxMana } from '@/lib/combat';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { rebirthKit } from '@/lib/inventory';
-import type { PrestigeState } from '@/types/game';
+import { placeKept } from '@/lib/rebirthKeep';
+import type { ItemInstance, PrestigeState } from '@/types/game';
 import { clickLimiter, createInitialData, type GameGet, type GameSet } from './base';
 import type { ChestSync } from './chestSync';
 import type { InventorySync } from './inventorySync';
@@ -26,7 +27,8 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 
 	// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
 	// `serverGain`: the Embers the server computed (POST /api/rebirth); the game never takes more than it works out itself
-	rebirth: (serverGain?: number) => {
+	// `kept`: the legendary pieces the server carried over (`lib/rebirthKeep.ts`); they go into the new bag
+	rebirth: (serverGain?: number, kept: readonly ItemInstance[] = []) => {
 		const state = get();
 		const status = rebirthStatus(state);
 		if (!status.canRebirth) return false;
@@ -70,7 +72,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				gearIncomePct(kit.equipment),
 			),
 			equipment: kit.equipment,
-			bag: kit.bag,
+			bag: placeKept(kit.bag, kept),
 			lootPity: kit.lootPity,
 			gems: state.gems, // the premium currency survives a rebirth
 			idolLevels: state.idolLevels, // the Idols' levels are the account's: only the buildings go with the map, they are placed again for free

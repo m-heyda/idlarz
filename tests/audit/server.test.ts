@@ -79,10 +79,10 @@ test('EXPLOIT 1 (closed, IDL-166): Embers and rebirths are bounded by what the p
 		assert.ok(row.rateFactor < 2, `${id}: the server's gold rate is ${row.rateFactor.toFixed(1)}x an honest player's`);
 	}
 	// the ceiling that sanitizeSave does enforce (1,000,000 Embers) is worth this much extra income on every resource but XP
-	near(oracle.ember(1_000_000), 1 + 0.1 * 1_000_000 ** 0.6, 'multiplier at the Ember ceiling');
-	assert.ok(oracle.ember(1_000_000) > 399 && oracle.ember(1_000_000) < 400);
+	near(oracle.ember(1_000_000), 1 + 0.12 * 1_000_000 ** 0.6, 'multiplier at the Ember ceiling');
+	assert.ok(oracle.ember(1_000_000) > 478 && oracle.ember(1_000_000) < 481);
 	// what an honest first rebirth pays, for scale (castle 6, 400 tiles)
-	assert.equal(oracle.emberGain(6, 400, 0, 0), 18);
+	assert.equal(oracle.emberGain(6, 400, 0, 0), 32);
 });
 
 test('EXPLOIT 2 (closed, IDL-168): merchant levels are paid for in the net-worth floor. Foreman, Haggler, Tithe and Bulk at the maximum are flagged and clamped', () => {
