@@ -510,32 +510,31 @@
 }
 
 .fight-hotbar {
-	--ds-slot-size: 42px;
+	--ds-slot-size: 36px;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	gap: 8px;
 }
 
-.fight-hotbar-sep {
-	align-self: stretch;
-	width: 1px;
-	margin: 2px 2px;
-	background: rgba(224, 169, 58, 0.35);
+.fight-skill-group {
+	display: flex;
+	gap: 8px;
+	margin-left: auto;
 }
 
 .combat-widget .fight-skill {
 	flex: none;
-	width: 42px;
-	height: 42px;
+	width: 36px;
+	height: 36px;
 	padding: 0;
 	display: grid;
 	place-items: center;
 }
 
 .fight-skill-icon {
-	width: 28px;
-	height: 28px;
+	width: 24px;
+	height: 24px;
 }
 
 .fight-skill .fight-hotkey,
@@ -568,13 +567,13 @@
 	position: absolute;
 	left: 50%;
 	top: 50%;
-	width: 48px;
-	height: 48px;
+	width: 62px;
+	height: 62px;
 	transform: translate(-50%, -50%);
 	image-rendering: pixelated;
 	filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.55));
 }
 
 .victory-loot {
-	--ds-slot-size: 38px;
+	--ds-slot-size: 32px;
 }

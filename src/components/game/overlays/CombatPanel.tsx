@@ -58,7 +58,8 @@ const Bar: React.FC<{ value: number; max: number; kind: 'monster' | 'player' | '
 			const pct = maxRef.current > 0 ? Math.max(0, Math.min(100, (v / maxRef.current) * 100)) : 0;
 			if (fillRef.current) fillRef.current.style.width = `${pct}%`;
 			if (trailRef.current) trailRef.current.style.width = `${pct}%`;
-			if (textRef.current) textRef.current.textContent = `${label} ${formatCompact(Math.ceil(v))} / ${formatCompact(Math.round(maxRef.current))}`;
+			if (textRef.current)
+				textRef.current.textContent = `${label ? `${label} ` : ''}${formatCompact(Math.ceil(v))} / ${formatCompact(Math.round(maxRef.current))}`;
 		},
 		[label],
 	);
@@ -252,34 +253,35 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 								)}
 							</button>
 						))}
-						<span className='fight-hotbar-sep' aria-hidden />
-						{SKILL_IDS.map((id, i) => {
-							const skill = SKILLS[id];
-							const locked = player.level < skill.unlockLevel;
-							const left = cd[id];
-							const key = (p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i;
-							const detail = locked
-								? `Unlocks at level ${skill.unlockLevel}.`
-								: `Costs ${skill.manaCost} mana, cooldown ${skill.cooldownSec} s. Press ${key} or click.`;
-							return (
-								<HoverTip key={id} placement='above' align='center' tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} ${detail}`} />}>
-									<button
-										type='button'
-										disabled={locked}
-										onClick={() => p.onSkill?.(id)}
-										className='fight-skill'
-										data-locked={locked}
-										data-nomana={!locked && player.mp < skill.manaCost}
-										aria-label={`${skill.name}. ${detail}`}
-									>
-										{/* eslint-disable-next-line @next/next/no-img-element */}
-										<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
-										<span className='fight-hotkey'>{key}</span>
-										{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
-									</button>
-								</HoverTip>
-							);
-						})}
+						<span className='fight-skill-group'>
+							{SKILL_IDS.map((id, i) => {
+								const skill = SKILLS[id];
+								const locked = player.level < skill.unlockLevel;
+								const left = cd[id];
+								const key = (p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i;
+								const detail = locked
+									? `Unlocks at level ${skill.unlockLevel}.`
+									: `Costs ${skill.manaCost} mana, cooldown ${skill.cooldownSec} s. Press ${key} or click.`;
+								return (
+									<HoverTip key={id} placement='above' align='center' tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} ${detail}`} />}>
+										<button
+											type='button'
+											disabled={locked}
+											onClick={() => p.onSkill?.(id)}
+											className='fight-skill'
+											data-locked={locked}
+											data-nomana={!locked && player.mp < skill.manaCost}
+											aria-label={`${skill.name}. ${detail}`}
+										>
+											{/* eslint-disable-next-line @next/next/no-img-element */}
+											<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
+											<span className='fight-hotkey'>{key}</span>
+											{!locked && left > 0 && <span className='fight-cooldown' style={{ height: `${Math.min(100, (left / skill.cooldownSec) * 100)}%` }} />}
+										</button>
+									</HoverTip>
+								);
+							})}
+						</span>
 					</div>
 				</>
 			)}
@@ -365,7 +367,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 				<div className='combat-stage' data-lucky={!!monster.lucky && !dead}>
 					{!dead && (
 						<div className='fight-monster-bar'>
-							<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label={label} snapKey={p.snapKey} />
+							<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label='' snapKey={p.snapKey} />
 						</div>
 					)}
 					<span key={hpKey} className='fight-sprite' data-hit={!over && p.hitTick > 0} data-loading={p.loading}>
