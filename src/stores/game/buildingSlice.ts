@@ -3,7 +3,10 @@
 
 import { buildingDef } from '@/catalog/buildings';
 import {
+	builderBusy,
+	builderCount,
 	buildProblem,
+	needsConstruction,
 	buildingLevelCost,
 	buildingUpgradeDuration,
 	levelOfTile,
@@ -20,7 +23,7 @@ import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
 import { economyTiles } from '@/utils/game/tiles';
 import { getTile, setTiles } from '@/utils/world';
-import type { GameGet, GameSet } from './base';
+import { limitCtx, type GameGet, type GameSet } from './base';
 
 export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 	const context = (): BuildingContext => {
@@ -30,7 +33,8 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			monsters: s.monsters,
 			castleLevel: castleLevelOf(s.tiles),
 			castleUpgrade: s.castleUpgrade,
-			buildingUpgrade: s.buildingUpgrade,
+			buildingUpgrades: s.buildingUpgrades,
+			builders: builderCount(limitCtx(s)),
 			ownedTiles: economyTiles(s.tiles, s.freeTiles),
 		};
 	};
@@ -41,7 +45,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 	};
 
 	return {
-		/** Builds `id` (level 1, paid now, no timer) on tile (x, y). */
+		/** Builds `id` (level 1, paid now) on tile (x, y): at once, except an Idol the account has not learned yet, which takes a builder and a timer (the tile shows it under construction and the building appears when the timer ends). */
 		buildBuilding: (x: number, y: number, id: string): boolean => {
 			if (!Number.isInteger(x) || !Number.isInteger(y)) return false;
 			const ctx = context();
@@ -54,13 +58,23 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			if (!canAffordBundle(s.resources, cost)) return false;
 			const tile = getTile(s.tiles, x, y);
 			if (!tile) return false;
+			if (needsConstruction(def, s.idolLevels)) {
+				if (builderBusy(ctx)) return false;
+				set({
+					resources: subtractBundle(s.resources, cost),
+					buildingUpgrades: [
+						...s.buildingUpgrades,
+						{ x, y, toLevel: 1, remainingSec: buildingUpgradeDuration(0, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct, true), building: id },
+					],
+				});
+				return true;
+			}
 			const level = Math.max(1, remembered);
 			const tiles = setTiles(s.tiles, [{ x, y, tile: { ...tile, building: id, buildingLevel: level } }]);
 			set({
 				tiles,
 				resources: subtractBundle(s.resources, cost),
 				resourceRates: ratesOf(tiles),
-				...(def?.kind === 'idol' && remembered === 0 ? { idolLevels: { ...s.idolLevels, [def.biome]: 1 } } : {}),
 			});
 			return true;
 		},
@@ -77,12 +91,20 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			if (!canAffordBundle(s.resources, cost)) return false;
 			set({
 				resources: subtractBundle(s.resources, cost),
-				buildingUpgrade: {
-					x,
-					y,
-					toLevel: level + 1,
-					remainingSec: buildingUpgradeDuration(level, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct),
-				},
+				buildingUpgrades: [
+					...s.buildingUpgrades,
+					{
+						x,
+						y,
+						toLevel: level + 1,
+						remainingSec: buildingUpgradeDuration(
+							level,
+							s.prestige,
+							idolEconomy(s.tiles, s.idolLevels).buildTimePct,
+							buildingDef(tile?.building)?.kind === 'idol',
+						),
+					},
+				],
 			});
 			return true;
 		},

@@ -28,8 +28,8 @@ const input = (over: Partial<OfflineInput>): OfflineInput => ({
 	rates: rates(10),
 	ratesAfterCastle: null,
 	castleUpgrade: null,
-	buildingUpgrade: null,
-	ratesAfterBuilding: null,
+	buildingUpgrades: [],
+	ratesAfterBuildings: [],
 	xpGainPct: 0,
 	gapSec: 3600,
 	capSec: 8 * 3600,
@@ -42,37 +42,55 @@ const job = (remainingSec: number) => ({ x: 5, y: 5, toLevel: 2, remainingSec })
 
 test('a building upgrade that finishes while away pays the old rate until then and the new one after', () => {
 	// 1 h away, the timer had 600 s left: 600 s at 10/s and 3000 s at 30/s, both at 50 % efficiency
-	const grant = computeOfflineGrant(input({ buildingUpgrade: job(600), ratesAfterBuilding: rates(30) }))!;
+	const grant = computeOfflineGrant(input({ buildingUpgrades: [job(600)], ratesAfterBuildings: [rates(30)] }))!;
 	assert.equal(grant.resources.wood, Math.floor((10 * 600 + 30 * 3000) * 0.5));
-	assert.deepEqual(grant.building, { x: 5, y: 5, toLevel: 2, finished: true });
+	assert.deepEqual(grant.buildings, [{ x: 5, y: 5, toLevel: 2, finished: true }]);
 	assert.equal(grant.castle, null);
 });
 
 test('partial progress: a timer that outlasts the absence earns the old rate throughout and is not finished', () => {
-	const grant = computeOfflineGrant(input({ buildingUpgrade: job(7200), ratesAfterBuilding: rates(30) }))!;
+	const grant = computeOfflineGrant(input({ buildingUpgrades: [job(7200)], ratesAfterBuildings: [rates(30)] }))!;
 	assert.equal(grant.resources.wood, Math.floor(10 * 3600 * 0.5));
-	assert.equal(grant.building?.finished, false);
+	assert.equal(grant.buildings?.[0].finished, false);
 });
 
 test('the absence is capped: a timer longer than the cap does not finish, one inside it does', () => {
-	assert.equal(computeOfflineGrant(input({ gapSec: 30 * 3600, buildingUpgrade: job(9 * 3600), ratesAfterBuilding: rates(30) }))!.building?.finished, false);
-	assert.equal(computeOfflineGrant(input({ gapSec: 30 * 3600, buildingUpgrade: job(7 * 3600), ratesAfterBuilding: rates(30) }))!.building?.finished, true);
+	assert.equal(
+		computeOfflineGrant(input({ gapSec: 30 * 3600, buildingUpgrades: [job(9 * 3600)], ratesAfterBuildings: [rates(30)] }))!.buildings?.[0].finished,
+		false,
+	);
+	assert.equal(
+		computeOfflineGrant(input({ gapSec: 30 * 3600, buildingUpgrades: [job(7 * 3600)], ratesAfterBuildings: [rates(30)] }))!.buildings?.[0].finished,
+		true,
+	);
 });
 
-test('the shared builder: the castle upgrade wins, a building running beside it (forged) is ignored; without a castle upgrade the building runs', () => {
+test('several builders: the castle upgrade and a building upgrade both finish while away, each adds its rates from the moment it ends', () => {
 	const both = computeOfflineGrant(
-		input({ castleUpgrade: { toLevel: 2, remainingSec: 1800 }, ratesAfterCastle: rates(20), buildingUpgrade: job(600), ratesAfterBuilding: rates(100) }),
+		input({ castleUpgrade: { toLevel: 2, remainingSec: 1800 }, ratesAfterCastle: rates(20), buildingUpgrades: [job(600)], ratesAfterBuildings: [rates(100)] }),
 	)!;
-	assert.equal(both.resources.wood, Math.floor((10 * 1800 + 20 * 1800) * 0.5));
-	assert.equal(both.building, undefined);
+	// 600 s at 10/s, then 1200 s at 100/s (the building's 90 more), then 1800 s at 110/s (the castle's 10 more on top), all at 50 % efficiency
+	assert.equal(both.resources.wood, Math.floor((10 * 600 + 100 * 1200 + 110 * 1800) * 0.5));
+	assert.deepEqual(both.buildings, [{ x: 5, y: 5, toLevel: 2, finished: true }]);
 	assert.deepEqual(both.castle, { toLevel: 2, finished: true });
-	const only = computeOfflineGrant(input({ buildingUpgrade: job(1800), ratesAfterBuilding: rates(20) }))!;
+	const only = computeOfflineGrant(input({ buildingUpgrades: [job(1800)], ratesAfterBuildings: [rates(20)] }))!;
 	assert.equal(only.resources.wood, Math.floor((10 * 1800 + 20 * 1800) * 0.5));
+});
+
+test('two building upgrades at once: each is reported, one can finish while the other keeps running', () => {
+	const two = computeOfflineGrant(
+		input({ buildingUpgrades: [job(600), { x: 6, y: 5, toLevel: 3, remainingSec: 99_999 }], ratesAfterBuildings: [rates(30), rates(50)] }),
+	)!;
+	assert.deepEqual(
+		two.buildings?.map((b) => b.finished),
+		[true, false],
+	);
+	assert.equal(two.resources.wood, Math.floor((10 * 600 + 30 * 3000) * 0.5));
 });
 
 test('flag off or no upgrade: the grant is the same as before the building system', () => {
 	const plain = computeOfflineGrant(input({}))!;
-	assert.equal('building' in plain, false);
+	assert.equal('buildings' in plain, false);
 	assert.equal(plain.resources.wood, Math.floor(10 * 3600 * 0.5));
 });
 
@@ -95,27 +113,27 @@ const upgrading = () => {
 test('end to end: the server derives the rates after the upgrade, the grant finishes it, the client applies the new level and rates', () => {
 	withBuildings(() => {
 		const { spot, summary } = upgrading();
-		assert.ok(summary.derived.ratesAfterBuilding && summary.derived.ratesAfterBuilding.wood > summary.rates.wood, 'the next level makes more');
+		assert.ok(summary.derived.ratesAfterBuildings![0] && summary.derived.ratesAfterBuildings![0]!.wood > summary.rates.wood, 'the next level makes more');
 		const grant = computeOfflineGrant({
 			rates: summary.rates,
 			ratesAfterCastle: summary.derived.ratesAfterCastle,
 			castleUpgrade: summary.derived.castleUpgrade,
-			buildingUpgrade: summary.derived.buildingUpgrade,
-			ratesAfterBuilding: summary.derived.ratesAfterBuilding,
+			buildingUpgrades: summary.derived.buildingUpgrades,
+			ratesAfterBuildings: summary.derived.ratesAfterBuildings,
 			xpGainPct: summary.xpGainPct,
 			gapSec: 2000,
 			capSec: 8 * 3600,
 			efficiency: 0.5,
 			minGapSec: 300,
 		})!;
-		assert.equal(grant.building?.finished, true);
+		assert.equal(grant.buildings?.[0].finished, true);
 		// more than the old rate alone would have paid: the new level counted from the moment the timer ended
 		assert.ok(grant.resources.wood > Math.floor(summary.rates.wood * 2000 * 0.5));
 
 		const state = api();
 		const applied = applyOfflineGrant(state, grant);
 		assert.equal(applied.summary.buildingReached, 2);
-		assert.equal(applied.patch.buildingUpgrade, null);
+		assert.deepEqual(applied.patch.buildingUpgrades, []);
 		assert.equal(tileAt(applied.patch.tiles!, spot.x, spot.y).buildingLevel, 2);
 		assert.ok(applied.patch.resourceRates!.total.wood > state.resourceRates.total.wood, 'the bonus of the new level is in the rates');
 		assert.ok(applied.patch.resources!.wood > state.resources.wood);
@@ -129,17 +147,17 @@ test('end to end: partial progress leaves the timer running with less time', () 
 			rates: summary.rates,
 			ratesAfterCastle: null,
 			castleUpgrade: null,
-			buildingUpgrade: summary.derived.buildingUpgrade,
-			ratesAfterBuilding: summary.derived.ratesAfterBuilding,
+			buildingUpgrades: summary.derived.buildingUpgrades,
+			ratesAfterBuildings: summary.derived.ratesAfterBuildings,
 			xpGainPct: 0,
 			gapSec: 400,
 			capSec: 8 * 3600,
 			efficiency: 0.5,
 			minGapSec: 300,
 		})!;
-		assert.equal(grant.building?.finished, false);
+		assert.equal(grant.buildings?.[0].finished, false);
 		const applied = applyOfflineGrant(api(), grant);
-		assert.equal(applied.patch.buildingUpgrade?.remainingSec, 200);
+		assert.equal(applied.patch.buildingUpgrades?.[0]?.remainingSec, 200);
 		assert.equal(applied.summary.buildingReached, undefined);
 	});
 });
@@ -160,13 +178,13 @@ test('a forged remainingSec is rejected by timer_jump: a level claimed after an 
 		const { spot, summary } = upgrading();
 		const T0 = 1_000_000;
 		// the client claims the level landed (and a timer of 0) only 5 s after the save that said 600 s were left
-		const forged = summarize(pickPersisted({ ...api(), tiles: patchTile(api().tiles, spot.x, spot.y, { buildingLevel: 2 }), buildingUpgrade: null } as never));
+		const forged = summarize(pickPersisted({ ...api(), tiles: patchTile(api().tiles, spot.x, spot.y, { buildingLevel: 2 }), buildingUpgrades: [] } as never));
 		assert.equal(forged.derived.buildings?.lumberyard, 2);
 		assert.equal(verifyTransition({ summary, serverSavedAt: T0 }, forged, T0 + 5000).includes('timer_jump'), true);
 		// the same claim after the absence the timer needed is fine
 		assert.equal(verifyTransition({ summary, serverSavedAt: T0 }, forged, T0 + 700_000).includes('timer_jump'), false);
 		// a timer rewritten to nearly nothing without the time passing
-		const rewritten = { ...summary, derived: { ...summary.derived, buildingUpgrade: { ...summary.derived.buildingUpgrade!, remainingSec: 1 } } };
+		const rewritten = { ...summary, derived: { ...summary.derived, buildingUpgrades: [{ ...summary.derived.buildingUpgrades![0], remainingSec: 1 }] } };
 		assert.equal(verifyTransition({ summary, serverSavedAt: T0 }, rewritten, T0 + 5000).includes('timer_jump'), true);
 	});
 });
@@ -202,21 +220,21 @@ test('an Extractor upgrade finishes while away: the old rate until the timer end
 		const { spot, summary: before } = withExtractor();
 		assert.ok(api().upgradeBuilding(spot.x, spot.y));
 		const summary = summarize(pickPersisted(api()));
-		assert.ok(summary.derived.ratesAfterBuilding!.sap > before.rates.sap, 'level 2 makes more sap');
+		assert.ok(summary.derived.ratesAfterBuildings![0]!.sap > before.rates.sap, 'level 2 makes more sap');
 		const grant = computeOfflineGrant({
 			rates: summary.rates,
 			ratesAfterCastle: null,
 			castleUpgrade: null,
-			buildingUpgrade: summary.derived.buildingUpgrade,
-			ratesAfterBuilding: summary.derived.ratesAfterBuilding,
+			buildingUpgrades: summary.derived.buildingUpgrades,
+			ratesAfterBuildings: summary.derived.ratesAfterBuildings,
 			xpGainPct: 0,
 			gapSec: 3600,
 			capSec: 8 * 3600,
 			efficiency: 0.5,
 			minGapSec: 300,
 		})!;
-		const timer = summary.derived.buildingUpgrade!.remainingSec;
-		const expected = Math.floor((summary.rates.sap * timer + summary.derived.ratesAfterBuilding!.sap * (3600 - timer)) * 0.5);
+		const timer = summary.derived.buildingUpgrades![0].remainingSec;
+		const expected = Math.floor((summary.rates.sap * timer + summary.derived.ratesAfterBuildings![0]!.sap * (3600 - timer)) * 0.5);
 		assert.equal(grant.resources.sap, expected);
 		const applied = applyOfflineGrant(api(), grant);
 		assert.equal(tileAt(applied.patch.tiles!, spot.x, spot.y).buildingLevel, 2);

@@ -288,7 +288,7 @@ still happens is resolved by `resolveConflict`. The lock dies with the page, so 
 
 ### `acceptSave` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:208`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:209`](../../src/lib/cloudSave/pipeline.ts)
 
 Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet).
   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
@@ -313,7 +313,7 @@ Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of pl
 
 ### `FLAG_POLICY` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:96`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:97`](../../src/lib/cloudSave/verify.ts)
 
 The flags and what the server does with each. Meaning of each flag:
 
@@ -434,7 +434,7 @@ In short: Embers only rise with the rebirth count; one rebirth fits between two 
 
 ### `MIN_SAVE_INTERVAL_MS` <small>const</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:89`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:90`](../../src/lib/cloudSave/pipeline.ts)
 
 Saves from one player are accepted at most this often (an honest client sends every ~90 s).
 
@@ -442,7 +442,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:247`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:257`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 
@@ -481,7 +481,7 @@ accepted[biome] = trusted                              when claimed <= trusted
 
 ### `POISON_FLAGS` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:155`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:156`](../../src/lib/cloudSave/verify.ts)
 
 Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
 
@@ -489,7 +489,7 @@ Flags that make an account ineligible for rankings for good. Going back in time 
 
 ### `losesProgress` <small>function</small>
 
-Source: [`src/lib/cloudSave/pipeline.ts:81`](../../src/lib/cloudSave/pipeline.ts)
+Source: [`src/lib/cloudSave/pipeline.ts:82`](../../src/lib/cloudSave/pipeline.ts)
 
 True when a new save holds less than the one it replaces: fewer rebirths, or the same rebirths with a lower level or fewer tiles (a rebirth
 resets level and tiles, so a higher rebirth count never counts). The replaced save is then pinned in the history, like a New Game's (`PINNED_KEEP`).
@@ -498,7 +498,7 @@ resets level and tiles, so a higher rebirth count never counts). The replaced sa
 
 ### `ENFORCEMENT` <small>const</small>
 
-Source: [`src/lib/cloudSave/verify.ts:140`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:141`](../../src/lib/cloudSave/verify.ts)
 
 The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
 accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
@@ -655,10 +655,10 @@ SQL call, so no scheduled job is needed); the cosmetics are read live. The `ques
 
 ### `computeOfflineGrant` <small>function</small>
 
-Source: [`src/lib/offline/grant.ts:75`](../../src/lib/offline/grant.ts)
+Source: [`src/lib/offline/grant.ts:76`](../../src/lib/offline/grant.ts)
 
 The grant for an absence of `gapSec`, or null when it is shorter than the minimum (nothing to show). Income is piecewise: if the
-castle upgrade (or a building's, they share one builder) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
+castle upgrade (or any building upgrade, they share the builders) finishes while away, the rest of the time earns at the higher rates. Amounts are rounded down.
 
 Away time (`/api/offline`).
 

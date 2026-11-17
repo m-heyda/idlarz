@@ -3,10 +3,10 @@
  * that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
  *
  * What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
- * the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share **one builder** (one timer at a time);
+ * the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, more later from the Ember shop: one timer each, see `builderCount`);
  * a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
  *
- * **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrade is the optional top-level `buildingUpgrade` (`{ x, y, toLevel, remainingSec }`, like `castleUpgrade`). They are
+ * **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
  * written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No `SAVE_SCHEMA` bump. The server derives income from the saved map
  * with the same {@link calculateResourceBreakdown} (so the client only displays), judges the timer from two summaries (`timer_jump` in `verify.ts`) and prices levels in the net-worth floor.
  *
@@ -20,7 +20,7 @@ export const BUILDINGS_FLAG = { enabled: true };
  * The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
  *
  * - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
- * - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
+ * - `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once (an Idol's first level has its own timer, see {@link IDOL_RULES}).
  * - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
  * - `extractor`: a level 1 Extractor makes `baseRate` (0.3) of its T3 material per second, before the global modifiers; each level above 1 adds `levelStep` (+40 %) of that; it grows with the size of its biome like the Producer (same `perOwnedTile` and `bonusCap`). It has no gold or wood side effects: the material is for crafting and later building upgrades, and the merchant never trades it.
  * - `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ({@link calculateTileCost}).
@@ -45,7 +45,8 @@ export const BUILDING_RULES = {
  * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
  * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
  * - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
- *   An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one).
+ *   An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 1,000 / 2,000 / 4,000 for levels 3 / 4 / 5.
+ *   **Timers** (`durationsSec`, indexed by the level reached): 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5, then x1.35 per level up to 7 days. Even the **first** build of an Idol takes one (a builder works on it and the tile shows it under construction); placing an Idol the account has already learned stays instant, at the level it remembers.
  *   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
  * - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
  *
@@ -54,4 +55,12 @@ export const BUILDING_RULES = {
  * @table idol-effects
  * @table idol-price-floor
  */
-export const IDOL_RULES = { perLevel: 2, luckPerLevel: 4, buildTimeCap: 60, t3PerLevel: 200, floorTiles: [20, 40, 60, 80, 100], floorStepTiles: 40 };
+export const IDOL_RULES = {
+	perLevel: 2,
+	luckPerLevel: 4,
+	buildTimeCap: 60,
+	t3PerLevel: 1000,
+	floorTiles: [20, 40, 60, 80, 100],
+	floorStepTiles: 40,
+	durationsSec: [1800, 3600, 14400, 43200, 86400],
+};

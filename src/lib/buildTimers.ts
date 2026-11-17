@@ -32,8 +32,7 @@ export const timerLabel = (remainingSec: number): string => castleTimerLabel({ r
 const progressOf = (remainingSec: number, totalSec: number): number => (totalSec > 0 ? Math.min(1, Math.max(0, 1 - remainingSec / totalSec)) : 0);
 
 /**
- * Every construction that is running, soonest finished first: the castle upgrade and each building upgrade. Takes a list of building upgrades (today the builder works on one at a time, so the list has at most one entry; a game that builds several
- * at once passes all of them and the bottom-left list shows one row each). `tiles` is only used to name the building on each tile.
+ * Every construction that is running, soonest finished first: the castle upgrade and each building upgrade. Takes the list of building upgrades (one per busy builder) and shows one row each. `tiles` is only used to name the building on each tile.
  */
 export const activeBuildTimers = (input: {
 	castleUpgrade: CastleUpgradeState | null;
@@ -60,8 +59,9 @@ export const activeBuildTimers = (input: {
 		});
 	}
 	for (const up of buildingUpgrades) {
-		const def = buildingDef(buildingAt(up.x, up.y));
-		const total = buildingUpgradeDuration(up.toLevel - 1, prestige, buildTimePct);
+		// a first Idol build has no building on its tile yet: the job names it
+		const def = buildingDef(buildingAt(up.x, up.y) ?? up.building);
+		const total = buildingUpgradeDuration(up.toLevel - 1, prestige, buildTimePct, def?.kind === 'idol');
 		out.push({
 			key: `building:${up.x},${up.y}`,
 			kind: 'building',

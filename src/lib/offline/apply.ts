@@ -21,7 +21,7 @@ type Applied = Pick<
 >;
 
 export type OfflineStateIn = Applied &
-	Partial<Pick<GameState, 'buildingUpgrade' | 'idolLevels'>> &
+	Partial<Pick<GameState, 'buildingUpgrades' | 'idolLevels'>> &
 	Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'> &
 	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds' | 'playerClass'>>;
 
@@ -90,38 +90,40 @@ export const applyOfflineGrant = (
 		}
 	}
 
-	// a building upgrade counts the same way (the builder is shared, so it never runs next to the castle's): the new level counts from the moment its timer ended
-	let buildingUpgrade = state.buildingUpgrade ?? null;
+	// the building upgrades count the same way (each on its own builder): a new level counts from the moment its timer ended
+	const buildingUpgrades: NonNullable<GameState['buildingUpgrades']> = [];
 	let buildingReached: number | undefined;
 	let idolLevels = state.idolLevels;
-	if (
-		buildingUpgrade &&
-		grant.building &&
-		buildingUpgrade.x === grant.building.x &&
-		buildingUpgrade.y === grant.building.y &&
-		buildingUpgrade.toLevel === grant.building.toLevel
-	) {
-		const remaining = buildingUpgrade.remainingSec - grant.elapsedSec;
-		if (remaining > 0) {
-			buildingUpgrade = { ...buildingUpgrade, remainingSec: remaining };
-		} else {
-			const done = completeUpgrade(tiles, state.idolLevels ?? {}, buildingUpgrade);
-			if (done.reached) {
-				tiles = done.tiles;
-				idolLevels = done.idolLevels;
-				resourceRates = calculateResourceRates(
-					tiles,
-					state.characterStats,
-					state.farmLevels,
-					state.prestige,
-					state.farmUpgrades,
-					state.merchantUpgrades,
-					gearIncomePct(state.equipment),
-				);
-				buildingReached = buildingUpgrade.toLevel;
-			}
-			buildingUpgrade = null;
+	let buildingDone = false;
+	for (const job of state.buildingUpgrades ?? []) {
+		const listed = grant.buildings?.some((g) => g.x === job.x && g.y === job.y && g.toLevel === job.toLevel);
+		if (!listed) {
+			buildingUpgrades.push(job);
+			continue;
 		}
+		const remaining = job.remainingSec - grant.elapsedSec;
+		if (remaining > 0) {
+			buildingUpgrades.push({ ...job, remainingSec: remaining });
+			continue;
+		}
+		const done = completeUpgrade(tiles, idolLevels ?? {}, job);
+		if (done.reached) {
+			tiles = done.tiles;
+			idolLevels = done.idolLevels;
+			buildingDone = true;
+			buildingReached = Math.max(buildingReached ?? 0, job.toLevel);
+		}
+	}
+	if (buildingDone) {
+		resourceRates = calculateResourceRates(
+			tiles,
+			state.characterStats,
+			state.farmLevels,
+			state.prestige,
+			state.farmUpgrades,
+			state.merchantUpgrades,
+			gearIncomePct(state.equipment),
+		);
 	}
 
 	// monsters age, and so grow, by the whole absence (the server then says which of them are still there)
@@ -146,7 +148,7 @@ export const applyOfflineGrant = (
 			resourceRates,
 			tiles,
 			castleUpgrade,
-			...(state.buildingUpgrade !== undefined ? { buildingUpgrade } : {}),
+			...(state.buildingUpgrades !== undefined ? { buildingUpgrades } : {}),
 			...(idolLevels !== undefined ? { idolLevels } : {}),
 			monsters,
 			level: { level, progress },

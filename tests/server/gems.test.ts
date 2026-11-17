@@ -15,7 +15,7 @@ import type { CharacterReply, GemsReply, GemsRequest, PendingIdentity } from '..
 import { dailyInfo, rollDailyChest, serverDay } from '../../src/lib/offline/gems';
 import { emptyGemShop, newLedger, readGemShop } from '../../src/lib/offline/ledger';
 import { ATTR_KEYS, allocatePoints, attributeBudget, newAttrs, readAttrs } from '../../src/lib/offline/attrs';
-import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, GEM_SHOP } from '../../src/config/gemShop';
+import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, GEM_SHOP, gemBuildersOf } from '../../src/config/gemShop';
 import { STARTING_GEMS } from '../../src/config/economy';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
 
@@ -179,6 +179,23 @@ test('Name colours: a one-time purchase of 1000 gems, a second one is refused an
 	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gemShop: { ...m.ledgers.get(ID)!.gemShop, bought: {} }, gems: 999 });
 	const short = ok(await gems(m, { action: 'spend', itemId: 'name_colors' }, T0 + STEP + 2000));
 	assert.equal(short.reason, 'short_balance');
+});
+
+test('Builder #2: a one-time purchase of 1000 gems on the Upgrades tab; the ledger record is the second builder', async () => {
+	const item = GEM_SHOP.find((i) => i.id === 'builder_2');
+	assert.equal(item?.price, 1000);
+	assert.equal(item?.kind, 'once');
+	assert.equal(item?.tab, 'upgrades');
+	assert.equal(gemBuildersOf({}), 0);
+	const { m } = await started();
+	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gems: 1500 });
+	const bought = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, T0 + STEP));
+	assert.equal(bought.ok, true);
+	assert.equal(bought.paid, 1000);
+	assert.equal(gemBuildersOf(bought.bought), 1);
+	const again = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, T0 + STEP + 1000));
+	assert.equal(again.reason, 'already_owned');
+	assert.equal(m.ledgers.get(ID)!.gems, 500, 'nothing more is charged');
 });
 
 test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name colours alone', async () => {

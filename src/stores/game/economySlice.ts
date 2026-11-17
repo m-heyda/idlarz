@@ -10,11 +10,12 @@ import { castleUpgradeDuration } from '@/utils/game/castle';
 import { economyTiles } from '@/utils/game/tiles';
 import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
+import { builderBusy, builderCount } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
-import { clickLimiter, findCastle, type GameGet, type GameSet } from './base';
+import { clickLimiter, findCastle, limitCtx, type GameGet, type GameSet } from './base';
 import audioManager from '@/utils/audioManager';
 
 export const createEconomySlice = (set: GameSet, get: GameGet) => {
@@ -71,7 +72,8 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 		upgradeCastle: () => {
 			const state = get();
 			if (state.castleUpgrade) return false;
-			if (state.buildingUpgrade) return false; // one builder: the castle waits for the building that is being upgraded
+			// the castle takes a builder like a building does: with every builder busy it waits
+			if (builderBusy({ castleUpgrade: null, buildingUpgrades: state.buildingUpgrades, builders: builderCount(limitCtx(state)) })) return false;
 
 			const castle = findCastle(state.tiles);
 			if (!castle || !castle.tile.upgradeCost || !castle.tile.level) return false;

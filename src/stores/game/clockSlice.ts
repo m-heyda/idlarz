@@ -71,32 +71,31 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			}
 		}
 
-		// Building upgrade timer (the per-biome building system, null unless BUILDINGS_FLAG is on): same rule as the castle's, and the same builder
-		let newBuildingUpgrade = state.buildingUpgrade;
+		// Building upgrade timers (the per-biome building system, empty unless BUILDINGS_FLAG is on): same rule as the castle's, one per busy builder
+		const newBuildingUpgrades: typeof state.buildingUpgrades = [];
 		let newIdolLevels = state.idolLevels;
 		let buildingFinished = false;
-		if (newBuildingUpgrade) {
-			const remaining = newBuildingUpgrade.remainingSec - secondsElapsed;
-			if (remaining <= 0) {
-				const done = completeUpgrade(newTiles, state.idolLevels, newBuildingUpgrade);
-				if (done.reached) {
-					newTiles = done.tiles;
-					newIdolLevels = done.idolLevels;
-					newRates = calculateResourceRates(
-						newTiles,
-						state.characterStats,
-						state.farmLevels,
-						state.prestige,
-						state.farmUpgrades,
-						state.merchantUpgrades,
-						gearIncomePct(state.equipment),
-					);
-				}
-				newBuildingUpgrade = null;
-				buildingFinished = true;
-			} else {
-				newBuildingUpgrade = { ...newBuildingUpgrade, remainingSec: remaining };
+		for (const job of state.buildingUpgrades) {
+			const remaining = job.remainingSec - secondsElapsed;
+			if (remaining > 0) {
+				newBuildingUpgrades.push({ ...job, remainingSec: remaining });
+				continue;
 			}
+			const done = completeUpgrade(newTiles, newIdolLevels, job);
+			if (done.reached) {
+				newTiles = done.tiles;
+				newIdolLevels = done.idolLevels;
+				newRates = calculateResourceRates(
+					newTiles,
+					state.characterStats,
+					state.farmLevels,
+					state.prestige,
+					state.farmUpgrades,
+					state.merchantUpgrades,
+					gearIncomePct(state.equipment),
+				);
+			}
+			buildingFinished = true;
 		}
 
 		// Chests and monsters come from the server (see applyServerTickets); between its answers the monsters on the map just age
@@ -167,7 +166,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			characterStats: newCharacterStats,
 			tiles: newTiles,
 			castleUpgrade: newCastleUpgrade,
-			buildingUpgrade: newBuildingUpgrade,
+			buildingUpgrades: newBuildingUpgrades,
 			idolLevels: newIdolLevels,
 			monsters: newMonsters,
 			combat: newCombat,

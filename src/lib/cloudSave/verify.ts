@@ -1,11 +1,12 @@
 import { BUILDINGS_FLAG, IDOL_RULES } from '@/config/buildings';
 import { CASTLE_UPGRADE } from '@/config/castle';
-import { buildingUpgradeDuration } from '@/lib/buildings';
+import { HARD_LIMITS } from '@/config/limits';
+import { shortestUpgradeSec } from '@/lib/buildings';
 import { idolDef } from '@/catalog/idols';
 import { MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADES } from '@/config/merchant';
 import type { GrantTotals } from '@/lib/offline/ledger';
-import type { Resources } from '@/types/game';
-import type { SaveSummary } from './summary';
+import type { BuildingUpgradeState, Resources } from '@/types/game';
+import { derivedJobs, type SaveSummary } from './summary';
 import { settleXp } from './xpModel';
 
 /** The Lighthouse level the sale check allows for (Idol levels have no design limit, so the check no longer follows the hard limit; raise it with the Idol level cap). */
@@ -197,16 +198,17 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
 };
 
 /**
- * The building timer, judged like the castle's: a building is born at level 1, every later level needs an upgrade that was running in the previous save for this very level
- * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Always false while the building system is off.
+ * The building timers, judged like the castle's: a building is born at level 1 (an Idol is built at its first level through a timer of its own), every later level needs an upgrade that was running in the previous save for this very level
+ * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Several can run at once, but never more than the account has builders (`builders`: the Gem shop's, from the ledger,
+ * plus the save's own, with the castle's upgrade counted too). Always false while the building system is off.
  */
-const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number> = {}): boolean => {
+const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number> = {}, gemBuilders = 0): boolean => {
 	if (!BUILDINGS_FLAG.enabled) return false;
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
-	const was = before.derived.buildingUpgrade ?? null;
-	const now = next.derived.buildingUpgrade ?? null;
+	const was = derivedJobs(before.derived).jobs;
+	const now = derivedJobs(next.derived).jobs;
 	const prev = before.derived.buildings ?? {};
-	let raised = 0;
+	const pool = [...was];
 	for (const [id, level] of Object.entries(next.derived.buildings ?? {})) {
 		const old = prev[id];
 		if (old === undefined) {
@@ -217,17 +219,25 @@ const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number,
 		}
 		if (level < old) return true;
 		if (level > old) {
-			if (level > old + 1 || !was || was.toLevel !== level || was.remainingSec > allowed) return true;
-			raised++;
+			// each level needs its own finished upgrade from the previous save
+			const at = pool.findIndex((job) => job.toLevel === level && job.remainingSec <= allowed);
+			if (level > old + 1 || at < 0) return true;
+			pool.splice(at, 1);
 		}
 	}
-	if (raised > 1) return true;
-	// a NEW building upgrade cannot be shorter than its timer allows with the most the build-time cuts could take off
-	if (now && !(was && was.toLevel === now.toLevel && was.x === now.x && was.y === now.y)) {
-		const min = Math.floor(buildingUpgradeDuration(now.toLevel - 1) * (1 - maxBuildTimeCut(before, next)));
-		if (now.remainingSec + allowed < min) return true;
+	const same = (a: BuildingUpgradeState, b: BuildingUpgradeState) => a.toLevel === b.toLevel && a.x === b.x && a.y === b.y;
+	for (const job of now) {
+		const old = was.find((w) => same(w, job));
+		if (!old) {
+			// a NEW building upgrade cannot be shorter than its timer allows with the most the build-time cuts could take off
+			const min = Math.floor(shortestUpgradeSec(job.toLevel) * (1 - maxBuildTimeCut(before, next)));
+			if (job.remainingSec + allowed < min) return true;
+		} else if (old.remainingSec - job.remainingSec > allowed) return true; // a timer that carries on must not have run faster than the clock
 	}
-	return !raised && !!was && !!now && was.toLevel === now.toLevel && was.x === now.x && was.y === now.y && was.remainingSec - now.remainingSec > allowed;
+	// more timers than builders: only a new one counts against the limit (a save that already ran more is not made worse)
+	const running = (s: SaveSummary) => derivedJobs(s.derived).jobs.length + (s.derived.castleUpgrade ? 1 : 0);
+	const builders = Math.min(HARD_LIMITS.builders, 1 + gemBuilders + Math.max(0, (next.derived.builders ?? 1) - 1));
+	return running(next) > Math.max(builders, running(before));
 };
 
 /** Gold-equivalent income per second: gold plus every sellable resource at the merchant's best price (stock sold is gold gained). */
@@ -250,6 +260,7 @@ export const verifyTransition = (
 	nowMs: number,
 	grants?: GrantTotals,
 	trustedIdols?: Record<string, number>,
+	gemBuilders = 0,
 ): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
@@ -274,7 +285,7 @@ export const verifyTransition = (
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
 	if (sameRun && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols)) flags.add('timer_jump');
+	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols, gemBuilders)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

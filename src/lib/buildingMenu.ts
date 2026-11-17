@@ -1,5 +1,16 @@
 import { buildingDef, buildingsOfBiome, type BuildingDef } from '@/catalog/buildings';
-import { buildProblem, builtBuildings, buildingLevelCost, moveProblem, relocationCost, rememberedIdolLevel, type BuildingContext } from '@/lib/buildings';
+import {
+	builderBusy,
+	builderCount,
+	buildProblem,
+	builtBuildings,
+	buildingLevelCost,
+	moveProblem,
+	needsConstruction,
+	relocationCost,
+	rememberedIdolLevel,
+	type BuildingContext,
+} from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { monsterAt } from '@/lib/monsters';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
@@ -62,7 +73,8 @@ export function buildOptions(game: MapGameStore, x: number, y: number): { builds
 		monsters: s.monsters,
 		castleLevel: castleLevelOf(s.tiles),
 		castleUpgrade: s.castleUpgrade,
-		buildingUpgrade: s.buildingUpgrade ?? null,
+		buildingUpgrades: s.buildingUpgrades ?? [],
+		builders: builderCount({ prestige: s.prestige, gemBuilders: s.gemBuilders }),
 		ownedTiles: economyTiles(s.tiles, s.freeTiles),
 	};
 	const standing = builtBuildings(s.tiles);
@@ -80,7 +92,11 @@ export function buildOptions(game: MapGameStore, x: number, y: number): { builds
 				def,
 				cost,
 				remembered,
-				problem: buildProblem(ctx, x, y, def.id) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources'),
+				// an Idol's first build takes a builder and a timer: no free builder is a refusal too
+				problem:
+					buildProblem(ctx, x, y, def.id) ??
+					(needsConstruction(def, s.idolLevels) ? builderBusy(ctx) : null) ??
+					(canAffordBundle(s.resources, cost) ? null : 'Not enough resources'),
 			});
 		}
 	}

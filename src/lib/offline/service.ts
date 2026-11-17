@@ -11,6 +11,7 @@
  */
 import { classPassives } from '@/lib/classPassives';
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';
+import { derivedJobs } from '@/lib/cloudSave/summary';
 import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
@@ -264,8 +265,8 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 					rates: stored.summary.rates,
 					ratesAfterCastle: derived.ratesAfterCastle,
 					castleUpgrade: derived.castleUpgrade,
-					buildingUpgrade: derived.buildingUpgrade ?? null,
-					ratesAfterBuilding: derived.ratesAfterBuilding ?? null,
+					buildingUpgrades: derivedJobs(derived).jobs,
+					ratesAfterBuildings: derivedJobs(derived).ratesAfter,
 					xpGainPct: stored.summary.xpGainPct,
 					gapSec,
 					capSec: derived.offlineCapSec,

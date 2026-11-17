@@ -32,8 +32,8 @@ test('flag off: the save body has exactly the keys it had before the building sy
 	const body = packBody(pickPersisted(api()));
 	const expected = new Set<string>([...PERSISTED_KEYS.filter((k) => !['tiles', 'level', 'previousLevel', 'activeChests'].includes(k)), 'land', 'extra']);
 	assert.deepEqual(new Set(Object.keys(body)), expected);
-	assert.equal('buildingUpgrade' in body, false);
-	assert.equal('buildingUpgrade' in pickPersisted(api()), false);
+	assert.equal('buildingUpgrades' in body, false);
+	assert.equal('buildingUpgrades' in pickPersisted(api()), false);
 	assert.equal(JSON.stringify(body.extra).includes('building'), false);
 });
 
@@ -76,7 +76,7 @@ test('flag off: a save that carries buildings (written with the flag on) loads, 
 	assert.ok(loaded.ok, loaded.ok ? '' : loaded.reason);
 	if (!loaded.ok) return;
 	assert.equal(builtBuildings(loaded.state.tiles).length, 0, `no building survives on the ${biome} tile`);
-	assert.equal('buildingUpgrade' in loaded.state, false);
+	assert.equal('buildingUpgrades' in loaded.state, false);
 });
 
 test('flag off: the actions refuse and the tile menu keeps the disabled placeholder', () => {
@@ -85,7 +85,7 @@ test('flag off: the actions refuse and the tile menu keeps the disabled placehol
 	assert.equal(api().buildBuilding(CASTLE_X + 1, CASTLE_Y, 'lumberyard'), false);
 	assert.equal(api().upgradeBuilding(CASTLE_X + 1, CASTLE_Y), false);
 	assert.equal(api().moveBuilding(CASTLE_X + 1, CASTLE_Y, CASTLE_X + 2, CASTLE_Y), false);
-	assert.equal(api().buildingUpgrade, null);
+	assert.deepEqual(api().buildingUpgrades, []);
 	const at = { x: CASTLE_X + 1, y: CASTLE_Y, t: tileAt(api().tiles, CASTLE_X + 1, CASTLE_Y) };
 	const items = tileMenuItems({ x: at.x, y: at.y, biome: at.t.biome, game: store as never, queuePos: 0, lineOpen: false, hasChest: false });
 	const entry = items.find((i) => i.id === BUILDINGS_ENTRY_ID);

@@ -16,7 +16,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
-- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`idolEconomy`](#idoleconomy)
+- Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`builderCount`](#buildercount), [`idolEconomy`](#idoleconomy)
 - Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
@@ -1002,10 +1002,10 @@ The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](ec
 that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
 
 What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
-the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share **one builder** (one timer at a time);
+the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, more later from the Ember shop: one timer each, see `builderCount`);
 a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
 
-**Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrade is the optional top-level `buildingUpgrade` (`{ x, y, toLevel, remainingSec }`, like `castleUpgrade`). They are
+**Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
 written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No `SAVE_SCHEMA` bump. The server derives income from the saved map
 with the same [`calculateResourceBreakdown`](economy.md#calculateresourcebreakdown) (so the client only displays), judges the timer from two summaries (`timer_jump` in `verify.ts`) and prices levels in the net-worth floor.
 
@@ -1020,7 +1020,7 @@ Source: [`src/config/buildings.ts:33`](../../src/config/buildings.ts)
 The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
 
 - `maxLevel`: the base level cap, 5. Level `L` can only be bought while the castle is at least level `L` (`min(5, castle level)`).
-- `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once.
+- `durationsSec`: the upgrade timers, indexed by the level being left (1 to 2 first): 10 min, 45 min, 3 h, 8 h. Level 1 is built at once (an Idol's first level has its own timer, see [`IDOL_RULES`](economy.md#idol-rules)).
 - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
 - `extractor`: a level 1 Extractor makes `baseRate` (0.3) of its T3 material per second, before the global modifiers; each level above 1 adds `levelStep` (+40 %) of that; it grows with the size of its biome like the Producer (same `perOwnedTile` and `bonusCap`). It has no gold or wood side effects: the material is for crafting and later building upgrades, and the merchant never trades it.
 - `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ([`calculateTileCost`](economy.md#calculatetilecost)).
@@ -1112,14 +1112,16 @@ See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
 
 ### `buildingUpgradeDuration` <small>function</small>
 
-Source: [`src/lib/buildings.ts:39`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:42`](../../src/lib/buildings.ts)
 
-Seconds the next level takes, from `fromLevel` to `fromLevel + 1` (10 min, 45 min, 3 h, 8 h); Master Builders (Ember shop) shortens it like the castle's timer.
+Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5
+(`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.
 
 **Formula**
 
 ```text
-seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))
+seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))          Producer, Extractor
+seconds = floor(IDOL_RULES.durationsSec[fromLevel] x (1 - ...))          Idol; above level 5: last x 1.35^(levels past 5), at most 7 days
 ```
 
 <a id="idols"></a>
@@ -1152,7 +1154,7 @@ An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`
 
 ### `buildingLevelCost` <small>function</small>
 
-Source: [`src/lib/buildings.ts:59`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:79`](../../src/lib/buildings.ts)
 
 The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
 
@@ -1167,14 +1169,15 @@ floor(level) = IDOL_RULES.floorTiles[level - 1], then +floorStepTiles per level 
 
 ### `IDOL_RULES` <small>const</small>
 
-Source: [`src/config/buildings.ts:57`](../../src/config/buildings.ts)
+Source: [`src/config/buildings.ts:58`](../../src/config/buildings.ts)
 
 The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
 
 - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
 - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
 - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
-  An upgrade is bought during a run: resources, a timer on the shared builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one).
+  An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 1,000 / 2,000 / 4,000 for levels 3 / 4 / 5.
+  **Timers** (`durationsSec`, indexed by the level reached): 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5, then x1.35 per level up to 7 days. Even the **first** build of an Idol takes one (a builder works on it and the tile shows it under construction); placing an Idol the account has already learned stays instant, at the level it remembers.
   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
 - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
 
@@ -1196,14 +1199,28 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 | --- | --- | --- | --- |
 | 1 | 20 | wood 2,016, stone 1,344, gold 6,748 | built at once |
 | 2 | 40 | wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K | 10 min |
-| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 200 | 45 min |
-| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 400 | 3 h |
-| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 800 | 8 h |
-| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 1,600 | 10.8 h |
-| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 3,200 | 14.58 h |
-| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 6,400 | 19.68 h |
-| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 12.8 K | 1.11 d |
-| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 25.6 K | 1.49 d |
+| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000 | 45 min |
+| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000 | 3 h |
+| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000 | 8 h |
+| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000 | 10.8 h |
+| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K | 14.58 h |
+| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K | 19.68 h |
+| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K | 1.11 d |
+| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K | 1.49 d |
+
+<a id="buildercount"></a>
+
+### `builderCount` <small>function</small>
+
+Source: [`src/lib/buildings.ts:64`](../../src/lib/buildings.ts)
+
+How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's builders on top, at most `HARD_LIMITS.builders`.
+
+**Formula**
+
+```text
+builders = 1 + (Builder #2 bought ? 1 : 0) + Ember shop builders
+```
 
 <a id="idoleconomy"></a>
 
@@ -1226,7 +1243,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:55`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:58`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1237,6 +1254,8 @@ The gem shop's price book: what each service costs and how often it can be bough
 - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
 
 - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
+
+- **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1254,12 +1273,13 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Frost name | once | 500 | none | An animated icy nickname with a glint that sweeps across it. |
 | Void name | once | 500 | none | A pale violet nickname that breathes out a dark purple glow. |
 | Galaxy name | once | 500 | none | An animated nickname with a starry purple and blue sky drifting inside the letters. |
+| Builder #2 | upgrades | 1000 | none | A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:148`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:166`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 
@@ -1279,7 +1299,7 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 
 ### `DAILY_CHEST` <small>const</small>
 
-Source: [`src/config/gemShop.ts:157`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:175`](../../src/config/gemShop.ts)
 
 The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
 never less than `floor`. It is rolled by the server when day 7 is claimed ([`rollDailyChest`](economy.md#rolldailychest)), from a sealed random number, and recorded as granted like any chest.

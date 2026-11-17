@@ -394,6 +394,7 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `craftOfflineHours` | 8 | 72 | nothing yet |
 | `craftSpeed` | 1 | 4 | nothing yet |
 | `idolMaxLevel` | 5 | 100 | nothing yet |
+| `builders` | 1 | 8 | nothing yet |
 
 See also: [`limitOf`](progression.md#limitof)
 
@@ -401,7 +402,7 @@ See also: [`limitOf`](progression.md#limitof)
 
 ### `limitOf` <small>function</small>
 
-Source: [`src/lib/limits.ts:40`](../../src/lib/limits.ts)
+Source: [`src/lib/limits.ts:44`](../../src/lib/limits.ts)
 
 The current value of a limit: its base plus the registered bonuses.
 

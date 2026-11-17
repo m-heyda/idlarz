@@ -7,6 +7,7 @@ import { BIOMES } from '@/config/biomes';
 import {
 	buildingLevelCost,
 	buildingOutput,
+	builderCount,
 	buildingUpgradeDuration,
 	idolFloorTiles,
 	levelOfTile,
@@ -45,7 +46,8 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const resources = useGameStore((state) => state.resources);
 	const monsters = useGameStore((state) => state.monsters);
 	const castleUpgrade = useGameStore((state) => state.castleUpgrade);
-	const buildingUpgrade = useGameStore((state) => state.buildingUpgrade);
+	const buildingUpgrades = useGameStore((state) => state.buildingUpgrades);
+	const gemBuilders = useGameStore((state) => state.gemBuilders);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const idolLevels = useGameStore((state) => state.idolLevels);
 	const prestige = useGameStore((state) => state.prestige);
@@ -64,12 +66,20 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const level = levelOfTile(tile);
 	const idol = idolDef(def.id);
 	const ownedTiles = economyTiles(tiles, freeTiles);
-	const ctx: BuildingContext = { tiles, monsters, castleLevel: castleLevelOf(tiles), castleUpgrade, buildingUpgrade: buildingUpgrade ?? null, ownedTiles };
+	const ctx: BuildingContext = {
+		tiles,
+		monsters,
+		castleLevel: castleLevelOf(tiles),
+		castleUpgrade,
+		buildingUpgrades,
+		builders: builderCount({ prestige, gemBuilders }),
+		ownedTiles,
+	};
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
 	const top = def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel;
 	const atTop = level >= top;
-	const running = buildingUpgrade && buildingUpgrade.x === x && buildingUpgrade.y === y ? buildingUpgrade : null;
+	const running = buildingUpgrades.find((u) => u.x === x && u.y === y) ?? null;
 	const nextLevel = level + 1;
 	const cost = atTop ? {} : buildingLevelCost(nextLevel, ownedTiles, def);
 	const problem = atTop ? null : (upgradeProblem(ctx, x, y) ?? (canAffordBundle(resources, cost) ? null : 'Not enough resources'));
@@ -90,7 +100,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		(key) => (now?.[key as keyof Resources] ?? 0) > 0 || (next?.[key as keyof Resources] ?? 0) > 0,
 	) as (keyof Resources)[];
 	const perHour = (o: Partial<Resources> | null, key: keyof Resources) => formatNumber((o?.[key] ?? 0) * HOUR);
-	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct) : 0;
+	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct, def.kind === 'idol') : 0;
 	const progress = running && total > 0 ? Math.min(1, Math.max(0, 1 - running.remainingSec / total)) : 0;
 
 	return (
@@ -184,7 +194,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>
 								)}
 								<div className='bw-foot'>
-									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct))}</span>
+									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct, def.kind === 'idol'))}</span>
 									<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
 										Upgrade
 									</Button>

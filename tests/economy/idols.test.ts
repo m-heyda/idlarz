@@ -77,6 +77,13 @@ const tick = (sec: number) => {
 	for (let t = 0; t < sec; t += 10) api().tick(10_000);
 };
 
+/** Builds an Idol the account has not learned yet and waits out its first-build timer (30 min): the Idol stands at level 1 afterwards. */
+const buildIdol = (a: { x: number; y: number }, id: string) => {
+	assert.ok(api().buildBuilding(a.x, a.y, id));
+	tick(1900);
+	assert.equal(tileAt(api().tiles, a.x, a.y).building, id);
+};
+
 // ---- catalog -----------------------------------------------------------------------------------------------------------------------------------
 
 test('the catalog: twelve Idols, one per biome, with art, a unique id and an effect; every effect is applied', () => {
@@ -162,10 +169,17 @@ test('the first Idol is paid, the level is remembered, and the cap is the castle
 	const gold = api().resources.gold;
 	assert.equal(api().buildBuilding(a.x, a.y, 'idol_forest'), true);
 	assert.ok(api().resources.gold < gold, 'the first Idol costs a level 1 building');
+	// the first build is a timer on a builder: nothing stands and nothing is remembered until it ends
+	assert.equal(tileAt(api().tiles, a.x, a.y).building, undefined);
+	assert.equal(api().idolLevels.forest, undefined);
+	assert.deepEqual(api().buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 1, remainingSec: 1800, building: 'idol_forest' }]);
+	assert.equal(api().upgradeCastle(), false, 'the only builder is busy');
+	tick(1900);
 	assert.equal(api().idolLevels.forest, 1);
 	assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 1);
 	assert.equal(api().upgradeBuilding(a.x, a.y), true, 'castle level 2 allows level 2');
-	tick(700);
+	assert.equal(api().buildingUpgrades[0].remainingSec, 3600, 'level 2 of an Idol takes 1 h');
+	tick(3700);
 	assert.equal(api().idolLevels.forest, 2, 'the finished upgrade is remembered');
 	assert.equal(api().upgradeBuilding(a.x, a.y), false, 'level 3 needs castle level 3');
 	assert.match(upgradeProblem({ ...ctxOf(), castleLevel: 2 }, a.x, a.y) ?? '', /Needs castle level 3/);
@@ -177,7 +191,7 @@ test('the first Idol is paid, the level is remembered, and the cap is the castle
 
 const ctxOf = () => {
 	const s = api();
-	return { tiles: s.tiles, monsters: s.monsters, castleLevel: 5, castleUpgrade: s.castleUpgrade, buildingUpgrade: s.buildingUpgrade, ownedTiles: 20 };
+	return { tiles: s.tiles, monsters: s.monsters, castleLevel: 5, castleUpgrade: s.castleUpgrade, buildingUpgrades: s.buildingUpgrades, ownedTiles: 20 };
 };
 
 test('an Idol level from 3 also costs the T3 extract of its biome (where it has one), doubling each level', () => {
@@ -185,12 +199,16 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 	assert.equal(buildingLevelCost(2, 20, def).sap, undefined);
 	assert.equal(buildingLevelCost(3, 20, def).sap, IDOL_RULES.t3PerLevel);
 	assert.equal(buildingLevelCost(4, 20, def).sap, IDOL_RULES.t3PerLevel * 2);
+	assert.deepEqual(
+		[3, 4, 5].map((l) => buildingLevelCost(l, 20, def).sap),
+		[1000, 2000, 4000],
+		'x5 since the slower Idols',
+	);
 	assert.equal(buildingLevelCost(3, 20, buildingDef('idol_jungle')).sap, undefined, 'a biome without an Extractor asks for none');
 	assert.equal(buildingLevelCost(3, 20, buildingDef('lumberyard')).sap, undefined, 'only Idols');
 	// and the upgrade really takes it from the stock
 	const [a] = gameWith('forest', 1, 5);
-	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
-	patchTileAt(a.x, a.y, { buildingLevel: 2 });
+	patchTileAt(a.x, a.y, { building: 'idol_forest', buildingLevel: 2 });
 	store.setState({ idolLevels: { forest: 2 } });
 	setResources({ sap: 10 });
 	assert.equal(api().upgradeBuilding(a.x, a.y), false, 'not enough sap');
@@ -207,17 +225,16 @@ test('Dwarf Statue shortens castle and building timers, capped at 60 % together 
 	assert.equal(castleUpgradeDuration(1, undefined, 10), Math.floor(1800 * 0.9));
 	// through the store: the timer of the next upgrade is shorter with the Statue standing
 	const [a, b] = gameWith('hills', 2, 5);
-	assert.ok(api().buildBuilding(a.x, a.y, 'idol_hills'));
-	patchTileAt(a.x, a.y, { buildingLevel: 5 });
+	patchTileAt(a.x, a.y, { building: 'idol_hills', buildingLevel: 5 });
 	store.setState({ idolLevels: { hills: 5 } });
 	assert.ok(api().buildBuilding(b.x, b.y, 'quarry'));
 	assert.ok(api().upgradeBuilding(b.x, b.y));
-	assert.equal(api().buildingUpgrade?.remainingSec, Math.floor(BUILDING_RULES.durationsSec[0] * 0.9));
+	assert.equal(api().buildingUpgrades[0]?.remainingSec, Math.floor(BUILDING_RULES.durationsSec[0] * 0.9));
 });
 
 test('the shared builder holds for Idols: an Idol upgrade and the castle exclude each other', () => {
 	const [a] = gameWith('forest', 1, 5);
-	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
+	buildIdol(a, 'idol_forest');
 	assert.ok(api().upgradeBuilding(a.x, a.y));
 	assert.equal(api().upgradeCastle(), false);
 });
@@ -369,22 +386,22 @@ test('server: crafting XP is paid with the Blossom Shrine bonus', async () => {
 
 test('offline: the income of the Idol effects is in the grant (efficiency) and a finished Idol upgrade lands while away', () => {
 	const [a] = gameWith('forest', 1, 5);
-	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
+	buildIdol(a, 'idol_forest');
 	assert.ok(api().upgradeBuilding(a.x, a.y));
 	const summary = summarize(structuredClone(pickPersisted(api())));
 	const grant = computeOfflineGrant({
 		rates: summary.rates,
 		ratesAfterCastle: null,
 		castleUpgrade: null,
-		buildingUpgrade: summary.derived.buildingUpgrade,
-		ratesAfterBuilding: summary.derived.ratesAfterBuilding,
+		buildingUpgrades: summary.derived.buildingUpgrades,
+		ratesAfterBuildings: summary.derived.ratesAfterBuildings,
 		xpGainPct: summary.xpGainPct,
 		gapSec: 3600,
 		capSec: 8 * 3600,
 		efficiency: summary.derived.offlineEfficiency,
 		minGapSec: 300,
 	})!;
-	assert.equal(grant.building?.finished, true);
+	assert.equal(grant.buildings?.[0].finished, true);
 	const applied = applyOfflineGrant(api(), grant);
 	assert.equal(tileAt(applied.patch.tiles!, a.x, a.y).buildingLevel, 2);
 	assert.equal(applied.patch.idolLevels?.forest, 2, 'the Idol level is remembered by the away path too');
@@ -489,16 +506,24 @@ test('through the save pipeline: the ledger remembers a built Idol, refuses a fo
 	// 1: a game with nothing
 	await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, ledgerRepo);
 	assert.deepEqual(ledgers.get('u1')?.legacy.idols ?? {}, {});
-	// 2: the Idol is built (level 1): remembered
+	// 2: the Idol's first build is started (a timer on the builder): nothing stands, nothing is remembered yet
 	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
 	store.setState({ playSeconds: 100_060 } as never);
 	let out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 1, T + 60_000, false, ledgerRepo);
 	assert.equal(out.kind, 'ok');
+	assert.deepEqual(ledgers.get('u1')?.legacy.idols ?? {}, {});
+	assert.equal(m.rows.get('u1')!.flags.includes('timer_jump'), false);
+	// 2b: after its 30 minutes the Idol stands at level 1: remembered
+	tick(1900);
+	store.setState({ playSeconds: 102_000 } as never);
+	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 2, T + 2_000_000, false, ledgerRepo);
+	assert.equal(out.kind, 'ok');
 	assert.deepEqual(ledgers.get('u1')?.legacy.idols, { forest: 1 });
+	assert.equal(m.rows.get('u1')!.flags.includes('timer_jump'), false);
 	// 3: a forged claim of level 5 in one save: refused (the ledger stays at 1), the economy follows level 1
 	patchTileAt(a.x, a.y, { buildingLevel: 5 });
-	store.setState({ idolLevels: { forest: 5 }, playSeconds: 100_120 } as never);
-	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 2, T + 120_000, false, ledgerRepo);
+	store.setState({ idolLevels: { forest: 5 }, playSeconds: 102_060 } as never);
+	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 3, T + 2_060_000, false, ledgerRepo);
 	assert.equal(out.kind, 'ok');
 	assert.deepEqual(ledgers.get('u1')?.legacy.idols, { forest: 1 }, 'the ledger did not accept the jump');
 	const stored = m.rows.get('u1')!;
@@ -506,18 +531,18 @@ test('through the save pipeline: the ledger remembers a built Idol, refuses a fo
 	assert.equal(stored.flags.includes('timer_jump'), true);
 	// 4: an honest upgrade: started, then finished after its timer
 	patchTileAt(a.x, a.y, { buildingLevel: 1 });
-	store.setState({ idolLevels: { forest: 1 }, buildingUpgrade: null, playSeconds: 100_180 } as never);
+	store.setState({ idolLevels: { forest: 1 }, buildingUpgrades: [], playSeconds: 102_120 } as never);
 	assert.ok(api().upgradeBuilding(a.x, a.y));
-	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 3, T + 180_000, false, ledgerRepo);
+	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 4, T + 2_120_000, false, ledgerRepo);
 	assert.equal(out.kind, 'ok');
-	tick(700);
-	store.setState({ playSeconds: 100_900 } as never);
-	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 4, T + 900_000, false, ledgerRepo);
+	tick(3700);
+	store.setState({ playSeconds: 106_000 } as never);
+	out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 5, T + 6_000_000, false, ledgerRepo);
 	assert.equal(out.kind, 'ok');
 	assert.deepEqual(
 		ledgers.get('u1')?.legacy.idols,
 		{ forest: 2 },
-		`the verified step is remembered ${JSON.stringify(m.rows.get('u1')!.flags)} ${JSON.stringify(m.rows.get('u1')!.summary.derived.buildings)} ${JSON.stringify(m.rows.get('u1')!.summary.derived.buildingUpgrade)} ${out.kind}`,
+		`the verified step is remembered ${JSON.stringify(m.rows.get('u1')!.flags)} ${JSON.stringify(m.rows.get('u1')!.summary.derived.buildings)} ${JSON.stringify(m.rows.get('u1')!.summary.derived.buildingUpgrades)} ${out.kind}`,
 	);
 });
 
@@ -565,7 +590,7 @@ test('without a usable ledger the claimed levels are kept in the stored save but
 	const broken = { load: async () => Promise.reject(new Error('down')), commit: async () => false };
 	const T = 1_800_000_000_000;
 	const [a] = gameWith('forest', 1, 2, 6);
-	assert.ok(api().buildBuilding(a.x, a.y, 'idol_forest'));
+	buildIdol(a, 'idol_forest');
 	store.setState({ playSeconds: 100_000 } as never);
 	const out = await acceptSave(m.saves, 'u1', 'Zoe', encodeSave(structuredClone(pickPersisted(api()))), 0, T, false, broken as never);
 	assert.equal(out.kind, 'ok');

@@ -42,6 +42,8 @@ export const LIMITS = {
 	craftSpeed: 1,
 	/** The level an Idol can be taken to (docs/plan/18 section 6): the Ember shop's Idol Mastery will raise it, up to the hard limit */
 	idolMaxLevel: 5,
+	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Builder #2 and the Ember shop add to it, see `builderCount`) */
+	builders: 1,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -64,4 +66,6 @@ export const HARD_LIMITS = {
 	craftSpeed: 4,
 	/** Idol levels have no design limit (price and timers grow exponentially); 100 is what a save and the ledger may hold */
 	idolMaxLevel: 100,
+	/** Builders a save may hold timers for: 1 + the Gem shop's one + the Ember shop's, with room to grow */
+	builders: 8,
 } as const;
