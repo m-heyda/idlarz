@@ -13,6 +13,11 @@ import { buyCost, sellPayout } from '@/utils/game/merchant';
 
 /** The longest stretch of income counted on top of the last accepted save: a save is uploaded far more often than this, so a longer gap only means the player is not saving. */
 export const TRADE_MAX_AGE_SEC = 24 * 3600;
+/**
+ * How long a trade stays on the record while saves keep arriving that do not show it (a browser that lost the purchase on a reload, an older picture): after this the record is dropped, so an honest player is never refused for ever.
+ * A save is uploaded every few minutes, so a correct one releases the record long before this; it only ends a record that nothing can release.
+ */
+export const TRADE_RECORD_MAX_AGE_SEC = 30 * 60;
 /** The bound is this much above the estimate, plus a few units, for the rounding and timing of a browser that is a little ahead of its last save. */
 const SLACK = 1.1;
 const SLACK_UNITS = 25;
@@ -45,18 +50,23 @@ const unexplained = (estimate: number, amount: number, have: number): number => 
 /**
  * What the trade record is after a save is accepted. The save is the browser's picture of its stock. A trade leaves the record only as far as that picture accounts for it: what the new stock still holds above what the previous save plus income
  * could explain **after** the trade came off stays as the deduction (all of it for another browser's older picture that still holds the pre-sale stock, none for an honest save). The deduction is measured against the new picture, so when a
- * later, correct save arrives the rest is released and an honest player is never held back for ever. The same goes for the gold a purchase should have cost. A new run (rebirth, New Game) or a first save starts the record again.
+ * later, correct save arrives the rest is released and an honest player is never held back for ever. The same goes for the gold a purchase should have cost. A record that no save has released within {@link TRADE_RECORD_MAX_AGE_SEC}
+ * (30 minutes since its first trade) is dropped whole: a purchase the browser lost (a reload, a retry that undid it) never shows as a debit in any save, and would otherwise cut the gold bound for ever. A new run (rebirth, New Game) or a first save starts the record again.
  */
 export const settleTrades = (ledger: Ledger, previous: StoredSave | null, newCore: { resources?: unknown }, nowSec: number, newRun: boolean): TradeSince => {
 	const trade = ledger.stats.tradeSince;
 	if (newRun || !previous || isEmptyTrade(trade)) return emptyTrade();
+	// a record nothing has released for too long is dropped; one from before the age was kept starts counting now
+	const since = trade.since ?? nowSec;
+	if (nowSec - since > TRADE_RECORD_MAX_AGE_SEC) return emptyTrade();
 	const resources = isRecord(newCore.resources) ? newCore.resources : {};
 	const sold: Record<string, number> = {};
 	for (const [resource, units] of Object.entries(trade.sold)) {
 		const left = unexplained(stockEstimate(ledger, previous, nowSec, resource), units, num(resources[resource]));
 		if (left > 0) sold[resource] = left;
 	}
-	return { sold, boughtGold: unexplained(stockEstimate(ledger, previous, nowSec, 'gold'), trade.boughtGold, num(resources.gold)) };
+	const left: TradeSince = { sold, boughtGold: unexplained(stockEstimate(ledger, previous, nowSec, 'gold'), trade.boughtGold, num(resources.gold)) };
+	return isEmptyTrade(left) ? left : { ...left, since };
 };
 
 /**
@@ -79,7 +89,7 @@ export const sellResource = (ledger: Ledger, stored: StoredSave, nowSec: number,
 		ledger: {
 			...ledger,
 			granted: gold > 0 ? addTotals(ledger.granted, { gold }) : ledger.granted,
-			stats: { ...stats, tradeSince: { ...stats.tradeSince, sold: { ...stats.tradeSince.sold, [resource]: sold + qty } } },
+			stats: { ...stats, tradeSince: { ...stats.tradeSince, since: stats.tradeSince.since ?? nowSec, sold: { ...stats.tradeSince.sold, [resource]: sold + qty } } },
 		},
 	};
 };
@@ -103,7 +113,7 @@ export const buyResource = (ledger: Ledger, stored: StoredSave, nowSec: number, 
 		ledger: {
 			...ledger,
 			granted: addTotals(ledger.granted, { [resource]: qty }),
-			stats: { ...ledger.stats, tradeSince: { ...ledger.stats.tradeSince, boughtGold: spent + cost } },
+			stats: { ...ledger.stats, tradeSince: { ...ledger.stats.tradeSince, since: ledger.stats.tradeSince.since ?? nowSec, boughtGold: spent + cost } },
 		},
 	};
 };

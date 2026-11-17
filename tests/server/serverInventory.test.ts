@@ -659,6 +659,20 @@ test('a retained deduction is released by the next correct save, it does not sta
 	);
 });
 
+test('a purchase the browser lost never shows as a debit: the record is dropped after its age, and the player can buy again (jx7)', async () => {
+	const p = await player(hoard());
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 1000)).ok, true);
+	// the browser lost the purchase (a reload): every save still holds the full purse, so nothing releases the record
+	let rev = p.m.rows.get(p.id)!.rev;
+	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN)).kind, 'ok');
+	assert.ok(p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold > 0, 'still held inside its age');
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 3 * MIN)).ok, false, 'refused while the record holds');
+	rev = p.m.rows.get(p.id)!.rev;
+	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 40 * MIN)).kind, 'ok');
+	assert.equal(p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold, 0, 'dropped once it is older than the limit');
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 41 * MIN)).ok, true);
+});
+
 test('a flagged save keeps the land and farm facts of the save before it, so a cheat cannot unlock a deed', async () => {
 	const p = await player(stocked());
 	const before = p.m.rows.get(p.id)!.summary.derived.deedWorld;
