@@ -89,7 +89,10 @@ export const sellResource = (ledger: Ledger, stored: StoredSave, nowSec: number,
 		ledger: {
 			...ledger,
 			granted: gold > 0 ? addTotals(ledger.granted, { gold }) : ledger.granted,
-			stats: { ...stats, tradeSince: { ...stats.tradeSince, since: stats.tradeSince.since ?? nowSec, sold: { ...stats.tradeSince.sold, [resource]: sold + qty } } },
+			stats: {
+				...stats,
+				tradeSince: { ...stats.tradeSince, since: stats.tradeSince.since ?? nowSec, sold: { ...stats.tradeSince.sold, [resource]: sold + qty } },
+			},
 		},
 	};
 };
