@@ -338,7 +338,7 @@ export interface BuildingUpgradeState {
 	y: number;
 	toLevel: number;
 	remainingSec: number;
-	/** The Idol being built for the first time (`toLevel` 1): its catalog id. The tile stays empty until the timer ends. Absent on an upgrade of a standing building. */
+	/** The catalog id of the building the job belongs to (the server binds a finished upgrade to it and reads an Idol's longer timers from it). For a first Idol build (`toLevel` 1) the tile stays empty until the timer ends. Absent on jobs from older saves. */
 	building?: string;
 }
 

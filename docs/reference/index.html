@@ -1787,68 +1787,68 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 <th>Level</th>
 <th>Floor (tiles)</th>
 <th>Price at 9 tiles</th>
-<th>Timer from the level below</th>
+<th>Timer to reach the level (first build included)</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>1</td>
 <td>20</td>
 <td>wood 2,016, stone 1,344, gold 6,748</td>
-<td>built at once</td>
+<td>30 min</td>
 </tr>
 <tr>
 <td>2</td>
 <td>40</td>
 <td>wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K</td>
-<td>10 min</td>
+<td>1 h</td>
 </tr>
 <tr>
 <td>3</td>
 <td>60</td>
 <td>wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000</td>
-<td>45 min</td>
+<td>4 h</td>
 </tr>
 <tr>
 <td>4</td>
 <td>80</td>
 <td>wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000</td>
-<td>3 h</td>
+<td>12 h</td>
 </tr>
 <tr>
 <td>5</td>
 <td>100</td>
 <td>wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000</td>
-<td>8 h</td>
+<td>1 d</td>
 </tr>
 <tr>
 <td>6</td>
 <td>140</td>
 <td>wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000</td>
-<td>10.8 h</td>
+<td>1.35 d</td>
 </tr>
 <tr>
 <td>7</td>
 <td>180</td>
 <td>wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K</td>
-<td>14.58 h</td>
+<td>1.82 d</td>
 </tr>
 <tr>
 <td>8</td>
 <td>220</td>
 <td>wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K</td>
-<td>19.68 h</td>
+<td>2.46 d</td>
 </tr>
 <tr>
 <td>9</td>
 <td>260</td>
 <td>wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K</td>
-<td>1.11 d</td>
+<td>3.32 d</td>
 </tr>
 <tr>
 <td>10</td>
 <td>300</td>
 <td>wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K</td>
-<td>1.49 d</td>
+<td>4.48 d</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="buildercount"></a></p>
@@ -6586,7 +6586,7 @@ best rebirth the game can pay.</li>
 <p>Saves from one player are accepted at most this often (an honest client sends every ~90 s).</p>
 </article><article><p><a id="verifytransition"></a></p>
 <h3><code>verifyTransition</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:257</code></a></p>
+<p>Source: <a href="../../src/lib/cloudSave/verify.ts"><code>src/lib/cloudSave/verify.ts:258</code></a></p>
 <p>Runs every plausibility check between two consecutive saves and returns the flags that fired; see <a href="#flag-policy"><code>FLAG_POLICY</code></a> for what each one means and does.</p>
 </article><article><p><a id="isnonproduction"></a></p>
 <h3><code>isNonProduction</code> <small>function</small></h3>

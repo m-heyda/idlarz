@@ -97,6 +97,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 						x,
 						y,
 						toLevel: level + 1,
+						building: tile?.building,
 						remainingSec: buildingUpgradeDuration(
 							level,
 							s.prestige,

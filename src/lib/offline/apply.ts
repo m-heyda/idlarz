@@ -96,7 +96,8 @@ export const applyOfflineGrant = (
 	let idolLevels = state.idolLevels;
 	let buildingDone = false;
 	for (const job of state.buildingUpgrades ?? []) {
-		const listed = grant.buildings?.some((g) => g.x === job.x && g.y === job.y && g.toLevel === job.toLevel);
+		const legacy = (grant as { building?: { x: number; y: number; toLevel: number } }).building; // a claim result stored before several builders
+		const listed = (grant.buildings ?? (legacy ? [legacy] : [])).some((g) => g.x === job.x && g.y === job.y && g.toLevel === job.toLevel);
 		if (!listed) {
 			buildingUpgrades.push(job);
 			continue;

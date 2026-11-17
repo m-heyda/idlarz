@@ -30,6 +30,9 @@ interface GemStoreState {
 }
 
 /** Takes what an answer changes in the game: the balance, and a class or name that was just written. */
+let seq = 0; // answers are applied in the order the requests were sent: an older one that arrives late is ignored
+let applied = 0;
+
 const applyReply = (reply: GemsReply) => {
 	const game = useGameStore.getState();
 	useGameStore.setState({ gems: reply.gems });
@@ -44,8 +47,10 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 	const run = async (key: string | null, request: GemsRequest): Promise<GemsReply | null> => {
 		set({ busy: true, message: null });
 		try {
+			const mine = ++seq;
 			let reply = await requestGems(key, request);
-			if (reply.status === 'unavailable' && key) reply = await requestGems(key, request);
+			// a failed answer is asked again once (a status has no key, so it is asked afresh: it changes nothing)
+			if (reply.status === 'unavailable' && (key || request.action === 'status')) reply = await requestGems(key, request);
 			if (reply.status === 'need_claim') {
 				signalNeedClaim();
 				set({ message: 'Collect your time away first, then try again.' });
@@ -57,6 +62,8 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 				notify('Could not reach the server. Nothing was charged.', 'error');
 				return null;
 			}
+			if (mine < applied) return reply.value; // a newer answer is already in
+			applied = mine;
 			applyReply(reply.value);
 			const refused = reply.value.ok ? null : (reply.value.message ?? 'The server did not do that.');
 			set({ info: reply.value, message: refused });

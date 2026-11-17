@@ -220,17 +220,18 @@ const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number,
 		if (level < old) return true;
 		if (level > old) {
 			// each level needs its own finished upgrade from the previous save
-			const at = pool.findIndex((job) => job.toLevel === level && job.remainingSec <= allowed);
+			const at = pool.findIndex((job) => job.toLevel === level && job.remainingSec <= allowed && (job.building === undefined || job.building === id)); // a credit belongs to the building that owns the job (older rows carry no id)
 			if (level > old + 1 || at < 0) return true;
 			pool.splice(at, 1);
 		}
 	}
 	const same = (a: BuildingUpgradeState, b: BuildingUpgradeState) => a.toLevel === b.toLevel && a.x === b.x && a.y === b.y;
 	for (const job of now) {
+		if (job.remainingSec <= 0) return true; // a finished timer is applied and removed at once: a save that still carries one is forged
 		const old = was.find((w) => same(w, job));
 		if (!old) {
 			// a NEW building upgrade cannot be shorter than its timer allows with the most the build-time cuts could take off
-			const min = Math.floor(shortestUpgradeSec(job.toLevel) * (1 - maxBuildTimeCut(before, next)));
+			const min = Math.floor(shortestUpgradeSec(job.toLevel, !!idolDef(job.building)) * (1 - maxBuildTimeCut(before, next)));
 			if (job.remainingSec + allowed < min) return true;
 		} else if (old.remainingSec - job.remainingSec > allowed) return true; // a timer that carries on must not have run faster than the clock
 	}

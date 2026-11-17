@@ -329,7 +329,7 @@ export const acceptSave = async (
 			summary = summarize(state);
 	}
 	summary.derived.xpBase = xpVerdict.base;
-	const flags = verifyTransition(previous, sent ?? claimed, nowMs, grants, ledger?.legacy.idols, gemBuildersOf(ledger?.gemShop.bought)); // judged as the player sent it (the XP check flags a clamp)
+	const flags = verifyTransition(previous, sent ?? claimed, nowMs, grants, ledger?.legacy.idols, ledgerUsable ? gemBuildersOf(ledger?.gemShop.bought) : 1); // judged as the player sent it (the XP check flags a clamp)
 	// a save may still hold the balance from before a gem purchase (it was on its way when the shop sold something): `spentSinceSave` is what the ledger allows above its own balance
 	if (ledger && gemsClaimed > ledger.gems + ledger.gemShop.spentSinceSave) flags.push('gems_increase');
 	if (emberVerdict.clamped) flags.push('ember_jump');

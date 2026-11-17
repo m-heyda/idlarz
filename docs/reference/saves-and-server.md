@@ -442,7 +442,7 @@ Saves from one player are accepted at most this often (an honest client sends ev
 
 ### `verifyTransition` <small>function</small>
 
-Source: [`src/lib/cloudSave/verify.ts:257`](../../src/lib/cloudSave/verify.ts)
+Source: [`src/lib/cloudSave/verify.ts:258`](../../src/lib/cloudSave/verify.ts)
 
 Runs every plausibility check between two consecutive saves and returns the flags that fired; see [`FLAG_POLICY`](saves-and-server.md#flag-policy) for what each one means and does.
 

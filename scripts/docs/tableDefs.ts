@@ -203,12 +203,12 @@ For scale, the income bonus of the Embers ever earned (\`emberIncomeBonus\`, eve
 TABLES['idol-price-floor'] = () => ({
 	title: 'Idol price floor: what each level costs on a small map (9 tiles) and its timer',
 	md: mdTable(
-		['Level', 'Floor (tiles)', 'Price at 9 tiles', 'Timer from the level below'],
+		['Level', 'Floor (tiles)', 'Price at 9 tiles', 'Timer to reach the level (first build included)'],
 		[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((L) => [
 			L,
 			idolFloorTiles(L),
 			res(buildingLevelCost(L, 9, BUILDINGS.find((b) => b.kind === 'idol')) as Record<string, number>),
-			L === 1 ? 'built at once' : sec(buildingUpgradeDuration(L - 1)),
+			sec(buildingUpgradeDuration(L - 1, undefined, 0, true)),
 		]),
 	),
 });

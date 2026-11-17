@@ -526,7 +526,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			const def = buildingDef(at.tile.building);
 			const remaining = num(b.remainingSec, 0, buildingUpgradeDuration(toLevel - 1, undefined, 0, def?.kind === 'idol'));
 			if (remaining !== null && def && levelOfTile(at.tile) === toLevel - 1 && toLevel <= upgradeCapOf(def, castleLevel)) {
-				buildingUpgrades.push({ x: bx, y: by, toLevel, remainingSec: remaining });
+				buildingUpgrades.push({ x: bx, y: by, toLevel, remainingSec: remaining, building: at.tile.building });
 			}
 		}
 		// the levels the account remembers for its Idols: known biomes, whole levels up to the hard limit; a standing Idol is never above what is remembered (a tile that says more raises the record, the server's ledger bounds it)

@@ -48,10 +48,10 @@ export const buildingUpgradeDuration = (fromLevel: number, prestige?: PrestigeSt
 };
 
 /**
- * The shortest a timer to `toLevel` can be (no build-time cuts): the server's floor for a new upgrade when it cannot tell an Idol from another building. The first build (level 1) only exists for Idols.
+ * The shortest a timer to `toLevel` can be (no build-time cuts): the server's floor for a new upgrade; `idol` says the job's building is an Idol (longer timers). The first build (level 1) only exists for Idols.
  */
-export const shortestUpgradeSec = (toLevel: number): number =>
-	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, true) : buildingUpgradeDuration(toLevel - 1);
+export const shortestUpgradeSec = (toLevel: number, idol = false): number =>
+	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, true) : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol);
 
 /**
  * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's builders on top, at most `HARD_LIMITS.builders`.

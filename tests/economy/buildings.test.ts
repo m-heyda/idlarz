@@ -227,7 +227,7 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 		const gold = api().resources.gold;
 		assert.equal(api().upgradeBuilding(a.x, a.y), true);
 		assert.ok(api().resources.gold < gold);
-		assert.deepEqual(api().buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 600 }]);
+		assert.deepEqual(api().buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 600, building: 'lumberyard' }]);
 		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 1, 'not yet');
 		// the builder is taken
 		assert.equal(api().upgradeBuilding(a.x, a.y), false);
@@ -300,7 +300,7 @@ test('the save keeps several timers; a save from before holds one `buildingUpgra
 		if (!('raw' in unpacked)) return;
 		const old = sanitizeSave(unpacked.raw);
 		assert.ok(old.ok, old.ok ? '' : old.reason);
-		if (old.ok) assert.deepEqual(old.state.buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 300 }]);
+		if (old.ok) assert.deepEqual(old.state.buildingUpgrades, [{ x: a.x, y: a.y, toLevel: 2, remainingSec: 300, building: 'lumberyard' }]);
 	});
 });
 
@@ -555,4 +555,29 @@ test('farm sprites: both cows (the bell cow too), pigs and sheep look right, chi
 	assert.equal(facesRight('animal_sheep'), true);
 	assert.equal(facesRight('animal_chicken_1'), false);
 	assert.equal(facesRight('animal_cow_2'), true);
+});
+
+test('timer_jump: a completion is bound to its own building, an Idol floor is the Idol timer, a finished job still carried is forged', () => {
+	withBuildings(() => {
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		const T0 = 1_000_000;
+		const base = summarize(pickPersisted(api()));
+		const job = (building: string, remainingSec: number, x = a.x) => ({ x, y: a.y, toLevel: 2, remainingSec, building });
+		const was = { ...base, derived: { ...base.derived, buildingUpgrades: [job('idol_forest', 0.5)] } };
+		// the saptapper rises 1 -> 2 on the credit of an Idol's job: refused; on its own job: fine
+		const raised = { ...base, derived: { ...base.derived, buildings: { lumberyard: 1, saptapper: 2 }, buildingUpgrades: [] } };
+		assert.equal(verifyTransition({ summary: was, serverSavedAt: T0 }, raised, T0 + 5000).includes('timer_jump'), true);
+		const own = { ...base, derived: { ...base.derived, buildingUpgrades: [job('saptapper', 0.5)] } };
+		assert.equal(verifyTransition({ summary: own, serverSavedAt: T0 }, raised, T0 + 5000).includes('timer_jump'), false);
+		// a new Idol upgrade of 600 s is under the Idol's 3600 s floor; a Producer's 600 s is honest
+		const idolJob = { ...base, derived: { ...base.derived, buildingUpgrades: [job('idol_forest', 600)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, idolJob, T0 + 1000).includes('timer_jump'), true);
+		const plain = { ...base, derived: { ...base.derived, buildingUpgrades: [job('lumberyard', 600)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, plain, T0 + 1000).includes('timer_jump'), false);
+		// a job with no time left that a save still carries
+		const carried = { ...base, derived: { ...base.derived, buildingUpgrades: [job('lumberyard', 0)] } };
+		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, carried, T0 + 1000).includes('timer_jump'), true);
+	});
 });

@@ -1195,18 +1195,18 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 
 **Idol price floor: what each level costs on a small map (9 tiles) and its timer** _(computed from the code)_
 
-| Level | Floor (tiles) | Price at 9 tiles | Timer from the level below |
+| Level | Floor (tiles) | Price at 9 tiles | Timer to reach the level (first build included) |
 | --- | --- | --- | --- |
-| 1 | 20 | wood 2,016, stone 1,344, gold 6,748 | built at once |
-| 2 | 40 | wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K | 10 min |
-| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000 | 45 min |
-| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000 | 3 h |
-| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000 | 8 h |
-| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000 | 10.8 h |
-| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K | 14.58 h |
-| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K | 19.68 h |
-| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K | 1.11 d |
-| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K | 1.49 d |
+| 1 | 20 | wood 2,016, stone 1,344, gold 6,748 | 30 min |
+| 2 | 40 | wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K | 1 h |
+| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000 | 4 h |
+| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000 | 12 h |
+| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000 | 1 d |
+| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000 | 1.35 d |
+| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K | 1.82 d |
+| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K | 2.46 d |
+| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K | 3.32 d |
+| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K | 4.48 d |
 
 <a id="buildercount"></a>
 

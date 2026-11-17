@@ -1505,7 +1505,7 @@
   "kind": "function",
   "category": "Saves & Server/Accepting a save",
   "file": "src/lib/cloudSave/verify.ts",
-  "line": 257,
+  "line": 258,
   "summary": "Runs every plausibility check between two consecutive saves and returns the flags that fired; see {@link FLAG_POLICY} for what each one means and does.",
   "see": []
  },
