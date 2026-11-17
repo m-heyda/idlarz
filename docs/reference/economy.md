@@ -1006,7 +1006,7 @@ The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](ec
 that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
 
 What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
-the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, more later from the Ember shop: one timer each, see `builderCount`);
+the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, +1 with the Ember shop's Extra Builder, 3 at most: one timer each, see `builderCount`);
 a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
 
 **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
@@ -1218,12 +1218,12 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 
 Source: [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts)
 
-How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.
+How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
 
 **Formula**
 
 ```text
-builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
+builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
 ```
 
 <a id="idoleconomy"></a>

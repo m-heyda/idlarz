@@ -1339,7 +1339,7 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <p>The per-biome building system (R7, IDL-91, IDL-92), behind <a href="#buildings-flag"><code>BUILDINGS_FLAG</code></a>, which is <strong>ON</strong> (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build
 that never had this system (<code>tests/economy/buildingsFlagOff.test.ts</code> pins it), and saves written with it on still load, minus their buildings.</p>
 <p>What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; <strong>one of each type per map</strong>; a Producer makes <code>tileEquivalents</code> tiles&#39; worth of its biome&#39;s main materials, grown by
-the share of the biome the player owns; <strong>levels 1-5</strong>, a level above 1 gated by the castle level and bought with resources plus a <strong>timer</strong> counted by the tick loop; the castle and the buildings share the <strong>builders</strong> (1 for everyone, +1 with the Gem shop&#39;s Builder #2, more later from the Ember shop: one timer each, see <code>builderCount</code>);
+the share of the biome the player owns; <strong>levels 1-5</strong>, a level above 1 gated by the castle level and bought with resources plus a <strong>timer</strong> counted by the tick loop; the castle and the buildings share the <strong>builders</strong> (1 for everyone, +1 with the Gem shop&#39;s Builder #2, +1 with the Ember shop&#39;s Extra Builder, 3 at most: one timer each, see <code>builderCount</code>);
 a building can be <strong>moved</strong> for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (<code>docs/plan/18-biome-buildings-and-material-tiers.md</code>).</p>
 <p><strong>Save and server.</strong> A building is two optional fields of a tile&#39;s <code>extra</code> entry (<code>building</code> = catalog id, <code>bl</code> = level) and the running upgrades are the optional top-level list <code>buildingUpgrades</code> (<code>{ x, y, toLevel, remainingSec }</code> each, like <code>castleUpgrade</code>; a first Idol build adds <code>building</code>, the Idol&#39;s id, and <code>toLevel</code> 1). A save from before several builders holds one <code>buildingUpgrade</code>, which is read as a list of one. They are
 written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No <code>SAVE_SCHEMA</code> bump. The server derives income from the saved map
@@ -1875,9 +1875,9 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 </article><article><p><a id="buildercount"></a></p>
 <h3><code>builderCount</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:71</code></a></p>
-<p>How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop&#39;s one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop&#39;s Extra Builder on top, at most <code>HARD_LIMITS.builders</code>.</p>
+<p>How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop&#39;s one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop&#39;s one-level Extra Builder: 3 at most (<code>HARD_LIMITS.builders</code> is only the ceiling a save may hold).</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
+<pre><code class="language-text">builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
 </code></pre>
 </article><article><p><a id="idoleconomy"></a></p>
 <h3><code>idolEconomy</code> <small>function</small></h3>

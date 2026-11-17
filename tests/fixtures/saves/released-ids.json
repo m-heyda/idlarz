@@ -843,7 +843,7 @@
 		"ember.buildcap": 5,
 		"ember.idolcap": 10,
 		"ember.decree": 1,
-		"ember.extrabuilder": 2,
+		"ember.extrabuilder": 1,
 		"ember.questrarity": 10,
 		"ember.questslots": 5
 	}

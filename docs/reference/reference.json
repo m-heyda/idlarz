@@ -1215,7 +1215,7 @@
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
   "line": 71,
-  "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.",
+  "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).",
   "see": []
  },
  {

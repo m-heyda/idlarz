@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
+import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
 import { useGemStore } from '@/stores/gemStore';
@@ -58,7 +58,6 @@ const GemShopDialog: React.FC = () => {
 	const gems = useGameStore((state) => state.gems);
 	const admin = useUiStore((state) => state.badge.admin);
 	useBadgeChoice();
-	const playerName = useGameStore((state) => state.playerName);
 	const [name, setName] = useState('');
 	const [confirm, setConfirm] = useState<string | null>(null);
 	const [tab, setTab] = useState<ShopView>('daily');
@@ -83,8 +82,8 @@ const GemShopDialog: React.FC = () => {
 		return { price, blocked: null };
 	};
 
-	/** A one-time item the account already has (bought, or included for an admin account): the row shows MAX and is dimmed */
-	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && (admin || (info?.bought?.[item.id] ?? 0) > 0);
+	/** A one-time item the account already has (bought, or included for an admin account): the row shows MAX and is dimmed. Builder #2 is never free for an admin: it is the ledger's record that adds the builder. */
+	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && ((admin && item.id !== BUILDER_ITEM) || (info?.bought?.[item.id] ?? 0) > 0);
 
 	const buy = async (item: GemItem, value?: string) => {
 		setConfirm(null);
@@ -107,10 +106,7 @@ const GemShopDialog: React.FC = () => {
 					items={[{ id: 'daily', label: 'Daily reward' }, ...TABS.map((entry) => ({ id: entry.id, label: entry.label }))]}
 				/>
 
-				<div className='flex items-center justify-between gap-3 text-sm text-[#a89878]'>
-					<div>
-						Hero: <span className='text-[#f1e6c8]'>{playerName}</span>
-					</div>
+				<div className='flex items-center justify-end gap-3 text-sm text-[#a89878]'>
 					<div title='Your gems'>
 						Gems:{' '}
 						<span className='text-[#ffe27a] tabular-nums' data-testid='gem-balance'>

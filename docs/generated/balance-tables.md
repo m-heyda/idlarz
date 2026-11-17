@@ -435,6 +435,6 @@ Shop (cost in points of the next level, by current level):
 | Master Masonry | 1 | 5 | 40 | 88 | 194 | 426 | 2062 | 48291 |
 | Idol Mastery | 1 | 10 | 100 | 250 | 625 | 1563 | 9766 | 381470 |
 | Imperial Decree | 1 | 1 | 150 | 150 | 150 | 150 | 150 | 150 |
-| Extra Builder | 1 | 2 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
+| Extra Builder | 1 | 1 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
 | Quest Rarity | 2 | 10 | 5 | 7 | 10 | 14 | 27 | 104 |
 | Quest Slots | 1 | 5 | 25 | 50 | 100 | 200 | 800 | 12800 |
