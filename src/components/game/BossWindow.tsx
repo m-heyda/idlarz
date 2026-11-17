@@ -5,11 +5,29 @@ import GameWindow from './GameWindow';
 
 /**
  * The Boss window: a coming-soon placeholder for the world boss (the end-game goal: every player offers a material such as a corruption core to summon one boss together, then all fight it for a shared super reward).
- * Nothing is kept or sent yet; the design comes later.
+ * The treasure hall (`pixel/bg/boss_hall.webp`) fills the window under a black overlay, so it reads as a dimmed backdrop for the "coming soon" card. Nothing is kept or sent yet; the design comes later.
  */
 const BossWindow: React.FC = () => (
-	<GameWindow id='boss' title='Boss' width={560} height={420}>
-		<ComingSoon title='World boss' icon={pixelIconSrc('menu_boss')} text='World boss spawns coming soon.' />
+	<GameWindow id='boss' title='Boss' width={640} height={480} flush>
+		<div
+			style={{
+				position: 'relative',
+				width: '100%',
+				height: '100%',
+				minHeight: 0,
+				display: 'grid',
+				placeItems: 'center',
+				backgroundImage: "url('/pixel/bg/boss_hall.webp')",
+				backgroundSize: 'cover',
+				backgroundPosition: 'center',
+				imageRendering: 'pixelated',
+			}}
+		>
+			<div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.68)' }} />
+			<div style={{ position: 'relative' }}>
+				<ComingSoon title='World boss' icon={pixelIconSrc('menu_boss')} text='World boss spawns coming soon.' />
+			</div>
+		</div>
 	</GameWindow>
 );
 

@@ -2707,7 +2707,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 91,
+  "line": 99,
   "summary": "Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.",
   "see": []
  },
@@ -2718,7 +2718,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 119,
+  "line": 128,
   "summary": "Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.",
   "see": []
  },

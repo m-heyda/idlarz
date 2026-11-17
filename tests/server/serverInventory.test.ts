@@ -12,6 +12,7 @@ import { countJunk, isJunk } from '../../src/lib/loot/junk';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import { sellPayout } from '../../src/utils/game/merchant';
+import { TRADE_RECORD_MAX_AGE_SEC, TRADE_SLACK, TRADE_SLACK_UNITS } from '../../src/lib/offline/trade';
 import { ITEM_CATALOG, LOOT_PROFILES } from '../../src/catalog';
 import type { Inventory } from '../../src/lib/offline/types';
 import type { BagSlot } from '../../src/types/game';
@@ -577,40 +578,43 @@ test('trades since the save come off after the slack, so repeated small sales ca
 	let sold = 0;
 	let refused = 0;
 	for (let i = 0; i < 200 && refused < 2; i++) {
-		const out = await op(p, { action: 'sellResource', resource: 'wood', qty: 25 }, T0 + 1000);
-		if (out.ok) sold += 25;
+		const out = await op(p, { action: 'sellResource', resource: 'wood', qty: 5000 }, T0 + 1000);
+		if (out.ok) sold += 5000;
 		else refused++;
 	}
-	assert.ok(sold <= (1000 + wood * 1) * 1.1 + 25 + 1e-6, `${sold} units sold of a stock of 1000`);
+	assert.ok(sold <= (1000 + wood * 1) * TRADE_SLACK + TRADE_SLACK_UNITS + 1e-6, `${sold} units sold of a stock of 1000`);
 	assert.ok(refused >= 2, 'it ends');
 });
 
+const HOARD = 100_000_000;
 const hoard = (): PersistedGame => {
 	const base = game();
-	return { ...base, resources: { ...base.resources, wood: 100_000, gold: 100_000 } } as PersistedGame;
+	// a big purse and stock, so the loose slack of the trade bound (twice the estimate plus a floor) is small beside the trades below
+	return { ...base, resources: { ...base.resources, wood: HOARD, gold: HOARD } } as PersistedGame;
 };
 
 test('a save that still holds the pre-sale stock does not clear the sale: the same stock cannot be sold again', async () => {
 	const p = await player(hoard());
-	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 1000)).ok, true);
-	// another browser uploads its older picture: 100,000 wood and the old gold
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000_000 }, T0 + 1000)).ok, true);
+	// another browser uploads its older picture: 100,000,000 wood and the old gold
 	const rev = p.m.rows.get(p.id)!.rev;
 	const saved = await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN);
 	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
 	const kept = p.m.ledgers.get(p.id)!.stats.tradeSince.sold.wood;
-	assert.ok(kept > 90_000 && kept <= 99_000, `most of the sale stays on the record, got ${kept}`);
-	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 99_000 }, T0 + 3 * MIN)).ok, false);
+	assert.ok(kept > 90_000_000 && kept <= 99_000_000, `most of the sale stays on the record, got ${kept}`);
+	// the record counts against the bound (twice the stock plus a floor, a week of income at most): a sale on top of it that the bound cannot hold is refused
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 150_000_000 }, T0 + 3 * MIN)).ok, false);
 });
 
 test('a purchase stays on the record until the gold it cost is gone from the saved purse', async () => {
 	const p = await player(hoard());
-	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 1000)).ok, true);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 80_000_000 }, T0 + 1000)).ok, true);
 	const boughtGold = p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
-	assert.ok(boughtGold > 50_000);
+	assert.ok(boughtGold > 100_000_000);
 	// a modified browser uploads the wood but not the debit
 	const rev = p.m.rows.get(p.id)!.rev;
 	const base = hoard();
-	const saved = await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 140_000 } } as PersistedGame, rev, T0 + 2 * MIN);
+	const saved = await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 180_000_000 } } as PersistedGame, rev, T0 + 2 * MIN);
 	assert.equal(saved.kind, 'ok', JSON.stringify(saved));
 	const kept = p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
 	assert.ok(kept > boughtGold * 0.8 && kept <= boughtGold, `most of the debit stays on the record, got ${kept} of ${boughtGold}`);
@@ -639,7 +643,7 @@ test('gold from a flagged save is not counted towards the peak', async () => {
 
 test('a retained deduction is released by the next correct save, it does not stay for ever (review)', async () => {
 	const p = await player(hoard());
-	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 50_000 }, T0 + 1000)).ok, true);
+	assert.equal((await op(p, { action: 'sellResource', resource: 'wood', qty: 90_000_000 }, T0 + 1000)).ok, true);
 	// another browser's picture first (it still holds the old stock) ...
 	let rev = p.m.rows.get(p.id)!.rev;
 	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN)).kind, 'ok');
@@ -648,12 +652,12 @@ test('a retained deduction is released by the next correct save, it does not sta
 	rev = p.m.rows.get(p.id)!.rev;
 	const base = hoard();
 	assert.equal(
-		(await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 50_000, gold: 100_000 } } as PersistedGame, rev, T0 + 4 * MIN)).kind,
+		(await save(p.m, p.id, { ...base, resources: { ...base.resources, wood: 10_000_000, gold: HOARD } } as PersistedGame, rev, T0 + 4 * MIN)).kind,
 		'ok',
 	);
 	assert.deepEqual(p.m.ledgers.get(p.id)!.stats.tradeSince.sold, {}, 'released');
 	assert.equal(
-		(await op(p, { action: 'sellResource', resource: 'wood', qty: 40_000 }, T0 + 5 * MIN)).ok,
+		(await op(p, { action: 'sellResource', resource: 'wood', qty: 8_000_000 }, T0 + 5 * MIN)).ok,
 		true,
 		'and the player can sell what they really hold',
 	);
@@ -661,16 +665,40 @@ test('a retained deduction is released by the next correct save, it does not sta
 
 test('a purchase the browser lost never shows as a debit: the record is dropped after its age, and the player can buy again (jx7)', async () => {
 	const p = await player(hoard());
-	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 1000)).ok, true);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 80_000_000 }, T0 + 1000)).ok, true);
 	// the browser lost the purchase (a reload): every save still holds the full purse, so nothing releases the record
 	let rev = p.m.rows.get(p.id)!.rev;
 	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 2 * MIN)).kind, 'ok');
 	assert.ok(p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold > 0, 'still held inside its age');
-	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 3 * MIN)).ok, false, 'refused while the record holds');
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 80_000_000 }, T0 + 3 * MIN)).ok, false, 'refused while the record holds');
 	rev = p.m.rows.get(p.id)!.rev;
 	assert.equal((await save(p.m, p.id, hoard(), rev, T0 + 40 * MIN)).kind, 'ok');
 	assert.equal(p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold, 0, 'dropped once it is older than the limit');
-	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 40_000 }, T0 + 41 * MIN)).ok, true);
+	assert.equal((await op(p, { action: 'buyResource', resource: 'wood', qty: 80_000_000 }, T0 + 41 * MIN)).ok, true);
+});
+
+test('a trade after the old record expired starts a fresh one, with its own age and only its own units (review)', async () => {
+	const { sellResource } = await import('../../src/lib/offline/trade');
+	const { emptyStats } = await import('../../src/lib/offline/stats');
+	const { zeroTotals } = await import('../../src/lib/offline/ledger');
+	// 1000 wood saved at second 0 and no income; 800 were sold at second 1 and no save has released them since
+	const stored = { core: { resources: { wood: 1000 } }, summary: { rates: {} }, serverSavedAt: 0 } as unknown as StoredSave;
+	const ledger = {
+		granted: zeroTotals(),
+		grantedSeen: zeroTotals(),
+		stats: { ...emptyStats(), tradeSince: { sold: { wood: 800 }, boughtGold: 0, since: 1 } },
+	} as never;
+	// inside the record's age the 800 still count (the 300 more fit the bound, 2 x 1000 + the floor, only because the slack is loose)
+	const inside = sellResource(ledger, stored, 100, 'wood', 300);
+	assert.equal(inside.ok && inside.ledger.stats.tradeSince.sold.wood, 1100);
+	// past the age the old record is dropped first: the new trade carries its own units and age
+	const later = TRADE_RECORD_MAX_AGE_SEC + 2;
+	const out = sellResource(ledger, stored, later, 'wood', 300);
+	assert.equal(out.ok, true);
+	if (out.ok) {
+		assert.deepEqual(out.ledger.stats.tradeSince.sold, { wood: 300 }, 'the expired 800 are gone from the record');
+		assert.equal(out.ledger.stats.tradeSince.since, later, 'a fresh age, not the old one');
+	}
 });
 
 test('a save that was on its way when the merchant paid does not make the server forget that gold: the player can spend what they were paid', async () => {

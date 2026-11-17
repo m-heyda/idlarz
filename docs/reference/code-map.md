@@ -257,7 +257,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
-- [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the list icon next to the settings gear):
+- [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the crown icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).

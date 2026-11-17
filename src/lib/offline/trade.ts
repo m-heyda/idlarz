@@ -9,20 +9,28 @@ import { buyCost, sellPayout } from '@/utils/game/merchant';
 // SERVER ONLY. The merchant's resource trades (IDL-319): the price, the Haggler and Idol bonuses and the buy multiplier are worked out here, from the last accepted save, never from a figure the browser sends. The browser still previews the trade
 // at once and the answer settles it (the same optimistic path as every inventory change). The server cannot see the live stock (it lives in the browser's save), so a trade is judged against an **upper bound** of what the player can hold: the last accepted
 // save, plus what the rates have made since (the elapsed time is capped), plus what the server itself granted, minus what it already sold since that save, with a generous slack so an honest player is never refused. That stops a stock being sold twice
-// or a stock that never existed being sold; it does not try to be exact.
+// or a stock that never existed being sold; it does not try to be exact. It is deliberately loose (2026-11-18, nobody is cheating and income alone cannot explain a stock: players buy resources, click for gold, open chests and trade between
+// their own saves), so a refusal only happens for a trade far beyond anything the last save, a week of income and the server's grants could ever explain.
 
 /** The longest stretch of income counted on top of the last accepted save: a save is uploaded far more often than this, so a longer gap only means the player is not saving. */
-export const TRADE_MAX_AGE_SEC = 24 * 3600;
+export const TRADE_MAX_AGE_SEC = 7 * 24 * 3600;
 /**
  * How long a trade stays on the record while saves keep arriving that do not show it (a browser that lost the purchase on a reload, an older picture): after this the record is dropped, so an honest player is never refused for ever.
  * A save is uploaded every few minutes, so a correct one releases the record long before this; it only ends a record that nothing can release.
  */
 export const TRADE_RECORD_MAX_AGE_SEC = 10 * 60;
-/** The bound is this much above the estimate, plus a few units, for the rounding and timing of a browser that is a little ahead of its last save. */
-const SLACK = 1.1;
-const SLACK_UNITS = 25;
+/**
+ * The bound is this many times the estimate plus a floor of units: income is only part of how a stock grows (buying, clicks, chests, another tab's trades), so the estimate may be well off. The slack must stay above 1 for the
+ * record arithmetic of {@link settleTrades}; the floor lets a player with little in the last save still make an ordinary trade.
+ */
+export const TRADE_SLACK = 2;
+export const TRADE_SLACK_UNITS = 100_000;
 
 export type TradeResult = { ok: true; ledger: Ledger; gold: number } | { ok: false };
+
+/** The record of trades since the last save as it stands at `nowSec`: a record nothing released for {@link TRADE_RECORD_MAX_AGE_SEC} is gone, so a new trade starts a fresh one and never rides on the age of an old one (or is checked against its units). */
+const liveTrade = (trade: TradeSince, nowSec: number): TradeSince =>
+	trade.since !== undefined && nowSec - trade.since > TRADE_RECORD_MAX_AGE_SEC ? emptyTrade() : trade;
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
 
@@ -39,12 +47,12 @@ const stockEstimate = (ledger: Ledger, stored: StoredSave, nowSec: number, resou
 /** The most of `resource` the player can plausibly hold now: see the note at the top of this file. */
 const stockBound = (ledger: Ledger, stored: StoredSave, nowSec: number, resource: string, soldSince: number, boughtGold = 0): number =>
 	// the slack goes on the estimate first and the trades since the save come off after it, so the slack is not a fresh allowance for every request
-	Math.max(0, stockEstimate(ledger, stored, nowSec, resource) * SLACK + SLACK_UNITS - soldSince - boughtGold);
+	Math.max(0, stockEstimate(ledger, stored, nowSec, resource) * TRADE_SLACK + TRADE_SLACK_UNITS - soldSince - boughtGold);
 
 /** What a new picture of `have` leaves unexplained of a trade `amount` once the trade is taken off the previous estimate (the slack is allowed): none, some, or all of the trade. */
 const unexplained = (estimate: number, amount: number, have: number): number => {
 	const after = Math.max(0, estimate - amount);
-	return Math.min(amount, Math.max(0, have - after - (after * (SLACK - 1) + SLACK_UNITS)));
+	return Math.min(amount, Math.max(0, have - after - (after * (TRADE_SLACK - 1) + TRADE_SLACK_UNITS)));
 };
 
 /**
@@ -91,10 +99,11 @@ export const grantedSeenAfterSave = (ledger: Ledger, trade: TradeSince): GrantTo
 export const sellResource = (ledger: Ledger, stored: StoredSave, nowSec: number, resource: string, qty: number): TradeResult => {
 	if (!Object.prototype.hasOwnProperty.call(MERCHANT_RESOURCE_PRICES, resource)) return { ok: false };
 	if (typeof qty !== 'number' || !Number.isFinite(qty) || qty <= 0 || qty > MERCHANT_MAX_TRADE_QTY) return { ok: false };
-	const sold = ledger.stats.tradeSince.sold[resource] ?? 0;
+	const record = liveTrade(ledger.stats.tradeSince, nowSec);
+	const sold = record.sold[resource] ?? 0;
 	if (qty > stockBound(ledger, stored, nowSec, resource, sold)) return { ok: false };
 	const gold = sellPayout(MERCHANT_RESOURCE_PRICES[resource as keyof typeof MERCHANT_RESOURCE_PRICES], qty, sellContextOf(stored.core));
-	const stats = recordSale(ledger.stats, Math.floor(qty), gold);
+	const stats = recordSale({ ...ledger.stats, tradeSince: record }, Math.floor(qty), gold);
 	return {
 		ok: true,
 		gold,
@@ -103,7 +112,7 @@ export const sellResource = (ledger: Ledger, stored: StoredSave, nowSec: number,
 			granted: gold > 0 ? addTotals(ledger.granted, { gold }) : ledger.granted,
 			stats: {
 				...stats,
-				tradeSince: { ...stats.tradeSince, since: stats.tradeSince.since ?? nowSec, sold: { ...stats.tradeSince.sold, [resource]: sold + qty } },
+				tradeSince: { ...record, since: record.since ?? nowSec, sold: { ...record.sold, [resource]: sold + qty } },
 			},
 		},
 	};
@@ -120,7 +129,8 @@ export const buyResource = (ledger: Ledger, stored: StoredSave, nowSec: number, 
 	if (!(MERCHANT_BUYABLE as readonly string[]).includes(resource)) return { ok: false };
 	if (!Number.isInteger(qty) || qty < 1 || qty > MERCHANT_MAX_TRADE_QTY) return { ok: false };
 	const cost = buyCost(resource as keyof typeof MERCHANT_RESOURCE_PRICES, qty);
-	const spent = ledger.stats.tradeSince.boughtGold;
+	const record = liveTrade(ledger.stats.tradeSince, nowSec);
+	const spent = record.boughtGold;
 	if (cost > stockBound(ledger, stored, nowSec, 'gold', 0, spent)) return { ok: false };
 	return {
 		ok: true,
@@ -128,7 +138,7 @@ export const buyResource = (ledger: Ledger, stored: StoredSave, nowSec: number, 
 		ledger: {
 			...ledger,
 			granted: addTotals(ledger.granted, { [resource]: qty }),
-			stats: { ...ledger.stats, tradeSince: { ...ledger.stats.tradeSince, since: ledger.stats.tradeSince.since ?? nowSec, boughtGold: spent + cost } },
+			stats: { ...ledger.stats, tradeSince: { ...record, since: record.since ?? nowSec, boughtGold: spent + cost } },
 		},
 	};
 };

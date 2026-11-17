@@ -90,7 +90,7 @@ const HudTopBar: React.FC = () => {
 		<TopBar
 			right={
 				<>
-					<GlyphButton glyph='☰' label='Kingdom overview' active={kingdomOpen} onClick={() => useWindowStore.getState().toggleWindow('kingdom')} />
+					<GlyphButton glyph='♛' label='Kingdom overview' active={kingdomOpen} onClick={() => useWindowStore.getState().toggleWindow('kingdom')} />
 					<GlyphButton
 						glyph='⚙'
 						label='Game menu: settings, save, export'

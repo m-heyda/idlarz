@@ -10,7 +10,7 @@ import GameWindow from './GameWindow';
 import '@/styles/Kingdom.css';
 
 /**
- * The Kingdom overview window (the list icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome, every building with its level
+ * The Kingdom overview window (the crown icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome, every building with its level
  * against what it can reach now (dimmed when not built yet) and how many monsters stand on the map. No income or resources: the resource windows have them. A first version, meant to grow.
  */
 const KingdomWindow: React.FC = () => {
