@@ -4897,6 +4897,13 @@ button.ds-income-head:hover {
 	color: #9aa4bd;
 }
 
+.dd-day-chest {
+	width: 40px;
+	height: 40px;
+	image-rendering: pixelated;
+	filter: drop-shadow(0 0 6px rgba(176, 92, 245, 0.7));
+}
+
 .dd-day-gems {
 	display: inline-flex;
 	align-items: center;

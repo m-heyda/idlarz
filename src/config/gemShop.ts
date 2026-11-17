@@ -147,4 +147,20 @@ export const GEM_CONFIRM_ABOVE = 300;
  */
 export const DAILY_BONUS_GEMS: readonly number[] = [20, 25, 30, 35, 40, 45, 50];
 
+/**
+ * The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
+ * never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.
+ *
+ * @category Economy/Gems
+ * @order 3
+ */
+export const DAILY_CHEST = {
+	resources: ['gold', 'wood', 'stone', 'coal', 'food', 'meat', 'eggs', 'milk', 'hide', 'wool'] as const,
+	count: [3, 5] as [number, number],
+	minutes: [30, 90] as [number, number],
+	floor: 500,
+};
+
+export type DailyChestResource = (typeof DAILY_CHEST.resources)[number];
+
 export const gemItemById = (id: unknown): GemItem | null => GEM_SHOP.find((item) => item.id === id) ?? null;

@@ -18,7 +18,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyPets` | Progression / Pets | [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts) | Applies one pets request to the ledger. |
-| `applySpend` | Economy / Gems | [`src/lib/offline/gems.ts:73`](../../src/lib/offline/gems.ts) | One purchase from the gem shop, decided on the ledger: |
+| `applySpend` | Economy / Gems | [`src/lib/offline/gems.ts:96`](../../src/lib/offline/gems.ts) | One purchase from the gem shop, decided on the ledger: |
 | `applyTutorial` | Progression / Guided tutorial | [`src/lib/offline/tutorial.ts:45`](../../src/lib/offline/tutorial.ts) | Applies one tutorial request to the ledger. |
 | `applyUse` | Combat / Consumables | [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts) | Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now). |
 | `armorOf` | Combat / Player numbers | [`src/lib/combat.ts:186`](../../src/lib/combat.ts) | Armor against monster hits: |
@@ -104,7 +104,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:149`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
 | `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:148`](../../src/config/gemShop.ts) | The daily first-login bonus: |
-| `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:20`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
+| `DAILY_CHEST` | Economy / Gems | [`src/config/gemShop.ts:157`](../../src/config/gemShop.ts) | The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: |
+| `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:21`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:119`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
 | Deeds | Progression / Deeds | [`src/catalog/achievements.ts:441`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
@@ -243,6 +244,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
 | `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
+| `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
 | `rollJunkDrops` | Loot / Junk | [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |

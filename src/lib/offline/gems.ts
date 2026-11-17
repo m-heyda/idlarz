@@ -1,10 +1,11 @@
-import { DAILY_BONUS_GEMS, DAY_SEC, gemItemById, type GemItem } from '@/config/gemShop';
+import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, gemItemById, type DailyChestResource, type GemItem } from '@/config/gemShop';
 import { GEMS_CAP } from '@/config/economy';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { respecAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { recordRespec } from '@/lib/offline/stats';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
-import type { DailyInfo, GemShop, GemsRefusal, PendingIdentity } from '@/lib/offline/gemTypes';
+import type { DailyChestItem, DailyInfo, GemShop, GemsRefusal, PendingIdentity } from '@/lib/offline/gemTypes';
+import type { Rng } from '@/lib/rng';
 
 // The gem shop's rules, pure: the ledger in, the ledger out. No database and no clock of its own (the caller passes the server clock), so the same functions run against Supabase and against a Map in the tests.
 
@@ -25,17 +26,39 @@ export const dailyInfo = (shop: GemShop, nowSec: number): DailyInfo => {
 	return { available, step, gems: DAILY_BONUS_GEMS[step - 1] };
 };
 
-/** Claims today's bonus: the gems go into the balance (clamped to the cap) and into `granted`, like every gem the server hands out. Null when today is already claimed. */
-export const claimDaily = (ledger: Ledger, nowSec: number): { ledger: Ledger; gems: number } | null => {
+/**
+ * The materials in the day 7 chest of the daily bonus: `DAILY_CHEST.count` kinds picked at random, each worth a random number of minutes of the player's income of that kind (at least `DAILY_CHEST.floor`). `rates` is the player's income per second.
+ *
+ * @category Economy/Gems
+ * @order 4
+ * @formula
+ * amount = max(floor, floor(income/s x U(30..90 min) x 60))      3 to 5 kinds of material, picked without repeats
+ */
+export const rollDailyChest = (rates: Partial<Record<DailyChestResource, number>>, rng: Rng): DailyChestItem[] => {
+	const pool: DailyChestResource[] = [...DAILY_CHEST.resources];
+	const between = ([lo, hi]: [number, number]) => lo + rng() * (hi - lo);
+	const count = Math.min(pool.length, Math.round(between(DAILY_CHEST.count)));
+	const items: DailyChestItem[] = [];
+	for (let i = 0; i < count; i++) {
+		const resource = pool.splice(Math.floor(rng() * pool.length) % pool.length, 1)[0];
+		items.push({ resource, amount: Math.max(DAILY_CHEST.floor, Math.floor((rates[resource] ?? 0) * between(DAILY_CHEST.minutes) * 60)) });
+	}
+	return items;
+};
+
+/** Claims today's bonus: the gems go into the balance (clamped to the cap) and into `granted`, like every gem the server hands out. On the last day of the ladder the caller passes the rolled `chest`: its materials go into `granted` too. Null when today is already claimed. */
+export const claimDaily = (ledger: Ledger, nowSec: number, chest: readonly DailyChestItem[] = []): { ledger: Ledger; gems: number } | null => {
 	const info = dailyInfo(ledger.gemShop, nowSec);
 	if (!info.available) return null;
 	const gems = Math.max(0, Math.min(info.gems, GEMS_CAP - ledger.gems));
+	const granted = addTotals(ledger.granted, { gems });
+	for (const item of chest) granted[item.resource] = (granted[item.resource] ?? 0) + item.amount;
 	return {
 		gems,
 		ledger: {
 			...ledger,
 			gems: ledger.gems + gems,
-			granted: addTotals(ledger.granted, { gems }),
+			granted,
 			gemShop: { ...ledger.gemShop, daily: { day: serverDay(nowSec), streak: info.step } },
 		},
 	};

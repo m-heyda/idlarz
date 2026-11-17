@@ -12,10 +12,10 @@ import { runGems } from '../../src/lib/offline/gemsFlow';
 import { parseGemsBody } from '../../src/lib/offline/gemsParse';
 import type { IdentityInfo, IdentityRepo } from '../../src/lib/offline/identity';
 import type { CharacterReply, GemsReply, GemsRequest, PendingIdentity } from '../../src/lib/offline/gemTypes';
-import { dailyInfo, serverDay } from '../../src/lib/offline/gems';
+import { dailyInfo, rollDailyChest, serverDay } from '../../src/lib/offline/gems';
 import { emptyGemShop, newLedger, readGemShop } from '../../src/lib/offline/ledger';
 import { ATTR_KEYS, allocatePoints, attributeBudget, newAttrs, readAttrs } from '../../src/lib/offline/attrs';
-import { DAILY_BONUS_GEMS, DAY_SEC, GEM_SHOP } from '../../src/config/gemShop';
+import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, GEM_SHOP } from '../../src/config/gemShop';
 import { STARTING_GEMS } from '../../src/config/economy';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
 
@@ -376,4 +376,35 @@ test('the route reads a claim: it needs the key and an id, and never lets a clai
 	assert.equal(parseGemsBody({ action: 'claim', key, id: '' }), null, 'empty id');
 	assert.equal(parseGemsBody({ action: 'claim', key, id: 'x'.repeat(61) }), null, 'id too long');
 	assert.deepEqual(parseGemsBody({ action: 'status' }), { key: null, request: { action: 'status' } });
+});
+
+test('day seven also opens a chest of materials, recorded as granted; the other days pay gems only', async () => {
+	const { m } = await started();
+	const at = (day: number) => T0 + day * DAY_SEC * 1000 + STEP;
+	for (let day = 0; day < DAILY_BONUS_GEMS.length - 1; day++) {
+		here(m, at(day));
+		const reply = ok(await gems(m, { action: 'daily' }, at(day)));
+		assert.equal(reply.paid, DAILY_BONUS_GEMS[day]);
+		assert.equal(reply.dailyChest, undefined, `day ${day + 1} has no chest`);
+	}
+	const before = { ...m.ledgers.get(ID)!.granted };
+	const last = DAILY_BONUS_GEMS.length - 1;
+	here(m, at(last));
+	const seven = ok(await gems(m, { action: 'daily' }, at(last)));
+	assert.equal(seven.paid, DAILY_BONUS_GEMS[last]);
+	assert.ok(seven.dailyChest && seven.dailyChest.length >= DAILY_CHEST.count[0] && seven.dailyChest.length <= DAILY_CHEST.count[1], 'a few kinds of material');
+	const granted = m.ledgers.get(ID)!.granted;
+	for (const item of seven.dailyChest ?? []) {
+		assert.ok(item.amount >= DAILY_CHEST.floor);
+		assert.equal(granted[item.resource] - before[item.resource], item.amount, `${item.resource} is recorded as granted`);
+	}
+});
+
+test('rollDailyChest: kinds without repeats, never under the floor, and it grows with income', () => {
+	const rng = () => 0.5;
+	const poor = rollDailyChest({}, rng);
+	assert.equal(new Set(poor.map((i) => i.resource)).size, poor.length);
+	for (const item of poor) assert.equal(item.amount, DAILY_CHEST.floor);
+	const rich = rollDailyChest({ gold: 1000, wood: 1000, stone: 1000, coal: 1000, food: 1000, meat: 1000, eggs: 1000, milk: 1000, hide: 1000, wool: 1000 }, rng);
+	for (const item of rich) assert.ok(item.amount > DAILY_CHEST.floor);
 });

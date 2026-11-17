@@ -22,7 +22,8 @@ import { clearBootSnapshot } from '@/lib/bootSnapshot';
 import { fetchMe, logout, type AwayInfo, type Profile, type ProfileStats, type UnavailableReason } from '@/lib/authClient';
 import { PLAY_PATH, safeNextPath } from '@/lib/playRoute';
 import '@idlarz/design-system';
-import { Button, Frame, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
+import { Button, Frame, HoverTip, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
+import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BadgePic, NickName } from '../../../packages/design-system/src/components/composites';
 import '@/styles/Landing.css';
 
@@ -359,10 +360,25 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 							</>
 						)}
 					</Frame>
+					{/* only for a visitor who is logged out: a limited-features game with no account, not built yet */}
+					{visitor.name === 'guest' && (
+						<div className='ld-guest'>
+							<HoverTip
+								placement='above'
+								align='center'
+								fill
+								tip={
+									<HintTooltip title='Coming soon' text='Play as a guest with limited features, no account needed. Make an account any time to keep going.' />
+								}
+							>
+								<Button disabled aria-disabled='true' style={{ width: '100%', minHeight: 44 }}>
+									Play as guest
+								</Button>
+							</HoverTip>
+						</div>
+					)}
 				</div>
 			</div>
-
-			<p className='ld-tagline'>Build a realm. Leave it running. Come back to a bigger one.</p>
 		</main>
 	);
 };

@@ -9,8 +9,8 @@ const dailyLine = (daily: DailyInfo | undefined): string => {
 	if (!daily) return 'Checking...';
 	const last = DAILY_BONUS_GEMS.length;
 	return daily.available
-		? `Day ${daily.step} of ${last}: +${daily.gems} gems. Come back every day: day ${last} pays the most.`
-		: `Claimed today. Come back tomorrow (UTC); day ${last} pays the most. A missed day starts the week again.`;
+		? `Day ${daily.step} of ${last}: +${daily.gems} gems${daily.step === last ? ' and a chest of materials' : ''}. Come back every day: day ${last} pays the most.`
+		: `Claimed today. Come back tomorrow (UTC); day ${last} pays the most (gems and a chest of materials). A missed day starts the week again.`;
 };
 
 /**
@@ -34,6 +34,10 @@ const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClai
 				return (
 					<li key={day} className='dd-day' data-state={done ? 'done' : today ? 'today' : 'later'} data-last={last}>
 						<span className='dd-day-name'>{last ? 'Day 7 bonus' : `Day ${day}`}</span>
+						{last ? (
+							// eslint-disable-next-line @next/next/no-img-element
+							<img className='dd-day-chest' src='/pixel/icons/bonus_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
+						) : null}
 						<span className='dd-day-gems'>
 							+{gemsPaid} <GemIcon />
 						</span>

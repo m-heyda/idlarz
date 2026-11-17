@@ -5,6 +5,9 @@ import { requestGems } from '@/lib/rewardsClient';
 import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
 import { notify } from '@/lib/notices';
 import { signalNeedClaim } from '@/lib/serverSession';
+import { RESOURCE_CAP } from '@/config/economy';
+import { RESOURCES } from '@/catalog';
+import { formatCompact } from '@/utils/formatters';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 
@@ -71,7 +74,19 @@ export const useGemStore = create<GemStoreState>((set, get) => {
 		},
 		claimDaily: async () => {
 			const reply = await run(newClaimId(), { action: 'daily' });
-			if (reply?.ok && reply.paid) useUiStore.getState().showToast(`Daily bonus: +${reply.paid} gems`);
+			if (reply?.ok && reply.paid) {
+				const chest = reply.dailyChest ?? [];
+				if (chest.length > 0) {
+					// the day 7 chest: the server paid these materials, so they go into the game like a chest's loot
+					useGameStore.setState((state) => {
+						const resources = { ...state.resources };
+						for (const item of chest) resources[item.resource] = Math.min(resources[item.resource] + item.amount, RESOURCE_CAP);
+						return { resources };
+					});
+					const text = chest.map((item) => `${formatCompact(item.amount)} ${RESOURCES[item.resource]?.label ?? item.resource}`).join(', ');
+					useUiStore.getState().showToast(`Daily chest: +${reply.paid} gems, ${text}`);
+				} else useUiStore.getState().showToast(`Daily bonus: +${reply.paid} gems`);
+			}
 			return reply;
 		},
 		buy: async (itemId, value) => {

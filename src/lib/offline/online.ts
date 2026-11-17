@@ -1,7 +1,7 @@
 import { GEMS_CAP } from '@/config/economy';
-import { gemItemById } from '@/config/gemShop';
+import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
-import { applySpend, claimDaily, clearPending, dailyInfo, refundPending } from '@/lib/offline/gems';
+import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
 import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
 import { recordCuriosity } from '@/lib/offline/curiosity';
@@ -394,9 +394,18 @@ export const gemsStep = (
 		});
 		if (request.action === 'status') return { ledger, value: gemsView(ledger, ctx.nowSec, identity) };
 		if (request.action === 'daily') {
-			const claim = claimDaily(ledger, ctx.nowSec);
+			const today = dailyInfo(ledger.gemShop, ctx.nowSec);
+			// the last day of the ladder also opens a chest of materials, rolled from the player's income on a sealed number (one per day, so a retry cannot roll again)
+			const chest =
+				today.available && today.step === DAILY_BONUS_GEMS.length
+					? rollDailyChest(ctx.stored.summary.rates, sealedRng(deps.secret, userId, ledger.runId, 'daily', serverDay(ctx.nowSec)))
+					: [];
+			const claim = claimDaily(ledger, ctx.nowSec, chest);
 			if (!claim) return refused('already_claimed', "Today's bonus is already claimed.");
-			return { ledger: claim.ledger, value: { ...gemsView(claim.ledger, ctx.nowSec, identity), paid: claim.gems } };
+			return {
+				ledger: claim.ledger,
+				value: { ...gemsView(claim.ledger, ctx.nowSec, identity), paid: claim.gems, ...(chest.length > 0 ? { dailyChest: chest } : {}) },
+			};
 		}
 		if (request.action === 'claim') {
 			// the Claim button of the Achievements window: pays the rewards of one earned achievement, once
