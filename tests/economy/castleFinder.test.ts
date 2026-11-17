@@ -98,3 +98,10 @@ test('centerOnCastle brings the castle back from anywhere the view can be dragge
 		assert.equal(isCastleOnScreen({ x: s.x, y: s.y, zoom: s.zoom, w: s.w, h: s.h }), true);
 	}
 });
+
+test('the arrow slides out of the top right box (the minimap under the header)', () => {
+	const top: Insets = { top: 60, right: 0, bottom: 0, left: 0, avoidTop: { w: 200, h: 200 } };
+	const arrow = compassArrow(looking(CASTLE_X + 40, CASTLE_Y - 40), top);
+	assert.ok(arrow);
+	assert.ok(!(arrow.x > W - 200 - 38 && arrow.y < 60 + 200 + 38), 'the arrow is not on the minimap');
+});

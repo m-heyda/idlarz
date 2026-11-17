@@ -167,13 +167,9 @@ test('the Dev title and the octopus badge exist for the admin account only (its 
 	assert.equal(badgePicSrc('early_tester'), '/pixel/achievements/early_tester.png');
 });
 
-test('the laptop badge is a second admin-only badge, a still picture next to the animated octopus', () => {
+test('the removed laptop badge id is no longer offered, accepted or shown', () => {
 	const adminEarned = ['early_tester', ADMIN_UNLOCK];
-	assert.ok(badgeOptions(adminEarned).some((b) => b.id === 'admin_laptop'));
-	assert.ok(!badgeOptions(['early_tester']).some((b) => b.id === 'admin_laptop'), 'not offered to a player');
-	assert.equal(checkBadgeChoice({ badgeId: 'admin_laptop', titleId: null }, adminEarned).ok, true);
-	assert.equal(checkBadgeChoice({ badgeId: 'admin_laptop', titleId: null }, ['early_tester']).ok, false);
-	assert.equal(shownBadge('admin_laptop', ['early_tester']), null);
-	assert.equal(shownBadge('admin_laptop', adminEarned)?.badge, 'admin_laptop');
-	assert.equal(badgePicSrc('admin_laptop'), '/pixel/ui/admin/badge_laptop.png');
+	assert.ok(!badgeOptions(adminEarned).some((b) => b.id === 'admin_laptop'));
+	assert.equal(checkBadgeChoice({ badgeId: 'admin_laptop', titleId: null }, adminEarned).ok, false);
+	assert.equal(shownBadge('admin_laptop', adminEarned), null);
 });

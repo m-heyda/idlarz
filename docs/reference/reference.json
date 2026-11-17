@@ -122,7 +122,7 @@
   "kind": "function",
   "category": "Progression/Badges",
   "file": "src/catalog/badges.ts",
-  "line": 56,
+  "line": 50,
   "summary": "Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement. The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.",
   "see": []
  },
@@ -3281,7 +3281,7 @@
   "kind": "function",
   "category": "Progression/Rebirth",
   "file": "src/utils/game/rebirthUnlocks.ts",
-  "line": 102,
+  "line": 125,
   "summary": "The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states (what the player really got, whether the server or the browser named the amount), never recomputed here.",
   "see": []
  },

@@ -131,6 +131,12 @@ export interface TooltipProps {
 /** The base tooltip: dark slate body, rim in the rarity colour, and a glow for uncommon and up. Icon + title header, free content, optional two-part footer. */
 export const Tooltip: React.FC<TooltipProps> = ({ rarity = 'common', icon, iconClassName, title, subtitle, children, footer, className, banner }) => (
 	<div className={cx('ds-root', 'ds-tip', className)} data-rarity={rarity} role='tooltip'>
+		{rarity === 'legendary' || rarity === 'unique' ? (
+			// the flames behind the text: an orange blaze along the bottom for legendary, a red flame wrap around the whole rim for unique (pure CSS, see `.ds-tip-flames`)
+			<span className='ds-tip-flames' aria-hidden>
+				<i />
+			</span>
+		) : null}
 		{banner ? (
 			<div className='ds-tip-banner' data-tone={banner.tone}>
 				{banner.text}
@@ -229,7 +235,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	extra,
 	footer,
 }) => (
-	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer} banner={banner}>
+	<Tooltip rarity={rarity} icon={icon} title={name} subtitle={type} footer={footer} banner={banner} className='ds-tip-gear'>
 		{equippedLabel ? <div className='ds-tip-equipped'>Equipped</div> : null}
 		{levelLine ? <TipLine tone='muted'>{levelLine}</TipLine> : null}
 		{primary ? (
@@ -327,8 +333,7 @@ export const ResourceTooltip: React.FC<{ icon: string; name: string; rows: TipRo
 );
 
 /**
- * A monster on the map: HP, damage, your odds, drops, bestiary progress, and the game's extra lines: BOSS mark, kills so far, how it grows ("Level 12 of 20, grows in 8 min" or "fully grown"), the boss line (crits, stun resist, the time
- * limit), a call to action (fight, add to the queue, in the queue) and the art-preview note.
+ * A monster on the map: HP, damage, your odds, drops, bestiary progress, and the game's extra lines: BOSS mark, kills so far, how it grows ("Level 12 of 20, grows in 8 min" or "fully grown"), a call to action (fight, add to the queue, in the queue) and the art-preview note.
  */
 export const MonsterTooltip: React.FC<{
 	icon: string;
@@ -345,12 +350,12 @@ export const MonsterTooltip: React.FC<{
 	lucky?: boolean;
 	defeated?: number;
 	growth?: string;
-	bossLine?: string;
 	cta?: string;
 	wip?: boolean;
-}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, lucky, defeated, growth, bossLine, cta, wip }) => (
+}> = ({ icon, name, subtitle, hp, rows, drops, dropsTitle = 'Drops', footer, boss, lucky, defeated, growth, cta, wip }) => (
 	<Tooltip
-		rarity={lucky ? 'legendary' : boss ? 'epic' : 'common'}
+		className='ds-tip-mon'
+		rarity={lucky ? 'legendary' : boss ? 'unique' : 'common'}
 		icon={icon}
 		iconClassName={lucky ? 'ds-tip-lucky' : undefined}
 		title={lucky ? `★ ${name}` : name}
@@ -374,10 +379,9 @@ export const MonsterTooltip: React.FC<{
 			<div className='ds-bar-fill' style={{ width: '100%' }} />
 		</div>
 		<TipRows rows={rows} />
-		{growth || bossLine ? (
+		{growth ? (
 			<div className='ds-tip-sep'>
-				{growth ? <TipLine tone='amber'>{growth}</TipLine> : null}
-				{bossLine ? <TipLine tone='red'>{bossLine}</TipLine> : null}
+				<TipLine tone='amber'>{growth}</TipLine>
 			</div>
 		) : null}
 		{drops && drops.length > 0 ? (

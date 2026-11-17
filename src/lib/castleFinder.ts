@@ -18,8 +18,10 @@ export interface Insets {
 	right: number;
 	bottom: number;
 	left: number;
-	/** A box in the bottom right corner (the minimap) the arrow stays out of */
+	/** A box in the bottom right corner (the combat window) the arrow stays out of */
 	avoid?: Size;
+	/** A box in the top right corner, just under the header (the minimap) the arrow stays out of */
+	avoidTop?: Size;
 }
 
 export const NO_INSETS: Insets = { top: 0, right: 0, bottom: 0, left: 0 };
@@ -62,7 +64,7 @@ export const isCastleOnScreen = (view: ViewLike, insets: Insets = NO_INSETS): bo
 /**
  * Where the arrow to the castle goes, or null while the castle is on screen. It sits on the border of the free screen (shrunk
  * by ARROW_MARGIN) on the line from the middle of the screen to the castle, nudged along the border when it would land on the
- * `avoid` box, and its angle always points at the castle from where it ended up.
+ * `avoid` (bottom right) or `avoidTop` (top right) box, and its angle always points at the castle from where it ended up.
  */
 export const compassArrow = (view: ViewLike, insets: Insets = NO_INSETS, margin: number = ARROW_MARGIN): CompassArrow | null => {
 	if (isCastleOnScreen(view, insets)) return null;
@@ -89,6 +91,18 @@ export const compassArrow = (view: ViewLike, insets: Insets = NO_INSETS, margin:
 			const up = y - top;
 			const sideways = x - left;
 			if (up <= sideways) y = top;
+			else x = left;
+		}
+	}
+	const avoidTop = insets.avoidTop;
+	if (avoidTop) {
+		const left = view.w - avoidTop.w - margin;
+		const bottom = insets.top + avoidTop.h + margin;
+		if (x > left && y < bottom) {
+			// slide along the border to the nearest free spot: down the right edge or left along the top edge
+			const down = bottom - y;
+			const sideways = x - left;
+			if (down <= sideways) y = bottom;
 			else x = left;
 		}
 	}

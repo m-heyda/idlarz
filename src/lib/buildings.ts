@@ -166,11 +166,12 @@ export const buildProblem = (ctx: BuildingContext, x: number, y: number, id: str
 	return tileProblem(ctx, x, y, def);
 };
 
-/** Why the building on tile (x, y) cannot go up a level now, or null: it must exist, be below `min(5, castle level)`, and the builder must be free. Paying is the caller's check. */
+/** Why the building on tile (x, y) cannot go up a level now, or null: it must exist, have no monster on its tile (defeat it first), be below `min(5, castle level)`, and the builder must be free. Paying is the caller's check. */
 export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): string | null => {
 	if (!buildingsEnabled()) return 'Buildings are not available yet';
 	const tile = getTile(ctx.tiles, x, y);
 	if (!tile?.building || !buildingDef(tile.building)) return 'No building here';
+	if (monsterAt(ctx.monsters as Monster[], x, y)) return 'Defeat the monster here first';
 	const level = levelOfTile(tile);
 	const def = buildingDef(tile.building);
 	const top = def?.kind === 'idol' ? Math.min(ctx.idolMax ?? limitOf('idolMaxLevel'), HARD_LIMITS.idolMaxLevel) : BUILDING_RULES.maxLevel;
@@ -186,6 +187,7 @@ export const moveProblem = (ctx: BuildingContext, fromX: number, fromY: number, 
 	const def = buildingDef(from?.building);
 	if (!from || !def) return 'No building here';
 	if (fromX === toX && fromY === toY) return 'Already here';
+	if (monsterAt(ctx.monsters as Monster[], fromX, fromY)) return 'Defeat the monster on the building first';
 	if (ctx.buildingUpgrade && ctx.buildingUpgrade.x === fromX && ctx.buildingUpgrade.y === fromY) return 'It is being upgraded';
 	return tileProblem(ctx, toX, toY, def);
 };

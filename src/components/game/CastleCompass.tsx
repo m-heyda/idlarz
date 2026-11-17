@@ -6,12 +6,20 @@ import '@/styles/CastleCompass.css';
 /** Breathing room (px) between the header and the free part of the screen */
 const HEADER_FALLBACK_PX = 56;
 
-/** The parts of the window the arrow must stay out of: the header on top and the minimap stack bottom right. */
+/** The parts of the window the arrow must stay out of: the header on top, the combat stack bottom right and the minimap top right. */
 const readInsets = (): Insets => {
 	const header = parseFloat(document.documentElement.style.getPropertyValue('--header-h')) || HEADER_FALLBACK_PX;
 	const stack = document.querySelector<HTMLElement>('[data-bottom-right-stack]');
 	const box = stack?.getBoundingClientRect();
-	return { top: header, right: 0, bottom: 0, left: 0, avoid: box && box.width > 0 ? { w: box.width + 16, h: box.height + 16 } : undefined };
+	const mini = document.querySelector<HTMLElement>('[data-top-right-stack]')?.getBoundingClientRect();
+	return {
+		top: header,
+		right: 0,
+		bottom: 0,
+		left: 0,
+		avoid: box && box.width > 0 ? { w: box.width + 16, h: box.height + 16 } : undefined,
+		avoidTop: mini && mini.width > 0 ? { w: mini.width + 16, h: mini.height + 16 } : undefined,
+	};
 };
 
 /**
@@ -41,9 +49,8 @@ const CastleCompass: React.FC = () => {
 		update();
 		const unsubscribe = useViewStore.subscribe(update);
 		// the minimap changes size (shown, hidden, a different map): the arrow keeps out of their way
-		const stack = document.querySelector('[data-bottom-right-stack]');
-		const observer = typeof ResizeObserver !== 'undefined' && stack ? new ResizeObserver(update) : null;
-		if (observer && stack) observer.observe(stack);
+		const observer = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(update) : null;
+		for (const el of document.querySelectorAll('[data-bottom-right-stack], [data-top-right-stack]')) observer?.observe(el);
 		return () => {
 			unsubscribe();
 			observer?.disconnect();

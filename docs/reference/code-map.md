@@ -229,7 +229,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BossWindow.tsx`](../../src/components/game/BossWindow.tsx) — ~ The Boss window:
-- [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The bottom right corner:
+- [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The corners of the screen outside the map's click area (using them never pays gold):
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
@@ -238,9 +238,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
 - [`CharacterPortrait.tsx`](../../src/components/game/CharacterPortrait.tsx) — ~ Kept for callers:
 - [`ClassPickerDialog.tsx`](../../src/components/game/ClassPickerDialog.tsx) — ~ Four heroes to choose from, shown as their portraits.
-- [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Dismiss this monster?":
+- [`ConfirmDialogs.tsx`](../../src/components/game/ConfirmDialogs.tsx) — ~ "Discard this item?":
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu, drawn by the design system's `ContextMenu`.
-- [`CostList.tsx`](../../src/components/game/CostList.tsx) — ~ A bundle of resource costs; each entry is green when affordable and red when not.
+- [`CostGrid.tsx`](../../src/components/game/CostGrid.tsx) — ~ A bundle of resource costs laid out as a grid of chips (icon and amount), green when the player has enough and red when not (`muted`:
 - [`DailyBoard.tsx`](../../src/components/game/DailyBoard.tsx) — ~ The line under the board's title:
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
@@ -319,7 +319,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`FarmScene.tsx`](../../src/components/game/overlays/FarmScene.tsx) — ~ Moving to the right on screen (the way it last walked)
 - [`FarmUpgradeDock.tsx`](../../src/components/game/overlays/FarmUpgradeDock.tsx) — ~ The tiles of the upgrade window.
 - [`GameWindows.tsx`](../../src/components/game/overlays/GameWindows.tsx) — ~ Every game window, each open or not on its own:
-- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The tabs, in order, with what an empty one promises (gems only come in from the daily bonus and achievements, so these are what they will be spent on).
+- [`GemShopDialog.tsx`](../../src/components/game/overlays/GemShopDialog.tsx) — ~ The window's tabs:
 - [`LevelUpNotification.tsx`](../../src/components/game/overlays/LevelUpNotification.tsx) — ~ Level-up celebration:
 - [`LoadingScreen.tsx`](../../src/components/game/overlays/LoadingScreen.tsx) — ~ The splash while the saved game loads (needs the game store; the start gate uses LoadingView, which does not).
 - [`LoadingView.tsx`](../../src/components/game/overlays/LoadingView.tsx) — ~ The monsters that take turns on the loading card (art under public/pixel/enemies)
@@ -331,7 +331,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`OfflineDialog.tsx`](../../src/components/game/overlays/OfflineDialog.tsx) — ~ Whether the away-time hint (Night Watch, Steward) is worth showing:
-- [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ Rebirth and the Ember shop.
+- [`RebirthDialog.tsx`](../../src/components/game/overlays/RebirthDialog.tsx) — ~ What an Ember shop upgrade gives at level `n` (the same numbers as before; a tile shows it for the level now and for the next one)
 - [`RebirthUnlockModal.tsx`](../../src/components/game/overlays/RebirthUnlockModal.tsx) — ~ The result screen shown right after a rebirth:
 - [`RebirthsPanel.tsx`](../../src/components/game/overlays/RebirthsPanel.tsx) — ~ One run as a card:
 - [`SaveMenuDialog.tsx`](../../src/components/game/overlays/SaveMenuDialog.tsx) — ~ Save & backup:
@@ -462,6 +462,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`combat.ts`](../../src/lib/combat.ts) — ~ The player's numbers (all pure functions in `src/lib/combat.ts`, used by the server engine and the UI):
 - [`combatCursor.ts`](../../src/lib/combatCursor.ts) — ~ Which account the cursor belongs to (a cursor written for another account is ignored).
 - [`combatFx.ts`](../../src/lib/combatFx.ts) — ~ The floating number of a hit the player lands:
+- [`craftCategories.ts`](../../src/lib/craftCategories.ts) — ~ The Crafting tab's navigation as data.
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
@@ -728,6 +729,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fight-sim.ts`](../../scripts/fight-sim.ts) — Fight balance table: loadouts x monsters, run through the server's own fight engine (src/lib/fightSim.ts -> src/lib/offline/fight.ts).
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
 - [`gen-save-fixtures.ts`](../../scripts/gen-save-fixtures.ts) — Writes the frozen save fixtures of `tests/fixtures/saves/` from the CURRENT code.
+- [`grant-test-items.ts`](../../scripts/grant-test-items.ts) — Gives ONE development account a legendary item in its bag and a boss waiting on its map, so tooltips, the boss fight and the new windows can be tried by hand.
 - [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
@@ -826,6 +828,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/crafting/**
 
+- [`craftCategories.test.ts`](../../tests/crafting/craftCategories.test.ts)
 - [`craftQueue.test.ts`](../../tests/crafting/craftQueue.test.ts)
 - [`craftServer.test.ts`](../../tests/crafting/craftServer.test.ts) — ~ Queues `count` of a recipe at `at` seconds, waits until all of them are done and claims them.
 - [`craftingOverlaySelectors.test.ts`](../../tests/crafting/craftingOverlaySelectors.test.ts)

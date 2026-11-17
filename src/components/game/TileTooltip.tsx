@@ -76,6 +76,8 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 		{ label: 'Armor', value: formatCompact(stats.armor) },
 		...(stats.critChance > 0 ? [{ label: 'Crit', value: `${stats.critChance}% x${stats.critMult}` }] : []),
 		...(stats.stunResist > 0 ? [{ label: 'Stun resist', value: `${stats.stunResist}%` }] : []),
+		// a boss has to be beaten in time: the limit is a stat of its own
+		...(boss && MONSTERS[type].timeLimitSec ? [{ label: 'Time limit', value: `${MONSTERS[type].timeLimitSec} s` }] : []),
 	];
 	return (
 		<div className={place}>
@@ -93,7 +95,6 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 				lucky={!!monster?.lucky}
 				defeated={kills}
 				growth={growth}
-				bossLine={boss ? `Crits ${stats.critChance}%, resists Stun ${stats.stunResist}%. Beat it within ${MONSTERS[type].timeLimitSec} seconds` : undefined}
 				cta={queued > 0 ? `In the queue (${queued}) - click to leave it` : lineOpen ? 'Click to add to the queue' : 'Click to fight'}
 			/>
 		</div>

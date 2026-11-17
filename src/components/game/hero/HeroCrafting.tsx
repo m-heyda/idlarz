@@ -1,10 +1,11 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Button, HoverTip, Inset, Panel, ProgressBar, Slot } from '../../../../packages/design-system/src/components/primitives';
+import { Button, HoverTip, Inset, Panel, ProgressBar, SearchInput, Slot } from '../../../../packages/design-system/src/components/primitives';
 import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-system/src/components/tooltips';
 import { RARITIES, RESOURCES } from '@/catalog';
 import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
 import { gearOdds } from '@/lib/craftGear';
+import { craftGroups } from '@/lib/craftCategories';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
@@ -272,31 +273,9 @@ const Queue: React.FC = () => {
 	);
 };
 
-/** The weapon and armour slots of the first two categories; every other recipe (components, potions, jewellery) goes to "Other". */
-const WEAPON_SLOTS: readonly string[] = ['mainHand', 'offHand'];
-const ARMOUR_SLOTS: readonly string[] = ['head', 'shoulder', 'chest', 'hands', 'legs', 'feet', 'cape', 'belt'];
-const slotOf = (recipe: Recipe): string | null => ('gear' in recipe.output ? recipe.output.gear.slot : null);
-
-/** The categories of the recipe list, in display order. Inside one, every recipe is listed by the crafting level it needs (locked ones dimmed and tagged with that level). Trade goods are not shown for now (their recipes stay in the data). */
-const CATEGORIES: { id: string; label: string; has: (recipe: Recipe) => boolean }[] = [
-	{ id: 'weapons', label: 'Weapons', has: (r) => WEAPON_SLOTS.includes(slotOf(r) ?? '') },
-	{ id: 'armor', label: 'Armor', has: (r) => ARMOUR_SLOTS.includes(slotOf(r) ?? '') },
-	{
-		id: 'other',
-		label: 'Other',
-		has: (r) => r.kind !== 'good' && r.kind !== 'legendary' && !WEAPON_SLOTS.includes(slotOf(r) ?? '') && !ARMOUR_SLOTS.includes(slotOf(r) ?? ''),
-	},
-	{ id: 'legendary', label: 'Legendary', has: (r) => r.kind === 'legendary' },
-];
-/** Every recipe the tab shows: the craftable ones and the display-only legendaries. */
+/** Every recipe the tab shows: the craftable ones and the display-only legendaries. The categories and the search are `lib/craftCategories.ts`. */
 const SHOWN: Recipe[] = [...RECIPES, ...LEGENDARY_RECIPES];
-/** Lowest level first; recipes of the same level keep the catalog's order */
-const byLevel = (recipes: Recipe[]): Recipe[] =>
-	recipes
-		.map((recipe, index) => ({ recipe, index }))
-		.sort((a, b) => a.recipe.unlock - b.recipe.unlock || a.index - b.index)
-		.map((e) => e.recipe);
-const GROUPS = CATEGORIES.map((c) => ({ ...c, recipes: byLevel(SHOWN.filter(c.has)) })).filter((c) => c.recipes.length > 0);
+const ALL_GROUPS = craftGroups(SHOWN);
 
 /**
  * The left column of the Crafting tab: the crafting level and its XP bar on top, the queue under it (Collect all lights up when something finished), and the blacksmith filling the rest. It stands in for the hero card on this tab, so the recipes
@@ -334,7 +313,7 @@ export const CraftingSidebar: React.FC = () => {
 };
 
 /**
- * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), the recipe list in folding categories (Weapons, Armor, Other, Legendary; each by required level, a locked recipe is dimmed and tagged with the level it needs, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
+ * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), a search box and the recipe list in folding categories (Weapons, Armor by slot, Potions, Jewelry by kind, Components, Legendary; see `lib/craftCategories.ts`; each by required level, a locked recipe is dimmed and tagged with the level it needs, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
  * Everything the old Crafting window did: amount by slider or typed text, cost colours, XP and time, gear odds, queue slots, Collect, Cancel.
  */
 const HeroCrafting: React.FC = () => {
@@ -343,11 +322,15 @@ const HeroCrafting: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
+	const [query, setQuery] = useState('');
 	useEffect(() => void refresh(), [refresh]);
 
 	const { level } = craftLevelOf(craft?.xp ?? 0);
 	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
-	const selected = SHOWN.find((r) => r.id === selectedId) ?? GROUPS[0].recipes.find((r) => r.unlock <= level) ?? GROUPS[0].recipes[0];
+	const searching = query.trim() !== '';
+	const groups = useMemo(() => craftGroups(SHOWN, query), [query]);
+	const firstRecipes = ALL_GROUPS[0].sections[0].recipes;
+	const selected = SHOWN.find((r) => r.id === selectedId) ?? firstRecipes.find((r) => r.unlock <= level) ?? firstRecipes[0];
 	const toggleKind = (kind: string) =>
 		setClosed((before) => {
 			const out = new Set(before);
@@ -360,31 +343,42 @@ const HeroCrafting: React.FC = () => {
 		<div className='ds-craft'>
 			<div className='ds-craft-body'>
 				<Inset className='ds-craft-list'>
-					{GROUPS.map((group) => (
+					<SearchInput value={query} onChange={setQuery} placeholder='Search recipes' label='Search recipes' />
+					{groups.length === 0 && <p className='ds-craft-sub'>No recipe matches &ldquo;{query.trim()}&rdquo;.</p>}
+					{groups.map((group) => (
 						<CollapsibleGroup
 							key={group.id}
 							title={group.label}
-							count={group.recipes.length}
-							open={!closed.has(group.id)}
+							count={group.count}
+							open={searching || !closed.has(group.id)}
 							onToggle={() => toggleKind(group.id)}
 						>
-							<div className='ds-craft-grid'>
-								{group.recipes.map((recipe) => {
-									const locked = have.craftLevel < recipe.unlock;
-									return (
-										<HoverTip key={recipe.id} tip={<RecipeTip recipe={recipe} have={have} />}>
-											<Slot
-												icon={recipeIconUrl(recipe)}
-												locked={locked}
-												levelBadge={locked ? recipe.unlock : undefined}
-												active={recipe.id === selected.id}
-												aria-label={`${outputName(recipe)}${locked ? `, unlocks at crafting level ${recipe.unlock}` : ''}`}
-												onClick={() => setSelectedId(recipe.id)}
-											/>
-										</HoverTip>
-									);
-								})}
-							</div>
+							{group.sections.map((section) => (
+								<div key={section.id} className='ds-craft-section'>
+									{group.headed && (
+										<div className='ds-craft-subhead'>
+											{section.label} <span>{section.recipes.length}</span>
+										</div>
+									)}
+									<div className='ds-craft-grid'>
+										{section.recipes.map((recipe) => {
+											const locked = have.craftLevel < recipe.unlock;
+											return (
+												<HoverTip key={recipe.id} tip={<RecipeTip recipe={recipe} have={have} />}>
+													<Slot
+														icon={recipeIconUrl(recipe)}
+														locked={locked}
+														levelBadge={locked ? recipe.unlock : undefined}
+														active={recipe.id === selected.id}
+														aria-label={`${outputName(recipe)}${locked ? `, unlocks at crafting level ${recipe.unlock}` : ''}`}
+														onClick={() => setSelectedId(recipe.id)}
+													/>
+												</HoverTip>
+											);
+										})}
+									</div>
+								</div>
+							))}
 						</CollapsibleGroup>
 					))}
 					<p className='ds-craft-sub'>Crafting level never resets. New recipes unlock as it grows.</p>

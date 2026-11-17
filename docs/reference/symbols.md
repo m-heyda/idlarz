@@ -31,7 +31,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `autoUseUnlocked` | Combat / A fight | [`src/lib/combat.ts:55`](../../src/lib/combat.ts) | Auto-use (the server drinking potions, casting Heal and Stun for the player) is a reward for the first rebirth too: |
 | Avatars | Progression / Avatars | [`src/catalog/avatars.ts:18`](../../src/catalog/avatars.ts) | Avatars (IDL-71, class lock IDL-269): |
 | `awayBlockOf` | Saves & Server / Away time | [`src/lib/offline/away.ts:23`](../../src/lib/offline/away.ts) | The read-only `away` block of `GET /api/auth/me`: |
-| `badgeOptions` | Progression / Badges | [`src/catalog/badges.ts:56`](../../src/catalog/badges.ts) | Badges and titles of a profile. |
+| `badgeOptions` | Progression / Badges | [`src/catalog/badges.ts:50`](../../src/catalog/badges.ts) | Badges and titles of a profile. |
 | `bandOf` | Monsters / Spawning | [`src/lib/distance.ts:13`](../../src/lib/distance.ts) | The band a castle distance falls in. |
 | `BASE_GENERATION_RATES` | Economy / Income | [`src/config/economy.ts:158`](../../src/config/economy.ts) | Income of the realm itself, per second, before any tile: |
 | `BASELINE_EPOCH` | Saves & Server / Epoch | [`src/config/epoch.ts:13`](../../src/config/epoch.ts) | The data epoch: |
@@ -224,7 +224,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `readProgress` | Progression / Guided tutorial | [`src/lib/tutorial/progress.ts:18`](../../src/lib/tutorial/progress.ts) | Reads the stored `stats.tutorial` (or an answer from the server) back: |
 | `REBIRTH` | Progression / Rebirth | [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts) | Rebirth: |
 | `REBIRTH_BIOME_OUTPUT` | Economy / Biomes | [`src/config/biomes.ts:32`](../../src/config/biomes.ts) | Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): |
-| `rebirthRunSummary` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:102`](../../src/utils/game/rebirthUnlocks.ts) | The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. |
+| `rebirthRunSummary` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:125`](../../src/utils/game/rebirthUnlocks.ts) | The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. |
 | `rebirthStatus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:128`](../../src/utils/game/rebirth.ts) | Can the player rebirth, and if not what is missing. |
 | `rebirthUnlockIntro` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:40`](../../src/utils/game/rebirthUnlocks.ts) | The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |

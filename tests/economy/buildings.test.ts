@@ -21,6 +21,7 @@ import {
 	buildingOutput,
 	relocationCost,
 } from '../../src/lib/buildings';
+import { buildingMenuItems } from '../../src/lib/buildingMenu';
 import { calculateResourceRates } from '../../src/utils/game/income';
 import { decodeSave, encodeSave } from '../../src/lib/saveFormat';
 import { pickPersisted } from '../../src/lib/sanitizeSave';
@@ -196,6 +197,22 @@ test('a Producer adds its output to the income (once the flag is on) and the fla
 		assert.equal(api().resourceRates.total.wood, rates());
 	});
 	withoutBuildings(() => assert.equal(rates(), off, 'flag off: the building on the tile makes nothing'));
+});
+
+test('a monster standing on a building blocks its upgrade, its move and its menu entry until it is defeated', () => {
+	withBuildings(() => {
+		const [a] = gameWith('forest', 1, 1);
+		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
+		store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: 3 }) }));
+		assert.ok(buildingMenuItems(store, a.x, a.y).length > 0, 'no monster: the menu offers the building');
+		store.setState({ monsters: [{ id: 1, type: 'thistleBoar', x: a.x, y: a.y, level: 1 } as never] });
+		assert.equal(api().upgradeBuilding(a.x, a.y), false, 'no upgrade under a monster');
+		assert.equal(api().buildingUpgrade, null);
+		assert.equal(api().moveBuilding(a.x, a.y, a.x + 1, a.y), false, 'no move from under a monster');
+		assert.deepEqual(buildingMenuItems(store, a.x, a.y), [], 'no menu entries under a monster');
+		store.setState({ monsters: [] });
+		assert.equal(api().upgradeBuilding(a.x, a.y), true, 'defeated: the building works again');
+	});
 });
 
 test('upgrading: gated by the castle level, paid now, one timer shared with the castle, the level lands when the timer ends', () => {

@@ -1,9 +1,10 @@
 import { buildingDef, buildingsOfBiome, type BuildingDef } from '@/catalog/buildings';
 import { buildProblem, builtBuildings, buildingLevelCost, moveProblem, relocationCost, rememberedIdolLevel, type BuildingContext } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
+import { monsterAt } from '@/lib/monsters';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
-import type { Resources } from '@/types/game';
+import type { Monster, Resources } from '@/types/game';
 import { canAffordBundle } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
 import { getTile } from '@/utils/world';
@@ -16,6 +17,8 @@ export function buildingMenuItems(game: MapGameStore, x: number, y: number): Con
 	const s = game.getState();
 	const tile = getTile(s.tiles, x, y);
 	if (!tile) return [];
+	// a monster on the tile blocks every building entry: it has to be defeated first
+	if (monsterAt(s.monsters as Monster[], x, y)) return [];
 
 	// a tile with a building: one entry that opens its window (the same as a left click), where the upgrade is
 	const here = buildingDef(tile.building);

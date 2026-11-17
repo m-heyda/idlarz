@@ -23,6 +23,7 @@
 	--ds-r-rare: #5f86ff;
 	--ds-r-epic: #b05cf5;
 	--ds-r-legendary: #f4a93c;
+	--ds-r-unique: #ef4444;
 	--ds-img: url('./assets/tex-slate.png');
 	font-family: var(--ds-font);
 	color: var(--ds-text);
@@ -560,6 +561,11 @@
 .ds-tip[data-rarity='legendary'] {
 	--ds-rim: var(--ds-r-legendary);
 	--ds-glow: rgba(244, 169, 60, 0.45);
+}
+
+.ds-tip[data-rarity='unique'] {
+	--ds-rim: var(--ds-r-unique);
+	--ds-glow: rgba(239, 68, 68, 0.5);
 }
 
 .ds-tip-head {
@@ -2462,6 +2468,72 @@
 	gap: 4px;
 }
 
+.ds-search {
+	position: sticky;
+	top: 0;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	margin-bottom: 4px;
+	background: var(--ds-slate-2);
+}
+
+.ds-search-field {
+	flex: 1;
+	min-width: 0;
+	height: 32px;
+	padding: 0 30px 0 10px;
+	font: inherit;
+	font-size: 13px;
+	color: var(--ds-text);
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line);
+	outline: none;
+}
+
+.ds-search-field:focus {
+	border-color: var(--ds-accent);
+}
+
+.ds-search-field::-webkit-search-cancel-button {
+	display: none;
+}
+
+.ds-search-clear {
+	position: absolute;
+	right: 4px;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	font: inherit;
+	line-height: 1;
+	color: var(--ds-text-dim);
+	background: transparent;
+	border: 0;
+	cursor: pointer;
+}
+
+.ds-search-clear:hover {
+	color: var(--ds-gold-lt);
+}
+
+.ds-craft-section + .ds-craft-section {
+	margin-top: 8px;
+}
+
+.ds-craft-subhead {
+	margin: 2px 0 4px;
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--ds-text-dim);
+}
+
+.ds-craft-subhead span {
+	margin-left: 4px;
+	color: var(--ds-gold);
+}
+
 .ds-craft-sub {
 	margin-bottom: 6px;
 	font-size: 11px;
@@ -3314,10 +3386,149 @@
 	}
 }
 
+/* ===== Unique: the rarest tier, red. The same shiny ring and sweep as legendary in red, and a flame wrap (see .ds-tip-flames) ===== */
+
+.ds-tip[data-rarity='unique'] {
+	border-color: transparent;
+	overflow: hidden;
+	background: radial-gradient(circle at 0 0, rgba(239, 68, 68, 0.34), transparent 66%), linear-gradient(#170d0d, #0a0707);
+}
+
+.ds-tip[data-rarity='unique']::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	padding: 2px;
+	pointer-events: none;
+	background: conic-gradient(
+		from var(--ds-ang),
+		#7a1010,
+		#ef4444 10%,
+		#ffb4a0 16%,
+		#ef4444 22%,
+		#7a1010 45%,
+		#5a0b0b 60%,
+		#ef4444 82%,
+		#ffb4a0 90%,
+		#ef4444 95%,
+		#7a1010
+	);
+	-webkit-mask:
+		linear-gradient(#000 0 0) content-box,
+		linear-gradient(#000 0 0);
+	-webkit-mask-composite: xor;
+	mask:
+		linear-gradient(#000 0 0) content-box exclude,
+		linear-gradient(#000 0 0);
+	animation: ds-ring 2.6s linear infinite;
+}
+
+.ds-tip[data-rarity='unique'] .ds-tip-title {
+	background: linear-gradient(90deg, #ef4444, #ffc2b0 45%, #ef4444 70%);
+	background-size: 220% 100%;
+	-webkit-background-clip: text;
+	background-clip: text;
+	color: transparent;
+	animation: ds-gleam 3s linear infinite;
+}
+
+.ds-tip[data-rarity='unique'] .ds-tip-head img {
+	box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+/*
+ * Flames behind the text of a legendary (orange) or unique (red) tooltip. One span with a child: the span draws a flickering glow along the edges, the child tongues of flame rising from the bottom
+ * (legendary: a low blaze; unique: taller, and a second row falling from the top, so the whole card is wrapped). It sits at z-index -1 inside the tooltip's own stacking context (`isolation: isolate`),
+ * so it is under the text, never over it, and takes no clicks. Only opacity and transform are animated.
+ */
+.ds-tip-flames {
+	--ds-flame-a: 244, 169, 60;
+	--ds-flame-b: 255, 110, 20;
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.ds-tip[data-rarity='unique'] .ds-tip-flames {
+	--ds-flame-a: 239, 68, 68;
+	--ds-flame-b: 255, 40, 20;
+}
+
+/* the glow: a soft warm light along the bottom edge that slowly breathes */
+.ds-tip-flames::before {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 55px;
+	background: radial-gradient(ellipse 70% 100% at 50% 100%, rgba(var(--ds-flame-b), 0.5), transparent 75%),
+		linear-gradient(to top, rgba(var(--ds-flame-a), 0.22), transparent);
+	opacity: 0.8;
+	animation: ds-flame-breathe 2.6s ease-in-out infinite alternate;
+}
+
+/* the sparks: a few small embers drifting up and fading, one layer that loops */
+.ds-tip-flames i {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 90px;
+	background: radial-gradient(circle 1.5px at 12% 80%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 27% 55%, rgb(var(--ds-flame-b)), transparent), radial-gradient(circle 1.5px at 41% 90%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 58% 62%, rgb(var(--ds-flame-b)), transparent), radial-gradient(circle 1.5px at 73% 85%, rgb(var(--ds-flame-a)), transparent),
+		radial-gradient(circle 1px at 88% 58%, rgb(var(--ds-flame-b)), transparent);
+	animation: ds-flame-sparks 3.4s linear infinite;
+}
+
+/* unique: the same, mirrored, along the top edge too */
+.ds-tip[data-rarity='unique'] .ds-tip-flames::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: 40px;
+	background: radial-gradient(ellipse 70% 100% at 50% 0%, rgba(var(--ds-flame-b), 0.3), transparent 75%);
+	animation: ds-flame-breathe 3.1s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes ds-flame-breathe {
+	from {
+		opacity: 0.55;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes ds-flame-sparks {
+	from {
+		transform: translateY(18px);
+		opacity: 0;
+	}
+	20% {
+		opacity: 0.9;
+	}
+	to {
+		transform: translateY(-22px);
+		opacity: 0;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
 	.ds-tip[data-rarity='legendary']::before,
 	.ds-tip[data-rarity='legendary']::after,
-	.ds-tip[data-rarity='legendary'] .ds-tip-title {
+	.ds-tip[data-rarity='legendary'] .ds-tip-title,
+	.ds-tip[data-rarity='unique']::before,
+	.ds-tip[data-rarity='unique'] .ds-tip-title,
+	.ds-tip-flames::before,
+	.ds-tip-flames::after,
+	.ds-tip-flames i {
 		animation: none;
 	}
 }
@@ -5226,8 +5437,8 @@ button.ds-income-head:hover {
 }
 
 .ds-rank-sk-art {
-	width: 72px;
-	height: 72px;
+	width: 67px;
+	height: 67px;
 }
 
 .ds-rank-sk-name {
@@ -5239,4 +5450,15 @@ button.ds-income-head:hover {
 /* the level in a monster tooltip's header once it cannot grow any more */
 .ds-tip-grown {
 	color: #5ee07a;
+}
+
+.ds-quick-grades {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.ds-quick-grade {
+	white-space: nowrap;
+	border-left: 6px solid var(--grade, transparent);
 }

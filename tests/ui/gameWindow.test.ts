@@ -89,7 +89,20 @@ test('the Crafting tab shows the level bar, the queue, the recipe categories and
 	const { default: HeroCrafting } = await import('../../src/components/game/hero/HeroCrafting');
 	reset();
 	const out = renderToStaticMarkup(h(HeroCrafting));
-	for (const word of ['Crafting level', 'Queue 0', 'Weapons', 'Armor', 'Other', 'Legendary', 'Cost', 'Amount', 'XP']) {
+	for (const word of [
+		'Crafting level',
+		'Queue 0',
+		'Weapons',
+		'Armor',
+		'Potions',
+		'Jewelry',
+		'Components',
+		'Legendary',
+		'Search recipes',
+		'Cost',
+		'Amount',
+		'XP',
+	]) {
 		assert.ok(out.includes(word), `the tab shows "${word}"`);
 	}
 	assert.match(out, /ds-craft-ticket/);
@@ -123,7 +136,7 @@ test('the Merchant Goods tab: the shelf with its restock, your bag with the filt
 		'Quick sell',
 		'Sell junk',
 		'Sell common',
-		'Up to uncommon',
+		'Sell up to uncommon',
 		'Sell everything shown',
 		'Auto-sell new gear up to',
 	]) {

@@ -268,7 +268,7 @@ const record = () => {
 	return calls;
 };
 
-test('hotkeys, switches and dismissals are requests to the server: a key per press, nothing about damage or HP', async () => {
+test('hotkeys and switches are requests to the server: a key per press, nothing about damage or HP', async () => {
 	syncedGame();
 	store.setState({ prestige: { ...api().prestige, rebirths: 1 } }); // auto-use is a reward for the first rebirth
 	store.setState({ monsters: [makeMonster({ id: 3, level: 1, x: CASTLE_X + 2, y: CASTLE_Y, ticket: 3 })] });
@@ -280,18 +280,15 @@ test('hotkeys, switches and dismissals are requests to the server: a key per pre
 		api().setAutoBattle(false);
 		assert.equal(api().combat.autoBattle, false, 'the switch shows at once');
 		api().setAutoUse(false);
-		assert.equal(api().dismissMonster(3), true);
-		assert.equal(api().monsters.length, 0);
 		await flush();
 		assert.deepEqual(
 			calls.map((c) => c.body.action),
-			['use', 'use', 'auto', 'auto', 'dismiss'],
+			['use', 'use', 'auto', 'auto'],
 		);
 		assert.deepEqual(calls[0].body.command, { kind: 'potion', id: 'potion_minor' });
 		assert.deepEqual(calls[1].body.command, { kind: 'skill', id: 'heal' });
 		assert.match(String(calls[0].body.key), /^[A-Za-z0-9_-]{8,64}$/);
 		assert.notEqual(calls[0].body.key, calls[1].body.key, 'every press has its own key');
-		assert.equal(calls[4].body.n, 3);
 		for (const call of calls) assert.equal(call.path, '/api/fight');
 		for (const call of calls)
 			assert.deepEqual(

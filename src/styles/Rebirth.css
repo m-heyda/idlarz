@@ -1,0 +1,224 @@
+/* The Rebirth window: two tabs (Rebirth, Ember shop), cards for the requirements and the next rebirth, and the Ember shop as upgrade tiles */
+.rb-root {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	min-width: 0;
+}
+.rb-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	min-width: 0;
+}
+.rb-card {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+	padding: 12px 14px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--ds-line, #3a2c1c);
+}
+.rb-stats {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+}
+.rb-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+	padding: 10px 8px;
+	background: rgba(0, 0, 0, 0.3);
+	border: 1px solid var(--ds-line, #3a2c1c);
+}
+.rb-stat-label {
+	font-size: 0.72rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #a89878;
+}
+.rb-stat-value {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 1.25rem;
+}
+.rb-text,
+.rb-note {
+	margin: 0;
+	color: #d8c8a0;
+}
+.rb-note {
+	font-size: 0.78rem;
+	color: #a89878;
+}
+.rb-note-center {
+	text-align: center;
+}
+.rb-reqs {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.rb-req {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-items: center;
+	gap: 6px 8px;
+	padding: 10px 12px;
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(255, 122, 106, 0.4);
+	border-top-width: 3px;
+	color: #ff9a8c;
+}
+.rb-req[data-met='true'] {
+	border-color: rgba(94, 224, 122, 0.4);
+	color: #5ee07a;
+}
+.rb-check {
+	display: grid;
+	place-items: center;
+	width: 18px;
+	font-size: 1.3rem;
+	font-weight: 700;
+	line-height: 1;
+	color: #ff7a6a;
+	text-shadow: 0 0 8px rgba(255, 122, 106, 0.45);
+}
+.rb-req[data-met='true'] .rb-check {
+	color: #5ee07a;
+	text-shadow: 0 0 8px rgba(94, 224, 122, 0.45);
+}
+.rb-req-label {
+	min-width: 0;
+	font-size: 0.85rem;
+	color: #ecdcb4;
+}
+.rb-req-now {
+	grid-column: 1 / -1;
+	font-size: 1.2rem;
+	font-variant-numeric: tabular-nums;
+}
+.rb-req-bar {
+	grid-column: 1 / -1;
+	height: 5px;
+	background: rgba(255, 255, 255, 0.08);
+}
+.rb-req-bar i {
+	display: block;
+	height: 100%;
+	background: currentColor;
+}
+.rb-gain {
+	display: grid;
+	grid-template-columns: repeat(2, minmax(0, 1fr));
+	gap: 8px;
+}
+.rb-gain-cell {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	gap: 2px;
+	padding: 10px 12px;
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.rb-gain-value {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 1.3rem;
+}
+.rb-gain-sub {
+	font-size: 0.72rem;
+	color: #a89878;
+}
+.rb-shop-head {
+	flex-direction: row;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	flex-wrap: wrap;
+}
+.rb-embers {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	margin-left: 6px;
+	color: #86efac;
+}
+
+.rb-unlocks {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.rb-unlock-list {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	gap: 8px;
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.rb-unlock {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	padding: 12px 10px;
+	text-align: center;
+	font-size: 0.85rem;
+	color: #ecdcb4;
+	background: rgba(0, 0, 0, 0.25);
+	border: 1px solid rgba(240, 210, 122, 0.3);
+}
+.rb-unlock .ds-dim {
+	font-size: 0.74rem;
+}
+.rb-unlock-art {
+	flex: none;
+	width: 88px;
+	height: 88px;
+	image-rendering: pixelated;
+}
+.rb-unlock-dot {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 88px;
+	height: 88px;
+	background: radial-gradient(closest-side, rgba(240, 210, 122, 0.18), transparent);
+	border: 1px solid rgba(240, 210, 122, 0.25);
+}
+.rb-unlock-dot i {
+	width: 22px;
+	height: 22px;
+	background: #f0d27a;
+	transform: rotate(45deg);
+	box-shadow: 0 0 12px rgba(240, 210, 122, 0.6);
+}
+
+/* narrow window: the cards sit one under another */
+.rb-root {
+	container-type: inline-size;
+}
+@container (max-width: 640px) {
+	.rb-reqs,
+	.rb-unlock-list {
+		grid-template-columns: minmax(0, 1fr);
+	}
+}
+
+.rb-shop-cat {
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+}

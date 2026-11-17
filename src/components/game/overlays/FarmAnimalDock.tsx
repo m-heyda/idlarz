@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, HoverTip } from '../../../../packages/design-system/src/components/primitives';
-import { HintTooltip, TipCostList, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
+import { TipCostList, TipLine, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { compact } from '../../../../packages/design-system/src/logic';
 import { RESOURCES } from '@/catalog';
 import { ANIMALS, FARM_UPGRADES } from '@/config/farm';
@@ -43,7 +43,7 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 	const cost = calculateAnimalCost(animal, owned);
 	const penMaxed = farmUpgradeLevel(upgrades, 'pen') >= FARM_UPGRADES.pen.maxLevel;
 	const canBuy = !full && food >= cost;
-	const reason = full ? (penMaxed ? 'The pen is as big as it gets.' : 'Pen full: expand it below.') : 'Not enough food.';
+	const reason = full ? (penMaxed ? 'The pen is as big as it gets.' : 'Pen full: expand it below.') : '';
 
 	return (
 		<div
@@ -78,7 +78,7 @@ const AnimalRow: React.FC<AnimalRowProps> = ({ animal, owned, upgrades, food, on
 				tip={
 					<Tooltip icon={resourceIconUrl('food')} title={`Buy ${animal.name}`} className='ds-tip-compact'>
 						<TipCostList costs={[{ label: RESOURCES.food.label, icon: resourceIconUrl('food'), have: food, cost, text: compact(cost) }]} />
-						{canBuy ? null : <HintTooltip title='' text={reason} tone='bad' />}
+						{full ? <TipLine tone='red'>{reason}</TipLine> : null}
 					</Tooltip>
 				}
 			>

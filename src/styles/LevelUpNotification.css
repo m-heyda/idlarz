@@ -183,18 +183,15 @@
 		lu-bob 2.4s steps(4) 1s infinite alternate;
 }
 
-.lu-orb .level-orb {
-	filter: none;
-}
-
-.lu-orb .level-orb-num {
-	text-shadow:
-		6px 0 0 #10042c,
-		-6px 0 0 #10042c,
-		0 6px 0 #10042c,
-		0 -6px 0 #10042c,
-		0 12px 0 #10042c;
-	color: #fff6c8;
+.lu-num {
+	display: block;
+	font-size: 150px;
+	line-height: 1;
+	font-weight: 900;
+	color: #a855f7;
+	-webkit-text-stroke: 6px #10042c;
+	paint-order: stroke fill;
+	text-shadow: 0 8px 0 #10042c;
 }
 
 @keyframes lu-pop {

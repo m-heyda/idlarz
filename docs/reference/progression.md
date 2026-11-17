@@ -302,7 +302,7 @@ The biome a rebirth unlocks, with what its tiles make, for the small modal shown
 
 ### `rebirthRunSummary` <small>function</small>
 
-Source: [`src/utils/game/rebirthUnlocks.ts:102`](../../src/utils/game/rebirthUnlocks.ts)
+Source: [`src/utils/game/rebirthUnlocks.ts:125`](../../src/utils/game/rebirthUnlocks.ts)
 
 The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. The Embers gained are read from the two prestige states
 (what the player really got, whether the server or the browser named the amount), never recomputed here.
@@ -1056,7 +1056,7 @@ Stored on `profiles.name_color` like a plain colour; the look of each is the `.d
 
 ### `badgeOptions` <small>function</small>
 
-Source: [`src/catalog/badges.ts:56`](../../src/catalog/badges.ts)
+Source: [`src/catalog/badges.ts:50`](../../src/catalog/badges.ts)
 
 Badges and titles of a profile. Every achievement has a badge picture, so the badges a player may wear are the achievements it has earned; a title is the `titleId` of an earned achievement.
 The choice lives on the profile (`badge_id`, `title_id`, written by the server after `checkBadgeChoice`): `null` badge = the default, `BADGE_NONE` = hidden.

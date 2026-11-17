@@ -88,7 +88,7 @@ export type EquipmentSlot =
 	| 'mainHand'
 	| 'offHand';
 
-export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
+export type EquipmentRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' | 'unique';
 
 export type ItemKind = 'weapon' | 'offhand' | 'armor' | 'accessory' | 'consumable';
 
@@ -472,7 +472,6 @@ export interface GameState {
 	applyServerPrestige: (prestige: PrestigeState) => void;
 	applyFightReply: (reply: FightReply) => void;
 	clearCombatNotice: () => void;
-	dismissMonster: (id: number) => boolean; // takes a monster off the map, no loot; the server ends the fight against it
 	equipItem: (bagIndex: number) => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;

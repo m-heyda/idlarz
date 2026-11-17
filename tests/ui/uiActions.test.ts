@@ -28,28 +28,6 @@ const withMonsters = (...monsters: Partial<Monster>[]) => {
 	});
 };
 
-test('dismissMonster removes the monster with no loot or XP', () => {
-	withMonsters({}, { id: 2, type: 'bossGreatAuroch', level: 15, spawnLevel: 15 });
-	const before = { ...api().resources };
-	const bag = api().bag;
-	assert.equal(api().dismissMonster(1), true);
-	assert.deepEqual(
-		api().monsters.map((m) => m.id),
-		[2],
-	);
-	assert.deepEqual(api().resources, before);
-	assert.equal(api().bag, bag);
-	assert.equal(api().dismissMonster(1), false, 'already gone');
-	assert.equal(api().dismissMonster(99), false, 'unknown id');
-});
-
-test('dismissing the monster that is being fought is allowed: the server ends that fight', () => {
-	withMonsters({}, { id: 2 });
-	openFight({ n: 1 });
-	assert.equal(api().dismissMonster(1), true, 'the server ends the fight against a dismissed monster');
-	assert.equal(api().monsters.length, 1);
-});
-
 test('discardItem throws bag items away without paying gold, and never touches equipment', () => {
 	freshGame();
 	const bag: BagSlot[] = emptyBag();
@@ -109,9 +87,6 @@ test('ui store: dialogs close the menu, confirmations track their target, prefs 
 	assert.equal(useUiStore.getState().contextMenu, null);
 	assert.equal(useUiStore.getState().discardIndex, 2);
 	ui.askDiscard(null);
-	ui.askDismissMonster(4);
-	assert.equal(useUiStore.getState().dismissMonsterId, 4);
-	ui.askDismissMonster(null);
 	ui.askDiscard(2);
 	assert.equal(useUiStore.getState().discardIndex, 2);
 	ui.askDiscard(null);

@@ -619,3 +619,39 @@ export const Badge = NotifyBadge;
 
 /** A group of resource chips sharing one dark tray, so tiers (money, base materials, farm goods) read as sets. */
 export const ChipGroup: React.FC<{ children: React.ReactNode }> = ({ children }) => <span className='ds-chipgroup'>{children}</span>;
+
+/**
+ * A search box: a text field with a magnifier and a clear button. Controlled; it never decides what is filtered, the caller does.
+ * Sticks to the top of a scrolling list (`ds-search`), so the phrase stays in view.
+ */
+export const SearchInput: React.FC<{ value: string; onChange: (value: string) => void; placeholder?: string; label: string }> = ({
+	value,
+	onChange,
+	placeholder,
+	label,
+}) => (
+	<div className='ds-search'>
+		<input
+			type='search'
+			className='ds-search-field'
+			value={value}
+			placeholder={placeholder}
+			aria-label={label}
+			autoComplete='off'
+			spellCheck={false}
+			onChange={(event) => onChange(event.target.value)}
+			onKeyDown={(event) => {
+				// Esc clears the phrase first; with nothing typed it keeps closing the window as usual
+				if (event.key === 'Escape' && value) {
+					event.stopPropagation();
+					onChange('');
+				}
+			}}
+		/>
+		{value ? (
+			<button type='button' className='ds-search-clear' aria-label='Clear the search' onClick={() => onChange('')}>
+				x
+			</button>
+		) : null}
+	</div>
+);

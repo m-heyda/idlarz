@@ -102,7 +102,6 @@ export const Monsters: Story = {
 				boss
 				defeated={3}
 				growth='Fully grown'
-				bossLine='Crits 8%, resists Stun 40%. Beat it within 90 seconds'
 				cta='In the queue (2)'
 				wip
 			/>

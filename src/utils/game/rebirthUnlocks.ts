@@ -2,7 +2,7 @@
 import { BIOMES, REBIRTH_BIOME_OUTPUT } from '@/config/biomes';
 import { BIOME_RULES } from '@/config/biomeRules';
 import { BIOME_YIELD } from '@/config/economy';
-import { MONSTERS } from '@/config/combatConfig';
+import { COMBAT, MONSTERS } from '@/config/combatConfig';
 import { REBIRTH } from '@/config/rebirth';
 import { emberIncomeBonus } from '@/utils/game/rebirth';
 import type { PrestigeState } from '@/types/game';
@@ -53,6 +53,29 @@ export function rebirthUnlockIntro(rebirths: number): RebirthUnlockIntro | null 
 		monsters: monstersUnlockedAt(rebirths),
 		note: REBIRTH_UNLOCK_NOTE,
 	};
+}
+
+/** One line of the Rebirth window's "You also unlock" list */
+export interface RebirthUnlockLine {
+	id: string;
+	label: string;
+	/** A short second line (what it is, or the biome's output) */
+	detail?: string;
+	/** Picture of a new biome */
+	art?: string;
+}
+
+/**
+ * Everything the rebirth with this number (1 = the first) unlocks, as a flat list for the Rebirth window: auto-battle, auto-use of potions and skills (the rebirths named by
+ * `COMBAT.auto`) and the new biome (`BIOME_RULES.unlockAfterRebirths`). Empty when that rebirth unlocks nothing.
+ */
+export function rebirthUnlockList(rebirths: number): RebirthUnlockLine[] {
+	const list: RebirthUnlockLine[] = [];
+	if (COMBAT.auto.minRebirths === rebirths) list.push({ id: 'auto-battle', label: 'Auto-battle', detail: 'Fights the next monster for you' });
+	if (COMBAT.auto.useMinRebirths === rebirths) list.push({ id: 'auto-use', label: 'Auto potions and skills', detail: 'Uses them in a fight on its own' });
+	const biome = rebirthUnlockIntro(rebirths);
+	if (biome) list.push({ id: `biome-${biome.biome}`, label: `New land: ${biome.label}`, detail: `x${biome.multiplier} output`, art: biome.biome });
+	return list;
 }
 
 /** What the browser knew the moment before a rebirth wiped the run (`RebirthDialog` captures it). */

@@ -20480,21 +20480,6 @@
 	},
 	{
 		"usedBy": [
-			"AdminMark"
-		],
-		"name": "badge_laptop",
-		"category": "ui",
-		"subcategory": "admin mark (8 frame sprite sheet)",
-		"src": "/pixel/ui/admin/badge_laptop.png",
-		"status": "used",
-		"source": "ui/admin",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
 			"src/components/game/AmbientLife.tsx"
 		],
 		"name": "bonus_bee",

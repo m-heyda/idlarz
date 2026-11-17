@@ -485,6 +485,12 @@
 	padding-top: 30px;
 }
 
+/* a won fight has no monster bar on the stage any more: the top padding that made room for it goes */
+.combat-widget .combat-stage[data-dead='true'] {
+	padding-top: 12px;
+	min-height: 130px;
+}
+
 .fight-monster-bar {
 	position: absolute;
 	top: 8px;
@@ -510,7 +516,7 @@
 }
 
 .fight-hotbar {
-	--ds-slot-size: 36px;
+	--ds-slot-size: 40px;
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
@@ -519,22 +525,28 @@
 
 .fight-skill-group {
 	display: flex;
+	align-items: flex-start;
 	gap: 8px;
 	margin-left: auto;
 }
 
 .combat-widget .fight-skill {
 	flex: none;
-	width: 36px;
-	height: 36px;
+	width: 40px;
+	height: 40px;
 	padding: 0;
 	display: grid;
 	place-items: center;
 }
 
 .fight-skill-icon {
-	width: 24px;
-	height: 24px;
+	width: 26px;
+	height: 26px;
+}
+
+/* potions are item slots (a 48px frame): scaled down to 42px so they stay a little bigger than the 40px skills */
+.fight-hotbar .inv-slot {
+	zoom: 0.875;
 }
 
 .fight-skill .fight-hotkey,
@@ -576,4 +588,28 @@
 
 .victory-loot {
 	--ds-slot-size: 32px;
+}
+
+/* the loot of a won fight, about 10% smaller than a bag slot */
+.victory-loot .inv-slot {
+	zoom: 0.9;
+}
+
+/* a skill with its mana cost under the icon */
+.fight-skill-wrap {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 2px;
+}
+
+.fight-skill-cost {
+	font-size: 0.62rem;
+	line-height: 1;
+	letter-spacing: 0.04em;
+	color: #7fb8ff;
+}
+
+.fight-skill-cost[data-short='true'] {
+	color: #ff7a6a;
 }
