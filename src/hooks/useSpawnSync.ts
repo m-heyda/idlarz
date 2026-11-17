@@ -11,6 +11,8 @@ import { currentCloudSaver } from '@/lib/manualCloudSave';
 const MIN_WAIT_SEC = 20;
 const MAX_WAIT_SEC = 600;
 const RETRY_SEC = 60;
+/** The longest the map stays grey while it waits for the first answer */
+const MAP_REVEAL_MAX_MS = 8000;
 
 /**
  * The one poll of the game. The server decides when a chest or a monster has appeared, where the monster stands, and how every fight
@@ -34,6 +36,9 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 		let running = false;
 		let timer: ReturnType<typeof setTimeout> | undefined;
 		let spawnDueAt = Infinity; // when the next spawn is due by this browser's clock (epoch ms)
+		// the map shows grey with a spinner until the first answer has put the monsters and chests on it (or a few seconds have passed: the map must never stay grey)
+		useUiStore.getState().setMapReady(false);
+		const revealTimer = setTimeout(() => useUiStore.getState().setMapReady(true), MAP_REVEAL_MAX_MS);
 
 		const schedule = (sec: number) => {
 			clearTimeout(timer);
@@ -47,6 +52,7 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 				if (stopped) return;
 				if (reply.status === 'ok') {
 					useGameStore.getState().applyServerTickets(reply.value);
+					useUiStore.getState().setMapReady(true);
 					if (!attrsSynced) {
 						attrsSynced = true;
 						void useGameStore.getState().syncServerAttrs();
@@ -89,6 +95,7 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 		return () => {
 			stopped = true;
 			clearTimeout(timer);
+			clearTimeout(revealTimer);
 			setNeedClaimHandler(null);
 			setPollHandler(null);
 			document.removeEventListener('visibilitychange', onVisible);

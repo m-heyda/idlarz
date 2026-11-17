@@ -21516,6 +21516,36 @@
 	},
 	{
 		"usedBy": [
+			"src/catalog/skills.ts"
+		],
+		"name": "skill_heal",
+		"category": "ui",
+		"subcategory": "skill",
+		"src": "/pixel/icons/skill_heal.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/skills.ts"
+		],
+		"name": "skill_stun",
+		"category": "ui",
+		"subcategory": "skill",
+		"src": "/pixel/icons/skill_stun.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
 			"src/components/game/Tile.tsx",
 			"src/lib/cloudClient.ts",
 			"src/lib/offline/achievements.ts"

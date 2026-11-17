@@ -254,6 +254,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
+- [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
@@ -406,7 +407,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`useRememberedOpen.ts`](../../src/hooks/useRememberedOpen.ts) — ~ Whether a folding block is open, remembered per `id` in this browser (the same keys the old Character window used, so a player's choices carry over).
 - [`useRestCountdown.ts`](../../src/hooks/useRestCountdown.ts) — ~ "1 min 12 s" or "45 s"
 - [`useSingleTab.ts`](../../src/hooks/useSingleTab.ts) — ~ Only one tab may run the game.
-- [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The one poll of the game.
+- [`useSpawnSync.ts`](../../src/hooks/useSpawnSync.ts) — ~ The longest the map stays grey while it waits for the first answer
 - [`useTipDismiss.ts`](../../src/hooks/useTipDismiss.ts) — ~ Keeps a hover tooltip from outliving its reason:
 
 **src/lib/**

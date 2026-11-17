@@ -21,7 +21,7 @@ import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog'
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
 import { badgePicSrc, shownBadge, shownTitle } from '@/catalog/badges';
 import { COMPONENTS } from '@/catalog/recipes';
-import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
+import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { MERCHANT_GOODS, MERCHANT_UPGRADES } from '@/config/merchant';
 import { MAX_LEVEL } from '@/config/character';
@@ -119,8 +119,9 @@ const SkillSlot: React.FC<{ id: (typeof SKILL_IDS)[number] }> = ({ id }) => {
 	return (
 		<HoverTip tip={<HintTooltip title={skill.name} text={`${skillDescription(skill)} (${detail})`} />}>
 			<Slot
-				label={skill.name}
-				sub={locked ? `Lv ${skill.unlockLevel}` : cd > 0 ? `${cd} s` : `${skill.manaCost} MP`}
+				icon={SKILL_ICONS[id]}
+				aria-label={skill.name}
+				caption={locked ? `Lv ${skill.unlockLevel}` : cd > 0 ? `${cd} s` : `${skill.manaCost} MP`}
 				locked={locked}
 				disabled={locked || skill.fightOnly}
 				onClick={() => requestSkill(id)}

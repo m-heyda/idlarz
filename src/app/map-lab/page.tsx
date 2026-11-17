@@ -73,6 +73,9 @@ const MapLab: React.FC = () => {
 		return () => window.removeEventListener('keydown', onKey);
 	}, []);
 
+	// the lab has no server to wait for: the map is in colour at once
+	useEffect(() => useUiStore.getState().setMapReady(true), []);
+
 	return (
 		<MapSourceProvider value={source}>
 			<Grid />

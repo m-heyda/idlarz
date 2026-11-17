@@ -39,6 +39,9 @@ import CastleRange from './CastleRange';
 import TerrainLayer from './TerrainLayer';
 import WaterLayer from './WaterLayer';
 import HighlightLayer from './HighlightLayer';
+import MapLoadingOverlay from './MapLoadingOverlay';
+import { useUiStore } from '@/stores/uiStore';
+import '@/styles/MapLoading.css';
 
 interface Velocity {
 	x: number;
@@ -239,6 +242,7 @@ const Grid: React.FC = () => {
 	// Which tiles are on screen right now (read by the ambient critters when they pick a spot)
 	const [tipLayer, setTipLayer] = useState<HTMLElement | null>(null);
 	const viewportRef = useRef<Viewport>({ minX: 0, maxX: 0, minY: 0, maxY: 0 });
+	const mapReady = useUiStore((state) => state.mapReady);
 	const size = { w: windowW, h: windowH };
 	viewportRef.current = visibleTileRange({ x: viewX, y: viewY }, zoom, size);
 	const getViewport = useCallback(() => viewportRef.current, []);
@@ -269,7 +273,8 @@ const Grid: React.FC = () => {
 			ref={gridRef}
 			data-click-area
 			data-tutorial='map'
-			className='fixed inset-0 overflow-hidden bg-gray-950'
+			className='fixed inset-0 overflow-hidden bg-gray-950 map-root'
+			data-map-ready={mapReady}
 			onMouseDown={handleMouseDown}
 			onMouseMove={handleMouseMove}
 			onMouseUp={handleMouseUp}
@@ -304,6 +309,7 @@ const Grid: React.FC = () => {
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 			<HighlightLayer />
+			<MapLoadingOverlay show={!mapReady} />
 		</div>
 	);
 };

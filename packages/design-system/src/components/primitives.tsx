@@ -191,6 +191,8 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	active?: boolean;
 	/** A small level tag in the bottom left corner (the crafting level a recipe needs) */
 	levelBadge?: number | string;
+	/** A short line along the bottom of the slot, over the picture (a skill's mana cost, cooldown or unlock level) */
+	caption?: string;
 	/** Text inside an icon-less slot (a skill name) */
 	label?: string;
 	sub?: string;

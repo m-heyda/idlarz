@@ -3,7 +3,7 @@ import { monsterNameOf } from '@/stores/bestiaryStore';
 import { formatCompact, formatNumber, tidy } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
-import { SKILLS, SKILL_IDS, skillDescription } from '@/catalog/skills';
+import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
 import { SLASH_FRAME, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
@@ -246,6 +246,8 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 									data-nomana={!locked && player.mp < skill.manaCost}
 									title={`${skill.name}: ${skillDescription(skill)} (${locked ? `unlocks at level ${skill.unlockLevel}` : `${skill.manaCost} mana, ${skill.cooldownSec} s cooldown`}). Press ${(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i} or click.`}
 								>
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img className='fight-skill-icon' src={SKILL_ICONS[id]} alt='' draggable={false} />
 									<span className='fight-skill-name'>{skill.name}</span>
 									<span className='fight-skill-cost'>{locked ? `Lv ${skill.unlockLevel}` : `${skill.manaCost} MP`}</span>
 									<span className='fight-hotkey'>{(p.potionSlots ?? COMBAT.potionBaseSlots) + 1 + i}</span>
