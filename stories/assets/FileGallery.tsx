@@ -4,7 +4,7 @@ import { useTrashMarks } from './trashMarks';
 export interface FileEntry {
 	/** URL the picture is served from */
 	src: string;
-	/** Stable repo path, shown on the card and used as the trash mark (`/pixel/bg/x.png`, `art_style_reference/farm/y.png`) */
+	/** Stable repo path, shown on the card and used as the trash mark (`/pixel/bg/x.png`) */
 	id: string;
 	/** Group to filter by (the sub-folder) */
 	group: string;

@@ -175,7 +175,7 @@ get a generated name (`<pack>_<file>`, e.g. `tree_autumn_tree1`), with shadow re
 Source: [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts)
 
 The NPC portraits: 12 small bust pictures (48x48, transparent, Sprite Fusion) in `public/pixel/portraits/`, named `npc_<who>`. They are NOT the 40x40 bust frame of
-the avatars in `art_style_reference/ui-and-portraits/README.md`: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
+the avatars: keep them at their own size, drawn with `image-rendering: pixelated` (class `pixelated`).
 None is shown in the game right now (the Merchant window dropped its per-tab face); they stay in the asset library (category Portraits) as ready faces for
 a future quest giver, innkeeper, blacksmith or dialogue.
 

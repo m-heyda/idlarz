@@ -3,7 +3,7 @@
   python scripts/pixel/palette_swap.py SRC.png S1 OUT.png [--ramp 1]      one file
   python scripts/pixel/palette_swap.py --batch [OUTDIR]                   the first batch + a contact sheet (64/40/20 px on map green)
 
-Ramps: art_style_reference/equip/README.md section 5.1 (S1 Sunhoney, S2 Ashen Warlord, S3 Blightbound), five tones light to dark;
+Ramps: (S1 Sunhoney, S2 Ashen Warlord, S3 Blightbound), five tones light to dark;
 the last tone is the 1 px outline, the first four shade the body. --ramp picks the ramp of the set (0 = main, 1 = second, 2 = third).
 Rules: no dither, hard alpha, the outline is kept as an outline (opaque pixels that touch transparency), body colours are ranked by
 luminance (pixel-weighted) and spread over the four body tones. Nothing is registered here: copy the result to public/pixel/items/<slot>/

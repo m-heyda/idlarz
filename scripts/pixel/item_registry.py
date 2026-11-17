@@ -5,7 +5,7 @@ The same files are read by src/config/pixelIcons.ts, so an icon is wired in exac
   file = null             a 40 px icon the build draws (sprites_gear.py) into public/pixel/icons/<icon>.png
 
   python scripts/pixel/item_registry.py            validate against the build's sprite list
-  python scripts/pixel/item_registry.py --provenance   print the provenance lines for art_style_reference/equip/README.md"""
+  python scripts/pixel/item_registry.py --provenance   print the provenance lines"""
 import glob
 import json
 import os

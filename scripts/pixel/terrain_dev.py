@@ -5,7 +5,7 @@ so they are built into public/pixel/terrain and src/config/terrainAtlas.json lik
 decided only by src/config/biomeStage.ts (dev = map lab only). The draw order and hash ids are in terrain_logic.py.
 
 Art sources: every ground, rim and the Jungle / Fields / Orchard / Blight props are drawn here and in terrain_dev_sprites.py
-in the style of terrain_props.py; the Battlefield props are cut from art_style_reference/biomes by cut_biome_refs.py.
+in the style of terrain_props.py.
 Concepts: Jungle = river-cut teal rainforest with palms, bamboo, banyans and exotic flowers; Fields = a patchwork of farm plots;
 Orchard = blossom trees in six shapes and five colours; Blight = a violet spore wasteland of giant mushrooms and amethyst crystal;
 Battlefield = churned mud with graves and bones.

@@ -6,7 +6,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 
 ## How to use it with an agent
 
-- **Use an asset:** "use `building_village_blacksmith_house` for the Blacksmith". The agent finds the file in `manifest.json` (`src`), copies it into the game folder and registers it (`src/config/pixelIcons.ts` or `src/config/itemIcons/`; rules in `art_style_reference/README.md`).
+- **Use an asset:** "use `building_village_blacksmith_house` for the Blacksmith". The agent finds the file in `manifest.json` (`src`), copies it into the game folder and registers it (`src/config/pixelIcons.ts` or `src/config/itemIcons/`).
 - **Delete an asset:** "delete `potion_pack_07`". Only `reuse` and `spare` assets are safe to delete outright; for a `used`, `planned` or `retired` asset the agent first switches the catalog entry to another picture (never delete a wired file before its replacement is wired).
 - **Rename:** add `"<src as in manifest.json>": "new_name"` to `scripts/assets/names.json` and run `npm run assets:catalog`.
 - **Map details:** pack objects come in up to four renderings of the same object (`none`, `shadow`, `texture`, `texture-dark`); the page lists them as `variants`. Pick the one that sits on your ground.

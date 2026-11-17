@@ -12,7 +12,7 @@ import { RESERVE_ITEMS } from './reuse';
 import { WOODEN_ITEMS } from './starter';
 import { STEEL_ITEMS } from './steel';
 
-// The grade ladder (IDL-37, 38, 39, 142; art_style_reference/equip/README.md sections 3-5): 9 normal grades G1-G9 and three special
+// The grade ladder (IDL-37, 38, 39, 142): 9 normal grades G1-G9 and three special
 // sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (docs/plan/26-next-updates-plan.md). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
 //
 // Where a ladder cell already exists as a live item (Iron Sword, the Steel pieces, the Obsidian family, Emberbrand) the live item
@@ -122,7 +122,7 @@ const forGrade = (grade: Grade, perIndex: PerIndex): PerIndex => {
 	return armor || maxHp ? { ...rest, luck: 0.15 } : rest;
 };
 
-// ---- the names (working titles from art_style_reference/equip/README.md section 4) ------------------------------------------
+// ---- the names (working titles) ------------------------------------------
 const list = (text: string): string[] => text.split(',').map((n) => n.trim());
 
 /** Per armour cell: G1..G9 then S1..S3 */

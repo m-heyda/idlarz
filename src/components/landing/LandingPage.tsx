@@ -368,10 +368,13 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 								align='center'
 								fill
 								tip={
-									<HintTooltip title='Coming soon' text='Play as a guest with limited features, no account needed. Make an account any time to keep going.' />
+									<HintTooltip
+										title='Coming soon'
+										text='A guest game is only for trying the game out. It is not shown in the rankings, and a play that is verified by the server needs an account.'
+									/>
 								}
 							>
-								<Button disabled aria-disabled='true' style={{ width: '100%', minHeight: 44 }}>
+								<Button disabled aria-disabled='true'>
 									Play as guest
 								</Button>
 							</HoverTip>

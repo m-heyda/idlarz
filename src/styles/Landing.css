@@ -320,9 +320,32 @@
 	justify-content: center;
 }
 
-/* the Play as guest button under the account window (logged out only; disabled until the guest mode exists) */
+/* the Play as guest button under the account window: full width and easy to read, but not wired to anything yet (a not-allowed cursor over it) */
 .ld-guest {
+	width: 100%;
 	margin-top: 14px;
+}
+
+.ld-guest .ds-hovertip,
+.ld-guest [data-fill] {
+	display: flex;
+	width: 100%;
+	cursor: not-allowed;
+}
+
+.ld-guest .ds-btn {
+	width: 100%;
+	min-height: 52px;
+	font-size: 1.05rem;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: #f4e3b0;
+	background: rgba(12, 10, 8, 0.92);
+	opacity: 1;
+	cursor: not-allowed;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 4px 14px rgba(0, 0, 0, 0.55);
 }
 
 /* the loading state: a ring of eight gold pixels whose brightness chases round in steps (pixel-art spinner), with a line of text under it */
