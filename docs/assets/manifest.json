@@ -38894,6 +38894,123 @@
 	},
 	{
 		"usedBy": [],
+		"name": "reuse_skills_chain_orbs",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/chain_orbs.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_comet",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/comet.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_evil_eye",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/evil_eye.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_flame_hand",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/flame_hand.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_green_swirl",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/green_swirl.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_jade_spire",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/jade_spire.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_starburst",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/starburst.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_void_meteor",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/void_meteor.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_skills_whirlwind",
+		"category": "unsorted",
+		"subcategory": "skills",
+		"src": "/pixel/__reuse/skills/whirlwind.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "loose_to_organize_battlegrounds_biom",
 		"category": "unsorted",
 		"subcategory": "to_organize (not named by the code)",

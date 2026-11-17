@@ -57,11 +57,17 @@ const OfflineDialog: React.FC = () => {
 	const [awayOpen, setAwayOpen] = useState<boolean | null>(null);
 	const [dailyOpen, setDailyOpen] = useState<boolean | null>(null);
 	const [eventsOpen, setEventsOpen] = useState<boolean | null>(null);
+	// the daily block shows only when today's bonus could be claimed from this window: it was claimable when the window opened, and stays (folded) once claimed here
+	const [dailyOffered, setDailyOffered] = useState(false);
 	const reportOpen = report !== null;
 
 	useEffect(() => {
 		if (reportOpen) void useGemStore.getState().refresh();
+		else setDailyOffered(false);
 	}, [reportOpen]);
+	useEffect(() => {
+		if (reportOpen && daily?.available) setDailyOffered(true);
+	}, [reportOpen, daily?.available]);
 
 	if (!report) return null;
 	const { grant } = report;
@@ -108,15 +114,17 @@ const OfflineDialog: React.FC = () => {
 					</div>
 				)}
 
-				<Section
-					title='Daily bonus'
-					open={dailyIsOpen}
-					onToggle={() => setDailyOpen(!dailyIsOpen)}
-					summary={daily?.available ? 'Ready to claim' : daily ? 'Claimed today' : 'Checking...'}
-					testId='offline-daily'
-				>
-					<DailyBoard bare daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />
-				</Section>
+				{dailyOffered && (
+					<Section
+						title='Daily bonus'
+						open={dailyIsOpen}
+						onToggle={() => setDailyOpen(!dailyIsOpen)}
+						summary={daily?.available ? 'Ready to claim' : daily ? 'Claimed today' : 'Checking...'}
+						testId='offline-daily'
+					>
+						<DailyBoard bare daily={daily} busy={busy} onClaim={() => void useGemStore.getState().claimDaily()} />
+					</Section>
+				)}
 
 				<Section title='What happened' open={eventsIsOpen} onToggle={() => setEventsOpen(!eventsIsOpen)}>
 					<ul className='wb-events'>

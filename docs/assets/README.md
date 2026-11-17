@@ -38,4 +38,4 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Biomes](biomes.md) | 5 | 5 | 0 | 0 |
 | [Equipment sets](sets.md) | 990 | 55 | 0 | 935 |
 | [Map ground and backdrops](map-ground.md) | 78 | 70 | 0 | 8 |
-| [Unsorted cuts](unsorted.md) | 128 | 1 | 0 | 127 |
+| [Unsorted cuts](unsorted.md) | 137 | 1 | 0 | 136 |

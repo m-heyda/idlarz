@@ -14,7 +14,7 @@ import {
 	Stat,
 	Tabs,
 } from '../../../../packages/design-system/src/components/primitives';
-import { CraftStash, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
+import { ComingSoon, CraftStash, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
 import { HintTooltip, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
@@ -489,10 +489,19 @@ const BagTab: React.FC = () => {
 	);
 };
 
-type HeroTab = 'bag' | 'stats' | 'craft';
+type HeroTab = 'bag' | 'stats' | 'skills' | 'craft';
+
+/** The Skills tab for now: a coming-soon screen (the two skills the hero has, Heal and Stun, are on the left under Skills). */
+const SkillsSoon: React.FC = () => (
+	<ComingSoon
+		title='Skills'
+		icon={SKILL_ICONS.heal}
+		text='New abilities and a place to learn and upgrade them are on the way. Heal and Stun, on the left, are what you have for now.'
+	/>
+);
 
 /**
- * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
+ * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats, Skills and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
  */
 const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
@@ -510,6 +519,7 @@ const HeroWindow: React.FC = () => {
 					items={[
 						{ id: 'bag', label: 'Bag' },
 						{ id: 'stats', label: 'Stats', badge: points > 0 ? points : undefined, anchor: tab === 'stats' ? undefined : 'stat-add' },
+						{ id: 'skills', label: 'Skills' },
 						{ id: 'craft', label: 'Crafting' },
 					]}
 				/>
@@ -517,7 +527,9 @@ const HeroWindow: React.FC = () => {
 		>
 			<div className='ds-hero' data-tab={tab}>
 				{tab === 'craft' ? <CraftingSidebar /> : <HeroLeft />}
-				<Panel className='ds-hero-right'>{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : <HeroCrafting />}</Panel>
+				<Panel className='ds-hero-right'>
+					{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : tab === 'skills' ? <SkillsSoon /> : <HeroCrafting />}
+				</Panel>
 			</div>
 		</GameWindow>
 	);
