@@ -85,6 +85,7 @@ export interface TerrainAtlas {
 	sprites: Record<string, [number, number, number, number]>; // id -> x, y, w, h in props.png
 	props: Record<string, PropTable>;
 	decor?: Record<string, PropTable>; // tiny second-pass decorations (flowers, fallen trees)
+	details?: Record<string, { id: string; chance: number }>; // a rare tile-sized detail per ground (a skeleton on the battlefield): `chance` in thousandths per tile, only where the tile and all its neighbours are that ground and it holds no prop
 	water?: { swamp?: [number, number][][]; swamp0?: [number, number][][] }; // spots inside swamp pools (deep texture: ripples; plain texture: bubbles), per 48px block of the 4x4 texture
 }
 export const ATLAS = atlasJson as unknown as TerrainAtlas;
@@ -355,6 +356,18 @@ export function decorSprites(g: GroundSrc, x: number, y: number, props: Placed[]
 	return out;
 }
 
+/**
+ * A rare tile-sized detail (the battlefield's skeleton): `chance` thousandths of the tiles of a ground that has one in `ATLAS.details`, only where the tile and every neighbour are that ground and no prop stands on it.
+ * Its own hash salt, so it never moves a prop or a decoration; a TS-only pass (the Python parity covers props and decor, not this).
+ */
+export function detailSprites(g: GroundSrc, x: number, y: number, props: Placed[], m: TerrainAtlas = ATLAS): Placed[] {
+	const me = at(g, x, y);
+	const detail = me ? m.details?.[me] : undefined;
+	if (!me || !detail || props.length > 0 || hash32(x, y, 900) % 1000 >= detail.chance) return [];
+	if (!fits(g, x, y, [0, 0, CELL, CELL], 1, me)) return [];
+	return [{ id: detail.id, x: x * CELL, bottom: (y + 1) * CELL }];
+}
+
 /** A pier (sometimes with a boat) on a lake tile with exactly one land side; only a local maximum of the roll. */
 export function dockAt(g: GroundSrc, x: number, y: number, m: TerrainAtlas = ATLAS): Placed[] {
 	const eligible = (tx: number, ty: number): [number, number, string] | null => {
@@ -511,7 +524,7 @@ export function allSprites(g: GroundGrid, m: TerrainAtlas = ATLAS, built?: Set<s
 			if (covered.has(coverKey(x, y))) continue; // the landmark stands here
 			const skip = built?.has(`${x},${y}`);
 			const props = skip ? [] : tileSprites(g, x, y, m);
-			items.push(...props, ...(skip ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
+			items.push(...props, ...(skip ? [] : decorSprites(g, x, y, props, m)), ...(skip ? [] : detailSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
 		}
 	items.push(...anchors.map((a) => landmarkSprite(a, m)));
 	return items.sort((a, b) => a.bottom - b.bottom || a.x - b.x);
@@ -613,7 +626,7 @@ export function chunkSprites(world: World, cx: number, cy: number, m: TerrainAtl
 			if (!g(x, y) || covered.has(coverKey(x, y))) continue;
 			const built = isBuilt(getTile(world, x, y));
 			const props = built ? [] : tileSprites(g, x, y, m);
-			items.push(...props, ...(built ? [] : decorSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
+			items.push(...props, ...(built ? [] : decorSprites(g, x, y, props, m)), ...(built ? [] : detailSprites(g, x, y, props, m)), ...dockAt(g, x, y, m));
 		}
 	}
 	items.push(...anchors.map((a) => landmarkSprite(a, m)));

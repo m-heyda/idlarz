@@ -8633,8 +8633,8 @@
 		"status": "used",
 		"source": "monster roster",
 		"size": [
-			64,
-			64
+			68,
+			68
 		]
 	},
 	{
@@ -21059,18 +21059,16 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
-		"name": "ui_daily_chest",
+		"usedBy": [],
+		"name": "ui_daily_gift",
 		"category": "ui",
 		"subcategory": "frames and bars",
-		"src": "/pixel/ui/daily_chest.png",
+		"src": "/pixel/ui/daily_gift.png",
 		"status": "used",
 		"source": "public/pixel/ui",
 		"size": [
-			62,
-			51
+			384,
+			48
 		]
 	},
 	{
@@ -36821,7 +36819,7 @@
 		"source": "pixel/terrain",
 		"size": [
 			1024,
-			465
+			513
 		]
 	},
 	{
@@ -38991,32 +38989,6 @@
 		"size": [
 			32,
 			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_to_organize_battlegrounds_biom",
-		"category": "unsorted",
-		"subcategory": "to_organize (not named by the code)",
-		"src": "/to_organize/battlegrounds_biome_map_detail.png",
-		"status": "unused",
-		"source": "to_organize",
-		"size": [
-			48,
-			48
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_to_organize_gift_sprites",
-		"category": "unsorted",
-		"subcategory": "to_organize (not named by the code)",
-		"src": "/to_organize/gift-sprites.png",
-		"status": "unused",
-		"source": "to_organize",
-		"size": [
-			384,
-			48
 		]
 	},
 	{
