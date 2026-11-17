@@ -14,8 +14,8 @@ import { idolEconomy } from '@/lib/idolEconomy';
 import { castleModifier } from '@/utils/game/castle';
 import { calculateStatResourceModifiers } from '@/utils/game/character';
 import { calculateFarmOutput, type FarmUpgrades } from '@/utils/game/farm';
-import { merchantEffect, merchantIncomeMultiplier, type MerchantUpgrades } from '@/utils/game/merchant';
-import { emberIncomeMultiplier } from '@/utils/game/rebirth';
+import { merchantIncomeMultiplier, skinnerMultiplier, type MerchantUpgrades } from '@/utils/game/merchant';
+import { emberIncomeMultiplier, emberOwned, emberStartGold } from '@/utils/game/rebirth';
 import { countOwnedBiomeTypes } from '@/utils/game/tiles';
 
 const countAdjacentSameBiomes = (tiles: GameState['tiles'], x: number, y: number, biome: BiomeType): number =>
@@ -138,12 +138,18 @@ export const calculateResourceBreakdown = (
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
+	// Starting Treasury (Ember shop): a base of 1, 5, 10, 20 or 35 gold per second from the first second of every run; every multiplier counts from there
+	const startGold = emberStartGold(prestige);
+	if (startGold > base.gold) {
+		base.gold = startGold;
+		start.gold = startGold;
+	}
 	const farmPart = zeroResources();
 	const biomePart = zeroResources();
 
 	// Meat and the other farm products come from the animals alone (the Skinner's bonus is on the meat and the hide)
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
-	const skinner = 1 + merchantEffect(merchantUpgrades, 'skinner');
+	const skinner = skinnerMultiplier(merchantUpgrades, prestige);
 	farm.meat *= skinner;
 	farm.hide *= skinner;
 	// the Harvest Scarecrow (the plains Idol) makes every farm product grow by its percentage; read from the map's standing Idols, which the server has already cut to the trusted level
@@ -202,7 +208,8 @@ export const calculateResourceBreakdown = (
 	// Calculate castle modifier (exponential growth - doubles each level after level 1)
 	const castleTile = getTile(tiles, CASTLE_X, CASTLE_Y);
 	const castleLevel = castleTile && castleTile.biome === 'castle' && castleTile.level ? castleTile.level : 1;
-	const castleBonus = castleModifier(castleLevel);
+	// Imperial Decree (Ember shop, one-time): the castle bonus counts double
+	const castleBonus = castleModifier(castleLevel) * (emberOwned(prestige, 'decree') ? 2 : 1);
 
 	// The castle area bonus: the tiles inside the range (at most 9x9) add their output once more per range step
 	const areaPart = zeroResources();
@@ -239,7 +246,7 @@ export const calculateResourceBreakdown = (
 
 	// Embers income bonus multiplies everything; it is folded into the modifier so tooltips stay consistent
 	const emberMult = emberIncomeMultiplier(prestige);
-	const foreman = merchantIncomeMultiplier(merchantUpgrades);
+	const foreman = merchantIncomeMultiplier(merchantUpgrades, prestige);
 	const gearIncome = 1 + gearIncomePct / 100;
 
 	const result = {} as ResourceBreakdown;

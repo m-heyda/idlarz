@@ -191,12 +191,12 @@ test('merchant upgrades: cost grows, effects apply, max level stops, Pack Rat gr
 		assert.ok(merchantUpgradeCost(id, 1) > merchantUpgradeCost(id, 0), id);
 	}
 	const gold = api().resources.gold;
-	assert.equal(api().buyMerchantUpgrade('packrat'), true);
-	assert.equal(gold - api().resources.gold, merchantUpgradeCost('packrat', 0));
-	assert.equal(api().bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat.effectPerLevel);
-	for (let i = 1; i < MERCHANT_UPGRADES.packrat.maxLevel; i++) assert.equal(api().buyMerchantUpgrade('packrat'), true);
-	assert.equal(api().buyMerchantUpgrade('packrat'), false);
-	assert.equal(api().bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat.maxLevel * MERCHANT_UPGRADES.packrat.effectPerLevel);
+	assert.equal(api().buyMerchantUpgrade('packrat2'), true);
+	assert.equal(gold - api().resources.gold, merchantUpgradeCost('packrat2', 0));
+	assert.equal(api().bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat2.effectPerLevel);
+	for (let i = 1; i < MERCHANT_UPGRADES.packrat2.maxLevel; i++) assert.equal(api().buyMerchantUpgrade('packrat2'), true);
+	assert.equal(api().buyMerchantUpgrade('packrat2'), false);
+	assert.equal(api().bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat2.maxLevel * MERCHANT_UPGRADES.packrat2.effectPerLevel);
 	assert.equal(api().buyMerchantUpgrade('nope' as MerchantUpgradeId), false);
 
 	freshGame({ gold: 0 });
@@ -206,7 +206,7 @@ test('merchant upgrades: cost grows, effects apply, max level stops, Pack Rat gr
 test('merchant bonuses start again on a rebirth, except the bigger bag (the bag itself survives)', () => {
 	freshGame({ gold: 1e12 });
 	growTo(REBIRTH.minTiles);
-	api().buyMerchantUpgrade('packrat');
+	api().buyMerchantUpgrade('packrat2');
 	api().buyMerchantUpgrade('haggler');
 	api().buyMerchantUpgrade('charm');
 	const size = api().bag.length;
@@ -215,7 +215,7 @@ test('merchant bonuses start again on a rebirth, except the bigger bag (the bag 
 		return { tiles };
 	});
 	assert.equal(api().rebirth(), true);
-	assert.deepEqual(api().merchantUpgrades, { packrat: 1 });
+	assert.deepEqual(api().merchantUpgrades, { packrat2: 1 });
 	assert.equal(api().bag.length, size);
 	const raw = rawSnapshot();
 	assert.equal(sanitizeSave(raw).ok, true);
@@ -223,14 +223,14 @@ test('merchant bonuses start again on a rebirth, except the bigger bag (the bag 
 
 test('saves: merchant upgrades round-trip, the bag size follows Pack Rat, and bad values are rejected', () => {
 	freshGame({ gold: 1e12 });
-	api().buyMerchantUpgrade('packrat');
+	api().buyMerchantUpgrade('packrat2');
 	api().buyMerchantUpgrade('haggler');
 	const raw = rawSnapshot();
 	const ok = sanitizeSave(raw);
 	assert.equal(ok.ok, true, ok.ok ? '' : ok.reason);
 	if (ok.ok) {
-		assert.deepEqual(ok.state.merchantUpgrades, { packrat: 1, haggler: 1 });
-		assert.equal(ok.state.bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat.effectPerLevel);
+		assert.deepEqual(ok.state.merchantUpgrades, { packrat2: 1, haggler: 1 });
+		assert.equal(ok.state.bag.length, COMBAT.bagSize + MERCHANT_UPGRADES.packrat2.effectPerLevel);
 	}
 
 	const tooLow = JSON.parse(JSON.stringify(raw));

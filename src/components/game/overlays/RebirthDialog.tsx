@@ -2,8 +2,8 @@ import React, { useState } from 'react';
 import { sortedCostEntries } from '@/catalog';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
-import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '@/config/rebirth';
-import { CASTLE_UPGRADE } from '@/config/castle';
+import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '@/config/rebirth';
+import { limitOf } from '@/lib/limits';
 import { castleModifier } from '@/utils/game/castle';
 import { economyTiles } from '@/utils/game/tiles';
 import { emberIncomeBonus, emberIncomeMultiplier, emberUpgradeCost, rebirthStatus } from '@/utils/game/rebirth';
@@ -26,18 +26,45 @@ import EmberIcon from '../EmberIcon';
 
 const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercent(n * 100) : `${tidy((n * 100).toFixed(digits))}%`);
 
-/** What an Ember shop upgrade gives at level `n` (the same numbers as before; a tile shows it for the level now and for the next one) */
+/** What an Ember shop upgrade gives at level `n` (a tile shows it for the level now and for the next one) */
 const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 	thrift: (n) => `-${pct(n * EMBER_UPGRADES.thrift.effectPerLevel)} tile and building cost (with Charisma at most -${REBIRTH.discountCapPercent}%)`,
+	charter: (n) =>
+		`The tile discount can go up to ${REBIRTH.discountCapPercent + n * EMBER_UPGRADES.charter.effectPerLevel}% (Charisma, Thrift and Bulk Discount add up)`,
 	builders: (n) => `-${pct(n * EMBER_UPGRADES.builders.effectPerLevel)} castle build time`,
+	buildtime: (n) => `-${pct(n * EMBER_UPGRADES.buildtime.effectPerLevel)} build time of Producers and Extractors`,
+	idoltime: (n) => `-${pct(n * EMBER_UPGRADES.idoltime.effectPerLevel)} build time of Idols`,
 	nightwatch: (n) => `+${n * EMBER_UPGRADES.nightwatch.effectPerLevel} h of away time`,
 	steward: (n) => `+${pct(n * EMBER_UPGRADES.steward.effectPerLevel)} income while away`,
+	vigil: (n) => (n > 0 ? 'Away income 100% and up to 72 h of away time' : 'Away income 100% and up to 72 h of away time (one-time)'),
 	deeppockets: (n) => `+${n * EMBER_UPGRADES.deeppockets.effectPerLevel} bag slots, kept through every rebirth`,
 	mastery: (n) => `+${pct(n * EMBER_UPGRADES.mastery.effectPerLevel)} gold per click`,
+	startgold: (n) => `Every new run starts at ${EMBER_UPGRADES.startgold.steps[Math.min(n, EMBER_UPGRADES.startgold.steps.length - 1)]} base gold per second`,
 	provisions: (n) =>
 		`Every new run starts with ${sortedCostEntries(EMBER_UPGRADES.provisions.bundle)
 			.map(([r, v]) => `${formatNumber(v * n)} ${r}`)
 			.join(', ')}`,
+	haggler: (n) => `+${pct(n * EMBER_UPGRADES.haggler.effectPerLevel)} gold from everything you sell`,
+	fortune: (n) => `+${n * EMBER_UPGRADES.fortune.effectPerLevel} Luck for chests and kills`,
+	artisan: (n) => `+${n * EMBER_UPGRADES.artisan.effectPerLevel} Luck on crafted gear: a better chance of the higher rarities`,
+	overseer: (n) => `+${pct(n * EMBER_UPGRADES.overseer.effectPerLevel)} income from every resource, gold included`,
+	skinner: (n) => `+${pct(n * EMBER_UPGRADES.skinner.effectPerLevel)} meat and hide from your animals`,
+	tithe: (n) => `+${pct(n * EMBER_UPGRADES.tithe.effectPerLevel)} Embers from every rebirth`,
+	tempo: (n) => `+${n * EMBER_UPGRADES.tempo.effectPerLevel}% attack speed`,
+	precision: (n) => `+${n * EMBER_UPGRADES.precision.effectPerLevel}% crit chance`,
+	execution: (n) => `+${n * EMBER_UPGRADES.execution.effectPerLevel}% chance that a crit is a super crit`,
+	brawn: (n) => `+${n * EMBER_UPGRADES.brawn.effectPerLevel}% damage with physical weapons`,
+	sorcery: (n) => `+${n * EMBER_UPGRADES.sorcery.effectPerLevel}% damage with staves and wands`,
+	bloodthirst: (n) => `+${n * EMBER_UPGRADES.bloodthirst.effectPerLevel}% life leech`,
+	vigor: (n) => `+${n * EMBER_UPGRADES.vigor.effectPerLevel} HP regenerated per second`,
+	potion: () => 'Auto-potion: the hero drinks potions on their own in a fight (one-time)',
+	castlecap: (n) => `Castle level cap ${10 + n * EMBER_UPGRADES.castlecap.effectPerLevel}`,
+	buildcap: (n) => `Producers and Extractors go up to level ${5 + n * EMBER_UPGRADES.buildcap.effectPerLevel} (the castle level still gates each level)`,
+	idolcap: (n) => `Idols go up to level ${5 + n * EMBER_UPGRADES.idolcap.effectPerLevel}`,
+	decree: () => 'The castle bonus counts double (one-time)',
+	extrabuilder: (n) => `+${n * EMBER_UPGRADES.extrabuilder.effectPerLevel} builder`,
+	questrarity: () => 'A better chance of a higher quest rarity (comes with quests)',
+	questslots: () => 'More active quests at once (comes with quests)',
 };
 
 type RebirthTab = 'rebirth' | 'shop';
@@ -47,10 +74,16 @@ type RebirthTab = 'rebirth' | 'shop';
  * and put its id in a section here; an empty section shows `empty` until the first upgrade of that kind exists.
  */
 const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly EmberUpgradeId[]; empty?: string }[] = [
-	{ id: 'economy', label: 'Economy', ids: ['thrift', 'mastery', 'provisions'] },
-	{ id: 'time', label: 'Building and away time', ids: ['builders', 'nightwatch', 'steward'] },
-	{ id: 'battle', label: 'Battle', ids: [], empty: 'Battle bonuses will come here.' },
+	{
+		id: 'economy',
+		label: 'Economy',
+		ids: ['mastery', 'overseer', 'haggler', 'skinner', 'fortune', 'artisan', 'tithe', 'thrift', 'charter', 'startgold', 'provisions'],
+	},
+	{ id: 'time', label: 'Build and away time', ids: ['builders', 'buildtime', 'idoltime', 'nightwatch', 'steward', 'vigil'] },
+	{ id: 'caps', label: 'Caps and builders', ids: ['castlecap', 'buildcap', 'idolcap', 'extrabuilder', 'decree'] },
+	{ id: 'battle', label: 'Battle', ids: ['tempo', 'precision', 'execution', 'brawn', 'sorcery', 'bloodthirst', 'vigor', 'potion'] },
 	{ id: 'utility', label: 'Utility', ids: ['deeppockets'] },
+	{ id: 'quests', label: 'Quests (coming soon)', ids: ['questrarity', 'questslots'] },
 ];
 
 /**
@@ -219,8 +252,8 @@ const RebirthDialog: React.FC = () => {
 							</div>
 						</div>
 						<p className='rb-note'>
-							A higher castle level and more tiles give more Embers (castle level {CASTLE_UPGRADE.maxLevel} is the best you can do). The castle bonus today is +
-							{pct(castleModifier(castleLevel))}; it starts again from level 1.
+							A higher castle level and more tiles give more Embers (castle level {limitOf('castleMaxLevel', { prestige })} is the best you can do). The castle
+							bonus today is +{pct(castleModifier(castleLevel))}; it starts again from level 1.
 						</p>
 						{unlocks.length > 0 && (
 							<div className='rb-unlocks'>
@@ -276,8 +309,10 @@ const RebirthDialog: React.FC = () => {
 							<div className='ds-ups-grid'>
 								{cat.ids.map((id) => {
 									const def = EMBER_UPGRADES[id];
-									const level = prestige.upgrades[id] ?? 0;
+									// a one-time upgrade granted for free (an account from before the reworked shop) shows as owned
+									const level = prestige.upgrades[id] ?? (prestige.grants?.includes(id) ? 1 : 0);
 									const maxed = level >= def.maxLevel;
+									const locked = EMBER_DISABLED.has(id); // quests are not in the game yet
 									const cost = emberUpgradeCost(id, level);
 									return (
 										<UpgradeTile
@@ -295,7 +330,8 @@ const RebirthDialog: React.FC = () => {
 												</span>
 											}
 											have={prestige.legacyPoints}
-											shortText={`Need ${formatHeaderAmount(Math.max(0, cost - prestige.legacyPoints))} more`}
+											state={locked ? 'short' : undefined}
+											shortText={locked ? 'Coming soon' : `Need ${formatHeaderAmount(Math.max(0, cost - prestige.legacyPoints))} more`}
 											maxLabel='Max level'
 											onBuy={() => {
 												buyEmberUpgrade(id);

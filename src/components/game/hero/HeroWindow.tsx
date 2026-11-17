@@ -321,15 +321,15 @@ const MoreSpace: React.FC = () => {
 	const gold = useGameStore((state) => state.resources.gold);
 	const buy = useGameStore((state) => state.buyMerchantUpgrade);
 	const showToast = useUiStore((state) => state.showToast);
-	const def = MERCHANT_UPGRADES.packrat;
-	const level = merchantLevel(upgrades, 'packrat');
+	const def = MERCHANT_UPGRADES.packrat2;
+	const level = merchantLevel(upgrades, 'packrat2');
 	const maxed = level >= def.maxLevel;
-	const cost = merchantUpgradeCost('packrat', level);
+	const cost = merchantUpgradeCost('packrat2', level);
 	const affordable = gold >= cost;
 	const [asking, setAsking] = useState(false);
 	const purchase = () => {
 		setAsking(false);
-		if (buy('packrat')) showToast(`Purchased ${def.label} level ${level + 1} for ${compact(cost)} Gold`);
+		if (buy('packrat2')) showToast(`Purchased ${def.label} level ${level + 1} for ${compact(cost)} Gold`);
 		else showToast('Not enough gold for more bag space');
 	};
 	return (

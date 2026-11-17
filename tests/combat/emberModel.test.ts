@@ -65,7 +65,8 @@ test('forty rebirths in one save become at most one, and the Embers at most what
 	const verdict = settleEmbers(before, claim(40, 900_000));
 	assert.equal(verdict.clamped, true);
 	assert.equal(verdict.rebirths, 1);
-	assert.ok(verdict.legacyEarned >= 1 && verdict.legacyEarned < 100, `${verdict.legacyEarned}`);
+	// the bound counts both Tithes at their maximum: the merchant's +50% and the Eternal Tithe's +250%
+	assert.ok(verdict.legacyEarned >= 1 && verdict.legacyEarned < 300, `${verdict.legacyEarned}`);
 });
 
 test('inside one run the Embers ever earned cannot rise (spending them changes the unspent points, never this)', () => {
@@ -84,8 +85,9 @@ test('a first save holds a history: rebirths are bounded by the play time, Ember
 	const hours = (h: number) => h * 3600;
 	const three = settleEmbers(null, claim(3, 1_000_000, hours(3 * 5)));
 	assert.equal(three.rebirths, 3);
-	// the best rebirth the game can pay (castle 10, the first-save territory, Tithe maxed) three times over
-	assert.ok(three.clamped && three.legacyEarned === 3 * emberGain(10, EMBER_MODEL.firstSaveTiles, { tithe: 10 }, 0), `${three.legacyEarned}`);
+	// the best rebirth the game can pay (castle 15, the first-save territory, both Tithes maxed) three times over
+	const maxTithes = { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: { tithe: 5 } };
+	assert.ok(three.clamped && three.legacyEarned === 3 * emberGain(15, EMBER_MODEL.firstSaveTiles, { tithe: 10 }, 0, maxTithes), `${three.legacyEarned}`);
 	assert.equal(settleEmbers(null, claim(3, 60, hours(3 * 5))).clamped, false, 'an honest early player is untouched');
 	assert.equal(EMBER_MODEL.minRunSec, 4 * 3600);
 });

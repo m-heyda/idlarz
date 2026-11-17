@@ -74,10 +74,12 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		buildingUpgrades,
 		builders: builderCount({ prestige, gemBuilders }),
 		ownedTiles,
+		idolMax: limitOf('idolMaxLevel', { prestige }),
+		buildingMax: limitOf('buildingMaxLevel', { prestige }),
 	};
 	const owned = ownedOfBiome(tiles, def.biome);
 	const biomeLabel = BIOMES[def.biome]?.label ?? def.biome;
-	const top = def.kind === 'idol' ? limitOf('idolMaxLevel') : BUILDING_RULES.maxLevel;
+	const top = def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige });
 	const atTop = level >= top;
 	const running = buildingUpgrades.find((u) => u.x === x && u.y === y) ?? null;
 	const nextLevel = level + 1;
@@ -100,7 +102,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		(key) => (now?.[key as keyof Resources] ?? 0) > 0 || (next?.[key as keyof Resources] ?? 0) > 0,
 	) as (keyof Resources)[];
 	const perHour = (o: Partial<Resources> | null, key: keyof Resources) => formatNumber((o?.[key] ?? 0) * HOUR);
-	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct, def.kind === 'idol') : 0;
+	const total = running ? buildingUpgradeDuration(running.toLevel - 1, prestige, buildTimePct, def.kind === 'idol' ? 'idol' : 'building') : 0;
 	const progress = running && total > 0 ? Math.min(1, Math.max(0, 1 - running.remainingSec / total)) : 0;
 
 	return (
@@ -194,7 +196,9 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 									<div className='bw-note'>Priced as if you owned at least {idolFloorTiles(nextLevel)} tiles.</div>
 								)}
 								<div className='bw-foot'>
-									<span className='bw-time'>Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct, def.kind === 'idol'))}</span>
+									<span className='bw-time'>
+										Takes {formatTime(buildingUpgradeDuration(level, prestige, buildTimePct, def.kind === 'idol' ? 'idol' : 'building'))}
+									</span>
 									<Button tone='gold' disabled={!!problem} title={problem ?? undefined} onClick={upgrade}>
 										Upgrade
 									</Button>

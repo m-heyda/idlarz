@@ -57,6 +57,8 @@ import { checkNetWorth } from './netWorth';
 import { summarize, type SaveSummary } from './summary';
 import { settleXp } from './xpModel';
 import { clampPrestige, settleEmbers } from './emberModel';
+import { stampShopFromServer } from '@/lib/emberShopMigration';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { rebirthRecordOf, type RebirthRecord } from './rebirthHistory';
 import { gemBuildersOf } from '@/config/gemShop';
 import type { PrestigeState } from '@/types/game';
@@ -261,6 +263,10 @@ export const acceptSave = async (
 		ledger?.inv?.rebirth ?? null,
 	);
 	if (emberVerdict.clamped) state = { ...state, prestige: clampPrestige(state.prestige, emberVerdict) };
+	// the free one-time grants and the shop generation are the stored save's, never the upload's
+	const stampedPrestige = stampShopFromServer(state.prestige, current ? prestigeOfCore(current.core as unknown as Record<string, unknown>) : undefined);
+	const shopStamped = stampedPrestige !== state.prestige;
+	if (shopStamped) state = { ...state, prestige: stampedPrestige };
 	const gemsClaimed = state.gems;
 	/**
 	 * The bag, the worn gear, the loot pity and the auto-sell filter are the ledger's: the stored copy carries the server's, whatever the upload
@@ -534,7 +540,7 @@ export const acceptSave = async (
 		flags,
 		gems: ledgerUsable ? gems : undefined,
 		xp: xpVerdict.clamped ? xpVerdict.xp : undefined,
-		prestige: emberVerdict.clamped ? state.prestige : undefined,
+		prestige: emberVerdict.clamped || shopStamped ? state.prestige : undefined,
 		economy: trusted ? 'trusted' : undefined,
 		replaced:
 			replacesFurther && current

@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { api, freshGame, growTo, owned, setResources, store, tileAt, rawSnapshot } from '../helpers';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { CLICK_LADDER, INITIAL_RESOURCES, STARTING_GEMS } from '../../src/config/economy';
-import { EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
+import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
 import { calculateTileCost } from '../../src/utils/game/costs';
 import { castleUpgradeDuration } from '../../src/utils/game/castle';
 import { effectiveTileDiscount, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
@@ -136,10 +136,14 @@ test('gains grow with the castle level and the territory, and a tiny run earns n
 test('the shop: cost curve, max level, not enough points, validated ids', () => {
 	freshGame();
 	assert.equal(api().buyEmberUpgrade('thrift'), false);
-	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 1000, legacyEarned: 1000 } }));
+	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 1, legacyPoints: 100000, legacyEarned: 100000 } }));
 	assert.equal(api().buyEmberUpgrade('nonsense' as EmberUpgradeId), false);
 	for (const id of Object.keys(EMBER_UPGRADES) as EmberUpgradeId[]) {
 		const before = api().prestige.legacyPoints;
+		if (EMBER_DISABLED.has(id)) {
+			assert.equal(api().buyEmberUpgrade(id), false, `${id} is disabled until quests exist`);
+			continue;
+		}
 		assert.equal(api().buyEmberUpgrade(id), true);
 		assert.equal(before - api().prestige.legacyPoints, emberUpgradeCost(id, 0));
 	}
@@ -209,7 +213,7 @@ test('a full reset (not a rebirth) wipes the Embers too', () => {
 	assert.equal(api().rebirth(), true);
 	assert.ok(api().prestige.legacyEarned > 0);
 	api().resetGame();
-	assert.deepEqual(api().prestige, { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {} });
+	assert.deepEqual(api().prestige, { rebirths: 0, legacyPoints: 0, legacyEarned: 0, upgrades: {}, shopVersion: 2 });
 });
 
 test('saves: prestige survives validation, forged Embers is rejected', () => {

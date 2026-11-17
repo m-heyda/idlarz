@@ -18,6 +18,7 @@ import {
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { limitOf } from '@/lib/limits';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
@@ -36,6 +37,9 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			buildingUpgrades: s.buildingUpgrades,
 			builders: builderCount(limitCtx(s)),
 			ownedTiles: economyTiles(s.tiles, s.freeTiles),
+			// the Ember shop's cap raises (Idol Mastery, Master Masonry)
+			idolMax: limitOf('idolMaxLevel', { prestige: s.prestige }),
+			buildingMax: limitOf('buildingMaxLevel', { prestige: s.prestige }),
 		};
 	};
 
@@ -64,7 +68,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 					resources: subtractBundle(s.resources, cost),
 					buildingUpgrades: [
 						...s.buildingUpgrades,
-						{ x, y, toLevel: 1, remainingSec: buildingUpgradeDuration(0, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct, true), building: id },
+						{ x, y, toLevel: 1, remainingSec: buildingUpgradeDuration(0, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct, 'idol'), building: id },
 					],
 				});
 				return true;
@@ -102,7 +106,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 							level,
 							s.prestige,
 							idolEconomy(s.tiles, s.idolLevels).buildTimePct,
-							buildingDef(tile?.building)?.kind === 'idol',
+							buildingDef(tile?.building)?.kind === 'idol' ? 'idol' : 'building',
 						),
 					},
 				],

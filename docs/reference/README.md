@@ -51,7 +51,7 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Monsters](monsters.md) (15): The roster, levels, growth, spawning and what a kill pays.
 - [Loot](loot.md) (27): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - [Progression](progression.md) (65): Levels, attributes, skills, rebirth, Embers, limits and gems.
-- [Saves & Server](saves-and-server.md) (40): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
+- [Saves & Server](saves-and-server.md) (41): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
 - [Architecture](architecture.md) (16): Stack, state, the tick loop, the map, rendering and the art pipeline.
 - [Pacing](pacing.md) (6): The pace the economy is tuned for, and the bot simulation that checks it.
 - [Ops](ops.md) (11): Commands, CI, the pacing guard, season resets and the E2E test account.

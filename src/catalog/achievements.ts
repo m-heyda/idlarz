@@ -425,6 +425,15 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		rewards: { gems: 150, points: 80 },
 	},
 	...BATCH2_ACHIEVEMENTS,
+	{
+		id: 'castle_15',
+		title: 'Grand Architect',
+		description: 'Upgrade the castle to level 15 (the Castle Expansion in the Ember shop lifts the cap past level 10).',
+		when: { kind: 'castle', level: 15 },
+		badge: 'badge_castle_10_gold',
+		badgePlaceholder: true, // a stand-in until the level 11-15 castle art and its own badge exist
+		rewards: { gems: 150, points: 40 },
+	},
 ];
 
 export const achievementById = (id: string): AchievementDef | undefined => ACHIEVEMENTS.find((a) => a.id === id);
@@ -536,7 +545,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_tower_silver',
 		lore: 'The keep is the heart of the realm.',
 		how: 'Upgrade the castle from its window.',
-		tiers: ['castle_2', 'castle_6', 'castle_10'],
+		tiers: ['castle_2', 'castle_6', 'castle_10', 'castle_15'],
 	},
 	{
 		id: 'treasure_hunter',

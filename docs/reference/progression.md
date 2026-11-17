@@ -224,17 +224,17 @@ See also: [`rebirthStatus`](progression.md#rebirthstatus), [`emberGain`](progres
 
 ### `emberGain` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:97`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:107`](../../src/utils/game/rebirth.ts)
 
 Embers a rebirth gives: the castle and territory formula, plus the Ancestral Tithe's bonus.
 
-`REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level.
+`REBIRTH.gain`: `gainScale` 3, `castleExponent` 1.3, `tileExponent` 0.65, `surplusPerTile` 0.03. The Ancestral Tithe merchant upgrade adds +5% per level and the Eternal Tithe Ember upgrade +50% per level (added together).
 
 **Formula**
 
 ```text
 base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
-gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
+gain = floor(base x (1 + 0.05 x Ancestral Tithe level + 0.5 x Eternal Tithe level))
 ```
 
 **Embers gained (no Ancestral Tithe)** _(computed from the code)_
@@ -252,7 +252,7 @@ gain = floor(base x (1 + 0.05 x Ancestral Tithe level))
 
 ### `emberIncomeBonus` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:49`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:56`](../../src/utils/game/rebirth.ts)
 
 The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: linear when `incomeExponent` is 1, flatter when it is below 1.
 
@@ -279,7 +279,7 @@ income bonus = 0.12 x (Embers ever earned)^0.6          multiplier = 1 + bonus
 
 ### `rebirthStatus` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:128`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:138`](../../src/utils/game/rebirth.ts)
 
 Can the player rebirth, and if not what is missing. The header button, the rebirth window and the store's `rebirth`
 all read this one function, so what the tooltip promises is what the action checks.
@@ -333,28 +333,62 @@ The numbers of the rebirth result screen, from what the run had reached and the 
 
 ### `EMBER_UPGRADES` <small>const</small>
 
-Source: [`src/config/rebirth.ts:60`](../../src/config/rebirth.ts)
+Source: [`src/config/rebirth.ts:68`](../../src/config/rebirth.ts)
 
-The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)); the upgrades have 10 levels, except Deep Pockets (+4 bag slots per level, 3 levels, 30 / 54 / 98 Embers; it reads through `limitOf('bagSize')`). Shop levels are permanent: nothing refunds Embers.
-The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`). Thrift shares the 45% tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
+The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)). Shop levels are permanent: nothing refunds Embers on a rebirth.
+The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).
+
+- **Permanent twins of the merchant's gold upgrades** (about 3 x the step, kept through every rebirth): Master Haggler, Fortune, Overseer, Master Skinner, Click Mastery, the seven battle upgrades and Eternal Tithe (+50% Embers per level, 5 levels).
+- **Caps**: Treasury Charter (+5 points on the 45% tile-discount cap per level), Castle Expansion (castle level 10 to 15), Master Masonry (building level 5 to 10) and Idol Mastery (Idol level 5 up to 15, priced as an end-game goal). They read through `limitOf` (`castleMaxLevel`, `buildingMaxLevel`, `idolMaxLevel`).
+- **Build time**: Master Builders (castle), Mason's Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.
+- **One-time purchases** (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).
+- **Start of a run**: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).
+- **Disabled** (`EMBER_DISABLED`): Quest Rarity and Quest Slots wait for the quest system; they show greyed and cannot be bought.
+Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings take Thrift only.
 
 **The Ember shop** _(computed from the code)_
 
 | Id | Label | Base cost (Embers) | Effect per level |
 | --- | --- | --- | --- |
 | thrift | Thrift | 2 | -2% tile and building cost |
+| charter | Treasury Charter | 3 | +5 points on the 45% tile-discount cap |
 | builders | Master Builders | 3 | -5% castle build time |
-| mastery | Click Mastery | 2 | +25% gold per click |
-| provisions | Provisions | 2 | start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400 |
+| buildtime | Mason's Guild | 3 | -5% Producer and Extractor build time |
+| idoltime | Shrine Keepers | 3 | -5% Idol build time |
+| mastery | Click Mastery | 2 | +50% gold per click |
+| startgold | Starting Treasury | 6 | base gold per second at the start of a run: 1 / 5 / 10 / 20 / 35 by level |
+| provisions | Provisions | 2 | start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400, food 200, coal 100 |
 | nightwatch | Night Watch | 2 | +1 hour of paid away time |
 | steward | Steward | 3 | +5% income while away |
-| deeppockets | Deep Pockets | 30 | +4 bag slots |
+| vigil | Eternal Vigil | 120 | one-time: away income 100% and 72 h away time |
+| deeppockets | Deep Pockets | 30 | +8 bag slots |
+| haggler | Master Haggler | 3 | +10% gold from selling |
+| fortune | Fortune | 3 | +6 Luck |
+| artisan | Artisan's Eye | 4 | +3 Luck on crafted gear only |
+| overseer | Overseer | 4 | +3% income, every resource but XP |
+| skinner | Master Skinner | 3 | +15% meat and hide |
+| tithe | Eternal Tithe | 5 | +50% Embers per rebirth |
+| tempo | Battle Tempo | 3 | +3% attack speed |
+| precision | Precision | 3 | +1.5% crit chance |
+| execution | Execution | 3 | +1.5% super-crit chance |
+| brawn | Brawn | 3 | +4% physical damage |
+| sorcery | Sorcery | 3 | +4% staff and wand damage |
+| bloodthirst | Bloodthirst | 3 | +0.75% life leech |
+| vigor | Vigor | 3 | +0.5 HP per second |
+| potion | Potion Reflex | 15 | one-time: auto-potion |
+| castlecap | Castle Expansion | 60 | +1 castle level of cap (10 to 15) |
+| buildcap | Master Masonry | 40 | +1 Producer/Extractor level of cap (5 to 10) |
+| idolcap | Idol Mastery | 100 | +1 Idol level of cap (5 to 15) |
+| decree | Imperial Decree | 150 | one-time: the castle bonus counts double |
+| extrabuilder | Extra Builder | 40 | +1 builder |
+| questrarity | Quest Rarity | 5 | disabled until quests exist |
+| questslots | Quest Slots | 25 | disabled until quests exist |
 
 <a id="emberupgradecost"></a>
 
 ### `emberUpgradeCost` <small>function</small>
 
-Source: [`src/utils/game/rebirth.ts:26`](../../src/utils/game/rebirth.ts)
+Source: [`src/utils/game/rebirth.ts:33`](../../src/utils/game/rebirth.ts)
 
 Cost in Embers of buying the next level of an upgrade, given its current level.
 
@@ -385,15 +419,17 @@ Steward and set bonuses the away efficiency). `HARD_LIMITS` is the most a save m
 | `merchantOffers` | 6 | 12 | nothing yet |
 | `merchantRotateSec` | 1,800 | n/a | nothing yet |
 | `merchantRefreshBase` | 10 K | n/a | nothing yet |
-| `bagSize` | 60 | 200 | Pack Rat +8 per level, Deep Pockets +4 per level |
-| `offlineCapHours` | 8 | 72 | Night Watch +1 h per level, set bonus hours |
-| `offlineEfficiency` | 0.5 | 1 | Steward +0.05 per level, set bonus points |
+| `bagSize` | 60 | 200 | Pack Rat +4 per level (the retired one +8), Deep Pockets +8 per level, belt slots |
+| `offlineCapHours` | 8 | 72 | Night Watch +1 h per level, Eternal Vigil (72 h), set bonus hours |
+| `offlineEfficiency` | 0.5 | 1 | Steward +0.05 per level, Eternal Vigil (100%), set bonus points |
 | `offlineMinGapSec` | 300 | n/a | nothing yet |
 | `craftBatchCap` | 1 B | 1 B | nothing yet |
 | `craftQueueSlots` | 3 | 5 | nothing yet |
 | `craftOfflineHours` | 8 | 72 | nothing yet |
 | `craftSpeed` | 1 | 4 | nothing yet |
-| `idolMaxLevel` | 5 | 100 | nothing yet |
+| `idolMaxLevel` | 5 | 100 | Idol Mastery +1 per level |
+| `buildingMaxLevel` | 5 | 15 | Master Masonry +1 per level |
+| `castleMaxLevel` | 10 | 15 | Castle Expansion +1 per level |
 | `builders` | 1 | 8 | nothing yet |
 
 See also: [`limitOf`](progression.md#limitof)
@@ -402,7 +438,7 @@ See also: [`limitOf`](progression.md#limitof)
 
 ### `limitOf` <small>function</small>
 
-Source: [`src/lib/limits.ts:44`](../../src/lib/limits.ts)
+Source: [`src/lib/limits.ts:62`](../../src/lib/limits.ts)
 
 The current value of a limit: its base plus the registered bonuses.
 
@@ -410,14 +446,15 @@ The current value of a limit: its base plus the registered bonuses.
 
 ```text
 limit = LIMITS[key] + LIMIT_BONUSES[key](context)           or HARD_LIMITS[key] with ctx.hardCap
-bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat + Deep Pockets + belt bag slots)
+bagSize = min(HARD_LIMITS.bagSize, 60 + Pack Rat (old +8, new +4 per level) + Deep Pockets (+8 per level) + belt bag slots)
+castleMaxLevel = min(15, 10 + Castle Expansion level)      buildingMaxLevel = min(15, 5 + Master Masonry level)      idolMaxLevel = min(100, 5 + Idol Mastery level)
 ```
 
 <a id="beltslotsfor"></a>
 
 ### `beltSlotsFor` <small>function</small>
 
-Source: [`src/lib/offline/inventory.ts:65`](../../src/lib/offline/inventory.ts)
+Source: [`src/lib/offline/inventory.ts:71`](../../src/lib/offline/inventory.ts)
 
 The belt bag slots the server holds for the player: the most a belt has ever given (`Inventory.beltSlots`) or the worn belt gives now. Like Pack Rat it only goes up,
 so taking a belt off, or a rebirth, never shrinks the bag below the items in it.
@@ -434,7 +471,7 @@ beltSlots = max(Inventory.beltSlots, bagSlots of the worn gear)
 
 ### `STARTING_GEMS` <small>const</small>
 
-Source: [`src/config/economy.ts:219`](../../src/config/economy.ts)
+Source: [`src/config/economy.ts:221`](../../src/config/economy.ts)
 
 Gems every player starts with (also granted to saves from before Gems existed).
 
@@ -789,7 +826,7 @@ The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 sectio
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (123, 8130 gems in total)** _(computed from the code)_
+**The launch achievements (124, 8280 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -916,6 +953,7 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 121 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
 | 122 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
 | 123 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
+| 124 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -1097,7 +1135,7 @@ Claim all: pays every earned tier that is not claimed yet in one go (one request
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:441`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:450`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

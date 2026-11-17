@@ -37,6 +37,8 @@ import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { craftLuckBonus } from '@/utils/game/merchant';
 import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
 import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
 import { bestiaryOf } from '@/lib/offline/stats';
@@ -304,7 +306,7 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 		const env: CraftEnv = {
 			secret: deps.secret,
 			userId,
-			luck: ctx.stored.summary.derived.luck,
+			luck: ctx.stored.summary.derived.luck + craftLuckBonus(prestigeOfCore(ctx.stored.core)), // Artisan's Eye (Ember shop): crafted gear only
 			intelligence: ctx.stored.summary.derived.intelligence ?? 0,
 			xpPct: ctx.stored.summary.derived.idol?.craftXpPct ?? 0,
 		};
@@ -343,7 +345,11 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowMs: number, keep: readonly KeepRef[] = []): Promise<Online<RebirthReply>> =>
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: RebirthReply } => {
 		const inv = ctx.ledger.inv!;
-		const judged = judgeRebirth(ctx.stored.summary, ctx.stored.core.merchantUpgrades as Record<string, number> | undefined);
+		const judged = judgeRebirth(
+			ctx.stored.summary,
+			ctx.stored.core.merchantUpgrades as Record<string, number> | undefined,
+			ctx.stored.core.prestige as import('@/types/game').PrestigeState | undefined,
+		);
 		// already run for this very rebirth: the record is the answer (the wipe and the gain happen once)
 		if (judged.ok && inv.rebirth?.to === judged.to) {
 			const kept = keepCandidates(inv.bag, {})

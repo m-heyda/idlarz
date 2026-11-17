@@ -120,14 +120,26 @@ test('the Producer grows +2 % per owned tile of its biome, capped at +100 %', ()
 });
 
 test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 8 h', () => {
-	assert.deepEqual([1, 2, 3, 5, 6, 10].map(buildingLevelCap), [1, 2, 3, 5, 5, 5]);
+	assert.deepEqual(
+		[1, 2, 3, 5, 6, 10].map((castle) => buildingLevelCap(castle)),
+		[1, 2, 3, 5, 5, 5],
+	);
+	// Master Masonry raises the building cap; the castle level still gates each level
+	assert.deepEqual(
+		[3, 6, 10].map((castle) => buildingLevelCap(castle, 10)),
+		[3, 6, 10],
+	);
+	assert.equal(buildingLevelCap(15, 99), 15, 'never above the hard ceiling');
 	assert.deepEqual(BUILDING_RULES.durationsSec, [600, 2700, 10800, 28800]);
 	assert.deepEqual(
 		[1, 2, 3, 4].map((l) => buildingUpgradeDuration(l)),
 		[600, 2700, 10800, 28800],
 	);
-	// Master Builders shortens it like the castle's timer
-	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 540);
+	// Mason's Guild shortens a building's timer 5% per level, Shrine Keepers an Idol's, Master Builders the castle's: each only its own
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { buildtime: 2 } }), 540);
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }, 0, 'idol'), 3240, 'an Idol level 2 takes 1 h, less 10 %');
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { idoltime: 2 } }), 600, 'a Producer does not take the Idol upgrade');
+	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 600, 'the castle upgrade does not shorten a building');
 });
 
 test('prices: x2 per level on the price of 14 tiles; moving costs half of everything the building cost', () => {
@@ -579,5 +591,29 @@ test('timer_jump: a completion is bound to its own building, an Idol floor is th
 		// a job with no time left that a save still carries
 		const carried = { ...base, derived: { ...base.derived, buildingUpgrades: [job('lumberyard', 0)] } };
 		assert.equal(verifyTransition({ summary: base, serverSavedAt: T0 }, carried, T0 + 1000).includes('timer_jump'), true);
+	});
+});
+
+test('Extra Builder (Ember shop): each level adds a builder, and two parallel timers pass verify without the Gem shop one', () => {
+	withBuildings(() => {
+		const prestige = (level: number) => ({ ...api().prestige, upgrades: { extrabuilder: level } });
+		assert.equal(builderCount({ prestige: prestige(1) }), 2);
+		assert.equal(builderCount({ prestige: prestige(2) }), 3);
+		assert.equal(builderCount({ prestige: prestige(2), gemBuilders: 1 }), 4, 'with Builder #2 from the Gem shop');
+
+		const [a, b] = gameWith('forest', 2, 5);
+		api().buildBuilding(a.x, a.y, 'lumberyard');
+		api().buildBuilding(b.x, b.y, 'saptapper');
+		const first = summarize(pickPersisted(api()));
+		store.setState({ prestige: prestige(1) } as never);
+		assert.equal(api().upgradeBuilding(a.x, a.y), true);
+		assert.equal(api().upgradeBuilding(b.x, b.y), true, 'the Ember builder is the second one');
+		const two = summarize(pickPersisted(api()));
+		assert.equal(two.derived.builders, 2);
+		const T0 = 1_000_000;
+		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, two, T0 + 5000, undefined, {}, 0).includes('timer_jump'), false);
+		// without the Ember level the same two timers are refused
+		const none = { ...two, derived: { ...two.derived, builders: 1 } };
+		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, none, T0 + 5000, undefined, {}, 0).includes('timer_jump'), true);
 	});
 });

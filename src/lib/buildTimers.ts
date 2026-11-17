@@ -61,7 +61,7 @@ export const activeBuildTimers = (input: {
 	for (const up of buildingUpgrades) {
 		// a first Idol build has no building on its tile yet: the job names it
 		const def = buildingDef(buildingAt(up.x, up.y) ?? up.building);
-		const total = buildingUpgradeDuration(up.toLevel - 1, prestige, buildTimePct, def?.kind === 'idol');
+		const total = buildingUpgradeDuration(up.toLevel - 1, prestige, buildTimePct, def?.kind === 'idol' ? 'idol' : 'building');
 		out.push({
 			key: `building:${up.x},${up.y}`,
 			kind: 'building',

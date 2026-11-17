@@ -1,7 +1,7 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { worldFacts, type WorldFacts } from '@/lib/worldFacts';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
-import { buildTimeReduction, builderCount, builtBuildings } from '@/lib/buildings';
+import { builderCount, builtBuildings, maxBuildTimeReduction } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
@@ -201,7 +201,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			goldFind: fx.goldFind,
 			intelligence: state.characterStats.intelligence,
 			killRewardPct: gear.killRewardPct + idol.killRewardPct,
-			...(buildTimeReduction(state.prestige, idol.buildTimePct) > 0 ? { buildTimeReduction: buildTimeReduction(state.prestige, idol.buildTimePct) } : {}),
+			...(maxBuildTimeReduction(state.prestige, idol.buildTimePct) > 0 ? { buildTimeReduction: maxBuildTimeReduction(state.prestige, idol.buildTimePct) } : {}),
 			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct
 				? {
 						idol: {

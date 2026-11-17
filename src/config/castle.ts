@@ -45,10 +45,10 @@ export const CASTLE_WARD = { fromLevel: 7 };
 
 // Exponential castle upgrade system
 /**
- * The castle: levels 1-10. An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
+ * The castle: levels 1-10, up to 15 with the Castle Expansion Ember upgrade (`maxLevel` is the base cap; read the real one with `limitOf('castleMaxLevel')`, and `HARD_LIMITS.castleMaxLevel` is what a save may hold). An upgrade pays its cost up front, then runs a timer counted by the tick (saved, counted while away at full speed). One upgrade at a time.
  *
  * - **Modifier** added to every resource: see {@link castleModifier}. **Flat XP**: +0.5 xp/s per level above 1 (`xpBonus`).
- * - **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d. Master Builders (Ember shop) cuts them 5% per level ({@link castleUpgradeDuration}).
+ * - **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d, then 4.5 d, 6 d, 8 d, 11 d, 14 d for levels 11 to 15. Master Builders (Ember shop) cuts them 5% per level ({@link castleUpgradeDuration}).
  * - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in `docs/generated/balance-tables.md`.
  * - **Range** (violet area), **area bonus** and **ward**: {@link CASTLE_RANGE}, {@link CASTLE_AREA_BONUS}, {@link CASTLE_WARD}.
  *
@@ -65,7 +65,8 @@ export const CASTLE_UPGRADE = {
 	xpBonus: 0.5, // Additional flat XP/s for every castle level above 1
 	// Real upgrade time in seconds, indexed by the level being left (1 -> 2 is index 0). Counted by the tick loop.
 	// Halved in the 2026-11 balancing pass (was 1 h, 4 h, 12 h, 24 h, 48 h, 3 d, 4 d, 5 d, 7 d): 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d
-	durationsSec: [1800, 7200, 21600, 43200, 86400, 129600, 172800, 216000, 302400],
+	// Levels 11 to 15 (the last five entries) are only reachable with the Castle Expansion Ember upgrade: 4.5 d, 6 d, 8 d, 11 d, 14 d
+	durationsSec: [1800, 7200, 21600, 43200, 86400, 129600, 172800, 216000, 302400, 388800, 518400, 691200, 950400, 1209600],
 	upgradeCosts: [
 		{ gold: 70000, wood: 10000, stone: 10000 },
 		{ gold: 200000, wood: 30000, stone: 30000, coal: 20000 },
@@ -76,5 +77,11 @@ export const CASTLE_UPGRADE = {
 		{ gold: 48000000, wood: 4800000, stone: 4800000, coal: 2600000, food: 25600000, meat: 1280000 },
 		{ gold: 76800000, wood: 7600000, stone: 7600000, coal: 4000000, food: 41000000, meat: 2000000 },
 		{ gold: 122800000, wood: 12200000, stone: 12200000, coal: 6600000, food: 65600000, meat: 3200000 },
+		// 10 -> 15 (Castle Expansion): every step costs about 1.6 x the one before
+		{ gold: 196500000, wood: 19500000, stone: 19500000, coal: 10500000, food: 105000000, meat: 5100000 },
+		{ gold: 314400000, wood: 31200000, stone: 31200000, coal: 16800000, food: 168000000, meat: 8200000 },
+		{ gold: 503000000, wood: 50000000, stone: 50000000, coal: 26900000, food: 268800000, meat: 13100000 },
+		{ gold: 805000000, wood: 80000000, stone: 80000000, coal: 43000000, food: 430000000, meat: 21000000 },
+		{ gold: 1288000000, wood: 128000000, stone: 128000000, coal: 68800000, food: 688000000, meat: 33600000 },
 	],
 };

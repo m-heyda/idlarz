@@ -2,6 +2,8 @@ import { activeBuffs } from '@/lib/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
+import { autoUseUnlocked } from '@/lib/combat';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { potionsForEstimate, resumeHpOf, winnableBy, winPctBy } from '@/lib/offline/fightProfile';
 import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fightTargets';
 import { projectFight } from '@/lib/offline/fightProject';
@@ -29,7 +31,11 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		nextPollSec = plan ? Math.max(0.5, Math.min(600, plan.endsInSec + COMBAT.poll.afterEndSec)) : COMBAT.poll.fightSec;
 	} else {
 		// idle: ask again when something can change
-		const winnable = winnableBy(p, c.hp, potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, ledger.rebirths));
+		const winnable = winnableBy(
+			p,
+			c.hp,
+			potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, autoUseUnlocked(ledger.rebirths, prestigeOfCore(env.stored.core))),
+		);
 		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
 		const resume = resumeHpOf(p);
 		const retry = nextRetry(ledger, c, c.at);
@@ -46,7 +52,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		else if (!waiting && Number.isFinite(retry)) nextPollSec = Math.min(nextSpawnSec ?? 600, Math.min(600, Math.ceil(retry - c.at) + 1));
 		else if (!waiting) nextPollSec = Math.min(600, Math.max(COMBAT.poll.minimizedSec, Math.ceil(nextSpawnSec ?? 600) + 1));
 	}
-	const potions = potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, ledger.rebirths);
+	const potions = potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, autoUseUnlocked(ledger.rebirths, prestigeOfCore(env.stored.core)));
 	const runningBuffs = activeBuffs(ledger.buffs, c.at);
 	return {
 		hp: c.hp,

@@ -270,7 +270,7 @@ const record = () => {
 
 test('hotkeys and switches are requests to the server: a key per press, nothing about damage or HP', async () => {
 	syncedGame();
-	store.setState({ prestige: { ...api().prestige, rebirths: 1 } }); // auto-use is a reward for the first rebirth
+	store.setState({ prestige: { ...api().prestige, rebirths: 1, upgrades: { ...api().prestige.upgrades, potion: 1 } } }); // auto-use is bought in the Ember shop (Potion Reflex)
 	store.setState({ monsters: [makeMonster({ id: 3, level: 1, x: CASTLE_X + 2, y: CASTLE_Y, ticket: 3 })] });
 	const calls = record();
 	try {
@@ -385,7 +385,7 @@ test('auto-battle cannot be switched on before the first rebirth: nothing is sen
 		store.setState({ combat: { ...api().combat, autoBattle: false } } as never);
 		api().setAutoBattle(true);
 		assert.equal(api().combat.autoBattle, false);
-		store.setState({ prestige: { ...api().prestige, rebirths: 1 } } as never);
+		store.setState({ prestige: { ...api().prestige, rebirths: 1, upgrades: { ...api().prestige.upgrades, potion: 1 } } } as never);
 		api().setAutoBattle(true);
 		assert.equal(api().combat.autoBattle, true);
 		await flush();

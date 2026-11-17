@@ -1,7 +1,6 @@
 // economySlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
-import { CASTLE_UPGRADE } from '@/config/castle';
 import { CLICK_LADDER, clickGold, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { calculateTileCost, canAffordBundle, subtractBundle, tileCostAsResources } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
@@ -12,6 +11,7 @@ import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
 import { builderBusy, builderCount } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { limitOf } from '@/lib/limits';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
@@ -77,7 +77,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 			const castle = findCastle(state.tiles);
 			if (!castle || !castle.tile.upgradeCost || !castle.tile.level) return false;
-			if (castle.tile.level >= CASTLE_UPGRADE.maxLevel) return false;
+			if (castle.tile.level >= limitOf('castleMaxLevel', { prestige: state.prestige })) return false; // 10, up to 15 with the Castle Expansion
 			if (!canAffordBundle(state.resources, castle.tile.upgradeCost)) return false;
 
 			set({

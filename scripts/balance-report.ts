@@ -332,7 +332,7 @@ line();
 						.join(' + ')
 				: id === 'deeppockets'
 					? `+${EMBER_UPGRADES.deeppockets.effectPerLevel} bag slots`
-					: `${EMBER_UPGRADES[id].effectPerLevel * 100}%`,
+					: String(EMBER_UPGRADES[id].effectPerLevel),
 			EMBER_UPGRADES[id].maxLevel,
 			...[0, 1, 2, 3, 5, 9].map((l) => emberUpgradeCost(id, l)),
 		]),

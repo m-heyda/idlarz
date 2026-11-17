@@ -15,15 +15,21 @@ export const buildingsEnabled = (): boolean => BUILDINGS_FLAG.enabled;
 
 export { buildingOutput, extractorOutput, producerBonus, producerOutput } from '@/lib/buildingOutput';
 
-/** The highest level a building can be bought to at this castle level: `min(maxLevel, castle level)`. */
-export const buildingLevelCap = (castleLevel: number): number => Math.min(BUILDING_RULES.maxLevel, Math.max(1, Math.floor(castleLevel)));
+/** The highest level a Producer or Extractor can be bought to at this castle level: `min(cap, castle level)`, where `cap` is `buildingMaxLevel` (base 5, Master Masonry raises it). */
+export const buildingLevelCap = (castleLevel: number, buildingMax: number = BUILDING_RULES.maxLevel): number =>
+	Math.min(Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel), Math.max(1, Math.floor(castleLevel)));
 
 /**
  * The highest level a building can be taken to now: Producers and Extractors `min(5, castle level)`; an Idol the same up to level 5 and, above it, only the purchased cap (`idolMaxLevel`, base 5, raised by the Ember shop's Idol Mastery,
  * never past its hard limit): the castle gates the first five levels, the shop the rest.
  */
-export const upgradeCapOf = (def: BuildingDef | undefined, castleLevel: number, idolMax: number = limitOf('idolMaxLevel')): number => {
-	const gate = buildingLevelCap(castleLevel);
+export const upgradeCapOf = (
+	def: BuildingDef | undefined,
+	castleLevel: number,
+	idolMax: number = limitOf('idolMaxLevel'),
+	buildingMax: number = BUILDING_RULES.maxLevel,
+): number => {
+	const gate = buildingLevelCap(castleLevel, buildingMax);
 	if (def?.kind !== 'idol') return gate;
 	const cap = Math.min(idolMax, HARD_LIMITS.idolMaxLevel);
 	return castleLevel < BUILDING_RULES.maxLevel ? Math.min(cap, gate) : cap;
@@ -39,33 +45,50 @@ export const upgradeCapOf = (def: BuildingDef | undefined, castleLevel: number, 
  * seconds = floor(durationsSec[fromLevel - 1] x (1 - min(0.6, 0.05 x Master Builders level + Dwarf Statue %)))          Producer, Extractor
  * seconds = floor(IDOL_RULES.durationsSec[fromLevel] x (1 - ...))          Idol; above level 5: last x 1.35^(levels past 5), at most 7 days
  */
-export const buildingUpgradeDuration = (fromLevel: number, prestige?: PrestigeState, idolBuildTimePct = 0, idol = false): number => {
+export const buildingUpgradeDuration = (fromLevel: number, prestige?: PrestigeState, idolBuildTimePct = 0, kind: BuildKind = 'building'): number => {
+	const idol = kind === 'idol';
 	const table = idol ? IDOL_RULES.durationsSec : BUILDING_RULES.durationsSec;
 	const at = idol ? fromLevel : fromLevel - 1;
 	// past the base ladder (an Idol raised above level 5 by the Ember shop): the last timer x1.35 per level, at most 7 days
 	const base = table[at] ?? Math.min(7 * 86400, (table[table.length - 1] ?? 0) * Math.pow(1.35, at - table.length + 1));
-	return Math.floor(base * (1 - buildTimeReduction(prestige, idolBuildTimePct)));
+	return Math.floor(base * (1 - buildTimeReduction(prestige, idolBuildTimePct, kind)));
 };
 
 /**
  * The shortest a timer to `toLevel` can be (no build-time cuts): the server's floor for a new upgrade; `idol` says the job's building is an Idol (longer timers). The first build (level 1) only exists for Idols.
  */
 export const shortestUpgradeSec = (toLevel: number, idol = false): number =>
-	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, true) : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol);
+	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, 'idol') : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol ? 'idol' : 'building');
 
 /**
- * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's builders on top, at most `HARD_LIMITS.builders`.
+ * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.
  *
  * @category Economy/Buildings
  * @order 8
  * @formula
- * builders = 1 + (Builder #2 bought ? 1 : 0) + Ember shop builders
+ * builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
  */
 export const builderCount = (ctx: LimitContext = {}): number => Math.min(HARD_LIMITS.builders, limitOf('builders', ctx));
 
-/** The share of a build timer taken off: Master Builders (5 % per level) plus the Dwarf Statue, together at most `buildTimeCap` (60 %). */
-export const buildTimeReduction = (prestige: PrestigeState | undefined, idolBuildTimePct = 0): number =>
-	Math.min(IDOL_RULES.buildTimeCap / 100, emberEffect(prestige, 'builders') + idolBuildTimePct / 100);
+/** What a build timer belongs to: the castle, a Producer or Extractor (`building`) or an Idol. Each has its own Ember upgrade for the cut. */
+export type BuildKind = 'castle' | 'building' | 'idol';
+
+const BUILD_TIME_UPGRADE = { castle: 'builders', building: 'buildtime', idol: 'idoltime' } as const;
+
+/**
+ * The share of a build timer taken off: the Ember upgrade of that kind (Master Builders for the castle, Mason's Guild for Producers and Extractors, Shrine Keepers for Idols; 5 % per level)
+ * plus the Dwarf Statue, together at most `buildTimeCap` (60 %).
+ */
+export const buildTimeReduction = (prestige: PrestigeState | undefined, idolBuildTimePct = 0, kind: BuildKind = 'castle'): number =>
+	Math.min(IDOL_RULES.buildTimeCap / 100, emberEffect(prestige, BUILD_TIME_UPGRADE[kind]) + idolBuildTimePct / 100);
+
+/** The largest cut any of the three kinds has: what the server judges a saved timer against (it does not know which kind a step was). */
+export const maxBuildTimeReduction = (prestige: PrestigeState | undefined, idolBuildTimePct = 0): number =>
+	Math.max(
+		buildTimeReduction(prestige, idolBuildTimePct, 'castle'),
+		buildTimeReduction(prestige, idolBuildTimePct, 'building'),
+		buildTimeReduction(prestige, idolBuildTimePct, 'idol'),
+	);
 
 /**
  * The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
@@ -159,6 +182,8 @@ export interface BuildingContext {
 	ownedTiles: number;
 	/** The Idol level cap in force ({@link limitOf} `idolMaxLevel` with the Ember shop's raises); absent = the base */
 	idolMax?: number;
+	/** The Producer and Extractor level cap in force ({@link limitOf} `buildingMaxLevel`); absent = the base */
+	buildingMax?: number;
 }
 
 /** Why a tile cannot take this building, or null when it can: owned, not the castle, no building, chest or monster on it, and of the building's biome. */
@@ -202,7 +227,7 @@ export const buildProblem = (ctx: BuildingContext, x: number, y: number, id: str
 	return tileProblem(ctx, x, y, def);
 };
 
-/** Why the building on tile (x, y) cannot go up a level now, or null: it must exist, have no monster on its tile (defeat it first), be below `min(5, castle level)`, and the builder must be free. Paying is the caller's check. */
+/** Why the building on tile (x, y) cannot go up a level now, or null: it must exist, have no monster on its tile (defeat it first), be below `min(building cap, castle level)`, and the builder must be free. Paying is the caller's check. */
 export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): string | null => {
 	if (!buildingsEnabled()) return 'Buildings are not available yet';
 	const tile = getTile(ctx.tiles, x, y);
@@ -210,9 +235,11 @@ export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): stri
 	if (monsterAt(ctx.monsters as Monster[], x, y)) return 'Defeat the monster here first';
 	const level = levelOfTile(tile);
 	const def = buildingDef(tile.building);
-	const top = def?.kind === 'idol' ? Math.min(ctx.idolMax ?? limitOf('idolMaxLevel'), HARD_LIMITS.idolMaxLevel) : BUILDING_RULES.maxLevel;
+	const buildingMax = ctx.buildingMax ?? BUILDING_RULES.maxLevel;
+	const top =
+		def?.kind === 'idol' ? Math.min(ctx.idolMax ?? limitOf('idolMaxLevel'), HARD_LIMITS.idolMaxLevel) : Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel);
 	if (level >= top) return 'Highest level';
-	if (level >= upgradeCapOf(def, ctx.castleLevel, ctx.idolMax)) return `Needs castle level ${level + 1}`;
+	if (level >= upgradeCapOf(def, ctx.castleLevel, ctx.idolMax, buildingMax)) return `Needs castle level ${level + 1}`;
 	if (upgradeAt(ctx, x, y)) return 'It is being upgraded';
 	return builderBusy(ctx);
 };
