@@ -1,0 +1,97 @@
+/* The Kingdom overview window: a few stacked sections (castle, land, buildings, monsters) */
+.kd-root {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 4px;
+}
+
+.kd-castle {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.kd-castle img {
+	width: 56px;
+	height: 56px;
+	image-rendering: pixelated;
+}
+
+.kd-castle-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.kd-line {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	font-size: 13px;
+	color: #a89878;
+}
+
+.kd-line b {
+	color: #f1e6c8;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.kd-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.kd-biome {
+	display: grid;
+	grid-template-columns: 14px 120px minmax(0, 1fr) 56px;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	color: #f1e6c8;
+}
+
+.kd-swatch {
+	width: 14px;
+	height: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.kd-count {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+}
+
+.kd-building {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 110px 90px;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	color: #f1e6c8;
+}
+
+.kd-building[data-built='false'] {
+	opacity: 0.55;
+}
+
+.kd-sub {
+	color: #a89878;
+	font-size: 11px;
+}
+
+.kd-lvl {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	color: #a89878;
+}
+
+.kd-stats {
+	display: flex;
+	justify-content: space-around;
+}

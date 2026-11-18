@@ -155,7 +155,9 @@ export const canSpawnOn = (
 	castleLevel: number,
 	rebirths = 0,
 ): boolean => {
-	const rule = monsterDef(type).spawn;
+	const def = monsterDef(type);
+	if (def.retired) return false; // a stand-in the real art replaced: it never appears again
+	const rule = def.spawn;
 	if (rebirths < (rule.minRebirths ?? 0)) return false;
 	if (!(rule.biomes as readonly string[]).includes(tile.biome)) return false;
 	const distance = castleDistance({ x, y });

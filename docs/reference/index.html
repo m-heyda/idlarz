@@ -347,7 +347,7 @@ The more tiles owned, the more XP gained</p>
 <p>XP a tile purchase gives, for the <code>k</code>-th purchase (<code>BASE_XP_PER_TILE</code> 45, <code>XP_TILE</code> in <code>src/config/economy.ts</code>); multiplied by <code>1 + XP gain %</code> of the character.
 Tile XP is small on purpose: levels come from passive XP, kills and rebirth-paced play, see <a href="#leveling"><code>LEVELING</code></a>.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
+<pre><code class="language-text">xp(k) = 45 x 1.016^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
 </code></pre>
 </article><article><p><a id="economytiles"></a></p>
 <h3><code>economyTiles</code> <small>function</small></h3>
@@ -797,7 +797,7 @@ the others have 10 levels and growth 1.6.</p>
 <h3><code>MERCHANT_RESOURCE_PRICES</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/merchant.ts"><code>src/config/merchant.ts:18</code></a></p>
 <p>The merchant buys resources at these gold prices per unit. Payout is <code>floor(units x price x (1 + 0.03 x Haggler))</code> (<a href="#sellpayout"><code>sellPayout</code></a>).
-Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up (<a href="#merchant-buy-multiplier"><code>MERCHANT_BUY_MULTIPLIER</code></a>, <a href="#buycost"><code>buyCost</code></a>); farm products are never sold to the player.</p>
+Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up (<a href="#merchant-buy-multiplier"><code>MERCHANT_BUY_MULTIPLIER</code></a>, <a href="#buycost"><code>buyCost</code></a>); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.</p>
 <p><strong>Merchant prices (gold per unit)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -845,6 +845,41 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 <tr>
 <td>hide</td>
 <td>2</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>herbs</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>sap</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>ironOre</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>spores</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>frostshard</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>pearls</td>
+<td>5</td>
+<td>not sold</td>
+</tr>
+<tr>
+<td>salt</td>
+<td>5</td>
 <td>not sold</td>
 </tr>
 <tr>
@@ -916,7 +951,7 @@ The count is never reset, not even by a rebirth.</li>
 <td>packrat2 (Pack Rat)</td>
 <td>Economy</td>
 <td>+4 bag slots</td>
-<td>6</td>
+<td>10</td>
 <td>500 K</td>
 <td>3</td>
 </tr>
@@ -1049,7 +1084,7 @@ The count is never reset, not even by a rebirth.</li>
 </code></pre>
 </article><article><p><a id="sellresource"></a></p>
 <h3><code>sellResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:91</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:99</code></a></p>
 <p>Sells <code>qty</code> units of <code>resource</code> to the merchant: the gold is <code>sellPayout</code> with the save&#39;s Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
 <code>unitsSold</code> / <code>goldFromSales</code> counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.</p>
 </article><article><p><a id="bestworngrade"></a></p>
@@ -1059,7 +1094,7 @@ The count is never reset, not even by a rebirth.</li>
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).</p>
 </article><article><p><a id="buyresource"></a></p>
 <h3><code>buyResource</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:119</code></a></p>
+<p>Source: <a href="../../src/lib/offline/trade.ts"><code>src/lib/offline/trade.ts:128</code></a></p>
 <p>Buys <code>qty</code> whole units of a resource the merchant sells (<code>MERCHANT_BUYABLE</code>) for <code>buyCost</code>, rounded up in the merchant&#39;s favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
 spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.</p>
 </article><h2>Clicks</h2><article><p><a id="click-ladder"></a></p>
@@ -1339,7 +1374,7 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <p>The per-biome building system (R7, IDL-91, IDL-92), behind <a href="#buildings-flag"><code>BUILDINGS_FLAG</code></a>, which is <strong>ON</strong> (owner decision: live on merge). Switching it off is the rollback: the game, the save format, the server checks and the sim are then byte-identical to a build
 that never had this system (<code>tests/economy/buildingsFlagOff.test.ts</code> pins it), and saves written with it on still load, minus their buildings.</p>
 <p>What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; <strong>one of each type per map</strong>; a Producer makes <code>tileEquivalents</code> tiles&#39; worth of its biome&#39;s main materials, grown by
-the share of the biome the player owns; <strong>levels 1-5</strong>, a level above 1 gated by the castle level and bought with resources plus a <strong>timer</strong> counted by the tick loop; the castle and the buildings share the <strong>builders</strong> (1 for everyone, +1 with the Gem shop&#39;s Builder #2, more later from the Ember shop: one timer each, see <code>builderCount</code>);
+the share of the biome the player owns; <strong>levels 1-5</strong>, a level above 1 gated by the castle level and bought with resources plus a <strong>timer</strong> counted by the tick loop; the castle and the buildings share the <strong>builders</strong> (1 for everyone, +1 with the Gem shop&#39;s Builder #2, +1 with the Ember shop&#39;s Extra Builder, 3 at most: one timer each, see <code>builderCount</code>);
 a building can be <strong>moved</strong> for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (<code>docs/plan/18-biome-buildings-and-material-tiers.md</code>).</p>
 <p><strong>Save and server.</strong> A building is two optional fields of a tile&#39;s <code>extra</code> entry (<code>building</code> = catalog id, <code>bl</code> = level) and the running upgrades are the optional top-level list <code>buildingUpgrades</code> (<code>{ x, y, toLevel, remainingSec }</code> each, like <code>castleUpgrade</code>; a first Idol build adds <code>building</code>, the Idol&#39;s id, and <code>toLevel</code> 1). A save from before several builders holds one <code>buildingUpgrade</code>, which is read as a list of one. They are
 written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No <code>SAVE_SCHEMA</code> bump. The server derives income from the saved map
@@ -1875,9 +1910,9 @@ The base level cap is <code>idolMaxLevel</code> (5), raised later by the Ember s
 </article><article><p><a id="buildercount"></a></p>
 <h3><code>builderCount</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/buildings.ts"><code>src/lib/buildings.ts:71</code></a></p>
-<p>How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop&#39;s one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop&#39;s Extra Builder on top, at most <code>HARD_LIMITS.builders</code>.</p>
+<p>How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop&#39;s one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop&#39;s one-level Extra Builder: 3 at most (<code>HARD_LIMITS.builders</code> is only the ceiling a save may hold).</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
+<pre><code class="language-text">builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
 </code></pre>
 </article><article><p><a id="idoleconomy"></a></p>
 <h3><code>idolEconomy</code> <small>function</small></h3>
@@ -1889,7 +1924,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="gem-shop"></a></p>
 <h3><code>GEM_SHOP</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:58</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:64</code></a></p>
 <p>The gem shop&#39;s price book: what each service costs and how often it can be bought.</p>
 <ul>
 <li><p><strong>Class change</strong> (500): never during a fight; writes the profile&#39;s class (server only); the passives of the new class apply at once. An avatar that does not fit the new class is swapped for its starter.</p>
@@ -1903,6 +1938,8 @@ level = min(level on the tile, level the account remembers for the biome)
 <li><p><strong>Name effects</strong> (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (<code>NICK_EFFECTS</code>). Each is its own purchase, separate from the plain colours; they are also bought from the name window.</p>
 </li>
 <li><p><strong>Builder #2</strong> (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (<code>builderCount</code>). Permanent, kept over a rebirth; it is the ledger&#39;s record and the server&#39;s save check allows two timers only with it.</p>
+</li>
+<li><p><strong>Castle skins</strong> (2,500 each, once; Cosmetics tab, Skins): <code>CASTLE_SKINS</code>, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger&#39;s <code>bought</code> record is the ownership.</p>
 </li>
 </ul>
 <p>Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.</p>
@@ -1988,6 +2025,97 @@ level = min(level on the tile, level the account remembers for the biome)
 <td>An animated nickname with a starry purple and blue sky drifting inside the letters.</td>
 </tr>
 <tr>
+<td>Ice Lotus</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Ring Fortress</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Crimson Gothic</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Red Pagoda</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Stone Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Golden Palace</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Crystal Citadel</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Jewel Palace</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Ember Fortress</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Prism Spire</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Emerald Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Tidal Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Moonlit Cathedral</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
 <td>Builder #2</td>
 <td>upgrades</td>
 <td>1000</td>
@@ -1997,7 +2125,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </tbody></table>
 </article><article><p><a id="daily-bonus-gems"></a></p>
 <h3><code>DAILY_BONUS_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:166</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:184</code></a></p>
 <p>The daily first-login bonus: gems per day of the streak. A claim is once per <strong>UTC day</strong> (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.</p>
 <p><strong>Daily first-login bonus by day of the streak</strong> <em>(computed from the code)</em></p>
 <table>
@@ -2038,7 +2166,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </tbody></table>
 </article><article><p><a id="daily-chest"></a></p>
 <h3><code>DAILY_CHEST</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:175</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:193</code></a></p>
 <p>The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: <code>count</code> kinds of material picked at random from <code>resources</code>, each worth <code>minutes</code> of the player&#39;s own income of that kind (a random number in the range, so it grows with the kingdom),
 never less than <code>floor</code>. It is rolled by the server when day 7 is claimed (<a href="#rolldailychest"><code>rollDailyChest</code></a>), from a sealed random number, and recorded as granted like any chest.</p>
 </article><article><p><a id="dailyinfo"></a></p>
@@ -2580,8 +2708,8 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:534</code></a></p>
-<p>The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:552</code></a></p>
+<p>The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight&#39;s an elite), plus seven retired stand-ins and duplicates that never do (<code>RETIRED_MONSTERS</code>): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
 <li>Builds (<code>BUILD</code>): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.</li>
@@ -2686,6 +2814,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <tr>
 <td>swamp</td>
 <td>Garbage Ogre</td>
+<td>1</td>
+<td>286</td>
+<td>6</td>
+<td>2</td>
+<td>0.4</td>
+<td>8-10 -&gt; 16-18</td>
+</tr>
+<tr>
+<td>swamp</td>
+<td>Toxic Zombie</td>
 <td>1</td>
 <td>286</td>
 <td>6</td>
@@ -2824,6 +2962,46 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>22-25 -&gt; 29-32</td>
 </tr>
 <tr>
+<td>hills</td>
+<td>Magma Knight</td>
+<td>1</td>
+<td>152</td>
+<td>8</td>
+<td>1.5</td>
+<td>0.6</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Magma Crab</td>
+<td>1</td>
+<td>247</td>
+<td>5</td>
+<td>1.5</td>
+<td>0.4</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Mawhorn Brute</td>
+<td>1</td>
+<td>190</td>
+<td>7</td>
+<td>1.5</td>
+<td>0.5</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>The Ironhorn (boss)</td>
+<td>22</td>
+<td>2,300</td>
+<td>18</td>
+<td>28</td>
+<td>0.33</td>
+<td>22-25 -&gt; 29-32</td>
+</tr>
+<tr>
 <td>coast</td>
 <td>Wreck Crab</td>
 <td>1</td>
@@ -2895,6 +3073,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 </tr>
 <tr>
 <td>lake</td>
+<td>Tidepool Golem</td>
+<td>1</td>
+<td>338</td>
+<td>6</td>
+<td>2.5</td>
+<td>0.4</td>
+<td>10-12 -&gt; 17-19</td>
+</tr>
+<tr>
+<td>lake</td>
 <td>The Lake Hydra (boss)</td>
 <td>27</td>
 <td>4,500</td>
@@ -2936,6 +3124,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <tr>
 <td>jungle</td>
 <td>The Hardwood Colossus (boss)</td>
+<td>32</td>
+<td>9,000</td>
+<td>40</td>
+<td>64</td>
+<td>0.33</td>
+<td>32-35 -&gt; 39-42</td>
+</tr>
+<tr>
+<td>jungle</td>
+<td>The Brainstorm (boss)</td>
 <td>32</td>
 <td>9,000</td>
 <td>40</td>
@@ -3215,7 +3413,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by <a href="#bandof"><code>bandOf</code></a>. No spawn rule reads them yet.</p>
 </article><article><p><a id="boss-min-distance"></a></p>
 <h3><code>BOSS_MIN_DISTANCE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:482</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:485</code></a></p>
 <p>The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts&#39; start (7), and the band is open-ended (<code>BOSS_MAX_DISTANCE</code> is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">boss tile: BOSS_MIN_DISTANCE (8) &lt;= castle distance &lt;= BOSS_MAX_DISTANCE; normal monster tile: 2 &lt;= castle distance &lt;= 9
@@ -3235,7 +3433,7 @@ Items: see <a href="#generateloot"><code>generateLoot</code></a>. Measured share
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
 gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%))
-xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel)) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xp/s includes the XP gain %)
+xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
 hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
 </code></pre>
 <p><strong>Kill rewards per biome</strong> <em>(computed from the code)</em></p>
@@ -3780,7 +3978,7 @@ start at item level 4 plus 3 per castle level above 1.</p>
 <td>merchant_stock</td>
 <td>12 x 100%, 12 guaranteed from general_equipment</td>
 <td>source level +0 +-2</td>
-<td>common 60, uncommon 40</td>
+<td>common 60, uncommon 40, rare 4</td>
 <td>-</td>
 </tr>
 </tbody></table>
@@ -4064,7 +4262,7 @@ touches set pieces, epic or legendary pieces or crafted gear (the mark overrides
 <p>See also: <code>isJunkStack</code>, <a href="#junksale"><code>junkSale</code></a></p>
 </article><article><p><a id="junksale"></a></p>
 <h3><code>junkSale</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:70</code></a></p>
+<p>Source: <a href="../../src/lib/loot/junk.ts"><code>src/lib/loot/junk.ts:74</code></a></p>
 <p>What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant&#39;s Haggler and Idol bonuses. The one function the server and the browser both run,
 so their previews agree. <code>junk</code> is a parameter so a test can flip the gear rule.</p>
 </article><article><p><a id="selljunkrule"></a></p>
@@ -4864,7 +5062,7 @@ the loot pipeline (<code>LOOT_SOURCES.craft</code>, profile <code>craft</code>, 
 </tbody></table>
 </article><article><p><a id="gearitemlevels"></a></p>
 <h3><code>gearItemLevels</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:37</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:40</code></a></p>
 <p>The item level a recipe of this grade makes, by crafting level: the grade&#39;s window (<code>gradeLevels</code>) is climbed from its bottom at the grade&#39;s unlock to its top at the next grade&#39;s unlock, and the roll is +-1 around that centre, never outside the window.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">centre = round(window low + (window high - window low) x clamp((crafting level - unlock) / (next unlock - unlock), 0, 1))
@@ -4872,7 +5070,7 @@ item level = centre - 1 .. centre + 1, held inside the grade&#39;s window
 </code></pre>
 </article><article><p><a id="qualitybiasof"></a></p>
 <h3><code>qualityBiasOf</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:57</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:60</code></a></p>
 <p>Intelligence&#39;s lean on the quality and the affix magnitudes of a craft, for <code>rollLeaning</code>.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">bias = min(1, 0.01 x (Intelligence - 5)), 0 at 5 or less
@@ -4887,14 +5085,14 @@ additions never drift. The server uses this for every craft, claim and queue pay
 </code></pre>
 </article><article><p><a id="pitymultiplier"></a></p>
 <h3><code>pityMultiplier</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:78</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:81</code></a></p>
 <p>The pity multiplier on the grade&#39;s best rarity after <code>misses</code> crafts that missed it.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">multiplier = min(1.5, 1 + 0.05 x misses)        a hit resets the counter; a grade with one rarity has none
 </code></pre>
 </article><article><p><a id="rollgear"></a></p>
 <h3><code>rollGear</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:114</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:117</code></a></p>
 <p>One crafted piece: the <code>craft</code> loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe&#39;s slot inside the grade&#39;s item level window, and the piece is marked <code>crafted</code>. Null when nothing is eligible (a
 configuration error, never silently replaced).</p>
 <p>The roll of one gear craft. The server calls it once per delivered piece with <code>sealedRng(secret, user, 0, &#39;craft&#39;, craft.ord + n)</code>: the lifetime counter, not the run&#39;s, so a rebirth never repeats a sequence and a replayed claim rolls the same pieces.
@@ -4902,7 +5100,7 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>See also: <a href="#gearodds"><code>gearOdds</code></a>, <a href="#craft-gear"><code>CRAFT_GEAR</code></a></p>
 </article><article><p><a id="gearodds"></a></p>
 <h3><code>gearOdds</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:140</code></a></p>
+<p>Source: <a href="../../src/lib/craftGear.ts"><code>src/lib/craftGear.ts:143</code></a></p>
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Rankings</h2><article><p><a id="ranking-boards"></a></p>
 <h3>The boards</h3>
@@ -7252,11 +7450,11 @@ unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the five reb
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:249</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:255</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:264</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:270</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>

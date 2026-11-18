@@ -263,7 +263,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **chest** (profile `basic_chest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
-- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 60.0%, Uncommon 40.0%
+- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 57.7%, Uncommon 38.5%, Rare 3.8%
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 - **craft level 41** (profile `craft`, item level 41): 32 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 
@@ -290,11 +290,11 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `xp` | XP |  | The castle, buying tiles and your stats. |
 | `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |
 | `embers` | Embers |  | Rebirthing from castle level 6: the higher your castle and land, the more you get. |
-| `herbs` | Herbs |  | The Herb Garden on a plains tile. Cannot be bought or sold. |
-| `sap` | Sap |  | The Sap Tapper on a forest tile. Cannot be bought or sold. |
-| `ironOre` | Iron Ore |  | The Deep Mine on a hills tile. Cannot be bought or sold. |
-| `spores` | Spores |  | The Spore Cellar on a swamp tile. Cannot be bought or sold. |
-| `frostshard` | Frostshard |  | The Ice Cutter on a tundra tile. Cannot be bought or sold. |
-| `pearls` | Pearls |  | The Pearl Diver on a lake tile. Cannot be bought or sold. |
-| `salt` | Salt |  | The Salt Works on a coast tile. Cannot be bought or sold. |
+| `herbs` | Herbs | 5 | The Herb Garden on a plains tile. Sells to the merchant (he does not sell it back). |
+| `sap` | Sap | 5 | The Sap Tapper on a forest tile. Sells to the merchant (he does not sell it back). |
+| `ironOre` | Iron Ore | 5 | The Deep Mine on a hills tile. Sells to the merchant (he does not sell it back). |
+| `spores` | Spores | 5 | The Spore Cellar on a swamp tile. Sells to the merchant (he does not sell it back). |
+| `frostshard` | Frostshard | 5 | The Ice Cutter on a tundra tile. Sells to the merchant (he does not sell it back). |
+| `pearls` | Pearls | 5 | The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back). |
+| `salt` | Salt | 5 | The Salt Works on a coast tile. Sells to the merchant (he does not sell it back). |
 | `wool` | Wool | 2 | Sheep on the farm. Cannot be bought. |

@@ -8,6 +8,7 @@ import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { openMenuAt } from '@/lib/globalMenu';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
+import { useWindowStore } from '@/stores/windowStore';
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
 
 const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
@@ -83,11 +84,13 @@ const ResourceTrays: React.FC = () => {
  */
 const HudTopBar: React.FC = () => {
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
+	const kingdomOpen = useWindowStore((state) => state.order.includes('kingdom'));
 
 	return (
 		<TopBar
 			right={
 				<>
+					<GlyphButton glyph='♛' label='Kingdom overview' active={kingdomOpen} onClick={() => useWindowStore.getState().toggleWindow('kingdom')} />
 					<GlyphButton
 						glyph='⚙'
 						label='Game menu: settings, save, export'

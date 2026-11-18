@@ -4,23 +4,25 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { MONSTER_CATALOG, labMonsters, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
 import { BIOMES } from '../../src/config/biomes';
-import { MONSTERS } from '../../src/config/combatConfig';
+import { MONSTERS, RETIRED_MONSTERS } from '../../src/config/combatConfig';
 
 // The roster (catalog/monsters.ts) lists every planned monster; only enabled ones may spawn, and those must have real stats in MONSTERS.
 
 // the swamp and the tundra got a fourth monster from new art (2026-11-16) and the blight a fourth, elite one
 const FOURTH = new Set(['swamp', 'tundra', 'blight']);
+// the retired stand-ins and duplicates are not counted
+const NORMALS: Record<string, number> = {};
 
 test('ids are unique and every biome has three monsters (four in the swamp, tundra and blight) and one boss', () => {
 	const ids = MONSTER_CATALOG.map((m) => m.id);
 	assert.equal(new Set(ids).size, ids.length);
 	const byBiome = new Map<string, typeof MONSTER_CATALOG>();
-	for (const m of MONSTER_CATALOG) {
+	for (const m of MONSTER_CATALOG.filter((entry) => !RETIRED_MONSTERS.has(entry.id))) {
 		byBiome.set(m.biomes[0], [...(byBiome.get(m.biomes[0]) ?? []), m]);
 	}
 	assert.equal(byBiome.size, 12);
 	for (const [biome, list] of byBiome) {
-		assert.equal(list.filter((m) => m.grade === 'normal').length, FOURTH.has(biome) ? 4 : 3, `${biome}: monsters`);
+		assert.equal(list.filter((m) => m.grade === 'normal').length, NORMALS[biome] ?? (FOURTH.has(biome) ? 4 : 3), `${biome}: monsters`);
 		assert.equal(list.filter((m) => m.grade === 'boss').length, 1, `${biome}: 1 boss`);
 	}
 });
@@ -43,9 +45,14 @@ test('the rats are gone: the seven home biomes and the five rebirth biomes are e
 		'tundra',
 	]);
 	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 51);
+	assert.ok(
+		MONSTER_CATALOG.filter((m) => RETIRED_MONSTERS.has(m.id)).every((m) => !m.enabled),
+		'a retired stand-in is not enabled',
+	);
 	assert.deepEqual(
 		Object.keys(MONSTERS).sort(),
-		MONSTER_CATALOG.filter((m) => m.enabled)
+		// the retired stand-ins stay in MONSTERS (saves and tickets may name them) but are not enabled
+		MONSTER_CATALOG.filter((m) => m.enabled || RETIRED_MONSTERS.has(m.id))
 			.map((m) => m.id)
 			.sort(),
 	);
@@ -70,7 +77,7 @@ test('a monster without its own art has a stand-in file that exists; a monster w
 		if (m.art) assert.equal(monsterSpriteUrl(m), monsterArtUrl(m), `${m.id}: real art wins over the stand-in`);
 	}
 	const standIns = MONSTER_CATALOG.filter((m) => m.enabled && !m.art).map((m) => m.id);
-	assert.deepEqual(standIns.sort(), ['bossHardwoodColossus', 'bossHillGiant', 'boulderBeetle', 'caveGoblinMiner', 'graniteRam', 'pikeLurker']);
+	assert.deepEqual(standIns, [], 'every live monster has its real art; the old stand-ins are retired');
 });
 
 test('monstersInBiome hides disabled monsters unless asked', () => {
@@ -78,7 +85,7 @@ test('monstersInBiome hides disabled monsters unless asked', () => {
 		monstersInBiome('swamp')
 			.map((m) => m.id)
 			.sort(),
-		['bossMireMatriarch', 'dumpback', 'garbageOgre', 'rotHeron', 'scrapGolem'],
+		['bossMireMatriarch', 'dumpback', 'rotHeron', 'scrapGolem', 'toxicZombie'],
 	);
 	assert.equal(monstersInBiome('lake').length, 4, 'the lake roster is enabled');
 	assert.equal(monstersInBiome('hills').length, 4);

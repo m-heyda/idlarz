@@ -12,7 +12,7 @@ import { Button, DiamondLevel, Tabs } from '../../../packages/design-system/src/
 import '@/styles/BuildModal.css';
 import { useWindowStore } from '@/stores/windowStore';
 import CostGrid from './CostGrid';
-import { ComingSoon } from '../../../packages/design-system/src/components/composites';
+import CastleSkinsSection from './CastleSkinsSection';
 import CastleSprite from './CastleSprite';
 
 /** The castle upgrade window (opened from the castle tile): one of the game's windows, so it can stay open beside the merchant. */
@@ -112,11 +112,7 @@ const CastleUpgradeDialog: FC = () => {
 			}
 		>
 			{tab === 'skins' ? (
-				<ComingSoon
-					title='Castle skins'
-					icon={`/pixel/castles/castle_${Math.min(castleLevel, 10)}.png`}
-					text='Give your castle a new look. Skins are only for show: the castle bonus stays the same.'
-				/>
+				<CastleSkinsSection />
 			) : (
 				<div className='bw-main' style={{ gap: 14 }}>
 					<div className='bw-castle-sprites'>
@@ -139,7 +135,7 @@ const CastleUpgradeDialog: FC = () => {
 									<span className='bw-arrow-sign'>→</span>
 								</div>
 								<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.85 }}>
-									<CastleSprite level={castleLevel + 1} variant='inline' />
+									<CastleSprite level={castleLevel + 1} variant='inline' plain />
 									<span style={{ fontSize: 12, color: '#f4d57e' }}>Level {castleLevel + 1}</span>
 								</div>
 							</>

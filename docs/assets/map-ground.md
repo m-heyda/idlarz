@@ -47,7 +47,7 @@ Ground textures, shape atlases and shores that TerrainLayer draws, the cracked-s
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `ground_terrain_props` | <img src="../../public/pixel/terrain/props.png" width="96" alt="ground_terrain_props"> | 1024x465 | used | TerrainLayer | `pixel/terrain/props.png` |
+| `ground_terrain_props` | <img src="../../public/pixel/terrain/props.png" width="96" alt="ground_terrain_props"> | 1024x513 | used | TerrainLayer | `pixel/terrain/props.png` |
 | `ground_terrain_shapes_battlefield` | <img src="../../public/pixel/terrain/shapes_battlefield.png" width="96" alt="ground_terrain_shapes_battlefield"> | 768x192 | used | TerrainLayer | `pixel/terrain/shapes_battlefield.png` |
 | `ground_terrain_shapes_blight` | <img src="../../public/pixel/terrain/shapes_blight.png" width="96" alt="ground_terrain_shapes_blight"> | 768x192 | used | TerrainLayer | `pixel/terrain/shapes_blight.png` |
 | `ground_terrain_shapes_blight_d1` | <img src="../../public/pixel/terrain/shapes_blight_d1.png" width="96" alt="ground_terrain_shapes_blight_d1"> | 768x192 | used | TerrainLayer | `pixel/terrain/shapes_blight_d1.png` |

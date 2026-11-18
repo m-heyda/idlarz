@@ -121,7 +121,7 @@ const BASE_ICON_SIZES = {
 	equip_feet: [40, 40],
 	equip_ring: [40, 40],
 	// monsters: 2-frame idle sheets (frame width x 2)
-	// castles: castle_1..castle_10 (one per upgrade level) and castle_skin_1..7 (premium skins, not wired yet) live in public/pixel/castles.
+	// castles: castle_1..castle_10 (one per upgrade level) and castle_skin_1..14 (premium skins, sold in the Gem shop: `config/castleSkins.ts`) live in public/pixel/castles.
 	// 64px, drawn centred on the 48px castle tile so they spill 8px over the neighbours.
 	castle_1: [64, 64],
 	castle_2: [64, 64],
@@ -140,6 +140,12 @@ const BASE_ICON_SIZES = {
 	castle_skin_5: [64, 64],
 	castle_skin_6: [64, 64],
 	castle_skin_7: [64, 64],
+	castle_skin_8: [64, 64],
+	castle_skin_9: [64, 64],
+	castle_skin_10: [64, 64],
+	castle_skin_12: [64, 64],
+	castle_skin_13: [64, 64],
+	castle_skin_14: [64, 64],
 	// map: one icon per biome
 	biome_forest: [32, 32],
 	biome_plains: [32, 32],

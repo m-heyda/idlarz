@@ -518,7 +518,7 @@ the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`
 
 ### `gearItemLevels` <small>function</small>
 
-Source: [`src/lib/craftGear.ts:37`](../../src/lib/craftGear.ts)
+Source: [`src/lib/craftGear.ts:40`](../../src/lib/craftGear.ts)
 
 The item level a recipe of this grade makes, by crafting level: the grade's window (`gradeLevels`) is climbed from its bottom at the grade's unlock to its top at the next grade's unlock, and the roll is +-1 around that centre, never outside the window.
 
@@ -533,7 +533,7 @@ item level = centre - 1 .. centre + 1, held inside the grade's window
 
 ### `qualityBiasOf` <small>function</small>
 
-Source: [`src/lib/craftGear.ts:57`](../../src/lib/craftGear.ts)
+Source: [`src/lib/craftGear.ts:60`](../../src/lib/craftGear.ts)
 
 Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`.
 
@@ -562,7 +562,7 @@ craftXpOf = recipe.xp x count x CRAFTING.xpScale x (1 + crafting XP bonus %)   (
 
 ### `pityMultiplier` <small>function</small>
 
-Source: [`src/lib/craftGear.ts:78`](../../src/lib/craftGear.ts)
+Source: [`src/lib/craftGear.ts:81`](../../src/lib/craftGear.ts)
 
 The pity multiplier on the grade's best rarity after `misses` crafts that missed it.
 
@@ -576,7 +576,7 @@ multiplier = min(1.5, 1 + 0.05 x misses)        a hit resets the counter; a grad
 
 ### `rollGear` <small>function</small>
 
-Source: [`src/lib/craftGear.ts:114`](../../src/lib/craftGear.ts)
+Source: [`src/lib/craftGear.ts:117`](../../src/lib/craftGear.ts)
 
 One crafted piece: the `craft` loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe's slot inside the grade's item level window, and the piece is marked `crafted`. Null when nothing is eligible (a
 configuration error, never silently replaced).
@@ -590,7 +590,7 @@ See also: [`gearOdds`](progression.md#gearodds), [`CRAFT_GEAR`](progression.md#c
 
 ### `gearOdds` <small>function</small>
 
-Source: [`src/lib/craftGear.ts:140`](../../src/lib/craftGear.ts)
+Source: [`src/lib/craftGear.ts:143`](../../src/lib/craftGear.ts)
 
 What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.
 

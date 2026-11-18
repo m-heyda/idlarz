@@ -10,12 +10,12 @@ import { pixelIconSrc } from '@/config/pixelIcons';
 import { averageItemLevel, gearOf, slotQty } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import { isAutoSold } from '@/lib/loot/autoSell';
-import { countJunk, junkFor } from '@/lib/loot/junk';
+import { countJunk, junkFor, junkGold } from '@/lib/loot/junk';
 import { freeRefreshesLeft, refreshCooldown, refreshCost, secondsToRotation, shelfCells, shopPriceOf } from '@/lib/merchant';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import type { BagSlot, ItemInstance } from '@/types/game';
-import { formatNumber, formatTime } from '@/utils/formatters';
+import { formatCompact, formatNumber, formatTime } from '@/utils/formatters';
 import { sellPayout } from '@/utils/game/merchant';
 import { itemIconName, slotProps } from '../itemUi';
 import GameItemTip from '../hero/GameItemTip';
@@ -124,6 +124,7 @@ const MerchantGoodsTab: React.FC = () => {
 		return sellPayout(unit, slotQty(slot), sellCtx);
 	};
 	const junkCount = countJunk(bag, junkFor(equipment));
+	const junkWorth = junkGold(bag, sellCtx, junkFor(equipment)); // the gold the button pays, shown on it
 	const worth = entries.reduce((sum, e) => sum + worthOf(e.slot), 0);
 	const plainWorth = bag.reduce((sum, slot) => {
 		const gear = slot ? gearOf(slot) : null;
@@ -282,13 +283,13 @@ const MerchantGoodsTab: React.FC = () => {
 						fill
 						tip={
 							<HintTooltip
-								title={junkCount > 0 ? `Sell ${formatNumber(junkCount)} junk` : 'No junk yet'}
+								title={junkCount > 0 ? `Sell ${formatNumber(junkCount)} junk for ${formatNumber(junkWorth)} Gold` : 'No junk yet'}
 								text='Junk materials from monsters, gear you marked as junk and gear well below what you wear. Mark gear from its right-click menu in the bag.'
 							/>
 						}
 					>
 						<Button tone='danger' style={{ minHeight: 40 }} disabled={fighting || junkCount === 0} onClick={sellJunkRule}>
-							Sell junk{junkCount > 0 ? ` (${formatNumber(junkCount)})` : ''}
+							Sell junk{junkCount > 0 ? ` (${formatCompact(junkWorth)} Gold)` : ''}
 						</Button>
 					</HoverTip>
 					<div className='ds-quick-grades'>

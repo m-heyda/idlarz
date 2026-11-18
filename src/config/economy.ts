@@ -62,7 +62,7 @@ export const TILE_PRICE = {
  * fitted to the XP these numbers give the sim bot, so change them together (re-run the sim and move the anchors).
  */
 export const XP_TILE = {
-	growth: 1.02,
+	growth: 1.016, // was 1.02 (2026-11-17): the top player reached level 77 in days with auto clickers; about 2.7x less tile XP at 300 tiles
 	growthUntil: 300,
 	tailExponent: 1.5,
 };

@@ -750,9 +750,9 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'farm_rework',
 		});
 
-	// 7. Loose drops: pictures put into a folder before they were named or wired (unnamed Sprite Fusion files in enemies/, the new pets/, to_organize/). They show under Unsorted cuts so each can be named, wired or deleted.
+	// 7. Loose drops: pictures put into a folder before they were named or wired (unnamed Sprite Fusion files in enemies/ and the new pets/). They show under Unsorted cuts so each can be named, wired or deleted.
 	const listedSrc = new Set(entries.flatMap((e) => [e.src, ...Object.values(e.variants ?? {})]));
-	for (const dir of [join(PUBLIC, 'pixel', 'enemies'), join(PUBLIC, 'pixel', 'pets'), join(PUBLIC, 'to_organize')])
+	for (const dir of [join(PUBLIC, 'pixel', 'enemies'), join(PUBLIC, 'pixel', 'pets')])
 		for (const f of walk(dir)) {
 			if (listedSrc.has(url(f))) continue;
 			const folder = relative(PUBLIC, dirname(f)).split(sep).join('/');

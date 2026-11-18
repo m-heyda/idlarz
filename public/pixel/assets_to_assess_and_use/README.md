@@ -14,7 +14,7 @@ Art that was added for later features and is **not used by the game yet**. Nothi
 | [misc_map_details](misc_map_details/README.md)                                                              | fantasy trees, ents, tree idols, mushrooms          | 81    | Jungle and Blossom Orchard, Idol buildings         |
 | [map_details_misc](map_details_misc/README.md)                                                              | temple ruin, gargoyles, graves, ghost, cultist      | 7     | Blight and Battlefield, animations                 |
 | [map_details](map_details/README.md)                                                                        | farm plants and trees sheet                         | 1     | farm crops, Fields and Orchard                     |
-| [monsters](monsters/README.md)                                                                              | 9 monster sprites, 64-70 px (2 moved to `enemies/jungle/`)   | 9     | monsters and bosses of the new biomes (R9)         |
+| [monsters](monsters/README.md)                                                                              | 8 monster sprites, 64-70 px (2 moved to `enemies/jungle/`, `purple_ogre` to `enemies/hills/mawhorn-brute.png`)   | 8     | monsters and bosses of the new biomes (R9)         |
 
 ## Before any of this ships (read this)
 

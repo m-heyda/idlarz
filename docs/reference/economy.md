@@ -247,7 +247,7 @@ Tile XP is small on purpose: levels come from passive XP, kills and rebirth-pace
 **Formula**
 
 ```text
-xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
+xp(k) = 45 x 1.016^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
 ```
 
 <a id="economytiles"></a>
@@ -574,7 +574,7 @@ The whole farm's output per second: the sum of [`animalOutput`](economy.md#anima
 Source: [`src/config/merchant.ts:18`](../../src/config/merchant.ts)
 
 The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ([`sellPayout`](economy.md#sellpayout)).
-Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ([`MERCHANT_BUY_MULTIPLIER`](economy.md#merchant-buy-multiplier), [`buyCost`](economy.md#buycost)); farm products are never sold to the player.
+Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up ([`MERCHANT_BUY_MULTIPLIER`](economy.md#merchant-buy-multiplier), [`buyCost`](economy.md#buycost)); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.
 
 **Merchant prices (gold per unit)** _(computed from the code)_
 
@@ -588,6 +588,13 @@ Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up 
 | eggs | 2 | not sold |
 | milk | 3 | not sold |
 | hide | 2 | not sold |
+| herbs | 5 | not sold |
+| sap | 5 | not sold |
+| ironOre | 5 | not sold |
+| spores | 5 | not sold |
+| frostshard | 5 | not sold |
+| pearls | 5 | not sold |
+| salt | 5 | not sold |
 | wool | 2 | not sold |
 
 <a id="merchant-goods"></a>
@@ -620,7 +627,7 @@ Merchant upgrades are bought with gold; the cost of level N+1 is `ceil(baseCost 
 | bulk (Bulk Discount) | Economy | -1% tile cost | 8 | 250 K | 2.1 |
 | charm (Lucky Charm) | Economy | +2 Luck for chests and kills | 10 | 150 K | 1.9 |
 | packrat (Pack Rat (old)) | Economy | +8 bag slots | 6 | 500 K | 3 |
-| packrat2 (Pack Rat) | Economy | +4 bag slots | 6 | 500 K | 3 |
+| packrat2 (Pack Rat) | Economy | +4 bag slots | 10 | 500 K | 3 |
 | foreman (Foreman) | Economy | +1% income from every resource, gold included | 10 | 400 K | 1.9 |
 | skinner (Skinner) | Economy | +5% meat and hide from your animals | 8 | 300 K | 1.9 |
 | swift (Quick Hands) | Combat | +2% attack speed | 8 | 250 K | 1.9 |
@@ -727,7 +734,7 @@ paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
 
 ### `sellResource` <small>function</small>
 
-Source: [`src/lib/offline/trade.ts:91`](../../src/lib/offline/trade.ts)
+Source: [`src/lib/offline/trade.ts:99`](../../src/lib/offline/trade.ts)
 
 Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime
 `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.
@@ -745,7 +752,7 @@ the next grade stays a reward for fights and chests until the player has worn th
 
 ### `buyResource` <small>function</small>
 
-Source: [`src/lib/offline/trade.ts:119`](../../src/lib/offline/trade.ts)
+Source: [`src/lib/offline/trade.ts:128`](../../src/lib/offline/trade.ts)
 
 Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the
 spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.
@@ -1006,7 +1013,7 @@ The per-biome building system (R7, IDL-91, IDL-92), behind [`BUILDINGS_FLAG`](ec
 that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
 
 What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
-the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, more later from the Ember shop: one timer each, see `builderCount`);
+the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, +1 with the Ember shop's Extra Builder, 3 at most: one timer each, see `builderCount`);
 a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
 
 **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
@@ -1218,12 +1225,12 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 
 Source: [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts)
 
-How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.
+How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
 
 **Formula**
 
 ```text
-builders = 1 + (Builder #2 bought ? 1 : 0) + Extra Builder level
+builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
 ```
 
 <a id="idoleconomy"></a>
@@ -1247,7 +1254,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:58`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:64`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1260,6 +1267,8 @@ The gem shop's price book: what each service costs and how often it can be bough
 - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
 
 - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
+
+- **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1277,13 +1286,26 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Frost name | once | 500 | none | An animated icy nickname with a glint that sweeps across it. |
 | Void name | once | 500 | none | A pale violet nickname that breathes out a dark purple glow. |
 | Galaxy name | once | 500 | none | An animated nickname with a starry purple and blue sky drifting inside the letters. |
+| Ice Lotus | once | 2500 | none | A castle skin. |
+| Ring Fortress | once | 2500 | none | A castle skin. |
+| Crimson Gothic | once | 2500 | none | A castle skin. |
+| Red Pagoda | once | 2500 | none | A castle skin. |
+| Stone Keep | once | 2500 | none | A castle skin. |
+| Golden Palace | once | 2500 | none | A castle skin. |
+| Crystal Citadel | once | 2500 | none | A castle skin. |
+| Jewel Palace | once | 2500 | none | A castle skin. |
+| Ember Fortress | once | 2500 | none | A castle skin. |
+| Prism Spire | once | 2500 | none | A castle skin. |
+| Emerald Keep | once | 2500 | none | A castle skin. |
+| Tidal Keep | once | 2500 | none | A castle skin. |
+| Moonlit Cathedral | once | 2500 | none | A castle skin. |
 | Builder #2 | upgrades | 1000 | none | A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:166`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:184`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 
@@ -1303,7 +1325,7 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 
 ### `DAILY_CHEST` <small>const</small>
 
-Source: [`src/config/gemShop.ts:175`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:193`](../../src/config/gemShop.ts)
 
 The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
 never less than `floor`. It is rolled by the server when day 7 is claimed ([`rollDailyChest`](economy.md#rolldailychest)), from a sealed random number, and recorded as granted like any chest.

@@ -25,7 +25,7 @@ export interface RebirthUnlockIntro {
 
 /** Monsters whose `spawn.minRebirths` is exactly this rebirth: they appear on the new map from now on. */
 export const monstersUnlockedAt = (rebirths: number): { normal: number; boss: number } => {
-	const found = Object.values(MONSTERS).filter((def) => (def.spawn.minRebirths ?? 0) === rebirths && rebirths > 0);
+	const found = Object.values(MONSTERS).filter((def) => !('retired' in def) && (def.spawn.minRebirths ?? 0) === rebirths && rebirths > 0);
 	return { normal: found.filter((def) => def.grade !== 'boss').length, boss: found.filter((def) => def.grade === 'boss').length };
 };
 

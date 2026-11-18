@@ -8352,6 +8352,81 @@
 	},
 	{
 		"usedBy": [
+			"bossIronhorn"
+		],
+		"name": "monster_boss_ironhorn",
+		"category": "monsters",
+		"subcategory": "hills boss",
+		"src": "/pixel/enemies/hills/boss-ironhorn.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			70,
+			70
+		]
+	},
+	{
+		"usedBy": [
+			"magmaCrab"
+		],
+		"name": "monster_magma_crab",
+		"category": "monsters",
+		"subcategory": "hills normal",
+		"src": "/pixel/enemies/hills/magma-crab.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"magmaKnight"
+		],
+		"name": "monster_magma_knight",
+		"category": "monsters",
+		"subcategory": "hills normal",
+		"src": "/pixel/enemies/hills/magma-knight.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			66,
+			66
+		]
+	},
+	{
+		"usedBy": [
+			"mawhornBrute"
+		],
+		"name": "monster_mawhorn_brute",
+		"category": "monsters",
+		"subcategory": "hills normal",
+		"src": "/pixel/enemies/hills/mawhorn-brute.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"bossBrainstorm"
+		],
+		"name": "monster_boss_brainstorm",
+		"category": "monsters",
+		"subcategory": "jungle boss",
+		"src": "/pixel/enemies/jungle/boss-brainstorm.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"eyeHorror"
 		],
 		"name": "monster_eye_horror",
@@ -8441,6 +8516,21 @@
 		]
 	},
 	{
+		"usedBy": [
+			"tidepoolGolem"
+		],
+		"name": "monster_tidepool_golem",
+		"category": "monsters",
+		"subcategory": "lake normal",
+		"src": "/pixel/enemies/lake/tidepool-golem.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "monster_pack_frost_flame_knight",
 		"category": "monsters",
@@ -8455,49 +8545,10 @@
 	},
 	{
 		"usedBy": [],
-		"name": "monster_pack_magma_knight",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/magma_knight.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			66,
-			66
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_mecha_triceratops",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/mecha_triceratops.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			70,
-			70
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "monster_pack_mushroom_wizard",
 		"category": "monsters",
 		"subcategory": "new biome monsters (not wired)",
 		"src": "/pixel/assets_to_assess_and_use/monsters/mushroom_wizard.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_purple_ogre",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/purple_ogre.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/monsters",
 		"size": [
@@ -8537,19 +8588,6 @@
 		"category": "monsters",
 		"subcategory": "new biome monsters (not wired)",
 		"src": "/pixel/assets_to_assess_and_use/monsters/skull_vine.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			65,
-			65
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_toxic_zombie",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/toxic_zombie.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/monsters",
 		"size": [
@@ -8623,6 +8661,7 @@
 			"caveGoblinMiner",
 			"boulderBeetle",
 			"bossHillGiant",
+			"garbageOgre",
 			"pikeLurker",
 			"bossHardwoodColossus"
 		],
@@ -8633,8 +8672,8 @@
 		"status": "used",
 		"source": "monster roster",
 		"size": [
-			64,
-			64
+			68,
+			68
 		]
 	},
 	{
@@ -8729,21 +8768,6 @@
 	},
 	{
 		"usedBy": [
-			"garbageOgre"
-		],
-		"name": "monster_garbage_ogre",
-		"category": "monsters",
-		"subcategory": "swamp normal",
-		"src": "/pixel/enemies/swamp/garbage-ogre.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
 			"rotHeron"
 		],
 		"name": "monster_rot_heron",
@@ -8770,6 +8794,21 @@
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"toxicZombie"
+		],
+		"name": "monster_toxic_zombie",
+		"category": "monsters",
+		"subcategory": "swamp normal",
+		"src": "/pixel/enemies/swamp/toxic-zombie.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			65,
+			65
 		]
 	},
 	{
@@ -9031,19 +9070,6 @@
 		"category": "buildings",
 		"subcategory": "castle skin",
 		"src": "/pixel/castles/castle_skin_10.png",
-		"status": "planned",
-		"source": "public/pixel/castles",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "castle_skin_11",
-		"category": "buildings",
-		"subcategory": "castle skin",
-		"src": "/pixel/castles/castle_skin_11.png",
 		"status": "planned",
 		"source": "public/pixel/castles",
 		"size": [
@@ -12422,7 +12448,6 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/hero/HeroWindow.tsx",
 			"src/components/game/hero/recipeUi.ts"
 		],
 		"name": "comp_glass_vial",
@@ -21060,18 +21085,16 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
-		"name": "ui_daily_chest",
+		"usedBy": [],
+		"name": "ui_daily_gift",
 		"category": "ui",
 		"subcategory": "frames and bars",
-		"src": "/pixel/ui/daily_chest.png",
+		"src": "/pixel/ui/daily_gift.png",
 		"status": "used",
 		"source": "public/pixel/ui",
 		"size": [
-			62,
-			51
+			384,
+			48
 		]
 	},
 	{
@@ -36822,7 +36845,7 @@
 		"source": "pixel/terrain",
 		"size": [
 			1024,
-			465
+			513
 		]
 	},
 	{
@@ -38656,45 +38679,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "loose_enemies_jungle_brainstorm",
-		"category": "unsorted",
-		"subcategory": "pixel/enemies/jungle (not named by the code)",
-		"src": "/pixel/enemies/jungle/BRAINSTORM.png",
-		"status": "unused",
-		"source": "pixel/enemies/jungle",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_enemies_lake_brainstorm",
-		"category": "unsorted",
-		"subcategory": "pixel/enemies/lake (not named by the code)",
-		"src": "/pixel/enemies/lake/BRAINSTORM.png",
-		"status": "unused",
-		"source": "pixel/enemies/lake",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_enemies_lava_magma_crab",
-		"category": "unsorted",
-		"subcategory": "pixel/enemies/lava (not named by the code)",
-		"src": "/pixel/enemies/lava/magma-crab.png",
-		"status": "unused",
-		"source": "pixel/enemies/lava",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "loose_pets_brown_cute_pet_cat",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
@@ -38992,32 +38976,6 @@
 		"size": [
 			32,
 			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_to_organize_battlegrounds_biom",
-		"category": "unsorted",
-		"subcategory": "to_organize (not named by the code)",
-		"src": "/to_organize/battlegrounds_biome_map_detail.png",
-		"status": "unused",
-		"source": "to_organize",
-		"size": [
-			48,
-			48
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "loose_to_organize_gift_sprites",
-		"category": "unsorted",
-		"subcategory": "to_organize (not named by the code)",
-		"src": "/to_organize/gift-sprites.png",
-		"status": "unused",
-		"source": "to_organize",
-		"size": [
-			384,
-			48
 		]
 	},
 	{

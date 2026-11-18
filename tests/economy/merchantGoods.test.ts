@@ -21,7 +21,9 @@ const tick = (seconds: number) => {
 	for (let i = 0; i < seconds; i++) api().tick(1000);
 };
 
-test('a shelf holds six pieces of gear, rolled by the loot pipeline: common or uncommon, never better', () => {
+test('a shelf holds six pieces of gear, rolled by the loot pipeline: common or uncommon, and now and then a blue rare one, never better', () => {
+	let rares = 0;
+	let pieces = 0;
 	for (const castle of [1, 3, 6, 10]) {
 		for (let seed = 1; seed <= 40; seed++) {
 			const s = stock(castle, seed);
@@ -29,11 +31,16 @@ test('a shelf holds six pieces of gear, rolled by the loot pipeline: common or u
 			assert.equal(s.at, 0);
 			for (const item of s.offers) {
 				assert.ok(ITEM_CATALOG[item.base] && ITEM_CATALOG[item.base].kind !== 'consumable', item.base);
-				assert.ok(item.rarity === 'common' || item.rarity === 'uncommon', `${item.base} is ${item.rarity}`);
+				assert.ok(['common', 'uncommon', 'rare'].includes(item.rarity), `${item.base} is ${item.rarity}`);
 				assert.ok(item.rarity in RARITIES);
+				pieces++;
+				if (item.rarity === 'rare') rares++;
 			}
 		}
 	}
+	// weights 60 / 40 / 4: about one piece in 26 is blue, so some show up in 160 shelves but never most
+	assert.ok(rares > 0, 'a rare piece shows up now and then');
+	assert.ok(rares < pieces * 0.12, `rare pieces stay rare: ${rares} of ${pieces}`);
 });
 
 test('the shelf follows the world level: a castle 10 shelf holds higher level gear than a castle 1 shelf', () => {

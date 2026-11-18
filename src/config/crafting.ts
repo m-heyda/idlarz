@@ -15,11 +15,11 @@ export const CRAFTING = {
 	maxLevel: 80,
 	firstStepXp: 20,
 	/**
-	 * Multiplier on every recipe's `xp` when a craft is paid out (owner 2026-11-11, a quick fix): crafting is an end-game system, so for now it levels very slowly: a Minor Healing Potion (recipe xp 6)
-	 * gives 0.12 XP, level 10 takes tens of thousands of potions. Raise it when legendaries and other big sources of crafting XP exist, or flip the whole thing again (IDL-274); the recipe values and
+	 * Multiplier on every recipe's `xp` when a craft is paid out (owner 2026-11-11, cut again 2026-11-17 from 0.02): crafting is a long-term goal, so it levels very slowly: a Minor Healing Potion (recipe xp 6)
+	 * gives 0.03 XP, level 10 takes about a hundred thousand potions. Raise it when legendaries and other big sources of crafting XP exist, or flip the whole thing again (IDL-274); the recipe values and
 	 * the level curve stay as designed.
 	 */
-	xpScale: 0.02,
+	xpScale: 0.005,
 	/** [level, total crafting XP needed to reach it], increasing, ending at maxLevel. Level 10 is ~1,250 minor potions' worth of XP (the curve was 5x faster in the first draft). */
 	anchors: [
 		[10, 7_500],

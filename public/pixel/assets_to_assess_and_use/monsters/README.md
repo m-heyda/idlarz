@@ -10,7 +10,6 @@ Monster sprites added 2026-11-10 for the new biomes (Jungle, Fields, Blossom Orc
 | `magma_knight.png` | 66x66 | dark knight with a flaming sword | Battlefield boss candidate |
 | `toxic_zombie.png` | 65x65 | green zombie in an orange hazard suit | Blight |
 | `frost_flame_knight.png` | 64x64 | knight in blue flame armour | Battlefield, Tundra elite |
-| `purple_ogre.png` | 64x64 | purple ogre with horns and a wide mouth | Blight |
 | `mecha_triceratops.png` | 70x70 | purple armoured triceratops | Battlefield boss candidate |
 | `mushroom_wizard.png` | 64x64 | mushroom with a pink wizard hat | Blossom Orchard, Fields |
 

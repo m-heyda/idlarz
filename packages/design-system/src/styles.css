@@ -1068,6 +1068,20 @@
 
 /* Compact tooltip (header resources): narrower, smaller type, tighter rows */
 
+.ds-tip-wide {
+	/* a card whose key hints and lines must fit without breaking (the crafting bag, the recipe list) */
+	width: 300px;
+}
+
+.ds-tip-wide .ds-tip-keys {
+	gap: 6px;
+	font-size: 10px;
+}
+
+.ds-tip-wide .ds-tip-keys span {
+	white-space: nowrap;
+}
+
 .ds-tip-compact {
 	width: 210px;
 	padding: 7px 9px;
@@ -5195,10 +5209,20 @@ button.ds-income-head:hover {
 }
 
 .dd-day-chest {
+	/* the gift sprite sheet (ui/daily_gift.png): eight 48 px frames in a row, played in a loop */
+	display: block;
 	width: 56px;
-	height: auto;
+	height: 56px;
+	background: url('/pixel/ui/daily_gift.png') 0 0 / 448px 56px no-repeat;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 0 8px rgba(176, 92, 245, 0.75));
+	animation: dd-gift 0.9s steps(8) infinite;
+}
+
+@keyframes dd-gift {
+	to {
+		background-position-x: -448px;
+	}
 }
 
 @keyframes dd-pulse {

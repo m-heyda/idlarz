@@ -1,7 +1,7 @@
 /* The combat panel in the bottom right corner, and the icon it shrinks to. Fight.css holds the bars, numbers and slots they share. */
 
 .combat-widget {
-	width: 440px;
+	width: 480px; /* wide enough for a battle queue of 10 in one row */
 	max-width: calc(100vw - 32px);
 	padding: 6px 8px 8px;
 	pointer-events: auto;

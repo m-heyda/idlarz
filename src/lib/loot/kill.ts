@@ -45,7 +45,7 @@ export interface KillLoot {
  * @formula
  * goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
  * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%))
- * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel)) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xp/s includes the XP gain %)
+ * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
  * hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
  * @table kill-rewards
  */
@@ -58,7 +58,7 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	const kills = 1 + (ctx.killRewardPct ?? 0) / 100;
 	// the monster's part first (income share, capped, times its level), the player's investment (Luck, Gold Find, Kill Rewards %) after the cap
 	const goldBase = Math.min(ctx.goldPerSec * reward.gold.rewardSec, reward.gold.cap) * levelMult;
-	const xpBase = Math.min(ctx.xpPerSec * reward.xp.rewardSec, reward.xp.cap) * levelMult;
+	const xpBase = Math.min(ctx.xpPerSec * reward.xp.rewardSec, reward.xp.cap) * levelMult * COMBAT.rewards.xpScale;
 	return {
 		gold: Math.floor(Math.max(COMBAT.rewards.minGold, goldBase * luckBonus * goldFind) * bonus * kills),
 		xp: Math.max(COMBAT.rewards.minXp, xpBase) * bonus * kills,

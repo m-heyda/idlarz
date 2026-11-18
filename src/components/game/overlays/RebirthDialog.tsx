@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { sortedCostEntries } from '@/catalog';
 import { useUiStore } from '@/stores/uiStore';
+import { useWindowStore } from '@/stores/windowStore';
 import { useGameStore } from '@/stores/gameStore';
 import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '@/config/rebirth';
 import { limitOf } from '@/lib/limits';
@@ -14,7 +15,7 @@ import audioManager from '@/utils/audioManager';
 import { askServerRebirth } from '@/lib/serverRebirth';
 import { rebirthRunSummary, rebirthUnlockIntro, rebirthUnlockList, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
-import GameModal from '../GameModal';
+import GameWindow from '../GameWindow';
 import { Button, SectionLabel, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import '@/styles/Rebirth.css';
@@ -92,7 +93,7 @@ const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly Embe
  * bonuses and prices can be browsed (and Embers planned for) before the first rebirth.
  */
 const RebirthDialog: React.FC = () => {
-	const open = useUiStore((state) => state.rebirthOpen);
+	const open = useWindowStore((state) => state.order.includes('rebirth'));
 	const close = useUiStore((state) => state.closeRebirth);
 	const tiles = useGameStore((state) => state.tiles);
 	const freeTiles = useGameStore((state) => state.freeTiles);
@@ -348,8 +349,12 @@ const RebirthDialog: React.FC = () => {
 	);
 
 	return (
-		<GameModal title='Rebirth' size='lg' onClose={handleClose}>
-			<div className='rb-root'>
+		<GameWindow
+			id='rebirth'
+			title='Rebirth'
+			width={1040}
+			height={700}
+			bar={
 				<Tabs
 					active={tab}
 					onChange={(id) => setTab(id as RebirthTab)}
@@ -358,10 +363,11 @@ const RebirthDialog: React.FC = () => {
 						{ id: 'shop', label: 'Ember shop' },
 					]}
 				/>
-				{tab === 'rebirth' ? rebirthTab : shopTab}
-			</div>
+			}
+		>
+			<div className='rb-root'>{tab === 'rebirth' ? rebirthTab : shopTab}</div>
 			{confirmModal}
-		</GameModal>
+		</GameWindow>
 	);
 };
 

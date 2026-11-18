@@ -659,7 +659,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 482,
+  "line": 485,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -670,8 +670,8 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 534,
-  "summary": "The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "line": 552,
+  "summary": "The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
  {
@@ -896,7 +896,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 58,
+  "line": 64,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -907,7 +907,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 166,
+  "line": 184,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -918,7 +918,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 175,
+  "line": 193,
   "summary": "The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom), never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.",
   "see": []
  },
@@ -943,7 +943,7 @@
   "category": "Economy/Merchant",
   "file": "src/config/merchant.ts",
   "line": 18,
-  "summary": "The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}). Wood, stone, coal, food and meat can be bought at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); farm products are never sold to the player.",
+  "summary": "The merchant buys resources at these gold prices per unit. Payout is `floor(units x price x (1 + 0.03 x Haggler))` ({@link sellPayout}). Wood, stone, coal, food, meat and the four farm products can be bought back at 2x the sell price, rounded up ({@link MERCHANT_BUY_MULTIPLIER}, {@link buyCost}); the seven biome extracts (herbs, sap, iron ore, spores, frostshard, pearls, salt) are sell only.",
   "see": []
  },
  {
@@ -1029,7 +1029,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 249,
+  "line": 255,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -1040,7 +1040,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 264,
+  "line": 270,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },
@@ -1215,7 +1215,7 @@
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
   "line": 71,
-  "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and the Ember shop's Extra Builder on top, at most `HARD_LIMITS.builders`.",
+  "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).",
   "see": []
  },
  {
@@ -1685,7 +1685,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 37,
+  "line": 40,
   "summary": "The item level a recipe of this grade makes, by crafting level: the grade's window (`gradeLevels`) is climbed from its bottom at the grade's unlock to its top at the next grade's unlock, and the roll is +-1 around that centre, never outside the window.",
   "see": []
  },
@@ -1696,7 +1696,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 57,
+  "line": 60,
   "summary": "Intelligence's lean on the quality and the affix magnitudes of a craft, for `rollLeaning`.",
   "see": []
  },
@@ -1707,7 +1707,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 78,
+  "line": 81,
   "summary": "The pity multiplier on the grade's best rarity after `misses` crafts that missed it.",
   "see": []
  },
@@ -1718,7 +1718,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 114,
+  "line": 117,
   "summary": "One crafted piece: the `craft` loot source rolls rarity (Luck, pity, ceiling), base, quality and affixes (Intelligence) for the recipe's slot inside the grade's item level window, and the piece is marked `crafted`. Null when nothing is eligible (a configuration error, never silently replaced).",
   "see": [
    "gearOdds",
@@ -1732,7 +1732,7 @@
   "kind": "function",
   "category": "Progression/Crafting",
   "file": "src/lib/craftGear.ts",
-  "line": 140,
+  "line": 143,
   "summary": "What the Crafting window's odds panel shows for a recipe: the rarity chances at the player's Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll's own loot trace (`generateLoot` with a fixed rng), so the panel is the real odds and cannot drift from the roll.",
   "see": []
  },
@@ -1935,7 +1935,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junk.ts",
-  "line": 70,
+  "line": 74,
   "summary": "What the Sell junk button does to a bag: every junk stack goes whole and every piece of gear the rule names goes, each paid at its sell value through the merchant's Haggler and Idol bonuses. The one function the server and the browser both run, so their previews agree. `junk` is a parameter so a test can flip the gear rule.",
   "see": []
  },
@@ -2707,7 +2707,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 91,
+  "line": 99,
   "summary": "Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with the save's Haggler, Idols and prestige, recorded as granted (so the save that holds it passes the checks), the units go into the sold-since-save record and the lifetime `unitsSold` / `goldFromSales` counters (Market Day). Refused for a resource the merchant does not buy (gold and XP), a quantity that is not a positive number, or more than the player can plausibly hold.",
   "see": []
  },
@@ -2718,7 +2718,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/offline/trade.ts",
-  "line": 119,
+  "line": 128,
   "summary": "Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. The units are recorded as granted (so the save that holds them passes the checks) and the cost goes into the spent-since-save record that tightens the gold bound; the cost itself is paid in the browser, as before. Refused for a resource that is not for sale, a quantity that is not a whole number, or a price the player cannot plausibly pay.",
   "see": []
  },

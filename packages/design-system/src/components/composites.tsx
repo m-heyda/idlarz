@@ -609,8 +609,14 @@ export const SelectBox: React.FC<{ value: string; onChange: (v: string) => void;
 );
 
 /** A placeholder page for a tab that is not built yet: icon, title, a line of text and a "Coming soon" tag. */
-export const ComingSoon: React.FC<{ title: string; text: string; icon?: string; tag?: string }> = ({ title, text, icon, tag = 'Coming soon' }) => (
-	<div className='ds-soon'>
+export const ComingSoon: React.FC<{ title: string; text: string; icon?: string; tag?: string; style?: React.CSSProperties }> = ({
+	title,
+	text,
+	icon,
+	tag = 'Coming soon',
+	style,
+}) => (
+	<div className='ds-soon' style={style}>
 		{icon ? <img src={icon} alt='' /> : null}
 		<div className='ds-soon-title'>{title}</div>
 		<span className='ds-soon-tag'>{tag}</span>

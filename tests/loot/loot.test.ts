@@ -116,10 +116,10 @@ test('gold and xp are seconds of income (below the cap) and scale with the monst
 	const low = { goldPerSec: 1, xpPerSec: 0.2, luck: 0 };
 	const t1 = rollKillLoot(T1, low, () => 0.999);
 	assert.equal(t1.gold, 90);
-	assert.equal(t1.xp, 18);
+	assert.equal(t1.xp, 18 * COMBAT.rewards.xpScale);
 	const t3 = rollKillLoot({ type: 'thistleBoar', level: 3 }, low, () => 0.999);
 	assert.equal(t3.gold, Math.floor(90 * 1.08 ** 2));
-	assert.ok(Math.abs(t3.xp - 18 * 1.08 ** 2) < 1e-9);
+	assert.ok(Math.abs(t3.xp - 18 * COMBAT.rewards.xpScale * 1.08 ** 2) < 1e-9);
 	assert.ok(t3.gold > t1.gold);
 });
 

@@ -237,6 +237,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
+- [`CastleSkinsSection.tsx`](../../src/components/game/CastleSkinsSection.tsx) — ~ The castle skins:
 - [`CastleSprite.tsx`](../../src/components/game/CastleSprite.tsx) — ~ `tile`:
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):
@@ -257,9 +258,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`HighlightLayer.tsx`](../../src/components/game/HighlightLayer.tsx) — ~ The "Highlight" tint:
 - [`ItemSlot.tsx`](../../src/components/game/ItemSlot.tsx) — ~ A piece of gear (an instance) ...
 - [`ItemTooltip.tsx`](../../src/components/game/ItemTooltip.tsx) — ~ A signed change in parentheses, green for a gain and red for a loss:
+- [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the crown icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
+- [`MapTip.tsx`](../../src/components/game/MapTip.tsx) — ~ A hover card on the map, kept on screen.
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
@@ -370,6 +373,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`buildings.ts`](../../src/config/buildings.ts) — ~ The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
+- [`castleSkins.ts`](../../src/config/castleSkins.ts) — The premium castle skins of the Gem shop: one picture each (`public/pixel/castles/castle_skin_<n>.png`, 64 px), drawn in place of the level castle once bought and picked. A leaf module (pure data), read by the price book, the shop window and the sprite.
 - [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`): one release note per version, written as markdown in `content/changelog/` (format in its README).
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.
@@ -500,6 +504,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
+- [`kingdomSummary.ts`](../../src/lib/kingdomSummary.ts) — ~ What the Kingdom overview reads from the game state
 - [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
 - [`limits.ts`](../../src/lib/limits.ts) — ~ What can raise a limit:
 
@@ -1017,6 +1022,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`guideSprite.test.ts`](../../tests/ui/guideSprite.test.ts)
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
+- [`hoverTipPlacement.test.ts`](../../tests/ui/hoverTipPlacement.test.ts)
+- [`kingdomWindow.test.ts`](../../tests/ui/kingdomWindow.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
 - [`noDevConsole.test.ts`](../../tests/ui/noDevConsole.test.ts) — ~ Guard:
