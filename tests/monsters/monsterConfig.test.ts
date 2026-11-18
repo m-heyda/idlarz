@@ -41,7 +41,7 @@ test('each biome is a step up: its monsters and its boss start at higher levels,
 		['wreckCrab', 'bossReefLeviathan'],
 		['mossbackWolf', 'bossElderStag'],
 		['graniteRam', 'bossHillGiant'],
-		['garbageOgre', 'bossMireMatriarch'],
+		['toxicZombie', 'bossMireMatriarch'],
 		['mossSnapper', 'bossLakeHydra'],
 		['frostHare', 'bossWinterWyrm'],
 	] as const;

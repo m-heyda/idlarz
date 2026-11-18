@@ -480,7 +480,14 @@
 		"boneCleaver",
 		"frostguardKnight",
 		"gildedChampion",
-		"bossCinderWarlord"
+		"bossCinderWarlord",
+		"toxicZombie",
+		"magmaKnight",
+		"magmaCrab",
+		"mawhornBrute",
+		"bossIronhorn",
+		"tidepoolGolem",
+		"bossBrainstorm"
 	],
 	"recipeIds": [
 		"glass_vial",

@@ -1924,7 +1924,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </code></pre>
 </article><h2>Gems</h2><article><p><a id="gem-shop"></a></p>
 <h3><code>GEM_SHOP</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:58</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:64</code></a></p>
 <p>The gem shop&#39;s price book: what each service costs and how often it can be bought.</p>
 <ul>
 <li><p><strong>Class change</strong> (500): never during a fight; writes the profile&#39;s class (server only); the passives of the new class apply at once. An avatar that does not fit the new class is swapped for its starter.</p>
@@ -1938,6 +1938,8 @@ level = min(level on the tile, level the account remembers for the biome)
 <li><p><strong>Name effects</strong> (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (<code>NICK_EFFECTS</code>). Each is its own purchase, separate from the plain colours; they are also bought from the name window.</p>
 </li>
 <li><p><strong>Builder #2</strong> (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (<code>builderCount</code>). Permanent, kept over a rebirth; it is the ledger&#39;s record and the server&#39;s save check allows two timers only with it.</p>
+</li>
+<li><p><strong>Castle skins</strong> (2,500 each, once; Cosmetics tab, Skins): <code>CASTLE_SKINS</code>, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger&#39;s <code>bought</code> record is the ownership.</p>
 </li>
 </ul>
 <p>Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.</p>
@@ -2023,6 +2025,97 @@ level = min(level on the tile, level the account remembers for the biome)
 <td>An animated nickname with a starry purple and blue sky drifting inside the letters.</td>
 </tr>
 <tr>
+<td>Ice Lotus</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Ring Fortress</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Crimson Gothic</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Red Pagoda</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Stone Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Golden Palace</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Crystal Citadel</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Jewel Palace</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Ember Fortress</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Prism Spire</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Emerald Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Tidal Keep</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
+<td>Moonlit Cathedral</td>
+<td>once</td>
+<td>2500</td>
+<td>none</td>
+<td>A castle skin.</td>
+</tr>
+<tr>
 <td>Builder #2</td>
 <td>upgrades</td>
 <td>1000</td>
@@ -2032,7 +2125,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </tbody></table>
 </article><article><p><a id="daily-bonus-gems"></a></p>
 <h3><code>DAILY_BONUS_GEMS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:166</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:184</code></a></p>
 <p>The daily first-login bonus: gems per day of the streak. A claim is once per <strong>UTC day</strong> (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.</p>
 <p><strong>Daily first-login bonus by day of the streak</strong> <em>(computed from the code)</em></p>
 <table>
@@ -2073,7 +2166,7 @@ level = min(level on the tile, level the account remembers for the biome)
 </tbody></table>
 </article><article><p><a id="daily-chest"></a></p>
 <h3><code>DAILY_CHEST</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:175</code></a></p>
+<p>Source: <a href="../../src/config/gemShop.ts"><code>src/config/gemShop.ts:193</code></a></p>
 <p>The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: <code>count</code> kinds of material picked at random from <code>resources</code>, each worth <code>minutes</code> of the player&#39;s own income of that kind (a random number in the range, so it grows with the kingdom),
 never less than <code>floor</code>. It is rolled by the server when day 7 is claimed (<a href="#rolldailychest"><code>rollDailyChest</code></a>), from a sealed random number, and recorded as granted like any chest.</p>
 </article><article><p><a id="dailyinfo"></a></p>
@@ -2615,8 +2708,8 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:535</code></a></p>
-<p>The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:552</code></a></p>
+<p>The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight&#39;s an elite), plus seven retired stand-ins and duplicates that never do (<code>RETIRED_MONSTERS</code>): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
 <li>Builds (<code>BUILD</code>): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.</li>
@@ -2721,6 +2814,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <tr>
 <td>swamp</td>
 <td>Garbage Ogre</td>
+<td>1</td>
+<td>286</td>
+<td>6</td>
+<td>2</td>
+<td>0.4</td>
+<td>8-10 -&gt; 16-18</td>
+</tr>
+<tr>
+<td>swamp</td>
+<td>Toxic Zombie</td>
 <td>1</td>
 <td>286</td>
 <td>6</td>
@@ -2859,6 +2962,46 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>22-25 -&gt; 29-32</td>
 </tr>
 <tr>
+<td>hills</td>
+<td>Magma Knight</td>
+<td>1</td>
+<td>152</td>
+<td>8</td>
+<td>1.5</td>
+<td>0.6</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Magma Crab</td>
+<td>1</td>
+<td>247</td>
+<td>5</td>
+<td>1.5</td>
+<td>0.4</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Mawhorn Brute</td>
+<td>1</td>
+<td>190</td>
+<td>7</td>
+<td>1.5</td>
+<td>0.5</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>The Ironhorn (boss)</td>
+<td>22</td>
+<td>2,300</td>
+<td>18</td>
+<td>28</td>
+<td>0.33</td>
+<td>22-25 -&gt; 29-32</td>
+</tr>
+<tr>
 <td>coast</td>
 <td>Wreck Crab</td>
 <td>1</td>
@@ -2930,6 +3073,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 </tr>
 <tr>
 <td>lake</td>
+<td>Tidepool Golem</td>
+<td>1</td>
+<td>338</td>
+<td>6</td>
+<td>2.5</td>
+<td>0.4</td>
+<td>10-12 -&gt; 17-19</td>
+</tr>
+<tr>
+<td>lake</td>
 <td>The Lake Hydra (boss)</td>
 <td>27</td>
 <td>4,500</td>
@@ -2971,6 +3124,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <tr>
 <td>jungle</td>
 <td>The Hardwood Colossus (boss)</td>
+<td>32</td>
+<td>9,000</td>
+<td>40</td>
+<td>64</td>
+<td>0.33</td>
+<td>32-35 -&gt; 39-42</td>
+</tr>
+<tr>
+<td>jungle</td>
+<td>The Brainstorm (boss)</td>
 <td>32</td>
 <td>9,000</td>
 <td>40</td>
@@ -3250,7 +3413,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by <a href="#bandof"><code>bandOf</code></a>. No spawn rule reads them yet.</p>
 </article><article><p><a id="boss-min-distance"></a></p>
 <h3><code>BOSS_MIN_DISTANCE</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:483</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:485</code></a></p>
 <p>The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts&#39; start (7), and the band is open-ended (<code>BOSS_MAX_DISTANCE</code> is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">boss tile: BOSS_MIN_DISTANCE (8) &lt;= castle distance &lt;= BOSS_MAX_DISTANCE; normal monster tile: 2 &lt;= castle distance &lt;= 9
@@ -7287,11 +7450,11 @@ unlocked&quot; window shows them (<code>RebirthUnlockModal</code>); the five reb
 The file name is <code>biome_&lt;name&gt;.png</code>; change the value here to use another one.</p>
 </article><article><p><a id="animal-pixel-icons"></a></p>
 <h3><code>ANIMAL_PIXEL_ICONS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:249</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:255</code></a></p>
 <p>Farm animal id -&gt; its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is <a href="#animalicon"><code>animalIcon</code></a>.</p>
 </article><article><p><a id="animalicon"></a></p>
 <h3><code>animalIcon</code> <small>function</small></h3>
-<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:264</code></a></p>
+<p>Source: <a href="../../src/config/pixelIcons.ts"><code>src/config/pixelIcons.ts:270</code></a></p>
 <p>The sprite one animal wears: a stable pick among its kind&#39;s looks from a hash of <code>seed</code> (the farm uses the animal&#39;s key, e.g. <code>chicken-3</code>),
 so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind&#39;s first look (shop cards, tutorial).
 Pure: no random numbers.</p>

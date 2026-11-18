@@ -1254,7 +1254,7 @@ level = min(level on the tile, level the account remembers for the biome)
 
 ### `GEM_SHOP` <small>const</small>
 
-Source: [`src/config/gemShop.ts:58`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:64`](../../src/config/gemShop.ts)
 
 The gem shop's price book: what each service costs and how often it can be bought.
 
@@ -1267,6 +1267,8 @@ The gem shop's price book: what each service costs and how often it can be bough
 - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
 
 - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
+
+- **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
 
 Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
 
@@ -1284,13 +1286,26 @@ Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) ar
 | Frost name | once | 500 | none | An animated icy nickname with a glint that sweeps across it. |
 | Void name | once | 500 | none | A pale violet nickname that breathes out a dark purple glow. |
 | Galaxy name | once | 500 | none | An animated nickname with a starry purple and blue sky drifting inside the letters. |
+| Ice Lotus | once | 2500 | none | A castle skin. |
+| Ring Fortress | once | 2500 | none | A castle skin. |
+| Crimson Gothic | once | 2500 | none | A castle skin. |
+| Red Pagoda | once | 2500 | none | A castle skin. |
+| Stone Keep | once | 2500 | none | A castle skin. |
+| Golden Palace | once | 2500 | none | A castle skin. |
+| Crystal Citadel | once | 2500 | none | A castle skin. |
+| Jewel Palace | once | 2500 | none | A castle skin. |
+| Ember Fortress | once | 2500 | none | A castle skin. |
+| Prism Spire | once | 2500 | none | A castle skin. |
+| Emerald Keep | once | 2500 | none | A castle skin. |
+| Tidal Keep | once | 2500 | none | A castle skin. |
+| Moonlit Cathedral | once | 2500 | none | A castle skin. |
 | Builder #2 | upgrades | 1000 | none | A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth. |
 
 <a id="daily-bonus-gems"></a>
 
 ### `DAILY_BONUS_GEMS` <small>const</small>
 
-Source: [`src/config/gemShop.ts:166`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:184`](../../src/config/gemShop.ts)
 
 The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.
 
@@ -1310,7 +1325,7 @@ The daily first-login bonus: gems per day of the streak. A claim is once per **U
 
 ### `DAILY_CHEST` <small>const</small>
 
-Source: [`src/config/gemShop.ts:175`](../../src/config/gemShop.ts)
+Source: [`src/config/gemShop.ts:193`](../../src/config/gemShop.ts)
 
 The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
 never less than `floor`. It is rolled by the server when day 7 is claimed ([`rollDailyChest`](economy.md#rolldailychest)), from a sealed random number, and recorded as granted like any chest.

@@ -13,8 +13,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:243`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `allocatePoints` | Progression / Levels | [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts) | Puts points into attributes: |
-| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:249`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
-| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:264`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
+| `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:255`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
+| `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:270`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
 | `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyPets` | Progression / Pets | [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts) | Applies one pets request to the ledger. |
@@ -45,7 +45,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |
 | `BodyUpgrade` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:35`](../../src/lib/saveUpgrade.ts) | **The one way to change what a save means: |
 | `BOSS_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:215`](../../src/catalog/lootConfig.ts) | Who owns which drops (IDL-44, docs/plan/20-monster-families-and-rewards.md): |
-| `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:483`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
+| `BOSS_MIN_DISTANCE` | Monsters / Spawning | [`src/config/combatConfig.ts:485`](../../src/config/combatConfig.ts) | The boss band (IDL-222, owner decision 2026-11-09): |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
 | `builderCount` | Economy / Buildings | [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts) | How many castle or building upgrades can run at once: |
@@ -104,8 +104,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:153`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
 | `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
-| `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:166`](../../src/config/gemShop.ts) | The daily first-login bonus: |
-| `DAILY_CHEST` | Economy / Gems | [`src/config/gemShop.ts:175`](../../src/config/gemShop.ts) | The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: |
+| `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:184`](../../src/config/gemShop.ts) | The daily first-login bonus: |
+| `DAILY_CHEST` | Economy / Gems | [`src/config/gemShop.ts:193`](../../src/config/gemShop.ts) | The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: |
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:21`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:123`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
@@ -140,7 +140,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
 | `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:40`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
 | `gearOdds` | Progression / Crafting | [`src/lib/craftGear.ts:143`](../../src/lib/craftGear.ts) | What the Crafting window's odds panel shows for a recipe: |
-| `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:58`](../../src/config/gemShop.ts) | The gem shop's price book: |
+| `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:64`](../../src/config/gemShop.ts) | The gem shop's price book: |
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts) | Everything one source gives. |
 | `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
@@ -196,7 +196,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `merchantUpgradeCost` | Economy / Merchant | [`src/utils/game/merchant.ts:26`](../../src/utils/game/merchant.ts) | Gold price of the next level of a merchant upgrade. |
 | `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:92`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:236`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
-| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:535`](../../src/config/combatConfig.ts) | The roster: |
+| `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:552`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
 | Movement arrows | Progression / Rankings | [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts) | The change since the refresh before: |
 | `nextWanderStep` | Progression / Pets | [`src/lib/pets.ts:29`](../../src/lib/pets.ts) | The pet's next step: |

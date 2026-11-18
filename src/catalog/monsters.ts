@@ -1,4 +1,4 @@
-import { MONSTERS } from '@/config/combatConfig';
+import { MONSTERS, RETIRED_MONSTERS } from '@/config/combatConfig';
 import type { BiomeType } from '@/types/game';
 
 /**
@@ -54,7 +54,7 @@ const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, pl
 	label,
 	grade: 'normal',
 	biomes: [biome],
-	enabled: id in MONSTERS,
+	enabled: id in MONSTERS && !RETIRED_MONSTERS.has(id),
 	art,
 	...(placeholder ? { placeholder } : {}),
 });
@@ -63,7 +63,7 @@ const boss = (id: string, label: string, biome: CatalogBiome, art: boolean, plac
 	label,
 	grade: 'boss',
 	biomes: [biome],
-	enabled: id in MONSTERS,
+	enabled: id in MONSTERS && !RETIRED_MONSTERS.has(id),
 	art,
 	...(placeholder ? { placeholder } : {}),
 });
@@ -79,12 +79,19 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('rotcapStag', 'Rotcap Stag', 'forest', true),
 	boss('bossElderStag', 'The Elder Stag', 'forest', true),
 
+	// the first four were stand-ins (retired, see `RETIRED_MONSTERS`); the roster below has the real art
 	normal('graniteRam', 'Granite Ram', 'hills', false, PLACEHOLDER),
 	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false, PLACEHOLDER),
 	normal('boulderBeetle', 'Boulder Beetle', 'hills', false, PLACEHOLDER),
 	boss('bossHillGiant', 'The Hill Giant', 'hills', false, PLACEHOLDER),
+	normal('magmaKnight', 'Magma Knight', 'hills', true),
+	normal('magmaCrab', 'Magma Crab', 'hills', true),
+	normal('mawhornBrute', 'Mawhorn Brute', 'hills', true),
+	boss('bossIronhorn', 'The Ironhorn', 'hills', true),
 
-	normal('garbageOgre', 'Garbage Ogre', 'swamp', true),
+	// a duplicate of the Mawhorn Brute's look: retired, the Toxic Zombie takes its place
+	normal('garbageOgre', 'Garbage Ogre', 'swamp', false, PLACEHOLDER),
+	normal('toxicZombie', 'Toxic Zombie', 'swamp', true),
 	normal('dumpback', 'Dumpback', 'swamp', true),
 	normal('rotHeron', 'Rot Heron', 'swamp', true),
 	normal('scrapGolem', 'Scrap Golem', 'swamp', true),
@@ -105,6 +112,7 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('mossSnapper', 'Moss Snapper', 'lake', true),
 	normal('reedNymph', 'Reed Nymph', 'lake', true),
 	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER),
+	normal('tidepoolGolem', 'Tidepool Golem', 'lake', true),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
 	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the jungle roster is live (rebirth 1), the other four wait. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
@@ -112,6 +120,7 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('eyeHorror', 'Eye Horror', 'jungle', true),
 	normal('zombieTriceratops', 'Zombie Triceratops', 'jungle', true),
 	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false, PLACEHOLDER),
+	boss('bossBrainstorm', 'The Brainstorm', 'jungle', true),
 
 	// the rebirth biomes: fields 2, orchard 3, blight 4, battlefield 5; each roster takes the names of the supplied sprites (owner decision 2026-11-16) and is a step harder than the biome before (BIOME_TIER)
 	normal('barnGargoyle', 'Barn Gargoyle', 'fields', true),
@@ -141,6 +150,21 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
  * The story the rebirth biomes tell: every rebirth the realm grows a new land beyond the old border, and each land holds what the old world left unfinished.
  */
 export const LORE: Readonly<Record<string, string>> = {
+	// hills (2026-11-18): the high country above the farms, where the road climbs into the rock and the old quarries still smoke
+	magmaKnight:
+		'A dwarven forge-guard who walked into the quarry fire and kept walking. The armour glows where the sword touches it, and he still salutes the road.',
+	magmaCrab: 'The deep quarry runs hot enough to cook stone, and something with a shell learned to live in it. It surfaces after rain, still steaming.',
+	mawhornBrute:
+		'Something deep in the quarry went wrong a long time ago and came up with three eyes, two horns and a hunger that drips. The miners seal the shaft every spring and every spring it is open again.',
+	bossIronhorn:
+		'The dwarves built it to hold the mountain pass and then left in a hurry. It is still holding it, and steam still leaks from the joints they never finished.',
+	toxicZombie: 'The swamp took the clean-up crews first. The orange suits are still sealed; whoever is inside still thinks the shift is not over.',
+	// lake
+	tidepoolGolem:
+		'The reeds hold more than water. Years of silt and lamp-lit eyes gathered into something that walks, and it still glows where the algae grows through it.',
+	// jungle
+	bossBrainstorm:
+		'A mushroom that grew a brain, or a brain that grew a mushroom: the jungle will not say which. Its spores carry thoughts from cap to cap, and what it knows, the whole jungle knows.',
 	scrapGolem:
 		'The swamp swallows what the realm throws away. Enough of it, rusted together, learned to walk, and it still carries one green eye from the lamp it used to be.',
 	frostMoth: 'It drifts over the snow in silence, drawn to the warmth of anything alive. Where it lands, frost follows.',

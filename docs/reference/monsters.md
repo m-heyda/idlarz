@@ -17,9 +17,9 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:535`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:552`](../../src/config/combatConfig.ts)
 
-The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
+The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
 
 - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -40,6 +40,7 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | forest | Rotcap Stag | 1 | 208 | 5 | 1 | 0.4 | 4-6 -> 12-14 |
 | forest | The Elder Stag (boss) | 20 | 1,900 | 16 | 24 | 0.33 | 20-23 -> 27-30 |
 | swamp | Garbage Ogre | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
+| swamp | Toxic Zombie | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
 | swamp | Dumpback | 1 | 220 | 7 | 2 | 0.5 | 8-10 -> 16-18 |
 | swamp | Rot Heron | 1 | 176 | 9 | 2 | 0.6 | 8-10 -> 16-18 |
 | swamp | Scrap Golem | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
@@ -53,6 +54,10 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | hills | Cave Goblin Miner | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
 | hills | Boulder Beetle | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
 | hills | The Hill Giant (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
+| hills | Magma Knight | 1 | 152 | 8 | 1.5 | 0.6 | 6-8 -> 14-16 |
+| hills | Magma Crab | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
+| hills | Mawhorn Brute | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
+| hills | The Ironhorn (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
 | coast | Wreck Crab | 1 | 169 | 4 | 0 | 0.4 | 2-4 -> 10-12 |
 | coast | Net Gull | 1 | 104 | 6 | 0 | 0.6 | 2-4 -> 10-12 |
 | coast | Drowned Sailor | 1 | 130 | 5 | 0 | 0.5 | 2-4 -> 10-12 |
@@ -60,11 +65,13 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | lake | Moss Snapper | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
 | lake | Reed Nymph | 1 | 260 | 8 | 2.5 | 0.5 | 10-12 -> 17-19 |
 | lake | Pike Lurker | 1 | 208 | 9 | 2.5 | 0.6 | 10-12 -> 17-19 |
+| lake | Tidepool Golem | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
 | lake | The Lake Hydra (boss) | 27 | 4,500 | 27 | 45 | 0.33 | 27-30 -> 34-37 |
 | jungle | Skull Vine | 1 | 340 | 9 | 4 | 0.5 | 14-16 -> 18-20 |
 | jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 14-16 -> 18-20 |
 | jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 14-16 -> 18-20 |
 | jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
+| jungle | The Brainstorm (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
 | fields | Barn Gargoyle | 1 | 320 | 13 | 5 | 0.6 | 17-19 -> 21-23 |
 | fields | Bucket Knight | 1 | 520 | 8 | 5 | 0.4 | 17-19 -> 21-23 |
 | fields | Hedge Bandit | 1 | 400 | 11 | 5 | 0.5 | 17-19 -> 21-23 |
@@ -253,7 +260,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:483`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:485`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 

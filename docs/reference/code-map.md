@@ -372,6 +372,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`branding.ts`](../../src/config/branding.ts) — The public name of the game, in one place. UI text, page metadata and the README read it from here, so a rename is a one-line change.
 - [`buildings.ts`](../../src/config/buildings.ts) — ~ The numbers of the building system (proposals from docs/plan/18, tuned with the sim; every one is a plain config value).
 - [`castle.ts`](../../src/config/castle.ts) — The castle: its position, base output, area, and the timed upgrade.
+- [`castleSkins.ts`](../../src/config/castleSkins.ts) — The premium castle skins of the Gem shop: one picture each (`public/pixel/castles/castle_skin_<n>.png`, 64 px), drawn in place of the level castle once bought and picked. A leaf module (pure data), read by the price book, the shop window and the sprite.
 - [`changelog.ts`](../../src/config/changelog.ts) — The changelog window on the landing page (`/`): one release note per version, written as markdown in `content/changelog/` (format in its README).
 - [`character.ts`](../../src/config/character.ts) — The player: default name, starting attributes, the level curve and what an attribute point gives.
 - [`combatConfig.ts`](../../src/config/combatConfig.ts) — ~ Combat tunables.

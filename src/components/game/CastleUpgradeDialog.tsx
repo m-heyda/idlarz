@@ -139,7 +139,7 @@ const CastleUpgradeDialog: FC = () => {
 									<span className='bw-arrow-sign'>→</span>
 								</div>
 								<div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, opacity: 0.85 }}>
-									<CastleSprite level={castleLevel + 1} variant='inline' />
+									<CastleSprite level={castleLevel + 1} variant='inline' plain />
 									<span style={{ fontSize: 12, color: '#f4d57e' }}>Level {castleLevel + 1}</span>
 								</div>
 							</>

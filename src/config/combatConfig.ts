@@ -137,6 +137,8 @@ export interface MonsterReward {
 export interface MonsterDef {
 	grade: MonsterGrade;
 	label: string;
+	/** A stand-in the real art replaced: it keeps its stats and id (saves, tickets and the Bestiary may name it) but never spawns again (`canSpawnOn`). See {@link RETIRED_MONSTERS}. */
+	retired?: true;
 	hp: number;
 	attack: number;
 	/** Reduces the damage of every hit like a player's armor does (armor / (armor + armorK)) */
@@ -515,12 +517,27 @@ const boss = (
 	};
 };
 
+/**
+ * Monsters that no longer appear: the stand-ins the real art replaced (2026-11-18). They stay in `MONSTERS` because a save, a ticket or the Bestiary may still name them (ids are append-only), but nothing ever places one.
+ * They keep their own biome and numbers, and carry `retired: true`, which `canSpawnOn` refuses. `catalog/monsters.ts` lists them as not enabled.
+ */
+export const RETIRED_MONSTERS: ReadonlySet<string> = new Set([
+	'graniteRam',
+	'caveGoblinMiner',
+	'boulderBeetle',
+	'bossHillGiant',
+	'pikeLurker',
+	'bossHardwoodColossus',
+	'garbageOgre',
+]);
+const retire = <T extends MonsterDef>(def: T): T & { retired: true } => ({ ...def, retired: true });
+
 /** What a ticket or a monster without a (valid) type becomes: tickets written before monster types existed carry no type. */
 export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
 /**
- * The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
+ * The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
  * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
  *
  * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -544,7 +561,8 @@ export const MONSTERS = {
 	rotcapStag: normal('forest', 'Rotcap Stag', 'tough'),
 	bossElderStag: boss('forest', 'The Elder Stag', ['The Elder Stag lowers its antlers.', 'The forest remembers every trespasser.']),
 	// swamp
-	garbageOgre: normal('swamp', 'Garbage Ogre', 'tough'),
+	garbageOgre: retire(normal('swamp', 'Garbage Ogre', 'tough')),
+	toxicZombie: normal('swamp', 'Toxic Zombie', 'tough'),
 	dumpback: normal('swamp', 'Dumpback', 'even'),
 	rotHeron: normal('swamp', 'Rot Heron', 'fierce'),
 	scrapGolem: normal('swamp', 'Scrap Golem', 'tough'),
@@ -555,11 +573,19 @@ export const MONSTERS = {
 	rimeWraith: normal('tundra', 'Rime Wraith', 'elite'),
 	frostMoth: normal('tundra', 'Frost Moth', 'even'),
 	bossWinterWyrm: boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']),
-	// hills (IDL-201; placeholder art until the real sprites exist)
-	graniteRam: normal('hills', 'Granite Ram', 'fierce'),
-	caveGoblinMiner: normal('hills', 'Cave Goblin Miner', 'even'),
-	boulderBeetle: normal('hills', 'Boulder Beetle', 'tough'),
-	bossHillGiant: boss('hills', 'The Hill Giant', ['The Giant lifts a boulder.', 'The hills are his, and so is the road.']),
+	// hills (IDL-201; the first three and the giant were stand-ins, now retired: see `RETIRED_MONSTERS`)
+	graniteRam: retire(normal('hills', 'Granite Ram', 'fierce')),
+	caveGoblinMiner: retire(normal('hills', 'Cave Goblin Miner', 'even')),
+	boulderBeetle: retire(normal('hills', 'Boulder Beetle', 'tough')),
+	bossHillGiant: retire(boss('hills', 'The Hill Giant', ['The Giant lifts a boulder.', 'The hills are his, and so is the road.'])),
+	magmaKnight: normal('hills', 'Magma Knight', 'fierce'),
+	magmaCrab: normal('hills', 'Magma Crab', 'tough'),
+	mawhornBrute: normal('hills', 'Mawhorn Brute', 'even'),
+	bossIronhorn: boss('hills', 'The Ironhorn', [
+		'The Ironhorn lowers its plated head and steam hisses from its joints.',
+		'The dwarves built it to guard the pass. Nobody told it they left.',
+		'Turn back, or be ground into the road.',
+	]),
 	// coast
 	wreckCrab: normal('coast', 'Wreck Crab', 'tough'),
 	netGull: normal('coast', 'Net Gull', 'fierce'),
@@ -568,13 +594,22 @@ export const MONSTERS = {
 	// lake
 	mossSnapper: normal('lake', 'Moss Snapper', 'tough'),
 	reedNymph: normal('lake', 'Reed Nymph', 'even'),
-	pikeLurker: normal('lake', 'Pike Lurker', 'fierce'),
+	pikeLurker: retire(normal('lake', 'Pike Lurker', 'fierce')),
+	tidepoolGolem: normal('lake', 'Tidepool Golem', 'tough'),
 	bossLakeHydra: boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']),
 	// jungle: only after the first rebirth, like the biome itself (`BIOME_RULES.unlockAfterRebirths`)
 	skullVine: normal('jungle', 'Skull Vine', 'even', 1),
 	eyeHorror: normal('jungle', 'Eye Horror', 'fierce', 1),
 	zombieTriceratops: normal('jungle', 'Zombie Triceratops', 'tough', 1),
-	bossHardwoodColossus: boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
+	bossHardwoodColossus: retire(
+		boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
+	),
+	bossBrainstorm: boss(
+		'jungle',
+		'The Brainstorm',
+		['Spores drift from the cap and the air begins to hum.', 'Every thought you have was already thought here.', 'The jungle thinks. You are in the way.'],
+		1,
+	),
 	// fields (rebirth 2)
 	barnGargoyle: normal('fields', 'Barn Gargoyle', 'fierce', 2),
 	bucketKnight: normal('fields', 'Bucket Knight', 'tough', 2),

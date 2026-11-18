@@ -15,6 +15,7 @@ import type { CharacterReply, GemsReply, GemsRequest, PendingIdentity } from '..
 import { dailyInfo, rollDailyChest, serverDay } from '../../src/lib/offline/gems';
 import { emptyGemShop, newLedger, readGemShop } from '../../src/lib/offline/ledger';
 import { ATTR_KEYS, allocatePoints, attributeBudget, newAttrs, readAttrs } from '../../src/lib/offline/attrs';
+import { CASTLE_SKINS, CASTLE_SKIN_PRICE, castleSkinItemId, ownedSkinsOf } from '../../src/config/castleSkins';
 import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, GEM_SHOP, gemBuildersOf } from '../../src/config/gemShop';
 import { STARTING_GEMS } from '../../src/config/economy';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
@@ -196,6 +197,23 @@ test('Builder #2: a one-time purchase of 1000 gems on the Upgrades tab; the ledg
 	const again = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, T0 + STEP + 1000));
 	assert.equal(again.reason, 'already_owned');
 	assert.equal(m.ledgers.get(ID)!.gems, 500, 'nothing more is charged');
+});
+
+test('castle skins: fourteen one-time cosmetics of 2,500 gems each on the Cosmetics tab, owned through the ledger record', async () => {
+	const skins = GEM_SHOP.filter((i) => i.category === 'skins');
+	assert.equal(skins.length, CASTLE_SKINS.length);
+	assert.ok(skins.every((i) => i.price === CASTLE_SKIN_PRICE && i.kind === 'once' && i.tab === 'once'));
+	assert.equal(CASTLE_SKIN_PRICE, 2500);
+	assert.deepEqual(ownedSkinsOf({}), []);
+	const { m } = await started();
+	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gems: 3000 });
+	const bought = ok(await gems(m, { action: 'spend', itemId: castleSkinItemId(3) }, T0 + STEP));
+	assert.equal(bought.ok, true);
+	assert.equal(bought.paid, 2500);
+	assert.deepEqual(ownedSkinsOf(bought.bought), [3]);
+	assert.equal(ok(await gems(m, { action: 'spend', itemId: castleSkinItemId(3) }, T0 + STEP + 1000)).reason, 'already_owned');
+	assert.equal(ok(await gems(m, { action: 'spend', itemId: castleSkinItemId(4) }, T0 + STEP + 2000)).reason, 'short_balance');
+	assert.equal(m.ledgers.get(ID)!.gems, 500);
 });
 
 test('Rainbow name: a separate one-time purchase of 500 gems that leaves Name colours alone', async () => {

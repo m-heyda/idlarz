@@ -659,7 +659,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 483,
+  "line": 485,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -670,8 +670,8 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 535,
-  "summary": "The roster: 51 monsters in twelve biomes, three normal ones and a boss each (blight has a fourth, elite one): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "line": 552,
+  "summary": "The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
  {
@@ -896,7 +896,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 58,
+  "line": 64,
   "summary": "The gem shop's price book: what each service costs and how often it can be bought.",
   "see": []
  },
@@ -907,7 +907,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 166,
+  "line": 184,
   "summary": "The daily first-login bonus: gems per day of the streak. A claim is once per **UTC day** (the server clock); claiming on the day after the last claim moves one step up the ladder, missing a day starts again at day 1, and after day 7 it starts again at day 1.",
   "see": []
  },
@@ -918,7 +918,7 @@
   "kind": "const",
   "category": "Economy/Gems",
   "file": "src/config/gemShop.ts",
-  "line": 175,
+  "line": 193,
   "summary": "The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom), never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.",
   "see": []
  },
@@ -1029,7 +1029,7 @@
   "kind": "const",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 249,
+  "line": 255,
   "summary": "Farm animal id -> its sprites. Chickens and cows come in two looks, the others in one. Which look an animal wears is {@link animalIcon}.",
   "see": []
  },
@@ -1040,7 +1040,7 @@
   "kind": "function",
   "category": "Architecture/Art",
   "file": "src/config/pixelIcons.ts",
-  "line": 264,
+  "line": 270,
   "summary": "The sprite one animal wears: a stable pick among its kind's looks from a hash of `seed` (the farm uses the animal's key, e.g. `chicken-3`), so a chicken keeps its look between renders and visits and a flock is mixed. Without a seed it is the kind's first look (shop cards, tutorial). Pure: no random numbers.",
   "see": []
  },

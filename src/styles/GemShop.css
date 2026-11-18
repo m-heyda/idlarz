@@ -9,12 +9,12 @@
 
 /* the upgrade and cosmetic tiles sit two to a row, so a price and its button never have to break */
 .gem-two .ds-ups-grid {
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
 
 .gem-id-grid {
 	display: grid;
-	grid-template-columns: repeat(2, minmax(0, 1fr));
+	grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 	gap: 10px;
 	padding: 4px;
 }
@@ -90,4 +90,39 @@
 
 .gem-preview-tile[data-on='true'] .ds-upgrade {
 	outline: 1px solid var(--ds-gold);
+}
+
+/* the Cosmetics tab: sections one under another (nicknames, castle skins), each a grid of plain cards: a picture for a skin, a name, the price and Buy */
+
+.gem-cos-grid {
+	display: grid;
+	/* as many columns as fit the window, so a narrower window drops to fewer and a wider one gains more */
+	grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+	gap: 10px;
+	padding: 4px 4px 14px;
+}
+
+/* the skin cards are compact: a small castle, the name, the price and Buy */
+.gem-skins {
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+}
+
+.gem-cosmetic .gem-card-foot {
+	flex-wrap: wrap;
+}
+
+.gem-cosmetic {
+	cursor: default;
+}
+
+.gem-cosmetic[data-on='true'] {
+	outline: 1px solid var(--ds-gold);
+}
+
+.gem-skin-art {
+	align-self: center;
+	width: 56px;
+	height: 56px;
+	object-fit: contain;
+	image-rendering: pixelated;
 }

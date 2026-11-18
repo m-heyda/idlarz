@@ -23,9 +23,15 @@ const BossWindow: React.FC = () => (
 				imageRendering: 'pixelated',
 			}}
 		>
-			<div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.68)' }} />
+			<div aria-hidden style={{ position: 'absolute', inset: 0, background: 'rgba(0, 0, 0, 0.5)' }} />
 			<div style={{ position: 'relative' }}>
-				<ComingSoon title='World boss' icon={pixelIconSrc('menu_boss')} text='World boss spawns coming soon.' />
+				<ComingSoon
+					title='World boss'
+					icon={pixelIconSrc('menu_boss')}
+					text='World boss spawns coming soon.'
+					// a card with room around the text and a darker plate behind it, so it reads over the busy picture
+					style={{ height: 'auto', minHeight: 0, padding: '32px 52px', background: 'rgba(0, 0, 0, 0.78)', border: '1px solid rgba(240, 210, 122, 0.35)' }}
+				/>
 			</div>
 		</div>
 	</GameWindow>

@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
+import { CASTLE_SKINS, castleSkinItemId } from '@/config/castleSkins';
+import { pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { NICK_EFFECTS, nickColorValue } from '@/config/nickColors';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
@@ -10,7 +12,7 @@ import { notify } from '@/lib/notices';
 import { formatNumber } from '@/utils/formatters';
 import GameWindow from '../GameWindow';
 import { useBadgeChoice } from '../BadgeDialog';
-import { Button, Tabs } from '../../../../packages/design-system/src/components/primitives';
+import { Button, SectionLabel, Tabs } from '../../../../packages/design-system/src/components/primitives';
 import { NickName } from '../../../../packages/design-system/src/components/composites';
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import GemIcon from '../GemIcon';
@@ -70,6 +72,8 @@ const GemShopDialog: React.FC = () => {
 	const [tab, setTab] = useState<ShopView>('daily');
 	/** The name effect shown on the preview strip of the Cosmetics tab (an effect id; none = the plain name) */
 	const [previewFx, setPreviewFx] = useState<string | null>(null);
+	const castleSkin = useUiStore((state) => state.castleSkin);
+	const setCastleSkin = useUiStore((state) => state.setCastleSkin);
 
 	useEffect(() => {
 		if (open) void useGemStore.getState().refresh();
@@ -212,6 +216,54 @@ const GemShopDialog: React.FC = () => {
 		);
 	};
 
+	/**
+	 * One cosmetic as a plain card: its picture (castle skins), its name, then the price and Buy, or "Owned" (and, for a skin, Use / In use). No description: a name effect previews on the strip above when the card is hovered or clicked, and a skin
+	 * shows its castle. A refusal (a short balance) is a notice when Buy is pressed.
+	 */
+	const cosmeticTile = (item: GemItem) => {
+		const owned = ownedOf(item);
+		const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
+		const effect = NICK_EFFECTS.find((entry) => entry.item === item.id);
+		const skin = CASTLE_SKINS.find((entry) => castleSkinItemId(entry.n) === item.id);
+		return (
+			<div
+				key={item.id}
+				className='gem-card gem-cosmetic'
+				data-owned={owned}
+				data-on={effect ? previewFx === effect.id : skin ? castleSkin === skin.n : undefined}
+				onMouseEnter={effect ? () => setPreviewFx(effect.id) : undefined}
+				onClick={effect ? () => setPreviewFx(effect.id) : undefined}
+			>
+				{skin && (
+					// eslint-disable-next-line @next/next/no-img-element
+					<img className='gem-skin-art' src={pixelIconSrc(`castle_skin_${skin.n}` as PixelIconName)} alt='' draggable={false} />
+				)}
+				<div className='gem-card-name'>{item.name}</div>
+				<div className='gem-card-foot'>
+					{owned ? (
+						<>
+							<span className='gem-card-owned'>Owned</span>
+							{skin && (
+								<Button tone={castleSkin === skin.n ? 'dark' : 'stone'} onClick={() => setCastleSkin(castleSkin === skin.n ? null : skin.n)}>
+									{castleSkin === skin.n ? 'In use' : 'Use'}
+								</Button>
+							)}
+						</>
+					) : (
+						<>
+							<span className='gem-card-price'>
+								{formatNumber(price)} <GemIcon />
+							</span>
+							<Button tone={blocked ? 'dark' : 'gold'} disabled={busy} onClick={() => press(item, blocked, price)}>
+								{confirm === item.id ? 'Confirm' : 'Buy'}
+							</Button>
+						</>
+					)}
+				</div>
+			</div>
+		);
+	};
+
 	return (
 		<GameWindow
 			id='gems'
@@ -254,23 +306,28 @@ const GemShopDialog: React.FC = () => {
 					</div>
 				)}
 
-				{tab !== 'daily' && tab !== 'identity' && items.length > 0 && (
+				{tab === 'upgrades' && items.length > 0 && (
+					<div data-testid={`gem-${tab}`} className='ds-ups gem-two'>
+						<div className='ds-ups-grid'>{items.map(tile)}</div>
+					</div>
+				)}
+
+				{tab === 'once' && items.length > 0 && (
 					<div data-testid={`gem-${tab}`}>
-						{tab === 'once' && (
-							<>
-								<div className='ds-nick-stage' data-testid='gem-preview'>
-									<div className='ds-nick-preview'>
-										<NickName color={nickColorValue(previewFx)}>{playerName}</NickName>
-									</div>
-								</div>
-								<div className='gem-preview-hint'>
-									Hover or click a name effect to preview it on your name. You can also pick them in your character window.
-								</div>
-							</>
-						)}
-						<div className='ds-ups gem-two'>
-							<div className='ds-ups-grid'>{items.map(tile)}</div>
+						<SectionLabel>Nicknames</SectionLabel>
+						<div className='ds-nick-stage' data-testid='gem-preview'>
+							<div className='ds-nick-preview'>
+								<NickName color={nickColorValue(previewFx)}>{playerName}</NickName>
+							</div>
 						</div>
+						<div className='gem-preview-hint'>Hover a name to preview it. You can also pick them in your character window.</div>
+						<div className='gem-cos-grid'>{items.filter((item) => (item.category ?? 'nicknames') === 'nicknames').map(cosmeticTile)}</div>
+
+						<SectionLabel>Castle skins</SectionLabel>
+						<div className='gem-preview-hint'>
+							A skin replaces your castle on the map at every level. Pick it with Use; press In use again to go back to the level castles.
+						</div>
+						<div className='gem-cos-grid gem-skins'>{items.filter((item) => item.category === 'skins').map(cosmeticTile)}</div>
 					</div>
 				)}
 			</div>

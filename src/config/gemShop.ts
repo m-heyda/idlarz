@@ -1,4 +1,5 @@
 // The gem shop's price book (IDL-189, IDL-190, IDL-194). A leaf module: pure data and two tiny helpers, imported by the server (`lib/offline/gemShop.ts`) and the shop window alike.
+import { CASTLE_SKINS, CASTLE_SKIN_PRICE, castleSkinItemId } from '@/config/castleSkins';
 
 /** The tabs of the Gem shop window: services (identity), leveled upgrades and one-time purchases. A tab with no item shows a "coming soon" note. */
 export type GemShopTab = 'identity' | 'upgrades' | 'once';
@@ -17,13 +18,16 @@ export type GemItemId =
 	| 'name_frost'
 	| 'name_void'
 	| 'name_galaxy'
-	| 'builder_2';
+	| 'builder_2'
+	| `castle_skin_${number}`;
 
 export interface GemItem {
 	id: GemItemId;
 	tab: GemShopTab;
 	/** Defaults to `service` */
 	kind?: GemItemKind;
+	/** The Cosmetics tab groups its items: nicknames (the default) or castle skins */
+	category?: 'nicknames' | 'skins';
 	name: string;
 	/** One line: what the player gets. */
 	blurb: string;
@@ -48,6 +52,8 @@ export const DAY_SEC = 86_400;
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
  * - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
+ *
+ * - **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -136,6 +142,18 @@ export const GEM_SHOP: readonly GemItem[] = [
 		price: 500,
 		cooldownSec: 0,
 	},
+	...CASTLE_SKINS.map(
+		(skin): GemItem => ({
+			id: castleSkinItemId(skin.n),
+			tab: 'once',
+			kind: 'once',
+			category: 'skins',
+			name: skin.name,
+			blurb: 'A castle skin.',
+			price: CASTLE_SKIN_PRICE,
+			cooldownSec: 0,
+		}),
+	),
 	{
 		id: 'builder_2',
 		tab: 'upgrades',
