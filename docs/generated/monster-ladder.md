@@ -33,6 +33,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 10% | 100% |
 | Garbage Ogre | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Toxic Zombie | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Toxic Zombie | 17 (castle 8) | 0% | 0% | 0% | 0% | 8% | 100% |
+| Toxic Zombie | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Dumpback | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Dumpback | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 75% |
 | Dumpback | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -72,6 +75,18 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Hill Giant | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Magma Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Magma Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 88% | 100% |
+| Magma Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Magma Crab | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Magma Crab | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Magma Crab | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mawhorn Brute | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Mawhorn Brute | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Mawhorn Brute | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
@@ -93,6 +108,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Pike Lurker | 10 (castle 1) | 0% | 0% | 5% | 100% | 100% | 100% |
 | Pike Lurker | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Pike Lurker | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Tidepool Golem | 10 (castle 1) | 0% | 95% | 100% | 100% | 100% | 100% |
+| Tidepool Golem | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Tidepool Golem | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
 | The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
@@ -108,6 +126,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Barn Gargoyle | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Barn Gargoyle | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Barn Gargoyle | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
