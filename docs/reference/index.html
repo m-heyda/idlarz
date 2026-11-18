@@ -341,7 +341,7 @@ Buildings take Thrift only.</p>
 </code></pre>
 </article><article><p><a id="calculatexpgain"></a></p>
 <h3><code>calculateXpGain</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:85</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:80</code></a></p>
 <p>Calculate XP gain scaling based on owned tiles
 The more tiles owned, the more XP gained</p>
 <p>XP a tile purchase gives, for the <code>k</code>-th purchase (<code>BASE_XP_PER_TILE</code> 45, <code>XP_TILE</code> in <code>src/config/economy.ts</code>); multiplied by <code>1 + XP gain %</code> of the character.
@@ -4906,7 +4906,7 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 </tbody></table>
 </article><article><p><a id="levelscale"></a></p>
 <h3><code>levelScale</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:213</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:211</code></a></p>
 <p>Power multiplier of an item level (1 at level 1).</p>
 <p>Item power grows linearly with item level: each level adds 7% of the level-1 power (1 at level 1, 1.63 at 10, 7.9 at 100). Gear is authored at its own <code>minItemLevel</code>; an instance of level L has
 <code>baseStats x levelScale(L) / levelScale(minItemLevel)</code>, then the quality roll (+/-8%). Affix values use the same curve. Boss stats use it too (<a href="#monsterstats"><code>monsterStats</code></a>).</p>
@@ -4916,7 +4916,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 </code></pre>
 </article><article><p><a id="valuecurve"></a></p>
 <h3><code>valueCurve</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:186</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:184</code></a></p>
 <p>Value multiplier of an item level (1 at level 1).</p>
 <p>What gear is worth in gold follows its own curve, because the economy grows far faster than gear power: steep up to the knee (level 10), flatter after it.</p>
 <p><strong>Formula</strong></p>
@@ -5083,7 +5083,7 @@ The soft cap level is 80 (<code>softCapLevel</code>, informational). Retune the 
 <p>See also: <a href="#xptonextlevel"><code>xpToNextLevel</code></a>, <a href="#totalstatpoints"><code>totalStatPoints</code></a></p>
 </article><article><p><a id="xptonextlevel"></a></p>
 <h3><code>xpToNextLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:187</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:182</code></a></p>
 <p>XP to go from <code>level</code> to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
 everything that shows or checks a level threshold uses this.</p>
 <p><strong>Formula</strong></p>
@@ -5092,7 +5092,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 </code></pre>
 </article><article><p><a id="totalstatpoints"></a></p>
 <h3><code>totalStatPoints</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:152</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:147</code></a></p>
 <p>The attribute points a character that has reached <code>level</code> has earned in all (a level gives 1; the early levels give extra, see LEVELING).</p>
 <p><code>reconcileCharacter</code> hands every point back when a character holds more than its level has earned.</p>
 <p><strong>Formula</strong></p>
@@ -5138,7 +5138,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 <p>See also: <a href="#totalstatpoints"><code>totalStatPoints</code></a></p>
 </article><article><p><a id="cumulativexp"></a></p>
 <h3><code>cumulativeXp</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:199</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:194</code></a></p>
 <p>The total XP at which <code>level</code> is reached (level 1 is 0).</p>
 </article><article><p><a id="allocatepoints"></a></p>
 <h3><code>allocatePoints</code> <small>function</small></h3>
@@ -5146,11 +5146,11 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 <p>Puts points into attributes: <code>add</code> is how many per attribute. Refused (nothing changes) when it is empty or malformed, or when it would spend more than the level&#39;s budget holds.</p>
 </article><article><p><a id="calculatelevel"></a></p>
 <h3><code>calculateLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:211</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:206</code></a></p>
 <p>Level from total XP: each level needs more than the one before (see <code>xpToNextLevel</code>), up to MAX_LEVEL, where the bar is full.</p>
 </article><article><p><a id="reconcilecharacter"></a></p>
 <h3><code>reconcileCharacter</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:167</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:162</code></a></p>
 <p>Puts a character&#39;s attributes in line with an XP total: when more points are spent (and left to spend) than that XP&#39;s level has earned
 (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
 point the level has earned is left to spend again. A character that is within its points is returned as it is.</p>
@@ -5196,14 +5196,14 @@ point the level has earned is left to spend again. A character that is within it
 <p>See also: <a href="#calculatestatresourcemodifiers"><code>calculateStatResourceModifiers</code></a>, <a href="#calculatecombatstats"><code>calculateCombatStats</code></a></p>
 </article><article><p><a id="calculatestatresourcemodifiers"></a></p>
 <h3><code>calculateStatResourceModifiers</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:235</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:230</code></a></p>
 <p>What the five attributes add to the income modifier of each resource (all points count, not only those above 5).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">modifier[r] += 0.025 per attribute point on each resource the attribute feeds; xp: +0.2% (Int) / +0.25% (Cha) per point
 </code></pre>
 </article><article><p><a id="calculatecombatstats"></a></p>
 <h3><code>calculateCombatStats</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:257</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:252</code></a></p>
 <p>The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.</p>
 </article><h2>Rebirth</h2><article><p><a id="rebirth"></a></p>
 <h3><code>REBIRTH</code> <small>const</small></h3>

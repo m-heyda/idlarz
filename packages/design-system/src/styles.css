@@ -6250,3 +6250,14 @@ button.ds-income-head:hover {
 	color: #2f8a3a;
 	vertical-align: middle;
 }
+
+/* the drop table of a monster is grouped: Rewards, Junk, Crafting ingredients */
+.ds-bst-dropsec {
+	margin-top: 8px;
+	padding-bottom: 2px;
+	font-size: 11px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: #8a6a3a;
+	border-bottom: 1px solid rgba(106, 75, 36, 0.35);
+}

@@ -236,7 +236,7 @@ discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x T
 
 ### `calculateXpGain` <small>function</small>
 
-Source: [`src/utils/game/character.ts:85`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:80`](../../src/utils/game/character.ts)
 
 Calculate XP gain scaling based on owned tiles
 The more tiles owned, the more XP gained

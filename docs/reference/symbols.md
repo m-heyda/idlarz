@@ -60,14 +60,14 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `buyCost` | Economy / Merchant | [`src/utils/game/merchant.ts:75`](../../src/utils/game/merchant.ts) | Gold for buying `units` of a resource from the merchant: |
 | `buyResource` | Economy / Merchant | [`src/lib/offline/trade.ts:128`](../../src/lib/offline/trade.ts) | Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. |
 | `calculateAnimalCost` | Economy / Farm | [`src/utils/game/farm.ts:14`](../../src/utils/game/farm.ts) | Food cost of the next animal of a kind when `level` of them are owned: |
-| `calculateCombatStats` | Progression / Attributes | [`src/utils/game/character.ts:257`](../../src/utils/game/character.ts) | The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says. |
+| `calculateCombatStats` | Progression / Attributes | [`src/utils/game/character.ts:252`](../../src/utils/game/character.ts) | The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says. |
 | `calculateFarmOutput` | Economy / Farm | [`src/utils/game/farm.ts:79`](../../src/utils/game/farm.ts) | The whole farm's output per second: |
-| `calculateLevel` | Progression / Levels | [`src/utils/game/character.ts:211`](../../src/utils/game/character.ts) | Level from total XP: |
+| `calculateLevel` | Progression / Levels | [`src/utils/game/character.ts:206`](../../src/utils/game/character.ts) | Level from total XP: |
 | `calculateResourceBreakdown` | Economy / Income | [`src/utils/game/income.ts:129`](../../src/utils/game/income.ts) | Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). |
-| `calculateStatResourceModifiers` | Progression / Attributes | [`src/utils/game/character.ts:235`](../../src/utils/game/character.ts) | What the five attributes add to the income modifier of each resource (all points count, not only those above 5). |
+| `calculateStatResourceModifiers` | Progression / Attributes | [`src/utils/game/character.ts:230`](../../src/utils/game/character.ts) | What the five attributes add to the income modifier of each resource (all points count, not only those above 5). |
 | `calculateTileCost` | Economy / Tiles | [`src/utils/game/costs.ts:14`](../../src/utils/game/costs.ts) | Everything buying the next tile costs, given how many tiles are owned and the Charisma discount (percent). |
 | `calculateTileOutput` | Economy / Income | [`src/utils/game/income.ts:81`](../../src/utils/game/income.ts) | The one place a single tile's output is priced; |
-| `calculateXpGain` | Economy / Tiles | [`src/utils/game/character.ts:85`](../../src/utils/game/character.ts) | Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained |
+| `calculateXpGain` | Economy / Tiles | [`src/utils/game/character.ts:80`](../../src/utils/game/character.ts) | Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained |
 | `canSpawnOn` | Monsters / Spawning | [`src/lib/monsters.ts:150`](../../src/lib/monsters.ts) | Whether a monster of this type may stand on this tile: |
 | `capPerks` | Economy / Perk caps | [`src/catalog/perkCaps.ts:57`](../../src/catalog/perkCaps.ts) | The one function that caps the perk families of a summed gear block. |
 | `CASTLE_AREA_BONUS` | Economy / Castle | [`src/config/castle.ts:35`](../../src/config/castle.ts) | Area bonus: |
@@ -107,7 +107,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `createClickLimiter` | Economy / Clicks | [`src/lib/clickLimiter.ts:35`](../../src/lib/clickLimiter.ts) | Creates the click rate limiter: |
 | `createSaveStorage` | Saves & Server / The save | [`src/lib/saveStorage.ts:83`](../../src/lib/saveStorage.ts) | Where the save lives: |
 | `critOdds` | Combat / Player numbers | [`src/lib/combat.ts:153`](../../src/lib/combat.ts) | Chance (0-1) that a swing crits, and that a crit becomes a super crit: |
-| `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
+| `cumulativeXp` | Progression / Levels | [`src/utils/game/character.ts:194`](../../src/utils/game/character.ts) | The total XP at which `level` is reached (level 1 is 0). |
 | `DAILY_BONUS_GEMS` | Economy / Gems | [`src/config/gemShop.ts:184`](../../src/config/gemShop.ts) | The daily first-login bonus: |
 | `DAILY_CHEST` | Economy / Gems | [`src/config/gemShop.ts:193`](../../src/config/gemShop.ts) | The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: |
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:21`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
@@ -181,7 +181,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LEGENDARY_PERK_TIERS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:30`](../../src/catalog/perkCaps.ts) | The magnitude of a legendary perk by tier, in percent of its family (IDL-149: |
 | `levelAtAge` | Monsters / Level scaling | [`src/lib/monsters.ts:93`](../../src/lib/monsters.ts) | The level of a monster of this age: |
 | `LEVELING` | Progression / Levels | [`src/config/character.ts:55`](../../src/config/character.ts) | Character level 1-100 (`maxLevel`). |
-| `levelScale` | Loot / Items | [`src/catalog/stats.ts:213`](../../src/catalog/stats.ts) | Power multiplier of an item level (1 at level 1). |
+| `levelScale` | Loot / Items | [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts) | Power multiplier of an item level (1 at level 1). |
 | `lifeLeechPercent` | Combat / Player numbers | [`src/lib/combat.ts:206`](../../src/lib/combat.ts) | The Life Leech in %, the gear's and the merchant's together, never above the cap. |
 | `limitOf` | Progression / Limits | [`src/lib/limits.ts:62`](../../src/lib/limits.ts) | The current value of a limit: |
 | `LIMITS` | Progression / Limits | [`src/config/limits.ts:14`](../../src/config/limits.ts) | Limits that upgrades raise. |
@@ -243,7 +243,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rebirthStatus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:138`](../../src/utils/game/rebirth.ts) | Can the player rebirth, and if not what is missing. |
 | `rebirthUnlockIntro` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:40`](../../src/utils/game/rebirthUnlocks.ts) | The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |
-| `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:167`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
+| `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:162`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
 | `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:20`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
 | `recordRankPlace` | Progression / Achievements | [`src/lib/offline/curiosity.ts:31`](../../src/lib/offline/curiosity.ts) | Records the podium place a player holds on a Ranking board (1 to 3, any board): |
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
@@ -310,7 +310,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `tierGems` | Progression / Deeds | [`src/catalog/deedRewards.ts:17`](../../src/catalog/deedRewards.ts) | Gems paid for tier `index` (0-based) of a deed: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
-| `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:152`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
+| `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:147`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
 | `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:40`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
 | `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
 | Turning enforcement and the server-run rebirth on together | Ops / Operator guides | [`src/lib/cloudSave/verify.ts:116`](../../src/lib/cloudSave/verify.ts) | **Turning enforcement on: |
@@ -320,7 +320,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `unlockedAvatarIds` | Progression / Avatars | [`src/catalog/avatars.ts:174`](../../src/catalog/avatars.ts) | The avatar ids an account may use: |
 | `upgradeBody` | Saves & Server / The save | [`src/lib/saveUpgrade.ts:52`](../../src/lib/saveUpgrade.ts) | Brings a save body of schema `from` up to schema `to` by running the steps `from`, `from + 1`, ... |
 | `validateLootData` | Loot / Pipeline | [`src/lib/loot/validate.ts:35`](../../src/lib/loot/validate.ts) | Checks the whole loot configuration (docs/reference/loot.md): |
-| `valueCurve` | Loot / Items | [`src/catalog/stats.ts:186`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
+| `valueCurve` | Loot / Items | [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts) | Value multiplier of an item level (1 at level 1). |
 | `verifyTransition` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:258`](../../src/lib/cloudSave/verify.ts) | Runs every plausibility check between two consecutive saves and returns the flags that fired; |
 | `WEAPON_ATTACK_SPEED` | Combat / Player numbers | [`src/catalog/weapons.ts:13`](../../src/catalog/weapons.ts) | Attacks per second of a one-hand weapon by type (a plain weapon uses its type's speed; |
 | `WEAPON_LEGENDARY_DAMAGE_TOP` | Economy / Perk caps | [`src/catalog/perkCaps.ts:44`](../../src/catalog/perkCaps.ts) | The top damage tier of a WEAPON legendary: |
@@ -329,4 +329,4 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `withPushLock` | Saves & Server / Uploading | [`src/lib/pushLock.ts:19`](../../src/lib/pushLock.ts) | One upload at a time per browser. |
 | `worldFacts` | Progression / Achievements | [`src/lib/worldFacts.ts:34`](../../src/lib/worldFacts.ts) | The facts of a map and a farm. |
 | `XP_MODEL` | Saves & Server / Accepting a save | [`src/lib/cloudSave/xpModel.ts:21`](../../src/lib/cloudSave/xpModel.ts) | The server's model of how much XP a character can have. |
-| `xpToNextLevel` | Progression / Levels | [`src/utils/game/character.ts:187`](../../src/utils/game/character.ts) | XP to go from `level` to the next one (Infinity at the maximum level). |
+| `xpToNextLevel` | Progression / Levels | [`src/utils/game/character.ts:182`](../../src/utils/game/character.ts) | XP to go from `level` to the next one (Infinity at the maximum level). |

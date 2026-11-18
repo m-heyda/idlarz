@@ -201,7 +201,7 @@ test('attribute tooltips group their effects by kind, and every effect lands in 
 	assert.ok(economy?.lines.some((line) => line.includes('production per point')));
 	assert.ok(
 		getStatDescriptionGroups('intelligence')
-			.find((group) => group.category.id === 'magic')
+			.find((group) => group.category.id === 'combat')
 			?.lines.some((line) => line.includes('Max Mana')),
 	);
 });

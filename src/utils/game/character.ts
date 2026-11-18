@@ -53,14 +53,9 @@ export const getStatDescription = (stat: keyof Omit<CharacterStats, 'availablePo
 };
 
 /** Which kind of effect one line of a stat description is (the same categories item tooltips group by) */
-const descriptionCategory = (line: string): StatCategory => {
-	if (/production|XP gained|Discount|Luck|chest/i.test(line)) return 'economy';
-	if (/Mana|magic weapons/i.test(line)) return 'magic';
-	if (/damage|DMG|Crit|ATK Speed/i.test(line)) return 'combat';
-	return 'defense';
-};
+const descriptionCategory = (line: string): StatCategory => (/production|XP gained|Discount|Luck|chest/i.test(line) ? 'economy' : 'combat');
 
-/** The description of an attribute split into its effects and grouped by kind: Generators (income, XP), Combat, Defense, Magic. */
+/** The description of an attribute split into its effects and grouped by kind: Economy (income, XP, luck) and Combat (everything else). */
 export const getStatDescriptionGroups = (stat: keyof Omit<CharacterStats, 'availablePoints'>) => {
 	const lines = getStatDescription(stat)
 		.split(' / ')

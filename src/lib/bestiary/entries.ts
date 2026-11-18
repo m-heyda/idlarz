@@ -1,5 +1,5 @@
 import { MASTERY_BIOMES, BIOME_GOALS, bonusText, masteryTiersOf, biomeRoster } from '@/catalog/mastery';
-import { INGREDIENT_BY_JUNK } from '@/catalog/ingredients';
+import { INGREDIENT_BY_JUNK, type IngredientTier } from '@/catalog/ingredients';
 import { ingredientsOf, ingredientQty } from '@/catalog/monsterDrops';
 import { MONSTER_CATALOG, monsterSpriteUrl, type MonsterCatalogEntry } from '@/catalog/monsters';
 import { LOOT_PROFILES, LOOT_SOURCES } from '@/catalog/lootConfig';
@@ -78,6 +78,8 @@ export const statRowsOf = (type: string, level: number): [string, string][] => {
 
 const pct = (n: number): string => `${+(Math.min(1, n) * 100).toFixed(1)}%`;
 
+const INGREDIENT_TONE: Record<IngredientTier, BestiaryDropRow['tone']> = { 1: 'plain', 2: 'good', 3: 'rare', 4: 'epic' };
+
 /** The drop table of a monster at a level: gold and XP caps, the gear roll, potions, the common junk and its own ingredients, each scaled to the level. */
 export const dropRowsOf = (type: string, level: number): BestiaryDropRow[] => {
 	const t = type as MonsterType;
@@ -101,17 +103,20 @@ export const dropRowsOf = (type: string, level: number): BestiaryDropRow[] => {
 			else if (table.id === 'set') rows.push({ label: 'Set piece', value: pct(table.chance ?? 0), tone: 'epic' });
 		}
 	}
-	rows.push({ label: 'Common junk', value: 'every kill' });
+	rows.push({ label: 'Common junk', value: 'every kill', section: 'Junk' });
 	for (const ing of ingredientsOf(type)) {
 		if (level < ing.minLevel) continue;
 		const lo = ingredientQty(ing, level, 0);
 		const hi = ingredientQty(ing, level, 0.999);
 		const item = ITEM_CATALOG[ing.id];
 		const n = lo === hi ? `${lo}` : `${lo}-${hi}`;
+		const crafting = INGREDIENT_BY_JUNK.get(ing.id);
 		rows.push({
-			label: `${item?.name ?? ing.id} x${n}${INGREDIENT_BY_JUNK.has(ing.id) ? ' (ingredient)' : ''}`,
+			label: `${item?.name ?? ing.id} x${n}`,
 			value: ing.chance >= 1 ? 'always' : pct(ing.chance),
-			tone: item?.rarity === 'epic' ? 'epic' : item?.rarity === 'rare' ? 'rare' : 'plain',
+			// an ingredient wears its tier colour (1 grey, 2 green, 3 blue, 4 purple); plain junk the rarity of the item
+			tone: crafting ? INGREDIENT_TONE[crafting.tier] : item?.rarity === 'epic' ? 'epic' : item?.rarity === 'rare' ? 'rare' : 'plain',
+			section: crafting ? 'Crafting ingredients' : 'Junk',
 		});
 	}
 	return rows;
