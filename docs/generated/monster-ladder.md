@@ -156,99 +156,99 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
 | The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
-| Skull Vine | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 95% |
-| Skull Vine | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Skull Vine | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Eye Horror | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 50% |
-| Eye Horror | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Eye Horror | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Zombie Triceratops | 14 (castle 1) | 0% | 0% | 0% | 0% | 60% | 100% |
-| Zombie Triceratops | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Zombie Triceratops | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Vinewhip Panther | 14 (castle 1) | 0% | 0% | 0% | 0% | 3% | 98% |
-| Vinewhip Panther | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Vinewhip Panther | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mossback Idol | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 35% |
-| Mossback Idol | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mossback Idol | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Brainstorm | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Brainstorm | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Brainstorm | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Crow Marshal | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Crow Marshal | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Crow Marshal | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Millstone Golem | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Millstone Golem | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Millstone Golem | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 37 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 45 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 55 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mushroom Wizard | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mushroom Wizard | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mushroom Wizard | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Rootbound Gardener | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Rootbound Gardener | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Rootbound Gardener | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 42 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 50 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 60 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Sporeback Ogre | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Sporeback Ogre | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Sporeback Ogre | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Spore Hound | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Spore Hound | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Spore Hound | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 47 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 55 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 65 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Banner Wraith | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Banner Wraith | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Banner Wraith | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frost-Flame Knight | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frost-Flame Knight | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frost-Flame Knight | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 52 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 60 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 70 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Zombie Triceratops | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 38 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 46 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 56 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 38 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 46 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 56 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 46 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 54 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 64 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 54 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 62 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 72 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 60 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 68 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 78 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 68 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 76 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 86 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

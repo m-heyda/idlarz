@@ -380,7 +380,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
 | The Winter Wyrm (boss) | 36 | 92 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.62 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.9 %* |
-| **All kills together** | | | | | | | **6.9 %** (bosses 6.5 %; XP 22.6 %) |
+| **All kills together** | | | | | | | **6.9 %** (bosses 6.6 %; XP 22.9 %) |
 
 ## castle 7: hero level 58, obsidian + titan maul, 1,300 gold/s, 80.00 XP/s
 
@@ -443,7 +443,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
 | The Winter Wyrm (boss) | 36 | 96 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.5 %* |
-| **All kills together** | | | | | | | **3.9 %** (bosses 3.7 %; XP 14.9 %) |
+| **All kills together** | | | | | | | **4.0 %** (bosses 3.8 %; XP 15.2 %) |
 
 ## castle 8: hero level 70, obsidian + titan maul, 2,200 gold/s, 120.00 XP/s
 
@@ -506,7 +506,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
 | The Winter Wyrm (boss) | 37 | 97 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.3 %* |
-| **All kills together** | | | | | | | **2.4 %** (bosses 2.3 %; XP 10.4 %) |
+| **All kills together** | | | | | | | **2.5 %** (bosses 2.4 %; XP 10.7 %) |
 
 ## castle 9: hero level 84, obsidian + titan maul, 3,300 gold/s, 200.00 XP/s
 
@@ -569,7 +569,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 17 | 0 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
 | The Winter Wyrm (boss) | 38 | 98 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.2 %* |
-| **All kills together** | | | | | | | **1.7 %** (bosses 1.6 %; XP 6.7 %) |
+| **All kills together** | | | | | | | **1.8 %** (bosses 1.7 %; XP 7.0 %) |
 
 ## Summary
 
@@ -580,10 +580,10 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | castle 3 | 40 | 8.8 % | 6.6 % | 2.2 % | 25.9 % | Thistle Boar (level 4) | 1.6 % |
 | castle 4 | 100 | 10.8 % | 9.9 % | 0.9 % | 32.9 % | Thistle Boar (level 5) | 0.7 % |
 | castle 5 | 300 | 10.8 % | 10.2 % | 0.6 % | 38.1 % | Thistle Boar (level 6) | 0.2 % |
-| castle 6 | 700 | 6.9 % | 6.5 % | 0.4 % | 22.6 % | Thistle Boar (level 7) | 0.1 % |
-| castle 7 | 1,300 | 3.9 % | 3.7 % | 0.2 % | 14.9 % | Thistle Boar (level 8) | 0.1 % |
-| castle 8 | 2,200 | 2.4 % | 2.3 % | 0.1 % | 10.4 % | Thistle Boar (level 9) | 0.0 % |
-| castle 9 | 3,300 | 1.7 % | 1.6 % | 0.1 % | 6.7 % | Thistle Boar (level 9) | 0.0 % |
+| castle 6 | 700 | 6.9 % | 6.6 % | 0.4 % | 22.9 % | Thistle Boar (level 7) | 0.1 % |
+| castle 7 | 1,300 | 4.0 % | 3.8 % | 0.2 % | 15.2 % | Thistle Boar (level 8) | 0.1 % |
+| castle 8 | 2,200 | 2.5 % | 2.4 % | 0.1 % | 10.7 % | Thistle Boar (level 9) | 0.0 % |
+| castle 9 | 3,300 | 1.8 % | 1.7 % | 0.1 % | 7.0 % | Thistle Boar (level 9) | 0.0 % |
 
 ## Caps
 
@@ -641,35 +641,35 @@ Gold and XP caps at the monster's reference level and the multiplier per level (
 | Silt Eel | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
 | Lilypad Warden | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
 | The Lake Hydra | 27 - 45 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Skull Vine | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Eye Horror | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Zombie Triceratops | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Vinewhip Panther | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Mossback Idol | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| The Hardwood Colossus | 32 - 50 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| The Brainstorm | 32 - 50 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Barn Gargoyle | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Bucket Knight | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Hedge Bandit | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Crow Marshal | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Millstone Golem | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| The Harvest Matron | 37 - 55 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Greenscale Warden | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Blossom Ronin | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Gray Gleaner | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Mushroom Wizard | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Rootbound Gardener | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| The Blossom Reaper | 42 - 60 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Gasket Goblin | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Blighted Husk | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Mothwing Hexer | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Gloom Cerberus | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Sporeback Ogre | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Spore Hound | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| The Eyed Maw | 47 - 65 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Bone Cleaver | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Frostguard Knight | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Gilded Champion | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Banner Wraith | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Frost-Flame Knight | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| The Cinder Warlord | 52 - 70 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
+| Skull Vine | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Eye Horror | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Zombie Triceratops | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Vinewhip Panther | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Mossback Idol | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| The Hardwood Colossus | 38 - 56 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,219,676 |
+| The Brainstorm | 38 - 56 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,219,676 |
+| Barn Gargoyle | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Bucket Knight | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Hedge Bandit | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Crow Marshal | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Millstone Golem | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| The Harvest Matron | 46 - 64 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,332,773 |
+| Greenscale Warden | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Blossom Ronin | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Gray Gleaner | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Mushroom Wizard | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Rootbound Gardener | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| The Blossom Reaper | 54 - 72 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,456,357 |
+| Gasket Goblin | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Blighted Husk | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Mothwing Hexer | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Gloom Cerberus | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Sporeback Ogre | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Spore Hound | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| The Eyed Maw | 60 - 78 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,500,048 |
+| Bone Cleaver | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Frostguard Knight | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Gilded Champion | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Banner Wraith | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Frost-Flame Knight | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| The Cinder Warlord | 68 - 86 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,639,143 |
