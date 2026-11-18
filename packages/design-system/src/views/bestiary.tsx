@@ -52,9 +52,6 @@ export interface BestiaryEntry {
 export interface BestiaryBiomeGoal {
 	biome: string;
 	label: string;
-	/** The framed landscape picture of a rebirth biome (undefined for a home biome: a colour tile is drawn) and the biome's map colour */
-	art?: string;
-	color: string;
 	monsters: number;
 	/** Goal tiers reached by the kills / already claimed */
 	reached: number;
@@ -111,7 +108,15 @@ const Card: React.FC<{ e: BestiaryEntry; active: boolean; onPick: () => void }> 
 	const t = tierOf(e);
 	const full = t >= e.tiers.length;
 	return (
-		<button type='button' className='ds-mon' data-active={active} data-unk={!e.met} onClick={onPick} title={e.met ? e.name : 'Not met yet'}>
+		<button
+			type='button'
+			className='ds-mon'
+			data-active={active}
+			data-unk={!e.met}
+			data-tier={e.met ? e.claimed : 0}
+			onClick={onPick}
+			title={e.met ? e.name : 'Not met yet'}
+		>
 			<span className='ds-mon-lv' data-boss={e.boss}>
 				{e.boss ? 'Boss' : `Lv ${e.levels.min}`}
 			</span>
@@ -330,11 +335,8 @@ const BiomeGoals: React.FC<{ goals: readonly BestiaryBiomeGoal[]; busy?: boolean
 			{goals.map((g) => {
 				const tiers = g.tiers.length;
 				return (
-					<div className='ds-bst-goal-row' key={g.biome} style={{ gridTemplateColumns: `190px repeat(${tiers}, minmax(190px, 1fr)) 150px` }}>
+					<div className='ds-bst-goal-row' key={g.biome} style={{ gridTemplateColumns: `130px repeat(${tiers}, minmax(190px, 1fr)) 150px` }}>
 						<div className='ds-bst-goal-name'>
-							<span className='ds-bst-biome-art' style={g.art ? undefined : { background: g.color }}>
-								{g.art ? <img src={g.art} alt='' /> : null}
-							</span>
 							<span className='ds-bst-goal-label'>
 								<b>{g.label}</b>
 								<DiamondLevel level={g.claimed} max={tiers} small />

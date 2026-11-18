@@ -5,8 +5,6 @@ import { LOOT_PROFILES, LOOT_SOURCES } from '@/catalog/lootConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { BOSS_MIN_DISTANCE, MONSTERS } from '@/config/combatConfig';
 import { BIOMES } from '@/config/biomes';
-import { biomeArtUrl } from '@/config/biomeArt';
-import { biomeColor } from '@/config/biomePalette';
 import { biomeState, masteryBonusesFor, masteryStateOf, noBonuses } from '@/lib/mastery';
 import { maxLevelOf, monsterStats, rewardLevelMult } from '@/lib/monsters';
 import { formatCompact } from '@/utils/formatters';
@@ -158,8 +156,6 @@ export const biomeGoalsOf = (input: BestiaryInput): BestiaryBiomeGoal[] => {
 		return {
 			biome,
 			label: biomeLabelOf(biome),
-			art: biomeArtUrl(biome),
-			color: biomeColor(biome),
 			monsters: biomeRoster(biome).length,
 			reached: s.reached,
 			claimed: s.claimed,
