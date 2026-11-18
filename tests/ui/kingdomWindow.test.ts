@@ -39,6 +39,10 @@ test('the summary reports the castle against its cap, the builders, the land per
 	assert.equal(s.buildings.total, BUILDINGS.length);
 	assert.equal(s.buildings.built, 0);
 	assert.ok(s.buildings.rows.every((row) => row.level === 0 && row.cap >= 1));
+	assert.ok(
+		s.buildings.rows.filter((row) => row.kind !== 'idol').every((row) => row.cap === 5),
+		'the cap is the Ember cap (5 to start), not held down by the castle level',
+	);
 	assert.equal(s.monsters.total, api().monsters.length);
 });
 

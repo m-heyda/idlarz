@@ -38,7 +38,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Basics: tick, caps, start | Economy / Basics | [`src/config/economy.ts:22`](../../src/config/economy.ts) | Game constants the economy runs on: |
 | `beltSlotsFor` | Progression / Limits | [`src/lib/offline/inventory.ts:71`](../../src/lib/offline/inventory.ts) | The belt bag slots the server holds for the player: |
 | Bestiary mastery | Progression / Mastery | [`src/catalog/mastery.ts:52`](../../src/catalog/mastery.ts) | The mastery ladder shared by every normal monster: |
-| `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
+| `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:81`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_ART` | Architecture / Art | [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts) | The picture of each rebirth biome: |
 | `BIOME_GOALS` | Progression / Mastery | [`src/catalog/mastery.ts:126`](../../src/catalog/mastery.ts) | The biome collection goals, one per ladder tier (decided 2026-11-17): |
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:125`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
@@ -51,12 +51,12 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `BossModifiers` | Monsters / Boss modifiers | [`src/config/combatConfig.ts:145`](../../src/config/combatConfig.ts) | What makes a boss fight different (all optional; |
 | `BUFF_FAMILIES` | Combat / Consumables | [`src/catalog/buffs.ts:25`](../../src/catalog/buffs.ts) | The buff families. |
 | `buffTotals` | Combat / Consumables | [`src/lib/buffs.ts:84`](../../src/lib/buffs.ts) | The summed bonus per stat of the running buffs: |
-| `builderCount` | Economy / Buildings | [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts) | How many castle or building upgrades can run at once: |
+| `builderCount` | Economy / Buildings | [`src/lib/buildings.ts:78`](../../src/lib/buildings.ts) | How many castle or building upgrades can run at once: |
 | `BUILDING_RULES` | Economy / Buildings | [`src/config/buildings.ts:33`](../../src/config/buildings.ts) | The numbers of the building system (proposals from docs/plan/18, tuned with the sim; |
-| `buildingLevelCost` | Economy / Buildings | [`src/lib/buildings.ts:102`](../../src/lib/buildings.ts) | The price of reaching `level` (1 = building it): |
+| `buildingLevelCost` | Economy / Buildings | [`src/lib/buildings.ts:109`](../../src/lib/buildings.ts) | The price of reaching `level` (1 = building it): |
 | `BUILDINGS` | Economy / Buildings | [`src/catalog/buildings.ts:60`](../../src/catalog/buildings.ts) | The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; |
 | `BUILDINGS_FLAG` | Economy / Buildings | [`src/config/buildings.ts:17`](../../src/config/buildings.ts) | The per-biome building system (R7, IDL-91, IDL-92), behind BUILDINGS_FLAG, which is **ON** (owner decision: |
-| `buildingUpgradeDuration` | Economy / Buildings | [`src/lib/buildings.ts:48`](../../src/lib/buildings.ts) | Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. |
+| `buildingUpgradeDuration` | Economy / Buildings | [`src/lib/buildings.ts:55`](../../src/lib/buildings.ts) | Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. |
 | `buildNumbers` | Progression / Guided tutorial | [`src/lib/tutorial/numbers.ts:31`](../../src/lib/tutorial/numbers.ts) | The numbers the tutorial texts quote, read from the live config at the moment they are shown (a changed price changes the text, nothing is typed in): |
 | `buyCost` | Economy / Merchant | [`src/utils/game/merchant.ts:75`](../../src/utils/game/merchant.ts) | Gold for buying `units` of a resource from the merchant: |
 | `buyResource` | Economy / Merchant | [`src/lib/offline/trade.ts:128`](../../src/lib/offline/trade.ts) | Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. |
@@ -144,7 +144,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `fightStep` | Combat / A fight | [`src/lib/offline/fightSteps.ts:166`](../../src/lib/offline/fightSteps.ts) | One tick of the open fight. |
 | `finite` | Saves & Server / The ledger | [`src/lib/offline/ledgerRead.ts:19`](../../src/lib/offline/ledgerRead.ts) | Tolerant readers for the two ledger columns that hold catalog ids (`inv`: |
 | `FLAG_POLICY` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:97`](../../src/lib/cloudSave/verify.ts) | The flags and what the server does with each. |
-| `GameState` | Architecture / State | [`src/types/game.ts:374`](../../src/types/game.ts) | State. |
+| `GameState` | Architecture / State | [`src/types/game.ts:378`](../../src/types/game.ts) | State. |
 | `gear` | Loot / Adding content | [`src/catalog/items/define.ts:105`](../../src/catalog/items/define.ts) | The builder every piece of gear is authored with. |
 | `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:341`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
 | `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:40`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
@@ -152,7 +152,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:64`](../../src/config/gemShop.ts) | The gem shop's price book: |
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:322`](../../src/lib/loot/generate.ts) | Everything one source gives. |
-| `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
+| `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:110`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
 | `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:210`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
 | GET /api/rankings | Saves & Server / Endpoints | [`src/app/api/rankings/route.ts:23`](../../src/app/api/rankings/route.ts) | The Rankings: |
 | Giving a flagged account its trust back (restore-trust) | Ops / Operator guides | [`scripts/restore-trust.ts:1`](../../scripts/restore-trust.ts) | The way back for a false-positive flag (IDL-209): |
@@ -217,6 +217,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `NICK_EFFECTS` | Progression / Badges | [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts) | The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): |
 | `NPC_PORTRAITS` | Architecture / Art | [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts) | The NPC portraits: |
 | Pacing targets | Pacing / Targets | [`scripts/sim.ts:21`](../../scripts/sim.ts) | What pace the economy is tuned for, why, and how to check it. |
+| `paidRefreshesNow` | Economy / Merchant | [`src/lib/merchant.ts:33`](../../src/lib/merchant.ts) | The paid refreshes that still count towards the price: |
 | `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:58`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
 | `PERK_CAPS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:15`](../../src/catalog/perkCaps.ts) | The cap on the gear bucket of each perk family, in percent. |
 | `PERSISTED_KEYS` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:65`](../../src/lib/sanitizeSave.ts) | The part of the game state that is saved. |
@@ -248,7 +249,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:162`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
 | `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:20`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
 | `recordRankPlace` | Progression / Achievements | [`src/lib/offline/curiosity.ts:31`](../../src/lib/offline/curiosity.ts) | Records the podium place a player holds on a Ranking board (1 to 3, any board): |
-| `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
+| `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:44`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` (see paidRefreshesNow) have been bought: |
 | `refundOldShop` | Saves & Server / Migrations | [`src/lib/emberShopMigration.ts:37`](../../src/lib/emberShopMigration.ts) | The Ember shop was reworked (new ids, costs and effects). |
 | `regen` | Combat / Player numbers | [`src/lib/combat.ts:252`](../../src/lib/combat.ts) | HP regeneration outside fights: |
 | Rehearsal seeding (seed-rehearsal) | Ops / Operator guides | [`scripts/seed-rehearsal-account.ts:1`](../../scripts/seed-rehearsal-account.ts) | Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`,... |

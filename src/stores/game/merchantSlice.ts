@@ -13,7 +13,16 @@ import {
 import { RESOURCE_CAP } from '@/config/economy';
 import { calculateResourceRates } from '@/utils/game/income';
 import { buyCost, merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
-import { afterRefresh, bestWornGrade, freeRefreshesLeft, generateMerchantStock, refreshCooldown, refreshCost, shopPriceOf } from '@/lib/merchant';
+import {
+	afterRefresh,
+	bestWornGrade,
+	freeRefreshesLeft,
+	generateMerchantStock,
+	paidRefreshesNow,
+	refreshCooldown,
+	refreshCost,
+	shopPriceOf,
+} from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { addDrop, averageItemLevel } from '@/lib/inventory';
@@ -130,7 +139,8 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			const castle = castleLevelOf(state.tiles);
 			if (refreshCooldown(state.merchantRefresh, state.playSeconds) > 0) return false;
 			const free = freeRefreshesLeft(state.merchantRefresh, state.playSeconds) > 0;
-			const cost = free ? 0 : refreshCost(state.merchantRefreshes, limitCtx(state));
+			const paid = paidRefreshesNow(state.merchantRefreshes, state.merchantRefresh, state.playSeconds);
+			const cost = free ? 0 : refreshCost(paid, limitCtx(state));
 			if (state.resources.gold < cost) return false;
 			set({
 				resources: { ...state.resources, gold: state.resources.gold - cost },
@@ -142,8 +152,8 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 					limitCtx(state),
 					bestWornGrade(state.equipment),
 				),
-				merchantRefreshes: state.merchantRefreshes + (free ? 0 : 1),
-				merchantRefresh: afterRefresh(state.merchantRefresh, state.playSeconds, free),
+				merchantRefreshes: paid + (free ? 0 : 1),
+				merchantRefresh: afterRefresh(state.merchantRefresh, state.playSeconds, free, paid),
 			});
 			emitSaveEvent('refreshMerchantStock');
 			return true;

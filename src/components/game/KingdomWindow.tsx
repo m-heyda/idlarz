@@ -11,7 +11,7 @@ import '@/styles/Kingdom.css';
 
 /**
  * The Kingdom overview window (the crown icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome (a heatmap of one square per tile, coloured by biome, with the count per biome under it), every building with its level
- * against what it can reach now (dimmed when not built yet) and how many monsters stand on the map. No income or resources: the resource windows have them. A first version, meant to grow.
+ * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many monsters stand on the map. No income or resources: the resource windows have them. A first version, meant to grow.
  */
 /** The most squares the land heatmap draws; above it each square stands for several tiles */
 const HEAT_MAX_CELLS = 400;

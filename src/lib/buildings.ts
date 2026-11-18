@@ -20,6 +20,13 @@ export const buildingLevelCap = (castleLevel: number, buildingMax: number = BUIL
 	Math.min(Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel), Math.max(1, Math.floor(castleLevel)));
 
 /**
+ * The highest level a building can ever be taken to with what the account owns: Producers and Extractors `buildingMax` (base 5, Master Masonry raises it), an Idol `idolMax` (base 5, Idol Mastery), each never past its
+ * hard limit. The castle level is not part of it (it only gates when a level can be bought, see {@link upgradeCapOf}).
+ */
+export const maxLevelOf = (def: BuildingDef | undefined, idolMax: number = limitOf('idolMaxLevel'), buildingMax: number = BUILDING_RULES.maxLevel): number =>
+	def?.kind === 'idol' ? Math.min(idolMax, HARD_LIMITS.idolMaxLevel) : Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel);
+
+/**
  * The highest level a building can be taken to now: Producers and Extractors `min(5, castle level)`; an Idol the same up to level 5 and, above it, only the purchased cap (`idolMaxLevel`, base 5, raised by the Ember shop's Idol Mastery,
  * never past its hard limit): the castle gates the first five levels, the shop the rest.
  */
@@ -236,8 +243,7 @@ export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): stri
 	const level = levelOfTile(tile);
 	const def = buildingDef(tile.building);
 	const buildingMax = ctx.buildingMax ?? BUILDING_RULES.maxLevel;
-	const top =
-		def?.kind === 'idol' ? Math.min(ctx.idolMax ?? limitOf('idolMaxLevel'), HARD_LIMITS.idolMaxLevel) : Math.min(buildingMax, HARD_LIMITS.buildingMaxLevel);
+	const top = maxLevelOf(def, ctx.idolMax, buildingMax);
 	if (level >= top) return 'Highest level';
 	if (level >= upgradeCapOf(def, ctx.castleLevel, ctx.idolMax, buildingMax)) return `Needs castle level ${level + 1}`;
 	if (upgradeAt(ctx, x, y)) return 'It is being upgraded';

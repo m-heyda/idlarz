@@ -12,7 +12,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_WARD`](#castle-ward), [`isInWard`](#isinward), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
-- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
+- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`paidRefreshesNow`](#paidrefreshesnow), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes), [`INGREDIENTS`](#ingredients)
@@ -612,7 +612,7 @@ The goods shelf and its refresh rules ([`generateMerchantStock`](economy.md#gene
 - **Shelf**: 6 pieces of gear (`LIMITS.merchantOffers`) from the loot source `merchant` (common 60 / uncommon 40, see [`generateLoot`](loot.md#generateloot)), item level centred at most 3 above the average worn item
   level and never more than 5 above it, otherwise built from the castle level (4 + 3 per castle level above 1). Price is `ceil(sell value x 5)` ([`shopPriceOf`](economy.md#shoppriceof)). Reshuffled every 1,800 s of play time.
 - **Refresh**: 3 free per 12 h of play time (`windowSec` 43,200), 30 s between any two, then the paid price `10,000 x 2^(paid refreshes)` capped at 1e9 ([`refreshCost`](economy.md#refreshcost)).
-  The count is never reset, not even by a rebirth.
+  The count starts again at 0 (price back to base) 24 h of play time after the first paid refresh of the run (`escalationResetSec` 86,400), and at a rebirth.
 - **Item sale value**: see [`sellValueOf`](loot.md#sellvalueof).
 
 <a id="merchant-upgrades"></a>
@@ -699,7 +699,7 @@ cost of level N+1 = ceil(baseCost x growth^N)
 
 ### `generateMerchantStock` <small>function</small>
 
-Source: [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:110`](../../src/lib/merchant.ts)
 
 A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made.
 `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.
@@ -720,18 +720,33 @@ What a piece of gear costs at the merchant: far above what he pays for it, so bu
 shelf price = ceil(sellValueOf(item) x 5)
 ```
 
-<a id="refreshcost"></a>
+<a id="paidrefreshesnow"></a>
 
-### `refreshCost` <small>function</small>
+### `paidRefreshesNow` <small>function</small>
 
-Source: [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:33`](../../src/lib/merchant.ts)
 
-The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.
+The paid refreshes that still count towards the price: all of `refreshesBought`, until 24 h of play time (`escalationResetSec`) have
+passed since the first of them (`paidAt`), then none, so the price starts from its base again. A rebirth sets the count to 0 itself.
 
 **Formula**
 
 ```text
-paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
+paid refreshes counted = 0 if play time - paidAt >= 86,400 s, otherwise the paid refreshes bought
+```
+
+<a id="refreshcost"></a>
+
+### `refreshCost` <small>function</small>
+
+Source: [`src/lib/merchant.ts:44`](../../src/lib/merchant.ts)
+
+The gold the next paid refresh costs, when `refreshesBought` (see [`paidRefreshesNow`](economy.md#paidrefreshesnow)) have been bought: it doubles each time, up to a cap of 1b.
+
+**Formula**
+
+```text
+paid refresh price = min(1e9, 10,000 x 2^(paid refreshes counted))
 ```
 
 <a id="sellresource"></a>
@@ -747,7 +762,7 @@ Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with t
 
 ### `bestWornGrade` <small>function</small>
 
-Source: [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:81`](../../src/lib/merchant.ts)
 
 The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it:
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).
@@ -1161,7 +1176,7 @@ See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
 
 ### `buildingUpgradeDuration` <small>function</small>
 
-Source: [`src/lib/buildings.ts:48`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:55`](../../src/lib/buildings.ts)
 
 Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5
 (`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.
@@ -1203,7 +1218,7 @@ An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`
 
 ### `buildingLevelCost` <small>function</small>
 
-Source: [`src/lib/buildings.ts:102`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:109`](../../src/lib/buildings.ts)
 
 The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
 
@@ -1261,7 +1276,7 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 
 ### `builderCount` <small>function</small>
 
-Source: [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:78`](../../src/lib/buildings.ts)
 
 How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
 
