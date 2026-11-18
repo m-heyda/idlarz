@@ -50,7 +50,11 @@ begin
          greatest(s.best_tiles, s.tiles_owned),
          -- every monster killed: the ledger counts them per monster type, so the board adds the types up
          coalesce((select sum(e.value::numeric) from jsonb_each_text(case when jsonb_typeof(l.stats->'kills') = 'object' then l.stats->'kills' else '{}'::jsonb end) e
-                    where e.value ~ '^[0-9]+
+                    where e.value ~ '^[0-9]+$'), 0)::bigint,
+         -- deed points of the claimed tiers: the ledger's mirror number (0 for a ledger that has none yet)
+         case when (l.stats->>'deedPoints') ~ '^[0-9]+$' then (l.stats->>'deedPoints')::bigint else 0 end,
+         now(),
+         now()
     from public.player_stats s
     join public.player_saves p on p.user_id = s.user_id
     join public.profiles pr on pr.id = s.user_id
@@ -77,82 +81,6 @@ begin
     from public.player_rankings
   )
   update public.player_rankings p set rank_level = r.rl, rank_rebirths = r.rr, rank_crafting = r.rc, rank_tiles = r.rt, rank_kills = r.rk, rank_deeds = r.rd
-    from r where p.user_id = r.user_id;
-
-  insert into public.ranking_meta (id, refreshed_at) values (true, now())
-  on conflict (id) do update set refreshed_at = excluded.refreshed_at;
-  return true;
-end;
-$$;
-revoke execute on function public.refresh_rankings(integer, numeric, integer, integer) from public, anon, authenticated;
-grant execute on function public.refresh_rankings(integer, numeric, integer, integer) to service_role;
-
-delete from public.ranking_meta;
-select public.refresh_rankings(100, 29999957, 2, 1) as rebuilt;
-), 0)::bigint,
-         -- deed points of the claimed tiers: the ledger's mirror number (0 for a ledger that has none yet)
-         case when (l.stats->>'deedPoints') ~ '^[0-9]+
-    from public.player_stats s
-    join public.player_saves p on p.user_id = s.user_id
-    join public.profiles pr on pr.id = s.user_id
-    left join public.player_ledger l on l.user_id = s.user_id
-   where not p.test_account and coalesce(pr.epoch, p_baseline) >= p_epoch
-     and (v_reset is null or l.reset_at >= v_reset)
-  on conflict (user_id) do update set
-    level = excluded.level, xp = excluded.xp,
-    level_maxed_at = case when excluded.level_maxed_at is null then null else coalesce(public.player_rankings.level_maxed_at, excluded.level_maxed_at) end,
-    rebirths = excluded.rebirths, legacy_earned = excluded.legacy_earned, craft_xp = excluded.craft_xp,
-    craft_maxed_at = case when excluded.craft_maxed_at is null then null else coalesce(public.player_rankings.craft_maxed_at, excluded.craft_maxed_at) end,
-    best_tiles = excluded.best_tiles, kills = excluded.kills, updated_at = now();
-
-  with r as (
-    select user_id,
-      rank() over (order by level desc, xp desc, level_maxed_at asc nulls last)  as rl,
-      rank() over (order by rebirths desc, legacy_earned desc)                   as rr,
-      rank() over (order by craft_xp desc, craft_maxed_at asc nulls last)        as rc,
-      rank() over (order by best_tiles desc)                                     as rt,
-      rank() over (order by kills desc)                                          as rk
-    from public.player_rankings
-  )
-  update public.player_rankings p set rank_level = r.rl, rank_rebirths = r.rr, rank_crafting = r.rc, rank_tiles = r.rt, rank_kills = r.rk
-    from r where p.user_id = r.user_id;
-
-  insert into public.ranking_meta (id, refreshed_at) values (true, now())
-  on conflict (id) do update set refreshed_at = excluded.refreshed_at;
-  return true;
-end;
-$$;
-revoke execute on function public.refresh_rankings(integer, numeric, integer, integer) from public, anon, authenticated;
-grant execute on function public.refresh_rankings(integer, numeric, integer, integer) to service_role;
-
-delete from public.ranking_meta;
-select public.refresh_rankings(100, 29999957, 2, 1) as rebuilt;
- then (l.stats->>'deedPoints')::bigint else 0 end,
-         now(),
-         now()
-    from public.player_stats s
-    join public.player_saves p on p.user_id = s.user_id
-    join public.profiles pr on pr.id = s.user_id
-    left join public.player_ledger l on l.user_id = s.user_id
-   where not p.test_account and coalesce(pr.epoch, p_baseline) >= p_epoch
-     and (v_reset is null or l.reset_at >= v_reset)
-  on conflict (user_id) do update set
-    level = excluded.level, xp = excluded.xp,
-    level_maxed_at = case when excluded.level_maxed_at is null then null else coalesce(public.player_rankings.level_maxed_at, excluded.level_maxed_at) end,
-    rebirths = excluded.rebirths, legacy_earned = excluded.legacy_earned, craft_xp = excluded.craft_xp,
-    craft_maxed_at = case when excluded.craft_maxed_at is null then null else coalesce(public.player_rankings.craft_maxed_at, excluded.craft_maxed_at) end,
-    best_tiles = excluded.best_tiles, kills = excluded.kills, updated_at = now();
-
-  with r as (
-    select user_id,
-      rank() over (order by level desc, xp desc, level_maxed_at asc nulls last)  as rl,
-      rank() over (order by rebirths desc, legacy_earned desc)                   as rr,
-      rank() over (order by craft_xp desc, craft_maxed_at asc nulls last)        as rc,
-      rank() over (order by best_tiles desc)                                     as rt,
-      rank() over (order by kills desc)                                          as rk
-    from public.player_rankings
-  )
-  update public.player_rankings p set rank_level = r.rl, rank_rebirths = r.rr, rank_crafting = r.rc, rank_tiles = r.rt, rank_kills = r.rk
     from r where p.user_id = r.user_id;
 
   insert into public.ranking_meta (id, refreshed_at) values (true, now())
