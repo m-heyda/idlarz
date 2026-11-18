@@ -1,6 +1,6 @@
 import { BIOMES } from '@/config/biomes';
 import { BUILDINGS } from '@/catalog/buildings';
-import { builderCount, builtBuildings, upgradeCapOf } from '@/lib/buildings';
+import { builderCount, builtBuildings, maxLevelOf } from '@/lib/buildings';
 import { busyBuilders } from '@/lib/builders';
 import { castleLevelOf } from '@/lib/castleWard';
 import { limitOf } from '@/lib/limits';
@@ -18,7 +18,7 @@ export interface KingdomBuildingRow {
 	kind: 'producer' | 'extractor' | 'idol';
 	/** 0 = not built */
 	level: number;
-	/** The highest level it can be taken to now (castle level and the Ember caps) */
+	/** The highest level it can be taken to with what the account owns (the Ember caps; the castle level only gates when a level can be bought) */
 	cap: number;
 	/** An upgrade or first build is running on it */
 	upgrading: boolean;
@@ -56,7 +56,7 @@ export const kingdomSummary = (state: KingdomInput): KingdomSummary => {
 		biome: def.biome,
 		kind: def.kind,
 		level: built.get(def.id) ?? 0,
-		cap: upgradeCapOf(def, castleLevel, idolMax, buildingMax),
+		cap: maxLevelOf(def, idolMax, buildingMax),
 		upgrading: upgrading.has(def.id),
 	}));
 

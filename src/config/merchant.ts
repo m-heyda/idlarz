@@ -193,7 +193,7 @@ export const MERCHANT_SHOP_ITEMS: { id: string; price: number }[] = shopItems();
  * - **Shelf**: 6 pieces of gear (`LIMITS.merchantOffers`) from the loot source `merchant` (common 60 / uncommon 40, see {@link generateLoot}), item level centred at most 3 above the average worn item
  *   level and never more than 5 above it, otherwise built from the castle level (4 + 3 per castle level above 1). Price is `ceil(sell value x 5)` ({@link shopPriceOf}). Reshuffled every 1,800 s of play time.
  * - **Refresh**: 3 free per 12 h of play time (`windowSec` 43,200), 30 s between any two, then the paid price `10,000 x 2^(paid refreshes)` capped at 1e9 ({@link refreshCost}).
- *   The count is never reset, not even by a rebirth.
+ *   The count starts again at 0 (price back to base) 24 h of play time after the first paid refresh of the run (`escalationResetSec` 86,400), and at a rebirth.
  * - **Item sale value**: see {@link sellValueOf}.
  *
  * @category Economy/Merchant
@@ -205,10 +205,10 @@ export const MERCHANT_GOODS = {
 	maxOffers: HARD_LIMITS.merchantOffers, // what a save may hold
 	priceFactor: 5, // gold per gold of sell value: above the 3.9x a max Haggler could resell at, so buying and selling never gains
 	// A paid refresh costs `refreshBase` x growth^(refreshes bought so far), capped (10k, 20k, 40k ... 10m at the 11th, 1b from the 18th).
-	// Counted for good (a rebirth does not start it again). `freePerWindow` refreshes are free every `windowSec` of play time, and
-	// any refresh, free or paid, needs `cooldownSec` since the last one.
+	// The count starts again every `escalationResetSec` of play time and at a rebirth. `freePerWindow` refreshes are free every
+	// `windowSec` of play time, and any refresh, free or paid, needs `cooldownSec` since the last one.
 	refreshBase: LIMITS.merchantRefreshBase, // limitOf('merchantRefreshBase', ctx)
-	refresh: { growth: 2, cap: 1_000_000_000, freePerWindow: 3, windowSec: 43_200, cooldownSec: 30 },
+	refresh: { growth: 2, cap: 1_000_000_000, freePerWindow: 3, windowSec: 43_200, cooldownSec: 30, escalationResetSec: 86_400 },
 	// What the shelf may hold: never above rare, and rare only now and then (the weights are in lootConfig `merchant_stock`; epic and better stay a reward for fights and chests), and never more than
 	// `maxAboveAverage` item levels above the average level of the gear the player wears. The shelf is built around the world (castle)
 	// level, held down to `centreAboveAverage` above that average.

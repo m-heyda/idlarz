@@ -120,6 +120,8 @@ test('the Merchant Resources tab: ledger, trade ticket with the 1K / 1M / 1B / M
 	for (const preset of ['1K', '1M', '1B', 'Max']) assert.ok(out.includes(`>${preset}<`), `the amount has the ${preset} button`);
 	assert.match(out, /placeholder="Custom"/, 'and a typed amount field');
 	assert.match(out, /ds-range/, 'and the slider');
+	for (const group of ['Base materials', 'Farm products']) assert.ok(out.includes(group), `the ledger has a "${group}" category`);
+	assert.match(out, /aria-expanded="true"/, 'the categories start open');
 });
 
 test('the Merchant Goods tab: the shelf with its restock, your bag with the filters, and Quick sell with Sell junk, the rarity buttons and auto-sell', async () => {

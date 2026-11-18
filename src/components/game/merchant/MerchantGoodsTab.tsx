@@ -11,7 +11,7 @@ import { averageItemLevel, gearOf, slotQty } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import { isAutoSold } from '@/lib/loot/autoSell';
 import { countJunk, junkFor, junkGold } from '@/lib/loot/junk';
-import { freeRefreshesLeft, refreshCooldown, refreshCost, secondsToRotation, shelfCells, shopPriceOf } from '@/lib/merchant';
+import { freeRefreshesLeft, paidRefreshesNow, refreshCooldown, refreshCost, secondsToRotation, shelfCells, shopPriceOf } from '@/lib/merchant';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import type { BagSlot, ItemInstance } from '@/types/game';
@@ -104,7 +104,7 @@ const MerchantGoodsTab: React.FC = () => {
 
 	const freeLeft = freeRefreshesLeft(refreshState, playSeconds);
 	const wait = refreshCooldown(refreshState, playSeconds);
-	const cost = freeLeft > 0 ? 0 : refreshCost(refreshes);
+	const cost = freeLeft > 0 ? 0 : refreshCost(paidRefreshesNow(refreshes, refreshState, playSeconds));
 	const left = stock ? secondsToRotation(stock, playSeconds) : 0;
 	const cells = shelfCells(
 		stock,
@@ -190,7 +190,7 @@ const MerchantGoodsTab: React.FC = () => {
 						tip={
 							<HintTooltip
 								title='Restock the shelf now'
-								text={`${MERCHANT_GOODS.refresh.freePerWindow} refreshes are free every ${MERCHANT_GOODS.refresh.windowSec / 3600} hours of play, then each one costs double the last; ${MERCHANT_GOODS.refresh.cooldownSec} s between refreshes.`}
+								text={`${MERCHANT_GOODS.refresh.freePerWindow} refreshes are free every ${MERCHANT_GOODS.refresh.windowSec / 3600} hours of play, then each one costs double the last, starting again after ${MERCHANT_GOODS.refresh.escalationResetSec / 3600} hours and at a rebirth; ${MERCHANT_GOODS.refresh.cooldownSec} s between refreshes.`}
 							/>
 						}
 					>

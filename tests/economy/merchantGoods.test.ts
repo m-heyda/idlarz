@@ -7,7 +7,17 @@ import { REBIRTH } from '../../src/config/rebirth';
 import { ITEM_CATALOG, RARITIES } from '../../src/catalog';
 import { averageItemLevel, emptyBag, gearOf } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
-import { afterAbsence, generateMerchantStock, refreshCost, secondsToRotation, shelfLevels, shopPriceOf, stockDue } from '../../src/lib/merchant';
+import {
+	afterAbsence,
+	afterRefresh,
+	generateMerchantStock,
+	paidRefreshesNow,
+	refreshCost,
+	secondsToRotation,
+	shelfLevels,
+	shopPriceOf,
+	stockDue,
+} from '../../src/lib/merchant';
 import { mulberry32 } from '../../src/lib/rng';
 import { sanitizeSave } from '../../src/lib/sanitizeSave';
 import { sellPayout } from '../../src/utils/game/merchant';
@@ -319,4 +329,36 @@ test('a rebirth keeps the shelf of the merchant: it is no free reshuffle', () =>
 	assert.equal(api().merchantStock, shelf, 'the same shelf, with its rotation clock');
 	api().tick(1000);
 	assert.equal(api().merchantStock, shelf);
+});
+
+test('the Restock price starts from its base again 24 h of play after the first paid refresh', () => {
+	const day = MERCHANT_GOODS.refresh.escalationResetSec;
+	// the first paid refresh (count 0) opens the run; later ones keep its start
+	const first = afterRefresh({ windowAt: 0, freeUsed: 3, lastAt: 0 }, 1000, false, 0);
+	assert.equal(first.paidAt, 1000);
+	assert.equal(afterRefresh(first, 2000, false, 1).paidAt, 1000);
+	assert.equal(afterRefresh(first, 2000, true, 1).paidAt, 1000, 'a free refresh does not touch it');
+	// the count is kept for 24 h, then the price is the base price again
+	assert.equal(paidRefreshesNow(10, first, 1000 + day - 1), 10);
+	assert.equal(paidRefreshesNow(10, first, 1000 + day), 0);
+	assert.equal(refreshCost(paidRefreshesNow(10, first, 1000 + day)), refreshCost(0));
+	// an older save has no paidAt: it counts as 0, so a long-played save starts over at once
+	assert.equal(paidRefreshesNow(10, { windowAt: 0, freeUsed: 0, lastAt: 0 }, day), 0);
+	// time away also ends the run
+	const away = afterAbsence(null, first, 1500, day);
+	assert.equal(paidRefreshesNow(10, away.merchantRefresh, 1500), 0);
+});
+
+test('a rebirth sets the Restock price back to its base and gives the free refreshes back', () => {
+	freshGame();
+	growTo(REBIRTH.minTiles);
+	store.setState((s) => ({
+		tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }),
+		merchantRefreshes: 10,
+		merchantRefresh: { windowAt: 0, freeUsed: 3, lastAt: 0, paidAt: 0 },
+	}));
+	assert.equal(api().rebirth(), true);
+	assert.equal(api().merchantRefreshes, 0);
+	assert.equal(api().merchantRefresh.freeUsed, 0);
+	assert.equal(refreshCost(api().merchantRefreshes), refreshCost(0));
 });

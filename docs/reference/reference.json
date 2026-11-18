@@ -1348,7 +1348,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 48,
+  "line": 55,
   "summary": "Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5 (`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.",
   "see": []
  },
@@ -1359,7 +1359,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 71,
+  "line": 78,
   "summary": "How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).",
   "see": []
  },
@@ -1370,7 +1370,7 @@
   "kind": "function",
   "category": "Economy/Buildings",
   "file": "src/lib/buildings.ts",
-  "line": 102,
+  "line": 109,
   "summary": "The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.",
   "see": []
  },
@@ -2250,14 +2250,25 @@
   "see": []
  },
  {
+  "id": "paidrefreshesnow",
+  "name": "paidRefreshesNow",
+  "symbol": "paidRefreshesNow",
+  "kind": "function",
+  "category": "Economy/Merchant",
+  "file": "src/lib/merchant.ts",
+  "line": 33,
+  "summary": "The paid refreshes that still count towards the price: all of `refreshesBought`, until 24 h of play time (`escalationResetSec`) have passed since the first of them (`paidAt`), then none, so the price starts from its base again. A rebirth sets the count to 0 itself.",
+  "see": []
+ },
+ {
   "id": "refreshcost",
   "name": "refreshCost",
   "symbol": "refreshCost",
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/merchant.ts",
-  "line": 32,
-  "summary": "The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.",
+  "line": 44,
+  "summary": "The gold the next paid refresh costs, when `refreshesBought` (see {@link paidRefreshesNow}) have been bought: it doubles each time, up to a cap of 1b.",
   "see": []
  },
  {
@@ -2267,7 +2278,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/merchant.ts",
-  "line": 61,
+  "line": 81,
   "summary": "The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it: the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).",
   "see": []
  },
@@ -2278,7 +2289,7 @@
   "kind": "function",
   "category": "Economy/Merchant",
   "file": "src/lib/merchant.ts",
-  "line": 90,
+  "line": 110,
   "summary": "A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.",
   "see": [
    "bestWornGrade",
@@ -3278,7 +3289,7 @@
   "kind": "interface",
   "category": "Architecture/State",
   "file": "src/types/game.ts",
-  "line": 374,
+  "line": 378,
   "summary": "State. The persisted keys are `PERSISTED_KEYS` ({@link PERSISTED_KEYS}), the one list. Fields added later are optional in old saves and get defaults; a save without equipment + bag gets the starter kit.",
   "see": [
    "PERSISTED_KEYS"

@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button, Divider, Inset, Panel, SectionLabel, Slot } from '../../../../packages/design-system/src/components/primitives';
-import { AmountInput } from '../../../../packages/design-system/src/components/composites';
+import { AmountInput, PaperSection } from '../../../../packages/design-system/src/components/composites';
 import { clampAmount, compact } from '../../../../packages/design-system/src/logic';
 import { MERCHANT_BUYABLE, MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_INFO, MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
+import { RESOURCE_TIERS, resourcesInTier } from '@/catalog/resources';
+import { useRememberedOpen } from '@/hooks/useRememberedOpen';
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { useGameStore } from '@/stores/gameStore';
 import { MERCHANT_CUSTOM_MAX, useUiStore } from '@/stores/uiStore';
@@ -27,8 +29,23 @@ const PRESETS = [
 	{ id: 'max', label: 'Max' },
 ];
 
+/** One folding category of the ledger (a resource tier); open or shut is remembered in this browser, and it opens by itself when a resource inside it is picked from the top bar. */
+const LedgerGroup: React.FC<{ id: string; title: string; hasPicked: boolean; children: React.ReactNode }> = ({ id, title, hasPicked, children }) => {
+	const [open, toggle] = useRememberedOpen(`merchant-${id}`, true);
+	useEffect(() => {
+		if (hasPicked && !open) toggle();
+		// only a new pick opens a shut group: the player can fold it again afterwards
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [hasPicked]);
+	return (
+		<PaperSection title={title} open={open} onToggle={toggle} compact>
+			{children}
+		</PaperSection>
+	);
+};
+
 /**
- * The Resources tab: the stock ledger on paper (what you hold, income, what a unit sells for with Haggler, what it costs) and the trade ticket of the selected resource with the amount (1K, 1M, 1B, Max, a typed amount or the slider),
+ * The Resources tab: the stock ledger on paper (what you hold, income, what a unit sells for with Haggler, what it costs), in folding categories by tier (Base materials, Farm products, Extracts; each remembered open or shut) and the trade ticket of the selected resource with the amount (1K, 1M, 1B, Max, a typed amount or the slider),
  * what you receive or pay, and the Sell / Buy button. The amount you set is remembered (also across visits); a click on a resource in the top bar opens the Merchant with that row selected.
  */
 const MerchantResourcesTab: React.FC = () => {
@@ -105,30 +122,38 @@ const MerchantResourcesTab: React.FC = () => {
 					<span>Buy</span>
 				</div>
 				<div ref={tableRef}>
-					{RESOURCES.map((key) => {
-						const r = resourceRates.total[key as keyof typeof resourceRates.total] ?? 0;
-						const rowBuyable = isBuyable(key);
+					{RESOURCE_TIERS.map((tier) => {
+						const keys = resourcesInTier(tier.id).filter((key) => (RESOURCES as string[]).includes(key)) as ResourceKey[];
+						if (keys.length === 0) return null;
 						return (
-							<button
-								type='button'
-								key={key}
-								className='ds-stock-row'
-								data-active={key === selected}
-								title={`${MERCHANT_RESOURCE_INFO[key].label}: ${MERCHANT_RESOURCE_INFO[key].priceDescription}`}
-								onClick={() => pick(key)}
-							>
-								<span className='ds-stock-name'>
-									{/* eslint-disable-next-line @next/next/no-img-element */}
-									<img src={iconOf(key)} alt='' />
-									{MERCHANT_RESOURCE_INFO[key].label}
-								</span>
-								<span>{compact(Math.floor(resources[key]))}</span>
-								<span style={{ color: r ? GREEN : '#8a7a5a' }}>{r ? `+${Math.round(r)}/s` : '—'}</span>
-								<span>{tidy((MERCHANT_RESOURCE_PRICES[key] * haggle).toFixed(2))}</span>
-								<span style={{ color: rowBuyable ? BLUE : '#8a7a5a' }}>
-									{rowBuyable ? tidy((MERCHANT_RESOURCE_PRICES[key] * MERCHANT_BUY_MULTIPLIER).toFixed(2)) : 'not sold'}
-								</span>
-							</button>
+							<LedgerGroup key={tier.id} id={tier.id} title={tier.label} hasPicked={!!picked && (keys as string[]).includes(picked)}>
+								{keys.map((key) => {
+									const r = resourceRates.total[key as keyof typeof resourceRates.total] ?? 0;
+									const rowBuyable = isBuyable(key);
+									return (
+										<button
+											type='button'
+											key={key}
+											className='ds-stock-row'
+											data-active={key === selected}
+											title={`${MERCHANT_RESOURCE_INFO[key].label}: ${MERCHANT_RESOURCE_INFO[key].priceDescription}`}
+											onClick={() => pick(key)}
+										>
+											<span className='ds-stock-name'>
+												{/* eslint-disable-next-line @next/next/no-img-element */}
+												<img src={iconOf(key)} alt='' />
+												{MERCHANT_RESOURCE_INFO[key].label}
+											</span>
+											<span>{compact(Math.floor(resources[key]))}</span>
+											<span style={{ color: r ? GREEN : '#8a7a5a' }}>{r ? `+${Math.round(r)}/s` : '—'}</span>
+											<span>{tidy((MERCHANT_RESOURCE_PRICES[key] * haggle).toFixed(2))}</span>
+											<span style={{ color: rowBuyable ? BLUE : '#8a7a5a' }}>
+												{rowBuyable ? tidy((MERCHANT_RESOURCE_PRICES[key] * MERCHANT_BUY_MULTIPLIER).toFixed(2)) : 'not sold'}
+											</span>
+										</button>
+									);
+								})}
+							</LedgerGroup>
 						);
 					})}
 				</div>

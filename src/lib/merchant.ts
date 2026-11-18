@@ -22,12 +22,24 @@ import type { Equipment, ItemInstance, MerchantRefresh, MerchantStock } from '@/
 export const shopPriceOf = (item: ItemInstance): number => Math.ceil(sellValueOf(item) * MERCHANT_GOODS.priceFactor);
 
 /**
- * The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.
+ * The paid refreshes that still count towards the price: all of `refreshesBought`, until 24 h of play time (`escalationResetSec`) have
+ * passed since the first of them (`paidAt`), then none, so the price starts from its base again. A rebirth sets the count to 0 itself.
  *
  * @category Economy/Merchant
  * @order 10
  * @formula
- * paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
+ * paid refreshes counted = 0 if play time - paidAt >= 86,400 s, otherwise the paid refreshes bought
+ */
+export const paidRefreshesNow = (refreshesBought: number, refresh: MerchantRefresh, playSeconds: number): number =>
+	playSeconds - (refresh.paidAt ?? 0) >= MERCHANT_GOODS.refresh.escalationResetSec ? 0 : Math.max(0, Math.floor(refreshesBought));
+
+/**
+ * The gold the next paid refresh costs, when `refreshesBought` (see {@link paidRefreshesNow}) have been bought: it doubles each time, up to a cap of 1b.
+ *
+ * @category Economy/Merchant
+ * @order 10
+ * @formula
+ * paid refresh price = min(1e9, 10,000 x 2^(paid refreshes counted))
  */
 export const refreshCost = (refreshesBought: number, ctx: LimitContext = {}): number => {
 	const { growth, cap } = MERCHANT_GOODS.refresh;
@@ -45,10 +57,18 @@ export const freeRefreshesLeft = (refresh: MerchantRefresh, playSeconds: number)
 export const refreshCooldown = (refresh: MerchantRefresh, playSeconds: number): number =>
 	refresh.lastAt > 0 ? Math.max(0, Math.ceil(MERCHANT_GOODS.refresh.cooldownSec - (playSeconds - refresh.lastAt))) : 0;
 
-/** The refresh record after a refresh made now (`free`: it used one of the window's free refreshes). */
-export const afterRefresh = (refresh: MerchantRefresh, playSeconds: number, free: boolean): MerchantRefresh => {
+/**
+ * The refresh record after a refresh made now (`free`: it used one of the window's free refreshes). `paidBefore` is the count the price
+ * was taken from ({@link paidRefreshesNow}): a paid refresh made from 0 starts a new 24 h run of rising prices.
+ */
+export const afterRefresh = (refresh: MerchantRefresh, playSeconds: number, free: boolean, paidBefore = 1): MerchantRefresh => {
 	const fresh = playSeconds - refresh.windowAt >= MERCHANT_GOODS.refresh.windowSec;
-	return { windowAt: fresh ? playSeconds : refresh.windowAt, freeUsed: (fresh ? 0 : refresh.freeUsed) + (free ? 1 : 0), lastAt: playSeconds };
+	return {
+		windowAt: fresh ? playSeconds : refresh.windowAt,
+		freeUsed: (fresh ? 0 : refresh.freeUsed) + (free ? 1 : 0),
+		lastAt: playSeconds,
+		paidAt: !free && paidBefore === 0 ? playSeconds : (refresh.paidAt ?? 0),
+	};
 };
 
 /**
@@ -139,8 +159,8 @@ export const secondsToRotation = (stock: MerchantStock, playSeconds: number, ctx
 
 /**
  * The merchant's clocks count play time, which does not run while the player is away. After an absence of `elapsedSec` they catch up: a shelf
- * that would have been reshuffled by then is dropped (a new one is rolled on the next tick), and a free-refresh window that would have ended
- * gives its free refreshes back. (The 30 s cooldown between refreshes is not touched: an absence is much longer.)
+ * that would have been reshuffled by then is dropped (a new one is rolled on the next tick), a free-refresh window that would have ended
+ * gives its free refreshes back, and a 24 h run of rising paid prices that would have ended starts again. (The 30 s cooldown between refreshes is not touched: an absence is much longer.)
  */
 export const afterAbsence = (
 	stock: MerchantStock | null,
@@ -152,9 +172,15 @@ export const afterAbsence = (
 	const elapsed = Math.max(0, elapsedSec);
 	const dueAfter = stock ? secondsToRotation(stock, playSeconds, ctx) : 0;
 	const windowEnded = playSeconds + elapsed - refresh.windowAt >= MERCHANT_GOODS.refresh.windowSec;
+	const paidEnded = playSeconds + elapsed - (refresh.paidAt ?? 0) >= MERCHANT_GOODS.refresh.escalationResetSec;
 	return {
 		merchantStock: stock && dueAfter <= elapsed ? null : stock,
-		merchantRefresh: windowEnded ? { ...refresh, windowAt: 0, freeUsed: 0 } : refresh,
+		merchantRefresh: {
+			...refresh,
+			...(windowEnded ? { windowAt: 0, freeUsed: 0 } : {}),
+			// a start in the past puts the price run behind us whatever the play time is
+			...(paidEnded ? { paidAt: playSeconds - MERCHANT_GOODS.refresh.escalationResetSec } : {}),
+		},
 	};
 };
 
