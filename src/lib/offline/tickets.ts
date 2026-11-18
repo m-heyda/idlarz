@@ -258,7 +258,7 @@ export const advanceRocks = (
 	let nextRockN = bank.nextRockN ?? 1;
 	let acc = bank.rockAcc ?? 0;
 	const every = rockIntervalSec(ctx.luck);
-	const cap = rockCap(freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel));
+	const cap = rockCap(ctx.tilesOwned);
 	const room = () => rocks.length < cap && (bank.sites?.rock === undefined || rocks.length < bank.sites.rock);
 	let t = 0;
 	for (let guard = 0; guard < 500 && t < dt; guard++) {
@@ -299,8 +299,7 @@ export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ti
 
 /** Seconds until the next rock is due, as a list that is empty when the map holds all the rocks it may. */
 const rockLeft = (bank: TicketBank, ctx: BankContext): number[] =>
-	rocksOf(bank).length < rockCap(freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel)) &&
-	(bank.sites?.rock === undefined || rocksOf(bank).length < bank.sites.rock)
+	rocksOf(bank).length < rockCap(ctx.tilesOwned) && (bank.sites?.rock === undefined || rocksOf(bank).length < bank.sites.rock)
 		? [Math.max(0, rockIntervalSec(ctx.luck) - (bank.rockAcc ?? 0))]
 		: [];
 

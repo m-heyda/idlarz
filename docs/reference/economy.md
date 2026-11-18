@@ -1447,8 +1447,8 @@ Source: [`src/config/rocks.ts:51`](../../src/config/rocks.ts)
 
 How rocks appear and how fast they may be mined (server rules).
 
-- **Timer**: one new rock every 1,200 s (20 minutes) of play time (shorter with Luck, never under 60% of it), half as often as a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
-- **Room**: at most `maxOnMap` rocks wait at once, and no more than `landShare` of the free land (at least `minAllowed`).
+- **Timer**: one new rock every 900 s (15 minutes) of play time (shorter with Luck, never under 60% of it). It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
+- **Room**: one rock per `tilesPerRock` (50) tiles you own may wait at once (at least `minAllowed`), with no other cap: 503 tiles hold up to 10.
 - **Tiles**: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.
 - **Clicks**: the browser sends its clicks in batches. The server lets in at most `maxCps` clicks per second (a bucket of `burst` clicks), so a rock cannot be broken faster than a person can click.
 
@@ -1456,10 +1456,9 @@ How rocks appear and how fast they may be mined (server rules).
 
 | Rule | Value |
 | --- | --- |
-| Seconds between two rocks (no Luck) | 1,200 |
-| Most rocks on the map | 5 |
-| Share of the free land | 3% |
-| Room on 20 / 100 / 1,000 free tiles | 2 / 3 / 5 |
+| Seconds between two rocks (no Luck) | 900 |
+| Owned tiles per rock on the map | 50 |
+| Room on 50 / 503 / 1,000 owned tiles | 1 / 10 / 20 |
 | Clicks let in per second | 24 |
 | Burst of a fresh rock | 48 |
 | Most clicks in one request | 200 |
@@ -1468,7 +1467,7 @@ How rocks appear and how fast they may be mined (server rules).
 
 ### `ROCK_DROPS` <small>const</small>
 
-Source: [`src/config/rocks.ts:75`](../../src/config/rocks.ts)
+Source: [`src/config/rocks.ts:74`](../../src/config/rocks.ts)
 
 What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table.
 Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.
@@ -1525,7 +1524,7 @@ Seconds of play time between two new rocks.
 **Formula**
 
 ```text
-interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
+interval = 900 s x max(0.6, 1 / (1 + 0.004 x Luck))
 ```
 
 <a id="rockcap"></a>
@@ -1534,12 +1533,12 @@ interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
 
 Source: [`src/lib/rocks.ts:51`](../../src/lib/rocks.ts)
 
-The most rocks that wait at once on a map with `free` tiles a monster could stand on.
+The most rocks that wait at once on a map of `tilesOwned` owned tiles: one per 50 tiles, at least one, no other cap.
 
 **Formula**
 
 ```text
-room = min(15, max(2, floor(free land x 12%)))
+room = max(1, floor(tiles owned / 50))
 ```
 
 <a id="rollrocktier"></a>

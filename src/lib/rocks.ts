@@ -36,19 +36,19 @@ export const pickRockSpot = (world: World, taken: ReadonlySet<string>, castleLev
  * @category Economy/Rocks and Mining
  * @order 5
  * @formula
- * interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
+ * interval = 900 s x max(0.6, 1 / (1 + 0.004 x Luck))
  */
 export const rockIntervalSec = (luck: number): number => ROCK.intervalSec * Math.max(0.6, 1 / (1 + Math.max(0, luck) * 0.004));
 
 /**
- * The most rocks that wait at once on a map with `free` tiles a monster could stand on.
+ * The most rocks that wait at once on a map of `tilesOwned` owned tiles: one per 50 tiles, at least one, no other cap.
  *
  * @category Economy/Rocks and Mining
  * @order 6
  * @formula
- * room = min(15, max(2, floor(free land x 12%)))
+ * room = max(1, floor(tiles owned / 50))
  */
-export const rockCap = (free: number): number => Math.min(ROCK.maxOnMap, Math.max(ROCK.minAllowed, Math.floor(free * ROCK.landShare)));
+export const rockCap = (tilesOwned: number): number => Math.max(ROCK.minAllowed, Math.floor(Math.max(0, tilesOwned) / ROCK.tilesPerRock));
 
 /**
  * The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.
