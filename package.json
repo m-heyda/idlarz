@@ -25,6 +25,7 @@
 		"seed-dev-world": "tsx scripts/seed-dev-world.ts",
 		"grant-test-items": "tsx scripts/grant-test-items.ts",
 		"grant-test-rocks": "tsx scripts/grant-test-rocks.ts",
+		"grant-test-legendary": "tsx scripts/grant-test-rocks.ts --email test@example.com --tier legendary --count 1 --yes",
 		"gen-save-fixtures": "tsx scripts/gen-save-fixtures.ts",
 		"fight-sim": "tsx scripts/fight-sim.ts",
 		"perk-caps": "tsx scripts/perk-caps.ts",

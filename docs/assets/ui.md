@@ -108,7 +108,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `ui_bar_fill` | <img src="../../public/pixel/ui/bar_fill.png" width="48" alt="ui_bar_fill"> | 8x6 | used |  | `pixel/ui/bar_fill.png` |
 | `ui_bar_frame` | <img src="../../public/pixel/ui/bar_frame.png" width="48" alt="ui_bar_frame"> | 16x14 | used |  | `pixel/ui/bar_frame.png` |
 | `ui_coin_pouch` | <img src="../../public/pixel/ui/coin_pouch.png" width="96" alt="ui_coin_pouch"> | 143x143 | used | code | `pixel/ui/coin_pouch.png` |
-| `ui_cursor_pickaxe` | <img src="../../public/pixel/ui/cursor_pickaxe.png" width="64" alt="ui_cursor_pickaxe"> | 32x32 | used | code | `pixel/ui/cursor_pickaxe.png` |
+| `ui_cursor_pickaxe` | <img src="../../public/pixel/ui/cursor_pickaxe.png" width="72" alt="ui_cursor_pickaxe"> | 36x36 | used | code | `pixel/ui/cursor_pickaxe.png` |
 | `ui_daily_gift` | <img src="../../public/pixel/ui/daily_gift.png" width="96" alt="ui_daily_gift"> | 384x48 | used |  | `pixel/ui/daily_gift.png` |
 | `ui_frame_modal` | <img src="../../public/pixel/ui/frame_modal.png" width="72" alt="ui_frame_modal"> | 36x36 | used | code | `pixel/ui/frame_modal.png` |
 | `ui_frame_panel` | <img src="../../public/pixel/ui/frame_panel.png" width="48" alt="ui_frame_panel"> | 12x12 | used | code | `pixel/ui/frame_panel.png` |
@@ -139,7 +139,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | --- | --- | --- | --- | --- | --- |
 | `menu_achievements` | <img src="../../public/pixel/ui/menu_achievements.png" width="96" alt="menu_achievements"> | 64x64 | used |  | `pixel/ui/menu_achievements.png` |
 | `menu_bag_scroll` | <img src="../../public/pixel/ui/menu_bag_scroll.png" width="96" alt="menu_bag_scroll"> | 64x64 | used |  | `pixel/ui/menu_bag_scroll.png` |
-| `menu_bestiary` | <img src="../../public/pixel/ui/menu_bestiary.png" width="96" alt="menu_bestiary"> | 64x64 | used | code | `pixel/ui/menu_bestiary.png` |
+| `menu_bestiary` | <img src="../../public/pixel/ui/menu_bestiary.png" width="96" alt="menu_bestiary"> | 64x64 | used |  | `pixel/ui/menu_bestiary.png` |
 | `menu_boss` | <img src="../../public/pixel/ui/menu_boss.png" width="96" alt="menu_boss"> | 64x64 | used |  | `pixel/ui/menu_boss.png` |
 | `menu_crafting` | <img src="../../public/pixel/ui/menu_crafting.png" width="96" alt="menu_crafting"> | 64x64 | used |  | `pixel/ui/menu_crafting.png` |
 | `menu_equipment` | <img src="../../public/pixel/ui/menu_equipment.png" width="96" alt="menu_equipment"> | 64x64 | used |  | `pixel/ui/menu_equipment.png` |

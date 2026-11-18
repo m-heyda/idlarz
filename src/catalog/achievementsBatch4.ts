@@ -388,6 +388,62 @@ deed(
 	),
 );
 deed(
+	'silver_miner',
+	'Silver miner',
+	'Break silver ore or better.',
+	'economy',
+	['mining', 'rocks'],
+	'tower_silver',
+	'The pale ones ring when they fall.',
+	'Rocks of the Silver ore kind and every better kind count.',
+	ladder(
+		'rocks_silver',
+		[5, 25, 100, 500, 2_000],
+		(min) => ({ kind: 'rocksTier', tier: 'uncommon', min }),
+		(min) => `Break ${n(min)} silver ores or better.`,
+		10,
+		20,
+	),
+);
+deed(
+	'crystal_cracker',
+	'Crystal cracker',
+	'Break crystals.',
+	'economy',
+	['mining', 'rocks'],
+	'star_silver',
+	'Five hundred clicks, and it sings when it lets go.',
+	'Crystal rocks and the legendary ore count.',
+	ladder(
+		'rocks_crystal',
+		[1, 5, 25, 100, 500],
+		(min) => ({ kind: 'rocksTier', tier: 'epic', min }),
+		(min) => `Break ${n(min)} ${min === 1 ? 'crystal' : 'crystals'}.`,
+		15,
+		25,
+		{ id: 'crystal-cracker', name: 'Crystal Cracker' },
+	),
+);
+deed(
+	'legendary_miner',
+	'Legend of the mine',
+	'Break legendary ore.',
+	'economy',
+	['mining', 'rocks'],
+	'star_silver',
+	'A thousand clicks, and the mountain remembers your name.',
+	'Only the legendary ore counts, the rarest rock of all.',
+	ladder(
+		'rocks_legend',
+		[1, 3, 10, 25, 50],
+		(min) => ({ kind: 'rocksTier', tier: 'legendary', min }),
+		(min) => `Break ${n(min)} legendary ${min === 1 ? 'ore' : 'ores'}.`,
+		20,
+		30,
+		{ id: 'mountain-legend', name: 'Mountain Legend' },
+	),
+);
+deed(
 	'ember_finder',
 	'Ember Coal finder',
 	'Find Ember Coal in rocks.',

@@ -4,7 +4,9 @@
  *   npm run grant-test-rocks -- --email <address>                  DRY RUN: finds the account, reads its map and ledger, says what it would add, writes nothing
  *   npm run grant-test-rocks -- --email <address> --yes            backs the ledger row up (`backups/grant-test-rocks-<time>.json`) and writes the change
  *   options: --count <1..5>   how many rocks of each tier (default 1; 4 tiers, so 4 rocks by default)
+ *            --tier <name>     only rocks of this tier (common, uncommon, rare, epic or legendary), e.g. `--tier legendary` adds just the legendary ore
  *            --chests <0..20>  how many treasure chests to put on the map as well (default 0)
+ *            --clear-rocks     first takes only the rocks off the map (new ones are added with the current rules, fresh at 0 clicks)
  *            --clear           first takes every monster, the boss, every chest and every rock off the map (their tickets are dropped from the bank), so only what this run adds is there
  *
  * What it changes (only the `player_ledger` row, through the same compare-and-swap the server uses, so a browser saving at the same moment makes it refuse instead of overwrite): the bank gets `--count` rocks of each tier and `--chests` chests, each already on a free tile
@@ -31,12 +33,18 @@ const option = (name: string): string | undefined => {
 	const i = args.indexOf(name);
 	return i >= 0 && args[i + 1] && !args[i + 1].startsWith('--') ? args[i + 1] : undefined;
 };
-const execute = args.includes('--yes');
-// the e-mail is `--email <address>` or just the first bare word (PowerShell and npm can swallow the `--` that npm needs, so the plain form works too)
-const email = (option('--email') ?? args.find((a) => a.includes('@')))?.toLowerCase();
-const count = Math.min(5, Math.max(1, Math.floor(Number(option('--count') ?? 1)) || 1));
+// npm (and PowerShell) can swallow flags: `npm run grant-test-rocks -- --email a@b --tier legendary --yes` may reach this script as the bare words `a@b legendary` (npm takes `--yes`, `--email` ... for itself). So every option also works as a bare word:
+// an address, a tier name, `yes` (apply), `clear`, `clear-rocks`, and a number (how many of each tier). The `grant-test-legendary` npm script has them all baked in.
+const bare = args.filter((a) => !a.startsWith('--'));
+const tierNames = ROCK_TIER_ORDER as readonly string[];
+const execute = args.includes('--yes') || bare.includes('yes');
+const email = (option('--email') ?? bare.find((a) => a.includes('@')))?.toLowerCase();
+const countText = option('--count') ?? bare.find((a) => /^\d+$/.test(a));
+const count = Math.min(5, Math.max(1, Math.floor(Number(countText ?? 1)) || 1));
 const chestCount = Math.min(20, Math.max(0, Math.floor(Number(option('--chests') ?? 0)) || 0));
-const clear = args.includes('--clear');
+const onlyTier = option('--tier') ?? bare.find((a) => tierNames.includes(a));
+const clear = args.includes('--clear') || bare.includes('clear');
+const clearRocks = args.includes('--clear-rocks') || bare.includes('clear-rocks');
 
 for (const file of ['.env.local', '.env']) {
 	try {
@@ -52,6 +60,8 @@ const stop = (message: string): never => {
 };
 
 const run = async (): Promise<void> => {
+	if (onlyTier && !(ROCK_TIER_ORDER as readonly string[]).includes(onlyTier))
+		stop(`--tier ${onlyTier} is not a rock tier (${ROCK_TIER_ORDER.join(', ')}): refusing to run.`);
 	if (!email) stop('an e-mail address is required (npm run grant-test-rocks -- --email <address>): refusing to run.');
 	const url = process.env.SUPABASE_URL;
 	const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -78,14 +88,19 @@ const run = async (): Promise<void> => {
 	const nowSec = Math.floor(Date.now() / 1000);
 	const castleLevel = castleLevelOf(world);
 	// with --clear the map starts empty: no monster (the boss too), no chest, no rock
-	const bank = clear ? { ...ledger.bank, monsters: [], chests: [], rocks: [], monsterAcc: 0, bossAcc: 0, chestAcc: 0, rockAcc: 0 } : ledger.bank;
+	const bank =
+		clearRocks && !clear
+			? { ...ledger.bank, rocks: [], rockAcc: 0 }
+			: clear
+				? { ...ledger.bank, monsters: [], chests: [], rocks: [], monsterAcc: 0, bossAcc: 0, chestAcc: 0, rockAcc: 0 }
+				: ledger.bank;
 	const taken = new Set<string>();
 	for (const t of [...bank.monsters, ...bank.chests, ...rocksOf(bank)]) if (t.x !== undefined && t.y !== undefined) taken.add(`${t.x},${t.y}`);
 	const rng = mulberry32(Date.now() & 0x7fffffff);
 	const added: RockTicket[] = [];
 	let n = bank.nextRockN ?? 1;
 	for (let round = 0; round < count; round++) {
-		for (const tier of ROCK_TIER_ORDER) {
+		for (const tier of onlyTier ? [onlyTier as (typeof ROCK_TIER_ORDER)[number]] : ROCK_TIER_ORDER) {
 			const spot = pickRockSpot(world, taken, castleLevel, rng);
 			if (!spot) return stop(`The land has no more free tiles for rocks (${added.length} placed so far). Nothing was changed.`);
 			taken.add(`${spot.x},${spot.y}`);
@@ -107,6 +122,7 @@ const run = async (): Promise<void> => {
 	};
 
 	console.log(`${execute ? 'GRANTING' : 'DRY RUN (nothing is written)'} on ${new URL(url!).host}, account ${email}.`);
+	if (clearRocks && !clear) console.log(`Would clear ${rocksOf(ledger.bank).length} rock(s) first.`);
 	if (clear)
 		console.log(
 			`Would clear ${ledger.bank.monsters.length} monster ticket(s), ${ledger.bank.chests.length} chest(s) and ${rocksOf(ledger.bank).length} rock(s) first.`,

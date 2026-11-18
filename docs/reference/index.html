@@ -2338,7 +2338,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 </article><h2>Rocks and Mining</h2><article><p><a id="rock-tiers"></a></p>
 <h3><code>ROCK_TIERS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:25</code></a></p>
-<p>The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.</p>
+<p>The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.</p>
 <p><strong>Rock tiers</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -2378,10 +2378,17 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 <td>1</td>
 <td>1%</td>
 </tr>
+<tr>
+<td>legendary</td>
+<td>Legendary ore</td>
+<td>1,000</td>
+<td>0.25</td>
+<td>0%</td>
+</tr>
 </tbody></table>
 </article><article><p><a id="rock"></a></p>
 <h3><code>ROCK</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:50</code></a></p>
+<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:51</code></a></p>
 <p>How rocks appear and how fast they may be mined (server rules).</p>
 <ul>
 <li><strong>Timer</strong>: one new rock every 150 s of play time (shorter with Luck, never under 60% of it), much faster than a chest&#39;s 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.</li>
@@ -2428,7 +2435,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 </tbody></table>
 </article><article><p><a id="rock-drops"></a></p>
 <h3><code>ROCK_DROPS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:74</code></a></p>
+<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:75</code></a></p>
 <p>What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters&#39; ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier&#39;s table.
 Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <code>catalog/ingredients.ts</code>). Ember Coal is the rare one: 1 to 3 at a low chance.</p>
 <p><strong>What a rock drops</strong> <em>(computed from the code)</em></p>
@@ -2566,6 +2573,48 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>ing_ember_coal</td>
 <td>1-3</td>
 <td>15%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>stone</td>
+<td>40-60 min of income (at least 500)</td>
+<td>always</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>coal</td>
+<td>25-40 min of income (at least 300)</td>
+<td>always</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_crystal</td>
+<td>1-2</td>
+<td>40%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_gold_ore</td>
+<td>1-2</td>
+<td>40%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_silver_ore</td>
+<td>1-3</td>
+<td>50%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_copper_ore</td>
+<td>1-2</td>
+<td>30%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_ember_coal</td>
+<td>1-3</td>
+<td>10%</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="rockspots"></a></p>
@@ -6578,7 +6627,7 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 <p>The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 (<a href="#settleachievements"><code>settleAchievements</code></a>) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. &quot;Rat King defeated&quot; was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial&#39;s starter path ends. Later releases add grind ladders (R6) after these.</p>
-<p><strong>The launch achievements (292, 26250 gems in total)</strong> <em>(computed from the code)</em></p>
+<p><strong>The launch achievements (307, 27750 gems in total)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
 <tr>
@@ -8880,6 +8929,126 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 </tr>
 <tr>
 <td>287</td>
+<td><code>rocks_silver_5</code></td>
+<td>Silver miner I</td>
+<td>rocksTier &gt;= 5</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>288</td>
+<td><code>rocks_silver_25</code></td>
+<td>Silver miner II</td>
+<td>rocksTier &gt;= 25</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>289</td>
+<td><code>rocks_silver_100</code></td>
+<td>Silver miner III</td>
+<td>rocksTier &gt;= 100</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>290</td>
+<td><code>rocks_silver_500</code></td>
+<td>Silver miner IV</td>
+<td>rocksTier &gt;= 500</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>291</td>
+<td><code>rocks_silver_2000</code></td>
+<td>Silver miner V</td>
+<td>rocksTier &gt;= 2000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>292</td>
+<td><code>rocks_crystal_1</code></td>
+<td>Crystal cracker I</td>
+<td>rocksTier &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>293</td>
+<td><code>rocks_crystal_5</code></td>
+<td>Crystal cracker II</td>
+<td>rocksTier &gt;= 5</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>294</td>
+<td><code>rocks_crystal_25</code></td>
+<td>Crystal cracker III</td>
+<td>rocksTier &gt;= 25</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>295</td>
+<td><code>rocks_crystal_100</code></td>
+<td>Crystal cracker IV</td>
+<td>rocksTier &gt;= 100</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>296</td>
+<td><code>rocks_crystal_500</code></td>
+<td>Crystal cracker V</td>
+<td>rocksTier &gt;= 500</td>
+<td>150</td>
+<td>crystal-cracker</td>
+</tr>
+<tr>
+<td>297</td>
+<td><code>rocks_legend_1</code></td>
+<td>Legend of the mine I</td>
+<td>rocksTier &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>298</td>
+<td><code>rocks_legend_3</code></td>
+<td>Legend of the mine II</td>
+<td>rocksTier &gt;= 3</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>299</td>
+<td><code>rocks_legend_10</code></td>
+<td>Legend of the mine III</td>
+<td>rocksTier &gt;= 10</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>300</td>
+<td><code>rocks_legend_25</code></td>
+<td>Legend of the mine IV</td>
+<td>rocksTier &gt;= 25</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>301</td>
+<td><code>rocks_legend_50</code></td>
+<td>Legend of the mine V</td>
+<td>rocksTier &gt;= 50</td>
+<td>150</td>
+<td>mountain-legend</td>
+</tr>
+<tr>
+<td>302</td>
 <td><code>ember_coal_1</code></td>
 <td>Ember Coal finder I</td>
 <td>emberCoal &gt;= 1</td>
@@ -8887,7 +9056,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>-</td>
 </tr>
 <tr>
-<td>288</td>
+<td>303</td>
 <td><code>ember_coal_10</code></td>
 <td>Ember Coal finder II</td>
 <td>emberCoal &gt;= 10</td>
@@ -8895,7 +9064,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>-</td>
 </tr>
 <tr>
-<td>289</td>
+<td>304</td>
 <td><code>ember_coal_50</code></td>
 <td>Ember Coal finder III</td>
 <td>emberCoal &gt;= 50</td>
@@ -8903,7 +9072,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>-</td>
 </tr>
 <tr>
-<td>290</td>
+<td>305</td>
 <td><code>ember_coal_250</code></td>
 <td>Ember Coal finder IV</td>
 <td>emberCoal &gt;= 250</td>
@@ -8911,7 +9080,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>-</td>
 </tr>
 <tr>
-<td>291</td>
+<td>306</td>
 <td><code>ember_coal_1000</code></td>
 <td>Ember Coal finder V</td>
 <td>emberCoal &gt;= 1000</td>
@@ -8919,7 +9088,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td>-</td>
 </tr>
 <tr>
-<td>292</td>
+<td>307</td>
 <td><code>castle_15</code></td>
 <td>Grand Architect</td>
 <td>castle level 15</td>
@@ -10437,6 +10606,10 @@ three minutes on 8 cores (one seed).</p>
 <tr>
 <td><code>npm run grant-test-rocks</code></td>
 <td><code>tsx scripts/grant-test-rocks.ts</code></td>
+</tr>
+<tr>
+<td><code>npm run grant-test-legendary</code></td>
+<td><code>tsx scripts/grant-test-rocks.ts --email test@example.com --tier legendary --count 1 --yes</code></td>
 </tr>
 <tr>
 <td><code>npm run gen-save-fixtures</code></td>

@@ -948,7 +948,7 @@ The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 sectio
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (292, 26250 gems in total)** _(computed from the code)_
+**The launch achievements (307, 27750 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -1238,12 +1238,27 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 284 | `rocks_rich_50` | Ore hoarder III | rocksTier >= 50 | 100 | - |
 | 285 | `rocks_rich_250` | Ore hoarder IV | rocksTier >= 250 | 125 | - |
 | 286 | `rocks_rich_1000` | Ore hoarder V | rocksTier >= 1000 | 150 | - |
-| 287 | `ember_coal_1` | Ember Coal finder I | emberCoal >= 1 | 50 | - |
-| 288 | `ember_coal_10` | Ember Coal finder II | emberCoal >= 10 | 75 | - |
-| 289 | `ember_coal_50` | Ember Coal finder III | emberCoal >= 50 | 100 | - |
-| 290 | `ember_coal_250` | Ember Coal finder IV | emberCoal >= 250 | 125 | - |
-| 291 | `ember_coal_1000` | Ember Coal finder V | emberCoal >= 1000 | 150 | - |
-| 292 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
+| 287 | `rocks_silver_5` | Silver miner I | rocksTier >= 5 | 50 | - |
+| 288 | `rocks_silver_25` | Silver miner II | rocksTier >= 25 | 75 | - |
+| 289 | `rocks_silver_100` | Silver miner III | rocksTier >= 100 | 100 | - |
+| 290 | `rocks_silver_500` | Silver miner IV | rocksTier >= 500 | 125 | - |
+| 291 | `rocks_silver_2000` | Silver miner V | rocksTier >= 2000 | 150 | - |
+| 292 | `rocks_crystal_1` | Crystal cracker I | rocksTier >= 1 | 50 | - |
+| 293 | `rocks_crystal_5` | Crystal cracker II | rocksTier >= 5 | 75 | - |
+| 294 | `rocks_crystal_25` | Crystal cracker III | rocksTier >= 25 | 100 | - |
+| 295 | `rocks_crystal_100` | Crystal cracker IV | rocksTier >= 100 | 125 | - |
+| 296 | `rocks_crystal_500` | Crystal cracker V | rocksTier >= 500 | 150 | crystal-cracker |
+| 297 | `rocks_legend_1` | Legend of the mine I | rocksTier >= 1 | 50 | - |
+| 298 | `rocks_legend_3` | Legend of the mine II | rocksTier >= 3 | 75 | - |
+| 299 | `rocks_legend_10` | Legend of the mine III | rocksTier >= 10 | 100 | - |
+| 300 | `rocks_legend_25` | Legend of the mine IV | rocksTier >= 25 | 125 | - |
+| 301 | `rocks_legend_50` | Legend of the mine V | rocksTier >= 50 | 150 | mountain-legend |
+| 302 | `ember_coal_1` | Ember Coal finder I | emberCoal >= 1 | 50 | - |
+| 303 | `ember_coal_10` | Ember Coal finder II | emberCoal >= 10 | 75 | - |
+| 304 | `ember_coal_50` | Ember Coal finder III | emberCoal >= 50 | 100 | - |
+| 305 | `ember_coal_250` | Ember Coal finder IV | emberCoal >= 250 | 125 | - |
+| 306 | `ember_coal_1000` | Ember Coal finder V | emberCoal >= 1000 | 150 | - |
+| 307 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 

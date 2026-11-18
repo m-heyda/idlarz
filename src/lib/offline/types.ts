@@ -137,7 +137,8 @@ export type RockReply =
 			need: number;
 			accepted: number;
 			broken: false;
-			tickets: PublicTickets;
+			/** Left out while the rock still stands: the list is 3 kB and the browser keeps its own, so a batch of clicks answers with a few numbers */
+			tickets?: PublicTickets;
 			serverNowSec: number;
 			gemsTotal: number;
 			inv?: Inventory;

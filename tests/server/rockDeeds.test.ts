@@ -50,7 +50,7 @@ test('the rock deeds read the counters: all rocks, a tier or better, Ember Coal'
 });
 
 test('the mining deeds exist with ladders, and every tier gives gems and points', () => {
-	for (const id of ['rock_breaker', 'ore_hoarder', 'ember_finder']) {
+	for (const id of ['rock_breaker', 'ore_hoarder', 'silver_miner', 'crystal_cracker', 'legendary_miner', 'ember_finder']) {
 		const deed = DEEDS.find((d) => d.id === id);
 		assert.ok(deed, id);
 		assert.equal(deed.tiers.length, 5);

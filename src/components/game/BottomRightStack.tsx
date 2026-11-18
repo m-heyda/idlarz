@@ -1,5 +1,6 @@
 import React from 'react';
 import Minimap from './Minimap';
+import MapHighlightBar from './MapHighlightBar';
 import CombatWidget from './overlays/CombatWidget';
 
 /**
@@ -10,6 +11,7 @@ const BottomRightStack: React.FC<{ combat?: React.ReactNode }> = ({ combat }) =>
 	<>
 		<div data-top-right-stack className='fixed right-4 z-40 flex flex-col items-end' style={{ top: 'calc(var(--header-h, 76px) + 8px)' }}>
 			<Minimap />
+			<MapHighlightBar />
 		</div>
 		<div data-bottom-right-stack className='fixed bottom-4 right-4 z-40 flex flex-col items-end gap-2'>
 			{combat !== undefined ? combat : <CombatWidget />}

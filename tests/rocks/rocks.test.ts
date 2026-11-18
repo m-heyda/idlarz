@@ -59,10 +59,10 @@ test('rocks come much more often than chests (every 150 s), faster with Luck but
 	assert.equal(rockIntervalSec(1_000_000), 150 * 0.6);
 });
 
-test('the tiers need 50, 125, 250 and 500 clicks, and a better rock is rarer', () => {
+test('the tiers need 50, 125, 250, 500 and 1,000 clicks, and a better rock is rarer', () => {
 	assert.deepEqual(
 		ROCK_TIER_ORDER.map((t) => ROCK_TIERS[t].clicks),
-		[50, 125, 250, 500],
+		[50, 125, 250, 500, 1000],
 	);
 	const weights = ROCK_TIER_ORDER.map((t) => ROCK_TIERS[t].weight);
 	assert.deepEqual(
@@ -75,7 +75,7 @@ test('the tiers need 50, 125, 250 and 500 clicks, and a better rock is rarer', (
 test('rolling the tier: common most of the time, and Luck makes the better ones likelier', () => {
 	const count = (luck: number) => {
 		const rng = mulberry32(7);
-		const n = { common: 0, uncommon: 0, rare: 0, epic: 0 };
+		const n = { common: 0, uncommon: 0, rare: 0, epic: 0, legendary: 0 };
 		for (let i = 0; i < 20_000; i++) n[rollRockTier(luck, rng)]++;
 		return n;
 	};
@@ -161,4 +161,26 @@ test('the ores are crafting ingredients with art, and their tooltip says rocks d
 	}
 	for (const tier of ROCK_TIER_ORDER)
 		for (const drop of ROCK_DROPS[tier]) if (drop.kind === 'ingredient') assert.ok(INGREDIENT_BY_ID.has(drop.id), `${drop.id} is a known ingredient`);
+});
+
+test('the legendary ore takes 1,000 clicks, is the rarest rock, gives the most stone and coal and holds Ember Coal now and then', () => {
+	assert.equal(ROCK_TIERS.legendary.clicks, 1000);
+	assert.ok(ROCK_TIERS.legendary.weight < ROCK_TIERS.epic.weight, 'rarer than the crystal');
+	assert.match(rockSprite('legendary', 1), /rock_legendary\.png$/);
+	const ember = ROCK_DROPS.legendary.find((d) => d.kind === 'ingredient' && d.id === 'ing_ember_coal');
+	assert.ok(ember && ember.kind === 'ingredient' && ember.chance <= 0.15 && ember.qty[0] === 1 && ember.qty[1] === 3, 'a small chance, 1 to 3');
+	const rates = { stone: 100, coal: 100 };
+	const legend = rollRockLoot('legendary', { rates, luck: 0 }, mulberry32(9));
+	const epic = rollRockLoot('epic', { rates, luck: 0 }, mulberry32(9));
+	assert.ok(legend.resources.stone > epic.resources.stone && legend.resources.coal > epic.resources.coal);
+	let found = 0;
+	let most = 0;
+	const rng = mulberry32(21);
+	for (let i = 0; i < 10_000; i++) {
+		const n = rollRockLoot('legendary', { rates: { stone: 0, coal: 0 }, luck: 0 }, rng).stash.ing_ember_coal ?? 0;
+		if (n > 0) found++;
+		most = Math.max(most, n);
+	}
+	assert.ok(found / 10_000 > 0.07 && found / 10_000 < 0.13, `about 10% of legendary rocks hold Ember Coal (${found / 10_000})`);
+	assert.equal(most, 3);
 });

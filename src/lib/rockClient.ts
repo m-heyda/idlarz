@@ -15,8 +15,8 @@ import audioManager from '@/utils/audioManager';
 // The browser's side of mining a rock (IDL-376). Every click is counted and shown at once; the clicks are sent to the server in batches (about one a second, and at once when the count reaches what the rock needs).
 // The server decides how many it lets in, keeps the rock's progress and, when the rock breaks, rolls and pays the drops: nothing here decides a reward.
 
-/** How long clicks are gathered before a batch is sent */
-export const FLUSH_MS = 1000;
+/** How long clicks are gathered before a batch is sent. Every batch is a read and a write of the player's ledger on the server, so they are not sent more than once in two seconds (at the 24 clicks/s the server allows that is 48 clicks, exactly its burst), and one at a time across all rocks */
+export const FLUSH_MS = 2000;
 /** The most clicks one request may carry (the server's `ROCK.maxBatch`) */
 const BATCH = 200;
 /** The shortest gap between two chop sounds: a fast clicker gets a roll of hits, not a wall of noise */
@@ -24,6 +24,8 @@ const SOUND_GAP_MS = 60;
 
 const unsent = new Map<string, number>();
 const inflight = new Set<string>();
+/** One batch on its way at a time, whatever the rock: two rocks clicked in turn do not make two requests at once (they would race for the same ledger row) */
+let busy = false;
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 let lastSound = 0;
 
@@ -56,18 +58,32 @@ const flush = async (x: number, y: number): Promise<void> => {
 	if (inflight.has(key)) return;
 	const waiting = unsent.get(key) ?? 0;
 	if (waiting <= 0) return;
+	if (busy) {
+		// another rock's batch is on its way: try again shortly
+		timers.set(
+			key,
+			setTimeout(() => void flush(x, y), 250),
+		);
+		return;
+	}
 	const sent = Math.min(BATCH, waiting);
 	unsent.set(key, waiting - sent);
 	inflight.add(key);
+	busy = true;
 	const claim = newClaimId();
-	let reply: Reply<RockReply> = await requestRock(claim, x, y, sent);
-	if (reply.status === 'unavailable') reply = await requestRock(claim, x, y, sent);
-	inflight.delete(key);
+	let reply: Reply<RockReply>;
+	try {
+		reply = await requestRock(claim, x, y, sent);
+		if (reply.status === 'unavailable') reply = await requestRock(claim, x, y, sent);
+	} finally {
+		inflight.delete(key);
+		busy = false;
+	}
 
 	const store = useRockStore.getState();
 	if (reply.status === 'ok') {
 		if (reply.value.ok) {
-			store.ack(x, y, sent, reply.value.hits, reply.value.broken);
+			store.ack(x, y, sent, reply.value.hits, reply.value.broken, reply.value.need);
 			if (reply.value.broken) {
 				unsent.delete(key);
 				received(x, y, reply.value);

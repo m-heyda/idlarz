@@ -261,8 +261,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
 | `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:90`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
-| `ROCK` | Economy / Rocks and Mining | [`src/config/rocks.ts:50`](../../src/config/rocks.ts) | How rocks appear and how fast they may be mined (server rules). |
-| `ROCK_DROPS` | Economy / Rocks and Mining | [`src/config/rocks.ts:74`](../../src/config/rocks.ts) | What each tier drops. |
+| `ROCK` | Economy / Rocks and Mining | [`src/config/rocks.ts:51`](../../src/config/rocks.ts) | How rocks appear and how fast they may be mined (server rules). |
+| `ROCK_DROPS` | Economy / Rocks and Mining | [`src/config/rocks.ts:75`](../../src/config/rocks.ts) | What each tier drops. |
 | `ROCK_TIERS` | Economy / Rocks and Mining | [`src/config/rocks.ts:25`](../../src/config/rocks.ts) | The rock tiers. |
 | `rockCap` | Economy / Rocks and Mining | [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts) | The most rocks that wait at once on a map with `free` tiles a monster could stand on. |
 | `rockIntervalSec` | Economy / Rocks and Mining | [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts) | Seconds of play time between two new rocks. |

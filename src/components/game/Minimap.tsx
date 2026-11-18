@@ -1,6 +1,17 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
-import { CHEST_COLOR, MONSTER_COLOR, minimapLayout, minimapMarkers, minimapToTile, paintChestGlow, paintMinimap, viewRectangle } from '@/lib/minimap';
+import {
+	CHEST_COLOR,
+	MONSTER_COLOR,
+	ORE_COLOR,
+	minimapLayout,
+	minimapMarkers,
+	minimapToTile,
+	paintChestGlow,
+	paintMinimap,
+	viewRectangle,
+} from '@/lib/minimap';
+import { useRockStore } from '@/stores/rockStore';
 import { useUiStore } from '@/stores/uiStore';
 import '@/styles/Minimap.css';
 import { useMapGame, useMapView } from './mapSource';
@@ -16,6 +27,12 @@ const MinimapBody: React.FC = () => {
 	const tiles = game((state) => state.tiles);
 	// Where the monsters stand, as one string: the monster list itself is a new array every tick (they age), their places rarely change
 	const monsterPlaces = game((state) => state.monsters.map((m) => `${m.x},${m.y}`).join(';'));
+	// the rocks the server put on the map, by their places (the store view changes with every click; the places do not)
+	const orePlaces = useRockStore((state) =>
+		Object.values(state.rocks)
+			.map((r) => `${r.x},${r.y}`)
+			.join(';'),
+	);
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const glowRef = useRef<HTMLCanvasElement>(null);
 	const viewRef = useRef<HTMLDivElement>(null);
@@ -27,6 +44,7 @@ const MinimapBody: React.FC = () => {
 		() => (monsterPlaces ? monsterPlaces.split(';').map((p) => ({ x: Number(p.split(',')[0]), y: Number(p.split(',')[1]) })) : []),
 		[monsterPlaces],
 	);
+	const ores = useMemo(() => (orePlaces ? orePlaces.split(';').map((p) => ({ x: Number(p.split(',')[0]), y: Number(p.split(',')[1]) })) : []), [orePlaces]);
 	const chestCount = tiles.stats.chests;
 
 	useEffect(() => {
@@ -36,7 +54,7 @@ const MinimapBody: React.FC = () => {
 		if (!canvas || !ctx) return;
 		const paint = () => {
 			lastPaint.current = performance.now();
-			const markers = minimapMarkers(tiles, monsters, layout);
+			const markers = minimapMarkers(tiles, monsters, layout, ores);
 			const image = ctx.createImageData(layout.width, layout.height);
 			paintMinimap(image.data, tiles, layout, markers);
 			ctx.putImageData(image, 0, 0);
@@ -53,7 +71,7 @@ const MinimapBody: React.FC = () => {
 		}
 		const timer = setTimeout(paint, wait);
 		return () => clearTimeout(timer);
-	}, [tiles, monsters, layout]);
+	}, [tiles, monsters, ores, layout]);
 
 	// The outline of the part of the map on screen follows every pan frame, so it is moved straight in the DOM (no React render per frame)
 	useLayoutEffect(() => {
@@ -85,6 +103,7 @@ const MinimapBody: React.FC = () => {
 	const summary = [
 		monsters.length > 0 ? `${monsters.length} ${monsters.length === 1 ? 'enemy' : 'enemies'}` : '',
 		chestCount > 0 ? `${chestCount} ${chestCount === 1 ? 'chest' : 'chests'}` : '',
+		ores.length > 0 ? `${ores.length} ${ores.length === 1 ? 'ore' : 'ores'}` : '',
 	].filter(Boolean);
 
 	return (
@@ -111,6 +130,11 @@ const MinimapBody: React.FC = () => {
 					{monsters.length > 0 && (
 						<span className='ds-bad' title='Enemies on the map'>
 							<i className='minimap-dot' style={{ background: MONSTER_COLOR }} /> {monsters.length}
+						</span>
+					)}
+					{ores.length > 0 && (
+						<span style={{ color: ORE_COLOR }} title='Rocks and ores on the map'>
+							<i className='minimap-dot' style={{ background: ORE_COLOR }} /> {ores.length}
 						</span>
 					)}
 					{chestCount > 0 && (

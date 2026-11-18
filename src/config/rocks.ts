@@ -1,9 +1,9 @@
 // Mineable rocks: the numbers. Pure data; the rules that use it are in `src/lib/rocks.ts` (spots, tier roll, loot) and `src/lib/offline/*` (the server owns every spawn, hit count and drop).
 
 /** The rarity of a rock: how many clicks it takes and what it can hold. The names match the item rarities, so the colours are the game's own. */
-export type RockTier = 'common' | 'uncommon' | 'rare' | 'epic';
+export type RockTier = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
 
-export const ROCK_TIER_ORDER: readonly RockTier[] = ['common', 'uncommon', 'rare', 'epic'];
+export const ROCK_TIER_ORDER: readonly RockTier[] = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
 export interface RockTierDef {
 	label: string;
@@ -16,7 +16,7 @@ export interface RockTierDef {
 }
 
 /**
- * The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.
+ * The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.
  *
  * @category Economy/Rocks and Mining
  * @order 1
@@ -27,6 +27,7 @@ export const ROCK_TIERS: Record<RockTier, RockTierDef> = {
 	uncommon: { label: 'Silver ore', clicks: 125, weight: 22, sprites: ['rock_silver'] },
 	rare: { label: 'Rich ore', clicks: 250, weight: 7, sprites: ['rock_gold'] },
 	epic: { label: 'Crystal', clicks: 500, weight: 1, sprites: ['rock_crystal'] },
+	legendary: { label: 'Legendary ore', clicks: 1000, weight: 0.25, sprites: ['rock_legendary'] },
 };
 
 /** The picture of a rock: one of its tier's sprites, chosen from the ticket number so a rock never changes its look. */
@@ -100,5 +101,15 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_gold_ore', chance: 0.25, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.3, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.15, qty: [1, 3] },
+	],
+	// MVP (the pool is adjusted later): much more stone and coal than an epic rock, the better ores often, and Ember Coal now and then (1 to 3)
+	legendary: [
+		{ kind: 'resource', id: 'stone', minutes: [40, 60], floor: 500 },
+		{ kind: 'resource', id: 'coal', minutes: [25, 40], floor: 300 },
+		{ kind: 'ingredient', id: 'ing_crystal', chance: 0.4, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_gold_ore', chance: 0.4, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.5, qty: [1, 3] },
+		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.3, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.1, qty: [1, 3] },
 	],
 };

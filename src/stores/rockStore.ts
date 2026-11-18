@@ -40,8 +40,8 @@ interface RockStore {
 	setFromServer: (rocks: readonly PublicRock[]) => void;
 	/** One click, counted at once. Returns the rock, or null when there is none (or it is already being confirmed). */
 	localHit: (x: number, y: number) => RockView | null;
-	/** The server answered a batch of `sent` clicks: its total is `hits`; the clicks still pending are added on top. */
-	ack: (x: number, y: number, sent: number, hits: number, broken: boolean) => void;
+	/** The server answered a batch of `sent` clicks: its total is `hits` out of `need` (the server's number, so a browser that loaded an older rule list still shows the right count); the clicks still pending are added on top. */
+	ack: (x: number, y: number, sent: number, hits: number, broken: boolean, need?: number) => void;
 	/** A batch was lost: its clicks are not counted */
 	lose: (x: number, y: number, sent: number) => void;
 	remove: (x: number, y: number) => void;
@@ -87,7 +87,7 @@ export const useRockStore = create<RockStore>((set, get) => ({
 		set({ rocks: { ...get().rocks, [rockKey(x, y)]: next } });
 		return next;
 	},
-	ack: (x, y, sent, hits, broken) => {
+	ack: (x, y, sent, hits, broken, need) => {
 		const key = rockKey(x, y);
 		const rock = get().rocks[key];
 		if (!rock) return;
@@ -98,7 +98,8 @@ export const useRockStore = create<RockStore>((set, get) => ({
 			return;
 		}
 		const pending = Math.max(0, rock.pending - sent);
-		set({ rocks: { ...get().rocks, [key]: { ...rock, pending, hits: Math.min(rock.need, hits + pending), breaking: false } } });
+		const total = need !== undefined && need > 0 ? need : rock.need;
+		set({ rocks: { ...get().rocks, [key]: { ...rock, need: total, pending, hits: Math.min(total, hits + pending), breaking: false } } });
 	},
 	lose: (x, y, sent) => {
 		const key = rockKey(x, y);

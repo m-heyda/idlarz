@@ -274,20 +274,21 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the crown icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
-- [`MapHighlightBar.tsx`](../../src/components/game/MapHighlightBar.tsx)
+- [`MapHighlightBar.tsx`](../../src/components/game/MapHighlightBar.tsx) — ~ `size`:
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
-- [`MapMarkers.tsx`](../../src/components/game/MapMarkers.tsx) — ~ The edge arrow keeps this far from the borders of the screen (the dock is below, the header above)
+- [`MapMarkers.tsx`](../../src/components/game/MapMarkers.tsx) — ~ The edge arrow keeps this far from the borders of the screen (the header is above, the dock below)
 - [`MapTip.tsx`](../../src/components/game/MapTip.tsx) — ~ A hover card on the map, kept on screen.
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
+- [`PickaxeCursor.tsx`](../../src/components/game/PickaxeCursor.tsx) — ~ Where the tip of the pick is in the 36 px picture:
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
 - [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
-- [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ The ore a rock of each tier is made of:
+- [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ How long the whole effect lives:
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
@@ -586,6 +587,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gemsParse.ts`](../../src/lib/offline/gemsParse.ts) — ~ The body of `POST /api/gems` as a typed request, or null when it is not one (the route answers 400).
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`identity.ts`](../../src/lib/offline/identity.ts) — ~ Epoch seconds of the last paid name change; null = never changed
+- [`ingredientMove.ts`](../../src/lib/offline/ingredientMove.ts) — ~ Moves every bag stack of an ingredient (by its old junk id, see `INGREDIENT_BY_JUNK`) into the Crafting bag stock, up to the stock cap per ingredient; what does not fit stays in the bag.
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
 - [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept):
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
@@ -636,7 +638,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
-- [`rockClient.ts`](../../src/lib/rockClient.ts) — ~ How long clicks are gathered before a batch is sent
+- [`rockClient.ts`](../../src/lib/rockClient.ts) — ~ How long clicks are gathered before a batch is sent.
 - [`rocks.ts`](../../src/lib/rocks.ts) — ~ The tiles a rock could stand on:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
@@ -1022,6 +1024,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`guestMode.test.ts`](../../tests/server/guestMode.test.ts)
+- [`ingredientMove.test.ts`](../../tests/server/ingredientMove.test.ts)
 - [`ingredients.test.ts`](../../tests/server/ingredients.test.ts)
 - [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)

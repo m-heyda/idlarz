@@ -1,24 +1,22 @@
 import React, { useEffect } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
 import { useRockStore, type RockBurst } from '@/stores/rockStore';
+import { formatCompact } from '@/utils/formatters';
 import '@/styles/Rocks.css';
 
-// The break effect of a rock (IDL-376): a flash, a spray of chips in the colour of the stone, and a few pieces (stone, coal and what else came out) that are thrown out of the rock and fall. Purely a picture of what the server already paid.
+// The break effect of a rock (IDL-376): a flash and a spray of chips in the colour of the stone, and the things the rock really gave: each one (stone, coal, every ingredient found) is thrown out of the rock, lands in a row on the ground with
+// its amount under it, stays there for about a second and fades away. So the player sees exactly what dropped. Purely a picture of what the server already paid.
 
-const LIFE_MS = 2100;
+/** How long the whole effect lives: the throw, a second on the ground, the fade */
+const LIFE_MS = 2200;
 const STONE = '/pixel/icons/stone.png';
 const COAL = '/pixel/icons/coal.png';
-/** The ore a rock of each tier is made of: pieces of it fall with the stone and coal (the same pictures as the bag icons of the ingredients) */
-const TIER_ORE: Partial<Record<RockBurst['tier'], string>> = {
-	uncommon: '/pixel/items/junk/junk_silver_ore.png',
-	rare: '/pixel/items/junk/junk_gold_ore.png',
-	epic: '/pixel/items/junk/junk_crystal.png',
-};
 const CHIP_COLOURS: Record<RockBurst['tier'], string[]> = {
 	common: ['#8b867a', '#a8a293', '#6f6a60'],
 	uncommon: ['#b9c4cf', '#8f9aa8', '#e6edf3'],
 	rare: ['#e3b64a', '#b87333', '#f2d98d'],
 	epic: ['#9ad8ff', '#c9a4ff', '#e9f6ff'],
+	legendary: ['#3b2f36', '#ff7a2a', '#ffb347'],
 };
 
 /** A small repeatable pseudo-random number from a seed, so a burst looks the same on every render. */
@@ -30,18 +28,12 @@ const rand = (seed: number): number => {
 /** The picture of an ingredient from the crafting bag key (`ing_ember_coal` -> the junk art of the same name) */
 const stashArt = (key: string): string => `/pixel/items/junk/junk_${key.replace(/^ing_/, '')}.png`;
 
-/** What falls out of the rock: stone and coal for what it paid, pieces of its own ore (silver, gold, crystal) and one piece of every ingredient it held, in a fan from the left to the right. */
-const piecesOf = (burst: RockBurst): string[] => {
-	const ore = TIER_ORE[burst.tier];
-	return [
-		STONE,
-		...(burst.stone > 0 ? [STONE] : []),
-		...(ore ? [ore, ore] : []),
-		COAL,
-		...(burst.coal > 0 ? [COAL] : []),
-		...Object.keys(burst.stash).map(stashArt),
-	].slice(0, 9);
-};
+/** What the rock gave, as pictures with their amounts: the same things the notice lists. */
+export const dropsOf = (burst: Pick<RockBurst, 'stone' | 'coal' | 'stash'>): { src: string; label: string }[] => [
+	...(burst.stone > 0 ? [{ src: STONE, label: `+${formatCompact(burst.stone)}` }] : []),
+	...(burst.coal > 0 ? [{ src: COAL, label: `+${formatCompact(burst.coal)}` }] : []),
+	...Object.entries(burst.stash).map(([key, amount]) => ({ src: stashArt(key), label: `+${formatCompact(amount)}` })),
+];
 
 const Burst: React.FC<{ burst: RockBurst }> = ({ burst }) => {
 	const drop = useRockStore((s) => s.dropBurst);
@@ -50,7 +42,7 @@ const Burst: React.FC<{ burst: RockBurst }> = ({ burst }) => {
 		return () => clearTimeout(id);
 	}, [burst.id, drop]);
 	const colours = CHIP_COLOURS[burst.tier];
-	const thrown = piecesOf(burst);
+	const given = dropsOf(burst);
 	return (
 		<div className='rock-fx' style={{ left: burst.x * TILE_SIZE + TILE_SIZE / 2, top: burst.y * TILE_SIZE + TILE_SIZE * 0.6 }} aria-hidden>
 			<i className='rock-fx-puff' />
@@ -74,20 +66,25 @@ const Burst: React.FC<{ burst: RockBurst }> = ({ burst }) => {
 					</span>
 				);
 			})}
-			{thrown.map((src, i) => {
-				const dir = thrown.length === 1 ? 0 : (i / (thrown.length - 1)) * 2 - 1;
+			{given.map((item, i) => {
+				// loose on the ground below the rock, each thrown out of it and landing in its own place: rows of three, 54 px apart, so neither the pictures nor their amounts touch
+				const perRow = 3;
+				const row = Math.floor(i / perRow);
+				const inRow = Math.min(perRow, given.length - row * perRow);
+				const dx = (i - row * perRow - (inRow - 1) / 2) * 54 + (rand(burst.id + i * 7) - 0.5) * 8;
 				const style = {
-					'--dx': `${dir * 34 + (rand(burst.id + i) - 0.5) * 10}px`,
-					'--up': `${-26 - rand(burst.id * 3 + i) * 12}px`,
-					'--down': `${14 + rand(burst.id * 5 + i) * 6}px`,
-					'--t': `${1350 + rand(i + burst.id) * 250}ms`,
-					'--delay': `${i * 40}ms`,
+					'--dx': `${dx}px`,
+					'--up': `${-30 - rand(burst.id * 3 + i) * 10}px`,
+					'--down': `${22 + row * 40}px`,
+					'--t': `${LIFE_MS - 100}ms`,
+					'--delay': `${i * 50}ms`,
 				} as React.CSSProperties;
 				return (
-					<span key={`p${i}`} className='rock-fx-x' style={style}>
-						<span className='rock-fx-y' style={style}>
+					<span key={`p${i}`} className='rock-drop-x' style={style}>
+						<span className='rock-drop-y' style={style}>
 							{/* eslint-disable-next-line @next/next/no-img-element */}
-							<img className='rock-fx-piece' src={src} alt='' />
+							<img className='rock-fx-piece' src={item.src} alt='' />
+							<b className='rock-drop-label'>{item.label}</b>
 						</span>
 					</span>
 				);

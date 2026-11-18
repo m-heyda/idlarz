@@ -1412,7 +1412,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 
 Source: [`src/config/rocks.ts:25`](../../src/config/rocks.ts)
 
-The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.
+The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.
 
 **Rock tiers** _(computed from the code)_
 
@@ -1422,12 +1422,13 @@ The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 2
 | uncommon | Silver ore | 125 | 22 | 22% |
 | rare | Rich ore | 250 | 7 | 7% |
 | epic | Crystal | 500 | 1 | 1% |
+| legendary | Legendary ore | 1,000 | 0.25 | 0% |
 
 <a id="rock"></a>
 
 ### `ROCK` <small>const</small>
 
-Source: [`src/config/rocks.ts:50`](../../src/config/rocks.ts)
+Source: [`src/config/rocks.ts:51`](../../src/config/rocks.ts)
 
 How rocks appear and how fast they may be mined (server rules).
 
@@ -1452,7 +1453,7 @@ How rocks appear and how fast they may be mined (server rules).
 
 ### `ROCK_DROPS` <small>const</small>
 
-Source: [`src/config/rocks.ts:74`](../../src/config/rocks.ts)
+Source: [`src/config/rocks.ts:75`](../../src/config/rocks.ts)
 
 What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table.
 Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.
@@ -1482,6 +1483,13 @@ Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.
 | epic | ing_gold_ore | 1 | 25% |
 | epic | ing_silver_ore | 1-2 | 30% |
 | epic | ing_ember_coal | 1-3 | 15% |
+| legendary | stone | 40-60 min of income (at least 500) | always |
+| legendary | coal | 25-40 min of income (at least 300) | always |
+| legendary | ing_crystal | 1-2 | 40% |
+| legendary | ing_gold_ore | 1-2 | 40% |
+| legendary | ing_silver_ore | 1-3 | 50% |
+| legendary | ing_copper_ore | 1-2 | 30% |
+| legendary | ing_ember_coal | 1-3 | 10% |
 
 <a id="rockspots"></a>
 

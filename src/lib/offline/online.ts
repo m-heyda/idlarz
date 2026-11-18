@@ -36,6 +36,7 @@ import { advanceBank, rockAt, rocksOf, secondsToNext, takeChestAt, type TicketBa
 import { ROCK_TIERS } from '@/config/rocks';
 import { rollRockLoot, takeClicks } from '@/lib/rocks';
 import { stashIn } from '@/lib/offline/reward';
+import { moveIngredientStacks } from '@/lib/offline/ingredientMove';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
 import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
@@ -117,7 +118,8 @@ const onlineStep = async <T>(
 		const advanced = { ...advanceBank(looked, dt, bankContext(stored), rollFor).bank, accAt: nowSec };
 		const bank = await place(advanced);
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
-		const out = await body({ ledger: { ...ledger, bank }, stored, bank, nowSec, env, place });
+		// ingredient stacks the player held before the Crafting bag existed move over (a pass that finds nothing once it has run)
+		const out = await body({ ledger: moveIngredientStacks({ ...ledger, bank }), stored, bank, nowSec, env, place });
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;
@@ -298,7 +300,6 @@ export const hitRock = (
 						need,
 						accepted,
 						broken: false,
-						tickets: publicTickets(next, ledger.ordChest),
 						serverNowSec: nowSec,
 						gemsTotal: ledger.gems,
 					},

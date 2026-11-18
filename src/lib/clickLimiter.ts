@@ -51,7 +51,8 @@ export const createClickLimiter = (config: ClickLimitConfig = CLICK_LIMIT): Clic
 			last = last === null ? now : Math.max(last, now);
 
 			let verdict = false;
-			if ((!config.requireTrusted || trusted) && burst >= 1 && stamina >= 1) {
+			// a hair of tolerance: refilling at exactly the sustained rate can leave 0.9999999 of a token, and that click is a real one
+			if ((!config.requireTrusted || trusted) && burst >= 1 - 1e-9 && stamina >= 1 - 1e-9) {
 				burst -= 1;
 				stamina -= 1;
 				verdict = true;

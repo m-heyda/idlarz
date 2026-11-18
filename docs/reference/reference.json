@@ -1178,7 +1178,7 @@
   "category": "Economy/Rocks and Mining",
   "file": "src/config/rocks.ts",
   "line": 25,
-  "summary": "The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.",
+  "summary": "The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.",
   "see": []
  },
  {
@@ -1188,7 +1188,7 @@
   "kind": "const",
   "category": "Economy/Rocks and Mining",
   "file": "src/config/rocks.ts",
-  "line": 50,
+  "line": 51,
   "summary": "How rocks appear and how fast they may be mined (server rules).",
   "see": []
  },
@@ -1199,7 +1199,7 @@
   "kind": "const",
   "category": "Economy/Rocks and Mining",
   "file": "src/config/rocks.ts",
-  "line": 74,
+  "line": 75,
   "summary": "What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table. Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.",
   "see": []
  },

@@ -16,6 +16,10 @@
 .tile-rock[data-tier='rare'] {
 	--rock-glow: #60a5fa;
 }
+/* the legendary ore: a hot orange glow, a little stronger than the rest */
+.tile-rock[data-tier='legendary'] {
+	--rock-glow: #ff8a3c;
+}
 .tile-rock[data-tier='epic'] {
 	--rock-glow: #c084fc;
 }
@@ -102,12 +106,44 @@
 	transition: transform 120ms linear;
 }
 
-/* the pickaxe: the cursor over a rock (the hot spot is the tip of the pick) */
+/* the pickaxe: over a rock the real cursor is hidden and PickaxeCursor draws a pickaxe that follows the pointer and swings on every click */
 .tile-has-rock,
 .tile-has-rock * {
-	cursor:
-		url('/pixel/ui/cursor_pickaxe.png') 22 8,
-		pointer !important;
+	cursor: none !important;
+}
+.pickaxe-cursor {
+	position: fixed;
+	left: 0;
+	top: 0;
+	display: none;
+	z-index: 900;
+	pointer-events: none;
+	will-change: transform;
+}
+.pickaxe-cursor img {
+	display: block;
+	image-rendering: auto;
+	/* the swing turns around the end of the handle, bottom left */
+	transform-origin: 18% 88%;
+	filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.55));
+}
+.pickaxe-cursor img.swing {
+	animation: pickaxe-swing 170ms cubic-bezier(0.3, 0.1, 0.4, 1);
+}
+/* wind up, hit, settle */
+@keyframes pickaxe-swing {
+	0% {
+		transform: rotate(0deg);
+	}
+	28% {
+		transform: rotate(-26deg);
+	}
+	58% {
+		transform: rotate(16deg);
+	}
+	100% {
+		transform: rotate(0deg);
+	}
 }
 
 /* break effect: chips and the pieces that fall out of the rock, laid on the map where it stood */
@@ -147,6 +183,75 @@
 	image-rendering: pixelated;
 	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
 }
+/* the things the rock gave: thrown out, a row on the ground with the amount under each, about a second there, then they fade */
+.rock-drop-x,
+.rock-drop-y {
+	position: absolute;
+	left: 0;
+	top: 0;
+}
+.rock-drop-x {
+	animation: rock-drop-x var(--t, 2000ms) linear var(--delay, 0ms) both;
+}
+.rock-drop-y {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	animation: rock-drop-y var(--t, 2000ms) ease-in var(--delay, 0ms) both;
+}
+.rock-drop-y .rock-fx-piece {
+	width: 26px;
+	height: 26px;
+	margin: -13px 0 0;
+}
+.rock-drop-label {
+	margin-top: 1px;
+	font-size: 11px;
+	line-height: 1;
+	font-weight: 700;
+	color: #fff6d6;
+	white-space: nowrap;
+	text-shadow:
+		1px 0 0 #000,
+		-1px 0 0 #000,
+		0 1px 0 #000,
+		0 -1px 0 #000;
+}
+@keyframes rock-drop-x {
+	0% {
+		transform: translateX(0);
+	}
+	22% {
+		transform: translateX(var(--dx));
+	}
+	100% {
+		transform: translateX(var(--dx));
+	}
+}
+/* up, down into place (the first 22%), stay put, fade over the last fifth */
+@keyframes rock-drop-y {
+	0% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	11% {
+		transform: translateY(var(--up));
+		opacity: 1;
+	}
+	22% {
+		transform: translateY(var(--down));
+		opacity: 1;
+	}
+	80% {
+		transform: translateY(var(--down));
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(var(--down));
+		opacity: 0;
+	}
+}
+
 /* a soft flash where the rock was */
 .rock-fx-puff {
 	position: absolute;
@@ -217,7 +322,14 @@
 	.rock-fx-chip {
 		animation-duration: 300ms;
 	}
+	.rock-drop-x,
+	.rock-drop-y {
+		animation-duration: 1200ms;
+	}
 	.rock-fx-puff {
 		display: none;
+	}
+	.pickaxe-cursor img.swing {
+		animation: none;
 	}
 }

@@ -20,7 +20,7 @@ export type AchievementCondition =
 	/** Rocks broken (mining), all kinds */
 	| { kind: 'rocks'; min: number }
 	/** Rocks of this tier or a better one broken (`common` ... `epic`) */
-	| { kind: 'rocksTier'; tier: 'uncommon' | 'rare' | 'epic'; min: number }
+	| { kind: 'rocksTier'; tier: 'uncommon' | 'rare' | 'epic' | 'legendary'; min: number }
 	/** Ember Coal found in rocks */
 	| { kind: 'emberCoal'; min: number }
 	/** The castle has reached this level in the last accepted save */

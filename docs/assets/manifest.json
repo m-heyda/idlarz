@@ -16512,6 +16512,21 @@
 		"usedBy": [
 			"rocks"
 		],
+		"name": "rock_legendary",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_legendary.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"rocks"
+		],
 		"name": "rock_silver",
 		"category": "map-details",
 		"subcategory": "mineable rocks",
@@ -21596,8 +21611,8 @@
 		"status": "used",
 		"source": "public/pixel/ui",
 		"size": [
-			32,
-			32
+			36,
+			36
 		]
 	},
 	{
@@ -21881,9 +21896,7 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
+		"usedBy": [],
 		"name": "menu_bestiary",
 		"category": "ui",
 		"subcategory": "menu",

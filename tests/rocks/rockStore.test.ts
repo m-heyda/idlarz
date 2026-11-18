@@ -71,3 +71,16 @@ test('clicks the server never heard are taken back, and a break plays its effect
 	useRockStore.getState().dropBurst(useRockStore.getState().bursts[0].id);
 	assert.equal(useRockStore.getState().bursts.length, 0);
 });
+
+test('the server’s answer corrects the clicks a rock needs, so an older rule list in the browser never shows a wrong count', () => {
+	useRockStore.getState().reset();
+	// the browser was told the rock needs 100 clicks; the server's rules say 50
+	useRockStore.getState().setFromServer([rock({ need: 100 })]);
+	for (let i = 0; i < 10; i++) useRockStore.getState().localHit(3, 4);
+	useRockStore.getState().ack(3, 4, 10, 10, false, 50);
+	assert.equal(view().need, 50);
+	assert.equal(view().hits, 10);
+	// without a need in the answer the old one stays
+	useRockStore.getState().ack(3, 4, 0, 10, false);
+	assert.equal(view().need, 50);
+});
