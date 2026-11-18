@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge, Button, DiamondLevel, Inset, Panel, ProgressBar } from '../components/primitives';
 import { compact } from '../logic';
 
@@ -109,7 +109,9 @@ const Card: React.FC<{ e: BestiaryEntry; active: boolean; onPick: () => void }> 
 	const full = t >= e.tiers.length;
 	return (
 		<button type='button' className='ds-mon' data-active={active} data-unk={!e.met} onClick={onPick} title={e.met ? e.name : 'Not met yet'}>
-			<span className='ds-mon-lv'>{e.boss ? 'Boss' : `Lv ${e.levels.min}`}</span>
+			<span className='ds-mon-lv' data-boss={e.boss}>
+				{e.boss ? 'Boss' : `Lv ${e.levels.min}`}
+			</span>
 			{waitingOf(e) > 0 ? <span className='ds-mon-ready' title='Reward ready' /> : null}
 			<span className='ds-mon-art'>
 				<img src={e.met ? e.icon : SILHOUETTE} alt='' />
@@ -244,38 +246,118 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 	);
 };
 
-/** The biome collection strips: one bar per biome toward the next goal tier (every monster of the biome, its boss included, at that tier) with its own Claim. */
-const BiomeStrip: React.FC<{ goals: readonly BestiaryBiomeGoal[]; busy?: boolean; onClaimBiome?: (biome: string, tier: number) => void }> = ({
+/** A dropdown drawn like the rest of the window (the native select is not styleable): a button that opens a list of options, closes on an outside press or Escape. */
+const Dropdown: React.FC<{ value: string; options: readonly [string, string][]; onChange: (v: string) => void; label: string }> = ({
+	value,
+	options,
+	onChange,
+	label,
+}) => {
+	const [open, setOpen] = useState(false);
+	const ref = useRef<HTMLDivElement>(null);
+	useEffect(() => {
+		if (!open) return;
+		const away = (ev: MouseEvent) => {
+			if (ref.current && !ref.current.contains(ev.target as Node)) setOpen(false);
+		};
+		const esc = (ev: KeyboardEvent) => {
+			if (ev.key === 'Escape') {
+				ev.stopPropagation();
+				setOpen(false);
+			}
+		};
+		document.addEventListener('mousedown', away);
+		document.addEventListener('keydown', esc, true);
+		return () => {
+			document.removeEventListener('mousedown', away);
+			document.removeEventListener('keydown', esc, true);
+		};
+	}, [open]);
+	const current = options.find(([id]) => id === value)?.[1] ?? label;
+	return (
+		<div className='ds-dd' ref={ref}>
+			<button
+				type='button'
+				className='ds-dd-btn'
+				aria-haspopup='listbox'
+				aria-expanded={open}
+				data-active={value !== options[0][0]}
+				onClick={() => setOpen(!open)}
+			>
+				{current}
+				<i aria-hidden>▾</i>
+			</button>
+			{open ? (
+				<ul className='ds-dd-list' role='listbox' aria-label={label}>
+					{options.map(([id, text]) => (
+						<li key={id} role='option' aria-selected={id === value}>
+							<button
+								type='button'
+								data-active={id === value}
+								onClick={() => {
+									onChange(id);
+									setOpen(false);
+								}}
+							>
+								{text}
+							</button>
+						</li>
+					))}
+				</ul>
+			) : null}
+		</div>
+	);
+};
+
+/**
+ * The biome collection goals as a table over the whole panel: one row per biome, one cell per goal tier with its bonus on a single line (claimed, claimable with a button, or locked), and how many monsters still hold the next tier back.
+ * Every monster of the biome, its boss included, must reach the tier.
+ */
+const BiomeGoals: React.FC<{ goals: readonly BestiaryBiomeGoal[]; busy?: boolean; onClaimBiome?: (biome: string, tier: number) => void }> = ({
 	goals,
 	busy,
 	onClaimBiome,
 }) => (
-	<div className='ds-bst-biomes'>
-		{goals.map((g) => {
-			const next = Math.min(g.reached + 1, g.tiers.length);
-			const claimable = g.reached > g.claimed;
-			const done = g.claimed >= g.tiers.length;
-			return (
-				<div className='ds-bst-biome' key={g.biome} data-ready={claimable} title={g.missing.length ? `Still missing: ${g.missing.join(', ')}` : undefined}>
-					<div className='ds-bst-biome-head'>
-						<b>{g.label}</b>
-						<DiamondLevel level={g.claimed} max={g.tiers.length} small />
+	<div className='ds-bst-overlay'>
+		<div className='ds-bst-goals-head'>
+			<b>Biome collection goals</b>
+			<span className='ds-dim'>Bring every monster of a biome, its boss included, to the same tier to claim a bonus against all of them.</span>
+		</div>
+		<div className='ds-bst-goals'>
+			{goals.map((g) => {
+				const tiers = g.tiers.length;
+				return (
+					<div className='ds-bst-goal-row' key={g.biome} style={{ gridTemplateColumns: `130px repeat(${tiers}, minmax(190px, 1fr)) 150px` }}>
+						<div className='ds-bst-goal-name'>
+							<b>{g.label}</b>
+							<DiamondLevel level={g.claimed} max={tiers} small />
+						</div>
+						{g.tiers.map((t, i) => {
+							const state = i < g.claimed ? 'claimed' : i === g.claimed && g.reached > g.claimed ? 'claim' : i < g.reached ? 'claimed' : 'locked';
+							return (
+								<div className='ds-bst-goal' key={i} data-state={state}>
+									<span className='ds-bst-goal-tier'>Goal {i + 1}</span>
+									<span className='ds-bst-goal-text'>
+										{t.text}
+										{t.gems ? ` · ${t.gems} gems` : ''}
+									</span>
+									{state === 'claim' ? (
+										<Button tone='gold' size='sm' disabled={busy} onClick={() => onClaimBiome?.(g.biome, i + 1)}>
+											Claim
+										</Button>
+									) : (
+										<em>{state === 'claimed' ? 'Claimed' : 'Locked'}</em>
+									)}
+								</div>
+							);
+						})}
+						<div className='ds-dim ds-bst-goal-short' title={g.missing.length ? `Still short: ${g.missing.join(', ')}` : undefined}>
+							{g.claimed >= tiers ? 'Complete' : `${g.missing.length} of ${g.monsters} short`}
+						</div>
 					</div>
-					<div className='ds-dim ds-bst-biome-text'>
-						{done ? 'Collection complete' : `Goal ${next}: ${g.tiers[next - 1].text}${g.tiers[next - 1].gems ? ` · ${g.tiers[next - 1].gems} gems` : ''}`}
-					</div>
-					{claimable ? (
-						<Button tone='gold' size='sm' disabled={busy} onClick={() => onClaimBiome?.(g.biome, g.claimed + 1)}>
-							Claim goal {g.claimed + 1}
-						</Button>
-					) : done ? null : (
-						<span className='ds-dim ds-bst-biome-text'>
-							{g.missing.length} of {g.monsters} still short
-						</span>
-					)}
-				</div>
-			);
-		})}
+				);
+			})}
+		</div>
 	</div>
 );
 
@@ -328,45 +410,40 @@ export const BestiaryPanel: React.FC<BestiaryPanelProps> = ({ entries, biomes, a
 							{label}
 						</button>
 					))}
-					<select className='ds-bst-family' value={family} onChange={(ev) => setFamily(ev.target.value)} aria-label='Family'>
-						<option value='all'>Any family</option>
-						{families.map((f) => (
-							<option key={f} value={f}>
-								{f}
-							</option>
-						))}
-					</select>
-					<button type='button' data-active={showBiomes} onClick={() => setShowBiomes(!showBiomes)}>
-						Biome goals
+					<Dropdown label='Family' value={family} onChange={setFamily} options={[['all', 'Any family'], ...families.map((f): [string, string] => [f, f])]} />
+					<button type='button' className='ds-bst-biomebtn' data-active={showBiomes} onClick={() => setShowBiomes(!showBiomes)}>
+						{showBiomes ? 'Back to monsters' : 'Biome goals'}
 					</button>
 				</div>
 			</div>
-			{showBiomes ? <BiomeStrip goals={biomes} busy={busy} onClaimBiome={onClaimBiome} /> : null}
-			<div className='ds-bst-body'>
-				<Inset className='ds-mons'>
-					{cards.length === 0 ? (
-						<div className='ds-bst-empty'>
-							<img src={SILHOUETTE} alt='' />
-							<b>{filter === 'ready' ? 'No rewards waiting' : 'No monsters here yet'}</b>
-							<span className='ds-dim'>
-								{filter === 'ready' ? 'Reach a mastery tier and it shows up here.' : 'Nothing matches this filter. Try another one.'}
-							</span>
-							<Button
-								size='sm'
-								onClick={() => {
-									setFilter('all');
-									setFamily('all');
-								}}
-							>
-								Show all
-							</Button>
-						</div>
-					) : null}
-					{cards.map((e) => (
-						<Card key={e.id} e={e} active={e.id === m.id} onPick={() => setSel(e.id)} />
-					))}
-				</Inset>
-				<Detail key={m.id} e={m} busy={busy} onClaim={onClaim} />
+			<div className='ds-bst-main'>
+				{showBiomes ? <BiomeGoals goals={biomes} busy={busy} onClaimBiome={onClaimBiome} /> : null}
+				<div className='ds-bst-body'>
+					<Inset className='ds-mons'>
+						{cards.length === 0 ? (
+							<div className='ds-bst-empty'>
+								<img src={SILHOUETTE} alt='' />
+								<b>{filter === 'ready' ? 'No rewards waiting' : 'No monsters here yet'}</b>
+								<span className='ds-dim'>
+									{filter === 'ready' ? 'Reach a mastery tier and it shows up here.' : 'Nothing matches this filter. Try another one.'}
+								</span>
+								<Button
+									size='sm'
+									onClick={() => {
+										setFilter('all');
+										setFamily('all');
+									}}
+								>
+									Show all
+								</Button>
+							</div>
+						) : null}
+						{cards.map((e) => (
+							<Card key={e.id} e={e} active={e.id === m.id} onPick={() => setSel(e.id)} />
+						))}
+					</Inset>
+					<Detail key={m.id} e={m} busy={busy} onClaim={onClaim} />
+				</div>
 			</div>
 		</div>
 	);

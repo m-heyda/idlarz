@@ -5713,3 +5713,203 @@ button.ds-income-head:hover {
 	font-size: 16px;
 	color: var(--ds-gold-lt);
 }
+
+/* Bestiary: boss tag, custom dropdown, biome goals overlay */
+.ds-mon-lv[data-boss='true'] {
+	background: #b3201a;
+}
+
+.ds-bst-main {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+}
+
+.ds-bst-main > .ds-bst-body {
+	flex: 1;
+}
+
+.ds-bst-bar .ds-filters .ds-bst-biomebtn {
+	color: #eaffea;
+	font-weight: 700;
+	background: linear-gradient(#3fae4b, #1f7a2a);
+	border-color: #0f4a18;
+	box-shadow: 0 0 8px rgba(80, 220, 100, 0.45);
+}
+
+.ds-bst-bar .ds-filters .ds-bst-biomebtn:hover,
+.ds-bst-bar .ds-filters .ds-bst-biomebtn[data-active='true'] {
+	background: linear-gradient(#55c862, #2a9a38);
+}
+
+.ds-dd {
+	position: relative;
+}
+
+.ds-dd-btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	font: inherit;
+	font-size: 12px;
+	color: var(--ds-text);
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid var(--ds-line-dk);
+	padding: 4px 8px;
+	cursor: pointer;
+}
+
+.ds-dd-btn[data-active='true'] {
+	border-color: var(--ds-gold);
+	color: var(--ds-gold-lt);
+}
+
+.ds-dd-btn i {
+	font-style: normal;
+	font-size: 10px;
+}
+
+.ds-dd-list {
+	position: absolute;
+	z-index: 30;
+	top: calc(100% + 3px);
+	right: 0;
+	min-width: 100%;
+	max-height: 280px;
+	overflow: auto;
+	margin: 0;
+	padding: 3px;
+	list-style: none;
+	background: linear-gradient(#1c1510, #0e0905);
+	border: 1px solid var(--ds-gold);
+	box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
+}
+
+.ds-dd-list button {
+	display: block;
+	width: 100%;
+	text-align: left;
+	font: inherit;
+	font-size: 12px;
+	white-space: nowrap;
+	color: var(--ds-text);
+	background: none;
+	border: 0;
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+.ds-dd-list button:hover {
+	background: rgba(255, 255, 255, 0.07);
+}
+
+.ds-dd-list button[data-active='true'] {
+	color: var(--ds-gold-lt);
+	background: color-mix(in srgb, var(--ds-gold) 14%, transparent);
+}
+
+.ds-bst-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 20;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	overflow: auto;
+	background: #0a0705;
+	border: 1px solid #1f7a2a;
+}
+
+.ds-bst-goals-head {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+
+.ds-bst-goals-head b {
+	font-size: 16px;
+	color: #7ad07a;
+}
+
+.ds-bst-goals {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: max-content;
+}
+
+.ds-bst-goal-row {
+	display: grid;
+	gap: 6px;
+	align-items: stretch;
+}
+
+.ds-bst-goal-name,
+.ds-bst-goal,
+.ds-bst-goal-short {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 10px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line-dk);
+}
+
+.ds-bst-goal-name {
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 4px;
+}
+
+.ds-bst-goal-name b {
+	font-size: 14px;
+}
+
+.ds-bst-goal {
+	justify-content: space-between;
+}
+
+.ds-bst-goal-tier {
+	font-size: 11px;
+	color: var(--ds-text-dim);
+}
+
+.ds-bst-goal-text,
+.ds-bst-goal em {
+	white-space: nowrap;
+	font-size: 12px;
+}
+
+.ds-bst-goal-text {
+	flex: 1;
+}
+
+.ds-bst-goal em {
+	font-style: normal;
+	color: var(--ds-text-dim);
+}
+
+.ds-bst-goal[data-state='claimed'] {
+	border-color: #1f7a2a;
+}
+
+.ds-bst-goal[data-state='claimed'] em {
+	color: #7ad07a;
+}
+
+.ds-bst-goal[data-state='claim'] {
+	border-color: var(--ds-gold);
+	background: color-mix(in srgb, var(--ds-gold) 12%, rgba(0, 0, 0, 0.5));
+}
+
+.ds-bst-goal[data-state='locked'] {
+	opacity: 0.65;
+}
+
+.ds-bst-goal-short {
+	font-size: 12px;
+	white-space: nowrap;
+}
