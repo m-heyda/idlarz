@@ -360,7 +360,7 @@ make the first purchases expensive. Pass the state&#39;s <code>freeTiles</code>.
 </code></pre>
 </article><h2>Biomes</h2><article><p><a id="rollbiome"></a></p>
 <h3><code>rollBiome</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/biomeRules.ts"><code>src/utils/biomeRules.ts:129</code></a></p>
+<p>Source: <a href="../../src/utils/biomeRules.ts"><code>src/utils/biomeRules.ts:149</code></a></p>
 <p>The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra
 same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
 (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).</p>
@@ -372,7 +372,10 @@ below it the biome is never allowed, so it can neither be rolled nor copied from
 <li>Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.</li>
 <li>Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
 plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with <code>buddyPct</code> 100.</li>
-<li>Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.</li>
+<li>A rebirth biome also needs distance from the castle (<code>BIOME_RULES.minCastleDistance</code>, Chebyshev): jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
+so it cannot be rolled or copied from a neighbour there.</li>
+<li>Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance (<code>distanceWeight</code>): basic biomes fade
+from x1 at 10 tiles to x0.25 at 30, a rebirth biome ramps from x3/8 at its minimum distance to x3 eight tiles further.</li>
 <li>The start ring (the four free tiles) is plains and forest only, at least two plains (<a href="#generatestartring"><code>generateStartRing</code></a>).</li>
 </ul>
 </article><article><p><a id="biomes"></a></p>
@@ -499,7 +502,7 @@ output of the basic tile it is measured against (per second, before <code>BIOME_
 </tbody></table>
 </article><article><p><a id="generatestartring"></a></p>
 <h3><code>generateStartRing</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/biomeRules.ts"><code>src/utils/biomeRules.ts:189</code></a></p>
+<p>Source: <a href="../../src/utils/biomeRules.ts"><code>src/utils/biomeRules.ts:210</code></a></p>
 <p>The castle&#39;s four starting neighbours for a new game: the basic biomes (plains most), always at least <code>minPlains</code>
 plains and never more than <code>maxOfOther</code> of any other biome. Retries with the same random source until it fits.</p>
 </article><h2>Castle</h2><article><p><a id="castle-upgrade"></a></p>

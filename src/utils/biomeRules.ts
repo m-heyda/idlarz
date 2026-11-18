@@ -2,6 +2,7 @@ import { BIOMES, BIOME_SPAWN, SPECIAL_SINGLE_TYPE_BIOMES, EMPTY_BIOMES } from '@
 import { isLiveBiome } from '@/config/biomeStage';
 import { BIOME_RULES } from '@/config/biomeRules';
 import type { BiomeType, Tile } from '@/types/game';
+import { castleDistance } from '@/lib/distance';
 import { getTile, type World } from '@/utils/world';
 
 /** Whether a biome may turn up on one tile, and why not. */
@@ -49,14 +50,30 @@ export const SELECTABLE_BIOMES = Object.keys(BIOMES).filter(
 	(name) => !SPECIAL_SINGLE_TYPE_BIOMES.includes(name as BiomeType) && !EMPTY_BIOMES.includes(name as BiomeType) && isLiveBiome(name),
 ) as BiomeType[];
 
+/**
+ * Weight multiplier of a biome on a tile `distance` from the castle (see `BIOME_RULES.distanceWeights`): the basic biomes fade to a floor far from home,
+ * a rebirth biome with a minimum distance ramps up from there.
+ */
+export function distanceWeight(biome: BiomeType, distance: number): number {
+	const w = BIOME_RULES.distanceWeights;
+	const min = BIOME_RULES.minCastleDistance[biome];
+	if (min !== undefined) return w.newMaxWeight * Math.min(1, Math.max(0, distance - min + 1) / w.rampTiles);
+	if (distance <= w.basicFadeFrom) return 1;
+	const t = Math.min(1, (distance - w.basicFadeFrom) / (w.basicFadeTo - w.basicFadeFrom));
+	return 1 - t * (1 - w.basicFloor);
+}
+
 /** Verdict for each biome a purchase can produce on tile (x, y) after `purchased` purchases in a run that follows `rebirths` completed rebirths (0 = a first run). */
 export function biomeVerdicts(tiles: World, x: number, y: number, purchased: number, rebirths = 0): BiomeVerdict[] {
 	const { four, eight } = neighbourBiomes(tiles, x, y);
 	const hasWater = eight.some((b) => b === 'lake' || b === 'coast');
+	const distance = castleDistance({ x, y });
 	return SELECTABLE_BIOMES.map((biome) => {
 		const ext = four.includes(biome);
 		const needRebirths = BIOME_RULES.unlockAfterRebirths[biome] ?? 0;
 		if (rebirths < needRebirths) return { biome, allowed: false, reason: `Unlocks after rebirth ${needRebirths}` };
+		const minDistance = BIOME_RULES.minCastleDistance[biome] ?? 0;
+		if (distance < minDistance) return { biome, allowed: false, reason: `Only ${minDistance}+ tiles from the castle` };
 		const unlock = BIOME_RULES.unlockAfterPurchases[biome] ?? 0;
 		if (purchased < unlock) return { biome, allowed: false, reason: `Unlocks after ${unlock} tiles` };
 		if (!BIOME_RULES.neutral.includes(biome)) {
@@ -120,7 +137,10 @@ function weighted<T>(items: [T, number][], roll: number): T {
  * - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
  * - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
  *   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
- * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
+ * - A rebirth biome also needs distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
+ *   so it cannot be rolled or copied from a neighbour there.
+ * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance ({@link distanceWeight}): basic biomes fade
+ *   from x1 at 10 tiles to x0.25 at 30, a rebirth biome ramps from x3/8 at its minimum distance to x3 eight tiles further.
  * - The start ring (the four free tiles) is plains and forest only, at least two plains ({@link generateStartRing}).
  *
  * @category Economy/Biomes
@@ -160,10 +180,11 @@ export function rollBiome(tiles: World, x: number, y: number, purchased: number,
 		if (random() * 100 < pct) return pick;
 	}
 
+	const distance = castleDistance({ x, y });
 	const nearLake = four.includes('lake');
 	const nearCoast = four.includes('coast');
 	const weights = allowed.map((b): [BiomeType, number] => {
-		let w = BIOME_SPAWN.weights[b] ?? 1;
+		let w = (BIOME_SPAWN.weights[b] ?? 1) * distanceWeight(b, distance);
 		if (nearLake) w *= BIOME_SPAWN.nearLake[b] ?? 1;
 		if (nearCoast) w *= BIOME_SPAWN.nearCoast[b] ?? 1;
 		return [b, w];

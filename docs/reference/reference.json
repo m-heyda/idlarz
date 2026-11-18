@@ -3159,7 +3159,7 @@
   "kind": "function",
   "category": "Economy/Biomes",
   "file": "src/utils/biomeRules.ts",
-  "line": 129,
+  "line": 149,
   "summary": "The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore (BIOME_SPAWN). Always returns an allowed biome (plains is never blocked).",
   "see": []
  },
@@ -3170,7 +3170,7 @@
   "kind": "function",
   "category": "Economy/Biomes",
   "file": "src/utils/biomeRules.ts",
-  "line": 189,
+  "line": 210,
   "summary": "The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains` plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.",
   "see": []
  },

@@ -151,7 +151,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gemChance` | Economy / Chests and Luck | [`src/lib/luck.ts:50`](../../src/lib/luck.ts) | Chance (0-1) that a chest also holds gems. |
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:322`](../../src/lib/loot/generate.ts) | Everything one source gives. |
 | `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
-| `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
+| `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:210`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
 | GET /api/rankings | Saves & Server / Endpoints | [`src/app/api/rankings/route.ts:23`](../../src/app/api/rankings/route.ts) | The Rankings: |
 | Giving a flagged account its trust back (restore-trust) | Ops / Operator guides | [`scripts/restore-trust.ts:1`](../../scripts/restore-trust.ts) | The way back for a false-positive flag (IDL-209): |
 | `goldenMonsterChance` | Economy / Chests and Luck | [`src/lib/luck.ts:67`](../../src/lib/luck.ts) | Chance (0-1) that a newly arrived rat is a lucky one. |
@@ -259,7 +259,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
 | `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:90`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
-| `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
+| `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:149`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:117`](../../src/lib/craftGear.ts) | One crafted piece: |

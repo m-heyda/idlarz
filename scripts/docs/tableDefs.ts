@@ -57,7 +57,8 @@ import { cumulativeXp, totalStatPoints } from '../../src/utils/game/character';
 import { emberGain, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { monsterStats, spawnLevelRange } from '../../src/lib/monsters';
 import { COORD_LIMIT, MAX_OWNED_TILES } from '../../src/utils/world';
-import { SELECTABLE_BIOMES } from '../../src/utils/biomeRules';
+import { SELECTABLE_BIOMES, distanceWeight } from '../../src/utils/biomeRules';
+import type { BiomeType } from '../../src/types/game';
 import { PERSISTED_KEYS } from '../../src/lib/sanitizeSave';
 import { SYNC } from '../../src/lib/syncPolicy';
 import { MANUAL_CLOUD_COOLDOWN_MS } from '../../src/lib/manualCloudSave';
@@ -132,6 +133,18 @@ TABLES['rebirth-biome-output'] = () => ({
 	md: mdTable(
 		['Biome', 'Unlocks after rebirth', 'Measured against', 'Multiplier', 'Config output / s'],
 		Object.entries(REBIRTH_BIOME_OUTPUT).map(([b, o]) => [BIOMES[b].label, BIOME_RULES.unlockAfterRebirths[b], o.measuredAgainst, `x${o.multiplier}`, res(BIOMES[b].resourceGeneration as Record<string, number>)]),
+	),
+});
+
+TABLES['biome-distance-weights'] = () => ({
+	title: 'Biome weight by castle distance (the multiplier on the weighted roll; a rebirth biome is not allowed nearer than its minimum)',
+	md: mdTable(
+		['Castle distance', ...Object.keys(BIOME_RULES.minCastleDistance).map((b) => BIOMES[b].label), 'Basic biomes'],
+		[5, 10, 14, 18, 22, 30, 40].map((d) => [
+			d,
+			...Object.keys(BIOME_RULES.minCastleDistance).map((b) => (d < BIOME_RULES.minCastleDistance[b] ? 'not allowed' : `x${+distanceWeight(b as BiomeType, d).toFixed(2)}`)),
+			`x${+distanceWeight('plains', d).toFixed(2)}`,
+		]),
 	),
 });
 
