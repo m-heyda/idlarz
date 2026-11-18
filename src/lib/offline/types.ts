@@ -68,8 +68,20 @@ export interface PublicChest {
 	y: number;
 }
 
+/** A rock standing on the map: its tier, the clicks it has taken and the clicks it needs (the server's numbers). */
+export interface PublicRock {
+	n: number;
+	x: number;
+	y: number;
+	tier: import('@/config/rocks').RockTier;
+	hits: number;
+	need: number;
+}
+
 export interface PublicTickets {
 	chests: PublicChest[];
+	/** The rocks standing on the map (left out by older servers) */
+	rocks?: PublicRock[];
 	/**
 	 * How many chests this run has opened, as the server counted when it made this answer. The browser uses it to tell an answer that
 	 * was made before one of its own chest opens (it still counts that chest) from one made after it. Left out by older servers.
@@ -109,6 +121,38 @@ export type ChestReward =
 			received?: { convertedGold: number; autoSold: { count: number; gold: number } };
 			/** The junk materials the chest held on top of its reward (already in the bag; the gold of what did not fit is in `received`) */
 			junk?: Drop[];
+			inv?: Inventory;
+	  }
+	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };
+
+/**
+ * A batch of clicks on a rock, answered by the server: how many it let in (`hits` is the rock's total now), and, when the rock broke, what it dropped (`stone`, `coal` and `stash`, the ingredients that went into the crafting bag; already paid on the server).
+ * `no_ticket`: there is no rock on that tile (it was broken, or it was never real).
+ */
+export type RockReply =
+	| {
+			ok: true;
+			tier: import('@/config/rocks').RockTier;
+			hits: number;
+			need: number;
+			accepted: number;
+			broken: false;
+			tickets: PublicTickets;
+			serverNowSec: number;
+			gemsTotal: number;
+			inv?: Inventory;
+	  }
+	| {
+			ok: true;
+			tier: import('@/config/rocks').RockTier;
+			hits: number;
+			need: number;
+			accepted: number;
+			broken: true;
+			loot: { stone: number; coal: number; stash: Record<string, number> };
+			tickets: PublicTickets;
+			serverNowSec: number;
+			gemsTotal: number;
 			inv?: Inventory;
 	  }
 	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };

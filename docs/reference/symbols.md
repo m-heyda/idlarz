@@ -10,7 +10,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Achievements | Progression / Achievements | [`src/catalog/achievements.ts:116`](../../src/catalog/achievements.ts) | The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:310`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
-| `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
+| `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:182`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
 | `aggregateStats` | Economy / Perk caps | [`src/lib/inventory.ts:243`](../../src/lib/inventory.ts) | The one place gear is summed: |
 | `allocatePoints` | Progression / Levels | [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts) | Puts points into attributes: |
 | `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:255`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
@@ -161,13 +161,13 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `gradeLevels` | Loot / Items | [`src/catalog/items/grades.ts:79`](../../src/catalog/items/grades.ts) | The item level window an item of this grade is generated in. |
 | `gradeRarities` | Loot / Items | [`src/catalog/items/grades.ts:94`](../../src/catalog/items/grades.ts) | The rarities an item of this grade may roll as: |
 | Guest game (/guest) | Architecture / Guest mode | [`src/app/guest/page.tsx:35`](../../src/app/guest/page.tsx) | `/guest`: |
-| Guest mode | Architecture / Guest mode | [`src/lib/guest/dispatch.ts:43`](../../src/lib/guest/dispatch.ts) | Guest mode: |
+| Guest mode | Architecture / Guest mode | [`src/lib/guest/dispatch.ts:45`](../../src/lib/guest/dispatch.ts) | Guest mode: |
 | `guideVisibleFor` | Progression / Guided tutorial | [`src/lib/tutorial/live.ts:35`](../../src/lib/tutorial/live.ts) | Whether Brother Alder is **shown** (the bubbles, the focus layer, the journal tab). |
 | `healAmount` | Combat / Potions and skills | [`src/lib/skills.ts:21`](../../src/lib/skills.ts) | HP a Heal restores: |
 | `IDOL_RULES` | Economy / Buildings | [`src/config/buildings.ts:58`](../../src/config/buildings.ts) | The Idols (IDL-96, docs/plan/18 section 6): |
 | `idolEconomy` | Economy / Buildings | [`src/lib/idolEconomy.ts:80`](../../src/lib/idolEconomy.ts) | The economy effects of the standing Idols. |
 | `IDOLS` | Economy / Buildings | [`src/catalog/idols.ts:41`](../../src/catalog/idols.ts) | The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): |
-| `INGREDIENTS` | Economy / Crafting | [`src/catalog/ingredients.ts:31`](../../src/catalog/ingredients.ts) | The ingredients and what is planned for each (none of it is built yet). |
+| `INGREDIENTS` | Economy / Crafting | [`src/catalog/ingredients.ts:32`](../../src/catalog/ingredients.ts) | The ingredients and what is planned for each (none of it is built yet). |
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
 | `isInWard` | Economy / Castle | [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts) | Is this tile inside the ward: |
@@ -225,7 +225,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `pickTarget` | Combat / A fight | [`src/lib/offline/fightTargets.ts:39`](../../src/lib/offline/fightTargets.ts) | The next monster to engage: |
 | `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:81`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
 | Pixel art pipeline | Architecture / Art | [`src/config/pixelIcons.ts:1`](../../src/config/pixelIcons.ts) | All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: |
-| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:74`](../../src/lib/offline/placement.ts) | Looks at the land: |
+| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:79`](../../src/lib/offline/placement.ts) | Looks at the land: |
 | `playerProfile` | Combat / A fight | [`src/lib/offline/profile.ts:65`](../../src/lib/offline/profile.ts) | Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, l... |
 | `POISON_FLAGS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:156`](../../src/lib/cloudSave/verify.ts) | Flags that make an account ineligible for rankings for good. |
 | `potionCooldownSec` | Combat / Potions and skills | [`src/lib/potionBelt.ts:17`](../../src/lib/potionBelt.ts) | The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s... |
@@ -261,6 +261,12 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `restThrough` | Combat / Results and rest | [`src/lib/offline/fight.ts:164`](../../src/lib/offline/fight.ts) | After an absence the player is back on their feet: |
 | `rewardWeights` | Economy / Chests and Luck | [`src/lib/chests.ts:90`](../../src/lib/chests.ts) | Relative chances with Luck shifted from plain gold toward the lucky chest and the item. |
 | `rngFor` | Combat / A fight | [`src/lib/offline/fightContext.ts:81`](../../src/lib/offline/fightContext.ts) | The next random stream of a fight: |
+| `ROCK` | Economy / Rocks and Mining | [`src/config/rocks.ts:50`](../../src/config/rocks.ts) | How rocks appear and how fast they may be mined (server rules). |
+| `ROCK_DROPS` | Economy / Rocks and Mining | [`src/config/rocks.ts:74`](../../src/config/rocks.ts) | What each tier drops. |
+| `ROCK_TIERS` | Economy / Rocks and Mining | [`src/config/rocks.ts:25`](../../src/config/rocks.ts) | The rock tiers. |
+| `rockCap` | Economy / Rocks and Mining | [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts) | The most rocks that wait at once on a map with `free` tiles a monster could stand on. |
+| `rockIntervalSec` | Economy / Rocks and Mining | [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts) | Seconds of play time between two new rocks. |
+| `rockSpots` | Economy / Rocks and Mining | [`src/lib/rocks.ts:15`](../../src/lib/rocks.ts) | The tiles a rock could stand on: |
 | `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:149`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
@@ -268,6 +274,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:112`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
 | `rollJunkLoot` | Loot / Junk | [`src/lib/loot/junkDrops.ts:71`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:90`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
+| `rollRockLoot` | Economy / Rocks and Mining | [`src/lib/rocks.ts:108`](../../src/lib/rocks.ts) | Rolls what a broken rock drops, line by line of its tier's table (ROCK_DROPS); |
+| `rollRockTier` | Economy / Rocks and Mining | [`src/lib/rocks.ts:59`](../../src/lib/rocks.ts) | The tier of a new rock: |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:68`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
 | `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:219`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
@@ -291,6 +299,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `statsWithoutTutorial` | Saves & Server / The ledger | [`src/lib/offline/statsReset.ts:11`](../../src/lib/offline/statsReset.ts) | The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, ches... |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:173`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
+| `takeClicks` | Economy / Rocks and Mining | [`src/lib/rocks.ts:84`](../../src/lib/rocks.ts) | How many of `clicks` the server lets in for a rock at `nowSec`: |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
 | The boards | Progression / Rankings | [`src/lib/rankings.ts:41`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
@@ -308,7 +317,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
 | The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:125`](../../src/app/GameApp.tsx) | The tick loop. |
-| `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
+| `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |
 | `tierGems` | Progression / Deeds | [`src/catalog/deedRewards.ts:17`](../../src/catalog/deedRewards.ts) | Gems paid for tier `index` (0-based) of a deed: |
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |

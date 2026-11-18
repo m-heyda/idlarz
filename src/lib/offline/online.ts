@@ -32,9 +32,12 @@ import {
 	type ServiceDeps,
 	type StepOutcome,
 } from '@/lib/offline/service';
-import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
+import { advanceBank, rockAt, rocksOf, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
+import { ROCK_TIERS } from '@/config/rocks';
+import { rollRockLoot, takeClicks } from '@/lib/rocks';
+import { stashIn } from '@/lib/offline/reward';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
-import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
@@ -249,6 +252,82 @@ export const redeemChest = (
 					serverNowSec: nowSec,
 					...(received ? { received } : {}),
 					junk: junkIn.received.stored,
+				},
+			};
+		},
+		invVer,
+	);
+
+/**
+ * A batch of `clicks` on the rock that stands on tile (x, y) (IDL-376). The server lets in what a person could have clicked since the last batch (`takeClicks`), keeps the rock's hit count in the bank, and when it reaches the clicks the rock's tier needs, breaks it:
+ * the loot is rolled from the secret, sealed on the number of rocks broken this run, and paid here (stone and coal into the granted totals, ingredients into the crafting bag). A tile with no rock gives `no_ticket`.
+ */
+export const hitRock = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string,
+	spot: { x: number; y: number },
+	clicks: number,
+	nowMs: number,
+	invVer?: number,
+): Promise<Online<RockReply>> =>
+	onlineStep(
+		deps,
+		userId,
+		key,
+		nowMs,
+		({ ledger, stored, bank, nowSec }): { ledger: Ledger; value: RockReply } => {
+			const rock = rockAt(bank, spot.x, spot.y);
+			if (!rock) {
+				return {
+					ledger: { ...ledger, bank },
+					value: { ok: false, reason: 'no_ticket', tickets: publicTickets(bank, ledger.ordChest), serverNowSec: nowSec, gemsTotal: ledger.gems },
+				};
+			}
+			const need = ROCK_TIERS[rock.tier].clicks;
+			const { accepted, tokens } = takeClicks(rock, clicks, nowSec);
+			const hits = Math.min(need, rock.hits + accepted);
+			if (hits < need) {
+				const next: TicketBank = { ...bank, rocks: rocksOf(bank).map((r) => (r.n === rock.n ? { ...r, hits, tokens, hitAt: nowSec } : r)) };
+				return {
+					ledger: { ...ledger, bank: next },
+					value: {
+						ok: true,
+						tier: rock.tier,
+						hits,
+						need,
+						accepted,
+						broken: false,
+						tickets: publicTickets(next, ledger.ordChest),
+						serverNowSec: nowSec,
+						gemsTotal: ledger.gems,
+					},
+				};
+			}
+			const rocksBroken = (bank.rocksBroken ?? 0) + 1;
+			const rng = sealedRng(deps.secret, userId, ledger.runId, 'rockloot', rocksBroken);
+			const { rates, derived } = stored.summary;
+			const loot = rollRockLoot(rock.tier, { rates: { stone: rates.stone, coal: rates.coal }, luck: derived.luck }, rng);
+			const stashed = stashIn(ledger.craft.stock, loot.stash);
+			const next: TicketBank = { ...bank, rocks: rocksOf(bank).filter((r) => r.n !== rock.n), rocksBroken };
+			return {
+				ledger: {
+					...ledger,
+					bank: next,
+					craft: Object.keys(stashed.stored).length > 0 ? { ...ledger.craft, stock: stashed.stock } : ledger.craft,
+					granted: addTotals(ledger.granted, loot.resources),
+				},
+				value: {
+					ok: true,
+					tier: rock.tier,
+					hits: need,
+					need,
+					accepted,
+					broken: true,
+					loot: { ...loot.resources, stash: stashed.stored },
+					tickets: publicTickets(next, ledger.ordChest),
+					serverNowSec: nowSec,
+					gemsTotal: ledger.gems,
 				},
 			};
 		},

@@ -220,7 +220,7 @@ look = ANIMAL_PIXEL_ICONS[kind][hash(seed) mod number of looks], hash(s) = fold 
 
 ### Guest mode
 
-Source: [`src/lib/guest/dispatch.ts:43`](../../src/lib/guest/dispatch.ts)
+Source: [`src/lib/guest/dispatch.ts:45`](../../src/lib/guest/dispatch.ts)
 
 Guest mode: the game's /api calls answered in the browser by the same engine the server runs (`src/lib/offline/*`: spawns, chests, fights, loot, crafting, the gem shop, rebirth, offline claims), against the guest's own
 ledger in `localStorage` and a "saved game" built from the live game. Nothing leaves the browser, nothing is checked against a database, and nothing is ranked: the loot secret is public and the save is never verified, so a guest may cheat, and

@@ -251,6 +251,22 @@
 	},
 	{
 		"usedBy": [
+			"junk_crystal"
+		],
+		"name": "art_junk_crystal",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_crystal.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_dark_potion"
 		],
 		"name": "art_junk_dark_potion",
@@ -385,6 +401,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_glowberry.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_gold_ore"
+		],
+		"name": "art_junk_gold_ore",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_gold_ore.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -593,6 +625,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_scrap.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_silver_ore"
+		],
+		"name": "art_junk_silver_ore",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_silver_ore.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -16431,6 +16479,81 @@
 		]
 	},
 	{
+		"usedBy": [
+			"rocks"
+		],
+		"name": "rock_copper",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_copper.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"rocks"
+		],
+		"name": "rock_crystal",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_crystal.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"rocks"
+		],
+		"name": "rock_gold",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_gold.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"rocks"
+		],
+		"name": "rock_silver",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_silver.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"rocks"
+		],
+		"name": "rock_stone",
+		"category": "map-details",
+		"subcategory": "mineable rocks",
+		"src": "/pixel/rocks/rock_stone.png",
+		"status": "used",
+		"source": "rocks",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "mineral_black_crystal1",
 		"category": "map-details",
@@ -21473,6 +21596,21 @@
 		"size": [
 			143,
 			143
+		]
+	},
+	{
+		"usedBy": [
+			"code"
+		],
+		"name": "ui_cursor_pickaxe",
+		"category": "ui",
+		"subcategory": "frames and bars",
+		"src": "/pixel/ui/cursor_pickaxe.png",
+		"status": "used",
+		"source": "public/pixel/ui",
+		"size": [
+			32,
+			32
 		]
 	},
 	{

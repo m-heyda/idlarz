@@ -51,6 +51,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run seed-rehearsal` | `tsx scripts/seed-rehearsal-account.ts` |
 | `npm run seed-dev-world` | `tsx scripts/seed-dev-world.ts` |
 | `npm run grant-test-items` | `tsx scripts/grant-test-items.ts` |
+| `npm run grant-test-rocks` | `tsx scripts/grant-test-rocks.ts` |
 | `npm run gen-save-fixtures` | `tsx scripts/gen-save-fixtures.ts` |
 | `npm run fight-sim` | `tsx scripts/fight-sim.ts` |
 | `npm run perk-caps` | `tsx scripts/perk-caps.ts` |

@@ -25,6 +25,9 @@ import { openTileMenu } from './TileMenu';
 import { buildingDef } from '@/catalog/buildings';
 import { buildingUpgradeDuration } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { rockSprite } from '@/config/rocks';
+import { hitRockAt } from '@/lib/rockClient';
+import { rockKey, useRockStore } from '@/stores/rockStore';
 
 const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = false }) => {
 	const { game, onTile, drag } = useMapSource();
@@ -58,6 +61,9 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 		},
 		(target) => !!target.closest(`#tile-${x}-${y}`),
 	);
+
+	// A rock the server put on this tile (never on the map lab, which has no server): the store view is replaced on every click, so the tile redraws for its own rock only
+	const rock = useRockStore((state) => (isOwned && !onTile ? state.rocks[rockKey(x, y)] : undefined));
 
 	// Check if this tile has a chest
 	const hasChest = game((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
@@ -113,6 +119,13 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 			// the click sound is for starting a fight: a click that only joins or leaves the queue is silent (it sounded like a purchase)
 			const lineWasOpen = lineOpen;
 			if (e.nativeEvent.isTrusted && startFight(Number(monsterId)) && !lineWasOpen) audioManager.playSound('click');
+			return;
+		}
+
+		// A rock: every click is a hit with the pickaxe (counted here, confirmed by the server in batches); no chest, no gold
+		if (isOwned && rock) {
+			e.stopPropagation();
+			if (e.nativeEvent.isTrusted) hitRockAt(x, y);
 			return;
 		}
 
@@ -185,6 +198,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 			<div
 				id={`tile-${x}-${y}`}
 				data-tutorial={!isOwned && isAdjacent ? 'tile-buy' : isOwned && biome === 'castle' ? 'castle' : hasChest ? 'chest' : monsterKey ? 'monster' : undefined}
+				data-rock={rock ? rock.tier : undefined}
 				className={cn('absolute transition-all duration-200 ease-in-out select-none', {
 					'opacity-100': isOwned,
 					// the ground itself is drawn by TerrainLayer; a tile is a transparent hit area with its overlays
@@ -198,6 +212,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					'opacity-75 border-2 border-red-500': isShaking,
 					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey || !!building),
 					'tile-has-monster': isOwned && !!monsterKey,
+					'tile-has-rock': isOwned && !!rock,
 					'castle-tile': isOwned && biome === 'castle',
 				})}
 				style={{
@@ -298,6 +313,25 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 						/>
 					)}
 
+					{isOwned && rock && (
+						<span className='tile-rock' data-tier={rock.tier} data-breaking={rock.breaking}>
+							<i className='tile-rock-shadow' />
+							{/* eslint-disable-next-line @next/next/no-img-element */}
+							<img
+								key={rock.chop}
+								className={cn('tile-rock-img', rock.chop > 0 && 'chop')}
+								src={rockSprite(rock.tier, rock.n)}
+								alt={`Mineable rock, ${rock.tier}`}
+								draggable={false}
+							/>
+							{rock.hits > 0 && (
+								<span className='tile-rock-bar' aria-hidden>
+									<i style={{ transform: `scaleX(${Math.min(1, rock.hits / rock.need)})` }} />
+								</span>
+							)}
+						</span>
+					)}
+
 					{/* Bonus treasure chest on the tile */}
 					{isOwned && hasChest && biome === 'lake' && (
 						<span className='tile-chest-ripple' aria-label='Something glints in the water'>
@@ -326,6 +360,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					y={y}
 					level={level}
 					hasChest={hasChest}
+					rock={rock ? { tier: rock.tier, hits: rock.hits, need: rock.need } : undefined}
 					showChestTip={showChestTooltip}
 					monster={
 						monsterKey ? { id: Number(monsterId), type: monsterType as MonsterType, level: Number(monsterLevel), art: monsterArt || undefined } : undefined
