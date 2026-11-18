@@ -512,6 +512,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`inventory.ts`](../../src/lib/inventory.ts) — ~ What a character carries after a rebirth:
 - [`inventoryDrag.ts`](../../src/lib/inventoryDrag.ts) — What is being dragged between the bag and the equipment slots (HTML5 drag and drop cannot read data during dragover).
 - [`isRecord.ts`](../../src/lib/isRecord.ts) — A plain JSON object:
+- [`itemCategory.ts`](../../src/lib/itemCategory.ts) — ~ The type line of an item with no gear slot in its tooltip:
 - [`itemInstance.ts`](../../src/lib/itemInstance.ts) — ~ The base stats at this level and quality (no affixes)
 - [`kingdomSummary.ts`](../../src/lib/kingdomSummary.ts) — ~ What the Kingdom overview reads from the game state
 - [`landingWorld.ts`](../../src/lib/landingWorld.ts) — ~ The world behind the landing page:
@@ -1034,6 +1035,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`headerFormat.test.ts`](../../tests/ui/headerFormat.test.ts)
 - [`heroCreator.test.ts`](../../tests/ui/heroCreator.test.ts)
 - [`hoverTipPlacement.test.ts`](../../tests/ui/hoverTipPlacement.test.ts)
+- [`itemCategory.test.ts`](../../tests/ui/itemCategory.test.ts)
 - [`kingdomWindow.test.ts`](../../tests/ui/kingdomWindow.test.ts)
 - [`menuState.test.ts`](../../tests/ui/menuState.test.ts)
 - [`monsterArt.test.ts`](../../tests/ui/monsterArt.test.ts)
