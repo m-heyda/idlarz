@@ -139,7 +139,7 @@ function weighted<T>(items: [T, number][], roll: number): T {
  *   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
  * - A rebirth biome also needs distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
  *   so it cannot be rolled or copied from a neighbour there.
- * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance ({@link distanceWeight}): basic biomes fade
+ * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance (`distanceWeight`): basic biomes fade
  *   from x1 at 10 tiles to x0.25 at 30, a rebirth biome ramps from x3/8 at its minimum distance to x3 eight tiles further.
  * - The start ring (the four free tiles) is plains and forest only, at least two plains ({@link generateStartRing}).
  *

@@ -449,6 +449,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/lib/**
 
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
+- [`bossModifiers.ts`](../../src/lib/bossModifiers.ts) — ~ One chip of the fight panel:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildTimers.ts`](../../src/lib/buildTimers.ts) — ~ One running construction as the bottom-left timer list shows it.
 - [`builders.ts`](../../src/lib/builders.ts) — ~ Builders at work:
@@ -849,6 +850,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **tests/combat/**
 
 - [`battleQueue.test.ts`](../../tests/combat/battleQueue.test.ts) — ~ A request at `t` seconds after the start.
+- [`bossModifiers.test.ts`](../../tests/combat/bossModifiers.test.ts)
 - [`buffs.test.ts`](../../tests/combat/buffs.test.ts)
 - [`clickLimiter.test.ts`](../../tests/combat/clickLimiter.test.ts)
 - [`clientCombat.test.ts`](../../tests/combat/clientCombat.test.ts) — ~ The player's things as the server would hold them right now:

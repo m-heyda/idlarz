@@ -18,6 +18,7 @@ const FX_INDEX: Partial<Record<FightEvent['kind'], number>> = {
 	potion: PLAN_FX_KINDS.indexOf('heal'),
 	stun: PLAN_FX_KINDS.indexOf('stun'),
 	resist: PLAN_FX_KINDS.indexOf('resist'),
+	poison: PLAN_FX_KINDS.indexOf('poison'),
 };
 
 /**
@@ -32,7 +33,14 @@ const FX_INDEX: Partial<Record<FightEvent['kind'], number>> = {
 export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): FightPlan | null => {
 	const f = c.fight;
 	if (!f) return null;
-	const sim: CombatState = { ...c, cd: { ...c.cd }, fight: { ...f }, queue: [...c.queue], retryAt: { ...c.retryAt }, log: [] };
+	const sim: CombatState = {
+		...c,
+		cd: { ...c.cd },
+		fight: { ...f, ...(f.poison ? { poison: { ...f.poison } } : {}) },
+		queue: [...c.queue],
+		retryAt: { ...c.retryAt },
+		log: [],
+	};
 	const ctx: FightCtx = { env, c: sim, ledger, profileNow: f.profile, potionIds: healingPotionIds() };
 	const start = c.at;
 	const samples: FightPlan['samples'] = [[0, round1(c.hp), round1(f.monsterHp), round1(c.mp)]];

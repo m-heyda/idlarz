@@ -262,7 +262,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:139`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:166`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -298,7 +298,7 @@ Takes a monster off the map without a fight (a monster that cannot be beaten, or
 
 ### `projectFight` <small>function</small>
 
-Source: [`src/lib/offline/fightProject.ts:32`](../../src/lib/offline/fightProject.ts)
+Source: [`src/lib/offline/fightProject.ts:33`](../../src/lib/offline/fightProject.ts)
 
 The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player
 commands something first), as the picture the browser animates: HP of both sides and the hero's mana about once a second, and the swings and
@@ -347,7 +347,7 @@ bucket = Safe if pct >= 100 x safeWinChance (80), Risky if pct >= 100 x minWinCh
 
 ### `estimateWin` <small>function</small>
 
-Source: [`src/lib/offline/winChance.ts:60`](../../src/lib/offline/winChance.ts)
+Source: [`src/lib/offline/winChance.ts:64`](../../src/lib/offline/winChance.ts)
 
 The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that
 cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.
@@ -579,7 +579,7 @@ crit' = min(maxCritChance, crit + critChance/100)       dodge' = min(maxDodge, d
 
 ### `applyUse` <small>function</small>
 
-Source: [`src/lib/offline/consumables.ts:27`](../../src/lib/offline/consumables.ts)
+Source: [`src/lib/offline/consumables.ts:28`](../../src/lib/offline/consumables.ts)
 
 Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 

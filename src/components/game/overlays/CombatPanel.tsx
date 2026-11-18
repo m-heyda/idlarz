@@ -17,13 +17,14 @@ import { HoverTip } from '../../../../packages/design-system/src/components/prim
 import { HintTooltip } from '../../../../packages/design-system/src/components/tooltips';
 import ResourceIcon from '../ResourceIcon';
 import { slotProps } from '../itemUi';
+import { describeModifiers } from '@/lib/bossModifiers';
 import '@/styles/Fight.css';
 import '@/styles/CombatWidget.css';
 
 export interface FloatNumber {
 	id: number;
 	text: string;
-	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'heal' | 'stun' | 'resist';
+	kind: 'dmg' | 'crit' | 'super' | 'hurt' | 'poison' | 'heal' | 'stun' | 'resist';
 	x: number;
 }
 
@@ -370,6 +371,11 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						<span className='fight-boss-traits'>
 							Crits {formatCompact(traits.critChance)}% - resists Stun {formatCompact(traits.stunResist)}% - armor {formatCompact(Math.round(traits.armor))}
 						</span>
+						{describeModifiers(def.modifiers).map((chip) => (
+							<span key={chip.key} className='fight-mod' data-mod={chip.key} title={chip.text}>
+								{chip.label}
+							</span>
+						))}
 					</div>
 				)}
 				{fight && fight.timeLeftSec !== null && (

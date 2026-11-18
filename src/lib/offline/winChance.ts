@@ -1,6 +1,6 @@
 import { COMBAT } from '@/config/combatConfig';
 import { armorReduction, mitigate } from '@/lib/combat';
-import { monsterDef, monsterStats } from '@/lib/monsters';
+import { modifiersOf, monsterDef, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
 
@@ -37,11 +37,15 @@ const expectedHit = (p: PlayerProfile, armor: number): number => {
 };
 
 /** Expected damage per second the monster does to this player (dodges, crits and armor in). */
-const monsterDps = (p: PlayerProfile, type: MonsterType, level: number): number => {
-	const m = monsterStats(type, level);
+const monsterDps = (p: PlayerProfile, type: MonsterType, level: number, elapsedSec = 0): number => {
+	const m = monsterStats(type, level, elapsedSec);
 	const crit = Math.min(1, Math.max(0, m.critChance / 100));
 	const perHit = (1 - crit) * mitigate(m.attack, p.armor) + crit * mitigate(Math.round(m.attack * m.critMult), p.armor);
-	return perHit * m.attackSpeed * (1 - Math.min(1, Math.max(0, p.dodge)));
+	const hits = m.attackSpeed * (1 - Math.min(1, Math.max(0, p.dodge)));
+	const venom = modifiersOf(type).venom;
+	// Venom: the stacks the boss keeps on the hero (about one per landed hit inside the duration, up to the maximum) each cost a share of max HP per second
+	const stacks = venom ? Math.min(venom.maxStacks, hits * venom.durationSec) : 0;
+	return perHit * hits + (venom ? (stacks * venom.pctPerSec * p.maxHp) / 100 : 0);
 };
 
 /**
@@ -66,13 +70,17 @@ export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, lev
 	if (killSec > limit) return { chance: 0, killSec, surviveSec: 0 };
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown
-	const healPerSec = Math.max(0, p.hpRegen) + (dps * Math.max(0, p.leechPct)) / 100;
+	const venomCut = 1 - (modifiersOf(type).venom?.regenCutPct ?? 0) / 100;
+	const healPerSec = Math.max(0, p.hpRegen) * venomCut + (dps * Math.max(0, p.leechPct)) / 100;
 	const potionHp = potions.reduce(
 		(sum, potion) =>
-			sum + potion.healHp * (p.potionPower ?? 1) * Math.min(potion.count, Math.floor(killSec / (p.potionCooldownSec ?? COMBAT.potionCooldownSec)) + 1),
+			sum +
+			potion.healHp *
+				(p.potionPower ?? 1) *
+				Math.min(potion.count, Math.floor(killSec / potionCooldownAgainst(type, p.potionCooldownSec ?? COMBAT.potionCooldownSec)) + 1),
 		0,
 	);
-	const net = monsterDps(p, type, level) - healPerSec;
+	const net = monsterDps(p, type, level, killSec / 2) - healPerSec; // Enrage: the attack speed of the middle of the fight stands for the whole
 	const surviveSec = net <= 0 ? Infinity : (Math.max(0, hp) + potionHp) / net;
 	if (!Number.isFinite(surviveSec)) return { chance: 1, killSec, surviveSec };
 

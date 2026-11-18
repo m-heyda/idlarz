@@ -4,7 +4,7 @@ import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
-import { isBoss, monsterStats } from '@/lib/monsters';
+import { isBoss, modifiersOf, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import { masteryBonusesFor, type MasteryTotals } from '@/lib/mastery';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatCommand, PlayerProfile, QueueResult } from '@/lib/offline/fightTypes';
@@ -49,7 +49,7 @@ export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
 	c.hp += healed;
 	ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
-	if (c.fight) c.cd.potion = profileOf(ctx).potionCooldownSec ?? COMBAT.potionCooldownSec;
+	if (c.fight) c.cd.potion = potionCooldownAgainst(c.fight.type, profileOf(ctx).potionCooldownSec ?? COMBAT.potionCooldownSec);
 	pushEvent(ctx, t, 'potion', { id, amount: Math.round(healed) });
 	return true;
 };
@@ -129,6 +129,33 @@ export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' 
 };
 
 /**
+ * Venom for one tick: every poison stack costs `venom.pctPerSec` % of the hero's max HP per second, and the hero's regeneration is cut by `venom.regenCutPct` % while it lasts (the part of this tick's regeneration that the poison cancels is taken back). The damage is reported as one `poison` event per second of the fight and when the poison runs out. No random numbers.
+ */
+const tickPoison = (
+	ctx: FightCtx,
+	t: number,
+	dt: number,
+	f: NonNullable<FightCtx['c']['fight']>,
+	venom: NonNullable<ReturnType<typeof modifiersOf>['venom']>,
+): void => {
+	const c = ctx.c;
+	const poison = f.poison!;
+	const live = Math.min(dt, poison.leftSec);
+	const regenBack = ((f.profile.hpRegen * dt + regenGain(c, t - dt, dt)) * venom.regenCutPct) / 100;
+	const damage = (poison.stacks * venom.pctPerSec * f.profile.maxHp * live) / 100 + (regenBack * live) / dt;
+	c.hp = Math.max(0, c.hp - damage);
+	f.hurt = (f.hurt ?? 0) + damage;
+	poison.acc += damage;
+	poison.leftSec -= live;
+	const over = poison.leftSec <= EPS;
+	if (poison.acc >= 1 && (over || Math.floor(f.elapsed) > Math.floor(f.elapsed - dt))) {
+		pushEvent(ctx, t, 'poison', { amount: round1(poison.acc) });
+		poison.acc = 0;
+	}
+	if (over) delete f.poison;
+};
+
+/**
  * One tick of the open fight. Returns when the fight ended.
  *
  * One tick of the open fight, in the order of the numbered list on {@link runCombat}.
@@ -140,8 +167,9 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const { c, env } = ctx;
 	const f = c.fight!;
 	const p = f.profile;
-	const monster = monsterStats(f.type, f.level);
 	f.elapsed += dt;
+	const monster = monsterStats(f.type, f.level, f.elapsed);
+	const venom = modifiersOf(f.type).venom;
 	c.hp = Math.min(p.maxHp, c.hp + p.hpRegen * dt + regenGain(c, t - dt, dt));
 	c.mp = Math.min(p.maxMp, c.mp + p.mpRegen * dt);
 	tickCooldowns(ctx, dt);
@@ -190,6 +218,9 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		return;
 	}
 
+	// Venom: the poison costs HP every tick and cuts the regeneration that ticked above (the cut is taken back out of what this tick gave)
+	if (venom && f.poison) tickPoison(ctx, t, dt, f, venom);
+
 	// the monster's swings (a stunned monster does not wind up)
 	f.monsterTimer += dt - stunned;
 	const every = 1 / Math.max(0.01, monster.attackSpeed);
@@ -205,6 +236,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		c.hp = Math.max(0, c.hp - amount);
 		f.hurt = (f.hurt ?? 0) + amount;
 		pushEvent(ctx, t, 'hurt', { amount, crit });
+		if (venom) f.poison = { stacks: Math.min(venom.maxStacks, (f.poison?.stacks ?? 0) + 1), leftSec: venom.durationSec, acc: f.poison?.acc ?? 0 };
 	}
 	if (c.hp <= 0) endFight(ctx, t, 'defeated');
 	else if (f.timeLeftSec === 0 || f.elapsed >= COMBAT.maxFightSec) endFight(ctx, t, 'timeout');

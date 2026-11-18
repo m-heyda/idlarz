@@ -57,7 +57,8 @@ test('an unlocked biome is reachable, but only from its minimum castle distance 
 		let rolled = 0;
 		for (let i = 0; i < 400; i++) if (rollBiome(world, CASTLE_X + min + 12, CASTLE_Y, 40, Math.random, needs(b)) === b) rolled++;
 		assert.ok(rolled > 0, `${b} is rolled far out`);
-		for (let i = 0; i < 400; i++) assert.notEqual(rollBiome(world, CASTLE_X + min - 1, CASTLE_Y, 40, Math.random, needs(b)), b, `${b} rolled inside its minimum`);
+		for (let i = 0; i < 400; i++)
+			assert.notEqual(rollBiome(world, CASTLE_X + min - 1, CASTLE_Y, 40, Math.random, needs(b)), b, `${b} rolled inside its minimum`);
 	}
 });
 
@@ -100,9 +101,15 @@ test("the buy action rolls with the run's rebirth count: rebirth 0 never grows a
 	};
 	const first = seenAt(0);
 	for (const b of NEW_BIOMES) assert.ok(!first.has(b), `${b} in a first run`);
-	// 260 tiles stay within about 8 tiles of the castle, inside every minimum distance: no rebirth biome yet, however many rebirths
-	const late = seenAt(5);
-	for (const b of NEW_BIOMES) assert.ok(!late.has(b), `${b} close to the castle`);
+	// a run with every rebirth unlocked still keeps each rebirth biome beyond its minimum castle distance
+	freshGame();
+	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 5 } }));
+	growTo(260);
+	for (const e of ownedEntries(api().tiles)) {
+		const min = BIOME_RULES.minCastleDistance[e.tile.biome as string];
+		if (min !== undefined)
+			assert.ok(Math.max(Math.abs(e.x - CASTLE_X), Math.abs(e.y - CASTLE_Y)) >= min, `${e.tile.biome} at ${e.x},${e.y} is inside its minimum distance`);
+	}
 });
 
 test('conflicts: blight keeps off lake, coast and orchard; battlefield off swamp; jungle off tundra (never touching in 8 directions)', () => {

@@ -743,13 +743,24 @@
   ]
  },
  {
+  "id": "bossmodifiers",
+  "name": "BossModifiers",
+  "symbol": "BossModifiers",
+  "kind": "interface",
+  "category": "Monsters/Boss modifiers",
+  "file": "src/config/combatConfig.ts",
+  "line": 145,
+  "summary": "What makes a boss fight different (all optional; a boss may carry one to three). The numbers are looked up from the monster's definition during the fight, so tuning them is a config edit. The browser shows each one as a chip in the fight panel ({@link describeModifiers}, `src/lib/bossModifiers.ts`).",
+  "see": []
+ },
+ {
   "id": "boss-min-distance",
   "name": "BOSS_MIN_DISTANCE",
   "symbol": "BOSS_MIN_DISTANCE",
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 489,
+  "line": 517,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -760,7 +771,7 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 561,
+  "line": 592,
   "summary": "The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
@@ -1201,6 +1212,17 @@
   "file": "src/lib/avatarPick.ts",
   "line": 23,
   "summary": "Optimistic avatar change (the picker used to wait 2-3 s for the server before the new face showed). `pick(id)` shows `id` everywhere at once, then asks the server; the server stays the judge. - The avatar shown right now counts as the request in flight, so picking it again sends nothing. - Only the latest pick may write the final state: a late answer of an earlier pick is `stale` (it only moves the last confirmed avatar forward when it succeeded). - A refused or failed latest pick goes back to the last avatar the server confirmed (not to an earlier optimistic one), and returns the reason to show. - When the server stores another avatar than the one asked for, the server's value is shown. Nothing is stored by the client; saves and ledgers are untouched.",
+  "see": []
+ },
+ {
+  "id": "describemodifiers",
+  "name": "describeModifiers",
+  "symbol": "describeModifiers",
+  "kind": "function",
+  "category": "Monsters/Boss modifiers",
+  "file": "src/lib/bossModifiers.ts",
+  "line": 18,
+  "summary": "The chips a boss shows in the fight panel, one per modifier it carries (none for a monster without). Pure text from the config, so a retune needs no edit here.",
   "see": []
  },
  {
@@ -2227,7 +2249,7 @@
   "kind": "function",
   "category": "Monsters/Level scaling",
   "file": "src/lib/monsters.ts",
-  "line": 39,
+  "line": 51,
   "summary": "The levels a new monster of this type can appear at in a world of this castle level (both ends included).",
   "see": []
  },
@@ -2238,7 +2260,7 @@
   "kind": "function",
   "category": "Monsters/Level scaling",
   "file": "src/lib/monsters.ts",
-  "line": 56,
+  "line": 68,
   "summary": "The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same. `levelCap` (optional) is the highest level the player can still beat (see offline/spawnWeights.ts): a roll above it comes down to it, never below `min`.",
   "see": []
  },
@@ -2249,7 +2271,7 @@
   "kind": "function",
   "category": "Monsters/Level scaling",
   "file": "src/lib/monsters.ts",
-  "line": 74,
+  "line": 86,
   "summary": "Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier.",
   "see": []
  },
@@ -2260,7 +2282,7 @@
   "kind": "function",
   "category": "Monsters/Level scaling",
   "file": "src/lib/monsters.ts",
-  "line": 93,
+  "line": 105,
   "summary": "The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.",
   "see": []
  },
@@ -2271,7 +2293,7 @@
   "kind": "function",
   "category": "Monsters/Level scaling",
   "file": "src/lib/monsters.ts",
-  "line": 117,
+  "line": 132,
   "summary": "HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`).",
   "see": []
  },
@@ -2282,7 +2304,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/monsters.ts",
-  "line": 150,
+  "line": 165,
   "summary": "Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.",
   "see": []
  },
@@ -2408,7 +2430,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/consumables.ts",
-  "line": 27,
+  "line": 28,
   "summary": "Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).",
   "see": []
  },
@@ -2489,7 +2511,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightProject.ts",
-  "line": 32,
+  "line": 33,
   "summary": "The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates: HP of both sides and the hero's mana about once a second, and the swings and spells to fly. Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxFightSec`.",
   "see": []
  },
@@ -2522,7 +2544,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 139,
+  "line": 166,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -2887,7 +2909,7 @@
   "kind": "function",
   "category": "Combat/Win chance",
   "file": "src/lib/offline/winChance.ts",
-  "line": 60,
+  "line": 64,
   "summary": "The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.",
   "see": []
  },

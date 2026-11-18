@@ -28,6 +28,7 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 		if (kind === 'hit' || kind === 'crit' || kind === 'super') emitCombat({ kind: 'hit', damage: amount, killed: false, crit: kind === 'hit' ? 'none' : kind });
 		else if (kind === 'hurt' || kind === 'hurtCrit') emitCombat({ kind: 'hurt', amount, crit: kind === 'hurtCrit' });
 		else if (kind === 'heal' || kind === 'potion') emitCombat({ kind: 'heal', amount });
+		else if (kind === 'poison') emitCombat({ kind: 'poison', amount });
 		else if (kind === 'stun') emitCombat({ kind: 'stun', sec: amount });
 		else if (kind === 'resist') emitCombat({ kind: 'resist' });
 	};
@@ -58,7 +59,7 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 	/** Shows what the server says happened in a fight, with the numbers flying in the order (and roughly the rhythm) they happened. */
 	const playFx = (events: FightEvent[]) => {
 		const recent = events.filter((e) => {
-			if (!['hit', 'crit', 'super', 'hurt', 'heal', 'potion', 'stun', 'resist'].includes(e.kind)) return false;
+			if (!['hit', 'crit', 'super', 'hurt', 'heal', 'potion', 'stun', 'resist', 'poison'].includes(e.kind)) return false;
 			// the plan already flew this one
 			const key = planKey(e.t - planStart, e.kind);
 			const left = planKeys.get(key) ?? 0;

@@ -33,7 +33,8 @@ import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
-import { MONSTERS } from '../../src/config/combatConfig';
+import { MONSTERS, type BossModifiers } from '../../src/config/combatConfig';
+import { describeModifiers } from '../../src/lib/bossModifiers';
 import { BIOME_GOALS, BOSS_MASTERY_TIERS, MASTERY_CAPS, MASTERY_TIERS, bonusText, type MasteryTier } from '../../src/catalog/mastery';
 import { MONSTER_CATALOG } from '../../src/catalog/monsters';
 import { ingredientsOf } from '../../src/catalog/monsterDrops';
@@ -133,6 +134,16 @@ TABLES['rebirth-biome-output'] = () => ({
 	md: mdTable(
 		['Biome', 'Unlocks after rebirth', 'Measured against', 'Multiplier', 'Config output / s'],
 		Object.entries(REBIRTH_BIOME_OUTPUT).map(([b, o]) => [BIOMES[b].label, BIOME_RULES.unlockAfterRebirths[b], o.measuredAgainst, `x${o.multiplier}`, res(BIOMES[b].resourceGeneration as Record<string, number>)]),
+	),
+});
+
+TABLES['boss-modifiers'] = () => ({
+	title: 'Boss modifiers by boss',
+	md: mdTable(
+		['Boss', 'Biome', 'Modifiers'],
+		Object.entries(MONSTERS)
+			.filter(([, d]) => d.grade === 'boss' && 'modifiers' in d && d.modifiers && !('retired' in d && d.retired))
+			.map(([, d]) => [d.label, d.spawn.biomes.join(', '), describeModifiers(d.modifiers as BossModifiers).map((c) => `**${c.label}**: ${c.text}`).join('<br>')]),
 	),
 });
 
