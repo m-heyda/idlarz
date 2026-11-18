@@ -2399,8 +2399,8 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 <p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:51</code></a></p>
 <p>How rocks appear and how fast they may be mined (server rules).</p>
 <ul>
-<li><strong>Timer</strong>: one new rock every 1,200 s (20 minutes) of play time (shorter with Luck, never under 60% of it), half as often as a chest&#39;s 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.</li>
-<li><strong>Room</strong>: at most <code>maxOnMap</code> rocks wait at once, and no more than <code>landShare</code> of the free land (at least <code>minAllowed</code>).</li>
+<li><strong>Timer</strong>: one new rock every 900 s (15 minutes) of play time (shorter with Luck, never under 60% of it). It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.</li>
+<li><strong>Room</strong>: one rock per <code>tilesPerRock</code> (50) tiles you own may wait at once (at least <code>minAllowed</code>), with no other cap: 503 tiles hold up to 10.</li>
 <li><strong>Tiles</strong>: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.</li>
 <li><strong>Clicks</strong>: the browser sends its clicks in batches. The server lets in at most <code>maxCps</code> clicks per second (a bucket of <code>burst</code> clicks), so a rock cannot be broken faster than a person can click.</li>
 </ul>
@@ -2414,19 +2414,15 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 </thead>
 <tbody><tr>
 <td>Seconds between two rocks (no Luck)</td>
-<td>1,200</td>
+<td>900</td>
 </tr>
 <tr>
-<td>Most rocks on the map</td>
-<td>5</td>
+<td>Owned tiles per rock on the map</td>
+<td>50</td>
 </tr>
 <tr>
-<td>Share of the free land</td>
-<td>3%</td>
-</tr>
-<tr>
-<td>Room on 20 / 100 / 1,000 free tiles</td>
-<td>2 / 3 / 5</td>
+<td>Room on 50 / 503 / 1,000 owned tiles</td>
+<td>1 / 10 / 20</td>
 </tr>
 <tr>
 <td>Clicks let in per second</td>
@@ -2443,7 +2439,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 </tbody></table>
 </article><article><p><a id="rock-drops"></a></p>
 <h3><code>ROCK_DROPS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:75</code></a></p>
+<p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:74</code></a></p>
 <p>What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters&#39; ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier&#39;s table.
 Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <code>catalog/ingredients.ts</code>). Ember Coal is the rare one: 1 to 3 at a low chance.</p>
 <p><strong>What a rock drops</strong> <em>(computed from the code)</em></p>
@@ -2634,14 +2630,14 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <p>Source: <a href="../../src/lib/rocks.ts"><code>src/lib/rocks.ts:41</code></a></p>
 <p>Seconds of play time between two new rocks.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
+<pre><code class="language-text">interval = 900 s x max(0.6, 1 / (1 + 0.004 x Luck))
 </code></pre>
 </article><article><p><a id="rockcap"></a></p>
 <h3><code>rockCap</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/rocks.ts"><code>src/lib/rocks.ts:51</code></a></p>
-<p>The most rocks that wait at once on a map with <code>free</code> tiles a monster could stand on.</p>
+<p>The most rocks that wait at once on a map of <code>tilesOwned</code> owned tiles: one per 50 tiles, at least one, no other cap.</p>
 <p><strong>Formula</strong></p>
-<pre><code class="language-text">room = min(15, max(2, floor(free land x 12%)))
+<pre><code class="language-text">room = max(1, floor(tiles owned / 50))
 </code></pre>
 </article><article><p><a id="rollrocktier"></a></p>
 <h3><code>rollRockTier</code> <small>function</small></h3>

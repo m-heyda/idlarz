@@ -1199,7 +1199,7 @@
   "kind": "const",
   "category": "Economy/Rocks and Mining",
   "file": "src/config/rocks.ts",
-  "line": 75,
+  "line": 74,
   "summary": "What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table. Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.",
   "see": []
  },
@@ -3107,7 +3107,7 @@
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
   "line": 51,
-  "summary": "The most rocks that wait at once on a map with `free` tiles a monster could stand on.",
+  "summary": "The most rocks that wait at once on a map of `tilesOwned` owned tiles: one per 50 tiles, at least one, no other cap.",
   "see": []
  },
  {

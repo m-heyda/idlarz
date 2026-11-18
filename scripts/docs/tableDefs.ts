@@ -487,9 +487,8 @@ TABLES['rock-rules'] = () => ({
 		['Rule', 'Value'],
 		[
 			['Seconds between two rocks (no Luck)', fmt(rockIntervalSec(0))],
-			['Most rocks on the map', fmt(ROCK.maxOnMap)],
-			['Share of the free land', `${ROCK.landShare * 100}%`],
-			['Room on 20 / 100 / 1,000 free tiles', [20, 100, 1000].map((n) => rockCap(n)).join(' / ')],
+			['Owned tiles per rock on the map', fmt(ROCK.tilesPerRock)],
+			['Room on 50 / 503 / 1,000 owned tiles', [50, 503, 1000].map((n) => rockCap(n)).join(' / ')],
 			['Clicks let in per second', fmt(ROCK.maxCps)],
 			['Burst of a fresh rock', fmt(ROCK.burst)],
 			['Most clicks in one request', fmt(ROCK.maxBatch)],
