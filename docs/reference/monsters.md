@@ -82,38 +82,38 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | lake | Silt Eel | 1 | 146 | 12 | 2.5 | 0.6 | 10-12 -> 17-19 |
 | lake | Lilypad Warden | 1 | 424 | 7 | 8 | 0.4 | 10-12 -> 17-19 |
 | lake | The Lake Hydra (boss) | 27 | 4,500 | 27 | 45 | 0.33 | 27-30 -> 34-37 |
-| jungle | Skull Vine | 1 | 340 | 9 | 4 | 0.5 | 14-16 -> 18-20 |
-| jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 14-16 -> 18-20 |
-| jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 14-16 -> 18-20 |
-| jungle | Vinewhip Panther | 1 | 190 | 14 | 4 | 0.6 | 14-16 -> 18-20 |
-| jungle | Mossback Idol | 1 | 554 | 8 | 11 | 0.4 | 14-16 -> 18-20 |
-| jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
-| jungle | The Brainstorm (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
-| fields | Barn Gargoyle | 1 | 320 | 13 | 5 | 0.6 | 17-19 -> 21-23 |
-| fields | Bucket Knight | 1 | 520 | 8 | 5 | 0.4 | 17-19 -> 21-23 |
-| fields | Hedge Bandit | 1 | 400 | 11 | 5 | 0.5 | 17-19 -> 21-23 |
-| fields | Crow Marshal | 1 | 224 | 17 | 5 | 0.6 | 17-19 -> 21-23 |
-| fields | Millstone Golem | 1 | 652 | 10 | 13 | 0.4 | 17-19 -> 21-23 |
-| fields | The Harvest Matron (boss) | 37 | 12.5 K | 52 | 80 | 0.33 | 37-40 -> 44-47 |
-| orchard | Greenscale Warden | 1 | 611 | 10 | 6 | 0.4 | 20-22 -> 24-26 |
-| orchard | Blossom Ronin | 1 | 376 | 15 | 6 | 0.6 | 20-22 -> 24-26 |
-| orchard | Gray Gleaner | 1 | 470 | 12 | 6 | 0.5 | 20-22 -> 24-26 |
-| orchard | Mushroom Wizard | 1 | 263 | 19 | 6 | 0.6 | 20-22 -> 24-26 |
-| orchard | Rootbound Gardener | 1 | 766 | 11 | 15 | 0.4 | 20-22 -> 24-26 |
-| orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 64 | 98 | 0.33 | 42-45 -> 49-52 |
-| blight | Gasket Goblin | 1 | 550 | 14 | 7.5 | 0.5 | 23-25 -> 27-29 |
-| blight | Blighted Husk | 1 | 715 | 11 | 7.5 | 0.4 | 23-25 -> 27-29 |
-| blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
-| blight | Gloom Cerberus | 1 | 1,100 | 20 | 15.5 | 0.45 | 23-25 -> 27-29 |
-| blight | Sporeback Ogre | 1 | 1,540 | 15 | 19 | 0.45 | 23-25 -> 27-29 |
-| blight | Spore Hound | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
-| blight | The Eyed Maw (boss) | 47 | 21.5 K | 78 | 118 | 0.33 | 47-50 -> 54-57 |
-| battlefield | Bone Cleaver | 1 | 640 | 15 | 9 | 0.5 | 26-28 -> 30-32 |
-| battlefield | Frostguard Knight | 1 | 832 | 12 | 9 | 0.4 | 26-28 -> 30-32 |
-| battlefield | Gilded Champion | 1 | 512 | 19 | 9 | 0.6 | 26-28 -> 30-32 |
-| battlefield | Banner Wraith | 1 | 358 | 24 | 9 | 0.6 | 26-28 -> 30-32 |
-| battlefield | Frost-Flame Knight | 1 | 1,043 | 14 | 21 | 0.4 | 26-28 -> 30-32 |
-| battlefield | The Cinder Warlord (boss) | 52 | 28 K | 95 | 140 | 0.33 | 52-55 -> 59-62 |
+| jungle | Skull Vine | 1 | 340 | 9 | 4 | 0.5 | 16-18 -> 23-25 |
+| jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 16-18 -> 23-25 |
+| jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 16-18 -> 23-25 |
+| jungle | Vinewhip Panther | 1 | 190 | 14 | 4 | 0.6 | 16-18 -> 23-25 |
+| jungle | Mossback Idol | 1 | 554 | 8 | 11 | 0.4 | 16-18 -> 23-25 |
+| jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 38-41 -> 45-48 |
+| jungle | The Brainstorm (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 38-41 -> 45-48 |
+| fields | Barn Gargoyle | 1 | 320 | 13 | 5 | 0.6 | 20-22 -> 27-29 |
+| fields | Bucket Knight | 1 | 520 | 8 | 5 | 0.4 | 20-22 -> 27-29 |
+| fields | Hedge Bandit | 1 | 400 | 11 | 5 | 0.5 | 20-22 -> 27-29 |
+| fields | Crow Marshal | 1 | 224 | 17 | 5 | 0.6 | 20-22 -> 27-29 |
+| fields | Millstone Golem | 1 | 652 | 10 | 13 | 0.4 | 20-22 -> 27-29 |
+| fields | The Harvest Matron (boss) | 37 | 12.5 K | 52 | 80 | 0.33 | 46-49 -> 53-56 |
+| orchard | Greenscale Warden | 1 | 611 | 10 | 6 | 0.4 | 24-26 -> 31-33 |
+| orchard | Blossom Ronin | 1 | 376 | 15 | 6 | 0.6 | 24-26 -> 31-33 |
+| orchard | Gray Gleaner | 1 | 470 | 12 | 6 | 0.5 | 24-26 -> 31-33 |
+| orchard | Mushroom Wizard | 1 | 263 | 19 | 6 | 0.6 | 24-26 -> 31-33 |
+| orchard | Rootbound Gardener | 1 | 766 | 11 | 15 | 0.4 | 24-26 -> 31-33 |
+| orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 64 | 98 | 0.33 | 54-57 -> 61-64 |
+| blight | Gasket Goblin | 1 | 550 | 14 | 7.5 | 0.5 | 28-30 -> 35-37 |
+| blight | Blighted Husk | 1 | 715 | 11 | 7.5 | 0.4 | 28-30 -> 35-37 |
+| blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 28-30 -> 35-37 |
+| blight | Gloom Cerberus | 1 | 1,100 | 20 | 15.5 | 0.45 | 28-30 -> 35-37 |
+| blight | Sporeback Ogre | 1 | 1,540 | 15 | 19 | 0.45 | 28-30 -> 35-37 |
+| blight | Spore Hound | 1 | 440 | 17 | 7.5 | 0.6 | 28-30 -> 35-37 |
+| blight | The Eyed Maw (boss) | 47 | 21.5 K | 78 | 118 | 0.33 | 60-63 -> 67-70 |
+| battlefield | Bone Cleaver | 1 | 640 | 15 | 9 | 0.5 | 32-34 -> 39-41 |
+| battlefield | Frostguard Knight | 1 | 832 | 12 | 9 | 0.4 | 32-34 -> 39-41 |
+| battlefield | Gilded Champion | 1 | 512 | 19 | 9 | 0.6 | 32-34 -> 39-41 |
+| battlefield | Banner Wraith | 1 | 358 | 24 | 9 | 0.6 | 32-34 -> 39-41 |
+| battlefield | Frost-Flame Knight | 1 | 1,043 | 14 | 21 | 0.4 | 32-34 -> 39-41 |
+| battlefield | The Cinder Warlord (boss) | 52 | 50 M | 9000 | 50000 | 0.33 | 68-71 -> 75-78 |
 
 ## Level scaling
 
