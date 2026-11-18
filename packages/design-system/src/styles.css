@@ -5643,3 +5643,73 @@ button.ds-income-head:hover {
 	line-height: 1.25;
 	overflow-wrap: anywhere;
 }
+
+/* Bestiary polish: breathing room at the top, a wider detail, the level tag above the art, purple level buttons, a readable bar label, one-line headers */
+.ds-bst {
+	padding-top: 10px;
+}
+
+.ds-bst-body {
+	grid-template-columns: minmax(0, 1fr) minmax(340px, 440px);
+}
+
+.ds-mon-lv {
+	z-index: 2;
+}
+
+.ds-mon-art {
+	position: relative;
+	z-index: 1;
+}
+
+.ds-mon {
+	padding-top: 14px;
+}
+
+.ds-bst .ds-bar-label {
+	color: #fff;
+	text-shadow:
+		0 1px 0 #000,
+		0 0 3px #000;
+}
+
+.ds-bst .ds-capi {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.ds-lv-ctl button {
+	color: #fff;
+	background: linear-gradient(#8a45e0, #5a22a8);
+	border-color: #3a1678;
+}
+
+.ds-lv-ctl button:hover:not(:disabled) {
+	background: linear-gradient(#9b5cf0, #6a2dc0);
+}
+
+.ds-bst-empty {
+	grid-column: 1 / -1;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 260px;
+	text-align: center;
+	padding: 24px;
+}
+
+.ds-bst-empty img {
+	width: 72px;
+	height: 72px;
+	image-rendering: pixelated;
+	filter: brightness(0);
+	opacity: 0.35;
+}
+
+.ds-bst-empty b {
+	font-size: 16px;
+	color: var(--ds-gold-lt);
+}

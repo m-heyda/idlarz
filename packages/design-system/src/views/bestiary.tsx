@@ -131,7 +131,6 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 	const statsOpen = e.met && e.claimed >= (e.tiers.findIndex((t) => t.reveal === 'stats') + 1 || 1) && e.tiers.some((t) => t.reveal === 'stats');
 	const dropsAt = e.tiers.findIndex((t) => t.reveal === 'drops') + 1;
 	const dropsOpen = e.met && dropsAt > 0 && e.claimed >= dropsAt;
-	const statsAt = e.tiers.findIndex((t) => t.reveal === 'stats') + 1;
 	return (
 		<Panel parchment className='ds-ledger ds-detail'>
 			<div className='ds-detail-head'>
@@ -200,7 +199,7 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 			<div className='ds-paper-cols' style={{ marginTop: 10 }}>
 				<div>
 					<div className='ds-capi ds-lv-row'>
-						<span>Stats · Level {lv}</span>
+						<span>Level {lv}</span>
 						{statsOpen ? (
 							<span className='ds-lv-ctl'>
 								<button type='button' aria-label='Lower level' disabled={lv <= e.levels.min} onClick={() => setLevel(lv - 1)}>
@@ -221,19 +220,12 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 						))
 					) : (
 						<div className='ds-paper-row'>
-							<span>{unk ? '?' : `Claim the ${compact(e.tiers[Math.max(0, statsAt - 1)].kills)}-kill tier to read the stats`}</span>
+							<span>{unk ? '?' : `Claim tier 1 to read the stats`}</span>
 						</div>
 					)}
-					{statsOpen ? (
-						<div className='ds-paper-sub' style={{ marginTop: 4 }}>
-							Levels {e.levels.min} to {e.levels.max}: it grows while it stands on the map.
-						</div>
-					) : null}
 				</div>
 				<div>
-					<div className='ds-capi'>
-						{dropsOpen ? `Drops · Level ${lv}` : `Drops · ${dropsAt > 0 ? compact(e.tiers[dropsAt - 1].kills) : '?'} kills to reveal`}
-					</div>
+					<div className='ds-capi'>{dropsOpen ? 'Drops' : `Drops · ${dropsAt > 0 ? compact(e.tiers[dropsAt - 1].kills) : '?'} kills`}</div>
 					{dropsOpen ? (
 						e.drops(lv).map((d) => (
 							<div className='ds-paper-row' key={d.label}>
@@ -353,8 +345,21 @@ export const BestiaryPanel: React.FC<BestiaryPanelProps> = ({ entries, biomes, a
 			<div className='ds-bst-body'>
 				<Inset className='ds-mons'>
 					{cards.length === 0 ? (
-						<div className='ds-dim' style={{ padding: 12 }}>
-							Nothing matches this filter.
+						<div className='ds-bst-empty'>
+							<img src={SILHOUETTE} alt='' />
+							<b>{filter === 'ready' ? 'No rewards waiting' : 'No monsters here yet'}</b>
+							<span className='ds-dim'>
+								{filter === 'ready' ? 'Reach a mastery tier and it shows up here.' : 'Nothing matches this filter. Try another one.'}
+							</span>
+							<Button
+								size='sm'
+								onClick={() => {
+									setFilter('all');
+									setFamily('all');
+								}}
+							>
+								Show all
+							</Button>
 						</div>
 					) : null}
 					{cards.map((e) => (
