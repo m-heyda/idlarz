@@ -2,18 +2,18 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { META } from '../../src/catalog/monsterMeta';
 import { MONSTER_CATALOG, labMonsters, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
 import { BIOMES } from '../../src/config/biomes';
 import { MONSTERS, RETIRED_MONSTERS } from '../../src/config/combatConfig';
 
 // The roster (catalog/monsters.ts) lists every planned monster; only enabled ones may spawn, and those must have real stats in MONSTERS.
 
-// the swamp and the tundra got a fourth monster from new art (2026-11-16) and the blight a fourth, elite one
-const FOURTH = new Set(['swamp', 'tundra', 'blight']);
+// roster v2 (IDL-360): every biome has five normal monsters and a boss
 // the retired stand-ins and duplicates are not counted
 const NORMALS: Record<string, number> = {};
 
-test('ids are unique and every biome has three monsters (four in the swamp, tundra and blight) and one boss', () => {
+test('ids are unique and every biome has five monsters and one boss', () => {
 	const ids = MONSTER_CATALOG.map((m) => m.id);
 	assert.equal(new Set(ids).size, ids.length);
 	const byBiome = new Map<string, typeof MONSTER_CATALOG>();
@@ -22,7 +22,7 @@ test('ids are unique and every biome has three monsters (four in the swamp, tund
 	}
 	assert.equal(byBiome.size, 12);
 	for (const [biome, list] of byBiome) {
-		assert.equal(list.filter((m) => m.grade === 'normal').length, NORMALS[biome] ?? (FOURTH.has(biome) ? 4 : 3), `${biome}: monsters`);
+		assert.equal(list.filter((m) => m.grade === 'normal').length, NORMALS[biome] ?? 5, `${biome}: monsters`);
 		assert.equal(list.filter((m) => m.grade === 'boss').length, 1, `${biome}: 1 boss`);
 	}
 });
@@ -44,7 +44,7 @@ test('the rats are gone: the seven home biomes and the five rebirth biomes are e
 		'swamp',
 		'tundra',
 	]);
-	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 51);
+	assert.equal(MONSTER_CATALOG.filter((m) => m.enabled).length, 72);
 	assert.ok(
 		MONSTER_CATALOG.filter((m) => RETIRED_MONSTERS.has(m.id)).every((m) => !m.enabled),
 		'a retired stand-in is not enabled',
@@ -77,7 +77,8 @@ test('a monster without its own art has a stand-in file that exists; a monster w
 		if (m.art) assert.equal(monsterSpriteUrl(m), monsterArtUrl(m), `${m.id}: real art wins over the stand-in`);
 	}
 	const standIns = MONSTER_CATALOG.filter((m) => m.enabled && !m.art).map((m) => m.id);
-	assert.deepEqual(standIns, [], 'every live monster has its real art; the old stand-ins are retired');
+	// roster v2 (IDL-360): the 21 new monsters wear the stand-in silhouette until the art pass
+	assert.equal(standIns.length, 21, 'the 21 roster v2 monsters have a stand-in; every other live monster has its real art');
 });
 
 test('monstersInBiome hides disabled monsters unless asked', () => {
@@ -85,15 +86,15 @@ test('monstersInBiome hides disabled monsters unless asked', () => {
 		monstersInBiome('swamp')
 			.map((m) => m.id)
 			.sort(),
-		['bossMireMatriarch', 'dumpback', 'rotHeron', 'scrapGolem', 'toxicZombie'],
+		['bogfireWisp', 'bossMireMatriarch', 'dumpback', 'rotHeron', 'scrapGolem', 'toxicZombie'],
 	);
-	assert.equal(monstersInBiome('lake').length, 4, 'the lake roster is enabled');
-	assert.equal(monstersInBiome('hills').length, 4);
-	assert.equal(monstersInBiome('coast').length, 4);
-	assert.equal(monstersInBiome('jungle').length, 4, 'the jungle roster is enabled');
-	assert.equal(monstersInBiome('fields').length, 4, 'every rebirth biome has its roster');
-	assert.equal(monstersInBiome('blight').length, 5);
-	assert.equal(monstersInBiome('battlefield', false).length, 4);
+	assert.equal(monstersInBiome('lake').length, 6, 'the lake roster is enabled');
+	assert.equal(monstersInBiome('hills').length, 6);
+	assert.equal(monstersInBiome('coast').length, 6);
+	assert.equal(monstersInBiome('jungle').length, 6, 'the jungle roster is enabled');
+	assert.equal(monstersInBiome('fields').length, 6, 'every rebirth biome has its roster');
+	assert.equal(monstersInBiome('blight').length, 6);
+	assert.equal(monstersInBiome('battlefield', false).length, 6);
 });
 
 test('the map lab always has a monster to show, every MONSTERS entry has a catalog entry and a picture, and every spawn biome exists', () => {
@@ -104,5 +105,15 @@ test('the map lab always has a monster to show, every MONSTERS entry has a catal
 		assert.ok(entry, `${id} is in the catalog`);
 		assert.ok(fs.existsSync(path.join(__dirname, '..', '..', 'public', monsterSpriteUrl(entry!))), `${id}: its picture exists`);
 		for (const biome of def.spawn.biomes) assert.ok(biome in BIOMES, `${id}: ${biome} is a biome`);
+	}
+});
+
+test('every monster has a family and every live one has tags and lore (the Bestiary entry needs all three)', () => {
+	for (const m of MONSTER_CATALOG) {
+		assert.ok(m.id in META, `${m.id}: a family row in monsterMeta`);
+		if (!m.enabled) continue;
+		assert.ok(m.tags.length >= 1 && m.tags.length <= 3, `${m.id}: one to three tags`);
+		assert.ok((m.lore ?? '').length > 20, `${m.id}: lore`);
+		assert.equal(m.tags.includes('Boss'), m.grade === 'boss', `${m.id}: the Boss tag marks exactly the bosses`);
 	}
 });

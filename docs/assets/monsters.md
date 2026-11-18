@@ -147,7 +147,7 @@ The monster roster art, per biome, plus planned monsters that have no picture ye
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `monster_placeholder_silhouette` | <img src="../../public/pixel/enemies/placeholder/silhouette.png" width="96" alt="monster_placeholder_silhouette"> | 68x68 | used | graniteRam, caveGoblinMiner, boulderBeetle, bossHillGiant, garbageOgre, pikeLurker, bossHardwoodColossus | `pixel/enemies/placeholder/silhouette.png` |
+| `monster_placeholder_silhouette` | <img src="../../public/pixel/enemies/placeholder/silhouette.png" width="96" alt="monster_placeholder_silhouette"> | 68x68 | used | gravelQuail, stonehornBison, emberSquirrel, pineconeWarden, graniteRam, caveGoblinMiner, boulderBeetle, bossHillGiant, quarryDrake, cairnSentinel, garbageOgre, bogfireWisp, glacierYeti, tideglassJelly, barnacleBrute, pikeLurker, siltEel, lilypadWarden, vinewhipPanther, mossbackIdol, bossHardwoodColossus, crowMarshal, millstoneGolem, mushroomWizard, rootboundGardener, sporebackOgre, bannerWraith, frostFlameKnight | `pixel/enemies/placeholder/silhouette.png` |
 
 ## plains boss
 

@@ -194,6 +194,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`loot.ts`](../../src/catalog/loot.ts) — ~ Items the merchant sells, cheapest first (a disabled item is never sold, whatever its `shop` price).
 - [`lootConfig.ts`](../../src/catalog/lootConfig.ts) — ~ A set of items a profile can draw from.
 - [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
+- [`monsterMeta.ts`](../../src/catalog/monsterMeta.ts) — ~ Family and tags of every monster.
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
 - [`pets.ts`](../../src/catalog/pets.ts) — ~ Path of the pixel icon under `public/` (`public/pixel/pets/`)

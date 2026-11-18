@@ -1,4 +1,5 @@
 import { MONSTERS, RETIRED_MONSTERS } from '@/config/combatConfig';
+import { META, MORE_LORE } from './monsterMeta';
 import type { BiomeType } from '@/types/game';
 
 /**
@@ -13,6 +14,13 @@ import type { BiomeType } from '@/types/game';
 export type PlannedBiome = 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlefield';
 export type CatalogBiome = BiomeType | PlannedBiome;
 
+/** What a monster is, for the Bestiary filters and the "+x% against beasts" mastery bonuses (IDL-336). One family per monster. */
+export const MONSTER_FAMILIES = ['Beast', 'Bird', 'Vermin', 'Aquatic', 'Undead', 'Plant', 'Fungus', 'Demon', 'Construct', 'Humanoid', 'Elemental', 'Dragon'] as const;
+export type MonsterFamily = (typeof MONSTER_FAMILIES)[number];
+
+/** Short traits shown as chips on a Bestiary entry (flavour and filters; no rule hangs on them yet) */
+export type MonsterTag = 'Pack' | 'Poison' | 'Magic' | 'Armored' | 'Fast' | 'Night' | 'Fire' | 'Frost' | 'Water' | 'Elite' | 'Boss' | 'Passive';
+
 export interface MonsterCatalogEntry {
 	/** Same key as in `MONSTERS` once the monster is enabled (camelCase, like `bossGreatAuroch`) */
 	id: string;
@@ -20,7 +28,11 @@ export interface MonsterCatalogEntry {
 	grade: 'normal' | 'boss';
 	/** Where it lives; the spawn rule (distance, rebirths) stays in `MONSTERS[id].spawn` */
 	biomes: readonly CatalogBiome[];
-	/** One or two lines of lore for the Bestiary (not shown anywhere yet); set for the monsters named after their art, see {@link LORE} */
+	/** What kind of monster it is (Beast, Undead ...): the Bestiary's filter and the family bonuses of mastery, see {@link META} */
+	family: MonsterFamily;
+	/** Up to three traits, shown as chips in the Bestiary */
+	tags: readonly MonsterTag[];
+	/** One or two lines of lore for the Bestiary entry, see {@link LORE} (every enabled monster has one) */
 	lore?: string;
 	/** false = in the roster but never spawns */
 	enabled: boolean;
@@ -49,7 +61,9 @@ export const usesPlaceholderArt = (entry: Pick<MonsterCatalogEntry, 'art' | 'pla
 /** The one stand-in picture (`public/pixel/enemies/placeholder/silhouette.png`, a black blob silhouette with a red eye) shown until a monster's real sprite is made */
 const PLACEHOLDER = '/pixel/enemies/placeholder/silhouette.png';
 
-const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
+type RosterRow = Omit<MonsterCatalogEntry, 'family' | 'tags' | 'lore'>;
+
+const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): RosterRow => ({
 	id,
 	label,
 	grade: 'normal',
@@ -58,7 +72,7 @@ const normal = (id: string, label: string, biome: CatalogBiome, art: boolean, pl
 	art,
 	...(placeholder ? { placeholder } : {}),
 });
-const boss = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): MonsterCatalogEntry => ({
+const boss = (id: string, label: string, biome: CatalogBiome, art: boolean, placeholder?: string): RosterRow => ({
 	id,
 	label,
 	grade: 'boss',
@@ -68,15 +82,19 @@ const boss = (id: string, label: string, biome: CatalogBiome, art: boolean, plac
 	...(placeholder ? { placeholder } : {}),
 });
 
-const ROSTER: readonly MonsterCatalogEntry[] = [
+const ROSTER: readonly RosterRow[] = [
 	normal('thistleBoar', 'Thistle Boar', 'plains', true),
 	normal('burrowBadger', 'Burrow Badger', 'plains', true),
 	normal('dustStrider', 'Dust Strider', 'plains', true),
+	normal('gravelQuail', 'Gravel Quail', 'plains', false, PLACEHOLDER),
+	normal('stonehornBison', 'Stonehorn Bison', 'plains', false, PLACEHOLDER),
 	boss('bossGreatAuroch', 'The Great Auroch', 'plains', true),
 
 	normal('mossbackWolf', 'Mossback Wolf', 'forest', true),
 	normal('brambleImp', 'Bramble Imp', 'forest', true),
 	normal('rotcapStag', 'Rotcap Stag', 'forest', true),
+	normal('emberSquirrel', 'Ember Squirrel', 'forest', false, PLACEHOLDER),
+	normal('pineconeWarden', 'Pinecone Warden', 'forest', false, PLACEHOLDER),
 	boss('bossElderStag', 'The Elder Stag', 'forest', true),
 
 	// the first four were stand-ins (retired, see `RETIRED_MONSTERS`); the roster below has the real art
@@ -87,6 +105,8 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('magmaKnight', 'Magma Knight', 'hills', true),
 	normal('magmaCrab', 'Magma Crab', 'hills', true),
 	normal('mawhornBrute', 'Mawhorn Brute', 'hills', true),
+	normal('quarryDrake', 'Quarry Drake', 'hills', false, PLACEHOLDER),
+	normal('cairnSentinel', 'Cairn Sentinel', 'hills', false, PLACEHOLDER),
 	boss('bossIronhorn', 'The Ironhorn', 'hills', true),
 
 	// a duplicate of the Mawhorn Brute's look: retired, the Toxic Zombie takes its place
@@ -95,30 +115,38 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('dumpback', 'Dumpback', 'swamp', true),
 	normal('rotHeron', 'Rot Heron', 'swamp', true),
 	normal('scrapGolem', 'Scrap Golem', 'swamp', true),
+	normal('bogfireWisp', 'Bogfire Wisp', 'swamp', false, PLACEHOLDER),
 	boss('bossMireMatriarch', 'The Mire Matriarch', 'swamp', true),
 
 	normal('frostHare', 'Frost Hare', 'tundra', true),
 	normal('icetuskCalf', 'Icetusk Calf', 'tundra', true),
 	normal('rimeWraith', 'Rime Wraith', 'tundra', true),
 	normal('frostMoth', 'Frost Moth', 'tundra', true),
+	normal('glacierYeti', 'Glacier Yeti', 'tundra', false, PLACEHOLDER),
 	boss('bossWinterWyrm', 'The Winter Wyrm', 'tundra', true),
 
 	// Water biomes (IDL-58): monsters stand on coast and lake tiles themselves
 	normal('wreckCrab', 'Wreck Crab', 'coast', true),
 	normal('netGull', 'Net Gull', 'coast', true),
 	normal('drownedSailor', 'Drowned Sailor', 'coast', true),
+	normal('tideglassJelly', 'Tideglass Jelly', 'coast', false, PLACEHOLDER),
+	normal('barnacleBrute', 'Barnacle Brute', 'coast', false, PLACEHOLDER),
 	boss('bossReefLeviathan', 'The Reef Leviathan', 'coast', true),
 
 	normal('mossSnapper', 'Moss Snapper', 'lake', true),
 	normal('reedNymph', 'Reed Nymph', 'lake', true),
 	normal('pikeLurker', 'Pike Lurker', 'lake', false, PLACEHOLDER),
 	normal('tidepoolGolem', 'Tidepool Golem', 'lake', true),
+	normal('siltEel', 'Silt Eel', 'lake', false, PLACEHOLDER),
+	normal('lilypadWarden', 'Lilypad Warden', 'lake', false, PLACEHOLDER),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
 	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the jungle roster is live (rebirth 1), the other four wait. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
 	normal('skullVine', 'Skull Vine', 'jungle', true),
 	normal('eyeHorror', 'Eye Horror', 'jungle', true),
 	normal('zombieTriceratops', 'Zombie Triceratops', 'jungle', true),
+	normal('vinewhipPanther', 'Vinewhip Panther', 'jungle', false, PLACEHOLDER),
+	normal('mossbackIdol', 'Mossback Idol', 'jungle', false, PLACEHOLDER),
 	boss('bossHardwoodColossus', 'The Hardwood Colossus', 'jungle', false, PLACEHOLDER),
 	boss('bossBrainstorm', 'The Brainstorm', 'jungle', true),
 
@@ -126,22 +154,29 @@ const ROSTER: readonly MonsterCatalogEntry[] = [
 	normal('barnGargoyle', 'Barn Gargoyle', 'fields', true),
 	normal('bucketKnight', 'Bucket Knight', 'fields', true),
 	normal('hedgeBandit', 'Hedge Bandit', 'fields', true),
+	normal('crowMarshal', 'Crow Marshal', 'fields', false, PLACEHOLDER),
+	normal('millstoneGolem', 'Millstone Golem', 'fields', false, PLACEHOLDER),
 	boss('bossHarvestMatron', 'The Harvest Matron', 'fields', true),
 
 	normal('greenscaleWarden', 'Greenscale Warden', 'orchard', true),
 	normal('blossomRonin', 'Blossom Ronin', 'orchard', true),
 	normal('grayGleaner', 'Gray Gleaner', 'orchard', true),
+	normal('mushroomWizard', 'Mushroom Wizard', 'orchard', false, PLACEHOLDER),
+	normal('rootboundGardener', 'Rootbound Gardener', 'orchard', false, PLACEHOLDER),
 	boss('bossBlossomReaper', 'The Blossom Reaper', 'orchard', true),
 
 	normal('gasketGoblin', 'Gasket Goblin', 'blight', true),
 	normal('blightedHusk', 'Blighted Husk', 'blight', true),
 	normal('mothwingHexer', 'Mothwing Hexer', 'blight', true),
 	normal('gloomCerberus', 'Gloom Cerberus', 'blight', true),
+	normal('sporebackOgre', 'Sporeback Ogre', 'blight', false, PLACEHOLDER),
 	boss('bossEyedMaw', 'The Eyed Maw', 'blight', true),
 
 	normal('boneCleaver', 'Bone Cleaver', 'battlefield', true),
 	normal('frostguardKnight', 'Frostguard Knight', 'battlefield', true),
 	normal('gildedChampion', 'Gilded Champion', 'battlefield', true),
+	normal('bannerWraith', 'Banner Wraith', 'battlefield', false, PLACEHOLDER),
+	normal('frostFlameKnight', 'Frost-Flame Knight', 'battlefield', false, PLACEHOLDER),
 	boss('bossCinderWarlord', 'The Cinder Warlord', 'battlefield', true),
 ];
 
@@ -190,7 +225,11 @@ export const LORE: Readonly<Record<string, string>> = {
 	bossCinderWarlord: 'The warlord burned every banner on the field, then his own. What stands in the ash now is armour with a cleaver and a very long memory.',
 };
 
-export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = ROSTER.map((m) => (LORE[m.id] ? { ...m, lore: LORE[m.id] } : m));
+export const MONSTER_CATALOG: readonly MonsterCatalogEntry[] = ROSTER.map((m) => {
+	const meta = META[m.id] ?? { family: 'Beast' as const, tags: [] };
+	const lore = LORE[m.id] ?? MORE_LORE[m.id];
+	return { ...m, family: meta.family, tags: meta.tags, ...(lore ? { lore } : {}) };
+});
 
 /** Roster entries that live in a biome. Spawning code passes `enabledOnly` so unfinished monsters never appear. */
 export const monstersInBiome = (biome: CatalogBiome, enabledOnly = true): MonsterCatalogEntry[] =>

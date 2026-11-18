@@ -36,11 +36,11 @@ const land = (tiles: [BiomeType, number, number][]) => {
 };
 const ticket = (n: number, kind: MonsterTicket['kind'] = 'normal'): MonsterTicket => ({ n, at: 0, kind, lucky: false });
 
-test('the three rosters are in: three normal monsters and a boss on each of the hills, the coast and the lake, all on their own biome', () => {
-	assert.equal(newTypes.length, 12);
+test('the three rosters are in: five normal monsters and a boss on each of the hills, the coast and the lake, all on their own biome', () => {
+	assert.equal(newTypes.length, 18);
 	for (const biome of HOME_NEW) {
 		const own = newTypes.filter((type) => MONSTERS[type].spawn.biomes[0] === biome);
-		assert.equal(own.filter((type) => MONSTERS[type].grade === 'normal').length, 3, biome);
+		assert.equal(own.filter((type) => MONSTERS[type].grade === 'normal').length, 5, biome);
 		assert.equal(own.filter((type) => MONSTERS[type].grade === 'boss').length, 1, biome);
 		for (const type of own) assert.deepEqual([...MONSTERS[type].spawn.biomes], [biome], `${type} stands on its own biome only`);
 	}
@@ -194,8 +194,8 @@ test('the bosses climb: the Reef Leviathan asks for G2 (the grade below loses), 
 
 const JUNGLE = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => !('retired' in MONSTERS[type]) && MONSTERS[type].spawn.biomes[0] === 'jungle');
 
-test('the jungle roster: three monsters and a boss on jungle tiles, from the first rebirth and not before', () => {
-	assert.equal(JUNGLE.length, 4);
+test('the jungle roster: five monsters and a boss on jungle tiles, from the first rebirth and not before', () => {
+	assert.equal(JUNGLE.length, 6);
 	const world = land([
 		['jungle', 3, 0],
 		['jungle', 9, 0],

@@ -10,6 +10,7 @@ The roster, levels, growth, spawning and what a kill pays.
 - Level scaling: [`monsterStats`](#monsterstats), [`spawnLevelRange`](#spawnlevelrange), [`rollSpawnLevel`](#rollspawnlevel), [`levelAtAge`](#levelatage), [`dangerBonus`](#dangerbonus)
 - Spawning: [`advanceBank`](#advancebank), [`canSpawnOn`](#canspawnon), [`typeWeights`](#typeweights), [`placeTickets`](#placetickets), [`ticketCap`](#ticketcap), [`DISTANCE_BANDS`](#distance-bands), [`BOSS_MIN_DISTANCE`](#boss-min-distance), [`bandOf`](#bandof)
 - Rewards: [`killIncome`](#killincome)
+- Bestiary: [`META`](#meta)
 
 ## Roster
 
@@ -17,9 +18,9 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:552`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:556`](../../src/config/combatConfig.ts)
 
-The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
+The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
 
 - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -34,21 +35,27 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | plains | Thistle Boar | 1 | 100 | 4 | 0 | 0.5 | 1-3 -> 8-10 |
 | plains | Burrow Badger | 1 | 130 | 3 | 0 | 0.4 | 1-3 -> 8-10 |
 | plains | Dust Strider | 1 | 80 | 5 | 0 | 0.6 | 1-3 -> 8-10 |
+| plains | Gravel Quail | 1 | 56 | 6 | 0 | 0.6 | 1-3 -> 8-10 |
+| plains | Stonehorn Bison | 1 | 163 | 4 | 3 | 0.4 | 1-3 -> 8-10 |
 | plains | The Great Auroch (boss) | 15 | 1,000 | 11 | 15 | 0.33 | 15-18 -> 22-25 |
 | forest | Mossback Wolf | 1 | 128 | 8 | 1 | 0.6 | 4-6 -> 12-14 |
 | forest | Bramble Imp | 1 | 160 | 6 | 1 | 0.5 | 4-6 -> 12-14 |
 | forest | Rotcap Stag | 1 | 208 | 5 | 1 | 0.4 | 4-6 -> 12-14 |
+| forest | Ember Squirrel | 1 | 90 | 9 | 1 | 0.6 | 4-6 -> 12-14 |
+| forest | Pinecone Warden | 1 | 261 | 6 | 5 | 0.4 | 4-6 -> 12-14 |
 | forest | The Elder Stag (boss) | 20 | 1,900 | 16 | 24 | 0.33 | 20-23 -> 27-30 |
 | swamp | Garbage Ogre | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
 | swamp | Toxic Zombie | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
 | swamp | Dumpback | 1 | 220 | 7 | 2 | 0.5 | 8-10 -> 16-18 |
 | swamp | Rot Heron | 1 | 176 | 9 | 2 | 0.6 | 8-10 -> 16-18 |
 | swamp | Scrap Golem | 1 | 286 | 6 | 2 | 0.4 | 8-10 -> 16-18 |
+| swamp | Bogfire Wisp | 1 | 123 | 11 | 2 | 0.6 | 8-10 -> 16-18 |
 | swamp | The Mire Matriarch (boss) | 25 | 2,800 | 21 | 32 | 0.33 | 25-28 -> 32-35 |
 | tundra | Frost Hare | 1 | 240 | 10 | 3 | 0.6 | 12-14 -> 16-18 |
 | tundra | Icetusk Calf | 1 | 390 | 6 | 3 | 0.4 | 12-14 -> 16-18 |
 | tundra | Rime Wraith | 1 | 600 | 12 | 11 | 0.45 | 12-14 -> 16-18 |
 | tundra | Frost Moth | 1 | 300 | 8 | 3 | 0.5 | 12-14 -> 16-18 |
+| tundra | Glacier Yeti | 1 | 840 | 9 | 10 | 0.45 | 12-14 -> 16-18 |
 | tundra | The Winter Wyrm (boss) | 30 | 7,000 | 36 | 58 | 0.33 | 30-33 -> 37-40 |
 | hills | Granite Ram | 1 | 152 | 8 | 1.5 | 0.6 | 6-8 -> 14-16 |
 | hills | Cave Goblin Miner | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
@@ -57,37 +64,52 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | hills | Magma Knight | 1 | 152 | 8 | 1.5 | 0.6 | 6-8 -> 14-16 |
 | hills | Magma Crab | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
 | hills | Mawhorn Brute | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
+| hills | Quarry Drake | 1 | 106 | 10 | 1.5 | 0.6 | 6-8 -> 14-16 |
+| hills | Cairn Sentinel | 1 | 310 | 6 | 6 | 0.4 | 6-8 -> 14-16 |
 | hills | The Ironhorn (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
 | coast | Wreck Crab | 1 | 169 | 4 | 0 | 0.4 | 2-4 -> 10-12 |
 | coast | Net Gull | 1 | 104 | 6 | 0 | 0.6 | 2-4 -> 10-12 |
 | coast | Drowned Sailor | 1 | 130 | 5 | 0 | 0.5 | 2-4 -> 10-12 |
+| coast | Tideglass Jelly | 1 | 73 | 8 | 0 | 0.6 | 2-4 -> 10-12 |
+| coast | Barnacle Brute | 1 | 212 | 5 | 3 | 0.4 | 2-4 -> 10-12 |
 | coast | The Reef Leviathan (boss) | 17 | 1,400 | 13 | 20 | 0.33 | 17-20 -> 24-27 |
 | lake | Moss Snapper | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
 | lake | Reed Nymph | 1 | 260 | 8 | 2.5 | 0.5 | 10-12 -> 17-19 |
 | lake | Pike Lurker | 1 | 208 | 9 | 2.5 | 0.6 | 10-12 -> 17-19 |
 | lake | Tidepool Golem | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
+| lake | Silt Eel | 1 | 146 | 12 | 2.5 | 0.6 | 10-12 -> 17-19 |
+| lake | Lilypad Warden | 1 | 424 | 7 | 8 | 0.4 | 10-12 -> 17-19 |
 | lake | The Lake Hydra (boss) | 27 | 4,500 | 27 | 45 | 0.33 | 27-30 -> 34-37 |
 | jungle | Skull Vine | 1 | 340 | 9 | 4 | 0.5 | 14-16 -> 18-20 |
 | jungle | Eye Horror | 1 | 272 | 11 | 4 | 0.6 | 14-16 -> 18-20 |
 | jungle | Zombie Triceratops | 1 | 442 | 7 | 4 | 0.4 | 14-16 -> 18-20 |
+| jungle | Vinewhip Panther | 1 | 190 | 14 | 4 | 0.6 | 14-16 -> 18-20 |
+| jungle | Mossback Idol | 1 | 554 | 8 | 11 | 0.4 | 14-16 -> 18-20 |
 | jungle | The Hardwood Colossus (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
 | jungle | The Brainstorm (boss) | 32 | 9,000 | 40 | 64 | 0.33 | 32-35 -> 39-42 |
 | fields | Barn Gargoyle | 1 | 320 | 13 | 5 | 0.6 | 17-19 -> 21-23 |
 | fields | Bucket Knight | 1 | 520 | 8 | 5 | 0.4 | 17-19 -> 21-23 |
 | fields | Hedge Bandit | 1 | 400 | 11 | 5 | 0.5 | 17-19 -> 21-23 |
+| fields | Crow Marshal | 1 | 224 | 17 | 5 | 0.6 | 17-19 -> 21-23 |
+| fields | Millstone Golem | 1 | 652 | 10 | 13 | 0.4 | 17-19 -> 21-23 |
 | fields | The Harvest Matron (boss) | 37 | 12.5 K | 52 | 80 | 0.33 | 37-40 -> 44-47 |
 | orchard | Greenscale Warden | 1 | 611 | 10 | 6 | 0.4 | 20-22 -> 24-26 |
 | orchard | Blossom Ronin | 1 | 376 | 15 | 6 | 0.6 | 20-22 -> 24-26 |
 | orchard | Gray Gleaner | 1 | 470 | 12 | 6 | 0.5 | 20-22 -> 24-26 |
+| orchard | Mushroom Wizard | 1 | 263 | 19 | 6 | 0.6 | 20-22 -> 24-26 |
+| orchard | Rootbound Gardener | 1 | 766 | 11 | 15 | 0.4 | 20-22 -> 24-26 |
 | orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 64 | 98 | 0.33 | 42-45 -> 49-52 |
 | blight | Gasket Goblin | 1 | 550 | 14 | 7.5 | 0.5 | 23-25 -> 27-29 |
 | blight | Blighted Husk | 1 | 715 | 11 | 7.5 | 0.4 | 23-25 -> 27-29 |
 | blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
 | blight | Gloom Cerberus | 1 | 1,100 | 20 | 15.5 | 0.45 | 23-25 -> 27-29 |
+| blight | Sporeback Ogre | 1 | 1,540 | 15 | 19 | 0.45 | 23-25 -> 27-29 |
 | blight | The Eyed Maw (boss) | 47 | 21.5 K | 78 | 118 | 0.33 | 47-50 -> 54-57 |
 | battlefield | Bone Cleaver | 1 | 640 | 15 | 9 | 0.5 | 26-28 -> 30-32 |
 | battlefield | Frostguard Knight | 1 | 832 | 12 | 9 | 0.4 | 26-28 -> 30-32 |
 | battlefield | Gilded Champion | 1 | 512 | 19 | 9 | 0.6 | 26-28 -> 30-32 |
+| battlefield | Banner Wraith | 1 | 358 | 24 | 9 | 0.6 | 26-28 -> 30-32 |
+| battlefield | Frost-Flame Knight | 1 | 1,043 | 14 | 21 | 0.4 | 26-28 -> 30-32 |
 | battlefield | The Cinder Warlord (boss) | 52 | 28 K | 95 | 140 | 0.33 | 52-55 -> 59-62 |
 
 ## Level scaling
@@ -260,7 +282,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:485`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:489`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 
@@ -319,3 +341,13 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 | orchard | 290 | 5,200 | 720 | 1.08 |
 | blight | 330 | 6,600 | 900 | 1.08 |
 | battlefield | 380 | 8,400 | 1,150 | 1.08 |
+
+## Bestiary
+
+<a id="meta"></a>
+
+### `META` <small>const</small>
+
+Source: [`src/catalog/monsterMeta.ts:11`](../../src/catalog/monsterMeta.ts)
+
+Family and tags of every monster. The family drives the Bestiary's family filter and the family bonuses of mastery ("+x% against beasts"); the tags are flavour chips. A monster without a row here reads as a Beast with no tags (a test fails on the gap).

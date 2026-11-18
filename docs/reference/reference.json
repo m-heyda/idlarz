@@ -314,6 +314,17 @@
   ]
  },
  {
+  "id": "meta",
+  "name": "META",
+  "symbol": "META",
+  "kind": "const",
+  "category": "Monsters/Bestiary",
+  "file": "src/catalog/monsterMeta.ts",
+  "line": 11,
+  "summary": "Family and tags of every monster. The family drives the Bestiary's family filter and the family bonuses of mastery (\"+x% against beasts\"); the tags are flavour chips. A monster without a row here reads as a Beast with no tags (a test fails on the gap).",
+  "see": []
+ },
+ {
   "id": "perk-caps",
   "name": "PERK_CAPS",
   "symbol": "PERK_CAPS",
@@ -659,7 +670,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 485,
+  "line": 489,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -670,8 +681,8 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 552,
-  "summary": "The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "line": 556,
+  "summary": "The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
  {

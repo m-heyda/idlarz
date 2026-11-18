@@ -447,6 +447,10 @@ const BUILD = {
 	fierce: { hp: 0.8, attack: 1.25, speed: 0.6 },
 	// a real challenge: it needs gear collected first (more of it is coming); armor 8 (the biome's own armor comes on top)
 	elite: { hp: 2, attack: 1.5, speed: 0.45, armor: 8 },
+	// the roster v2 archetypes (IDL-360), relative to the biome's tier like the builds above: a glass cannon (HP 0.56x, damage 1.57x), an armored wall (HP 1.63x, damage 0.92x, armor 2x the biome's + 3) and a brute (HP 2.8x, damage 1.14x, armor 2x + 4)
+	glass: { hp: 0.56, attack: 1.57, speed: 0.6 },
+	armored: { hp: 1.63, attack: 0.92, speed: 0.4, armorX: 2, armor: 3 },
+	brute: { hp: 2.8, attack: 1.14, speed: 0.45, armorX: 2, armor: 4 },
 } as const;
 
 const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof typeof BUILD, minRebirths?: number): MonsterDef => {
@@ -457,7 +461,7 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 		label,
 		hp: Math.round(tier.hp * b.hp),
 		attack: Math.round(tier.attack * b.attack * 10) / 10,
-		armor: tier.armor + ('armor' in b ? b.armor : 0),
+		armor: tier.armor * ('armorX' in b ? b.armorX : 1) + ('armor' in b ? b.armor : 0),
 		critChance: 0,
 		critMult: 1.5,
 		stunResist: 0,
@@ -537,7 +541,7 @@ export const FALLBACK_MONSTER = 'thistleBoar' as const;
 export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
 
 /**
- * The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
+ * The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
  * Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
  *
  * - Builds (`BUILD`): even x1 HP x1 attack, speed 0.5; tough x1.3 HP x0.8 attack, 0.4; fierce x0.8 HP x1.25 attack, 0.6; elite x2 HP x1.5 attack, 0.45, +8 armor.
@@ -554,11 +558,15 @@ export const MONSTERS = {
 	thistleBoar: normal('plains', 'Thistle Boar', 'even'),
 	burrowBadger: normal('plains', 'Burrow Badger', 'tough'),
 	dustStrider: normal('plains', 'Dust Strider', 'fierce'),
+	gravelQuail: normal('plains', 'Gravel Quail', 'glass'),
+	stonehornBison: normal('plains', 'Stonehorn Bison', 'armored'),
 	bossGreatAuroch: boss('plains', 'The Great Auroch', ['The Auroch stamps the ground.', 'Come back when you are stronger!', 'The herd is not impressed.']),
 	// forest
 	mossbackWolf: normal('forest', 'Mossback Wolf', 'fierce'),
 	brambleImp: normal('forest', 'Bramble Imp', 'even'),
 	rotcapStag: normal('forest', 'Rotcap Stag', 'tough'),
+	emberSquirrel: normal('forest', 'Ember Squirrel', 'glass'),
+	pineconeWarden: normal('forest', 'Pinecone Warden', 'armored'),
 	bossElderStag: boss('forest', 'The Elder Stag', ['The Elder Stag lowers its antlers.', 'The forest remembers every trespasser.']),
 	// swamp
 	garbageOgre: retire(normal('swamp', 'Garbage Ogre', 'tough')),
@@ -566,12 +574,14 @@ export const MONSTERS = {
 	dumpback: normal('swamp', 'Dumpback', 'even'),
 	rotHeron: normal('swamp', 'Rot Heron', 'fierce'),
 	scrapGolem: normal('swamp', 'Scrap Golem', 'tough'),
+	bogfireWisp: normal('swamp', 'Bogfire Wisp', 'glass'),
 	bossMireMatriarch: boss('swamp', 'The Mire Matriarch', ['The Matriarch gurgles with laughter.', 'The mire swallows the proud.']),
 	// tundra
 	frostHare: normal('tundra', 'Frost Hare', 'fierce'),
 	icetuskCalf: normal('tundra', 'Icetusk Calf', 'tough'),
 	rimeWraith: normal('tundra', 'Rime Wraith', 'elite'),
 	frostMoth: normal('tundra', 'Frost Moth', 'even'),
+	glacierYeti: normal('tundra', 'Glacier Yeti', 'brute'),
 	bossWinterWyrm: boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']),
 	// hills (IDL-201; the first three and the giant were stand-ins, now retired: see `RETIRED_MONSTERS`)
 	graniteRam: retire(normal('hills', 'Granite Ram', 'fierce')),
@@ -581,6 +591,8 @@ export const MONSTERS = {
 	magmaKnight: normal('hills', 'Magma Knight', 'fierce'),
 	magmaCrab: normal('hills', 'Magma Crab', 'tough'),
 	mawhornBrute: normal('hills', 'Mawhorn Brute', 'even'),
+	quarryDrake: normal('hills', 'Quarry Drake', 'glass'),
+	cairnSentinel: normal('hills', 'Cairn Sentinel', 'armored'),
 	bossIronhorn: boss('hills', 'The Ironhorn', [
 		'The Ironhorn lowers its plated head and steam hisses from its joints.',
 		'The dwarves built it to guard the pass. Nobody told it they left.',
@@ -590,17 +602,23 @@ export const MONSTERS = {
 	wreckCrab: normal('coast', 'Wreck Crab', 'tough'),
 	netGull: normal('coast', 'Net Gull', 'fierce'),
 	drownedSailor: normal('coast', 'Drowned Sailor', 'even'),
+	tideglassJelly: normal('coast', 'Tideglass Jelly', 'glass'),
+	barnacleBrute: normal('coast', 'Barnacle Brute', 'armored'),
 	bossReefLeviathan: boss('coast', 'The Reef Leviathan', ['The Leviathan rises out of the surf.', 'The tide takes everything in the end.']),
 	// lake
 	mossSnapper: normal('lake', 'Moss Snapper', 'tough'),
 	reedNymph: normal('lake', 'Reed Nymph', 'even'),
 	pikeLurker: retire(normal('lake', 'Pike Lurker', 'fierce')),
 	tidepoolGolem: normal('lake', 'Tidepool Golem', 'tough'),
+	siltEel: normal('lake', 'Silt Eel', 'glass'),
+	lilypadWarden: normal('lake', 'Lilypad Warden', 'armored'),
 	bossLakeHydra: boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']),
 	// jungle: only after the first rebirth, like the biome itself (`BIOME_RULES.unlockAfterRebirths`)
 	skullVine: normal('jungle', 'Skull Vine', 'even', 1),
 	eyeHorror: normal('jungle', 'Eye Horror', 'fierce', 1),
 	zombieTriceratops: normal('jungle', 'Zombie Triceratops', 'tough', 1),
+	vinewhipPanther: normal('jungle', 'Vinewhip Panther', 'glass', 1),
+	mossbackIdol: normal('jungle', 'Mossback Idol', 'armored', 1),
 	bossHardwoodColossus: retire(
 		boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
 	),
@@ -614,22 +632,29 @@ export const MONSTERS = {
 	barnGargoyle: normal('fields', 'Barn Gargoyle', 'fierce', 2),
 	bucketKnight: normal('fields', 'Bucket Knight', 'tough', 2),
 	hedgeBandit: normal('fields', 'Hedge Bandit', 'even', 2),
+	crowMarshal: normal('fields', 'Crow Marshal', 'glass', 2),
+	millstoneGolem: normal('fields', 'Millstone Golem', 'armored', 2),
 	bossHarvestMatron: boss('fields', 'The Harvest Matron', ['The Matron ruffles her scarf and clucks.', 'Every egg in the valley is hers.'], 2),
 	// orchard (rebirth 3)
 	greenscaleWarden: normal('orchard', 'Greenscale Warden', 'tough', 3),
 	blossomRonin: normal('orchard', 'Blossom Ronin', 'fierce', 3),
 	grayGleaner: normal('orchard', 'Gray Gleaner', 'even', 3),
+	mushroomWizard: normal('orchard', 'Mushroom Wizard', 'glass', 3),
+	rootboundGardener: normal('orchard', 'Rootbound Gardener', 'armored', 3),
 	bossBlossomReaper: boss('orchard', 'The Blossom Reaper', ['The Reaper lifts a scythe of blue fire.', 'Every blossom falls in its own time.'], 3),
 	// blight (rebirth 4)
 	gasketGoblin: normal('blight', 'Gasket Goblin', 'even', 4),
 	blightedHusk: normal('blight', 'Blighted Husk', 'tough', 4),
 	mothwingHexer: normal('blight', 'Mothwing Hexer', 'fierce', 4),
 	gloomCerberus: normal('blight', 'Gloom Cerberus', 'elite', 4),
+	sporebackOgre: normal('blight', 'Sporeback Ogre', 'brute', 4),
 	bossEyedMaw: boss('blight', 'The Eyed Maw', ['A dozen eyes open at once.', 'The Blight does not hate you. It only hungers.'], 4),
 	// battlefield (rebirth 5)
 	boneCleaver: normal('battlefield', 'Bone Cleaver', 'even', 5),
 	frostguardKnight: normal('battlefield', 'Frostguard Knight', 'tough', 5),
 	gildedChampion: normal('battlefield', 'Gilded Champion', 'fierce', 5),
+	bannerWraith: normal('battlefield', 'Banner Wraith', 'glass', 5),
+	frostFlameKnight: normal('battlefield', 'Frost-Flame Knight', 'armored', 5),
 	bossCinderWarlord: boss(
 		'battlefield',
 		'The Cinder Warlord',
