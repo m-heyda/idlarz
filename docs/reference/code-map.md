@@ -177,6 +177,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`deedRewards.ts`](../../src/catalog/deedRewards.ts) — The gems of a deed tier (IDL-321, owner rule): every tier pays the same base, and each further tier of a deed pays a little more. Points are the score and the headline; gems are the extra the Claim button pays.
 - [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
+- [`ingredients.ts`](../../src/catalog/ingredients.ts) — ~ The junk id the Bestiary drop tables and the monster tables name
 
 **src/catalog/items/**
 
@@ -1000,6 +1001,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`guestMode.test.ts`](../../tests/server/guestMode.test.ts)
+- [`ingredients.test.ts`](../../tests/server/ingredients.test.ts)
 - [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)

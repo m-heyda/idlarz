@@ -204,6 +204,17 @@
   "see": []
  },
  {
+  "id": "ingredients",
+  "name": "INGREDIENTS",
+  "symbol": "INGREDIENTS",
+  "kind": "const",
+  "category": "Economy/Crafting",
+  "file": "src/catalog/ingredients.ts",
+  "line": 31,
+  "summary": "The ingredients and what is planned for each (none of it is built yet). Append only.",
+  "see": []
+ },
+ {
   "id": "gear",
   "name": "gear",
   "symbol": "gear",
@@ -465,7 +476,7 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/recipes.ts",
-  "line": 36,
+  "line": 40,
   "summary": "The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).",
   "see": []
  },
@@ -476,7 +487,7 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/recipes.ts",
-  "line": 337,
+  "line": 341,
   "summary": "The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the `craft` loot source (rarity by Luck and the pity counter, quality by Intelligence, item level by the crafting level inside the grade's window; see {@link CRAFT_GEAR}). Every gear recipe is timed (`CRAFT_GEAR.timeSec`) and runs in the batch queue. Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.timeSec`; adding a slot is one in the tables above.",
   "see": []
  },
@@ -2030,13 +2041,13 @@
   "see": []
  },
  {
-  "id": "rolljunkdrops",
-  "name": "rollJunkDrops",
-  "symbol": "rollJunkDrops",
+  "id": "rolljunkloot",
+  "name": "rollJunkLoot",
+  "symbol": "rollJunkLoot",
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junkDrops.ts",
-  "line": 64,
+  "line": 71,
   "summary": "The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.",
   "see": []
  },
@@ -2047,7 +2058,7 @@
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 59,
+  "line": 61,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2754,7 +2765,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/reward.ts",
-  "line": 38,
+  "line": 58,
   "summary": "Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.",
   "see": []
  },

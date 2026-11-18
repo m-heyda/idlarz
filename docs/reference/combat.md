@@ -309,7 +309,7 @@ Nothing of the ledger is written. Returns null with no fight open or one that do
 
 ### `payKill` <small>function</small>
 
-Source: [`src/lib/offline/reward.ts:38`](../../src/lib/offline/reward.ts)
+Source: [`src/lib/offline/reward.ts:58`](../../src/lib/offline/reward.ts)
 
 Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
 it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.

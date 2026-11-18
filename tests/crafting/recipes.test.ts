@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { INGREDIENT_BY_ID } from '../../src/catalog/ingredients';
 import assert from 'node:assert/strict';
 import { COMPONENTS, RECIPES, RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { ITEM_CATALOG } from '../../src/catalog';
@@ -54,8 +55,8 @@ test('trade goods sell for at most 1.4x their inputs at merchant prices (and nev
 	assert.ok(new Set(goods.map((r) => r.unlock)).size > 1, 'goods do not all unlock at once');
 });
 
-test('every component has exactly one recipe that makes it, and every component is used or is a gear input to come', () => {
-	for (const id of Object.keys(COMPONENTS)) {
+test('every component has exactly one recipe that makes it, and every component is used or is a gear input to come (the monster ingredients are the planned exception: no recipe yet)', () => {
+	for (const id of Object.keys(COMPONENTS).filter((key) => !INGREDIENT_BY_ID.has(key))) {
 		assert.equal(RECIPES.filter((r) => 'component' in r.output && r.output.component === id).length, 1, id);
 	}
 });

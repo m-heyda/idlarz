@@ -1,3 +1,4 @@
+import { stashKeyOfJunk } from '@/catalog/ingredients';
 import { JUNK_ITEMS } from '@/catalog/items/junk';
 import { ingredientQty, ingredientsOf } from '@/catalog/monsterDrops';
 import type { Rng } from '@/lib/rng';
@@ -34,6 +35,12 @@ const BOSS: readonly { id: string; base: number; perLevel: number }[] = [
 	{ id: 'junk_amethyst', base: 1, perLevel: 1 / 12 },
 ];
 
+/** What a kill's junk roll gives: stacks for the bag, and ingredients for the crafting bag (crafting bag key -> amount). */
+export interface JunkLoot {
+	drops: Drop[];
+	stash: Record<string, number>;
+}
+
 export interface JunkRollContext {
 	/** The monster's level */
 	level: number;
@@ -61,8 +68,9 @@ const valueOf = (id: string): number => JUNK_ITEMS.find((i) => i.id === id)?.sel
  * boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
  * ingredient  = chance x (1 + 0.005 x Luck) per kill; qty = (min..max) + floor(perLevel x (level - 1))        (the monster's own table, x3 for a golden one)
  */
-export const rollJunkDrops = (ctx: JunkRollContext, rng: Rng): Drop[] => {
+export const rollJunkLoot = (ctx: JunkRollContext, rng: Rng): JunkLoot => {
 	const drops: Drop[] = [];
+	const stash: Record<string, number> = {};
 	const bonus = ctx.lucky ? 3 : 1;
 	const luck = 1 + Math.max(0, ctx.luck) * 0.005;
 	const total = COMMON.reduce((sum, c) => sum + c.weight, 0);
@@ -86,10 +94,19 @@ export const rollJunkDrops = (ctx: JunkRollContext, rng: Rng): Drop[] => {
 			if (ctx.level < ing.minLevel) continue;
 			if (ing.chance < 1 && rng() >= ing.chance * luck) continue;
 			const n = ingredientQty(ing, ctx.level, rng()) * bonus;
+			// an ingredient goes straight to the crafting bag, plain junk to the bag
+			const key = stashKeyOfJunk(ing.id);
+			if (key) {
+				stash[key] = (stash[key] ?? 0) + n;
+				continue;
+			}
 			const merged = drops.find((x) => x.kind === 'consumable' && x.id === ing.id);
 			if (merged && merged.kind === 'consumable') merged.qty += n;
 			else drops.push({ kind: 'consumable', id: ing.id, qty: n });
 		}
 	}
-	return drops;
+	return { drops, stash };
 };
+
+/** The junk a kill drops for the bag (the ingredients go to the crafting bag: {@link rollJunkLoot}). */
+export const rollJunkDrops = (ctx: JunkRollContext, rng: Rng): Drop[] => rollJunkLoot(ctx, rng).drops;

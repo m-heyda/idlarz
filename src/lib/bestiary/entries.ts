@@ -1,4 +1,5 @@
 import { MASTERY_BIOMES, BIOME_GOALS, bonusText, masteryTiersOf, biomeRoster } from '@/catalog/mastery';
+import { INGREDIENT_BY_JUNK } from '@/catalog/ingredients';
 import { ingredientsOf, ingredientQty } from '@/catalog/monsterDrops';
 import { MONSTER_CATALOG, monsterSpriteUrl, type MonsterCatalogEntry } from '@/catalog/monsters';
 import { LOOT_PROFILES, LOOT_SOURCES } from '@/catalog/lootConfig';
@@ -108,7 +109,7 @@ export const dropRowsOf = (type: string, level: number): BestiaryDropRow[] => {
 		const item = ITEM_CATALOG[ing.id];
 		const n = lo === hi ? `${lo}` : `${lo}-${hi}`;
 		rows.push({
-			label: `${item?.name ?? ing.id} x${n}`,
+			label: `${item?.name ?? ing.id} x${n}${INGREDIENT_BY_JUNK.has(ing.id) ? ' (ingredient)' : ''}`,
 			value: ing.chance >= 1 ? 'always' : pct(ing.chance),
 			tone: item?.rarity === 'epic' ? 'epic' : item?.rarity === 'rare' ? 'rare' : 'plain',
 		});

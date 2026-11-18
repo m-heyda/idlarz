@@ -1,4 +1,5 @@
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
+import { CRAFTING } from '@/config/crafting';
 import { rollKillLoot } from '@/lib/loot';
 import { deedBonuses } from '@/lib/deeds';
 import { masteryBonusesFor } from '@/lib/mastery';
@@ -24,7 +25,26 @@ export interface KillPayout {
 	convertedGold: number;
 	autoSold: { count: number; gold: number };
 	pity: Record<string, number>;
+	/** The ingredients that went into the crafting bag (key -> amount actually stored) */
+	stash: Record<string, number>;
 }
+
+/** Adds ingredients to the crafting bag stock, each key up to `CRAFTING.componentCap` (what does not fit is lost, like the other component deliveries). Returns the new stock and what was stored. */
+const stashIn = (
+	stock: Readonly<Record<string, number>>,
+	add: Readonly<Record<string, number>>,
+): { stock: Record<string, number>; stored: Record<string, number> } => {
+	const next = { ...stock };
+	const stored: Record<string, number> = {};
+	for (const [key, qty] of Object.entries(add)) {
+		const room = Math.max(0, CRAFTING.componentCap - (next[key] ?? 0));
+		const n = Math.min(room, Math.floor(qty));
+		if (n <= 0) continue;
+		next[key] = (next[key] ?? 0) + n;
+		stored[key] = n;
+	}
+	return { stock: next, stored };
+};
 
 /**
  * Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
@@ -77,9 +97,11 @@ export const payKill = (
 	);
 	// the drops go where they go on the server: the bag (or gold when it is full, or the auto-sell filter), and the pity counters move on
 	const received = receiveInto(inv, loot.items, sellContextOf(stored.core), loot.pity);
+	const stashed = stashIn(ledger.craft.stock, loot.stash);
 	return {
 		ledger: {
 			...ledger,
+			craft: Object.keys(stashed.stored).length > 0 ? { ...ledger.craft, stock: stashed.stock } : ledger.craft,
 			bank: taken.bank,
 			ordKill,
 			stats: recordKill(ledger.stats, {
@@ -103,6 +125,7 @@ export const payKill = (
 			convertedGold: received.received.convertedGold,
 			autoSold: received.received.autoSold,
 			pity: loot.pity,
+			stash: stashed.stored,
 		},
 	};
 };

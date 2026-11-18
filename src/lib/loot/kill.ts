@@ -4,7 +4,7 @@ import { isBoss, monsterDef, rewardLevelMult } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
 import { generateLoot } from './generate';
-import { rollJunkDrops } from './junkDrops';
+import { rollJunkLoot } from './junkDrops';
 
 export interface KillContext {
 	goldPerSec: number;
@@ -36,6 +36,8 @@ export interface KillLoot {
 	xp: number;
 	hide: number;
 	items: Drop[];
+	/** Crafting ingredients the kill dropped, for the crafting bag (key -> amount); they never touch the bag or the merchant */
+	stash: Record<string, number>;
 	/** The pity counters after this kill */
 	pity: Record<string, number>;
 }
@@ -95,6 +97,6 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 	);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	// junk materials come last, so the rest of the kill's rolls are untouched
-	const junk = rollJunkDrops({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky, type: monster.type }, rng);
-	return { gold, xp, hide, items: [...result.drops, ...junk], pity: result.pity };
+	const junk = rollJunkLoot({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky, type: monster.type }, rng);
+	return { gold, xp, hide, items: [...result.drops, ...junk.drops], stash: junk.stash, pity: result.pity };
 };

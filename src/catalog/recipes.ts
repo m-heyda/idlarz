@@ -9,6 +9,7 @@
 import { CRAFT_GEAR } from '@/config/crafting';
 import { GRADE_INFO, type Grade } from '@/catalog/items/grades';
 import type { ItemDef } from '@/types/game';
+import { INGREDIENT_COMPONENTS } from './ingredients';
 import { RESOURCES, type MerchantResourceKey } from './resources';
 
 export type RecipeKind = 'potion' | 'component' | 'good' | 'gear' | 'legendary';
@@ -19,11 +20,14 @@ export interface ComponentDef {
 	description: string;
 }
 
-export const COMPONENTS: Record<string, ComponentDef> = {
+const BASE_COMPONENTS: Record<string, ComponentDef> = {
 	glass_vial: { id: 'glass_vial', name: 'Glass Vial', description: 'A small flask of fire-blown glass. Every potion needs one.' },
 	cured_leather: { id: 'cured_leather', name: 'Cured Leather', description: 'Hide cured over coal until it is supple. The base of every leather good.' },
 	plank_bundle: { id: 'plank_bundle', name: 'Plank Bundle', description: 'Sawn, stone-planed boards tied in a bundle. Gear recipes will use them.' },
 };
+
+/** Every crafting bag stack that is not a potion or a trade good: the half-products recipes make, and the monster ingredients that drop into the bag (`catalog/ingredients.ts`, no recipe uses them yet). */
+export const COMPONENTS: Record<string, ComponentDef> = { ...BASE_COMPONENTS, ...INGREDIENT_COMPONENTS };
 
 /**
  * The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot

@@ -144,7 +144,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `FLAG_POLICY` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:97`](../../src/lib/cloudSave/verify.ts) | The flags and what the server does with each. |
 | `GameState` | Architecture / State | [`src/types/game.ts:374`](../../src/types/game.ts) | State. |
 | `gear` | Loot / Adding content | [`src/catalog/items/define.ts:105`](../../src/catalog/items/define.ts) | The builder every piece of gear is authored with. |
-| `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
+| `GEAR_RECIPES` | Economy / Crafting | [`src/catalog/recipes.ts:341`](../../src/catalog/recipes.ts) | The gear recipes (IDL-241): |
 | `gearItemLevels` | Progression / Crafting | [`src/lib/craftGear.ts:40`](../../src/lib/craftGear.ts) | The item level a recipe of this grade makes, by crafting level: |
 | `gearOdds` | Progression / Crafting | [`src/lib/craftGear.ts:143`](../../src/lib/craftGear.ts) | What the Crafting window's odds panel shows for a recipe: |
 | `GEM_SHOP` | Economy / Gems | [`src/config/gemShop.ts:64`](../../src/config/gemShop.ts) | The gem shop's price book: |
@@ -165,6 +165,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `IDOL_RULES` | Economy / Buildings | [`src/config/buildings.ts:58`](../../src/config/buildings.ts) | The Idols (IDL-96, docs/plan/18 section 6): |
 | `idolEconomy` | Economy / Buildings | [`src/lib/idolEconomy.ts:80`](../../src/lib/idolEconomy.ts) | The economy effects of the standing Idols. |
 | `IDOLS` | Economy / Buildings | [`src/catalog/idols.ts:41`](../../src/catalog/idols.ts) | The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): |
+| `INGREDIENTS` | Economy / Crafting | [`src/catalog/ingredients.ts:31`](../../src/catalog/ingredients.ts) | The ingredients and what is planned for each (none of it is built yet). |
 | `INITIAL_RESOURCES` | Economy / Basics | [`src/config/economy.ts:148`](../../src/config/economy.ts) | What a new game starts with: |
 | `isAutoSold` | Loot / Pipeline | [`src/lib/loot/autoSell.ts:10`](../../src/lib/loot/autoSell.ts) | Whether the auto-sell filter takes a piece of gear: |
 | `isInWard` | Economy / Castle | [`src/lib/castleWard.ts:15`](../../src/lib/castleWard.ts) | Is this tile inside the ward: |
@@ -173,7 +174,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `judgeRebase` | Saves & Server / Uploading | [`src/lib/cloudRecovery.ts:31`](../../src/lib/cloudRecovery.ts) | Whether a refused upload (409, "the account has a newer save") may be resolved without asking the player, and how. |
 | `junkSale` | Loot / Junk | [`src/lib/loot/junk.ts:74`](../../src/lib/loot/junk.ts) | What the Sell junk button does to a bag: |
 | `KeepRef` | Progression / Rebirth | [`src/lib/rebirthKeep.ts:20`](../../src/lib/rebirthKeep.ts) | Carrying legendary gear through a rebirth. |
-| `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:59`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
+| `killIncome` | Monsters / Rewards | [`src/lib/loot/kill.ts:61`](../../src/lib/loot/kill.ts) | Rewards for a kill. |
 | `kit` | Loot / Items | [`src/lib/fightSim.ts:58`](../../src/lib/fightSim.ts) | A full kit of one ladder grade: |
 | `Ledger` | Saves & Server / The ledger | [`src/lib/offline/ledger.ts:158`](../../src/lib/offline/ledger.ts) | The ledger: |
 | `LedgerRowUpgrade` | Saves & Server / The ledger | [`src/lib/offline/ledgerUpgrade.ts:26`](../../src/lib/offline/ledgerUpgrade.ts) | The upgrade path of a `player_ledger` row. |
@@ -214,7 +215,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `NICK_EFFECTS` | Progression / Badges | [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts) | The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): |
 | `NPC_PORTRAITS` | Architecture / Art | [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts) | The NPC portraits: |
 | Pacing targets | Pacing / Targets | [`scripts/sim.ts:21`](../../scripts/sim.ts) | What pace the economy is tuned for, why, and how to check it. |
-| `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:38`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
+| `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:58`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
 | `PERK_CAPS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:15`](../../src/catalog/perkCaps.ts) | The cap on the gear bucket of each perk family, in percent. |
 | `PERSISTED_KEYS` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:65`](../../src/lib/sanitizeSave.ts) | The part of the game state that is saved. |
 | `PetDef` | Progression / Pets | [`src/catalog/pets.ts:10`](../../src/catalog/pets.ts) | A pet of the catalog (pure config). |
@@ -263,7 +264,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
 | `rollGear` | Progression / Crafting | [`src/lib/craftGear.ts:117`](../../src/lib/craftGear.ts) | One crafted piece: |
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:112`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
-| `rollJunkDrops` | Loot / Junk | [`src/lib/loot/junkDrops.ts:64`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
+| `rollJunkLoot` | Loot / Junk | [`src/lib/loot/junkDrops.ts:71`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:90`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:56`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
@@ -310,7 +311,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `TILE_RESOURCE_COST` | Economy / Tiles | [`src/config/economy.ts:126`](../../src/config/economy.ts) | Extra resources a tile purchase costs: |
 | `tilePrice` | Economy / Tiles | [`src/config/economy.ts:106`](../../src/config/economy.ts) | Gold price of the next tile when `ownedTiles` are owned, before discounts: |
 | `totalStatPoints` | Progression / Levels | [`src/utils/game/character.ts:152`](../../src/utils/game/character.ts) | The attribute points a character that has reached `level` has earned in all (a level gives 1; |
-| `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
+| `TRADE_GOODS` | Economy / Crafting | [`src/catalog/recipes.ts:40`](../../src/catalog/recipes.ts) | The trade goods crafting makes (IDL-227): |
 | `trustedEconomy` | Saves & Server / Accepting a save | [`src/lib/cloudSave/trustedEconomy.ts:44`](../../src/lib/cloudSave/trustedEconomy.ts) | `ratio` is the net-worth check's `required / allowed` (over 1 = the save claims more than its time can explain). |
 | Turning enforcement and the server-run rebirth on together | Ops / Operator guides | [`src/lib/cloudSave/verify.ts:116`](../../src/lib/cloudSave/verify.ts) | **Turning enforcement on: |
 | `TutorialGuide` | Progression / Guided tutorial | [`src/components/game/tutorial/TutorialGuide.tsx:39`](../../src/components/game/tutorial/TutorialGuide.tsx) | Brother Alder, the tutorial guide. |
