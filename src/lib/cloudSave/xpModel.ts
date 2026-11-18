@@ -73,9 +73,11 @@ export const settleXp = (prev: Snapshot | null, next: SaveSummary, nowMs: number
 	const playedSec = Math.min(Math.max(0, next.playSeconds - before.playSeconds), elapsedSec * XP_MODEL.playtimeSlack + XP_MODEL.playtimeGraceSec);
 
 	// the purchases in between: a rebirth starts the count again (the old run may have run on for a few more tiles first)
+	// the tile XP bonus is priced at the better of the two saves: gear taken off before the next upload must not shrink what the purchase really paid
+	const gainPct = Math.max(before.xpGainPct, next.xpGainPct);
 	const bought = newRun
-		? tileXp(1, purchasedOf(next), next.xpGainPct) + tileXp(purchasedOf(before), purchasedOf(before) + XP_MODEL.runEndTiles, before.xpGainPct)
-		: tileXp(purchasedOf(before), purchasedOf(next), next.xpGainPct);
+		? tileXp(1, purchasedOf(next), gainPct) + tileXp(purchasedOf(before), purchasedOf(before) + XP_MODEL.runEndTiles, gainPct)
+		: tileXp(purchasedOf(before), purchasedOf(next), gainPct);
 	const rate = Math.max(xpRate(before), xpRate(next));
 	const earned = bought * XP_MODEL.tileSlack + rate * playedSec * XP_MODEL.passiveSlack + (grants?.xp ?? 0);
 

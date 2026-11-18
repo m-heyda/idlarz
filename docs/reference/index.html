@@ -2973,7 +2973,7 @@ the shop migration turns that into a free grant.</p>
 <p>Freezes everything a fight needs about the player into a <code>PlayerProfile</code> (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt&#39;s potion cooldown, power and slots), from the last accepted save and the ledger&#39;s gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (<code>classPassives</code>).</p>
 </article><article><p><a id="fightstep"></a></p>
 <h3><code>fightStep</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:166</code></a></p>
+<p>Source: <a href="../../src/lib/offline/fightSteps.ts"><code>src/lib/offline/fightSteps.ts:165</code></a></p>
 <p>One tick of the open fight. Returns when the fight ended.</p>
 <p>One tick of the open fight, in the order of the numbered list on <a href="#runcombat"><code>runCombat</code></a>.</p>
 </article><article><p><a id="endfight"></a></p>
@@ -3018,7 +3018,7 @@ bucket = Safe if pct &gt;= 100 x safeWinChance (80), Risky if pct &gt;= 100 x mi
 </code></pre>
 </article><article><p><a id="estimatewin"></a></p>
 <h3><code>estimateWin</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/winChance.ts"><code>src/lib/offline/winChance.ts:64</code></a></p>
+<p>Source: <a href="../../src/lib/offline/winChance.ts"><code>src/lib/offline/winChance.ts:72</code></a></p>
 <p>The player&#39;s chance against a monster of this type and level, starting with <code>hp</code> and with these potions to drink. A monster that
 cannot be killed inside the fight&#39;s time limit (a boss&#39;s own clock, <code>COMBAT.maxFightSec</code>) is a certain loss.</p>
 <p>Win chance: a closed form from the frozen profile and <code>monsterStats</code>. If <code>killSec &gt; limit</code> the chance is 0. The same estimate weights new spawns (<a href="#typeweights"><code>typeWeights</code></a>).
@@ -4111,7 +4111,7 @@ and to 0.1 for a hopeless one (chance &lt;= 5%); equal weights give the plain un
 for new spawns only. Bosses follow the same rules (IDL-222): among the boss types that have a free tile the pick is weighted and the level capped (<a href="#placetickets"><code>placeTickets</code></a>). Measured: <code>docs/generated/spawn-mix.md</code>.</p>
 </article><article><p><a id="placetickets"></a></p>
 <h3><code>placeTickets</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:79</code></a></p>
+<p>Source: <a href="../../src/lib/offline/placement.ts"><code>src/lib/offline/placement.ts:82</code></a></p>
 <p>Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
 grows. <code>rollFor(&#39;spawnpos&#39;, n)</code> picks the tile of monster ticket <code>n</code> and <code>rollFor(&#39;chestpos&#39;, n)</code> the one of chest <code>n</code> (the server seals

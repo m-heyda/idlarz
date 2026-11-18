@@ -1,3 +1,4 @@
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
 import { chestSpots, pickChestSpot } from '@/lib/chests';
 import { MONSTERS } from '@/config/combatConfig';
@@ -23,13 +24,13 @@ import { createWorld, getTile, type Placed, type World } from '@/utils/world';
 export const siteKey = (summary: { tilesOwned: number; castleLevel: number; rebirths: number }): string =>
 	`${summary.tilesOwned}:${summary.castleLevel}:${summary.rebirths}:r${Object.keys(MONSTERS).length}`;
 
-type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean };
+type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean; building?: string; bl?: number };
 
 /** The owned tiles of a stored map (`land` and `extra` of a save, see saveFormat), or null when it cannot be read. */
 export const worldFromPart = (part: { land: unknown; extra: unknown }): World | null => {
 	const unpacked = unpackBody({ land: part.land, extra: part.extra } as SaveBody);
 	if ('error' in unpacked) return null;
-	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, chest }) => ({
+	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, chest, building, bl }) => ({
 		x,
 		y,
 		tile: {
@@ -37,6 +38,8 @@ export const worldFromPart = (part: { land: unknown; extra: unknown }): World | 
 			isOwned: true,
 			...(level !== undefined ? { level } : {}),
 			...(chest ? { hasChest: true } : {}),
+			// a stored building (while the building system is on) keeps its tile occupied, so rocks are never placed on it or kept on it
+			...(BUILDINGS_FLAG.enabled && building ? { building, ...(bl !== undefined ? { buildingLevel: bl } : {}) } : {}),
 		},
 	}));
 	return createWorld(placed);

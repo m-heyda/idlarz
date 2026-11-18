@@ -23,6 +23,8 @@ const BATCH = 200;
 const SOUND_GAP_MS = 60;
 
 const unsent = new Map<string, number>();
+/** A batch whose answer never arrived (network or server failure): the server may already have counted it and paid a break, so the next try sends the SAME claim, and the server answers with what it did instead of counting twice or losing the loot */
+const undelivered = new Map<string, { claim: string; sent: number }>();
 const inflight = new Set<string>();
 /** One batch on its way at a time, whatever the rock: two rocks clicked in turn do not make two requests at once (they would race for the same ledger row) */
 let busy = false;
@@ -56,7 +58,8 @@ const flush = async (x: number, y: number): Promise<void> => {
 	if (timer) clearTimeout(timer);
 	timers.delete(key);
 	if (inflight.has(key)) return;
-	const waiting = unsent.get(key) ?? 0;
+	const retry = undelivered.get(key);
+	const waiting = retry ? retry.sent : (unsent.get(key) ?? 0);
 	if (waiting <= 0) return;
 	if (busy) {
 		// another rock's batch is on its way: try again shortly
@@ -66,11 +69,11 @@ const flush = async (x: number, y: number): Promise<void> => {
 		);
 		return;
 	}
-	const sent = Math.min(BATCH, waiting);
-	unsent.set(key, waiting - sent);
+	const sent = retry ? retry.sent : Math.min(BATCH, waiting);
+	if (!retry) unsent.set(key, waiting - sent);
 	inflight.add(key);
 	busy = true;
-	const claim = newClaimId();
+	const claim = retry ? retry.claim : newClaimId();
 	let reply: Reply<RockReply>;
 	try {
 		reply = await requestRock(claim, x, y, sent);
@@ -79,6 +82,8 @@ const flush = async (x: number, y: number): Promise<void> => {
 		inflight.delete(key);
 		busy = false;
 	}
+	if (reply.status === 'unavailable') undelivered.set(key, { claim, sent });
+	else undelivered.delete(key);
 
 	const store = useRockStore.getState();
 	if (reply.status === 'ok') {
@@ -95,13 +100,17 @@ const flush = async (x: number, y: number): Promise<void> => {
 			notify('The rock crumbled: it was not a real one.', 'error');
 			return;
 		}
+	} else if (reply.status === 'unavailable') {
+		// keep the hits: the same batch is sent again with the same claim, so a break the server already paid is not lost
+		notify('Could not reach the server: your last hits are kept and sent again.', 'error');
+		schedule(x, y);
+		return;
 	} else {
 		store.lose(x, y, sent);
 		if (reply.status === 'need_claim') {
 			signalNeedClaim();
 			notify('Catching up with the server, try again in a moment.', 'error');
 		} else if (reply.status === 'no_save') notify('Your progress is still being saved to the server: try mining again in a moment.', 'error');
-		else notify('Could not reach the server: your last hits were not counted.', 'error');
 	}
 	// clicks made while the batch was on its way
 	if ((unsent.get(key) ?? 0) > 0 && useRockStore.getState().rocks[key]) {

@@ -262,7 +262,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:166`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:165`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -347,7 +347,7 @@ bucket = Safe if pct >= 100 x safeWinChance (80), Risky if pct >= 100 x minWinCh
 
 ### `estimateWin` <small>function</small>
 
-Source: [`src/lib/offline/winChance.ts:64`](../../src/lib/offline/winChance.ts)
+Source: [`src/lib/offline/winChance.ts:72`](../../src/lib/offline/winChance.ts)
 
 The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that
 cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.

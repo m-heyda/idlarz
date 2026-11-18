@@ -136,12 +136,12 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `ENFORCEMENT` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:141`](../../src/lib/cloudSave/verify.ts) | The kill switch and the allowlist for enforcement (IDL-112). |
 | `engage` | Combat / A fight | [`src/lib/offline/fightTargets.ts:110`](../../src/lib/offline/fightTargets.ts) | The next fight: |
 | `ensureSeasonReset` | Saves & Server / Away time | [`src/lib/offline/season.ts:53`](../../src/lib/offline/season.ts) | Resets the player's game when a season reset happened that their ledger does not know about. |
-| `estimateWin` | Combat / Win chance | [`src/lib/offline/winChance.ts:64`](../../src/lib/offline/winChance.ts) | The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. |
+| `estimateWin` | Combat / Win chance | [`src/lib/offline/winChance.ts:72`](../../src/lib/offline/winChance.ts) | The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. |
 | `extractorOutput` | Economy / Buildings | [`src/lib/buildingOutput.ts:42`](../../src/lib/buildingOutput.ts) | What an Extractor of level `level` makes per second, before the global modifiers: |
 | `FAMILY_DROPS` | Monsters / Bestiary | [`src/catalog/monsterDrops.ts:35`](../../src/catalog/monsterDrops.ts) | What each family leaves (two or three ingredients), so a bear and a boar share a theme and the Bestiary can explain it. |
 | `FARM_UPGRADES` | Economy / Farm | [`src/config/farm.ts:81`](../../src/config/farm.ts) | Farm upgrades: |
 | `farmUpgradeCost` | Economy / Farm | [`src/utils/game/farm.ts:34`](../../src/utils/game/farm.ts) | Cost of the next level of a farm upgrade, given its current level (one entry per resource). |
-| `fightStep` | Combat / A fight | [`src/lib/offline/fightSteps.ts:166`](../../src/lib/offline/fightSteps.ts) | One tick of the open fight. |
+| `fightStep` | Combat / A fight | [`src/lib/offline/fightSteps.ts:165`](../../src/lib/offline/fightSteps.ts) | One tick of the open fight. |
 | `finite` | Saves & Server / The ledger | [`src/lib/offline/ledgerRead.ts:19`](../../src/lib/offline/ledgerRead.ts) | Tolerant readers for the two ledger columns that hold catalog ids (`inv`: |
 | `FLAG_POLICY` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:97`](../../src/lib/cloudSave/verify.ts) | The flags and what the server does with each. |
 | `GameState` | Architecture / State | [`src/types/game.ts:378`](../../src/types/game.ts) | State. |
@@ -226,7 +226,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `pickTarget` | Combat / A fight | [`src/lib/offline/fightTargets.ts:39`](../../src/lib/offline/fightTargets.ts) | The next monster to engage: |
 | `pityMultiplier` | Progression / Crafting | [`src/lib/craftGear.ts:81`](../../src/lib/craftGear.ts) | The pity multiplier on the grade's best rarity after `misses` crafts that missed it. |
 | Pixel art pipeline | Architecture / Art | [`src/config/pixelIcons.ts:1`](../../src/config/pixelIcons.ts) | All sprites, frames and the map terrain (textures, dual-grid shape atlases, trees, rocks, docks) are generated, not drawn by hand: |
-| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:79`](../../src/lib/offline/placement.ts) | Looks at the land: |
+| `placeTickets` | Monsters / Spawning | [`src/lib/offline/placement.ts:82`](../../src/lib/offline/placement.ts) | Looks at the land: |
 | `playerProfile` | Combat / A fight | [`src/lib/offline/profile.ts:65`](../../src/lib/offline/profile.ts) | Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, l... |
 | `POISON_FLAGS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:156`](../../src/lib/cloudSave/verify.ts) | Flags that make an account ineligible for rankings for good. |
 | `potionCooldownSec` | Combat / Potions and skills | [`src/lib/potionBelt.ts:17`](../../src/lib/potionBelt.ts) | The shared cooldown between potions inside a fight, shortened by the worn belt's Potion Cooldown and never below `COMBAT.potionCooldownMinSec` (4 s... |

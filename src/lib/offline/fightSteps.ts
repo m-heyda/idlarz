@@ -129,7 +129,7 @@ export const endFight = (ctx: FightCtx, t: number, kind: 'defeated' | 'timeout' 
 };
 
 /**
- * Venom for one tick: every poison stack costs `venom.pctPerSec` % of the hero's max HP per second, and the hero's regeneration is cut by `venom.regenCutPct` % while it lasts (the part of this tick's regeneration that the poison cancels is taken back). The damage is reported as one `poison` event per second of the fight and when the poison runs out. No random numbers.
+ * Venom for one tick: every poison stack costs `venom.pctPerSec` % of the hero's max HP per second, and the hero's regeneration is cut by `venom.regenCutPct` % while it lasts (applied in `fightStep` before the HP cap). The damage is reported as one `poison` event per second of the fight and when the poison runs out. No random numbers.
  */
 const tickPoison = (
 	ctx: FightCtx,
@@ -141,8 +141,7 @@ const tickPoison = (
 	const c = ctx.c;
 	const poison = f.poison!;
 	const live = Math.min(dt, poison.leftSec);
-	const regenBack = ((f.profile.hpRegen * dt + regenGain(c, t - dt, dt)) * venom.regenCutPct) / 100;
-	const damage = (poison.stacks * venom.pctPerSec * f.profile.maxHp * live) / 100 + (regenBack * live) / dt;
+	const damage = (poison.stacks * venom.pctPerSec * f.profile.maxHp * live) / 100;
 	c.hp = Math.max(0, c.hp - damage);
 	f.hurt = (f.hurt ?? 0) + damage;
 	poison.acc += damage;
@@ -170,7 +169,9 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	f.elapsed += dt;
 	const monster = monsterStats(f.type, f.level, f.elapsed);
 	const venom = modifiersOf(f.type).venom;
-	c.hp = Math.min(p.maxHp, c.hp + p.hpRegen * dt + regenGain(c, t - dt, dt));
+	// Venom cuts the regeneration for the part of the tick the poison is on, before the HP cap, so a hero at full HP loses nothing to the cut
+	const cut = venom && f.poison ? (venom.regenCutPct / 100) * (Math.min(dt, f.poison.leftSec) / dt) : 0;
+	c.hp = Math.min(p.maxHp, c.hp + (p.hpRegen * dt + regenGain(c, t - dt, dt)) * (1 - cut));
 	c.mp = Math.min(p.maxMp, c.mp + p.mpRegen * dt);
 	tickCooldowns(ctx, dt);
 	if (f.timeLeftSec !== null) f.timeLeftSec = Math.max(0, f.timeLeftSec - dt);
