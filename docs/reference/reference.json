@@ -509,7 +509,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 184,
+  "line": 200,
   "summary": "Value multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -520,7 +520,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 211,
+  "line": 227,
   "summary": "Power multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -1639,7 +1639,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 35,
+  "line": 36,
   "summary": "The player's numbers (all pure functions in `src/lib/combat.ts`, used by the server engine and the UI):",
   "see": [
    "armorReduction",
@@ -1654,7 +1654,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/combat.ts",
-  "line": 46,
+  "line": 47,
   "summary": "Auto-battle (the server picking the next monster) is a reward for the first rebirth; a click on a monster starts a fight from the start.",
   "see": []
  },
@@ -1665,7 +1665,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/combat.ts",
-  "line": 56,
+  "line": 57,
   "summary": "Auto-use (the server drinking potions, casting Heal and Stun for the player) is bought in the Ember shop (Potion Reflex, one-time, 15 Embers): before it the switch is neither shown nor honoured, whatever the saved flag says (the flag is kept, so a player who had it on has it on again the moment it unlocks). Hotkeys and clicks on the potion and skill slots always work. An account from before the reworked shop (no `shopVersion` in its Embers) keeps the old rule: unlocked with the first rebirth; the shop migration turns that into a free grant.",
   "see": []
  },
@@ -1676,7 +1676,7 @@
   "kind": "function",
   "category": "Combat/Win chance",
   "file": "src/lib/combat.ts",
-  "line": 75,
+  "line": 76,
   "summary": "The Next strip's win-chance bucket for a queued monster, from the server's estimate as a whole percent (the client never recomputes it): Safe from 80% up (green), Risky from 50% (`minWinChance`, the line auto-battle itself uses) to 79% (amber), Unlikely below 50% (red). The strip also shows the word and the exact percent on hover, so colour is never the only cue.",
   "see": []
  },
@@ -1687,7 +1687,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 123,
+  "line": 125,
   "summary": "Damage of one swing (before crits): the gear's total damage times the attribute bonus of the weapon's type (1 without a weapon) and the set's percent damage.",
   "see": []
  },
@@ -1698,7 +1698,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 134,
+  "line": 136,
   "summary": "Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.",
   "see": []
  },
@@ -1709,7 +1709,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 153,
+  "line": 155,
   "summary": "Chance (0-1) that a swing crits, and that a crit becomes a super crit: character crit plus gear.",
   "see": []
  },
@@ -1720,7 +1720,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 171,
+  "line": 173,
   "summary": "One swing: `hit` damage, times the crit or super crit multiplier when the roll says so (high rolls crit, so a stubbed rng() of 0 never does). Two random numbers at most (the second only on a crit). The server's fight engine and `rollHit` share it.",
   "see": []
  },
@@ -1731,7 +1731,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 190,
+  "line": 197,
   "summary": "Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.",
   "see": []
  },
@@ -1742,7 +1742,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 206,
+  "line": 214,
   "summary": "The Life Leech in %, the gear's and the merchant's together, never above the cap.",
   "see": []
  },
@@ -1753,7 +1753,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 223,
+  "line": 231,
   "summary": "The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much, so no amount of armor makes anything unkillable (the asymptote is 75 %).",
   "see": []
  },
@@ -1764,7 +1764,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 236,
+  "line": 244,
   "summary": "Damage of one monster hit after armor: `max(1, round(raw x (1 - armorReduction(armor))))`.",
   "see": []
  },
@@ -1775,7 +1775,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 244,
+  "line": 252,
   "summary": "HP regeneration outside fights: the base rate plus the gear's regen stat.",
   "see": []
  },
@@ -1786,7 +1786,7 @@
   "kind": "function",
   "category": "Combat/Player numbers",
   "file": "src/lib/combat.ts",
-  "line": 255,
+  "line": 263,
   "summary": "Chance (0-1) that a monster's hit misses: the gear's Dodge, capped.",
   "see": []
  },
@@ -1911,6 +1911,17 @@
   "file": "src/lib/fightSim.ts",
   "line": 58,
   "summary": "A full kit of one ladder grade: all 13 slots plus the belt (both rings), `weapon` as the main hand (a sword by default; special sets wear their own). Items are plain: authored level, neutral quality, no affixes. Grades above the live ones are disabled data, fine for a fight but nothing a player can have yet.",
+  "see": []
+ },
+ {
+  "id": "withgearattributes",
+  "name": "withGearAttributes",
+  "symbol": "withGearAttributes",
+  "kind": "function",
+  "category": "Loot/Affixes",
+  "file": "src/lib/gearAttributes.ts",
+  "line": 44,
+  "summary": "The character with the worn gear's attributes counted: the five attributes and everything derived from them (max HP and mana pools, armor, crit chance, Luck, XP gain...) worked out again from the totals. With no attribute gear it returns the same object.",
   "see": []
  },
  {
@@ -2765,7 +2776,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/profile.ts",
-  "line": 64,
+  "line": 65,
   "summary": "Freezes everything a fight needs about the player into a `PlayerProfile` (max HP and mana, damage per hit, crit odds, attack speed, armor, dodge, leech, regen, and the belt's potion cooldown, power and slots), from the last accepted save and the ledger's gear. The hero class of the save (stamped from the profile row) adds its combat passive: armor, regeneration, crit chance, mana and Spell Power (`classPassives`).",
   "see": []
  },
@@ -2776,7 +2787,7 @@
   "kind": "function",
   "category": "Combat/Consumables",
   "file": "src/lib/offline/profile.ts",
-  "line": 107,
+  "line": 108,
   "summary": "A profile with the running potion buffs on top ({@link buffTotals}): each is an additive percent of the number it changes. No buffs gives the profile itself (the same object), so a fight with no potions is exactly the fight there was before buffs. A fight freezes the result when it starts.",
   "see": []
  },
@@ -3102,7 +3113,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/skills.ts",
-  "line": 20,
+  "line": 21,
   "summary": "HP a Heal restores: its share of max HP, times the Intelligence bonus (the same one magic weapons get) and the gear's Spell Power.",
   "see": []
  },

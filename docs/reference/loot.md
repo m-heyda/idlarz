@@ -11,6 +11,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
 - Junk: [`isJunk`](#isjunk), [`junkSale`](#junksale), [`sellJunkRule`](#selljunkrule), [`rollJunkLoot`](#rolljunkloot)
+- Affixes: [`withGearAttributes`](#withgearattributes)
 
 ## Pipeline
 
@@ -291,7 +292,7 @@ Rarities: everything the game knows about one, in one place: label, colour, glow
 
 ### `levelScale` <small>function</small>
 
-Source: [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:227`](../../src/catalog/stats.ts)
 
 Power multiplier of an item level (1 at level 1).
 
@@ -309,7 +310,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 
 ### `valueCurve` <small>function</small>
 
-Source: [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:200`](../../src/catalog/stats.ts)
 
 Value multiplier of an item level (1 at level 1).
 
@@ -482,4 +483,24 @@ cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 f
 rare chance = base x (1 + 0.005 x Luck)
 boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
 ingredient  = chance x (1 + 0.005 x Luck) per kill; qty = (min..max) + floor(perLevel x (level - 1))        (the monster's own table, x3 for a golden one)
+```
+
+## Affixes
+
+<a id="withgearattributes"></a>
+
+### `withGearAttributes` <small>function</small>
+
+Source: [`src/lib/gearAttributes.ts:44`](../../src/lib/gearAttributes.ts)
+
+The character with the worn gear's attributes counted: the five attributes and everything derived from them (max HP and mana pools, armor, crit chance, Luck, XP gain...) worked out again from the totals.
+With no attribute gear it returns the same object.
+
+Gear attributes count in combat (damage, crit damage, armor, attack speed, max HP and mana, Heal), in Luck and XP gain, and in the quality bias of crafted gear (Intelligence).
+The economy (income, tile discount) reads the points the player spent only.
+
+**Formula**
+
+```text
+attribute total = spent points (start value 5 included) + sum of the worn gear's attribute affixes
 ```

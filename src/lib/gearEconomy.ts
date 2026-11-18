@@ -1,4 +1,5 @@
 import { aggregateStats } from '@/lib/inventory';
+import { CHARACTER_STAT_CONFIG } from '@/config/character';
 import { classXpBucket } from '@/lib/classPassives';
 import type { CharacterStats, Equipment } from '@/types/game';
 
@@ -39,6 +40,13 @@ export const gearEconomy = (equipment: Equipment): GearEconomy => {
 /** The % income bonus of the worn gear (the extra argument of `calculateResourceRates`). */
 export const gearIncomePct = (equipment: Equipment): number => aggregateStats(equipment).incomePct;
 
+/** The XP bonus in % that the worn gear's Intelligence and Charisma add, at the same rate as the points the player spends. */
+const gearAttributeXpPct = (equipment: Equipment): number => {
+	const gear = aggregateStats(equipment);
+	const per = CHARACTER_STAT_CONFIG.xpGainPercentPerPoint;
+	return gear.intelligence * per.intelligence + gear.charisma * per.charisma;
+};
+
 /** The total XP bonus in %: the attributes' (Intelligence, Charisma) plus the worn gear's and the class's (together held under the XP perk cap, {@link classXpBucket}). */
 export const xpGainPct = (characterStats: Pick<CharacterStats, 'xpGainMultiplier'>, equipment: Equipment, playerClass?: unknown): number =>
-	characterStats.xpGainMultiplier + classXpBucket(aggregateStats(equipment).xpPct, playerClass);
+	characterStats.xpGainMultiplier + gearAttributeXpPct(equipment) + classXpBucket(aggregateStats(equipment).xpPct, playerClass);

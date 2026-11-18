@@ -61,8 +61,13 @@ const LEVEL_SHARE: Record<string, number> = {
 	manaRegen: 0.5,
 	maxMana: 0.7,
 	spellPower: 0.4,
+	strength: 0.5,
+	dexterity: 0.5,
+	intelligence: 0.5,
+	vitality: 0.5,
+	charisma: 0.5,
 };
-const INTEGER_STATS = new Set(['damage', 'armor', 'maxHp', 'luck', 'maxMana']);
+const INTEGER_STATS = new Set(['damage', 'armor', 'maxHp', 'luck', 'maxMana', 'strength', 'dexterity', 'intelligence', 'vitality', 'charisma']);
 const TIER1: Record<string, number> = {
 	damage: 6,
 	armor: 1,
@@ -77,6 +82,11 @@ const TIER1: Record<string, number> = {
 	manaRegen: 0.2,
 	spellPower: 4,
 	lifeLeech: 0.5,
+	strength: 2,
+	dexterity: 2,
+	intelligence: 2,
+	vitality: 2,
+	charisma: 2,
 };
 const roundStat = (key: string, v: number) => (!v ? 0 : INTEGER_STATS.has(key) ? Math.max(1, Math.round(v)) : round2(v));
 const factor = (key: string, ratio: number) => 1 + (ratio - 1) * (LEVEL_SHARE[key] ?? 1);

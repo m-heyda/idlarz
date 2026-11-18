@@ -12,6 +12,7 @@ import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { CharacterStats, Equipment } from '@/types/game';
 import { calculateCombatStats, calculateLevel } from '@/utils/game/character';
+import { attributesWithGear } from '@/lib/gearAttributes';
 import { merchantCombat } from '@/utils/game/merchant';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 
@@ -79,7 +80,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		hit: damagePerHit(equipment, stats, bonus) * pct('damagePct'),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
-		critExtra: 1 + critDamagePercent(stats) / 100,
+		critExtra: 1 + critDamagePercent(attributesWithGear(stats, equipment)) / 100,
 		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
 		armor: armorOf(equipment, stats, playerClass) * pct('hpArmorPct'),
 		dodge: dodgeChance(equipment),

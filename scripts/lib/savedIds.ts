@@ -3,6 +3,7 @@ import { AVATARS } from '../../src/catalog/avatars';
 import { BUFF_FAMILIES } from '../../src/catalog/buffs';
 import { BUILDINGS } from '../../src/catalog/buildings';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, RARITIES } from '../../src/catalog';
+import { AFFIXES } from '../../src/catalog/affixes';
 import { COMPONENTS, RECIPES } from '../../src/catalog/recipes';
 import { STORED_KEYS } from '../../src/catalog/resourceKeys';
 import { CASTLE_UPGRADE } from '../../src/config/castle';
@@ -25,6 +26,8 @@ export interface SavedIds {
 	/** Letter per biome in the compact land: never changed or reused */
 	biomeCodes: Record<string, string>;
 	itemIds: string[];
+	/** Affix ids an item instance names (`{ id, roll }`): an unknown one drops the item, so they are never removed or renamed */
+	affixIds: string[];
 	monsterIds: string[];
 	recipeIds: string[];
 	componentIds: string[];
@@ -53,6 +56,7 @@ export const currentIds = (): SavedIds => ({
 	resourceKeys: [...STORED_KEYS],
 	biomeCodes: { ...BIOME_CODES },
 	itemIds: Object.keys(ITEM_CATALOG),
+	affixIds: AFFIXES.map((a) => a.id),
 	monsterIds: Object.keys(MONSTERS),
 	recipeIds: RECIPES.map((r) => r.id),
 	componentIds: Object.keys(COMPONENTS),
@@ -84,7 +88,9 @@ export const mergeReleased = (shipped: SavedIds | null, current: SavedIds): Save
 	for (const key of Object.keys(current) as (keyof SavedIds)[]) {
 		const was = shipped[key];
 		const now = current[key];
-		if (Array.isArray(was) && Array.isArray(now)) out[key] = [...was, ...now.filter((id) => !was.includes(id))];
+		if (was === undefined)
+			out[key] = now; // a kind of id the shipped list did not track yet
+		else if (Array.isArray(was) && Array.isArray(now)) out[key] = [...was, ...now.filter((id) => !was.includes(id))];
 		else
 			out[key] = {
 				...(now as Record<string, number | string>),

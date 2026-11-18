@@ -504,6 +504,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`epochGuard.ts`](../../src/lib/epochGuard.ts) — ~ The browser's half of the data epoch.
 - [`fightSim.ts`](../../src/lib/fightSim.ts) — ~ A character with attribute points spent on top of the starting 5 each (a level 30 character has about 25 to spend).
 - [`floatText.ts`](../../src/lib/floatText.ts) — Tiny event bus for the "+N resource" popups that appear at the cursor.
+- [`gearAttributes.ts`](../../src/lib/gearAttributes.ts) — ~ What the worn gear adds to each attribute (all zeros with no attribute affix on it).
 - [`gearEconomy.ts`](../../src/lib/gearEconomy.ts) — ~ The economy effects of the worn gear (the set bonuses of catalog/sets.ts).
 - [`globalMenu.ts`](../../src/lib/globalMenu.ts) — ~ Saves to this browser and, with an account signed in, to the cloud copy too (once every 10 minutes:
 
@@ -926,6 +927,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **tests/loot/**
 
+- [`attributeAffixes.test.ts`](../../tests/loot/attributeAffixes.test.ts) — ~ A base item of a slot tag, carrying the given affix at the given roll.
 - [`belt.test.ts`](../../tests/loot/belt.test.ts) — ~ A plain instance at a rarity the grade allows (plainItem is common, which the ladder's grades above G2 do not roll)
 - [`biomePools.test.ts`](../../tests/loot/biomePools.test.ts) — ~ The data as it will be when every grade is live (IDL-238):
 - [`bossOwnership.test.ts`](../../tests/loot/bossOwnership.test.ts) — ~ Sets with no boss yet and no open pool either:
