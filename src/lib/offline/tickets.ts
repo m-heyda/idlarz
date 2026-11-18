@@ -1,6 +1,8 @@
 import { COMBAT, FALLBACK_BOSS, FALLBACK_MONSTER, MONSTERS } from '@/config/combatConfig';
 import { SPAWN_LIMIT } from '@/config/spawns';
+import type { RockTier } from '@/config/rocks';
 import { chestIntervalSec, goldenMonsterChance } from '@/lib/luck';
+import { rockCap, rockIntervalSec, rollRockTier } from '@/lib/rocks';
 import type { Rng } from '@/lib/rng';
 import type { MonsterType } from '@/types/game';
 import { freeLand } from '@/lib/spawnLimits';
@@ -16,7 +18,7 @@ import { freeLand } from '@/lib/spawnLimits';
 export const TICKET_CAP = 40;
 
 /** What `kind` of ticket: a chest, a normal monster or a boss (one at a time). Also the name that seals the ticket's random rolls. */
-export type TicketKind = 'chest' | 'monster' | 'boss';
+export type TicketKind = 'chest' | 'monster' | 'boss' | 'rock';
 
 /** Which list of the monster a ticket stands for: a normal monster or the boss (fixed when the ticket is minted; the exact monster is chosen with its tile). */
 export type MonsterKind = 'normal' | 'boss';
@@ -26,6 +28,23 @@ export interface ChestTicket {
 	n: number;
 	/** When it appeared (epoch seconds, server clock) */
 	at: number;
+	x?: number;
+	y?: number;
+}
+
+/**
+ * A waiting rock (IDL-376). Its tier is rolled when it appears; `hits` are the clicks the server has let in, and `tokens` / `hitAt` are the click bucket (see `takeClicks`).
+ * Like a chest it gets a tile from placement.ts and is hidden until then.
+ */
+export interface RockTicket {
+	n: number;
+	/** When it appeared (epoch seconds, server clock) */
+	at: number;
+	tier: RockTier;
+	/** Clicks accepted so far */
+	hits: number;
+	tokens?: number;
+	hitAt?: number;
 	x?: number;
 	y?: number;
 }
@@ -68,8 +87,14 @@ export interface TicketBank {
 	nextN: number;
 	monstersMinted: number;
 	/** How many tiles a normal monster / the boss may stand on right now (from the last look at the map: `sitesKey` says which land that was). Monsters stop coming when they are all taken; unknown (never looked) means none come yet. `chest` counts the tiles a chest may stand on (absent in rows from before chests were placed here). */
-	sites?: { monster: number; boss: number; chest?: number };
+	sites?: { monster: number; boss: number; chest?: number; rock?: number };
 	sitesKey?: string;
+	/** Waiting rocks (absent in rows from before rocks) with their own timer; `rocksBroken` counts the ones broken this run (it seals each one's loot) */
+	rocks?: RockTicket[];
+	rockAcc?: number;
+	/** The number of the next rock: rocks count apart from chests and monsters, so their numbers never depend on how often the server was asked (absent: 1) */
+	nextRockN?: number;
+	rocksBroken?: number;
 }
 
 /** What decides how many tickets there can be and how fast they come: the last accepted save's land and the player's Luck. */
@@ -93,6 +118,9 @@ export const emptyBank = (nowSec: number): TicketBank => ({
 	nextN: 1,
 	monstersMinted: 0,
 });
+
+/** The waiting rocks (an older row has none). */
+export const rocksOf = (bank: Pick<TicketBank, 'rocks'>): RockTicket[] => bank.rocks ?? [];
 
 /** The boss waiting in the bank, if any (there is at most one). */
 export const bossOf = (bank: Pick<TicketBank, 'monsters'>): MonsterTicket | null => bank.monsters.find((ticket) => ticket.kind === 'boss') ?? null;
@@ -209,8 +237,50 @@ export const advanceBank = (
 		}
 	}
 	next.accAt = start + dt * scale;
-	return { bank: next, minted };
+	// rocks run on their own timer and room (they are not counted in `ticketCap`)
+	return { bank: { ...advanceRocks({ ...next, accAt: start }, dt, ctx, rollFor, options), accAt: next.accAt }, minted };
 };
+
+/**
+ * Brings the rock timer forward `dtSec` seconds and mints the rocks that come due, as long as there is room (`rockCap`, and a free tile once the map has been looked at). It has its own timer and its own room, apart from the chest and monster ones. `rollFor('rock', n)` seals the tier of rock `n`.
+ * The tickets are stamped across the real stretch `realDtSec` like the others.
+ */
+export const advanceRocks = (
+	bank: TicketBank,
+	dtSec: number,
+	ctx: BankContext,
+	rollFor: (kind: TicketKind, n: number) => Rng,
+	options: { realDtSec?: number } = {},
+): TicketBank => {
+	const dt = Number.isFinite(dtSec) ? Math.max(0, dtSec) : 0;
+	const scale = dt > 0 ? (options.realDtSec ?? dt) / dt : 1;
+	const rocks = [...rocksOf(bank)];
+	let nextRockN = bank.nextRockN ?? 1;
+	let acc = bank.rockAcc ?? 0;
+	const every = rockIntervalSec(ctx.luck);
+	const cap = rockCap(freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel));
+	const room = () => rocks.length < cap && (bank.sites?.rock === undefined || rocks.length < bank.sites.rock);
+	let t = 0;
+	for (let guard = 0; guard < 500 && t < dt; guard++) {
+		if (!room()) {
+			acc = 0;
+			break;
+		}
+		if (acc + (dt - t) < every - 1e-9) {
+			acc += dt - t;
+			t = dt;
+			break;
+		}
+		t += Math.max(0, every - acc);
+		acc = 0;
+		const n = nextRockN++;
+		rocks.push({ n, at: bank.accAt + t * scale, tier: rollRockTier(ctx.luck, rollFor('rock', n)), hits: 0 });
+	}
+	return { ...bank, rocks, rockAcc: acc, nextRockN };
+};
+
+/** The rock standing on this tile, or null: a click on a tile with no real rock does nothing. */
+export const rockAt = (bank: TicketBank, x: number, y: number): RockTicket | null => rocksOf(bank).find((rock) => rock.x === x && rock.y === y) ?? null;
 
 /** Takes the chest standing on this tile. Null when there is none: a click on a tile without a real chest opens nothing. */
 export const takeChestAt = (bank: TicketBank, x: number, y: number): { bank: TicketBank; ticket: ChestTicket } | null => {
@@ -227,13 +297,20 @@ export const takeMonster = (bank: TicketBank, n: number): { bank: TicketBank; ti
 	return { bank: { ...bank, monsters: rest, ...(ticket.kind === 'boss' ? { bossAcc: 0 } : {}) }, ticket, kind: ticket.kind };
 };
 
+/** Seconds until the next rock is due, as a list that is empty when the map holds all the rocks it may. */
+const rockLeft = (bank: TicketBank, ctx: BankContext): number[] =>
+	rocksOf(bank).length < rockCap(freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel)) &&
+	(bank.sites?.rock === undefined || rocksOf(bank).length < bank.sites.rock)
+		? [Math.max(0, rockIntervalSec(ctx.luck) - (bank.rockAcc ?? 0))]
+		: [];
+
 /** Seconds until the next ticket of any kind is due, or null when the map is full (nothing is coming until something is opened or killed). */
 export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null => {
-	if (ticketRoom(bank, ctx) <= 0) return null;
+	if (ticketRoom(bank, ctx) <= 0) return rockLeft(bank, ctx)[0] ?? null;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck, ctx.chestSpeedPct) - bank.chestAcc)];
 	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank) - bank.monsterAcc));
 	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.bossAcc));
-	return Math.min(...left);
+	return Math.min(...left, ...rockLeft(bank, ctx));
 };
 
 /**

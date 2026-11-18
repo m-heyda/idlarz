@@ -1,3 +1,4 @@
+import { ROCK_TIER_ORDER } from '@/config/rocks';
 import { ACHIEVEMENTS, achievementById, type AchievementCondition, type DeedDef } from '@/catalog/achievements';
 import { DEED_BONUS_CAP_PCT, DEED_MILESTONES, milestoneById, type DeedMilestone } from '@/catalog/deedMilestones';
 import { RARITIES } from '@/catalog';
@@ -51,6 +52,15 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 			return { cur: totalKills(f.stats), goal: when.min };
 		case 'chests':
 			return { cur: f.stats.chests, goal: when.min };
+		case 'rocks':
+			return { cur: f.stats.rocks, goal: when.min };
+		case 'rocksTier':
+			return {
+				cur: ROCK_TIER_ORDER.slice(ROCK_TIER_ORDER.indexOf(when.tier)).reduce((sum, tier) => sum + (f.stats.rocksByTier[tier] ?? 0), 0),
+				goal: when.min,
+			};
+		case 'emberCoal':
+			return { cur: f.stats.emberCoal, goal: when.min };
 		case 'castle':
 			return { cur: f.castleLevel, goal: when.level };
 		case 'rebirths':

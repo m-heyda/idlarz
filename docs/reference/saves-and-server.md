@@ -636,6 +636,7 @@ and its gold is paid in the browser.
 | `/api/rankings` | GET | `src/app/api/rankings/route.ts` |
 | `/api/rebirth` | POST | `src/app/api/rebirth/route.ts` |
 | `/api/rebirths` | GET | `src/app/api/rebirths/route.ts` |
+| `/api/rock` | POST | `src/app/api/rock/route.ts` |
 | `/api/save` | GET, DELETE, POST | `src/app/api/save/route.ts` |
 | `/api/spawn` | POST | `src/app/api/spawn/route.ts` |
 | `/api/tutorial` | POST | `src/app/api/tutorial/route.ts` |

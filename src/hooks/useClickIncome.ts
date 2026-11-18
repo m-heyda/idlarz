@@ -6,6 +6,9 @@ import { emitFloat } from '@/lib/floatText';
  * Click income: a real click on the map earns gold (rate limited in the store) and shows up as a popup under the cursor.
  * Clicks on windows, the header or buttons never pay, and neither do synthetic clicks.
  */
+/** The id of the last click handled: every click gets its own, so the limiter never mistakes two clicks for one */
+let clickSeq = 0;
+
 export function useClickIncome() {
 	const clickForGold = useGameStore((state) => state.clickForGold);
 
@@ -15,7 +18,8 @@ export function useClickIncome() {
 			if (!onMap) return;
 
 			const goldToAdd = clickForGold({
-				eventId: e.timeStamp,
+				// one id per click we handle: `timeStamp` is rounded coarsely by some browsers, and two different clicks with the same value would share one verdict
+				eventId: ++clickSeq,
 				now: performance.now(),
 				trusted: e.isTrusted,
 			});

@@ -6,6 +6,7 @@ import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import {
 	CASTLE_MARKER_COLOR,
 	CHEST_COLOR,
+	ORE_COLOR,
 	CLUSTER_PX,
 	MINIMAP_MARGIN,
 	MINIMAP_MAX_SCALE,
@@ -200,7 +201,7 @@ test('markers: nearby chests merge, distant ones and the monsters stay their own
 	assert.equal(m.monsters.length, 1);
 	assert.equal(m.monsters[0].n, 1);
 	// no chests, no monsters: nothing
-	assert.deepEqual(minimapMarkers(row(), [], l), { monsters: [], chests: [] });
+	assert.deepEqual(minimapMarkers(row(), [], l), { monsters: [], chests: [], ores: [] });
 });
 
 test('painting: chests are yellow, monsters red and above the chests; without markers the picture is the old one', () => {
@@ -220,14 +221,14 @@ test('painting: chests are yellow, monsters red and above the chests; without ma
 	paintMinimap(withDots, w, l, markers);
 	assert.equal(countPixels(plain, CHEST_COLOR) + countPixels(plain, MONSTER_COLOR), 0);
 	const empty = image(l);
-	paintMinimap(empty, w, l, { monsters: [], chests: [] });
+	paintMinimap(empty, w, l, { monsters: [], chests: [], ores: [] });
 	assert.deepEqual(empty, plain);
 	for (const c of markers.chests) assert.deepEqual(pixel(withDots, l.width, c.px, c.py), rgb(CHEST_COLOR));
 	for (const c of markers.monsters) assert.deepEqual(pixel(withDots, l.width, c.px, c.py), rgb(MONSTER_COLOR));
 	assert.ok(countPixels(withDots, CHEST_COLOR) >= 9 + 25, 'a lone chest is 3x3, a pair 5x5');
 	// on top of each other the monster wins
 	const same = image(l);
-	paintMinimap(same, w, l, { chests: [{ px: 60, py: 60, n: 1 }], monsters: [{ px: 60, py: 60, n: 1 }] });
+	paintMinimap(same, w, l, { chests: [{ px: 60, py: 60, n: 1 }], monsters: [{ px: 60, py: 60, n: 1 }], ores: [] });
 	assert.deepEqual(pixel(same, l.width, 60, 60), rgb(MONSTER_COLOR));
 });
 
@@ -278,4 +279,33 @@ test('the view rectangle follows the tiles on screen', () => {
 	assert.ok(Math.abs(r.width - 20 * l.scale) < 1e-9 && Math.abs(r.height - 12 * l.scale) < 1e-9);
 	const origin = tileToMinimap(l, 10, 40);
 	assert.ok(Math.abs(r.left - origin.x) < 1e-9 && Math.abs(r.top - origin.y) < 1e-9);
+});
+
+test('ores are purple dots on the overview, clustered like the rest, under the chests and the monsters', () => {
+	const w = withChests(row(), 5, 6, 14);
+	const l = minimapLayout(ownedBounds(w), BOX);
+	const ores = [
+		{ x: CASTLE_X + 3, y: CASTLE_Y },
+		{ x: CASTLE_X + 3, y: CASTLE_Y },
+		{ x: CASTLE_X + 9, y: CASTLE_Y },
+	];
+	const markers = minimapMarkers(w, [], l, ores);
+	assert.equal(
+		markers.ores.reduce((sum, c) => sum + c.n, 0),
+		3,
+		'every ore is in some dot',
+	);
+	assert.ok(
+		markers.ores.some((c) => c.n >= 2),
+		'two ores on one tile are one bigger dot',
+	);
+	const none = minimapMarkers(w, [], l);
+	assert.deepEqual(none.ores, [], 'no ores given, no ore dots');
+	const plain = image(l);
+	paintMinimap(plain, w, l);
+	const dots = image(l);
+	paintMinimap(dots, w, l, markers);
+	assert.equal(countPixels(plain, ORE_COLOR), 0);
+	assert.ok(countPixels(dots, ORE_COLOR) >= 9, 'a lone ore is at least a 3x3 dot');
+	for (const c of markers.ores) assert.deepEqual(pixel(dots, l.width, c.px, c.py), rgb(ORE_COLOR));
 });

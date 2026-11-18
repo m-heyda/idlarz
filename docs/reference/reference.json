@@ -26,7 +26,7 @@
   "kind": "function",
   "category": "Architecture/The loop",
   "file": "src/app/GameApp.tsx",
-  "line": 125,
+  "line": 126,
   "summary": "The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done. Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player's absence is claimed from the server before the loop starts ({@link computeOfflineGrant}).",
   "see": [
    "computeOfflineGrant",
@@ -72,7 +72,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 116,
+  "line": 122,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 560,
+  "line": 566,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -210,7 +210,7 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/ingredients.ts",
-  "line": 31,
+  "line": 32,
   "summary": "The ingredients and what is planned for each (none of it is built yet). Append only.",
   "see": []
  },
@@ -1171,6 +1171,39 @@
   "see": []
  },
  {
+  "id": "rock-tiers",
+  "name": "ROCK_TIERS",
+  "symbol": "ROCK_TIERS",
+  "kind": "const",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/config/rocks.ts",
+  "line": 25,
+  "summary": "The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.",
+  "see": []
+ },
+ {
+  "id": "rock",
+  "name": "ROCK",
+  "symbol": "ROCK",
+  "kind": "const",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/config/rocks.ts",
+  "line": 51,
+  "summary": "How rocks appear and how fast they may be mined (server rules).",
+  "see": []
+ },
+ {
+  "id": "rock-drops",
+  "name": "ROCK_DROPS",
+  "symbol": "ROCK_DROPS",
+  "kind": "const",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/config/rocks.ts",
+  "line": 75,
+  "summary": "What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table. Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.",
+  "see": []
+ },
+ {
   "id": "chest",
   "name": "CHEST",
   "symbol": "CHEST",
@@ -1866,7 +1899,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/deeds.ts",
-  "line": 223,
+  "line": 233,
   "summary": "The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.",
   "see": []
  },
@@ -1930,7 +1963,7 @@
   "kind": "topic",
   "category": "Architecture/Guest mode",
   "file": "src/lib/guest/dispatch.ts",
-  "line": 43,
+  "line": 45,
   "summary": "Guest mode: the game's /api calls answered in the browser by the same engine the server runs (`src/lib/offline/*`: spawns, chests, fights, loot, crafting, the gem shop, rebirth, offline claims), against the guest's own ledger in `localStorage` and a \"saved game\" built from the live game. Nothing leaves the browser, nothing is checked against a database, and nothing is ranked: the loot secret is public and the save is never verified, so a guest may cheat, and that is why none of it can ever be sent anywhere. It is installed only on `/guest` (`installGuest`) and loaded only there, so a signed-in player's bundle does not contain it.",
   "see": []
  },
@@ -2765,7 +2798,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/placement.ts",
-  "line": 74,
+  "line": 79,
   "summary": "Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land grows. `rollFor('spawnpos', n)` picks the tile of monster ticket `n` and `rollFor('chestpos', n)` the one of chest `n` (the server seals them with a secret; tests pass a seeded one). A chest leans toward the edge of the land and away from other chests (`pickChestSpot`). With the player's profile (`hero`) a new monster's type is weighted by how beatable it is (spawnWeights.ts) and its level and growth are capped near what the player can beat; without it every type is equally likely and nothing is capped. Bosses are treated the same way (IDL-222): among the boss types that still have a free tile the pick is weighted by win chance and the boss's spawn level and growth are capped. A boss only has a free tile 8 or more tiles from the castle (`BOSS_MIN_DISTANCE`).",
   "see": []
  },
@@ -2863,7 +2896,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 114,
+  "line": 142,
   "summary": "How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together), (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.",
   "see": []
  },
@@ -2874,7 +2907,7 @@
   "kind": "function",
   "category": "Monsters/Spawning",
   "file": "src/lib/offline/tickets.ts",
-  "line": 154,
+  "line": 182,
   "summary": "Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room. With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.",
   "see": []
  },
@@ -3031,6 +3064,72 @@
   "file": "src/lib/rebirthKeep.ts",
   "line": 20,
   "summary": "Carrying legendary gear through a rebirth. Pure rules shared by the server (`rebirthStep` picks from the LEDGER's inventory, never from items the browser sends) and the browser (which builds the same new bag from the same picks).",
+  "see": []
+ },
+ {
+  "id": "rockspots",
+  "name": "rockSpots",
+  "symbol": "rockSpots",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 15,
+  "summary": "The tiles a rock could stand on: owned land that is not the castle, water (a lake), the castle's ward, nor taken (`taken` holds the \"x,y\" keys of the monsters, boss, chests and rocks already standing) and has no building.",
+  "see": []
+ },
+ {
+  "id": "rockintervalsec",
+  "name": "rockIntervalSec",
+  "symbol": "rockIntervalSec",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 39,
+  "summary": "Seconds of play time between two new rocks.",
+  "see": []
+ },
+ {
+  "id": "rockcap",
+  "name": "rockCap",
+  "symbol": "rockCap",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 49,
+  "summary": "The most rocks that wait at once on a map with `free` tiles a monster could stand on.",
+  "see": []
+ },
+ {
+  "id": "rollrocktier",
+  "name": "rollRockTier",
+  "symbol": "rollRockTier",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 59,
+  "summary": "The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.",
+  "see": []
+ },
+ {
+  "id": "takeclicks",
+  "name": "takeClicks",
+  "symbol": "takeClicks",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 84,
+  "summary": "How many of `clicks` the server lets in for a rock at `nowSec`: a bucket of `burst` clicks that refills at `maxCps` per second (a new rock starts full). The rest are dropped, so a rock cannot be broken faster than a person clicks.",
+  "see": []
+ },
+ {
+  "id": "rollrockloot",
+  "name": "rollRockLoot",
+  "symbol": "rollRockLoot",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 108,
+  "summary": "Rolls what a broken rock drops, line by line of its tier's table ({@link ROCK_DROPS}); every line draws the same number of random values whether it hits or not, so adding a line later never shifts the rest. Stone and coal are minutes of the player's income (never under the floor of the line); an ingredient has a chance per rock, raised by Luck.",
   "see": []
  },
  {

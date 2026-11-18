@@ -33,6 +33,8 @@ import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
+import { ROCK, ROCK_DROPS, ROCK_TIER_ORDER, ROCK_TIERS } from '../../src/config/rocks';
+import { rockCap, rockIntervalSec } from '../../src/lib/rocks';
 import { MONSTERS, type BossModifiers } from '../../src/config/combatConfig';
 import { describeModifiers } from '../../src/lib/bossModifiers';
 import { BIOME_GOALS, BOSS_MASTERY_TIERS, MASTERY_CAPS, MASTERY_TIERS, bonusText, type MasteryTier } from '../../src/catalog/mastery';
@@ -464,6 +466,47 @@ TABLES['rarities'] = () => ({
 		Object.values(RARITIES)
 			.sort((a, b) => a.order - b.order)
 			.map((r) => [r.label, r.order, fmt(r.sellValue), r.minAffixes === r.maxAffixes ? r.minAffixes : `${r.minAffixes}-${r.maxAffixes}`, r.enabled ? 'yes' : 'no']),
+	),
+});
+
+TABLES['rock-tiers'] = () => {
+	const total = ROCK_TIER_ORDER.reduce((sum, t) => sum + ROCK_TIERS[t].weight, 0);
+	return {
+		title: 'Rock tiers',
+		md: mdTable(
+			['Tier', 'Name', 'Clicks to break', 'Weight', 'Share without Luck'],
+			ROCK_TIER_ORDER.map((t) => [t, ROCK_TIERS[t].label, fmt(ROCK_TIERS[t].clicks), ROCK_TIERS[t].weight, `${((ROCK_TIERS[t].weight / total) * 100).toFixed(0)}%`]),
+		),
+	};
+};
+
+TABLES['rock-rules'] = () => ({
+	title: 'Rock rules',
+	md: mdTable(
+		['Rule', 'Value'],
+		[
+			['Seconds between two rocks (no Luck)', fmt(rockIntervalSec(0))],
+			['Most rocks on the map', fmt(ROCK.maxOnMap)],
+			['Share of the free land', `${ROCK.landShare * 100}%`],
+			['Room on 20 / 100 / 1,000 free tiles', [20, 100, 1000].map((n) => rockCap(n)).join(' / ')],
+			['Clicks let in per second', fmt(ROCK.maxCps)],
+			['Burst of a fresh rock', fmt(ROCK.burst)],
+			['Most clicks in one request', fmt(ROCK.maxBatch)],
+		],
+	),
+});
+
+TABLES['rock-drops'] = () => ({
+	title: 'What a rock drops',
+	md: mdTable(
+		['Tier', 'Drop', 'Amount', 'Chance'],
+		ROCK_TIER_ORDER.flatMap((t) =>
+			ROCK_DROPS[t].map((d) =>
+				d.kind === 'resource'
+					? [t, d.id, `${d.minutes[0]}-${d.minutes[1]} min of income (at least ${fmt(d.floor)})`, 'always']
+					: [t, d.id, d.qty[0] === d.qty[1] ? `${d.qty[0]}` : `${d.qty[0]}-${d.qty[1]}`, `${(d.chance * 100).toFixed(0)}%`],
+			),
+		),
 	),
 });
 

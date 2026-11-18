@@ -18,6 +18,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes), [`INGREDIENTS`](#ingredients)
 - Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`builderCount`](#buildercount), [`idolEconomy`](#idoleconomy)
 - Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
+- Rocks and Mining: [`ROCK_TIERS`](#rock-tiers), [`ROCK`](#rock), [`ROCK_DROPS`](#rock-drops), [`rockSpots`](#rockspots), [`rockIntervalSec`](#rockintervalsec), [`rockCap`](#rockcap), [`rollRockTier`](#rollrocktier), [`takeClicks`](#takeclicks), [`rollRockLoot`](#rollrockloot)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -1008,11 +1009,11 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 
 ### `INGREDIENTS` <small>const</small>
 
-Source: [`src/catalog/ingredients.ts:31`](../../src/catalog/ingredients.ts)
+Source: [`src/catalog/ingredients.ts:32`](../../src/catalog/ingredients.ts)
 
 The ingredients and what is planned for each (none of it is built yet). Append only.
 
-**Crafting ingredients (18, no recipe uses them yet)** _(computed from the code)_
+**Crafting ingredients (21, no recipe uses them yet)** _(computed from the code)_
 
 | Ingredient | Tier | Planned for | Dropped by |
 | --- | --- | --- | --- |
@@ -1024,8 +1025,8 @@ The ingredients and what is planned for each (none of it is built yet). Append o
 | Hollow Log | 1 | planks | Plant |
 | Glowberry | 2 | night-vision and luck potions | Fungus |
 | Dark Horn | 2 | dark elixirs and enchanting powder | Demon |
-| Copper Ore | 2 | ingots (smelted with coal) | Construct |
-| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon |
+| Copper Ore | 2 | ingots (smelted with coal) | Construct, mining rocks |
+| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon, mining rocks |
 | Obsidian Chip | 2 | blade edges for the Obsidian grade | Elemental |
 | Geode | 2 | cut stones for jewelry | Aquatic, Construct |
 | Dark Shard | 2 | enchanting | Demon |
@@ -1034,6 +1035,9 @@ The ingredients and what is planned for each (none of it is built yet). Append o
 | Fire Drop | 3 | fire-ward jewelry | Elemental, Dragon |
 | Emerald Star | 3 | jewelry gems | a few monsters |
 | Heart Gem | 4 | the finest jewelry | a few monsters |
+| Silver Ore | 2 | silver ingots and fine jewelry | mining rocks |
+| Gold Ore | 3 | gold ingots and jewelry | mining rocks |
+| Raw Crystal | 3 | enchanting and jewelry gems | mining rocks |
 
 ## Buildings
 
@@ -1399,6 +1403,173 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 - **Name change**: `value` is the new name, already checked against the name rules and the unique index by the caller (the cooldown is the profile's, checked by the caller too).
 - **Attribute respec**: not during a fight; refused when nothing is spent; the first one of an account is free.
 - **A one-time item** (`kind: 'once'`, Name colours): refused when already owned; the purchase count in `bought` is the record of ownership.
+
+## Rocks and Mining
+
+<a id="rock-tiers"></a>
+
+### `ROCK_TIERS` <small>const</small>
+
+Source: [`src/config/rocks.ts:25`](../../src/config/rocks.ts)
+
+The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.
+
+**Rock tiers** _(computed from the code)_
+
+| Tier | Name | Clicks to break | Weight | Share without Luck |
+| --- | --- | --- | --- | --- |
+| common | Rock | 50 | 70 | 70% |
+| uncommon | Silver ore | 125 | 22 | 22% |
+| rare | Rich ore | 250 | 7 | 7% |
+| epic | Crystal | 500 | 1 | 1% |
+| legendary | Legendary ore | 1,000 | 0.25 | 0% |
+
+<a id="rock"></a>
+
+### `ROCK` <small>const</small>
+
+Source: [`src/config/rocks.ts:51`](../../src/config/rocks.ts)
+
+How rocks appear and how fast they may be mined (server rules).
+
+- **Timer**: one new rock every 150 s of play time (shorter with Luck, never under 60% of it), much faster than a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
+- **Room**: at most `maxOnMap` rocks wait at once, and no more than `landShare` of the free land (at least `minAllowed`).
+- **Tiles**: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.
+- **Clicks**: the browser sends its clicks in batches. The server lets in at most `maxCps` clicks per second (a bucket of `burst` clicks), so a rock cannot be broken faster than a person can click.
+
+**Rock rules** _(computed from the code)_
+
+| Rule | Value |
+| --- | --- |
+| Seconds between two rocks (no Luck) | 150 |
+| Most rocks on the map | 15 |
+| Share of the free land | 12% |
+| Room on 20 / 100 / 1,000 free tiles | 2 / 12 / 15 |
+| Clicks let in per second | 24 |
+| Burst of a fresh rock | 48 |
+| Most clicks in one request | 200 |
+
+<a id="rock-drops"></a>
+
+### `ROCK_DROPS` <small>const</small>
+
+Source: [`src/config/rocks.ts:75`](../../src/config/rocks.ts)
+
+What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table.
+Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.
+
+**What a rock drops** _(computed from the code)_
+
+| Tier | Drop | Amount | Chance |
+| --- | --- | --- | --- |
+| common | stone | 2-4 min of income (at least 25) | always |
+| common | coal | 1-2 min of income (at least 15) | always |
+| common | ing_copper_ore | 1 | 10% |
+| common | ing_ember_coal | 1 | 2% |
+| uncommon | stone | 5-8 min of income (at least 60) | always |
+| uncommon | coal | 3-5 min of income (at least 35) | always |
+| uncommon | ing_silver_ore | 1 | 12% |
+| uncommon | ing_copper_ore | 1 | 10% |
+| uncommon | ing_ember_coal | 1 | 4% |
+| rare | stone | 10-15 min of income (at least 120) | always |
+| rare | coal | 6-10 min of income (at least 70) | always |
+| rare | ing_gold_ore | 1 | 12% |
+| rare | ing_silver_ore | 1 | 20% |
+| rare | ing_copper_ore | 1-2 | 15% |
+| rare | ing_ember_coal | 1-2 | 8% |
+| epic | stone | 20-30 min of income (at least 250) | always |
+| epic | coal | 12-20 min of income (at least 150) | always |
+| epic | ing_crystal | 1 | 25% |
+| epic | ing_gold_ore | 1 | 25% |
+| epic | ing_silver_ore | 1-2 | 30% |
+| epic | ing_ember_coal | 1-3 | 15% |
+| legendary | stone | 40-60 min of income (at least 500) | always |
+| legendary | coal | 25-40 min of income (at least 300) | always |
+| legendary | ing_crystal | 1-2 | 40% |
+| legendary | ing_gold_ore | 1-2 | 40% |
+| legendary | ing_silver_ore | 1-3 | 50% |
+| legendary | ing_copper_ore | 1-2 | 30% |
+| legendary | ing_ember_coal | 1-3 | 10% |
+
+<a id="rockspots"></a>
+
+### `rockSpots` <small>function</small>
+
+Source: [`src/lib/rocks.ts:15`](../../src/lib/rocks.ts)
+
+The tiles a rock could stand on: owned land that is not the castle, water (a lake), the castle's ward, nor taken (`taken` holds the "x,y" keys of the monsters, boss, chests and rocks already standing) and has no building.
+
+<a id="rockintervalsec"></a>
+
+### `rockIntervalSec` <small>function</small>
+
+Source: [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts)
+
+Seconds of play time between two new rocks.
+
+**Formula**
+
+```text
+interval = 150 s x max(0.6, 1 / (1 + 0.004 x Luck))
+```
+
+<a id="rockcap"></a>
+
+### `rockCap` <small>function</small>
+
+Source: [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts)
+
+The most rocks that wait at once on a map with `free` tiles a monster could stand on.
+
+**Formula**
+
+```text
+room = min(15, max(2, floor(free land x 12%)))
+```
+
+<a id="rollrocktier"></a>
+
+### `rollRockTier` <small>function</small>
+
+Source: [`src/lib/rocks.ts:59`](../../src/lib/rocks.ts)
+
+The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.
+
+**Formula**
+
+```text
+weight(tier) = base weight x (min(1.6, 1 + 0.004 x Luck) for every tier but common)
+```
+
+<a id="takeclicks"></a>
+
+### `takeClicks` <small>function</small>
+
+Source: [`src/lib/rocks.ts:84`](../../src/lib/rocks.ts)
+
+How many of `clicks` the server lets in for a rock at `nowSec`: a bucket of `burst` clicks that refills at `maxCps` per second (a new rock starts full). The rest are dropped, so a rock cannot be broken faster than a person clicks.
+
+**Formula**
+
+```text
+allowed = min(48, tokens + seconds since the last batch x 24);  accepted = min(clicks, floor(allowed))
+```
+
+<a id="rollrockloot"></a>
+
+### `rollRockLoot` <small>function</small>
+
+Source: [`src/lib/rocks.ts:108`](../../src/lib/rocks.ts)
+
+Rolls what a broken rock drops, line by line of its tier's table ([`ROCK_DROPS`](economy.md#rock-drops)); every line draws the same number of random values whether it hits or not, so adding a line later never shifts the rest.
+Stone and coal are minutes of the player's income (never under the floor of the line); an ingredient has a chance per rock, raised by Luck.
+
+**Formula**
+
+```text
+stone or coal = max(floor, floor(income per second x U(minutes) x 60 x (1 + 0.005 x Luck)))
+ingredient    = chance x (1 + 0.005 x Luck) per rock;  quantity = U(min..max)
+```
 
 ## Perk caps
 

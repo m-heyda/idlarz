@@ -66,6 +66,20 @@ class AudioManager {
 		}
 	}
 
+	/**
+	 * Plays a sound on top of itself (a fast clicker hears every hit) at a slightly different speed, so repeated hits do not sound like one stuck sample. Uses a copy of the loaded element; the copies are dropped when they end.
+	 */
+	public playOverlap(key: string, rate = 1): void {
+		const audio = this.sounds.get(key);
+		if (this.muted || !audio || !this.loadedSounds.get(key)) return;
+		const copy = audio.cloneNode(true) as HTMLAudioElement;
+		copy.volume = audio.volume;
+		copy.playbackRate = Math.min(2, Math.max(0.5, rate));
+		copy.play().catch((error) => {
+			if (error?.name !== 'NotAllowedError') console.error(`Error playing sound ${key}:`, error);
+		});
+	}
+
 	/** Master volume 0..1 (multiplies every sound's own volume) and mute, from the Settings dialog. */
 	public setMasterVolume(volume: number): void {
 		this.master = Math.min(1, Math.max(0, Number.isFinite(volume) ? volume : 1));
@@ -95,6 +109,7 @@ if (typeof window !== 'undefined') {
 	audioManager.loadSound('heal', '/heal.wav', 0.5); // casting the Heal skill
 	audioManager.loadSound('stun', '/stun.wav', 0.5); // casting the Stun skill
 	audioManager.loadSound('gulp', '/gulp.wav', 0.5); // drinking a potion, in a fight or from the bag
+	audioManager.loadSound('mining', '/mining.wav', 0.5); // every hit on a rock (IDL-376)
 }
 
 export default audioManager;

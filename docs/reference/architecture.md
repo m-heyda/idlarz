@@ -20,7 +20,7 @@ Stack, state, the tick loop, the map, rendering and the art pipeline.
 
 ### The tick loop and persistence
 
-Source: [`src/app/GameApp.tsx:125`](../../src/app/GameApp.tsx)
+Source: [`src/app/GameApp.tsx:126`](../../src/app/GameApp.tsx)
 
 The tick loop. `GameApp` runs `setInterval(..., 100 ms)` **only** in the owning tab (one tab owns the game through a Web Lock, `useSingleTab`) and only after the save is loaded and the offline claim is done.
 Each interval computes `deltaTime = performance.now() - last` (monotonic) and calls `store.tick(deltaTime)`; `tick` clamps the delta to `0 ... MAX_CATCHUP_SEC` (300 s), so a throttled background tab catches up in 5-minute steps
@@ -220,7 +220,7 @@ look = ANIMAL_PIXEL_ICONS[kind][hash(seed) mod number of looks], hash(s) = fold 
 
 ### Guest mode
 
-Source: [`src/lib/guest/dispatch.ts:43`](../../src/lib/guest/dispatch.ts)
+Source: [`src/lib/guest/dispatch.ts:45`](../../src/lib/guest/dispatch.ts)
 
 Guest mode: the game's /api calls answered in the browser by the same engine the server runs (`src/lib/offline/*`: spawns, chests, fights, loot, crafting, the gem shop, rebirth, offline claims), against the guest's own
 ledger in `localStorage` and a "saved game" built from the live game. Nothing leaves the browser, nothing is checked against a database, and nothing is ranked: the loot secret is public and the save is never verified, so a guest may cheat, and

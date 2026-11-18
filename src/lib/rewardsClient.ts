@@ -1,5 +1,5 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
-import type { ChestReward, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
+import type { ChestReward, RockReply, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest } from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { PetsReply, PetsRequest } from '@/lib/offline/pets';
@@ -71,6 +71,10 @@ export const requestSync = (since?: number): Promise<Reply<SyncResult>> => post<
 
 /** Opens the chest on this tile (the server put it there; a tile with no chest answers `no_ticket`). */
 export const requestChest = (key: string, x: number, y: number): Promise<Reply<ChestReward>> => post<ChestReward>('/api/chest', { key, x, y });
+
+/** A batch of `clicks` on the rock on this tile (the server lets in what a person could click, and rolls the drops when the rock breaks). */
+export const requestRock = (key: string, x: number, y: number, clicks: number): Promise<Reply<RockReply>> =>
+	post<RockReply>('/api/rock', { key, x, y, clicks });
 
 /** One of the player's own changes to what they carry. The answer is the inventory as it stands, and the gold a sale paid. */
 export const requestInventory = (key: string, op: InventoryOp): Promise<Reply<InventoryReply>> => post<InventoryReply>('/api/inventory', { key, ...op });

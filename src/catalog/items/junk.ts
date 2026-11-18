@@ -65,4 +65,7 @@ export const JUNK_ITEMS: ItemDef[] = [
 	junk('moon', 'Moonstone Sliver', 420, 'Holds a little of the night and gives it back on cloudy days.', 'rare'),
 	junk('emerald_star', 'Emerald Star', 850, 'A green star the size of a thumbnail. Court wizards are not above stealing it.', 'rare'),
 	junk('heart_gem', 'Heart Gem', 3200, 'A blue heart-shaped gem with a pulse. Treasure hunters report it is, in fact, beating.', 'epic'),
+	junk('silver_ore', 'Silver Ore', 70, 'A pale, heavy lump with a bright vein. It rings when you drop it, which the neighbours dislike.', 'uncommon'),
+	junk('gold_ore', 'Gold Ore', 260, 'Stone with ambitions. A little of it glitters, and a lot of it is stone.', 'rare'),
+	junk('crystal', 'Raw Crystal', 520, 'A clear spike that hums faintly in a quiet room. Enchanters hear music in it.', 'rare'),
 ];

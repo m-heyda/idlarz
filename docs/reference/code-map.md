@@ -111,6 +111,10 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`route.ts`](../../src/app/api/rebirths/route.ts) — ~ The signed-in player's rebirth history, newest first.
 
+**src/app/api/rock/**
+
+- [`route.ts`](../../src/app/api/rock/route.ts) — ~ Hits the rock on one tile:
+
 **src/app/api/save/**
 
 - [`route.ts`](../../src/app/api/save/route.ts) — ~ The account's cloud save (text the client imports, plus headline numbers for the start hub), or `{ empty:
@@ -270,17 +274,21 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the crown icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
+- [`MapHighlightBar.tsx`](../../src/components/game/MapHighlightBar.tsx) — ~ `size`:
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
+- [`MapMarkers.tsx`](../../src/components/game/MapMarkers.tsx) — ~ The edge arrow keeps this far from the borders of the screen (the header is above, the dock below)
 - [`MapTip.tsx`](../../src/components/game/MapTip.tsx) — ~ A hover card on the map, kept on screen.
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
 - [`MonsterArt.tsx`](../../src/components/game/MonsterArt.tsx) — ~ The roster entry of the map lab's art preview (`art` names another monster whose picture is drawn instead); undefined for a real game monster, which is drawn by {@link MonsterArt} (so the "?" silhouette applies).
 - [`MonsterSprite.tsx`](../../src/components/game/MonsterSprite.tsx) — ~ A monster standing on its tile:
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
+- [`PickaxeCursor.tsx`](../../src/components/game/PickaxeCursor.tsx) — ~ Where the tip of the pick is in the 36 px picture:
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
 - [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
+- [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ How long the whole effect lives:
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
@@ -409,6 +417,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`playerClasses.ts`](../../src/config/playerClasses.ts) — Hero classes the player can pick (double-click the character). Each gives two passives (CLASS_PASSIVES below) and has its own
 - [`rebirth.ts`](../../src/config/rebirth.ts) — Rebirth and the Ember shop.
 - [`resources.ts`](../../src/config/resources.ts) — The old views of catalog/resources.ts (icons and header tooltips) and the helper that builds them.
+- [`rocks.ts`](../../src/config/rocks.ts) — Mineable rocks: the numbers. Pure data; the rules that use it are in `src/lib/rocks.ts` (spots, tier roll, loot) and `src/lib/offline/*` (the server owns every spawn, hit count and drop).
 - [`slashFx.ts`](../../src/config/slashFx.ts) — The slash effects drawn over the fight stage (public/fx/slash, built by scripts/fx/build_slash_sheets.py):
 - [`spawns.ts`](../../src/config/spawns.ts) — Chests, monster spawn limits and Luck.
 
@@ -578,6 +587,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gemsParse.ts`](../../src/lib/offline/gemsParse.ts) — ~ The body of `POST /api/gems` as a typed request, or null when it is not one (the route answers 400).
 - [`grant.ts`](../../src/lib/offline/grant.ts) — ~ What the server derived from the last accepted save (never sent by the client).
 - [`identity.ts`](../../src/lib/offline/identity.ts) — ~ Epoch seconds of the last paid name change; null = never changed
+- [`ingredientMove.ts`](../../src/lib/offline/ingredientMove.ts) — ~ Moves every bag stack of an ingredient (by its old junk id, see `INGREDIENT_BY_JUNK`) into the Crafting bag stock, up to the stock cap per ingredient; what does not fit stays in the bag.
 - [`inventory.ts`](../../src/lib/offline/inventory.ts) — ~ The Ember levels a save holds, as the limit machinery reads them (nothing when the save has none).
 - [`ledger.ts`](../../src/lib/offline/ledger.ts) — ~ What the account keeps across rebirths (the ledger's `legacy` column, null until something was kept):
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
@@ -628,6 +638,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`resourceDiscovery.ts`](../../src/lib/resourceDiscovery.ts) — ~ The tiers whose resources the header shows only once the player has met them:
 - [`rewardsClient.ts`](../../src/lib/rewardsClient.ts) — ~ Hands the monster discoveries of an answer to the bestiary store.
 - [`rng.ts`](../../src/lib/rng.ts) — A random source:
+- [`rockClient.ts`](../../src/lib/rockClient.ts) — ~ How long clicks are gathered before a batch is sent.
+- [`rocks.ts`](../../src/lib/rocks.ts) — ~ The tiles a rock could stand on:
 - [`sanitizeSave.ts`](../../src/lib/sanitizeSave.ts) — ~ The part of the game state that is saved.
 - [`saveEvents.ts`](../../src/lib/saveEvents.ts) — Tiny event bus for moments worth saving right away (a purchase, a castle upgrade, a rebirth, a level up).
 - [`saveFormat.ts`](../../src/lib/saveFormat.ts) — ~ The save format:
@@ -706,6 +718,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`labStore.ts`](../../src/stores/labStore.ts) — ~ The map lab's world:
 - [`petStore.ts`](../../src/stores/petStore.ts) — ~ The pets the account owns (ids of the catalog); empty until the server answered
 - [`rewardPendingStore.ts`](../../src/stores/rewardPendingStore.ts) — ~ How many rewards are on their way from the server (a chest being opened, a won fight whose result is not shown yet).
+- [`rockStore.ts`](../../src/stores/rockStore.ts) — ~ Clicks counted so far:
 - [`settingsStore.ts`](../../src/stores/settingsStore.ts)
 - [`tutorialStore.ts`](../../src/stores/tutorialStore.ts) — ~ How long to wait before asking again when the server could not confirm a step yet (its last saved copy lags the browser's) or could not be reached.
 - [`uiStore.ts`](../../src/stores/uiStore.ts) — ~ The badge, title and nickname colour choice of the account with what the pickers allow (see `BadgeState` in `lib/authClient.ts`); `loaded` once the server has answered.
@@ -777,6 +790,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`gen-inputs.ts`](../../scripts/gen-inputs.ts) — ~ The scripts named by `tsx scripts/<file>.ts` in the `docs:gen:*` entries of package.json, following `npm run <name>` one level (so the groups and a new generator are found without a list here).
 - [`gen-save-fixtures.ts`](../../scripts/gen-save-fixtures.ts) — Writes the frozen save fixtures of `tests/fixtures/saves/` from the CURRENT code.
 - [`grant-test-items.ts`](../../scripts/grant-test-items.ts) — Gives ONE development account a legendary item in its bag and a boss waiting on its map, so tooltips, the boss fight and the new windows can be tried by hand.
+- [`grant-test-rocks.ts`](../../scripts/grant-test-rocks.ts) — Puts mineable rocks of every tier on the map of ONE development account, so the mining can be tried by hand (cursor, tooltip, chop and break effects, the sound, the drops).
 - [`guide-sprite.ts`](../../scripts/guide-sprite.ts) — Draws Brother Alder's second frame, the one with the mouth open, from the one sprite the game has of him (`GUIDE_SPRITE`, 67x67).
 - [`kill-sim.ts`](../../scripts/kill-sim.ts) — Kill sim: how much of a player's income the monsters pay (docs/plan/20-monster-families-and-rewards.md sections 3 and 8, IDL-182).
 
@@ -964,6 +978,11 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`rehearsalSeed.test.ts`](../../tests/ops/rehearsalSeed.test.ts)
 - [`simLocal.test.ts`](../../tests/ops/simLocal.test.ts)
 
+**tests/rocks/**
+
+- [`rockStore.test.ts`](../../tests/rocks/rockStore.test.ts)
+- [`rocks.test.ts`](../../tests/rocks/rocks.test.ts)
+
 **tests/saves/**
 
 - [`appendOnly.test.ts`](../../tests/saves/appendOnly.test.ts) — Append-only guards: what a save or a ledger can name by id (an item, a monster, a biome letter, a resource key, a building, an avatar, an achievement, a recipe ...) may be ADDED to but never removed, renamed
@@ -1005,6 +1024,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`guestMode.test.ts`](../../tests/server/guestMode.test.ts)
+- [`ingredientMove.test.ts`](../../tests/server/ingredientMove.test.ts)
 - [`ingredients.test.ts`](../../tests/server/ingredients.test.ts)
 - [`junk.test.ts`](../../tests/server/junk.test.ts)
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
@@ -1018,6 +1038,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pets.test.ts`](../../tests/server/pets.test.ts) — ~ A random source that walks through a fixed list, then repeats it.
 - [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
+- [`rockDeeds.test.ts`](../../tests/server/rockDeeds.test.ts)
+- [`rocks.test.ts`](../../tests/server/rocks.test.ts)
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,

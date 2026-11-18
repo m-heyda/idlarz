@@ -14,6 +14,7 @@ import {
 	petsStep,
 	rebirthStep,
 	redeemChest,
+	hitRock,
 	syncTickets,
 	tutorialStep,
 	type FightRequest,
@@ -24,6 +25,7 @@ import type { TutorialRequest } from '@/lib/offline/tutorial';
 import type { PetsRequest } from '@/lib/offline/pets';
 import { isSkillId } from '@/lib/skills';
 import { COORD_LIMIT } from '@/utils/world';
+import { ROCK } from '@/config/rocks';
 import type { GameState } from '@/types/game';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import {
@@ -54,7 +56,7 @@ import {
 const REBUILD_MS = 1500;
 
 /** The routes the engine answers (the ones that need the guest's saved game prepared first). */
-const ENGINE_ROUTES = ['offline', 'spawn', 'chest', 'fight', 'inventory', 'craft', 'rebirth', 'gems', 'mastery', 'character', 'tutorial', 'pets'];
+const ENGINE_ROUTES = ['offline', 'spawn', 'chest', 'rock', 'fight', 'inventory', 'craft', 'rebirth', 'gems', 'mastery', 'character', 'tutorial', 'pets'];
 
 const intOrUndefined = (value: unknown): number | undefined => (Number.isInteger(value) && (value as number) >= 0 ? (value as number) : undefined);
 const key = (value: unknown): string | null => (typeof value === 'string' && KEY.test(value) ? value : null);
@@ -148,6 +150,16 @@ export const createGuestTransport = (getGame: () => GameState): GuestTransport =
 				return answered(await syncTickets(deps, userId, nowMs, intOrUndefined(body.since), invVer));
 			case '/api/chest':
 				return k && tile(body.x) && tile(body.y) ? answered(await redeemChest(deps, userId, k, { x: body.x, y: body.y }, nowMs, invVer)) : bad();
+			case '/api/rock':
+				return k &&
+					tile(body.x) &&
+					tile(body.y) &&
+					typeof body.clicks === 'number' &&
+					Number.isInteger(body.clicks) &&
+					body.clicks >= 1 &&
+					body.clicks <= ROCK.maxBatch
+					? answered(await hitRock(deps, userId, k, { x: body.x, y: body.y }, body.clicks, nowMs, invVer))
+					: bad();
 			case '/api/fight': {
 				const parsed = fightRequest(body);
 				return parsed ? answered(await fightStep(deps, userId, parsed.key, parsed.request, nowMs, invVer)) : bad();
