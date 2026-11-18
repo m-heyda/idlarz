@@ -48,14 +48,12 @@
 }
 
 .kd-heat {
+	/* one square per tile, filled left to right and wrapping to the width of the window, the biomes in runs */
 	display: grid;
-	grid-template-rows: repeat(7, 12px);
-	grid-auto-flow: column;
-	grid-auto-columns: 12px;
+	grid-template-columns: repeat(auto-fill, 12px);
+	grid-auto-rows: 12px;
 	gap: 3px;
 	justify-content: start;
-	overflow-x: auto;
-	padding-bottom: 2px;
 }
 
 .kd-cell {
