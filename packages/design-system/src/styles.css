@@ -6001,3 +6001,214 @@ button.ds-income-head:hover {
 	border-color: var(--ds-gold);
 	box-shadow: 0 0 8px rgba(224, 169, 58, 0.45);
 }
+
+/* Hall of Deeds (IDL-321): lays itself out from its own width (container ds-bst, shared with the Bestiary) */
+.ds-dh-main {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: 170px minmax(0, 1fr) minmax(280px, 340px);
+	gap: 10px;
+}
+
+.ds-dh-main > * {
+	min-height: 0;
+	overflow: auto;
+}
+
+.ds-dh-ms {
+	grid-column: 2 / -1;
+}
+
+.ds-dh-listcol {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	overflow: hidden !important;
+}
+
+.ds-dh-tools {
+	flex: none;
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px 10px;
+}
+
+.ds-dh-list {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	padding-right: 2px;
+}
+
+.ds-dh-empty {
+	padding: 24px;
+	text-align: center;
+}
+
+.ds-dh-pts {
+	font-weight: 400;
+	color: var(--ds-gold-lt);
+}
+
+.ds-deed[data-ready='true'] {
+	border-color: var(--ds-gold-dk);
+	background: color-mix(in srgb, var(--ds-gold) 8%, rgba(0, 0, 0, 0.4));
+}
+
+.ds-dh-crystals {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	margin-left: 2px;
+}
+
+.ds-dh-crystal {
+	display: inline-grid;
+	place-items: center;
+	width: 26px;
+	height: 26px;
+	flex: none;
+}
+
+.ds-dh-crystals[data-small] .ds-dh-crystal {
+	width: 20px;
+	height: 20px;
+}
+
+.ds-dh-crystal img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
+	image-rendering: pixelated;
+}
+
+.ds-dh-crystal[data-state='locked'] img {
+	filter: grayscale(1) brightness(0.55);
+	opacity: 0.5;
+}
+
+.ds-dh-crystal[data-state='earned'] img {
+	animation: ds-dh-pulse 1.4s ease-in-out infinite;
+}
+
+.ds-dh-crystal[data-state='claimed'] img {
+	filter: drop-shadow(0 0 3px rgba(255, 214, 120, 0.55));
+}
+
+@keyframes ds-dh-pulse {
+	0%,
+	100% {
+		filter: drop-shadow(0 0 2px rgba(255, 214, 120, 0.4));
+		transform: scale(1);
+	}
+	50% {
+		filter: drop-shadow(0 0 7px rgba(255, 230, 150, 0.95));
+		transform: scale(1.12);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-dh-crystal[data-state='earned'] img {
+		animation: none;
+		filter: drop-shadow(0 0 5px rgba(255, 230, 150, 0.9));
+	}
+}
+
+.ds-dh-tier {
+	display: grid;
+	grid-template-columns: 30px 1fr auto;
+	align-items: center;
+	gap: 8px;
+	padding: 4px 2px;
+	border-bottom: 1px dashed rgba(106, 75, 36, 0.35);
+}
+
+.ds-dh-tier-main {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	font-size: 13px;
+}
+
+.ds-dh-tier-main b {
+	font-weight: 400;
+}
+
+.ds-dh-tier-main small {
+	font-size: 11px;
+	opacity: 0.85;
+}
+
+.ds-dh-unlock {
+	color: #2c5d9a;
+}
+
+.ds-dh-tier em,
+.ds-dh-mrow em {
+	font-style: normal;
+	font-size: 12px;
+	color: #8a7a5a;
+}
+
+.ds-dh-mrow {
+	display: grid;
+	grid-template-columns: 90px 1fr auto;
+	align-items: center;
+	gap: 8px;
+	padding: 7px 4px;
+	border-bottom: 1px dashed rgba(106, 75, 36, 0.35);
+	font-size: 13px;
+}
+
+.ds-dh-mrow b {
+	font-weight: 400;
+}
+
+.ds-dh-mrow[data-state='claimed'] {
+	color: #2f6b2f;
+}
+
+.ds-dh-mrow[data-state='locked'] {
+	color: #8a7a5a;
+}
+
+/* medium: the detail drops under the list */
+@container ds-bst (max-width: 820px) {
+	.ds-dh-main {
+		grid-template-columns: 150px minmax(0, 1fr);
+		grid-template-rows: minmax(160px, 1fr) minmax(200px, 1fr);
+	}
+	.ds-dh-main > .ds-cats {
+		grid-row: 1 / -1;
+	}
+	.ds-dh-ms {
+		grid-column: 2;
+		grid-row: 1 / -1;
+	}
+}
+
+/* narrow: one column that scrolls as a whole */
+@container ds-bst (max-width: 520px) {
+	.ds-dh-main {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: none;
+		grid-auto-rows: min-content;
+		overflow: auto;
+	}
+	.ds-dh-main > * {
+		overflow: visible;
+	}
+	.ds-dh-main > .ds-cats {
+		grid-row: auto;
+	}
+	.ds-dh-ms {
+		grid-column: auto;
+		grid-row: auto;
+	}
+	.ds-dh-list {
+		max-height: 320px;
+		overflow: auto;
+	}
+}

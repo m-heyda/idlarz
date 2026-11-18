@@ -21,7 +21,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
-- Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
+- Deeds: [`claimAllAchievements`](#claimallachievements), [Deed milestones](#deed-milestones), [`deedBonuses`](#deedbonuses), [`claimMilestone`](#claimmilestone), [Deeds](#deeds)
 
 ## Levels
 
@@ -600,9 +600,9 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### The boards
 
-Source: [`src/lib/rankings.ts:40`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:41`](../../src/lib/rankings.ts)
 
-The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
+The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests: it needs the quest system first).
 
 Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:
@@ -611,12 +611,13 @@ Ties are broken in this order:
 - Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
 - Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
 - Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
+- Deeds: deed points of the **claimed** tiers (an earned tier counts only after Claim; the ledger mirrors the number in `stats.deedPoints`), then who reached the total first.
 
 <a id="movement"></a>
 
 ### Movement arrows
 
-Source: [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:93`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
@@ -892,7 +893,7 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:177`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:213`](../../src/lib/offline/achievements.ts)
 
 Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
@@ -908,7 +909,7 @@ See also: `achievementsDue`, `earnAchievements`
 
 ### `claimAchievement` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:96`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:129`](../../src/lib/offline/achievements.ts)
 
 The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time.
 Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.
@@ -1220,10 +1221,55 @@ The choice lives on the profile (`badge_id`, `title_id`, written by the server a
 
 ### `claimAllAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:124`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:158`](../../src/lib/offline/achievements.ts)
 
 Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP`
 (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.
+
+<a id="deed-milestones"></a>
+
+### Deed milestones
+
+Source: [`src/catalog/deedMilestones.ts:29`](../../src/catalog/deedMilestones.ts)
+
+The milestones, by claimed deed points (all tiers together are worth about 3,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+4% gold and +4% XP at the top, under `DEED_BONUS_CAP_PCT`).
+Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.
+
+**Deed point milestones (8, bonuses capped at +5% each)** _(computed from the code)_
+
+| Claimed deed points | Gems | Bonus on kill rewards |
+| --- | --- | --- |
+| 50 | 25 | +1% gold |
+| 150 | 50 | +1% xp |
+| 300 | 75 | +1% gold |
+| 600 | 100 | +1% xp |
+| 1000 | 150 | +1% gold |
+| 1500 | 200 | +1% xp |
+| 2250 | 300 | +1% gold |
+| 3000 | 500 | +1% xp |
+
+<a id="deedbonuses"></a>
+
+### `deedBonuses` <small>function</small>
+
+Source: [`src/lib/deeds.ts:202`](../../src/lib/deeds.ts)
+
+The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
+
+**Formula**
+
+```text
+bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
+```
+
+<a id="claimmilestone"></a>
+
+### `claimMilestone` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:101`](../../src/lib/offline/achievements.ts)
+
+Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ([`deedBonuses`](progression.md#deedbonuses)). Refused for an id that is not a milestone, one the claimed points
+have not reached yet, or one already claimed.
 
 <a id="deeds"></a>
 

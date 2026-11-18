@@ -1,4 +1,5 @@
 import { ACHIEVEMENTS, achievementById, type AchievementCondition, type DeedDef } from '@/catalog/achievements';
+import { DEED_BONUS_CAP_PCT, DEED_MILESTONES, milestoneById, type DeedMilestone } from '@/catalog/deedMilestones';
 import { TUTORIAL_PATH } from '@/catalog/tutorial';
 import type { LifetimeStats } from '@/lib/offline/stats';
 import type { WorldFacts } from '@/lib/worldFacts';
@@ -163,3 +164,53 @@ export const deedPoints = (claimed: readonly string[]): number => claimed.reduce
 
 /** The points every tier together would give (the total the window shows next to the player's). */
 export const TOTAL_DEED_POINTS: number = ACHIEVEMENTS.reduce((sum, a) => sum + (a.rewards.points ?? 0), 0);
+
+/** The permanent deed bonuses on kill rewards, in %. */
+export interface DeedBonuses {
+	gold: number;
+	xp: number;
+}
+
+/** Where one milestone stands: reached by claimed points, and claimed (paid, bonus on). */
+export interface MilestoneState {
+	milestone: DeedMilestone;
+	reached: boolean;
+	claimed: boolean;
+}
+
+/** Every milestone with where it stands for these claimed points and these claimed milestone ids. */
+export const milestoneStates = (points: number, claimed: readonly string[]): MilestoneState[] =>
+	DEED_MILESTONES.map((milestone) => ({ milestone, reached: points >= milestone.points, claimed: claimed.includes(milestone.id) }));
+
+/** The ids of the milestones that are reached and not claimed yet (the Claim button of the milestone strip), in order. */
+export const claimableMilestones = (points: number, claimed: readonly string[]): string[] =>
+	milestoneStates(points, claimed)
+		.filter((s) => s.reached && !s.claimed)
+		.map((s) => s.milestone.id);
+
+/** The first milestone not reached yet (null at the top), for the "next milestone" bar. */
+export const nextMilestone = (points: number): DeedMilestone | null => DEED_MILESTONES.find((m) => points < m.points) ?? null;
+
+/**
+ * The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
+ *
+ * @category Progression/Deeds
+ * @order 5
+ * @formula
+ * bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
+ */
+export const deedBonuses = (claimed: readonly string[]): DeedBonuses => {
+	const total: DeedBonuses = { gold: 0, xp: 0 };
+	for (const id of claimed) {
+		const bonus = milestoneById(id)?.bonus;
+		if (bonus) total[bonus.stat] += bonus.pct;
+	}
+	return { gold: Math.min(DEED_BONUS_CAP_PCT, total.gold), xp: Math.min(DEED_BONUS_CAP_PCT, total.xp) };
+};
+
+/** What the "Bonus from deeds" line says: the bonuses in force, or the first one on offer. */
+export const deedBonusText = (claimed: readonly string[]): string => {
+	const b = deedBonuses(claimed);
+	const parts = [b.gold > 0 && `+${b.gold}% kill gold`, b.xp > 0 && `+${b.xp}% kill XP`].filter(Boolean);
+	return parts.length > 0 ? parts.join(' · ') : 'None yet: claim a milestone';
+};

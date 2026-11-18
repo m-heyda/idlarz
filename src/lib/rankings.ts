@@ -12,7 +12,7 @@ import { craftCumulativeXp, craftLevelOf } from '@/lib/crafting';
 export type RankingBoardId = 'level' | 'rebirths' | 'crafting' | 'tiles' | 'kills' | 'quests' | 'deeds';
 
 /** The boards that have data */
-export type LiveBoardId = Exclude<RankingBoardId, 'quests' | 'deeds'>;
+export type LiveBoardId = Exclude<RankingBoardId, 'quests'>;
 
 export interface RankingBoardInfo {
 	id: RankingBoardId;
@@ -24,7 +24,7 @@ export interface RankingBoardInfo {
 }
 
 /**
- * The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
+ * The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests: it needs the quest system first).
  *
  * Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
  * Ties are broken in this order:
@@ -33,6 +33,7 @@ export interface RankingBoardInfo {
  * - Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
  * - Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
  * - Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
+ * - Deeds: deed points of the **claimed** tiers (an earned tier counts only after Claim; the ledger mirrors the number in `stats.deedPoints`), then who reached the total first.
  *
  * @category Progression/Rankings
  * @title The boards
@@ -44,7 +45,7 @@ export const RANKING_BOARDS: readonly RankingBoardInfo[] = [
 	{ id: 'tiles', label: 'Tiles', valueLabel: 'Most tiles', soon: false },
 	{ id: 'kills', label: 'Kills', valueLabel: 'Monsters killed', soon: false },
 	{ id: 'quests', label: 'Quests', valueLabel: 'Quests', soon: true },
-	{ id: 'deeds', label: 'Deeds', valueLabel: 'Deed points', soon: true },
+	{ id: 'deeds', label: 'Deeds', valueLabel: 'Deed points', soon: false },
 ];
 
 /** The boards that have data, the only ones the route answers */

@@ -8,7 +8,7 @@ import CastleUpgradeDialog from '../CastleUpgradeDialog';
 import HeroWindow from '../hero/HeroWindow';
 import MerchantWindow from '../merchant/MerchantWindow';
 import FarmOverlay from './FarmOverlay';
-import AchievementsOverlay from './AchievementsOverlay';
+import DeedsWindow from '../DeedsWindow';
 import BestiaryWindow from '../BestiaryWindow';
 import BossWindow from '../BossWindow';
 import RankingsWindow from '../RankingsWindow';
@@ -52,9 +52,7 @@ const GameWindows: React.FC = () => {
 			)}
 			{open.includes('achievements') && (
 				<WindowErrorBoundary name='Deeds'>
-					<GameWindow id='achievements' title='Deeds' width={620} height={640}>
-						<AchievementsOverlay />
-					</GameWindow>
+					<DeedsWindow />
 				</WindowErrorBoundary>
 			)}
 			{open.includes('bestiary') && (

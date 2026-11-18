@@ -170,6 +170,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
+- [`deedMilestones.ts`](../../src/catalog/deedMilestones.ts) — The deed point milestones of the Hall of Deeds (IDL-321, decided in IDL-310: points are a score plus milestone rewards; nothing is spent). Pure data: no server and no store imports.
 - [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 
@@ -249,6 +250,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ContextMenu.tsx`](../../src/components/game/ContextMenu.tsx) — ~ The one right-click / dropdown menu, drawn by the design system's `ContextMenu`.
 - [`CostGrid.tsx`](../../src/components/game/CostGrid.tsx) — ~ A bundle of resource costs laid out as a grid of chips (icon and amount), green when the player has enough and red when not (`muted`:
 - [`DailyBoard.tsx`](../../src/components/game/DailyBoard.tsx) — ~ The line under the board's title:
+- [`DeedsWindow.tsx`](../../src/components/game/DeedsWindow.tsx) — ~ The Hall of Deeds (IDL-321, replaces the flat Achievements list):
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ The game's HUD, drawn with the design system (IDL-325):
@@ -316,7 +318,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/components/game/overlays/**
 
 - [`AchievementNotification.tsx`](../../src/components/game/overlays/AchievementNotification.tsx) — ~ The reward moment for an earned achievement (IDL-332):
-- [`AchievementsOverlay.tsx`](../../src/components/game/overlays/AchievementsOverlay.tsx) — ~ One row:
 - [`BuildModal.tsx`](../../src/components/game/overlays/BuildModal.tsx) — ~ What an Idol is and does, in plain lines:
 - [`BuildingModal.tsx`](../../src/components/game/overlays/BuildingModal.tsx) — ~ The building window:
 - [`ChestNotification.tsx`](../../src/components/game/overlays/ChestNotification.tsx) — ~ The toast after opening a chest:
@@ -487,6 +488,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
 - [`deeds.ts`](../../src/lib/deeds.ts) — ~ Equipment slots a full kit must fill.
+- [`deedsView.ts`](../../src/lib/deedsView.ts) — ~ The report fields the window reads (the store's state).
 - [`distance.ts`](../../src/lib/distance.ts) — ~ How far a tile is from the castle, the way the chest placement and the danger bonus measure it (Chebyshev:
 - [`dragPaint.ts`](../../src/lib/dragPaint.ts) — ~ Press, hold and drag over the map to draw on it:
 - [`effectiveStats.ts`](../../src/lib/effectiveStats.ts) — ~ Everything that decides the numbers shown for the character:
@@ -986,6 +988,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`bestiary.test.ts`](../../tests/server/bestiary.test.ts)
 - [`bootSnapshot.test.ts`](../../tests/server/bootSnapshot.test.ts) — ~ A stand-in for the Supabase client:
 - [`clientInventory.test.ts`](../../tests/server/clientInventory.test.ts) — ~ A fetch whose answers the test gives, one request at a time.
+- [`deedMilestones.test.ts`](../../tests/server/deedMilestones.test.ts)
 - [`deeds.test.ts`](../../tests/server/deeds.test.ts)
 - [`deedsBatch2.test.ts`](../../tests/server/deedsBatch2.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
@@ -1027,6 +1030,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`buildingText.test.ts`](../../tests/ui/buildingText.test.ts)
 - [`castleArt.test.ts`](../../tests/ui/castleArt.test.ts)
 - [`changelog.test.ts`](../../tests/ui/changelog.test.ts)
+- [`deedsView.test.ts`](../../tests/ui/deedsView.test.ts)
 - [`designSystem.test.ts`](../../tests/ui/designSystem.test.ts)
 - [`designSystemRender.test.ts`](../../tests/ui/designSystemRender.test.ts)
 - [`formatStack.test.ts`](../../tests/ui/formatStack.test.ts)
@@ -1088,6 +1092,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`offline_ledger.sql`](../../supabase/migrations/offline_ledger.sql)
 - [`player_ledger_buffs.sql`](../../supabase/migrations/player_ledger_buffs.sql)
 - [`player_rankings.sql`](../../supabase/migrations/player_rankings.sql)
+- [`player_rankings_deeds.sql`](../../supabase/migrations/player_rankings_deeds.sql)
+- [`player_rankings_deeds_rollback.sql`](../../supabase/migrations/player_rankings_deeds_rollback.sql)
 - [`player_rankings_eligibility.sql`](../../supabase/migrations/player_rankings_eligibility.sql)
 - [`player_rankings_eligibility_rollback.sql`](../../supabase/migrations/player_rankings_eligibility_rollback.sql)
 - [`player_rankings_kills.sql`](../../supabase/migrations/player_rankings_kills.sql)

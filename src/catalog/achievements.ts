@@ -192,7 +192,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
 		badge: 'badge_early_tester_special',
-		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
+		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester', points: 25 },
 	},
 	{
 		id: 'beta_tester', // granted with the Early tester (`withAchievement`): by the reset, and for the accounts that already had it
@@ -201,7 +201,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		when: { kind: 'manual' },
 		withAchievement: 'early_tester',
 		badge: 'badge_early_tester_wireframe',
-		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester' },
+		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester', points: 50 },
 	},
 	// The tiers of the Hall of Deeds (IDL-306), appended after the launch list. Goals are the mockup's; gems and points are placeholders until the balance pass (IDL-310) and bonuses are text only.
 	{

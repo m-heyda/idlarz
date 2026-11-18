@@ -26,6 +26,9 @@ export interface KillContext {
 	masteryGoldPct?: number;
 	masteryXpPct?: number;
 	masteryLootPct?: number;
+	/** The deed bonuses (`deedBonuses`, claimed point milestones), in %: extra kill gold and kill XP, on every monster */
+	deedGoldPct?: number;
+	deedXpPct?: number;
 }
 
 export interface KillLoot {
@@ -48,8 +51,8 @@ export interface KillLoot {
  * @category Monsters/Rewards
  * @formula
  * goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
- * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%))
- * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
+ * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%) x (1 + deed gold%))
+ * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%) x (1 + deed XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
  * hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
  * @table kill-rewards
  */
@@ -62,12 +65,14 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	const kills = 1 + (ctx.killRewardPct ?? 0) / 100;
 	const masteryGold = 1 + (ctx.masteryGoldPct ?? 0) / 100;
 	const masteryXp = 1 + (ctx.masteryXpPct ?? 0) / 100;
+	const deedGold = 1 + (ctx.deedGoldPct ?? 0) / 100;
+	const deedXp = 1 + (ctx.deedXpPct ?? 0) / 100;
 	// the monster's part first (income share, capped, times its level), the player's investment (Luck, Gold Find, Kill Rewards %) after the cap
 	const goldBase = Math.min(ctx.goldPerSec * reward.gold.rewardSec, reward.gold.cap) * levelMult;
 	const xpBase = Math.min(ctx.xpPerSec * reward.xp.rewardSec, reward.xp.cap) * levelMult * COMBAT.rewards.xpScale;
 	return {
-		gold: Math.floor(Math.max(COMBAT.rewards.minGold, goldBase * luckBonus * goldFind) * bonus * kills * masteryGold),
-		xp: Math.max(COMBAT.rewards.minXp, xpBase) * bonus * kills * masteryXp,
+		gold: Math.floor(Math.max(COMBAT.rewards.minGold, goldBase * luckBonus * goldFind) * bonus * kills * masteryGold * deedGold),
+		xp: Math.max(COMBAT.rewards.minXp, xpBase) * bonus * kills * masteryXp * deedXp,
 		// pelts stay a share of the farm's hide income (uncapped; goods per family are a separate task)
 		hide: Math.floor((ctx.hidePerSec ?? 0) * reward.gold.rewardSec * levelMult * COMBAT.rewards.hideShare * bonus),
 	};

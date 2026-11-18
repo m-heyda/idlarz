@@ -21,6 +21,8 @@ interface AchievementState {
 	points: number;
 	claimable: number;
 	bonusText: string;
+	/** Deed point milestones the player has claimed (their bonuses on kill rewards are on) */
+	milestonesClaimed: readonly string[];
 	progress: Readonly<Record<string, number>>;
 	/** The id being claimed right now ('all' for Claim all; the buttons are disabled meanwhile) */
 	busy: string | null;
@@ -38,6 +40,7 @@ type LooseReport = Pick<AchievementReport, 'fresh' | 'earned' | 'gemsTotal'> & {
 	points?: number;
 	claimable?: number;
 	bonusText?: string;
+	milestonesClaimed?: string[];
 	progress?: Record<string, number>;
 };
 
@@ -49,6 +52,7 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 	points: 0,
 	claimable: 0,
 	bonusText: '',
+	milestonesClaimed: [],
 	progress: {},
 	busy: null,
 	apply: (report) => {
@@ -62,6 +66,7 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 			points: r.points ?? state.points,
 			claimable: r.claimable ?? r.earned.filter((id) => !claimed.includes(id)).length,
 			bonusText: r.bonusText ?? state.bonusText,
+			milestonesClaimed: r.milestonesClaimed ?? state.milestonesClaimed,
 			// a report without the numbers (an older server, or one made before the save is known) keeps what was shown
 			progress: r.progress ?? state.progress,
 		}));

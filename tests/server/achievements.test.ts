@@ -375,7 +375,7 @@ test('Claim all on a ledger from before claiming existed pays nothing it already
 	assert.deepEqual(claimAllAchievements(old, T0), { ok: false, reason: 'nothing_to_claim' });
 });
 
-test('the report carries deed points of the claimed tiers, the waiting count, the placeholder bonus and per-deed progress', () => {
+test('the report carries deed points of the claimed tiers, the waiting count, the bonus line and per-deed progress', () => {
 	const ledger = earnAchievements(newLedger(T0), ['slayer_100', 'slayer_500'], T0).ledger;
 	const claimed = claimAchievement(ledger, 'slayer_100', T0 + 1);
 	assert.ok(claimed.ok);
@@ -385,7 +385,7 @@ test('the report carries deed points of the claimed tiers, the waiting count, th
 	const report = reportOf(withKills, [], summary);
 	assert.equal(report.points, 10);
 	assert.equal(report.claimable, 1);
-	assert.equal(report.bonusText, 'Bonus from deeds: coming soon');
+	assert.equal(report.bonusText, 'None yet: claim a milestone');
 	assert.equal(report.progress?.slayer, 642);
 	assert.equal(report.progress?.castle, 3);
 	assert.equal(reportOf(withKills, []).progress, undefined, 'no save known: no progress');

@@ -41,7 +41,7 @@
   "category": "Saves & Server/Endpoints",
   "file": "src/app/api/rankings/route.ts",
   "line": 18,
-  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills|deeds`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` board is not built and is a 400.",
   "see": []
  },
  {
@@ -157,6 +157,17 @@
   "file": "src/catalog/buildings.ts",
   "line": 60,
   "summary": "The Producer and the Extractor of each of the seven home biomes (docs/plan/18 section 3; the five rebirth biomes and their buildings follow with IDL-99). Each makes the resources listed in `produces` at `BUILDING_RULES.producer.tileEquivalents` tiles' worth, so the land under it decides what it is good at. The sprite is first-pass art from the village pack, one `art` field per building.",
+  "see": []
+ },
+ {
+  "id": "deed-milestones",
+  "name": "Deed milestones",
+  "symbol": "DEED_MILESTONES",
+  "kind": "const",
+  "category": "Progression/Deeds",
+  "file": "src/catalog/deedMilestones.ts",
+  "line": 29,
+  "summary": "The milestones, by claimed deed points (all tiers together are worth about 3,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+4% gold and +4% XP at the top, under `DEED_BONUS_CAP_PCT`). Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.",
   "see": []
  },
  {
@@ -1805,6 +1816,17 @@
   "see": []
  },
  {
+  "id": "deedbonuses",
+  "name": "deedBonuses",
+  "symbol": "deedBonuses",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/deeds.ts",
+  "line": 202,
+  "summary": "The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.",
+  "see": []
+ },
+ {
   "id": "bandof",
   "name": "bandOf",
   "symbol": "bandOf",
@@ -2014,7 +2036,7 @@
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 56,
+  "line": 59,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2254,13 +2276,24 @@
   "see": []
  },
  {
+  "id": "claimmilestone",
+  "name": "claimMilestone",
+  "symbol": "claimMilestone",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 101,
+  "summary": "Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ({@link deedBonuses}). Refused for an id that is not a milestone, one the claimed points have not reached yet, or one already claimed.",
+  "see": []
+ },
+ {
   "id": "claimachievement",
   "name": "claimAchievement",
   "symbol": "claimAchievement",
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 96,
+  "line": 129,
   "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
   "see": []
  },
@@ -2271,7 +2304,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/offline/achievements.ts",
-  "line": 124,
+  "line": 158,
   "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
   "see": []
  },
@@ -2282,7 +2315,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 177,
+  "line": 213,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
@@ -2699,7 +2732,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/reward.ts",
-  "line": 37,
+  "line": 38,
   "summary": "Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.",
   "see": []
  },
@@ -2908,8 +2941,8 @@
   "kind": "const",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 40,
-  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
+  "line": 41,
+  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests: it needs the quest system first).",
   "see": []
  },
  {
@@ -2919,7 +2952,7 @@
   "kind": "function",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 92,
+  "line": 93,
   "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },

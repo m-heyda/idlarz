@@ -309,7 +309,7 @@ The band a castle distance falls in. Anything below the first band (the castle t
 
 ### `killIncome` <small>function</small>
 
-Source: [`src/lib/loot/kill.ts:56`](../../src/lib/loot/kill.ts)
+Source: [`src/lib/loot/kill.ts:59`](../../src/lib/loot/kill.ts)
 
 Rewards for a kill. Gold and XP are "seconds of income" (like chests) so they scale with the economy. The items come from
 the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which
@@ -322,8 +322,8 @@ Items: see [`generateLoot`](loot.md#generateloot). Measured share of income: `do
 
 ```text
 goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
-gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%))
-xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
+gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%) x (1 + deed gold%))
+xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%) x (1 + deed XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
 hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
 ```
 

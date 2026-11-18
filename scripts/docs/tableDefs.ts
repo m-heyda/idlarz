@@ -39,6 +39,7 @@ import { MONSTER_CATALOG } from '../../src/catalog/monsters';
 import { ingredientsOf } from '../../src/catalog/monsterDrops';
 import { SKILLS } from '../../src/catalog/skills';
 import { ACHIEVEMENTS, type AchievementCondition } from '../../src/catalog/achievements';
+import { DEED_BONUS_CAP_PCT, DEED_MILESTONES } from '../../src/catalog/deedMilestones';
 import { TUTORIAL_LESSONS, TUTORIAL_PATH, type TutorialReward } from '../../src/catalog/tutorial';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
@@ -525,6 +526,14 @@ TABLES['achievement-list'] = () => {
 		),
 	};
 };
+
+TABLES['deed-milestones'] = () => ({
+	title: `Deed point milestones (${DEED_MILESTONES.length}, bonuses capped at +${DEED_BONUS_CAP_PCT}% each)`,
+	md: mdTable(
+		['Claimed deed points', 'Gems', 'Bonus on kill rewards'],
+		DEED_MILESTONES.map((m) => [m.points, m.gems, m.bonus ? `+${m.bonus.pct}% ${m.bonus.stat}` : '-']),
+	),
+});
 
 TABLES['stack-versions'] = () => {
 	const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };

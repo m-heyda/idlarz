@@ -20,8 +20,9 @@ const BOARDS: Readonly<Record<LiveBoardId, { rank: string; prev: string; value: 
 	level: { rank: 'rank_level', prev: 'prev_rank_level', value: 'level', min: 0 },
 	rebirths: { rank: 'rank_rebirths', prev: 'prev_rank_rebirths', value: 'rebirths', min: 1 },
 	crafting: { rank: 'rank_crafting', prev: 'prev_rank_crafting', value: 'craft_xp', min: 1 },
-	tiles: { rank: 'rank_tiles', prev: 'prev_rank_tiles, prev_rank_kills', value: 'best_tiles', min: 1 },
+	tiles: { rank: 'rank_tiles', prev: 'prev_rank_tiles', value: 'best_tiles', min: 1 },
 	kills: { rank: 'rank_kills', prev: 'prev_rank_kills', value: 'kills', min: 1 },
+	deeds: { rank: 'rank_deeds', prev: 'prev_rank_deeds', value: 'deed_points', min: 1 },
 };
 
 type Stored = Record<string, unknown>;
@@ -94,7 +95,7 @@ const loadPeople = async (db: SupabaseClient, ids: readonly string[]) => {
 };
 
 const COLUMNS =
-	'user_id, level, xp, rebirths, craft_xp, best_tiles, kills, rank_level, rank_rebirths, rank_crafting, rank_tiles, rank_kills, prev_rank_level, prev_rank_rebirths, prev_rank_crafting, prev_rank_tiles';
+	'user_id, level, xp, rebirths, craft_xp, best_tiles, kills, rank_level, rank_rebirths, rank_crafting, rank_tiles, rank_kills, prev_rank_level, prev_rank_rebirths, prev_rank_crafting, prev_rank_tiles, prev_rank_kills, deed_points, rank_deeds, prev_rank_deeds';
 
 /**
  * One board: the first `RANKING_LIMIT` places and, when the asking player is ranked further down, their own place. The cosmetics are read now (not at the last rebuild), so a new colour or avatar shows at once.

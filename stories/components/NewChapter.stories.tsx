@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import AvatarPicker from '@/components/game/AvatarPicker';
-import { AchievementList } from '@/components/game/overlays/AchievementsOverlay';
+import { DsRoot, WindowShell } from '../../packages/design-system/src/components/primitives';
+import { DeedsPanel } from '../../packages/design-system/src/views/deeds';
+import { deedViewsOf, milestoneViewsOf, DEED_CATEGORIES, TOTAL_DEED_POINTS, type DeedsInput } from '@/lib/deedsView';
 import RebirthUnlockModal from '@/components/game/overlays/RebirthUnlockModal';
 import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import HeroCreator from '@/components/auth/HeroCreator';
@@ -51,28 +53,40 @@ export const AvatarsAllUnlocked: Story = {
 	),
 };
 
-export const AchievementsHalfEarned: Story = {
-	render: () => (
-		<div style={{ width: 720, padding: 24, color: '#f1e6c8' }}>
-			<AchievementList
-				report={{
-					earned: ACHIEVEMENTS.filter((_, i) => i % 2 === 0).map((a) => a.id),
-					claimed: ACHIEVEMENTS.filter((_, i) => i % 4 === 0).map((a) => a.id),
-					earnedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 12)])),
-					claimedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 13)])),
-				}}
-				onClaim={() => undefined}
-			/>
-		</div>
-	),
-};
+const deedsInput = (earnedEvery: number, claimedEvery: number): DeedsInput => ({
+	earned: ACHIEVEMENTS.filter((_, i) => i % earnedEvery === 0).map((a) => a.id),
+	claimed: ACHIEVEMENTS.filter((_, i) => i % claimedEvery === 0).map((a) => a.id),
+	earnedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 12)])),
+	claimedAt: Object.fromEntries(ACHIEVEMENTS.map((a) => [a.id, Date.UTC(2026, 10, 13)])),
+	milestonesClaimed: ['dm_50'],
+	progress: { slayer: 642, landlord: 130 },
+	points: 240,
+});
 
-export const AchievementsNoneEarned: Story = {
-	render: () => (
-		<div style={{ width: 720, padding: 24, color: '#f1e6c8' }}>
-			<AchievementList report={{ earned: [] }} />
-		</div>
-	),
+const DeedsStory = ({ input }: { input: DeedsInput }) => (
+	<DsRoot style={{ padding: 24, background: '#0b1022', minHeight: '100vh', boxSizing: 'border-box' }}>
+		<WindowShell title='Hall of Deeds' width={1120} height={700} minWidth={640}>
+			<DeedsPanel
+				deeds={deedViewsOf(input)}
+				milestones={milestoneViewsOf(input)}
+				points={input.points}
+				totalPoints={TOTAL_DEED_POINTS}
+				bonusText='+1% kill gold'
+				categories={DEED_CATEGORIES}
+				claimable={4}
+				busy={false}
+				onClaim={() => undefined}
+				onClaimAll={() => undefined}
+			/>
+		</WindowShell>
+	</DsRoot>
+);
+
+/** The Hall of Deeds with some tiers earned and some claimed (crystals lit, pulsing and dim). */
+export const HallOfDeedsHalfEarned: Story = { render: () => <DeedsStory input={deedsInput(2, 4)} /> };
+
+export const HallOfDeedsNoneEarned: Story = {
+	render: () => <DeedsStory input={{ earned: [], claimed: [], earnedAt: {}, claimedAt: {}, milestonesClaimed: [], progress: {}, points: 0 }} />,
 };
 
 const prestigeOf = (rebirths: number, gained: number, earnedBefore: number): { before: PrestigeState; after: PrestigeState } => ({

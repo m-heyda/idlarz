@@ -42,7 +42,7 @@ const HudDock: React.FC = () => {
 		() => readyCountOf({ loaded: true, seen: new Set(), kills, claimed: claimedTiers, biomeClaimed, deaths: {}, bestMs: {} }),
 		[kills, claimedTiers, biomeClaimed],
 	);
-	const claimable = useAchievementStore((state) => state.earned.filter((id) => !state.claimed.includes(id)).length);
+	const claimable = useAchievementStore((state) => state.claimable);
 
 	const rebirthOpen = order.includes('rebirth');
 	const toggleRebirth = useUiStore((state) => state.toggleRebirth);

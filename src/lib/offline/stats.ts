@@ -36,6 +36,10 @@ export interface LifetimeStats {
 	/** When each achievement was earned and claimed (epoch ms), for the Achievements window; absent for the ones earned before this was kept */
 	earnedAt: Record<string, number>;
 	claimedAt: Record<string, number>;
+	/** Deed point milestones the player has claimed (`catalog/deedMilestones.ts` ids). Additive: absent reads as none. */
+	milestonesClaimed: string[];
+	/** The deed points of the claimed tiers, mirrored here for the Rankings SQL (it has no copy of the catalog). The server writes it at every claim and in the settle; the window and the report derive the number from `claimed`. Additive: absent reads as 0. */
+	deedPoints: number;
 	/** The manual achievements (the testers) held in `player_achievements` have been merged into `achievements` once */
 	manualSynced: boolean;
 	/** The most gold the player held at an accepted save (Hoarder). Additive: absent reads as 0. */
@@ -96,6 +100,8 @@ export const emptyStats = (): LifetimeStats => ({
 	claimed: null,
 	earnedAt: {},
 	claimedAt: {},
+	milestonesClaimed: [],
+	deedPoints: 0,
 	manualSynced: false,
 	goldPeak: 0,
 	unitsSold: 0,
@@ -149,6 +155,8 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		claimed: Array.isArray(r.claimed) ? ids(r.claimed) : null,
 		earnedAt: counts(r.earnedAt),
 		claimedAt: counts(r.claimedAt),
+		milestonesClaimed: ids(r.milestonesClaimed),
+		deedPoints: Math.floor(num(r.deedPoints)),
 		manualSynced: r.manualSynced === true,
 		goldPeak: num(r.goldPeak),
 		unitsSold: Math.floor(num(r.unitsSold)),
@@ -171,6 +179,8 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		claimed,
 		earnedAt,
 		claimedAt,
+		milestonesClaimed,
+		deedPoints,
 		manualSynced,
 		goldPeak,
 		unitsSold,
@@ -191,6 +201,8 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(claimed !== null ? { claimed } : {}),
 		...(Object.keys(earnedAt).length > 0 ? { earnedAt } : {}),
 		...(Object.keys(claimedAt).length > 0 ? { claimedAt } : {}),
+		...(milestonesClaimed.length > 0 ? { milestonesClaimed } : {}),
+		...(deedPoints > 0 ? { deedPoints } : {}),
 		...(manualSynced ? { manualSynced } : {}),
 		// the deeds counters (IDL-307) are left out while they hold nothing, so a row from before stays byte-for-byte what it was
 		...(goldPeak > 0 ? { goldPeak } : {}),
@@ -221,6 +233,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	isEmptyProgress(s.tutorial) &&
 	s.achievements.length === 0 &&
 	!s.manualSynced &&
+	s.milestonesClaimed.length === 0 &&
+	s.deedPoints === 0 &&
 	(s.claimed === null || s.claimed.length === 0) &&
 	Object.keys(s.earnedAt).length === 0 &&
 	s.goldPeak === 0 &&

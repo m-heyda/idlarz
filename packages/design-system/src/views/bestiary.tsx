@@ -255,7 +255,7 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 };
 
 /** A dropdown drawn like the rest of the window (the native select is not styleable): a button that opens a list of options, closes on an outside press or Escape. */
-const Dropdown: React.FC<{ value: string; options: readonly [string, string][]; onChange: (v: string) => void; label: string }> = ({
+export const Dropdown: React.FC<{ value: string; options: readonly [string, string][]; onChange: (v: string) => void; label: string }> = ({
 	value,
 	options,
 	onChange,

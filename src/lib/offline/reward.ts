@@ -1,5 +1,6 @@
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollKillLoot } from '@/lib/loot';
+import { deedBonuses } from '@/lib/deeds';
 import { masteryBonusesFor } from '@/lib/mastery';
 import { levelAtAge } from '@/lib/monsters';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
@@ -53,6 +54,7 @@ export const payKill = (
 	const { luck, goldFind, killRewardPct } = stored.summary.derived;
 	const inv = ledger.inv!;
 	const mastery = masteryBonusesFor(type, ledger.stats.masteryClaimed, ledger.stats.biomeClaimed);
+	const deed = deedBonuses(ledger.stats.milestonesClaimed);
 	const loot = rollKillLoot(
 		{ type, level },
 		{
@@ -68,6 +70,8 @@ export const payKill = (
 			masteryGoldPct: mastery.gold,
 			masteryXpPct: mastery.xp,
 			masteryLootPct: mastery.loot,
+			deedGoldPct: deed.gold,
+			deedXpPct: deed.xp,
 		},
 		rng,
 	);
