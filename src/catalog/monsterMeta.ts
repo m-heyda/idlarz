@@ -29,6 +29,8 @@ export const META: Readonly<Record<string, { family: MonsterFamily; tags: readon
 	mawhornBrute: { family: 'Demon', tags: ['Poison'] },
 	quarryDrake: { family: 'Dragon', tags: ['Fast', 'Fire'] },
 	cairnSentinel: { family: 'Construct', tags: ['Armored'] },
+	quarryRatKnight: { family: 'Humanoid', tags: ['Pack', 'Armored'] },
+	highlandGnoll: { family: 'Humanoid', tags: ['Pack', 'Fast'] },
 	bossIronhorn: { family: 'Construct', tags: ['Boss', 'Armored', 'Fire'] },
 	graniteRam: { family: 'Beast', tags: ['Armored'] },
 	caveGoblinMiner: { family: 'Humanoid', tags: ['Pack'] },
@@ -92,6 +94,7 @@ export const META: Readonly<Record<string, { family: MonsterFamily; tags: readon
 	mothwingHexer: { family: 'Vermin', tags: ['Magic', 'Night'] },
 	gloomCerberus: { family: 'Demon', tags: ['Elite', 'Night'] },
 	sporebackOgre: { family: 'Fungus', tags: ['Poison', 'Elite'] },
+	sporeHound: { family: 'Beast', tags: ['Poison', 'Pack', 'Fast'] },
 	bossEyedMaw: { family: 'Demon', tags: ['Boss', 'Magic'] },
 	// battlefield
 	boneCleaver: { family: 'Undead', tags: ['Armored'] },
@@ -120,6 +123,9 @@ export const MORE_LORE: Readonly<Record<string, string>> = {
 	// hills
 	quarryDrake: 'A young drake that decided the quarry is its nest.',
 	cairnSentinel: 'A heap of stones that remembers being a wall.',
+	quarryRatKnight:
+		'The old Rat King lost his crown and his kingdom, but not his guard. They took the quarry, they drill every dawn, and they still salute an empty throne.',
+	highlandGnoll: 'Laughs at everything, mostly his own jokes, and steals the rest. The miners say the laugh means he has already found your lunch.',
 	// swamp
 	dumpback: 'Wears a rubbish heap as a shell and keeps the best bits at the bottom. It is surprisingly proud of its collection.',
 	rotHeron: 'It stands in the shallows for hours and looks wise. Then it eats a frog and ruins the effect.',
@@ -155,6 +161,7 @@ export const MORE_LORE: Readonly<Record<string, string>> = {
 	millstoneGolem: 'Grinds the grain and anything standing near it.',
 	mushroomWizard: 'Found a hat and became a scholar.',
 	rootboundGardener: 'Prunes trespassers, and files the cuttings in a very tidy shed.',
+	sporeHound: 'Somebody lost a good dog in the Blight. The dog is still good, and so is the cloud of spores that follows it everywhere.',
 	sporebackOgre: 'Grew a second back out of the fungus and a third out of spite.',
 	bannerWraith: 'Still carries the colours of an army that no longer exists.',
 	frostFlameKnight: 'Armour half ice, half ember, fully unwilling to retire.',

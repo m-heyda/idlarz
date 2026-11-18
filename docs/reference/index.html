@@ -2708,7 +2708,7 @@ recorded in <code>ledger.buffs</code> with its end time, a heal over time starts
 </ul>
 </article></section><section class="cat"><h2 class="cat" id="cat-monsters">Monsters</h2><p class="blurb">The roster, levels, growth, spawning and what a kill pays.</p><h2>Roster</h2><article><p><a id="monsters"></a></p>
 <h3><code>MONSTERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:556</code></a></p>
+<p>Source: <a href="../../src/config/combatConfig.ts"><code>src/config/combatConfig.ts:561</code></a></p>
 <p>The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (<code>RETIRED_MONSTERS</code>): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its <code>spawn.biomes</code>, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once <code>config/biomeStage.ts</code> turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a href="#monsterstats"><code>monsterStats</code></a>; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.</p>
 <ul>
@@ -3069,6 +3069,26 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 <td>6</td>
 <td>6</td>
 <td>0.4</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Quarry Rat Knight</td>
+<td>1</td>
+<td>247</td>
+<td>5</td>
+<td>1.5</td>
+<td>0.4</td>
+<td>6-8 -&gt; 14-16</td>
+</tr>
+<tr>
+<td>hills</td>
+<td>Highland Gnoll</td>
+<td>1</td>
+<td>190</td>
+<td>7</td>
+<td>1.5</td>
+<td>0.5</td>
 <td>6-8 -&gt; 14-16</td>
 </tr>
 <tr>
@@ -3453,6 +3473,16 @@ Stats are at level 1 (bosses at their <code>refLevel</code>), straight from <a h
 </tr>
 <tr>
 <td>blight</td>
+<td>Spore Hound</td>
+<td>1</td>
+<td>440</td>
+<td>17</td>
+<td>7.5</td>
+<td>0.6</td>
+<td>23-25 -&gt; 27-29</td>
+</tr>
+<tr>
+<td>blight</td>
 <td>The Eyed Maw (boss)</td>
 <td>47</td>
 <td>21.5 K</td>
@@ -3827,16 +3857,6 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>bacon 12%, blood 9%, horn always, glowberry always</td>
 </tr>
 <tr>
-<td>Magma Knight</td>
-<td>Humanoid</td>
-<td>coins 12%, jug 8%, bacon 6%, obsidian 5% (L6+), copper_ore 8%</td>
-</tr>
-<tr>
-<td>Magma Crab</td>
-<td>Vermin</td>
-<td>claw 7%, tar 6%, ember_coal 10%, geode 4% (L6+)</td>
-</tr>
-<tr>
 <td>Mawhorn Brute</td>
 <td>Demon</td>
 <td>blood 8%, horn_dark 6% (L6+), dark_shard 2% (L14+)</td>
@@ -3850,6 +3870,16 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>Cairn Sentinel</td>
 <td>Construct</td>
 <td>clay 12%, scrap 12%, copper_ore 10%, geode 5% (L6+)</td>
+</tr>
+<tr>
+<td>Quarry Rat Knight</td>
+<td>Humanoid</td>
+<td>coins 10%, jug 8%, bacon 6%, copper_ore 8%</td>
+</tr>
+<tr>
+<td>Highland Gnoll</td>
+<td>Humanoid</td>
+<td>coins 14%, jug 10%, bacon 6%</td>
 </tr>
 <tr>
 <td>The Ironhorn</td>
@@ -4072,11 +4102,6 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>coins 12%, jug 8%, bacon 6%, scrap 14%, copper_ore 8%</td>
 </tr>
 <tr>
-<td>Blighted Husk</td>
-<td>Undead</td>
-<td>bones 18%, dark_potion 6% (L10+), moon 1% (L14+)</td>
-</tr>
-<tr>
 <td>Mothwing Hexer</td>
 <td>Vermin</td>
 <td>claw 7%, tar 6%, dark_shard 3% (L14+)</td>
@@ -4090,6 +4115,11 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 <td>Sporeback Ogre</td>
 <td>Fungus</td>
 <td>orange_mushrooms 16%, glowberry 6% (L5+), dried_herbs 5%, dark_shard 4% (L14+)</td>
+</tr>
+<tr>
+<td>Spore Hound</td>
+<td>Beast</td>
+<td>bacon 12%, blood 10%, horn 4% (L3+), orange_mushrooms 10%</td>
 </tr>
 <tr>
 <td>The Eyed Maw</td>

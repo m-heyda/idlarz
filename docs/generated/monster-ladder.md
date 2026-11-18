@@ -15,6 +15,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Dust Strider | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 70% | 100% |
+| Gravel Quail | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Gravel Quail | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Gravel Quail | 20 (grown) | 0% | 0% | 0% | 0% | 83% | 100% |
+| Stonehorn Bison | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Stonehorn Bison | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 48% | 100% |
 | The Great Auroch | 15 (castle 1) | 80% | 88% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 23 (castle 8) | 5% | 35% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 33 (grown) | 0% | 3% | 100% | 100% | 100% | 100% |
@@ -27,6 +33,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rotcap Stag | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 13 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Ember Squirrel | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Ember Squirrel | 13 (castle 8) | 0% | 0% | 93% | 100% | 100% | 100% |
+| Ember Squirrel | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Pinecone Warden | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Pinecone Warden | 13 (castle 8) | 0% | 0% | 3% | 100% | 100% | 100% |
+| Pinecone Warden | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
@@ -45,6 +57,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Scrap Golem | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
 | Scrap Golem | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bogfire Wisp | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Bogfire Wisp | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
+| Bogfire Wisp | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 90% | 100% |
 | The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 75% | 100% |
 | The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 50% | 100% |
@@ -60,6 +75,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Frost Moth | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Moth | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Glacier Yeti | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
+| Glacier Yeti | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Glacier Yeti | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
 | The Winter Wyrm | 38 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 48 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -84,6 +102,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Mawhorn Brute | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Mawhorn Brute | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Mawhorn Brute | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Quarry Drake | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Quarry Drake | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Drake | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Cairn Sentinel | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Cairn Sentinel | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Cairn Sentinel | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
@@ -96,6 +120,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Drowned Sailor | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 20% |
+| Tideglass Jelly | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Tideglass Jelly | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Barnacle Brute | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
 | The Reef Leviathan | 25 (castle 8) | 0% | 0% | 73% | 98% | 100% | 100% |
 | The Reef Leviathan | 35 (grown) | 0% | 0% | 25% | 80% | 100% | 100% |
@@ -111,6 +141,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Tidepool Golem | 10 (castle 1) | 0% | 95% | 100% | 100% | 100% | 100% |
 | Tidepool Golem | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Tidepool Golem | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Silt Eel | 10 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
+| Silt Eel | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Silt Eel | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Lilypad Warden | 10 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
+| Lilypad Warden | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Lilypad Warden | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
 | The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
@@ -123,6 +159,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Zombie Triceratops | 14 (castle 1) | 0% | 0% | 0% | 0% | 60% | 100% |
 | Zombie Triceratops | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Zombie Triceratops | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 14 (castle 1) | 0% | 0% | 0% | 0% | 3% | 98% |
+| Vinewhip Panther | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 35% |
+| Mossback Idol | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -138,6 +180,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Hedge Bandit | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Hedge Bandit | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Hedge Bandit | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Harvest Matron | 37 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Harvest Matron | 45 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Harvest Matron | 55 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -150,6 +198,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Gray Gleaner | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gray Gleaner | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gray Gleaner | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Blossom Reaper | 42 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Blossom Reaper | 50 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Blossom Reaper | 60 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -165,6 +219,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Gloom Cerberus | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gloom Cerberus | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gloom Cerberus | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 47 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 55 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 65 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -177,6 +234,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Gilded Champion | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gilded Champion | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Gilded Champion | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Cinder Warlord | 52 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Cinder Warlord | 60 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Cinder Warlord | 70 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

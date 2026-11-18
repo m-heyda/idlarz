@@ -8483,6 +8483,21 @@
 	},
 	{
 		"usedBy": [
+			"frostFlameKnight"
+		],
+		"name": "monster_frost_flame_knight",
+		"category": "monsters",
+		"subcategory": "battlefield normal",
+		"src": "/pixel/enemies/battlefield/frost-flame-knight.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"frostguardKnight"
 		],
 		"name": "monster_frostguard_knight",
@@ -8528,21 +8543,6 @@
 	},
 	{
 		"usedBy": [
-			"blightedHusk"
-		],
-		"name": "monster_blighted_husk",
-		"category": "monsters",
-		"subcategory": "blight normal",
-		"src": "/pixel/enemies/blight/blighted-husk.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			65,
-			65
-		]
-	},
-	{
-		"usedBy": [
 			"gasketGoblin"
 		],
 		"name": "monster_gasket_goblin",
@@ -8584,6 +8584,21 @@
 		"size": [
 			64,
 			64
+		]
+	},
+	{
+		"usedBy": [
+			"sporebackOgre"
+		],
+		"name": "monster_sporeback_ogre",
+		"category": "monsters",
+		"subcategory": "blight normal",
+		"src": "/pixel/enemies/blight/sporeback-ogre.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			73,
+			73
 		]
 	},
 	{
@@ -8783,12 +8798,12 @@
 	},
 	{
 		"usedBy": [
-			"magmaCrab"
+			"mawhornBrute"
 		],
-		"name": "monster_magma_crab",
+		"name": "monster_mawhorn_brute",
 		"category": "monsters",
 		"subcategory": "hills normal",
-		"src": "/pixel/enemies/hills/magma-crab.png",
+		"src": "/pixel/enemies/hills/mawhorn-brute.png",
 		"status": "used",
 		"source": "monster roster",
 		"size": [
@@ -8798,27 +8813,12 @@
 	},
 	{
 		"usedBy": [
-			"magmaKnight"
+			"quarryRatKnight"
 		],
-		"name": "monster_magma_knight",
+		"name": "monster_quarry_rat_knight",
 		"category": "monsters",
 		"subcategory": "hills normal",
-		"src": "/pixel/enemies/hills/magma-knight.png",
-		"status": "used",
-		"source": "monster roster",
-		"size": [
-			66,
-			66
-		]
-	},
-	{
-		"usedBy": [
-			"mawhornBrute"
-		],
-		"name": "monster_mawhorn_brute",
-		"category": "monsters",
-		"subcategory": "hills normal",
-		"src": "/pixel/enemies/hills/mawhorn-brute.png",
+		"src": "/pixel/enemies/hills/quarry-rat-knight.png",
 		"status": "used",
 		"source": "monster roster",
 		"size": [
@@ -8947,71 +8947,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "monster_pack_frost_flame_knight",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/frost_flame_knight.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_mushroom_wizard",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/mushroom_wizard.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_reaper_frost_scythe",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/reaper_frost_scythe.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			65,
-			65
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_skeleton_cleaver",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/skeleton_cleaver.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "monster_pack_skull_vine",
-		"category": "monsters",
-		"subcategory": "new biome monsters (not wired)",
-		"src": "/pixel/assets_to_assess_and_use/monsters/skull_vine.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/monsters",
-		"size": [
-			65,
-			65
-		]
-	},
-	{
 		"usedBy": [
 			"bossBlossomReaper"
 		],
@@ -9073,6 +9008,21 @@
 	},
 	{
 		"usedBy": [
+			"mushroomWizard"
+		],
+		"name": "monster_mushroom_wizard",
+		"category": "monsters",
+		"subcategory": "orchard normal",
+		"src": "/pixel/enemies/orchard/mushroom-wizard.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"gravelQuail",
 			"stonehornBison",
 			"emberSquirrel",
@@ -9081,8 +9031,11 @@
 			"caveGoblinMiner",
 			"boulderBeetle",
 			"bossHillGiant",
+			"magmaKnight",
+			"magmaCrab",
 			"quarryDrake",
 			"cairnSentinel",
+			"highlandGnoll",
 			"garbageOgre",
 			"bogfireWisp",
 			"glacierYeti",
@@ -9096,11 +9049,10 @@
 			"bossHardwoodColossus",
 			"crowMarshal",
 			"millstoneGolem",
-			"mushroomWizard",
 			"rootboundGardener",
-			"sporebackOgre",
-			"bannerWraith",
-			"frostFlameKnight"
+			"blightedHusk",
+			"sporeHound",
+			"bannerWraith"
 		],
 		"name": "monster_placeholder_silhouette",
 		"category": "monsters",

@@ -18,7 +18,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:556`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:561`](../../src/config/combatConfig.ts)
 
 The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
@@ -66,6 +66,8 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | hills | Mawhorn Brute | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
 | hills | Quarry Drake | 1 | 106 | 10 | 1.5 | 0.6 | 6-8 -> 14-16 |
 | hills | Cairn Sentinel | 1 | 310 | 6 | 6 | 0.4 | 6-8 -> 14-16 |
+| hills | Quarry Rat Knight | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
+| hills | Highland Gnoll | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
 | hills | The Ironhorn (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
 | coast | Wreck Crab | 1 | 169 | 4 | 0 | 0.4 | 2-4 -> 10-12 |
 | coast | Net Gull | 1 | 104 | 6 | 0 | 0.6 | 2-4 -> 10-12 |
@@ -104,6 +106,7 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
 | blight | Gloom Cerberus | 1 | 1,100 | 20 | 15.5 | 0.45 | 23-25 -> 27-29 |
 | blight | Sporeback Ogre | 1 | 1,540 | 15 | 19 | 0.45 | 23-25 -> 27-29 |
+| blight | Spore Hound | 1 | 440 | 17 | 7.5 | 0.6 | 23-25 -> 27-29 |
 | blight | The Eyed Maw (boss) | 47 | 21.5 K | 78 | 118 | 0.33 | 47-50 -> 54-57 |
 | battlefield | Bone Cleaver | 1 | 640 | 15 | 9 | 0.5 | 26-28 -> 30-32 |
 | battlefield | Frostguard Knight | 1 | 832 | 12 | 9 | 0.4 | 26-28 -> 30-32 |
@@ -376,11 +379,11 @@ What each family leaves (two or three ingredients), so a bear and a boar share a
 | Ember Squirrel | Beast | bacon 12%, blood 9%, horn 4% (L3+), ember_coal 5%, sticks 8% |
 | Pinecone Warden | Plant | sticks 14%, dried_herbs 14%, hollow_log 8% |
 | The Elder Stag | Beast | bacon 12%, blood 9%, horn always, glowberry always |
-| Magma Knight | Humanoid | coins 12%, jug 8%, bacon 6%, obsidian 5% (L6+), copper_ore 8% |
-| Magma Crab | Vermin | claw 7%, tar 6%, ember_coal 10%, geode 4% (L6+) |
 | Mawhorn Brute | Demon | blood 8%, horn_dark 6% (L6+), dark_shard 2% (L14+) |
 | Quarry Drake | Dragon | claw 8%, ember_coal 6%, fire_drop 2% (L10+), copper_ore 8%, geode 4% (L8+) |
 | Cairn Sentinel | Construct | clay 12%, scrap 12%, copper_ore 10%, geode 5% (L6+) |
+| Quarry Rat Knight | Humanoid | coins 10%, jug 8%, bacon 6%, copper_ore 8% |
+| Highland Gnoll | Humanoid | coins 14%, jug 10%, bacon 6% |
 | The Ironhorn | Construct | clay 12%, scrap 12%, copper_ore always, geode always, ember_coal always |
 | Toxic Zombie | Undead | bones 18%, dark_potion 5% (L6+), moon 1% (L14+) |
 | Dumpback | Beast | bacon 12%, blood 9%, horn 4% (L3+), jug 8%, scrap 10% |
@@ -425,10 +428,10 @@ What each family leaves (two or three ingredients), so a bear and a boar share a
 | Rootbound Gardener | Plant | sticks 16%, dried_herbs 14%, hollow_log 8%, carrot 14%, beet 12%, grapes 10% |
 | The Blossom Reaper | Undead | bones 18%, dark_potion 3% (L8+), moon always, grapes always |
 | Gasket Goblin | Humanoid | coins 12%, jug 8%, bacon 6%, scrap 14%, copper_ore 8% |
-| Blighted Husk | Undead | bones 18%, dark_potion 6% (L10+), moon 1% (L14+) |
 | Mothwing Hexer | Vermin | claw 7%, tar 6%, dark_shard 3% (L14+) |
 | Gloom Cerberus | Demon | blood 8%, horn_dark 8% (L10+), dark_shard 5% (L14+) |
 | Sporeback Ogre | Fungus | orange_mushrooms 16%, glowberry 6% (L5+), dried_herbs 5%, dark_shard 4% (L14+) |
+| Spore Hound | Beast | bacon 12%, blood 10%, horn 4% (L3+), orange_mushrooms 10% |
 | The Eyed Maw | Demon | blood 8%, horn_dark 4% (L8+), dark_shard always, orange_mushrooms always |
 | Bone Cleaver | Undead | bones 20%, dark_potion 3% (L8+), moon 1% (L14+), blood 10% |
 | Frostguard Knight | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), copper_ore 10%, coins 10% |

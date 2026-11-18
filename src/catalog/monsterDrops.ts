@@ -64,6 +64,8 @@ export const MONSTER_DROPS: Readonly<Record<string, readonly IngredientDrop[]>> 
 	magmaCrab: [d('ember_coal', 0.1), d('geode', 0.04, [1, 1], 0.03, 6)],
 	mawhornBrute: [d('horn_dark', 0.06, [1, 1], 0.04, 6)],
 	quarryDrake: [d('copper_ore', 0.08), d('geode', 0.04, [1, 1], 0.03, 8)],
+	quarryRatKnight: [d('coins', 0.1, [1, 3]), d('copper_ore', 0.08), d('bacon', 0.06)],
+	highlandGnoll: [d('jug', 0.1), d('coins', 0.14, [1, 3])],
 	cairnSentinel: [d('geode', 0.05, [1, 1], 0.03, 6), d('copper_ore', 0.1, [1, 3])],
 	// swamp and tundra
 	dumpback: [d('jug', 0.08), d('scrap', 0.1, [1, 3])],
@@ -106,6 +108,7 @@ export const MONSTER_DROPS: Readonly<Record<string, readonly IngredientDrop[]>> 
 	blightedHusk: [d('dark_potion', 0.06, [1, 1], 0.03, 10)],
 	mothwingHexer: [d('dark_shard', 0.03, [1, 1], 0.03, 14)],
 	gloomCerberus: [d('dark_shard', 0.05, [1, 1], 0.03, 14), d('horn_dark', 0.08, [1, 1], 0.04, 10)],
+	sporeHound: [d('orange_mushrooms', 0.1, [1, 3]), d('blood', 0.1)],
 	sporebackOgre: [d('orange_mushrooms', 0.16, [1, 4]), d('dark_shard', 0.04, [1, 1], 0.03, 14)],
 	// battlefield
 	boneCleaver: [d('bones', 0.2, [1, 4]), d('blood', 0.1)],

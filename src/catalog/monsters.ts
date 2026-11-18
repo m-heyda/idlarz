@@ -115,11 +115,14 @@ const ROSTER: readonly RosterRow[] = [
 	normal('caveGoblinMiner', 'Cave Goblin Miner', 'hills', false, PLACEHOLDER),
 	normal('boulderBeetle', 'Boulder Beetle', 'hills', false, PLACEHOLDER),
 	boss('bossHillGiant', 'The Hill Giant', 'hills', false, PLACEHOLDER),
-	normal('magmaKnight', 'Magma Knight', 'hills', true),
-	normal('magmaCrab', 'Magma Crab', 'hills', true),
+	// retired (2026-11-18): the knight's picture was the Cinder Warlord's; both stay in the code for old saves
+	normal('magmaKnight', 'Magma Knight', 'hills', false, PLACEHOLDER),
+	normal('magmaCrab', 'Magma Crab', 'hills', false, PLACEHOLDER),
 	normal('mawhornBrute', 'Mawhorn Brute', 'hills', true),
 	normal('quarryDrake', 'Quarry Drake', 'hills', false, PLACEHOLDER),
 	normal('cairnSentinel', 'Cairn Sentinel', 'hills', false, PLACEHOLDER),
+	normal('quarryRatKnight', 'Quarry Rat Knight', 'hills', true),
+	normal('highlandGnoll', 'Highland Gnoll', 'hills', false, PLACEHOLDER),
 	boss('bossIronhorn', 'The Ironhorn', 'hills', true),
 
 	// a duplicate of the Mawhorn Brute's look: retired, the Toxic Zombie takes its place
@@ -174,22 +177,24 @@ const ROSTER: readonly RosterRow[] = [
 	normal('greenscaleWarden', 'Greenscale Warden', 'orchard', true),
 	normal('blossomRonin', 'Blossom Ronin', 'orchard', true),
 	normal('grayGleaner', 'Gray Gleaner', 'orchard', true),
-	normal('mushroomWizard', 'Mushroom Wizard', 'orchard', false, PLACEHOLDER),
+	normal('mushroomWizard', 'Mushroom Wizard', 'orchard', true),
 	normal('rootboundGardener', 'Rootbound Gardener', 'orchard', false, PLACEHOLDER),
 	boss('bossBlossomReaper', 'The Blossom Reaper', 'orchard', true),
 
 	normal('gasketGoblin', 'Gasket Goblin', 'blight', true),
-	normal('blightedHusk', 'Blighted Husk', 'blight', true),
+	// retired: its picture was the Toxic Zombie's
+	normal('blightedHusk', 'Blighted Husk', 'blight', false, PLACEHOLDER),
 	normal('mothwingHexer', 'Mothwing Hexer', 'blight', true),
 	normal('gloomCerberus', 'Gloom Cerberus', 'blight', true),
-	normal('sporebackOgre', 'Sporeback Ogre', 'blight', false, PLACEHOLDER),
+	normal('sporebackOgre', 'Sporeback Ogre', 'blight', true),
+	normal('sporeHound', 'Spore Hound', 'blight', false, PLACEHOLDER),
 	boss('bossEyedMaw', 'The Eyed Maw', 'blight', true),
 
 	normal('boneCleaver', 'Bone Cleaver', 'battlefield', true),
 	normal('frostguardKnight', 'Frostguard Knight', 'battlefield', true),
 	normal('gildedChampion', 'Gilded Champion', 'battlefield', true),
 	normal('bannerWraith', 'Banner Wraith', 'battlefield', false, PLACEHOLDER),
-	normal('frostFlameKnight', 'Frost-Flame Knight', 'battlefield', false, PLACEHOLDER),
+	normal('frostFlameKnight', 'Frost-Flame Knight', 'battlefield', true),
 	boss('bossCinderWarlord', 'The Cinder Warlord', 'battlefield', true),
 ];
 

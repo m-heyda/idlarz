@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { createHash } from 'node:crypto';
 import { META } from '../../src/catalog/monsterMeta';
 import { MONSTER_CATALOG, labMonsters, monsterArtUrl, monsterSpriteUrl, monstersInBiome } from '../../src/catalog/monsters';
 import { BIOMES } from '../../src/config/biomes';
@@ -77,8 +78,11 @@ test('a monster without its own art has a stand-in file that exists; a monster w
 		if (m.art) assert.equal(monsterSpriteUrl(m), monsterArtUrl(m), `${m.id}: real art wins over the stand-in`);
 	}
 	const standIns = MONSTER_CATALOG.filter((m) => m.enabled && !m.art).map((m) => m.id);
-	// roster v2 (IDL-360): the 21 new monsters wear the stand-in silhouette until the art pass
-	assert.equal(standIns.length, 21, 'the 21 roster v2 monsters have a stand-in; every other live monster has its real art');
+	assert.equal(
+		standIns.length,
+		20,
+		'roster v2 monsters without art yet (and the Highland Gnoll, Spore Hound and Blighted Husk) wear the stand-in; every other live monster has its real art',
+	);
 });
 
 test('monstersInBiome hides disabled monsters unless asked', () => {
@@ -115,5 +119,20 @@ test('every monster has a family and every live one has tags and lore (the Besti
 		assert.ok(m.tags.length >= 1 && m.tags.length <= 3, `${m.id}: one to three tags`);
 		assert.ok((m.lore ?? '').length > 20, `${m.id}: lore`);
 		assert.equal(m.tags.includes('Boss'), m.grade === 'boss', `${m.id}: the Boss tag marks exactly the bosses`);
+	}
+});
+
+test('no two monsters share a picture (a copy under another name is a duplicate), and the spare monster art folder holds no copy of one in use', () => {
+	const root = path.join(__dirname, '..', '..', 'public', 'pixel');
+	const seen = new Map<string, string>();
+	const files: string[] = [];
+	for (const dir of fs.readdirSync(path.join(root, 'enemies'), { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== 'placeholder'))
+		for (const f of fs.readdirSync(path.join(root, 'enemies', dir.name)).filter((n) => n.endsWith('.png'))) files.push(path.join(root, 'enemies', dir.name, f));
+	const spare = path.join(root, 'assets_to_assess_and_use', 'monsters');
+	for (const f of fs.readdirSync(spare).filter((n) => n.endsWith('.png'))) files.push(path.join(spare, f));
+	for (const file of files) {
+		const hash = createHash('md5').update(fs.readFileSync(file)).digest('hex');
+		assert.equal(seen.get(hash), undefined, `${path.relative(root, file)} is the same picture as ${seen.get(hash)}`);
+		seen.set(hash, path.relative(root, file));
 	}
 });

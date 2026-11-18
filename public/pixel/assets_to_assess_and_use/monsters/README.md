@@ -16,3 +16,5 @@ Monster sprites added 2026-11-10 for the new biomes (Jungle, Fields, Blossom Orc
 The suggested homes are only suggestions; the final assignment is made in the monster-roster issues. Licence: provided by the owner, free to use for the game (same terms as the rest of this folder, see the parent README). Before any of these ships, bring them to the game's palette and size through the normal intake recipe (`scripts/pixel`) and add a registry line with the source.
 
 Moved out on 2026-11-16: `eye_horror` (now `enemies/jungle/eye-horror.png`) and `zombie_triceratops` (now `enemies/jungle/zombie-triceratops.png`).
+
+Used and moved out on 2026-11-18: `frost_flame_knight` (now `enemies/battlefield/frost-flame-knight.png`) and `mushroom_wizard` (now `enemies/orchard/mushroom-wizard.png`). Removed as exact duplicates of art already in the game: `skull_vine` (jungle Skull Vine), `skeleton_cleaver` (Bone Cleaver) and `reaper_frost_scythe` (Blossom Reaper). Still unused here: nothing but the table above (`magma_knight`, `toxic_zombie`, `mecha_triceratops` were taken out earlier).

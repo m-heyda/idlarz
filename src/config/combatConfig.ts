@@ -533,6 +533,11 @@ export const RETIRED_MONSTERS: ReadonlySet<string> = new Set([
 	'pikeLurker',
 	'bossHardwoodColossus',
 	'garbageOgre',
+	// the magma stand-ins (2026-11-18): the knight's picture was the Cinder Warlord's, the crab is replaced by new hills art
+	'magmaKnight',
+	'magmaCrab',
+	// the Blighted Husk's picture was the Toxic Zombie's: it waits for its own art
+	'blightedHusk',
 ]);
 const retire = <T extends MonsterDef>(def: T): T & { retired: true } => ({ ...def, retired: true });
 
@@ -588,11 +593,13 @@ export const MONSTERS = {
 	caveGoblinMiner: retire(normal('hills', 'Cave Goblin Miner', 'even')),
 	boulderBeetle: retire(normal('hills', 'Boulder Beetle', 'tough')),
 	bossHillGiant: retire(boss('hills', 'The Hill Giant', ['The Giant lifts a boulder.', 'The hills are his, and so is the road.'])),
-	magmaKnight: normal('hills', 'Magma Knight', 'fierce'),
-	magmaCrab: normal('hills', 'Magma Crab', 'tough'),
+	magmaKnight: retire(normal('hills', 'Magma Knight', 'fierce')),
+	magmaCrab: retire(normal('hills', 'Magma Crab', 'tough')),
 	mawhornBrute: normal('hills', 'Mawhorn Brute', 'even'),
 	quarryDrake: normal('hills', 'Quarry Drake', 'glass'),
 	cairnSentinel: normal('hills', 'Cairn Sentinel', 'armored'),
+	quarryRatKnight: normal('hills', 'Quarry Rat Knight', 'tough'),
+	highlandGnoll: normal('hills', 'Highland Gnoll', 'even'),
 	bossIronhorn: boss('hills', 'The Ironhorn', [
 		'The Ironhorn lowers its plated head and steam hisses from its joints.',
 		'The dwarves built it to guard the pass. Nobody told it they left.',
@@ -644,10 +651,11 @@ export const MONSTERS = {
 	bossBlossomReaper: boss('orchard', 'The Blossom Reaper', ['The Reaper lifts a scythe of blue fire.', 'Every blossom falls in its own time.'], 3),
 	// blight (rebirth 4)
 	gasketGoblin: normal('blight', 'Gasket Goblin', 'even', 4),
-	blightedHusk: normal('blight', 'Blighted Husk', 'tough', 4),
+	blightedHusk: retire(normal('blight', 'Blighted Husk', 'tough', 4)),
 	mothwingHexer: normal('blight', 'Mothwing Hexer', 'fierce', 4),
 	gloomCerberus: normal('blight', 'Gloom Cerberus', 'elite', 4),
 	sporebackOgre: normal('blight', 'Sporeback Ogre', 'brute', 4),
+	sporeHound: normal('blight', 'Spore Hound', 'fierce', 4),
 	bossEyedMaw: boss('blight', 'The Eyed Maw', ['A dozen eyes open at once.', 'The Blight does not hate you. It only hungers.'], 4),
 	// battlefield (rebirth 5)
 	boneCleaver: normal('battlefield', 'Bone Cleaver', 'even', 5),

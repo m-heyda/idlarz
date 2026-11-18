@@ -17,8 +17,7 @@ export const MONSTER_ART_SIZE = {
 		brambleImp: 52,
 		mossSnapper: 52,
 		reedNymph: 52,
-		// the hills' new art (2026-11-18)
-		magmaCrab: 52,
+
 		tidepoolGolem: 50,
 		// already big or tall: the default is plenty
 		garbageOgre: 50,
