@@ -5,6 +5,7 @@ import { builderCount, builtBuildings, maxBuildTimeReduction } from '@/lib/build
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { attributesWithGear } from '@/lib/gearAttributes';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates } from '@/utils/game/income';
@@ -199,7 +200,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			ratesAfterCastle: ratesAfterUpgrade(state),
 			luck: fx.luck,
 			goldFind: fx.goldFind,
-			intelligence: state.characterStats.intelligence,
+			intelligence: attributesWithGear(state.characterStats, state.equipment).intelligence, // worn Intelligence gear counts for crafted gear
 			killRewardPct: gear.killRewardPct + idol.killRewardPct,
 			...(maxBuildTimeReduction(state.prestige, idol.buildTimePct) > 0 ? { buildTimeReduction: maxBuildTimeReduction(state.prestige, idol.buildTimePct) } : {}),
 			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct

@@ -33,7 +33,8 @@ import { CASTLE_BASE_RATES, CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '../../src
 import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GROUPS, MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
-import { MONSTERS } from '../../src/config/combatConfig';
+import { MONSTERS, type BossModifiers } from '../../src/config/combatConfig';
+import { describeModifiers } from '../../src/lib/bossModifiers';
 import { BIOME_GOALS, BOSS_MASTERY_TIERS, MASTERY_CAPS, MASTERY_TIERS, bonusText, type MasteryTier } from '../../src/catalog/mastery';
 import { MONSTER_CATALOG } from '../../src/catalog/monsters';
 import { ingredientsOf } from '../../src/catalog/monsterDrops';
@@ -57,7 +58,8 @@ import { cumulativeXp, totalStatPoints } from '../../src/utils/game/character';
 import { emberGain, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { monsterStats, spawnLevelRange } from '../../src/lib/monsters';
 import { COORD_LIMIT, MAX_OWNED_TILES } from '../../src/utils/world';
-import { SELECTABLE_BIOMES } from '../../src/utils/biomeRules';
+import { SELECTABLE_BIOMES, distanceWeight } from '../../src/utils/biomeRules';
+import type { BiomeType } from '../../src/types/game';
 import { PERSISTED_KEYS } from '../../src/lib/sanitizeSave';
 import { SYNC } from '../../src/lib/syncPolicy';
 import { MANUAL_CLOUD_COOLDOWN_MS } from '../../src/lib/manualCloudSave';
@@ -132,6 +134,28 @@ TABLES['rebirth-biome-output'] = () => ({
 	md: mdTable(
 		['Biome', 'Unlocks after rebirth', 'Measured against', 'Multiplier', 'Config output / s'],
 		Object.entries(REBIRTH_BIOME_OUTPUT).map(([b, o]) => [BIOMES[b].label, BIOME_RULES.unlockAfterRebirths[b], o.measuredAgainst, `x${o.multiplier}`, res(BIOMES[b].resourceGeneration as Record<string, number>)]),
+	),
+});
+
+TABLES['boss-modifiers'] = () => ({
+	title: 'Boss modifiers by boss',
+	md: mdTable(
+		['Boss', 'Biome', 'Modifiers'],
+		Object.entries(MONSTERS)
+			.filter(([, d]) => d.grade === 'boss' && 'modifiers' in d && d.modifiers && !('retired' in d && d.retired))
+			.map(([, d]) => [d.label, d.spawn.biomes.join(', '), describeModifiers(d.modifiers as BossModifiers).map((c) => `**${c.label}**: ${c.text}`).join('<br>')]),
+	),
+});
+
+TABLES['biome-distance-weights'] = () => ({
+	title: 'Biome weight by castle distance (the multiplier on the weighted roll; a rebirth biome is not allowed nearer than its minimum)',
+	md: mdTable(
+		['Castle distance', ...Object.keys(BIOME_RULES.minCastleDistance).map((b) => BIOMES[b].label), 'Basic biomes'],
+		[5, 10, 14, 18, 22, 30, 40].map((d) => [
+			d,
+			...Object.keys(BIOME_RULES.minCastleDistance).map((b) => (d < BIOME_RULES.minCastleDistance[b] ? 'not allowed' : `x${+distanceWeight(b as BiomeType, d).toFixed(2)}`)),
+			`x${+distanceWeight('plains', d).toFixed(2)}`,
+		]),
 	),
 });
 

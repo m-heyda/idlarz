@@ -15,6 +15,7 @@ import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config
 import { describeClassPassives } from '@/lib/classPassives';
 import { craftLevelOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
+import { gearAttributes } from '@/lib/gearAttributes';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { useRememberedOpen } from '@/hooks/useRememberedOpen';
@@ -149,10 +150,13 @@ const HeroStats: React.FC = () => {
 		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
 	);
 
+	const gearAttrs = gearAttributes(equipment);
 	const attrs: AttributeCard[] = BASE_STATS.map((stat) => ({
 		id: stat,
 		label: capital(stat),
-		value: formatCompact(characterStats[stat]),
+		value: gearAttrs[stat]
+			? `${formatCompact(characterStats[stat] + gearAttrs[stat])} (+${formatCompact(gearAttrs[stat])} gear)`
+			: formatCompact(characterStats[stat]),
 		color: ATTR_INK[stat],
 		tip: <AttributeTip stat={stat} />,
 		anchor: stat === 'strength' ? 'stat-add' : undefined,

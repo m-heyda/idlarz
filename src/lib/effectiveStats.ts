@@ -14,6 +14,7 @@ import {
 } from '@/lib/combat';
 import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
 import { critDamagePercent } from '@/lib/statBonuses';
+import { attributesWithGear, withGearAttributes } from '@/lib/gearAttributes';
 import { classPassives, withClassBonus } from '@/lib/classPassives';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
@@ -47,9 +48,9 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const bonus = withClassBonus(merchantCombat(merchantUpgrades, prestige), playerClass);
 	const passives = classPassives(playerClass);
 	const odds = critOdds(characterStats, equipment, bonus);
-	const critExtra = 1 + critDamagePercent(characterStats) / 100;
+	const critExtra = 1 + critDamagePercent(attributesWithGear(characterStats, equipment)) / 100;
 	const armor = armorOf(equipment, characterStats, playerClass) * idolPct(idol.hpArmorPct);
-	const luck = characterStats.luck + merchantLuck(merchantUpgrades, prestige) + gear.luck + idol.luck;
+	const luck = withGearAttributes(characterStats, equipment).luck + merchantLuck(merchantUpgrades, prestige) + gear.luck + idol.luck;
 	const economy = gearEconomy(equipment);
 	const limits = { prestige, merchantUpgrades, gear: { ...economy, offlineEff: economy.offlineEff + idol.offlineEffPts }, playerClass };
 	return {

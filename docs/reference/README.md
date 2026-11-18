@@ -48,8 +48,8 @@ when the code changes, change the block in the same edit. `tests/docs/reference.
 - [Overview](overview.md) (2): What the game is and how the loop fits together.
 - [Economy](economy.md) (85): Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - [Combat](combat.md) (44): The player's numbers, the server's fight engine, auto-battle, skills and win chance.
-- [Monsters](monsters.md) (17): The roster, levels, growth, spawning and what a kill pays.
-- [Loot](loot.md) (27): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
+- [Monsters](monsters.md) (19): The roster, levels, growth, spawning and what a kill pays.
+- [Loot](loot.md) (28): The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - [Progression](progression.md) (75): Levels, attributes, skills, rebirth, Embers, limits and gems.
 - [Saves & Server](saves-and-server.md) (41): The save, cloud-save checks, the ledger, sealed rolls, away time and the threat model.
 - [Architecture](architecture.md) (16): Stack, state, the tick loop, the map, rendering and the art pipeline.

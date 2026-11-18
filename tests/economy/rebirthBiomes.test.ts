@@ -12,7 +12,7 @@ import { MONSTERS } from '../../src/config/combatConfig';
 import { canSpawnOn } from '../../src/lib/monsters';
 import { pickPersisted, sanitizeSave } from '../../src/lib/sanitizeSave';
 import { BIOME_CODES, decodeSave, encodeSave } from '../../src/lib/saveFormat';
-import { SELECTABLE_BIOMES, biomeVerdicts, rollBiome } from '../../src/utils/biomeRules';
+import { SELECTABLE_BIOMES, biomeVerdicts, distanceWeight, rollBiome } from '../../src/utils/biomeRules';
 import { growWorld } from '../../src/utils/growWorld';
 import { HASH_ID, RANK, ATLAS } from '../../src/utils/terrain';
 import { REBIRTH_UNLOCK_NOTE, rebirthUnlockIntro } from '../../src/utils/game/rebirthUnlocks';
@@ -38,24 +38,57 @@ test('the unlock table: one biome per rebirth, 1 to 5, and all five are live', (
 test('a biome is never rolled (or even allowed) before its rebirth', () => {
 	for (let rebirths = 0; rebirths <= 6; rebirths++) {
 		const seen = new Set<string>();
-		for (let seed = 1; seed <= 12; seed++) for (const e of ownedEntries(growWorld(220, seed, 'nearest', rebirths))) seen.add(e.tile.biome);
-		for (const b of NEW_BIOMES) {
-			if (needs(b) > rebirths) assert.ok(!seen.has(b), `${b} appeared at rebirth ${rebirths}`);
-			else assert.ok(seen.has(b), `${b} is reachable at rebirth ${rebirths}`);
+		for (let seed = 1; seed <= 12; seed++) {
+			for (const e of ownedEntries(growWorld(220, seed, 'nearest', rebirths))) {
+				seen.add(e.tile.biome);
+				const min = BIOME_RULES.minCastleDistance[e.tile.biome as string];
+				if (min !== undefined)
+					assert.ok(Math.max(Math.abs(e.x - CASTLE_X), Math.abs(e.y - CASTLE_Y)) >= min, `${e.tile.biome} at ${e.x},${e.y} is inside its minimum distance`);
+			}
 		}
+		for (const b of NEW_BIOMES) if (needs(b) > rebirths) assert.ok(!seen.has(b), `${b} appeared at rebirth ${rebirths}`);
 	}
+});
+
+test('an unlocked biome is reachable, but only from its minimum castle distance outwards', () => {
+	const world = growWorld(40, 3);
+	for (const b of NEW_BIOMES) {
+		const min = BIOME_RULES.minCastleDistance[b];
+		const verdict = (d: number) => biomeVerdicts(world, CASTLE_X + d, CASTLE_Y, 40, needs(b)).find((v) => v.biome === b)!;
+		assert.equal(verdict(min - 1).allowed, false, `${b} one tile inside its minimum`);
+		assert.equal(verdict(min - 1).reason, `Only ${min}+ tiles from the castle`);
+		assert.equal(verdict(min).allowed, true, `${b} at its minimum`);
+		let rolled = 0;
+		for (let i = 0; i < 400; i++) if (rollBiome(world, CASTLE_X + min + 12, CASTLE_Y, 40, Math.random, needs(b)) === b) rolled++;
+		assert.ok(rolled > 0, `${b} is rolled far out`);
+		for (let i = 0; i < 400; i++)
+			assert.notEqual(rollBiome(world, CASTLE_X + min - 1, CASTLE_Y, 40, Math.random, needs(b)), b, `${b} rolled inside its minimum`);
+	}
+});
+
+test('the weights lean with distance: a rebirth biome ramps up, the basic biomes fade to the floor', () => {
+	const w = BIOME_RULES.distanceWeights;
+	assert.equal(distanceWeight('jungle', 9), 0);
+	assert.ok(Math.abs(distanceWeight('jungle', 10) - w.newMaxWeight / w.rampTiles) < 1e-9);
+	assert.equal(distanceWeight('jungle', 10 + w.rampTiles), w.newMaxWeight);
+	assert.equal(distanceWeight('jungle', 100), w.newMaxWeight);
+	assert.equal(distanceWeight('plains', w.basicFadeFrom), 1);
+	assert.equal(distanceWeight('plains', w.basicFadeTo), w.basicFloor);
+	assert.equal(distanceWeight('plains', 100), w.basicFloor);
+	const mid = distanceWeight('forest', (w.basicFadeFrom + w.basicFadeTo) / 2);
+	assert.ok(mid < 1 && mid > w.basicFloor);
 });
 
 test('rolls without the rebirth count behave like rebirth 0 (the default can never leak a gated biome)', () => {
 	const world = growWorld(40, 3);
-	for (let i = 0; i < 300; i++) assert.ok(!NEW_BIOMES.includes(rollBiome(world, CASTLE_X + 12, CASTLE_Y, 40, Math.random)), 'default rebirths = 0');
-	const verdicts = biomeVerdicts(world, CASTLE_X + 12, CASTLE_Y, 40);
+	for (let i = 0; i < 300; i++) assert.ok(!NEW_BIOMES.includes(rollBiome(world, CASTLE_X + 30, CASTLE_Y, 40, Math.random)), 'default rebirths = 0');
+	const verdicts = biomeVerdicts(world, CASTLE_X + 30, CASTLE_Y, 40);
 	for (const b of NEW_BIOMES) assert.equal(verdicts.find((v) => v.biome === b)!.allowed, false);
 });
 
 test('the verdict names the rebirth that unlocks a biome, and a neighbour cannot pull a locked biome in', () => {
 	const world = growWorld(30, 4);
-	const at = (rebirths: number, biome: string) => biomeVerdicts(world, CASTLE_X + 10, CASTLE_Y, 30, rebirths).find((v) => v.biome === biome)!;
+	const at = (rebirths: number, biome: string) => biomeVerdicts(world, CASTLE_X + 30, CASTLE_Y, 30, rebirths).find((v) => v.biome === biome)!;
 	assert.equal(at(1, 'fields').allowed, false);
 	assert.equal(at(1, 'fields').reason, 'Unlocks after rebirth 2');
 	assert.equal(at(2, 'fields').allowed, true);
@@ -63,7 +96,7 @@ test('the verdict names the rebirth that unlocks a biome, and a neighbour cannot
 	assert.equal(at(5, 'battlefield').reason === undefined || at(5, 'battlefield').allowed === false, true);
 });
 
-test("the buy action rolls with the run's rebirth count: rebirth 0 never grows a rebirth biome, rebirth 5 can", () => {
+test("the buy action rolls with the run's rebirth count: rebirth 0 never grows a rebirth biome, and none grows close to the castle", () => {
 	const seenAt = (rebirths: number) => {
 		freshGame();
 		store.setState((s) => ({ prestige: { ...s.prestige, rebirths } }));
@@ -72,11 +105,15 @@ test("the buy action rolls with the run's rebirth count: rebirth 0 never grows a
 	};
 	const first = seenAt(0);
 	for (const b of NEW_BIOMES) assert.ok(!first.has(b), `${b} in a first run`);
-	const late = seenAt(5);
-	assert.ok(
-		NEW_BIOMES.some((b) => late.has(b)),
-		'a rebirth 5 run grows at least one of the new biomes',
-	);
+	// a run with every rebirth unlocked still keeps each rebirth biome beyond its minimum castle distance
+	freshGame();
+	store.setState((s) => ({ prestige: { ...s.prestige, rebirths: 5 } }));
+	growTo(260);
+	for (const e of ownedEntries(api().tiles)) {
+		const min = BIOME_RULES.minCastleDistance[e.tile.biome as string];
+		if (min !== undefined)
+			assert.ok(Math.max(Math.abs(e.x - CASTLE_X), Math.abs(e.y - CASTLE_Y)) >= min, `${e.tile.biome} at ${e.x},${e.y} is inside its minimum distance`);
+	}
 });
 
 test('conflicts: blight keeps off lake, coast and orchard; battlefield off swamp; jungle off tundra (never touching in 8 directions)', () => {

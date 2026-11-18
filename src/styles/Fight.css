@@ -73,6 +73,27 @@
 	white-space: nowrap;
 }
 
+.fight-mod {
+	font-size: 0.65rem;
+	padding: 0 5px;
+	border: 1px solid #ffd860;
+	background: #2a0806;
+	color: #ffe9a8;
+	cursor: help;
+}
+.fight-mod[data-mod='venom'] {
+	color: #9be34a;
+}
+.fight-mod[data-mod='sluggish'] {
+	color: #8ac0ff;
+}
+.fight-mod[data-mod='enrage'] {
+	color: #ff8a5a;
+}
+.fight-mod[data-mod='brutal'] {
+	color: #ff6a5a;
+}
+
 .fight-timer {
 	text-align: center;
 	font-weight: 700;
@@ -209,6 +230,10 @@
 .fight-number[data-kind='hurt'] {
 	color: #ff6a5a;
 	top: 70%;
+}
+.fight-number[data-kind='poison'] {
+	color: #9be34a;
+	top: 78%;
 }
 .fight-number[data-kind='heal'] {
 	color: #7aff8a;

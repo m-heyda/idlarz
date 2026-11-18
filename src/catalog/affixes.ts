@@ -73,6 +73,44 @@ export const AFFIXES: AffixDef[] = [
 	...pair({ stat: 'manaRegen', prefix: 'Flowing', suffix: 'of Clarity', power: 1.5, tags: [...MAGIC, 'head', 'chest', 'neck', 'ring', 'charm'], weight: 8 }),
 	...pair({ stat: 'spellPower', prefix: 'Wise', suffix: 'of Sorcery', power: 1.5, tags: [...MAGIC, 'neck', 'ring', 'charm'], weight: 6 }),
 	...pair({ stat: 'lifeLeech', prefix: 'Vampiric', suffix: 'of the Leech', power: 2, tags: WEAPON, minItemLevel: 5, weight: 5 }),
+	// the attributes (lib/gearAttributes.ts): rarer than the plain stats, on the gear that suits them. Intelligence is the crafting stat: wear it while crafting.
+	...pair({
+		stat: 'strength',
+		prefix: 'Mighty',
+		suffix: 'of the Bear',
+		power: 1.5,
+		tags: [...WEAPON, 'hands', 'shoulder', 'chest', 'belt'],
+		minItemLevel: 3,
+		weight: 6,
+	}),
+	...pair({
+		stat: 'dexterity',
+		prefix: 'Nimble',
+		suffix: 'of the Fox',
+		power: 1.5,
+		tags: [...WEAPON, 'hands', 'feet', 'legs', 'cape'],
+		minItemLevel: 3,
+		weight: 6,
+	}),
+	...pair({
+		stat: 'intelligence',
+		prefix: 'Scholarly',
+		suffix: 'of the Owl',
+		power: 1.5,
+		tags: [...MAGIC, 'head', 'chest', 'neck', 'ring', 'charm', 'cape'],
+		minItemLevel: 3,
+		weight: 6,
+	}),
+	...pair({ stat: 'vitality', prefix: 'Robust', suffix: 'of the Ox', power: 1.5, tags: [], minItemLevel: 3, weight: 6 }),
+	...pair({
+		stat: 'charisma',
+		prefix: 'Gracious',
+		suffix: 'of the Peacock',
+		power: 1.5,
+		tags: ['head', 'neck', 'ring', 'charm', 'cape'],
+		minItemLevel: 3,
+		weight: 6,
+	}),
 ];
 
 // No prototype: an affix id from a save must not resolve to 'constructor' and friends

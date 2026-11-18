@@ -45,6 +45,12 @@ export const STAT_DEFS = {
 	manaRegen: { label: 'Mana Regen', short: 'MP REG', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', short: 'SPELL PWR', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
+	// the five attributes as gear stats: they add to the points the player spent while the item is worn (lib/gearAttributes.ts); Intelligence is the crafting stat (quality of crafted gear)
+	strength: { label: 'Strength', short: 'STR', integer: true, levelShare: 0.5 },
+	dexterity: { label: 'Dexterity', short: 'DEX', integer: true, levelShare: 0.5 },
+	intelligence: { label: 'Intelligence', short: 'INT', integer: true, levelShare: 0.5 },
+	vitality: { label: 'Vitality', short: 'VIT', integer: true, levelShare: 0.5 },
+	charisma: { label: 'Charisma', short: 'CHA', integer: true, levelShare: 0.5 },
 
 	// ---- belt-only stats: the potion belt (IDL-138 / IDL-153). Nothing but a belt carries them; see lib/potionBelt.ts ----------
 	potionCooldownPct: { label: 'Potion Cooldown', unit: '%', slotOnly: 'belt', levelShare: 0 }, // % shorter shared potion cooldown (never below COMBAT.potionCooldownMinSec)
@@ -81,6 +87,11 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	strength: 'combat',
+	dexterity: 'combat',
+	vitality: 'combat',
+	intelligence: 'economy',
+	charisma: 'economy',
 	potionCooldownPct: 'combat',
 	potionPowerPct: 'combat',
 	potionSlots: 'combat',
@@ -129,6 +140,11 @@ export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, nu
 	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
 	spellPower: [4, 7, 10, 14, 18],
 	lifeLeech: [0.5, 1, 1.5, 2, 3],
+	strength: [2, 3, 4, 5, 7],
+	dexterity: [2, 3, 4, 5, 7],
+	intelligence: [2, 3, 4, 5, 7],
+	vitality: [2, 3, 4, 5, 7],
+	charisma: [2, 3, 4, 5, 7],
 };
 
 /** The base value of a stat for a tier (1-5) at the item's authored level. */

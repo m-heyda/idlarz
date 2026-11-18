@@ -9,6 +9,7 @@ import { craftLuckBonus } from '@/utils/game/merchant';
 import { craftGroups } from '@/lib/craftCategories';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
+import { attributesWithGear } from '@/lib/gearAttributes';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -81,7 +82,8 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 	if (!('gear' in recipe.output)) return null;
 	const target = recipe.output.gear;
 	const luck = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades }).luck + craftLuckBonus(prestige); // Artisan's Eye counts for crafted gear only
-	const odds = gearOdds(target, { craftLevel, luck, intelligence: characterStats.intelligence, pity: pity?.[target.grade] ?? 0 });
+	const intelligence = attributesWithGear(characterStats, equipment).intelligence;
+	const odds = gearOdds(target, { craftLevel, luck, intelligence, pity: pity?.[target.grade] ?? 0 });
 	const levels = odds.itemLevel.min === odds.itemLevel.max ? `${odds.itemLevel.min}` : `${odds.itemLevel.min}-${odds.itemLevel.max}`;
 	const best = odds.rarities[odds.rarities.length - 1];
 	const baseRows = baseStatRows(recipe, craftLevel);
@@ -97,6 +99,13 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 				))}
 			</div>
 			<div className='ds-paper-note'>Item level {levels} (it grows with your crafting level)</div>
+			<div
+				className='ds-paper-note'
+				title='Intelligence leans the quality and affix values of crafted gear towards good rolls. Worn Intelligence gear counts: put it on and let the game sync before you claim.'
+			>
+				Intelligence {formatInt(Math.round(intelligence))}
+				{intelligence > characterStats.intelligence ? ` (+${formatInt(Math.round(intelligence - characterStats.intelligence))} from gear)` : ''}
+			</div>
 			{baseRows.length > 0 && (
 				<div data-slot='gear-base-stats'>
 					<div className='ds-paper-note'>Base stats (before affixes, common rarity, middle quality):</div>

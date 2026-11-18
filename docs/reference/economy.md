@@ -272,7 +272,7 @@ economyTiles = owned tiles - freeTiles + 1       (freeTiles = STARTER_FREE_TILES
 
 ### `rollBiome` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:149`](../../src/utils/biomeRules.ts)
 
 The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra
 same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
@@ -280,13 +280,16 @@ same-biome neighbour), otherwise a weighted roll among everything the rules allo
 
 Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
 
-- Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
+- Plains, forest, hills and lake from the start; swamp after 12 purchases (and 6 tiles from the castle), tundra after 25 (and 10 tiles out); coast only beside a lake or coast.
 - The rebirth biomes need completed rebirths (`BIOME_RULES.unlockAfterRebirths`): jungle after 1, fields 2, blossom orchard 3, blight 4, battlefield 5. `rebirths` is `prestige.rebirths`;
   below it the biome is never allowed, so it can neither be rolled nor copied from a neighbour.
 - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
 - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
-- Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
+- Swamp, tundra and the rebirth biomes also need distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): swamp 6, tundra 10, jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
+  so it cannot be rolled or copied from a neighbour there.
+- Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance (`distanceWeight`): basic biomes fade
+  from x1 at 10 tiles to x0.25 at 30, a biome with a minimum distance ramps from x3/8 at that distance to x3 eight tiles further.
 - The start ring (the four free tiles) is plains and forest only, at least two plains ([`generateStartRing`](economy.md#generatestartring)).
 
 <a id="biomes"></a>
@@ -340,7 +343,7 @@ output of the basic tile it is measured against (per second, before `BIOME_YIELD
 
 ### `generateStartRing` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:210`](../../src/utils/biomeRules.ts)
 
 The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
 plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.
@@ -1218,7 +1221,7 @@ The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
 - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
 - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
 - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
-  An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 1,000 / 2,000 / 4,000 for levels 3 / 4 / 5.
+  An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 10,000 / 20,000 / 40,000 for levels 3 / 4 / 5 (an Extractor makes 0.3 a second at level 1, so the first one is hours of work, and the Extractors' material is for crafting too).
   **Timers** (`durationsSec`, indexed by the level reached): 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5, then x1.35 per level up to 7 days. Even the **first** build of an Idol takes one (a builder works on it and the tile shows it under construction); placing an Idol the account has already learned stays instant, at the level it remembers.
   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
 - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
@@ -1241,14 +1244,14 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 | --- | --- | --- | --- |
 | 1 | 20 | wood 2,016, stone 1,344, gold 6,748 | 30 min |
 | 2 | 40 | wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K | 1 h |
-| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000 | 4 h |
-| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000 | 12 h |
-| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000 | 1 d |
-| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000 | 1.35 d |
-| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K | 1.82 d |
-| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K | 2.46 d |
-| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K | 3.32 d |
-| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K | 4.48 d |
+| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 10 K | 4 h |
+| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 20 K | 12 h |
+| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 40 K | 1 d |
+| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 80 K | 1.35 d |
+| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 160 K | 1.82 d |
+| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 320 K | 2.46 d |
+| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 640 K | 3.32 d |
+| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 1.28 M | 4.48 d |
 
 <a id="buildercount"></a>
 

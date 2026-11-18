@@ -47,11 +47,11 @@ test('rolled biomes are always allowed, never the castle or empty land', () => {
 
 test('unlocks: swamp and tundra only after enough purchases', () => {
 	const g = map(['.....', '.....', '.....', '.....', '.....']);
-	assert.equal(verdict(g, 5, 'swamp').allowed, false);
-	assert.match(verdict(g, 5, 'swamp').reason ?? '', /Unlocks after 6/);
-	assert.equal(verdict(g, 6, 'swamp').allowed, true);
-	assert.equal(verdict(g, 9, 'tundra').allowed, false);
-	assert.equal(verdict(g, 10, 'tundra').allowed, true);
+	assert.equal(verdict(g, 11, 'swamp').allowed, false);
+	assert.match(verdict(g, 11, 'swamp').reason ?? '', /Unlocks after 12/);
+	assert.equal(verdict(g, 12, 'swamp').allowed, true);
+	assert.equal(verdict(g, 24, 'tundra').allowed, false);
+	assert.equal(verdict(g, 25, 'tundra').allowed, true);
 	assert.equal(spread(g, 0).swamp, undefined);
 	assert.equal(spread(g, 0).tundra, undefined);
 });

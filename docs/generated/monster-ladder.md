@@ -39,7 +39,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Pinecone Warden | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Pinecone Warden | 13 (castle 8) | 0% | 0% | 3% | 100% | 100% | 100% |
 | Pinecone Warden | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
 | The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
@@ -60,9 +60,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Bogfire Wisp | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Bogfire Wisp | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
 | Bogfire Wisp | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 90% | 100% |
-| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 75% | 100% |
-| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 50% | 100% |
+| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 63% | 98% |
+| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 45% | 100% |
+| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 33% | 100% |
 | Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Frost Hare | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Hare | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -133,8 +133,8 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
-| The Reef Leviathan | 25 (castle 8) | 0% | 0% | 73% | 98% | 100% | 100% |
-| The Reef Leviathan | 35 (grown) | 0% | 0% | 25% | 80% | 100% | 100% |
+| The Reef Leviathan | 25 (castle 8) | 0% | 0% | 70% | 98% | 100% | 100% |
+| The Reef Leviathan | 35 (grown) | 0% | 0% | 23% | 80% | 100% | 100% |
 | Moss Snapper | 10 (castle 1) | 0% | 85% | 100% | 100% | 100% | 100% |
 | Moss Snapper | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Moss Snapper | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -153,9 +153,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Lilypad Warden | 10 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
 | Lilypad Warden | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Lilypad Warden | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
-| The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
-| The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
+| The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 95% |
+| The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 88% |
+| The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 78% |
 | Skull Vine | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Skull Vine | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Skull Vine | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

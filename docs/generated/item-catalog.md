@@ -172,6 +172,16 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | of Sorcery | suffix | spellPower | 1 | staff, wand, tome, neck, ring, charm |
 | Vampiric | prefix | lifeLeech | 5 | weapon |
 | of the Leech | suffix | lifeLeech | 5 | weapon |
+| Mighty | prefix | strength | 3 | weapon, hands, shoulder, chest, belt |
+| of the Bear | suffix | strength | 3 | weapon, hands, shoulder, chest, belt |
+| Nimble | prefix | dexterity | 3 | weapon, hands, feet, legs, cape |
+| of the Fox | suffix | dexterity | 3 | weapon, hands, feet, legs, cape |
+| Scholarly | prefix | intelligence | 3 | staff, wand, tome, head, chest, neck, ring, charm, cape |
+| of the Owl | suffix | intelligence | 3 | staff, wand, tome, head, chest, neck, ring, charm, cape |
+| Robust | prefix | vitality | 3 | any gear |
+| of the Ox | suffix | vitality | 3 | any gear |
+| Gracious | prefix | charisma | 3 | head, neck, ring, charm, cape |
+| of the Peacock | suffix | charisma | 3 | head, neck, ring, charm, cape |
 
 ## Loot sources
 

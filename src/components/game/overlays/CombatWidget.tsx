@@ -11,7 +11,7 @@ import { quickHealOf } from '@/catalog/buffs';
 import { autoBattleUnlocked, autoUseUnlocked } from '@/lib/combat';
 import { aggregateStats } from '@/lib/inventory';
 import { potionCooldownSec, potionSlotCount } from '@/lib/potionBelt';
-import { monsterDef, monsterStats } from '@/lib/monsters';
+import { monsterDef, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import { slashFor, SLASH_SHEETS, type SlashFx } from '@/config/slashFx';
 import { COMBAT_EVENT, hitNumberText, type CombatFx } from '@/lib/combatFx';
 import audioManager from '@/utils/audioManager';
@@ -119,6 +119,8 @@ const CombatWidget: React.FC = () => {
 				clearTimeout(shakeTimer.current);
 				shakeTimer.current = setTimeout(() => setShake(false), 320);
 				pushNumber(fx.crit ? `-${formatCompact(fx.amount)}!` : `-${formatCompact(fx.amount)}`, 'hurt');
+			} else if (fx.kind === 'poison') {
+				pushNumber(`-${formatCompact(fx.amount)}`, 'poison');
 			} else if (fx.kind === 'heal') {
 				pushNumber(`+${formatCompact(fx.amount)}`, 'heal');
 			} else if (fx.kind === 'resist') pushNumber('Resisted!', 'resist');
@@ -305,7 +307,7 @@ const CombatWidget: React.FC = () => {
 			cd={combat.cd}
 			potions={potions}
 			potionSlots={potionSlots}
-			potionCooldownSec={potionCooldown}
+			potionCooldownSec={potionCooldownAgainst(type, potionCooldown)}
 			autoBattle={combat.autoBattle}
 			autoLocked={autoLocked}
 			autoUse={combat.autoUse}

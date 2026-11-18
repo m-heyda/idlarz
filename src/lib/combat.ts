@@ -2,6 +2,7 @@ import { ITEM_CATALOG } from '@/catalog';
 import { COMBAT, STAT_RULES } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import { classPassives } from '@/lib/classPassives';
+import { attributesWithGear, withGearAttributes } from '@/lib/gearAttributes';
 import { atkSpeedPercent, critDamagePercent, magicDamagePercent, physicalDamagePercent, statArmor, statManaRegen, type Attributes } from '@/lib/statBonuses';
 import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
 
@@ -34,7 +35,7 @@ import type { CharacterStats, Equipment, PrestigeState } from '@/types/game';
  */
 export const maxHp = (characterStats: CharacterStats, equipment: Equipment): number => {
 	const gear = aggregateStats(equipment);
-	return Math.round((COMBAT.baseHp + characterStats.hp + gear.maxHp) * (1 + gear.maxHpPct / 100));
+	return Math.round((COMBAT.baseHp + withGearAttributes(characterStats, equipment).hp + gear.maxHp) * (1 + gear.maxHpPct / 100));
 };
 
 /**
@@ -108,7 +109,8 @@ export const NO_COMBAT_BONUS: CombatBonus = { atkSpeedPct: 0, critPct: 0, superC
 /** The damage multiplier the attributes give with the worn weapon (1 for a character with no bonus, or when no attributes are given). */
 export const damageMultiplier = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
 	const magic = weaponDamageType(equipment) === 'magic';
-	const percent = (stats ? (magic ? magicDamagePercent(stats) : physicalDamagePercent(stats)) : 0) + (bonus ? (magic ? bonus.magicPct : bonus.physPct) : 0);
+	const attrs = stats ? attributesWithGear(stats, equipment) : undefined;
+	const percent = (attrs ? (magic ? magicDamagePercent(attrs) : physicalDamagePercent(attrs)) : 0) + (bonus ? (magic ? bonus.magicPct : bonus.physPct) : 0);
 	return 1 + percent / 100;
 };
 
@@ -133,7 +135,7 @@ export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: C
  */
 export const attacksPerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
 	const base = equipment.mainHand ? (ITEM_CATALOG[equipment.mainHand.base]?.attackSpeed ?? 1) : 1;
-	return Math.round(base * (1 + ((stats ? atkSpeedPercent(stats) : 0) + (bonus?.atkSpeedPct ?? 0)) / 100) * 100) / 100;
+	return Math.round(base * (1 + ((stats ? atkSpeedPercent(attributesWithGear(stats, equipment)) : 0) + (bonus?.atkSpeedPct ?? 0)) / 100) * 100) / 100;
 };
 
 /** Damage per second at that speed: what the damage readout is built on. */
@@ -153,7 +155,7 @@ const clampPct = (pct: number, max: number) => Math.max(0, Math.min(max, pct)) /
 export const critOdds = (characterStats: CharacterStats, equipment: Equipment, bonus?: CombatBonus): { crit: number; superCrit: number } => {
 	const gear = aggregateStats(equipment);
 	return {
-		crit: clampPct((characterStats.critChance || 0) + gear.critChance + (bonus?.critPct ?? 0), COMBAT.crit.maxCritChance),
+		crit: clampPct((withGearAttributes(characterStats, equipment).critChance || 0) + gear.critChance + (bonus?.critPct ?? 0), COMBAT.crit.maxCritChance),
 		superCrit: clampPct(COMBAT.crit.superBase + gear.superCrit + (bonus?.superCritPct ?? 0), COMBAT.crit.maxSuperChance),
 	};
 };
@@ -176,7 +178,12 @@ export const swing = (hit: number, odds: { crit: number; superCrit: number }, cr
 
 /** One swing of this character with this gear (the attributes' extra crit damage included). */
 export const rollHit = (characterStats: CharacterStats, equipment: Equipment, rng: () => number): { damage: number; crit: CritKind } =>
-	swing(damagePerHit(equipment, characterStats), critOdds(characterStats, equipment), 1 + critDamagePercent(characterStats) / 100, rng);
+	swing(
+		damagePerHit(equipment, characterStats),
+		critOdds(characterStats, equipment),
+		1 + critDamagePercent(attributesWithGear(characterStats, equipment)) / 100,
+		rng,
+	);
 
 /** HP a swing of `damage` gives back through Life Leech. */
 export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => (damage * lifeLeechPercent(equipment, bonus)) / 100;
@@ -188,14 +195,15 @@ export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBo
  * @order 8
  */
 export const armorOf = (equipment: Equipment, stats?: Attributes, playerClass?: unknown): number =>
-	aggregateStats(equipment).armor + (stats ? statArmor(stats) : 0) + classPassives(playerClass).armor;
+	aggregateStats(equipment).armor + (stats ? statArmor(attributesWithGear(stats, equipment)) : 0) + classPassives(playerClass).armor;
 
 /** Mana: the attributes' pool plus the gear's and the class's. */
 export const maxMana = (characterStats: CharacterStats, equipment: Equipment, playerClass?: unknown): number =>
-	Math.round(characterStats.mp + aggregateStats(equipment).maxMana + classPassives(playerClass).maxMana);
+	Math.round(withGearAttributes(characterStats, equipment).mp + aggregateStats(equipment).maxMana + classPassives(playerClass).maxMana);
 
 /** Mana per second, in and out of fights. */
-export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number => statManaRegen(stats) + aggregateStats(equipment).manaRegen;
+export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number =>
+	statManaRegen(attributesWithGear(stats, equipment)) + aggregateStats(equipment).manaRegen;
 
 /**
  * The Life Leech in %, the gear's and the merchant's together, never above the cap.
