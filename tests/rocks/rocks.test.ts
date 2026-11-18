@@ -1,9 +1,10 @@
+import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { INGREDIENT_BY_ID, ingredientDescription } from '../../src/catalog/ingredients';
 import { JUNK_ITEMS } from '../../src/catalog/items/junk';
 import { ROCK, ROCK_DROPS, ROCK_TIER_ORDER, ROCK_TIERS, rockSprite } from '../../src/config/rocks';
-import { pickRockSpot, rockCap, rockIntervalSec, rockSpots, rollRockLoot, rollRockTier, takeClicks } from '../../src/lib/rocks';
+import { miningPower, pickRockSpot, rockCap, rockIntervalSec, rockSpots, rollRockLoot, rollRockTier, takeClicks } from '../../src/lib/rocks';
 import { mulberry32 } from '../../src/lib/rng';
 import { createWorld, type Placed } from '../../src/utils/world';
 import type { Tile } from '../../src/types/game';
@@ -47,16 +48,17 @@ test('a rock is placed evenly on the free tiles, and none when the land is full'
 	assert.equal(pickRockSpot(world, new Set(['1,0', '2,0']), 1, mulberry32(1)), null);
 });
 
-test('the rocks that may wait grow with the land, from 2 up to 15', () => {
+test('the rocks that may wait grow with the land, from 2 up to 5', () => {
 	assert.equal(rockCap(0), ROCK.minAllowed);
-	assert.equal(rockCap(50), 6);
+	assert.equal(rockCap(50), ROCK.minAllowed);
+	assert.equal(rockCap(150), 4);
 	assert.equal(rockCap(10_000), ROCK.maxOnMap);
 });
 
-test('rocks come much more often than chests (every 150 s), faster with Luck but never under 60% of it', () => {
-	assert.equal(rockIntervalSec(0), 150);
-	assert.ok(rockIntervalSec(100) < 150);
-	assert.equal(rockIntervalSec(1_000_000), 150 * 0.6);
+test('rocks are rarer than chests (every 20 minutes), faster with Luck but never under 60% of it', () => {
+	assert.equal(rockIntervalSec(0), 1200);
+	assert.ok(rockIntervalSec(100) < 1200);
+	assert.equal(rockIntervalSec(1_000_000), 1200 * 0.6);
 });
 
 test('the tiers need 50, 125, 250, 500 and 1,000 clicks, and a better rock is rarer', () => {
@@ -183,4 +185,11 @@ test('the legendary ore takes 1,000 clicks, is the rarest rock, gives the most s
 	}
 	assert.ok(found / 10_000 > 0.07 && found / 10_000 < 0.13, `about 10% of legendary rocks hold Ember Coal (${found / 10_000})`);
 	assert.equal(most, 3);
+});
+
+test('Mining Power is a one-time Ember shop upgrade (50 Embers) that doubles what a click counts for', () => {
+	assert.equal(EMBER_UPGRADES.miningpower.baseCost, 50);
+	assert.equal(EMBER_UPGRADES.miningpower.maxLevel, 1);
+	assert.equal(miningPower(undefined), 1);
+	assert.equal(miningPower({ upgrades: { miningpower: 1 } } as never), 2);
 });

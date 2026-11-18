@@ -267,6 +267,7 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 		'idolcap',
 		'idoltime',
 		'mastery',
+		'miningpower',
 		'nightwatch',
 		'overseer',
 		'potion',

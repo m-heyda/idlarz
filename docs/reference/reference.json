@@ -3084,7 +3084,7 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 15,
+  "line": 17,
   "summary": "The tiles a rock could stand on: owned land that is not the castle, water (a lake), the castle's ward, nor taken (`taken` holds the \"x,y\" keys of the monsters, boss, chests and rocks already standing) and has no building.",
   "see": []
  },
@@ -3095,7 +3095,7 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 39,
+  "line": 41,
   "summary": "Seconds of play time between two new rocks.",
   "see": []
  },
@@ -3106,7 +3106,7 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 49,
+  "line": 51,
   "summary": "The most rocks that wait at once on a map with `free` tiles a monster could stand on.",
   "see": []
  },
@@ -3117,7 +3117,7 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 59,
+  "line": 61,
   "summary": "The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.",
   "see": []
  },
@@ -3128,7 +3128,7 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 84,
+  "line": 86,
   "summary": "How many of `clicks` the server lets in for a rock at `nowSec`: a bucket of `burst` clicks that refills at `maxCps` per second (a new rock starts full). The rest are dropped, so a rock cannot be broken faster than a person clicks.",
   "see": []
  },
@@ -3139,8 +3139,19 @@
   "kind": "function",
   "category": "Economy/Rocks and Mining",
   "file": "src/lib/rocks.ts",
-  "line": 108,
+  "line": 110,
   "summary": "Rolls what a broken rock drops, line by line of its tier's table ({@link ROCK_DROPS}); every line draws the same number of random values whether it hits or not, so adding a line later never shifts the rest. Stone and coal are minutes of the player's income (never under the floor of the line); an ingredient has a chance per rock, raised by Luck.",
+  "see": []
+ },
+ {
+  "id": "miningpower",
+  "name": "miningPower",
+  "symbol": "miningPower",
+  "kind": "function",
+  "category": "Economy/Rocks and Mining",
+  "file": "src/lib/rocks.ts",
+  "line": 134,
+  "summary": "How many hits one click on a rock counts for: 1, or 2 with the Ember shop's Mining Power. The server applies it to the clicks it lets in (the click-rate cap counts real clicks), and the browser shows it at once.",
   "see": []
  },
  {

@@ -18,7 +18,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes), [`INGREDIENTS`](#ingredients)
 - Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`builderCount`](#buildercount), [`idolEconomy`](#idoleconomy)
 - Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
-- Rocks and Mining: [`ROCK_TIERS`](#rock-tiers), [`ROCK`](#rock), [`ROCK_DROPS`](#rock-drops), [`rockSpots`](#rockspots), [`rockIntervalSec`](#rockintervalsec), [`rockCap`](#rockcap), [`rollRockTier`](#rollrocktier), [`takeClicks`](#takeclicks), [`rollRockLoot`](#rollrockloot)
+- Rocks and Mining: [`ROCK_TIERS`](#rock-tiers), [`ROCK`](#rock), [`ROCK_DROPS`](#rock-drops), [`rockSpots`](#rockspots), [`rockIntervalSec`](#rockintervalsec), [`rockCap`](#rockcap), [`rollRockTier`](#rollrocktier), [`takeClicks`](#takeclicks), [`rollRockLoot`](#rollrockloot), [`miningPower`](#miningpower)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -1447,7 +1447,7 @@ Source: [`src/config/rocks.ts:51`](../../src/config/rocks.ts)
 
 How rocks appear and how fast they may be mined (server rules).
 
-- **Timer**: one new rock every 150 s of play time (shorter with Luck, never under 60% of it), much faster than a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
+- **Timer**: one new rock every 1,200 s (20 minutes) of play time (shorter with Luck, never under 60% of it), half as often as a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
 - **Room**: at most `maxOnMap` rocks wait at once, and no more than `landShare` of the free land (at least `minAllowed`).
 - **Tiles**: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.
 - **Clicks**: the browser sends its clicks in batches. The server lets in at most `maxCps` clicks per second (a bucket of `burst` clicks), so a rock cannot be broken faster than a person can click.
@@ -1456,10 +1456,10 @@ How rocks appear and how fast they may be mined (server rules).
 
 | Rule | Value |
 | --- | --- |
-| Seconds between two rocks (no Luck) | 150 |
-| Most rocks on the map | 15 |
-| Share of the free land | 12% |
-| Room on 20 / 100 / 1,000 free tiles | 2 / 12 / 15 |
+| Seconds between two rocks (no Luck) | 1,200 |
+| Most rocks on the map | 5 |
+| Share of the free land | 3% |
+| Room on 20 / 100 / 1,000 free tiles | 2 / 3 / 5 |
 | Clicks let in per second | 24 |
 | Burst of a fresh rock | 48 |
 | Most clicks in one request | 200 |
@@ -1510,7 +1510,7 @@ Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.
 
 ### `rockSpots` <small>function</small>
 
-Source: [`src/lib/rocks.ts:15`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:17`](../../src/lib/rocks.ts)
 
 The tiles a rock could stand on: owned land that is not the castle, water (a lake), the castle's ward, nor taken (`taken` holds the "x,y" keys of the monsters, boss, chests and rocks already standing) and has no building.
 
@@ -1518,21 +1518,21 @@ The tiles a rock could stand on: owned land that is not the castle, water (a lak
 
 ### `rockIntervalSec` <small>function</small>
 
-Source: [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:41`](../../src/lib/rocks.ts)
 
 Seconds of play time between two new rocks.
 
 **Formula**
 
 ```text
-interval = 150 s x max(0.6, 1 / (1 + 0.004 x Luck))
+interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
 ```
 
 <a id="rockcap"></a>
 
 ### `rockCap` <small>function</small>
 
-Source: [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:51`](../../src/lib/rocks.ts)
 
 The most rocks that wait at once on a map with `free` tiles a monster could stand on.
 
@@ -1546,7 +1546,7 @@ room = min(15, max(2, floor(free land x 12%)))
 
 ### `rollRockTier` <small>function</small>
 
-Source: [`src/lib/rocks.ts:59`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:61`](../../src/lib/rocks.ts)
 
 The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.
 
@@ -1560,7 +1560,7 @@ weight(tier) = base weight x (min(1.6, 1 + 0.004 x Luck) for every tier but comm
 
 ### `takeClicks` <small>function</small>
 
-Source: [`src/lib/rocks.ts:84`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:86`](../../src/lib/rocks.ts)
 
 How many of `clicks` the server lets in for a rock at `nowSec`: a bucket of `burst` clicks that refills at `maxCps` per second (a new rock starts full). The rest are dropped, so a rock cannot be broken faster than a person clicks.
 
@@ -1574,7 +1574,7 @@ allowed = min(48, tokens + seconds since the last batch x 24);  accepted = min(c
 
 ### `rollRockLoot` <small>function</small>
 
-Source: [`src/lib/rocks.ts:108`](../../src/lib/rocks.ts)
+Source: [`src/lib/rocks.ts:110`](../../src/lib/rocks.ts)
 
 Rolls what a broken rock drops, line by line of its tier's table ([`ROCK_DROPS`](economy.md#rock-drops)); every line draws the same number of random values whether it hits or not, so adding a line later never shifts the rest.
 Stone and coal are minutes of the player's income (never under the floor of the line); an ingredient has a chance per rock, raised by Luck.
@@ -1584,6 +1584,20 @@ Stone and coal are minutes of the player's income (never under the floor of the 
 ```text
 stone or coal = max(floor, floor(income per second x U(minutes) x 60 x (1 + 0.005 x Luck)))
 ingredient    = chance x (1 + 0.005 x Luck) per rock;  quantity = U(min..max)
+```
+
+<a id="miningpower"></a>
+
+### `miningPower` <small>function</small>
+
+Source: [`src/lib/rocks.ts:134`](../../src/lib/rocks.ts)
+
+How many hits one click on a rock counts for: 1, or 2 with the Ember shop's Mining Power. The server applies it to the clicks it lets in (the click-rate cap counts real clicks), and the browser shows it at once.
+
+**Formula**
+
+```text
+hits per click = 1 + Mining Power effect (0 or 1)
 ```
 
 ## Perk caps
