@@ -47,11 +47,39 @@
 	gap: 6px;
 }
 
-.kd-biome {
+.kd-heat {
 	display: grid;
-	grid-template-columns: 14px 120px minmax(0, 1fr) 56px;
+	grid-template-rows: repeat(7, 12px);
+	grid-auto-flow: column;
+	grid-auto-columns: 12px;
+	gap: 3px;
+	justify-content: start;
+	overflow-x: auto;
+	padding-bottom: 2px;
+}
+
+.kd-cell {
+	width: 12px;
+	height: 12px;
+	border: 1px solid rgba(0, 0, 0, 0.45);
+	box-sizing: border-box;
+}
+
+.kd-heat-note {
+	margin-top: 4px;
+}
+
+.kd-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 18px;
+	margin-top: 10px;
+}
+
+.kd-biome {
+	display: inline-flex;
 	align-items: center;
-	gap: 10px;
+	gap: 6px;
 	font-size: 13px;
 	color: #f1e6c8;
 }
@@ -63,8 +91,13 @@
 }
 
 .kd-count {
-	text-align: right;
 	font-variant-numeric: tabular-nums;
+}
+
+.kd-rows-wide {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+	gap: 6px 24px;
 }
 
 .kd-building {
