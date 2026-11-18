@@ -502,9 +502,16 @@
 .ds-upgrade-foot {
 	margin-top: auto;
 	display: flex;
+	flex-wrap: wrap; /* a long cost list takes its own line instead of squeezing the button */
 	align-items: center;
 	justify-content: space-between;
 	gap: 8px;
+}
+
+.ds-upgrade-foot .ds-btn {
+	white-space: nowrap; /* 'Not enough' stays on one line */
+	flex-shrink: 0;
+	margin-left: auto;
 }
 
 .ds-cost {
@@ -4800,7 +4807,8 @@ button.ds-income-head:hover {
 }
 
 .ds-pick-grid[data-compact='true'] {
-	grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+	/* three roomy columns: the longest title (Merchant Prince) stays on one line */
+	grid-template-columns: repeat(3, minmax(0, 1fr));
 	gap: 6px;
 }
 
