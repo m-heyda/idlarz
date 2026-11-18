@@ -52,6 +52,9 @@ export interface BestiaryEntry {
 export interface BestiaryBiomeGoal {
 	biome: string;
 	label: string;
+	/** The framed landscape picture of a rebirth biome (undefined for a home biome: a colour tile is drawn) and the biome's map colour */
+	art?: string;
+	color: string;
 	monsters: number;
 	/** Goal tiers reached by the kills / already claimed */
 	reached: number;
@@ -327,10 +330,15 @@ const BiomeGoals: React.FC<{ goals: readonly BestiaryBiomeGoal[]; busy?: boolean
 			{goals.map((g) => {
 				const tiers = g.tiers.length;
 				return (
-					<div className='ds-bst-goal-row' key={g.biome} style={{ gridTemplateColumns: `130px repeat(${tiers}, minmax(190px, 1fr)) 150px` }}>
+					<div className='ds-bst-goal-row' key={g.biome} style={{ gridTemplateColumns: `190px repeat(${tiers}, minmax(190px, 1fr)) 150px` }}>
 						<div className='ds-bst-goal-name'>
-							<b>{g.label}</b>
-							<DiamondLevel level={g.claimed} max={tiers} small />
+							<span className='ds-bst-biome-art' style={g.art ? undefined : { background: g.color }}>
+								{g.art ? <img src={g.art} alt='' /> : null}
+							</span>
+							<span className='ds-bst-goal-label'>
+								<b>{g.label}</b>
+								<DiamondLevel level={g.claimed} max={tiers} small />
+							</span>
 						</div>
 						{g.tiers.map((t, i) => {
 							const state = i < g.claimed ? 'claimed' : i === g.claimed && g.reached > g.claimed ? 'claim' : i < g.reached ? 'claimed' : 'locked';

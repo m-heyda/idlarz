@@ -5913,3 +5913,46 @@ button.ds-income-head:hover {
 	font-size: 12px;
 	white-space: nowrap;
 }
+
+/* Biome goals: the list scrolls under a fixed heading, nothing wraps, each biome has its picture */
+.ds-bst-overlay {
+	overflow: hidden;
+}
+
+.ds-bst-goals {
+	flex: 1;
+	min-height: 0;
+	overflow: auto;
+	padding-right: 4px;
+}
+
+.ds-bst-goal-name {
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	white-space: nowrap;
+}
+
+.ds-bst-biome-art {
+	flex: none;
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border: 1px solid var(--ds-line);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
+}
+
+.ds-bst-biome-art img {
+	width: 44px;
+	height: 44px;
+	image-rendering: pixelated;
+	object-fit: cover;
+}
+
+.ds-bst-goal-label {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 0;
+}
