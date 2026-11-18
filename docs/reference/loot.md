@@ -18,7 +18,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 
 ### `generateLoot` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:322`](../../src/lib/loot/generate.ts)
 
 Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.
 
@@ -61,7 +61,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 
 ### `resolveSourceLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:99`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:101`](../../src/lib/loot/generate.ts)
 
 The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.
 
@@ -75,7 +75,7 @@ source level = clamp(base + perCastleLevel x (castle level - 1), 1..100)
 
 ### `rollItemLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:112`](../../src/lib/loot/generate.ts)
 
 Rolls the item level around the source level, inside the profile's bounds.
 
@@ -113,7 +113,7 @@ Members that exist at this item level (item window and the pool's own minimum), 
 
 ### `rollLeaning` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:90`](../../src/lib/loot/generate.ts)
 
 A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).
 
@@ -148,11 +148,11 @@ start at item level 4 plus 3 per castle level above 1.
 | monster_coast | normal_monster_coast | the caller's level, range 2-22 |
 | monster_hills | normal_monster_hills | the caller's level, range 6-26 |
 | monster_lake | normal_monster_lake | the caller's level, range 10-29 |
-| monster_jungle | normal_monster_jungle | the caller's level, range 14-32 |
-| monster_fields | normal_monster_fields | the caller's level, range 17-35 |
-| monster_orchard | normal_monster_orchard | the caller's level, range 20-38 |
-| monster_blight | normal_monster_blight | the caller's level, range 23-41 |
-| monster_battlefield | normal_monster_battlefield | the caller's level, range 26-44 |
+| monster_jungle | normal_monster_jungle | the caller's level, range 16-47 |
+| monster_fields | normal_monster_fields | the caller's level, range 20-52 |
+| monster_orchard | normal_monster_orchard | the caller's level, range 24-56 |
+| monster_blight | normal_monster_blight | the caller's level, range 28-60 |
+| monster_battlefield | normal_monster_battlefield | the caller's level, range 32-64 |
 | boss | boss | the caller's level, range 15-45 |
 | boss_plains | boss_plains | the caller's level, range 15-35 |
 | boss_forest | boss_forest | the caller's level, range 20-40 |
@@ -161,11 +161,11 @@ start at item level 4 plus 3 per castle level above 1.
 | boss_coast | boss_coast | the caller's level, range 17-37 |
 | boss_hills | boss_hills | the caller's level, range 22-42 |
 | boss_lake | boss_lake | the caller's level, range 27-47 |
-| boss_jungle | boss_jungle | the caller's level, range 32-52 |
-| boss_fields | boss_fields | the caller's level, range 37-57 |
-| boss_orchard | boss_orchard | the caller's level, range 42-62 |
-| boss_blight | boss_blight | the caller's level, range 47-67 |
-| boss_battlefield | boss_battlefield | the caller's level, range 52-72 |
+| boss_jungle | boss_jungle | the caller's level, range 38-68 |
+| boss_fields | boss_fields | the caller's level, range 46-76 |
+| boss_orchard | boss_orchard | the caller's level, range 54-84 |
+| boss_blight | boss_blight | the caller's level, range 60-92 |
+| boss_battlefield | boss_battlefield | the caller's level, range 68-100 |
 | chest | basic_chest | own level: 4 + 3 per castle level above 1 |
 | merchant | merchant_stock | own level: 4 + 3 per castle level above 1 |
 | craft | craft | the caller's level, range 1-41 |
@@ -260,11 +260,11 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 | boss_coast | 17-37 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_coast |
 | boss_hills | 22-42 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_hills |
 | boss_lake | 27-47 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_lake |
-| boss_jungle | 32-52 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_jungle |
-| boss_fields | 37-57 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_fields |
-| boss_orchard | 42-62 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_orchard |
-| boss_blight | 47-67 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_blight |
-| boss_battlefield | 52-72 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_battlefield |
+| boss_jungle | 38-68 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_jungle |
+| boss_fields | 46-76 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_fields |
+| boss_orchard | 54-84 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_orchard |
+| boss_blight | 60-92 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_blight |
+| boss_battlefield | 68-100 | none yet | none yet (open sets still in the general pools: obsidian) | boss_general_battlefield |
 
 ## Items
 
@@ -470,7 +470,7 @@ every bag until the rule is decided (IDL-312). `junk` is a parameter so a test c
 
 ### `rollJunkDrops` <small>function</small>
 
-Source: [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts)
+Source: [`src/lib/loot/junkDrops.ts:64`](../../src/lib/loot/junkDrops.ts)
 
 The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance
 (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.
@@ -481,4 +481,5 @@ The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by r
 cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
 rare chance = base x (1 + 0.005 x Luck)
 boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
+ingredient  = chance x (1 + 0.005 x Luck) per kill; qty = (min..max) + floor(perLevel x (level - 1))        (the monster's own table, x3 for a golden one)
 ```

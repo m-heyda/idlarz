@@ -54,6 +54,8 @@ export interface LifetimeStats {
 	bestMs: Record<string, number>;
 	/** Bestiary mastery: per monster type id, how many mastery tiers the player has claimed (tiers are claimed in order, so a count is the whole record). Additive: absent reads as none. */
 	masteryClaimed: Record<string, number>;
+	/** Bestiary biome goals (IDL-336): per biome, how many collection tiers the player has claimed (every monster of the biome, its boss included, at tier N). Additive: absent reads as none. */
+	biomeClaimed: Record<string, number>;
 	/**
 	 * Merchant trades the server has made since the last accepted save (IDL-319): units sold per resource and the gold spent on buying. The server judges the next trade against the last save plus these, so a stock cannot be sold twice;
 	 * an accepted save that accounts for them drops them (`settleTrades`, trade.ts). Additive: absent reads as none.
@@ -104,6 +106,7 @@ export const emptyStats = (): LifetimeStats => ({
 	deaths: {},
 	bestMs: {},
 	masteryClaimed: {},
+	biomeClaimed: {},
 	tradeSince: emptyTrade(),
 	curiosity: [],
 });
@@ -156,6 +159,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		deaths: counts(r.deaths),
 		bestMs: counts(r.bestMs),
 		masteryClaimed: counts(r.masteryClaimed),
+		biomeClaimed: counts(r.biomeClaimed),
 		tradeSince: tradeOf(r.tradeSince),
 		curiosity: ids(r.curiosity),
 	};
@@ -177,6 +181,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		deaths,
 		bestMs,
 		masteryClaimed,
+		biomeClaimed,
 		tradeSince,
 		curiosity,
 		...rest
@@ -197,6 +202,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
 		...(Object.keys(bestMs).length > 0 ? { bestMs } : {}),
 		...(Object.keys(masteryClaimed).length > 0 ? { masteryClaimed } : {}),
+		...(Object.keys(biomeClaimed).length > 0 ? { biomeClaimed } : {}),
 		...(!isEmptyTrade(tradeSince) ? { tradeSince } : {}),
 		...(curiosity.length > 0 ? { curiosity } : {}),
 	};
@@ -226,6 +232,7 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	Object.keys(s.deaths).length === 0 &&
 	Object.keys(s.bestMs).length === 0 &&
 	Object.keys(s.masteryClaimed).length === 0 &&
+	Object.keys(s.biomeClaimed).length === 0 &&
 	isEmptyTrade(s.tradeSince) &&
 	s.curiosity.length === 0;
 
@@ -277,6 +284,8 @@ export interface BestiaryReport {
 	kills: Record<string, number>;
 	/** Mastery tiers claimed per type, the times a monster beat the player and the fastest win in ms (absent from an older server: read as none) */
 	claimed?: Record<string, number>;
+	/** Biome goal tiers claimed per biome (absent from an older server: read as none) */
+	biomeClaimed?: Record<string, number>;
 	deaths?: Record<string, number>;
 	bestMs?: Record<string, number>;
 }
@@ -285,6 +294,7 @@ export const bestiaryOf = (stats: LifetimeStats): BestiaryReport => ({
 	seen: Object.keys(stats.seen),
 	kills: stats.kills,
 	claimed: stats.masteryClaimed,
+	biomeClaimed: stats.biomeClaimed,
 	deaths: stats.deaths,
 	bestMs: stats.bestMs,
 });

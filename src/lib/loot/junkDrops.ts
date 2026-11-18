@@ -1,4 +1,5 @@
 import { JUNK_ITEMS } from '@/catalog/items/junk';
+import { ingredientQty, ingredientsOf } from '@/catalog/monsterDrops';
 import type { Rng } from '@/lib/rng';
 import type { Drop } from '@/types/game';
 
@@ -42,6 +43,8 @@ export interface JunkRollContext {
 	boss: boolean;
 	/** A golden monster: everything is tripled */
 	lucky: boolean;
+	/** The monster's type: its ingredients (`catalog/monsterDrops.ts`) drop on top of the junk. Left out (the debug panel, tests of the plain junk), no ingredient drops. */
+	type?: string;
 }
 
 const valueOf = (id: string): number => JUNK_ITEMS.find((i) => i.id === id)?.sellValue ?? 1;
@@ -56,6 +59,7 @@ const valueOf = (id: string): number => JUNK_ITEMS.find((i) => i.id === id)?.sel
  * cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
  * rare chance = base x (1 + 0.005 x Luck)
  * boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
+ * ingredient  = chance x (1 + 0.005 x Luck) per kill; qty = (min..max) + floor(perLevel x (level - 1))        (the monster's own table, x3 for a golden one)
  */
 export const rollJunkDrops = (ctx: JunkRollContext, rng: Rng): Drop[] => {
 	const drops: Drop[] = [];
@@ -76,5 +80,16 @@ export const rollJunkDrops = (ctx: JunkRollContext, rng: Rng): Drop[] => {
 			if (merged && merged.kind === 'consumable') merged.qty += n;
 			else drops.push({ kind: 'consumable', id: b.id, qty: n });
 		}
+	// the monster's own ingredients come last of all: a monster without a type (or one with no table) draws nothing, so the rest of the kill's rolls are the same as before they existed
+	if (ctx.type) {
+		for (const ing of ingredientsOf(ctx.type)) {
+			if (ctx.level < ing.minLevel) continue;
+			if (ing.chance < 1 && rng() >= ing.chance * luck) continue;
+			const n = ingredientQty(ing, ctx.level, rng()) * bonus;
+			const merged = drops.find((x) => x.kind === 'consumable' && x.id === ing.id);
+			if (merged && merged.kind === 'consumable') merged.qty += n;
+			else drops.push({ kind: 'consumable', id: ing.id, qty: n });
+		}
+	}
 	return drops;
 };

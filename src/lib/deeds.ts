@@ -64,6 +64,10 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 			return { cur: f.stats.flawless, goal: when.min };
 		case 'entries':
 			return { cur: entriesFilled(f.stats, when.kills), goal: when.min };
+		case 'mastered':
+			return { cur: Object.values(f.stats.masteryClaimed).reduce((sum, n) => sum + n, 0), goal: when.min };
+		case 'biomeGoals':
+			return { cur: Object.values(f.stats.biomeClaimed).reduce((sum, n) => sum + n, 0), goal: when.min };
 		case 'biome':
 			return { cur: f.world?.biomes.includes(when.biome) ? 1 : 0, goal: 1 };
 		case 'cluster':

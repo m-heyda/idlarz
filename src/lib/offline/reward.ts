@@ -1,5 +1,6 @@
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollKillLoot } from '@/lib/loot';
+import { masteryBonusesFor } from '@/lib/mastery';
 import { levelAtAge } from '@/lib/monsters';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
 import { ownedBases, receiveInto, sellContextOf } from '@/lib/offline/inventory';
@@ -51,6 +52,7 @@ export const payKill = (
 	const rng = sealedRng(secret, userId, ledger.runId, 'kill', ordKill);
 	const { luck, goldFind, killRewardPct } = stored.summary.derived;
 	const inv = ledger.inv!;
+	const mastery = masteryBonusesFor(type, ledger.stats.masteryClaimed, ledger.stats.biomeClaimed);
 	const loot = rollKillLoot(
 		{ type, level },
 		{
@@ -63,6 +65,9 @@ export const payKill = (
 			owned: ownedBases(inv),
 			pity: inv.lootPity,
 			lucky: ticket.lucky,
+			masteryGoldPct: mastery.gold,
+			masteryXpPct: mastery.xp,
+			masteryLootPct: mastery.loot,
 		},
 		rng,
 	);

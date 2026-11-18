@@ -132,12 +132,12 @@ export const BIOME_LOOT = {
 	hills: { ceiling: 4, levels: { min: 6, max: 26 } },
 	lake: { ceiling: 5, levels: { min: 10, max: 29 } },
 	// the jungle follows the tundra's band (rebirth 1 players wear the best grades there are)
-	jungle: { ceiling: 7, levels: { min: 14, max: 32 } },
+	jungle: { ceiling: 7, levels: { min: 16, max: 47 } },
 	// fields to battlefield: the spawn window's base to its cap plus the 10 levels of growth, each a step above the biome before
-	fields: { ceiling: 7, levels: { min: 17, max: 35 } },
-	orchard: { ceiling: 7, levels: { min: 20, max: 38 } },
-	blight: { ceiling: 7, levels: { min: 23, max: 41 } },
-	battlefield: { ceiling: 7, levels: { min: 26, max: 44 } },
+	fields: { ceiling: 7, levels: { min: 20, max: 52 } },
+	orchard: { ceiling: 7, levels: { min: 24, max: 56 } },
+	blight: { ceiling: 7, levels: { min: 28, max: 60 } },
+	battlefield: { ceiling: 7, levels: { min: 32, max: 64 } },
 } as const satisfies Record<string, { ceiling: number; levels: { min: number; max: number } }>;
 export type LootBiome = keyof typeof BIOME_LOOT;
 
@@ -221,11 +221,11 @@ export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	coast: { uniques: [], setId: null, levels: { min: 17, max: 37 } },
 	hills: { uniques: [], setId: null, levels: { min: 22, max: 42 } },
 	lake: { uniques: [], setId: null, levels: { min: 27, max: 47 } },
-	jungle: { uniques: [], setId: null, levels: { min: 32, max: 52 } },
-	fields: { uniques: [], setId: null, levels: { min: 37, max: 57 } },
-	orchard: { uniques: [], setId: null, levels: { min: 42, max: 62 } },
-	blight: { uniques: [], setId: null, levels: { min: 47, max: 67 } },
-	battlefield: { uniques: [], setId: null, levels: { min: 52, max: 72 } },
+	jungle: { uniques: [], setId: null, levels: { min: 38, max: 68 } },
+	fields: { uniques: [], setId: null, levels: { min: 46, max: 76 } },
+	orchard: { uniques: [], setId: null, levels: { min: 54, max: 84 } },
+	blight: { uniques: [], setId: null, levels: { min: 60, max: 92 } },
+	battlefield: { uniques: [], setId: null, levels: { min: 68, max: 100 } },
 };
 
 /** A boss's chance per kill of its unique, and the bad-luck protection on it (the numbers of the old single boss table: 5 %, +1 % per miss up to +10 %) */

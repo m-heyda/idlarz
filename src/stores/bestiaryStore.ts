@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import type { BestiaryReport } from '@/lib/offline/stats';
-import { provideBestiarySink } from '@/lib/rewardsClient';
+import { newClaimId } from '@/lib/offlineClient';
+import { notify } from '@/lib/notices';
+import { provideBestiarySink, requestMastery } from '@/lib/rewardsClient';
+import { signalNeedClaim } from '@/lib/serverSession';
+import { useGameStore } from '@/stores/gameStore';
+import type { MasteryRequest } from '@/lib/offline/gemTypes';
 
 /**
  * The monsters the player has met (the server's `stats.seen`, sent with every online answer) and the kills per type (`stats.kills`). The browser never decides: a monster type that is not in
@@ -16,16 +21,52 @@ interface BestiaryState {
 	claimed: Readonly<Record<string, number>>;
 	deaths: Readonly<Record<string, number>>;
 	bestMs: Readonly<Record<string, number>>;
+	/** Biome collection goals claimed per biome (the server's) */
+	biomeClaimed: Readonly<Record<string, number>>;
+	/** A claim is in flight (the window's buttons wait) */
+	busy: boolean;
+	/** Claims a tier, a biome goal or everything waiting: one request, the server judges it, the answer carries the new report */
+	claim: (request: MasteryRequest) => Promise<boolean>;
 	apply: (report: BestiaryReport) => void;
 }
 
-export const useBestiaryStore = create<BestiaryState>((set) => ({
+export const useBestiaryStore = create<BestiaryState>((set, get) => ({
 	loaded: false,
 	seen: new Set<string>(),
 	kills: {},
 	claimed: {},
 	deaths: {},
 	bestMs: {},
+	biomeClaimed: {},
+	busy: false,
+	claim: async (request) => {
+		if (get().busy) return false;
+		set({ busy: true });
+		try {
+			const key = newClaimId();
+			let reply = await requestMastery(key, request);
+			if (reply.status === 'unavailable') reply = await requestMastery(key, request);
+			if (reply.status === 'need_claim') {
+				signalNeedClaim();
+				notify('Collect your time away first, then claim.', 'error');
+				return false;
+			}
+			if (reply.status !== 'ok') {
+				notify('Could not reach the server. Nothing was claimed.', 'error');
+				return false;
+			}
+			const value = reply.value;
+			if (typeof value.gems === 'number') useGameStore.setState({ gems: value.gems });
+			if (!value.ok) {
+				notify(value.message ?? 'The server did not do that.', 'error');
+				return false;
+			}
+			notify(value.paid ? `Claimed: +${value.paid} gems` : value.tiers > 1 ? `Claimed ${value.tiers} rewards` : 'Claimed');
+			return true;
+		} finally {
+			set({ busy: false });
+		}
+	},
 	apply: (report) =>
 		set({
 			loaded: true,
@@ -34,6 +75,7 @@ export const useBestiaryStore = create<BestiaryState>((set) => ({
 			claimed: report.claimed ?? {},
 			deaths: report.deaths ?? {},
 			bestMs: report.bestMs ?? {},
+			biomeClaimed: report.biomeClaimed ?? {},
 		}),
 }));
 

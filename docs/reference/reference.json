@@ -72,7 +72,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 96,
+  "line": 100,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 450,
+  "line": 542,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -306,12 +306,69 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 27,
-  "summary": "The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.",
+  "line": 52,
+  "summary": "The mastery ladder shared by every normal monster: 10 kills open the entry and reveal the stats, 100 reveal the drop table, 500 and 2,500 are Mastery I and II. Every tier gives a permanent bonus against that monster and the top tier also pays gems. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.",
   "see": [
    "masteryState",
-   "claimMastery"
+   "claimMastery",
+   "BOSS_MASTERY_TIERS",
+   "BIOME_GOALS"
   ]
+ },
+ {
+  "id": "boss-mastery-tiers",
+  "name": "BOSS_MASTERY_TIERS",
+  "symbol": "BOSS_MASTERY_TIERS",
+  "kind": "const",
+  "category": "Progression/Mastery",
+  "file": "src/catalog/mastery.ts",
+  "line": 79,
+  "summary": "The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster's and the top tier pays more gems.",
+  "see": []
+ },
+ {
+  "id": "biome-goals",
+  "name": "BIOME_GOALS",
+  "symbol": "BIOME_GOALS",
+  "kind": "const",
+  "category": "Progression/Mastery",
+  "file": "src/catalog/mastery.ts",
+  "line": 126,
+  "summary": "The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.",
+  "see": []
+ },
+ {
+  "id": "mastery-caps",
+  "name": "MASTERY_CAPS",
+  "symbol": "MASTERY_CAPS",
+  "kind": "const",
+  "category": "Progression/Mastery",
+  "file": "src/catalog/mastery.ts",
+  "line": 159,
+  "summary": "The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).",
+  "see": []
+ },
+ {
+  "id": "family-drops",
+  "name": "FAMILY_DROPS",
+  "symbol": "FAMILY_DROPS",
+  "kind": "const",
+  "category": "Monsters/Bestiary",
+  "file": "src/catalog/monsterDrops.ts",
+  "line": 35,
+  "summary": "What each family leaves (two or three ingredients), so a bear and a boar share a theme and the Bestiary can explain it.",
+  "see": []
+ },
+ {
+  "id": "meta",
+  "name": "META",
+  "symbol": "META",
+  "kind": "const",
+  "category": "Monsters/Bestiary",
+  "file": "src/catalog/monsterMeta.ts",
+  "line": 11,
+  "summary": "Family and tags of every monster. The family drives the Bestiary's family filter and the family bonuses of mastery (\"+x% against beasts\"); the tags are flavour chips. A monster without a row here reads as a Beast with no tags (a test fails on the gap).",
+  "see": []
  },
  {
   "id": "perk-caps",
@@ -659,7 +716,7 @@
   "kind": "const",
   "category": "Monsters/Spawning",
   "file": "src/config/combatConfig.ts",
-  "line": 485,
+  "line": 489,
   "summary": "The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).",
   "see": []
  },
@@ -670,8 +727,8 @@
   "kind": "const",
   "category": "Monsters/Roster",
   "file": "src/config/combatConfig.ts",
-  "line": 552,
-  "summary": "The roster: 51 monsters in twelve biomes that can appear, three normal ones and a boss each (swamp, tundra and blight have a fourth normal one, blight's an elite), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
+  "line": 561,
+  "summary": "The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait. Stats are at level 1 (bosses at their `refLevel`), straight from {@link monsterStats}; speed is attacks per second; the spawn window shows castle level 1 to castle level 10.",
   "see": []
  },
  {
@@ -1872,7 +1929,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 88,
+  "line": 90,
   "summary": "A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).",
   "see": []
  },
@@ -1883,7 +1940,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 99,
+  "line": 101,
   "summary": "The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.",
   "see": []
  },
@@ -1894,7 +1951,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 110,
+  "line": 112,
   "summary": "Rolls the item level around the source level, inside the profile's bounds.",
   "see": []
  },
@@ -1905,7 +1962,7 @@
   "kind": "function",
   "category": "Loot/Pipeline",
   "file": "src/lib/loot/generate.ts",
-  "line": 320,
+  "line": 322,
   "summary": "Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.",
   "see": [
    "LOOT_SOURCES",
@@ -1946,7 +2003,7 @@
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junkDrops.ts",
-  "line": 60,
+  "line": 64,
   "summary": "The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.",
   "see": []
  },
@@ -1957,7 +2014,7 @@
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 52,
+  "line": 56,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2058,6 +2115,17 @@
   "file": "src/lib/manualCloudSave.ts",
   "line": 15,
   "summary": "\"Save game\" in the menu: always saves to this browser, and when an account is signed in it also uploads the game to the account's cloud save, at most once every 10 minutes. The automatic uploads (milestones, the 5 minute heartbeat, hiding the tab) keep running on their own; this is the player's manual button, so the limit is about how often it may be pressed. Pure apart from the small registry and the remembered time: the clock, the storage and the uploader are injected.",
+  "see": []
+ },
+ {
+  "id": "masterybonusesfor",
+  "name": "masteryBonusesFor",
+  "symbol": "masteryBonusesFor",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/mastery.ts",
+  "line": 74,
+  "summary": "What the mastery gives against one monster type: the bonuses of its claimed tiers plus the biome goal tiers claimed for its biome, each stat cut at `MASTERY_CAPS`. One pure function, used by the fight (damage dealt and taken), the kill reward (gold, XP, gear chance) and the Bestiary.",
   "see": []
  },
  {
@@ -2366,7 +2434,7 @@
   "kind": "function",
   "category": "Combat/Potions and skills",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 75,
+  "line": 87,
   "summary": "Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.",
   "see": []
  },
@@ -2377,7 +2445,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 96,
+  "line": 108,
   "summary": "Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.",
   "see": []
  },
@@ -2388,7 +2456,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/fightSteps.ts",
-  "line": 127,
+  "line": 139,
   "summary": "One tick of the open fight. Returns when the fight ended.",
   "see": []
  },
@@ -2554,8 +2622,19 @@
   "kind": "function",
   "category": "Progression/Mastery",
   "file": "src/lib/offline/mastery.ts",
-  "line": 37,
-  "summary": "Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one that skips a tier; a repeated or forged claim therefore pays nothing.",
+  "line": 39,
+  "summary": "Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached on the type's own ladder (a boss reaches its tiers at 1 / 5 / 25 / 100 kills). Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one that skips a tier; a repeated or forged claim therefore pays nothing.",
+  "see": []
+ },
+ {
+  "id": "claimbiomegoal",
+  "name": "claimBiomeGoal",
+  "symbol": "claimBiomeGoal",
+  "kind": "function",
+  "category": "Progression/Mastery",
+  "file": "src/lib/offline/mastery.ts",
+  "line": 57,
+  "summary": "Claims the next collection tier of a biome: every live monster of the biome, its boss included, must have reached that tier by its kills (each on its own ladder). In order, like the monster tiers; refused with nothing changed otherwise.",
   "see": []
  },
  {
@@ -2565,8 +2644,8 @@
   "kind": "function",
   "category": "Progression/Mastery",
   "file": "src/lib/offline/mastery.ts",
-  "line": 54,
-  "summary": "Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.",
+  "line": 73,
+  "summary": "Claim all: every tier every monster type has reached and not claimed, then every biome goal that became reachable, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.",
   "see": []
  },
  {
@@ -2620,7 +2699,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/reward.ts",
-  "line": 36,
+  "line": 37,
   "summary": "Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.",
   "see": []
  },

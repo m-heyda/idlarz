@@ -46,8 +46,8 @@ test('a rebirth that gave nothing reads as zero Embers, and unknown kills stay n
 test('the first rebirth unlocks the jungle with its monsters; the monster count follows the roster', () => {
 	const intro = rebirthUnlockIntro(1);
 	assert.equal(intro?.biome, 'jungle');
-	assert.deepEqual(intro?.monsters, { normal: 3, boss: 1 });
-	assert.deepEqual(monstersUnlockedAt(1), { normal: 3, boss: 1 });
+	assert.deepEqual(intro?.monsters, { normal: 5, boss: 1 });
+	assert.deepEqual(monstersUnlockedAt(1), { normal: 5, boss: 1 });
 	assert.deepEqual(monstersUnlockedAt(0), { normal: 0, boss: 0 }, 'monsters with no rebirth gate are not an unlock');
 	assert.equal(rebirthUnlockIntro(9), null, 'a late rebirth unlocks no land');
 });

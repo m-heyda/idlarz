@@ -92,7 +92,8 @@ test('a rookie finds some types worth fighting and some hopeless; an invincible 
 		strong.every((w) => w >= TRIVIAL_WEIGHT),
 		'nothing is out of reach',
 	);
-	assert.equal(new Set(strong).size, 1, 'so the pick stays uniform');
+	// the weights are equal up to float noise (0.75 and 0.7500000000000011 are the same weight)
+	assert.equal(new Set(strong.map((w) => w.toFixed(9))).size, 1, 'so the pick stays uniform');
 });
 
 test('a spawn level cap pulls the roll down but never below the window', () => {

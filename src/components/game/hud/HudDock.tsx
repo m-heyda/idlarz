@@ -5,6 +5,8 @@ import { pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { useMenuAttention } from '@/hooks/useMenuAttention';
 import { guideLive } from '@/lib/tutorial/live';
 import { useAchievementStore } from '@/stores/achievementStore';
+import { useBestiaryStore } from '@/stores/bestiaryStore';
+import { readyCountOf } from '@/lib/bestiary/entries';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useWindowStore, type WinId } from '@/stores/windowStore';
@@ -33,6 +35,13 @@ const HudDock: React.FC = () => {
 	const { stats: pointsWaiting } = useMenuAttention();
 	const toggleWindow = useWindowStore((state) => state.toggleWindow);
 	const farmWaiting = useGameStore((state) => farmHasPurchase(state.resources, state.farmLevels, state.farmUpgrades));
+	const kills = useBestiaryStore((state) => state.kills);
+	const claimedTiers = useBestiaryStore((state) => state.claimed);
+	const biomeClaimed = useBestiaryStore((state) => state.biomeClaimed);
+	const bestiaryWaiting = useMemo(
+		() => readyCountOf({ loaded: true, seen: new Set(), kills, claimed: claimedTiers, biomeClaimed, deaths: {}, bestMs: {} }),
+		[kills, claimedTiers, biomeClaimed],
+	);
 	const claimable = useAchievementStore((state) => state.earned.filter((id) => !state.claimed.includes(id)).length);
 
 	const rebirthOpen = order.includes('rebirth');
@@ -49,7 +58,7 @@ const HudDock: React.FC = () => {
 	);
 	const missing = status.requirements.filter((r) => !r.met).map((r) => r.label);
 
-	const waiting: Partial<Record<WinId, number>> = { farm: farmWaiting ? 1 : 0, achievements: claimable };
+	const waiting: Partial<Record<WinId, number>> = { farm: farmWaiting ? 1 : 0, achievements: claimable, bestiary: bestiaryWaiting };
 
 	return (
 		<div data-hud-dock style={{ position: 'fixed', left: '50%', bottom: 6, transform: 'translateX(-50%)', zIndex: 39 }}>

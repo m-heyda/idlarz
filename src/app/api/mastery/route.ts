@@ -7,7 +7,7 @@ export const dynamic = 'force-dynamic';
 type Body = { key: string; request: MasteryRequest };
 
 /**
- * Bestiary mastery: `{ action: 'claim', key, type, tier }` claims tier `tier` (1-based) of one monster type, `{ action: 'claimAll', key }` claims every tier that is waiting, in one request. The server judges the tier from its own kill counts;
+ * Bestiary mastery: `{ action: 'claim', key, type, tier }` claims tier `tier` (1-based) of one monster type, `{ action: 'claimAll', key }` claims every tier that is waiting, in one request; `{ action: 'claimBiome', key, biome, tier }` claims the next collection tier of a biome. The server judges the tier from its own kill counts;
  * the answer says what was claimed and the bestiary rides along as on every online answer. `key` is the idempotency key.
  */
 export async function POST(request: Request) {
@@ -18,6 +18,8 @@ export async function POST(request: Request) {
 			if (body.action === 'claimAll') return { key: body.key, request: { action: 'claimAll' } };
 			if (body.action === 'claim' && typeof body.type === 'string' && body.type.length > 0 && body.type.length <= 40 && Number.isInteger(body.tier))
 				return { key: body.key, request: { action: 'claim', type: body.type, tier: body.tier as number } };
+			if (body.action === 'claimBiome' && typeof body.biome === 'string' && body.biome.length > 0 && body.biome.length <= 40 && Number.isInteger(body.tier))
+				return { key: body.key, request: { action: 'claimBiome', biome: body.biome, tier: body.tier as number } };
 			return null;
 		},
 		(deps, userId, body, nowMs) => masteryStep(deps, userId, body.key, body.request, nowMs),

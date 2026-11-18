@@ -14,11 +14,11 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Rankings: [The boards](#ranking-boards), [Movement arrows](#movement)
+- Mastery: [`BOSS_MASTERY_TIERS`](#boss-mastery-tiers), [`BIOME_GOALS`](#biome-goals), [`MASTERY_CAPS`](#mastery-caps), [`claimMastery`](#claimmastery), [`claimBiomeGoal`](#claimbiomegoal), [`claimAllMastery`](#claimallmastery), [`masteryBonusesFor`](#masterybonusesfor), [Bestiary mastery](#mastery-tiers)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
-- Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
@@ -620,6 +620,119 @@ Source: [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
+## Mastery
+
+<a id="boss-mastery-tiers"></a>
+
+### `BOSS_MASTERY_TIERS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:79`](../../src/catalog/mastery.ts)
+
+The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster's and the top tier pays more gems.
+
+<a id="biome-goals"></a>
+
+### `BIOME_GOALS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:126`](../../src/catalog/mastery.ts)
+
+The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.
+
+<a id="mastery-caps"></a>
+
+### `MASTERY_CAPS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:159`](../../src/catalog/mastery.ts)
+
+The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).
+
+**Formula**
+
+```text
+bonus vs one monster = min(cap, tier bonuses of that monster + biome goal bonuses of its biome)       multiplier = 1 + bonus / 100 (defense: damage taken x (1 - bonus / 100))
+```
+
+<a id="claimmastery"></a>
+
+### `claimMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:39`](../../src/lib/offline/mastery.ts)
+
+Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached on the type's own ladder (a boss reaches its tiers at 1 / 5 / 25 / 100 kills). Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one
+that skips a tier; a repeated or forged claim therefore pays nothing.
+
+<a id="claimbiomegoal"></a>
+
+### `claimBiomeGoal` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:57`](../../src/lib/offline/mastery.ts)
+
+Claims the next collection tier of a biome: every live monster of the biome, its boss included, must have reached that tier by its kills (each on its own ladder). In order, like the monster tiers; refused with nothing changed otherwise.
+
+<a id="claimallmastery"></a>
+
+### `claimAllMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:73`](../../src/lib/offline/mastery.ts)
+
+Claim all: every tier every monster type has reached and not claimed, then every biome goal that became reachable, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.
+
+<a id="masterybonusesfor"></a>
+
+### `masteryBonusesFor` <small>function</small>
+
+Source: [`src/lib/mastery.ts:74`](../../src/lib/mastery.ts)
+
+What the mastery gives against one monster type: the bonuses of its claimed tiers plus the biome goal tiers claimed for its biome, each stat cut at `MASTERY_CAPS`. One pure function, used by the fight (damage dealt and taken), the kill reward (gold, XP, gear chance) and the Bestiary.
+
+**Formula**
+
+```text
+bonus[stat] = min(MASTERY_CAPS[stat], sum of the bonuses of the claimed tiers of the type + sum of the bonuses of the claimed biome goals of its biome)
+```
+
+<a id="mastery-tiers"></a>
+
+### Bestiary mastery
+
+Source: [`src/catalog/mastery.ts:52`](../../src/catalog/mastery.ts)
+
+The mastery ladder shared by every normal monster: 10 kills open the entry and reveal the stats, 100 reveal the drop table, 500 and 2,500 are Mastery I and II. Every tier gives a permanent bonus against that monster and the top tier also pays gems.
+The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.
+
+**Bestiary mastery tiers** _(computed from the code)_
+
+Shared ladder (every normal monster):
+
+| Tier | Kills | Reveals | Bonus against that monster | Gems |
+| --- | --- | --- | --- | --- |
+| 1 | 10 | Stats | +2% damage dealt | - |
+| 2 | 100 | Drop table | +5% XP | - |
+| 3 | 500 | - | +5% gear drop chance, -3% damage taken | - |
+| 4 | 2,500 | - | +4% damage dealt, +5% gold | 10 |
+
+Boss ladder:
+
+| Tier | Kills | Reveals | Bonus against that boss | Gems |
+| --- | --- | --- | --- | --- |
+| 1 | 1 | Stats | +3% damage dealt | - |
+| 2 | 5 | Drop table | +8% XP | - |
+| 3 | 25 | - | +8% gear drop chance, -5% damage taken | - |
+| 4 | 100 | - | +6% damage dealt, +8% gold | 40 |
+
+Biome collection goals (every live monster of the biome, its boss included, at the tier):
+
+| Tier | Bonus against every monster of the biome | Gems |
+| --- | --- | --- |
+| 1 | +1% damage dealt | - |
+| 2 | +3% XP, +3% gold | - |
+| 3 | +4% gear drop chance, -2% damage taken | - |
+| 4 | +3% damage dealt, +4% gold | 25 |
+
+Caps against one monster: damage 20%, defense 20%, gold 25%, xp 25%, loot 20%.
+
+See also: `masteryState`, [`claimMastery`](progression.md#claimmastery), [`BOSS_MASTERY_TIERS`](progression.md#boss-mastery-tiers), [`BIOME_GOALS`](progression.md#biome-goals)
+
 ## Avatars
 
 <a id="unlockedavatarids"></a>
@@ -820,13 +933,13 @@ Records a curiosity once. An id that is not on the list, or one already recorded
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:96`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:100`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (124, 8280 gems in total)** _(computed from the code)_
+**The launch achievements (135, 9850 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -871,121 +984,102 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 39 | `scholar_5` | Scholar I | entries >= 5 | 20 | - |
 | 40 | `scholar_15` | Scholar II | entries >= 15 | 60 | - |
 | 41 | `scholar_30` | Scholar III | entries >= 30 | 150 | - |
-| 42 | `biome_jungle` | New land: Jungle | biome jungle | 50 | - |
-| 43 | `biome_fields` | New land: Fields | biome fields | 50 | - |
-| 44 | `biome_orchard` | New land: Blossom Orchard | biome orchard | 50 | - |
-| 45 | `biome_blight` | New land: Blight | biome blight | 50 | - |
-| 46 | `biome_battlefield` | New land: Battlefield | biome battlefield | 50 | - |
-| 47 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 20 | - |
-| 48 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 50 | - |
-| 49 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 80 | - |
-| 50 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 20 | - |
-| 51 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 50 | - |
-| 52 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 80 | - |
-| 53 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 20 | - |
-| 54 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 50 | - |
-| 55 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 80 | - |
-| 56 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 20 | - |
-| 57 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 50 | - |
-| 58 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 80 | - |
-| 59 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 20 | - |
-| 60 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 50 | - |
-| 61 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 80 | - |
-| 62 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 20 | - |
-| 63 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 50 | - |
-| 64 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 80 | - |
-| 65 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 20 | - |
-| 66 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 50 | - |
-| 67 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 80 | - |
-| 68 | `kit_uncommon` | Fully kitted I | kit uncommon | 40 | - |
-| 69 | `kit_epic` | Fully kitted II | kit epic | 120 | - |
-| 70 | `kit_legendary` | Fully kitted III | kit legendary | 400 | - |
-| 71 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 30 | - |
-| 72 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 70 | - |
-| 73 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 110 | - |
-| 74 | `streak_3` | Regular I | streak >= 3 | 20 | - |
-| 75 | `streak_7` | Regular II | streak >= 7 | 60 | - |
-| 76 | `first_respec` | Second thoughts | respecs >= 1 | 20 | - |
-| 77 | `attr_strength_50` | Strength focus I | attribute >= 50 | 30 | - |
-| 78 | `attr_strength_100` | Strength focus II | attribute >= 100 | 80 | - |
-| 79 | `attr_strength_200` | Strength focus III | attribute >= 200 | 130 | - |
-| 80 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 30 | - |
-| 81 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 80 | - |
-| 82 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 130 | - |
-| 83 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 30 | - |
-| 84 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 80 | - |
-| 85 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 130 | - |
-| 86 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 30 | - |
-| 87 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 80 | - |
-| 88 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 130 | - |
-| 89 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 30 | - |
-| 90 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 80 | - |
-| 91 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 130 | - |
-| 92 | `farm_10` | Farmer I | animals >= 10 | 20 | - |
-| 93 | `farm_50` | Farmer II | animals >= 50 | 60 | - |
-| 94 | `farm_200` | Farmer III | animals >= 200 | 100 | - |
-| 95 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 20 | - |
-| 96 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 60 | - |
-| 97 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 20 | - |
-| 98 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 60 | - |
-| 99 | `farm_pig_10` | Pig keeper I | animals >= 10 | 20 | - |
-| 100 | `farm_pig_50` | Pig keeper II | animals >= 50 | 60 | - |
-| 101 | `farm_cow_10` | Cow keeper I | animals >= 10 | 20 | - |
-| 102 | `farm_cow_50` | Cow keeper II | animals >= 50 | 60 | - |
-| 103 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 25 | - |
-| 104 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 65 | - |
-| 105 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 25 | - |
-| 106 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 65 | - |
-| 107 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 25 | - |
-| 108 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 65 | - |
-| 109 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 25 | - |
-| 110 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 65 | - |
-| 111 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 25 | - |
-| 112 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 65 | - |
-| 113 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 25 | - |
-| 114 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 65 | - |
-| 115 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 25 | - |
-| 116 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 65 | - |
-| 117 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 40 | - |
-| 118 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 100 | - |
-| 119 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 160 | - |
-| 120 | `boss_kills_5` | Bossbane I | bosses >= 5 | 40 | - |
-| 121 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
-| 122 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
-| 123 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
-| 124 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
+| 42 | `scholar_50` | Loremaster | entries >= 50 | 250 | loremaster |
+| 43 | `archivist_10` | Archivist I | mastered >= 10 | 40 | - |
+| 44 | `archivist_50` | Archivist II | mastered >= 50 | 120 | - |
+| 45 | `archivist_150` | Archivist III | mastered >= 150 | 300 | - |
+| 46 | `archivist_all` | Grand Archivist | mastered >= 288 | 100 | grand-archivist |
+| 47 | `naturalist_1` | Field Naturalist I | biomeGoals >= 1 | 40 | - |
+| 48 | `naturalist_12` | Field Naturalist II | biomeGoals >= 12 | 150 | - |
+| 49 | `naturalist_48` | Warden of the Wilds | biomeGoals >= 48 | 400 | warden-of-the-wilds |
+| 50 | `archivist_1` | First Entry | mastered >= 1 | 20 | - |
+| 51 | `bane_boar` | Boar Breaker | 1000 x `thistleBoar` | 30 | boar-breaker |
+| 52 | `bane_wyrm` | Wyrmbane | 10 x `bossWinterWyrm` | 120 | wyrmbane |
+| 53 | `biome_jungle` | New land: Jungle | biome jungle | 50 | - |
+| 54 | `biome_fields` | New land: Fields | biome fields | 50 | - |
+| 55 | `biome_orchard` | New land: Blossom Orchard | biome orchard | 50 | - |
+| 56 | `biome_blight` | New land: Blight | biome blight | 50 | - |
+| 57 | `biome_battlefield` | New land: Battlefield | biome battlefield | 50 | - |
+| 58 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 20 | - |
+| 59 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 50 | - |
+| 60 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 80 | - |
+| 61 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 20 | - |
+| 62 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 50 | - |
+| 63 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 80 | - |
+| 64 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 20 | - |
+| 65 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 50 | - |
+| 66 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 80 | - |
+| 67 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 20 | - |
+| 68 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 50 | - |
+| 69 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 80 | - |
+| 70 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 20 | - |
+| 71 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 50 | - |
+| 72 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 80 | - |
+| 73 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 20 | - |
+| 74 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 50 | - |
+| 75 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 80 | - |
+| 76 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 20 | - |
+| 77 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 50 | - |
+| 78 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 80 | - |
+| 79 | `kit_uncommon` | Fully kitted I | kit uncommon | 40 | - |
+| 80 | `kit_epic` | Fully kitted II | kit epic | 120 | - |
+| 81 | `kit_legendary` | Fully kitted III | kit legendary | 400 | - |
+| 82 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 30 | - |
+| 83 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 70 | - |
+| 84 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 110 | - |
+| 85 | `streak_3` | Regular I | streak >= 3 | 20 | - |
+| 86 | `streak_7` | Regular II | streak >= 7 | 60 | - |
+| 87 | `first_respec` | Second thoughts | respecs >= 1 | 20 | - |
+| 88 | `attr_strength_50` | Strength focus I | attribute >= 50 | 30 | - |
+| 89 | `attr_strength_100` | Strength focus II | attribute >= 100 | 80 | - |
+| 90 | `attr_strength_200` | Strength focus III | attribute >= 200 | 130 | - |
+| 91 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 30 | - |
+| 92 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 80 | - |
+| 93 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 130 | - |
+| 94 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 30 | - |
+| 95 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 80 | - |
+| 96 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 130 | - |
+| 97 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 30 | - |
+| 98 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 80 | - |
+| 99 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 130 | - |
+| 100 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 30 | - |
+| 101 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 80 | - |
+| 102 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 130 | - |
+| 103 | `farm_10` | Farmer I | animals >= 10 | 20 | - |
+| 104 | `farm_50` | Farmer II | animals >= 50 | 60 | - |
+| 105 | `farm_200` | Farmer III | animals >= 200 | 100 | - |
+| 106 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 20 | - |
+| 107 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 60 | - |
+| 108 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 20 | - |
+| 109 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 60 | - |
+| 110 | `farm_pig_10` | Pig keeper I | animals >= 10 | 20 | - |
+| 111 | `farm_pig_50` | Pig keeper II | animals >= 50 | 60 | - |
+| 112 | `farm_cow_10` | Cow keeper I | animals >= 10 | 20 | - |
+| 113 | `farm_cow_50` | Cow keeper II | animals >= 50 | 60 | - |
+| 114 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 25 | - |
+| 115 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 65 | - |
+| 116 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 25 | - |
+| 117 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 65 | - |
+| 118 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 25 | - |
+| 119 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 65 | - |
+| 120 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 25 | - |
+| 121 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 65 | - |
+| 122 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 25 | - |
+| 123 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 65 | - |
+| 124 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 25 | - |
+| 125 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 65 | - |
+| 126 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 25 | - |
+| 127 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 65 | - |
+| 128 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 40 | - |
+| 129 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 100 | - |
+| 130 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 160 | - |
+| 131 | `boss_kills_5` | Bossbane I | bosses >= 5 | 40 | - |
+| 132 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
+| 133 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
+| 134 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
+| 135 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
-
-## Mastery
-
-<a id="claimmastery"></a>
-
-### `claimMastery` <small>function</small>
-
-Source: [`src/lib/offline/mastery.ts:37`](../../src/lib/offline/mastery.ts)
-
-Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one
-that skips a tier; a repeated or forged claim therefore pays nothing.
-
-<a id="claimallmastery"></a>
-
-### `claimAllMastery` <small>function</small>
-
-Source: [`src/lib/offline/mastery.ts:54`](../../src/lib/offline/mastery.ts)
-
-Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.
-
-<a id="mastery-tiers"></a>
-
-### Bestiary mastery
-
-Source: [`src/catalog/mastery.ts:27`](../../src/catalog/mastery.ts)
-
-The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II
-with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.
-
-See also: `masteryState`, [`claimMastery`](progression.md#claimmastery)
 
 ## Guided tutorial
 
@@ -1135,7 +1229,7 @@ Claim all: pays every earned tier that is not claimed yet in one go (one request
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:450`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:542`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).
