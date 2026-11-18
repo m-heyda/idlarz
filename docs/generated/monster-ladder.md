@@ -108,6 +108,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Cairn Sentinel | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Cairn Sentinel | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Cairn Sentinel | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Quarry Rat Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Quarry Rat Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Rat Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Highland Gnoll | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Highland Gnoll | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Highland Gnoll | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
@@ -222,6 +228,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Sporeback Ogre | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Sporeback Ogre | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Sporeback Ogre | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 47 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 55 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Eyed Maw | 65 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
