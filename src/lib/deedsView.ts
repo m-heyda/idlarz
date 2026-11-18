@@ -1,6 +1,6 @@
 import { DEEDS, achievementById, type DeedDef } from '@/catalog/achievements';
+import { avatarById } from '@/catalog/avatars';
 import { DEED_MILESTONES } from '@/catalog/deedMilestones';
-import { formatAchievementDate } from '@/lib/achievementView';
 import { claimableMilestones, conditionProgress, deedBonusText, milestoneStates, TOTAL_DEED_POINTS, type DeedFacts } from '@/lib/deeds';
 import { emptyStats } from '@/lib/offline/stats';
 import type { DeedTierVM, DeedVM, MilestoneVM } from '../../packages/design-system/src/views/deeds';
@@ -44,14 +44,17 @@ const goalOf = (id: string): number => {
 };
 
 const SECRET = '???';
+/** The medal drawn as a silhouette for a deed without art yet */
+const PLACEHOLDER_BADGE = 'badge_star_bronze';
 
 const tierOf = (input: DeedsInput, id: string): DeedTierVM => {
 	const def = achievementById(id)!;
 	const isEarned = input.earned.includes(id);
 	const isClaimed = isEarned && input.claimed.includes(id);
-	const unlocks = [def.rewards.avatarId && 'Avatar unlocked', def.rewards.titleId && 'Title unlocked'].filter(Boolean).join(' · ');
-	const earnedDate = isEarned ? formatAchievementDate(input.earnedAt[id]) : null;
-	const claimedDate = isClaimed ? formatAchievementDate(input.claimedAt[id]) : null;
+	const unlocks = [
+		def.rewards.titleId && `Title: ${def.rewards.titleName ?? def.title}`,
+		def.rewards.avatarId && `Avatar: ${avatarById(def.rewards.avatarId)?.name ?? 'new portrait'}`,
+	].filter((u): u is string => !!u);
 	return {
 		id,
 		goal: goalOf(id),
@@ -59,15 +62,15 @@ const tierOf = (input: DeedsInput, id: string): DeedTierVM => {
 		points: def.rewards.points ?? 0,
 		text: def.description,
 		state: isClaimed ? 'claimed' : isEarned ? 'earned' : 'locked',
-		unlocks: isEarned && unlocks ? unlocks : null,
-		earnedText: earnedDate && `Earned ${earnedDate}`,
-		claimedText: claimedDate && `Claimed ${claimedDate}`,
+		unlocks,
 	};
 };
 
 /** A deed as the window shows it. A secret deed with no tier earned yet is `???`, as the old list hid its locked achievements. */
 export const deedViewOf = (deed: DeedDef, input: DeedsInput): DeedVM => {
 	const tiers = deed.tiers.filter((id) => achievementById(id)).map((id) => tierOf(input, id));
+	// a deed whose picture is only a stand-in shows the shared medal, as a silhouette (the window darkens it)
+	const placeholder = !!achievementById(deed.tiers[0])?.badgePlaceholder;
 	const hidden = deed.tags.includes('secret') && tiers.every((t) => t.state === 'locked');
 	return {
 		id: deed.id,
@@ -75,11 +78,12 @@ export const deedViewOf = (deed: DeedDef, input: DeedsInput): DeedVM => {
 		desc: hidden ? SECRET : deed.description,
 		category: deed.category,
 		tags: deed.tags,
-		icon: `/pixel/achievements/${deed.badge}.png`,
+		icon: `/pixel/achievements/${placeholder ? PLACEHOLDER_BADGE : deed.badge}.png`,
+		placeholder,
 		lore: hidden ? SECRET : deed.lore,
 		how: hidden ? 'Find out.' : deed.how,
 		cur: input.progress[deed.id] ?? 0,
-		tiers: hidden ? tiers.map((t) => ({ ...t, text: SECRET })) : tiers,
+		tiers: hidden ? tiers.map((t) => ({ ...t, text: SECRET, unlocks: [] })) : tiers,
 	};
 };
 

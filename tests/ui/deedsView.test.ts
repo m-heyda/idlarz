@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { DEEDS } from '../../src/catalog/achievements';
 import { bonusLine, deedViewsOf, milestoneViewsOf, waitingCount, type DeedsInput } from '../../src/lib/deedsView';
-import { crystalSrc } from '../../packages/design-system/src/views/deeds';
+import { tierGems } from '../../src/catalog/deedRewards';
 
 // IDL-321: what the Hall of Deeds window shows, built from the server's report.
 
@@ -24,14 +24,14 @@ test('every deed is listed with its tiers, goals ascending and the tier states f
 	const slayer = deed(views, 'slayer');
 	assert.deepEqual(
 		slayer.tiers.map((t) => t.state),
-		['claimed', 'earned', 'locked', 'locked'],
+		['claimed', 'earned', 'locked', 'locked', 'locked', 'locked', 'locked', 'locked'],
 	);
 	assert.deepEqual(
 		slayer.tiers.map((t) => t.goal),
-		[100, 500, 2500, 10000],
+		[100, 500, 2500, 10000, 50_000, 250_000, 1_000_000, 5_000_000],
 	);
 	assert.equal(slayer.cur, 642);
-	assert.equal(slayer.tiers[1].gems, 50);
+	assert.equal(slayer.tiers[1].gems, 75, 'gems: 50 for the first tier, 25 more for each further one');
 	assert.equal(slayer.tiers[1].points, 25);
 });
 
@@ -69,10 +69,30 @@ test('milestones follow the claimed points and the claimed list', () => {
 	assert.equal(bonusLine({ milestonesClaimed: ['dm_50'] }), '+1% kill gold');
 });
 
-test('crystals: yellow for tiers I to IV, violet from the fifth, and all violet once the deed is complete', () => {
-	assert.equal(crystalSrc(0, false), '/pixel/ui/deeds/crystal_yellow_1.png');
-	assert.equal(crystalSrc(3, false), '/pixel/ui/deeds/crystal_yellow_4.png');
-	assert.equal(crystalSrc(4, false), '/pixel/ui/deeds/crystal_violet_1.png');
-	assert.equal(crystalSrc(9, false), '/pixel/ui/deeds/crystal_violet_4.png');
-	assert.equal(crystalSrc(1, true), '/pixel/ui/deeds/crystal_violet_2.png');
+test('gems follow the tier position: 50 for the first tier and 25 more for each further tier of a deed', () => {
+	for (const d of deedViewsOf(input())) {
+		if (d.id === 'early_tester' || d.id === 'beta_tester') continue;
+		d.tiers.forEach((t, i) => assert.equal(t.gems, tierGems(i), `${d.id} tier ${i + 1}`));
+	}
+	assert.deepEqual([0, 1, 2].map(tierGems), [50, 75, 100]);
+});
+
+test('titles and avatars a tier unlocks are listed as special unlocks', () => {
+	const slayer = deed(deedViewsOf(input()), 'slayer');
+	assert.deepEqual(slayer.tiers[3].unlocks, ['Title: Slayer']);
+	assert.deepEqual(slayer.tiers[0].unlocks, []);
+	assert.deepEqual(deed(deedViewsOf(input()), 'hoarder').tiers.at(-1)?.unlocks, ["Title: Dragon's Hoard"]);
+});
+
+test('a deed with only a stand-in picture shows the shared medal as a placeholder; real art stays', () => {
+	const views = deedViewsOf(input());
+	assert.equal(deed(views, 'slayer').placeholder, false);
+	assert.equal(deed(views, 'cluster_tundra').placeholder, true);
+	assert.match(deed(views, 'cluster_tundra').icon, /badge_star_bronze/);
+});
+
+test('the grind ladders reach billions and trillions', () => {
+	const hoarder = deed(deedViewsOf(input()), 'hoarder');
+	assert.ok(hoarder.tiers.at(-1)!.goal >= 1e12);
+	assert.ok(deed(deedViewsOf(input()), 'market').tiers.at(-1)!.goal >= 1e10);
 });

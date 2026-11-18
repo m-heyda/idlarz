@@ -52,9 +52,10 @@ export const tidy = (text: string): string => {
 	return out;
 };
 
-/** Short number format: 1.2K, 3.4M, 1K (never 1.0K or 3.40M). */
+/** Short number format: 1.2K, 3.4M, 5B, 1T (never 1.0K or 3.40M). */
 export const compact = (n: number): string => {
 	const abs = Math.abs(n);
+	if (abs >= 1e12) return `${tidy((n / 1e12).toFixed(2))}T`;
 	if (abs >= 1e9) return `${tidy((n / 1e9).toFixed(2))}B`;
 	if (abs >= 1e6) return `${tidy((n / 1e6).toFixed(2))}M`;
 	if (abs >= 1e3) return `${tidy((n / 1e3).toFixed(abs >= 1e5 ? 0 : 1))}K`;

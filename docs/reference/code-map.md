@@ -164,13 +164,15 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`achievements.ts`](../../src/catalog/achievements.ts) — ~ What has to hold.
-- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts) — ~ Adds a deed whose tiers are `[goal, when, title suffix, gems, points, bonus?]`.
+- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts) — ~ Adds a deed whose tiers are `{ suffix, id, when, text, points }`; the gems come from the tier position (`tierGems`).
+- [`achievementsBatch3.ts`](../../src/catalog/achievementsBatch3.ts) — ~ Goal; the id is `<prefix>_<goal>`
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
 - [`deedMilestones.ts`](../../src/catalog/deedMilestones.ts) — The deed point milestones of the Hall of Deeds (IDL-321, decided in IDL-310: points are a score plus milestone rewards; nothing is spent). Pure data: no server and no store imports.
+- [`deedRewards.ts`](../../src/catalog/deedRewards.ts) — The gems of a deed tier (IDL-321, owner rule): every tier pays the same base, and each further tier of a deed pays a little more. Points are the score and the headline; gems are the extra the Claim button pays.
 - [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
 - [`index.ts`](../../src/catalog/index.ts) — ~ Slots a full set fills (both rings count, so 12 items fill 13 slots)
 

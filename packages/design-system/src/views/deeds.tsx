@@ -3,7 +3,7 @@ import { Badge, Button, DiamondLevel, Inset, Panel, ProgressBar } from '../compo
 import { compact } from '../logic';
 import { Dropdown } from './bestiary';
 
-// The Hall of Deeds content (IDL-321): a summary bar (deeds done, deed points with the next milestone, the bonus, Claim all), categories + a tag filter + sorting, the deeds with tier crystals, progress and Claim, a paper detail
+// The Hall of Deeds content (IDL-321): a summary bar (deeds done, deed points with the next milestone, the bonus, Claim all), categories + a tag filter + sorting, the deeds with tier diamonds, progress and Claim, a paper detail
 // with the tier ladder, and the deed point milestones. Data in, callbacks out: the game feeds it from the server's report (`src/components/game/DeedsWindow.tsx`, built by `src/lib/deedsView.ts`), Storybook from fixtures.
 // It lays itself out from its own width (a CSS container, `ds-bst`, shared with the Bestiary).
 
@@ -22,10 +22,8 @@ export interface DeedTierVM {
 	/** What the tier asks, as a sentence ("Defeat 500 monsters.") */
 	text: string;
 	state: TierState;
-	/** "Avatar unlocked · Title unlocked", when the tier gives them */
-	unlocks: string | null;
-	earnedText: string | null;
-	claimedText: string | null;
+	/** What the tier unlocks besides gems and points ("Title: Slayer", "Avatar: Architect"), empty for most */
+	unlocks: string[];
 }
 
 export interface DeedVM {
@@ -35,6 +33,8 @@ export interface DeedVM {
 	category: string;
 	tags: readonly string[];
 	icon: string;
+	/** The deed has no picture of its own yet: its stand-in is drawn as a medal silhouette */
+	placeholder: boolean;
 	lore: string;
 	how: string;
 	/** The player's number towards the next tier's goal */
@@ -68,13 +68,6 @@ export interface DeedsPanelProps {
 	onClaimAll: () => void;
 }
 
-/** Crystal sprites: yellow for the first four tiers, violet from the fifth, and every tier of a deed that is complete. The four files are the four sizes of the pack; the tier picks the size. */
-export const crystalSrc = (tier: number, complete: boolean): string => {
-	const violet = complete || tier >= 4;
-	const size = tier < 4 ? tier + 1 : Math.min(4, tier - 3);
-	return `/pixel/ui/deeds/crystal_${violet ? 'violet' : 'yellow'}_${size}.png`;
-};
-
 type Sort = 'ready' | 'close' | 'category';
 const SORTS: readonly [Sort, string][] = [
 	['ready', 'Claimable first'],
@@ -83,7 +76,6 @@ const SORTS: readonly [Sort, string][] = [
 ];
 
 const claimedCount = (d: DeedVM) => d.tiers.filter((t) => t.state === 'claimed').length;
-const earnedCount = (d: DeedVM) => d.tiers.filter((t) => t.state !== 'locked').length;
 const readyTiers = (d: DeedVM) => d.tiers.filter((t) => t.state === 'earned');
 const isComplete = (d: DeedVM) => d.tiers.every((t) => t.state === 'claimed');
 const nextTier = (d: DeedVM) => d.tiers.find((t) => t.state === 'locked');
@@ -95,21 +87,12 @@ const closeness = (d: DeedVM): number => {
 	return Math.max(0, Math.min(1, (d.cur - from) / Math.max(1, d.tiers[i].goal - from)));
 };
 
-/** The crystals of a deed: one per tier, lit when earned, pulsing while unclaimed, dim while locked. */
-export const Crystals: React.FC<{ deed: DeedVM; small?: boolean }> = ({ deed, small }) => {
-	const done = isComplete(deed);
-	return (
-		<span className='ds-dh-crystals' data-small={small || undefined} aria-label={`${earnedCount(deed)} of ${deed.tiers.length} tiers earned`}>
-			{deed.tiers.map((t, i) => (
-				<span key={t.id} className='ds-dh-crystal' data-state={t.state}>
-					<img src={crystalSrc(i, done)} alt='' />
-				</span>
-			))}
-		</span>
-	);
-};
+/** The list shows points only; the gems are the extra the Claim button pays */
+const pointsText = (t: Pick<DeedTierVM, 'points'>) => `${t.points} pts`;
+const ladderText = (t: Pick<DeedTierVM, 'gems' | 'points'>) => `${t.points} pts · +${t.gems} gems on claim`;
 
-const rewardText = (t: Pick<DeedTierVM, 'gems' | 'points'>) => `${t.gems} gems · ${t.points} pts`;
+/** The picture of a deed; a deed without art yet shows a medal silhouette */
+const DeedIcon: React.FC<{ deed: DeedVM }> = ({ deed }) => <img src={deed.icon} alt='' data-placeholder={deed.placeholder || undefined} />;
 
 export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 	deeds,
@@ -188,7 +171,6 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 						<span>Milestones</span>
 						<span className='ds-dim'>{milestones.filter((m) => m.state === 'ready').length || milestones.length}</span>
 					</button>
-					<p className='ds-cats-note'>Finish a tier and claim it: its points count only after the claim.</p>
 				</Inset>
 				{inMilestones ? (
 					<Panel parchment className='ds-ledger ds-detail ds-dh-ms'>
@@ -216,9 +198,11 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 					<>
 						<div className='ds-dh-listcol'>
 							<div className='ds-dh-tools'>
-								<Dropdown label='Sort' value={sort} onChange={(v) => setSort(v as Sort)} options={SORTS} />
-								<Dropdown label='Tag' value={tag} onChange={setTag} options={[['all', 'Any tag'], ...tags.map((t): [string, string] => [t, t])]} />
 								<span className='ds-dim'>{list.length} deeds</span>
+								<span className='ds-dh-filters'>
+									<Dropdown label='Sort' value={sort} onChange={(v) => setSort(v as Sort)} options={SORTS} />
+									<Dropdown label='Tag' value={tag} onChange={setTag} options={[['all', 'Any tag'], ...tags.map((t): [string, string] => [t, t])]} />
+								</span>
 							</div>
 							<div className='ds-gloss-list ds-dh-list'>
 								{list.length === 0 ? <div className='ds-dim ds-dh-empty'>No deeds match.</div> : null}
@@ -241,13 +225,12 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 											onKeyDown={(e) => e.key === 'Enter' && setSel(x.id)}
 										>
 											<span className='ds-deed-icon'>
-												<img src={x.icon} alt='' />
+												<DeedIcon deed={x} />
 											</span>
 											<span className='ds-deed-main'>
 												<span className='ds-deed-name'>
 													{x.name}
 													<DiamondLevel level={claimedCount(x)} max={x.tiers.length} small />
-													<Crystals deed={x} small />
 												</span>
 												<span className='ds-deed-desc'>{n?.text ?? x.desc}</span>
 												<ProgressBar
@@ -259,7 +242,7 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 												/>
 											</span>
 											<span className='ds-deed-side'>
-												<b>{waiting.length > 0 ? rewardText(waiting[0]) : n ? rewardText(n) : 'All claimed'}</b>
+												<b>{waiting.length > 0 ? pointsText(waiting[0]) : n ? pointsText(n) : 'All claimed'}</b>
 												{waiting.length > 0 ? (
 													<Button
 														tone='gold'
@@ -282,7 +265,7 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 							<Panel parchment className='ds-ledger ds-detail'>
 								<div className='ds-detail-head'>
 									<span className='ds-deed-icon ds-deed-icon-lg'>
-										<img src={d.icon} alt='' />
+										<DeedIcon deed={d} />
 									</span>
 									<div>
 										<div className='ds-paper-title'>{d.name}</div>
@@ -290,23 +273,19 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 											{categories.find((c) => c[0] === d.category)?.[1]} ·{' '}
 											{isComplete(d) ? 'All tiers claimed' : `${claimedCount(d)} of ${d.tiers.length} tiers claimed`}
 										</div>
-										<Crystals deed={d} />
+										<DiamondLevel level={claimedCount(d)} max={d.tiers.length} />
 									</div>
 								</div>
 								<p className='ds-paper-text'>{d.lore}</p>
 								<div className='ds-capi'>Tiers</div>
 								{d.tiers.map((t, i) => (
 									<div className='ds-dh-tier' key={t.id} data-state={t.state}>
-										<span className='ds-dh-crystal' data-state={t.state}>
-											<img src={crystalSrc(i, isComplete(d))} alt='' />
-										</span>
+										<i className='ds-gem ds-dh-diamond' data-state={t.state === 'locked' ? 'off' : 'on'} data-waiting={t.state === 'earned' || undefined} />
 										<span className='ds-dh-tier-main' style={{ color: t.state === 'claimed' ? GREEN : t.state === 'earned' ? INK : MUTED }}>
 											<b>
 												Tier {i + 1} · {compact(t.goal)}
 											</b>
-											<small>{rewardText(t)}</small>
-											{t.unlocks ? <small className='ds-dh-unlock'>{t.unlocks}</small> : null}
-											{t.earnedText || t.claimedText ? <small>{[t.earnedText, t.claimedText].filter(Boolean).join(' · ')}</small> : null}
+											<small>{ladderText(t)}</small>
 										</span>
 										{t.state === 'earned' ? (
 											<Button tone='gold' size='sm' disabled={busy} onClick={() => onClaim(t.id)}>
@@ -317,6 +296,21 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 										)}
 									</div>
 								))}
+								{d.tiers.some((t) => t.unlocks.length > 0) ? (
+									<>
+										<div className='ds-capi' style={{ marginTop: 12 }}>
+											Special unlocks
+										</div>
+										{d.tiers.flatMap((t, i) =>
+											t.unlocks.map((u) => (
+												<div className='ds-dh-unlockrow' key={t.id + u} data-state={t.state}>
+													<span>{u}</span>
+													<em>Tier {i + 1}</em>
+												</div>
+											)),
+										)}
+									</>
+								) : null}
 								<div className='ds-capi' style={{ marginTop: 12 }}>
 									How to progress
 								</div>

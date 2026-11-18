@@ -72,7 +72,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 100,
+  "line": 103,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 542,
+  "line": 546,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -167,7 +167,18 @@
   "category": "Progression/Deeds",
   "file": "src/catalog/deedMilestones.ts",
   "line": 29,
-  "summary": "The milestones, by claimed deed points (all tiers together are worth about 3,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+4% gold and +4% XP at the top, under `DEED_BONUS_CAP_PCT`). Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.",
+  "summary": "The milestones, by claimed deed points (all tiers together are worth about 7,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+5% gold and +5% XP at the top, exactly at `DEED_BONUS_CAP_PCT`). Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.",
+  "see": []
+ },
+ {
+  "id": "tiergems",
+  "name": "tierGems",
+  "symbol": "tierGems",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/catalog/deedRewards.ts",
+  "line": 17,
+  "summary": "Gems paid for tier `index` (0-based) of a deed: 50, 75, 100, 125 ...",
   "see": []
  },
  {

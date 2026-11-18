@@ -18,7 +18,7 @@ export interface DeedMilestone {
 export const DEED_BONUS_CAP_PCT = 5;
 
 /**
- * The milestones, by claimed deed points (all tiers together are worth about 3,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+4% gold and +4% XP at the top, under `DEED_BONUS_CAP_PCT`).
+ * The milestones, by claimed deed points (all tiers together are worth about 7,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+5% gold and +5% XP at the top, exactly at `DEED_BONUS_CAP_PCT`).
  * Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.
  *
  * @title Deed milestones
@@ -35,6 +35,8 @@ export const DEED_MILESTONES: readonly DeedMilestone[] = [
 	{ id: 'dm_1500', points: 1500, gems: 200, bonus: { stat: 'xp', pct: 1 } },
 	{ id: 'dm_2250', points: 2250, gems: 300, bonus: { stat: 'gold', pct: 1 } },
 	{ id: 'dm_3000', points: 3000, gems: 500, bonus: { stat: 'xp', pct: 1 } },
+	{ id: 'dm_4500', points: 4500, gems: 600, bonus: { stat: 'gold', pct: 1 } },
+	{ id: 'dm_6000', points: 6000, gems: 800, bonus: { stat: 'xp', pct: 1 } },
 ];
 
 export const milestoneById = (id: string): DeedMilestone | undefined => DEED_MILESTONES.find((m) => m.id === id);

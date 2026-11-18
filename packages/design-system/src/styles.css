@@ -6007,7 +6007,7 @@ button.ds-income-head:hover {
 	flex: 1;
 	min-height: 0;
 	display: grid;
-	grid-template-columns: 170px minmax(0, 1fr) minmax(280px, 340px);
+	grid-template-columns: 170px minmax(0, 1fr) minmax(340px, 440px);
 	gap: 10px;
 }
 
@@ -6024,15 +6024,25 @@ button.ds-income-head:hover {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
-	overflow: hidden !important;
+	/* the filter menus open over the list, so the column itself must not clip; only the list scrolls */
+	overflow: visible !important;
 }
 
 .ds-dh-tools {
 	flex: none;
+	position: relative;
+	z-index: 20;
 	display: flex;
 	align-items: center;
+	justify-content: space-between;
 	flex-wrap: wrap;
 	gap: 6px 10px;
+}
+
+.ds-dh-filters {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 }
 
 .ds-dh-list {
@@ -6057,68 +6067,59 @@ button.ds-income-head:hover {
 	background: color-mix(in srgb, var(--ds-gold) 8%, rgba(0, 0, 0, 0.4));
 }
 
-.ds-dh-crystals {
-	display: inline-flex;
-	align-items: center;
-	gap: 3px;
-	margin-left: 2px;
-}
-
-.ds-dh-crystal {
-	display: inline-grid;
-	place-items: center;
-	width: 26px;
-	height: 26px;
+.ds-dh-diamond {
 	flex: none;
+	justify-self: center;
 }
 
-.ds-dh-crystals[data-small] .ds-dh-crystal {
-	width: 20px;
-	height: 20px;
-}
-
-.ds-dh-crystal img {
-	max-width: 100%;
-	max-height: 100%;
-	object-fit: contain;
-	image-rendering: pixelated;
-}
-
-.ds-dh-crystal[data-state='locked'] img {
-	filter: grayscale(1) brightness(0.55);
-	opacity: 0.5;
-}
-
-.ds-dh-crystal[data-state='earned'] img {
+.ds-dh-diamond[data-waiting] {
 	animation: ds-dh-pulse 1.4s ease-in-out infinite;
-}
-
-.ds-dh-crystal[data-state='claimed'] img {
-	filter: drop-shadow(0 0 3px rgba(255, 214, 120, 0.55));
 }
 
 @keyframes ds-dh-pulse {
 	0%,
 	100% {
-		filter: drop-shadow(0 0 2px rgba(255, 214, 120, 0.4));
-		transform: scale(1);
+		filter: drop-shadow(0 0 2px rgba(244, 193, 60, 0.5));
 	}
 	50% {
-		filter: drop-shadow(0 0 7px rgba(255, 230, 150, 0.95));
-		transform: scale(1.12);
+		filter: drop-shadow(0 0 7px rgba(255, 230, 150, 1));
 	}
 }
 
 @media (prefers-reduced-motion: reduce) {
-	.ds-dh-crystal[data-state='earned'] img {
+	.ds-dh-diamond[data-waiting] {
 		animation: none;
-		filter: drop-shadow(0 0 5px rgba(255, 230, 150, 0.9));
 	}
+}
+
+/* a deed without art yet: the shared medal as a silhouette */
+.ds-deed-icon img[data-placeholder] {
+	filter: brightness(0) opacity(0.45);
+}
+
+.ds-dh-unlockrow {
+	display: flex;
+	justify-content: space-between;
+	gap: 8px;
+	padding: 4px 2px;
+	font-size: 13px;
+	color: #2c5d9a;
+	border-bottom: 1px dashed rgba(106, 75, 36, 0.35);
+}
+
+.ds-dh-unlockrow[data-state='locked'] {
+	color: #8a7a5a;
+}
+
+.ds-dh-unlockrow em {
+	font-style: normal;
+	font-size: 12px;
+	color: #8a7a5a;
 }
 
 .ds-dh-tier {
 	display: grid;
-	grid-template-columns: 30px 1fr auto;
+	grid-template-columns: 22px 1fr auto;
 	align-items: center;
 	gap: 8px;
 	padding: 4px 2px;

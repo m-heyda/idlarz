@@ -39,13 +39,13 @@ const facts = (patch: Partial<AchievementFacts> = {}, stats: Partial<LifetimeSta
 });
 const ids = (f: AchievementFacts) => achievementsDue(f).map((a) => a.id);
 
-test('the catalog is the launch set plus the Beta tester (13 achievements, 800 gems, 5 avatars) with the deed tiers appended after it, unique ids', () => {
+test('the catalog is the launch set plus the Beta tester (13 achievements, 925 gems, 5 avatars) with the deed tiers appended after it, unique ids', () => {
 	const launch = ACHIEVEMENTS.slice(0, 13);
 	assert.equal(launch[12].id, 'beta_tester', 'the launch ids keep their places');
 	assert.equal(new Set(ACHIEVEMENTS.map((a) => a.id)).size, ACHIEVEMENTS.length);
 	assert.equal(
 		launch.reduce((sum, a) => sum + a.rewards.gems, 0),
-		800,
+		925,
 	);
 	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 400));
 	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5);
@@ -95,7 +95,7 @@ test('earning pays nothing and is idempotent; the Claim pays once, an unknown, u
 	const ledger = newLedger(T0);
 	const first = earnAchievements(ledger, ['first_tile', 'castle_10', 'not-an-achievement'], T0 + 5);
 	assert.deepEqual(first.unlocked, [
-		{ id: 'first_tile', gems: 25 },
+		{ id: 'first_tile', gems: 50 },
 		{ id: 'castle_10', gems: 100 },
 	]);
 	assert.equal(first.ledger.gems, STARTING_GEMS, 'earning pays nothing: the player claims');
@@ -230,7 +230,7 @@ test('a request that finds an achievement due records it once, tells the browser
 
 	const paid = ok(await syncTickets(m.deps, 'u1', T0 + 2000));
 	assert.deepEqual(paid.achievements?.fresh, [
-		{ id: 'first_chest', gems: 25 },
+		{ id: 'first_chest', gems: 50 },
 		{ id: 'golden_kill', gems: 50 },
 	]);
 	assert.equal(paid.achievements?.gemsTotal, before.gems, 'earning pays nothing');
@@ -272,7 +272,7 @@ test('requests at the same moment record once (the ledger write is a compare-and
 		gemsStep(m.deps, 'u1', 'claim-race-0001', { action: 'claim', id: 'first_chest' }, T0 + 3000, null),
 		gemsStep(m.deps, 'u1', 'claim-race-0002', { action: 'claim', id: 'first_chest' }, T0 + 3000, null),
 	]);
-	assert.equal(m.ledgers.get('u1')!.gems, before + 25);
+	assert.equal(m.ledgers.get('u1')!.gems, before + 50);
 });
 
 test('a failed mirror never blocks or repeats an unlock', async () => {
@@ -348,10 +348,10 @@ test('Claim all pays every waiting tier in one write, records each id, and refus
 	const all = claimAllAchievements(ledger, T0 + 20);
 	assert.ok(all.ok);
 	if (!all.ok) return;
-	assert.equal(all.gems, 25 + 100 + 25);
+	assert.equal(all.gems, 50 + 100 + 50);
 	assert.deepEqual(all.claimed, ['first_tile', 'castle_10', 'slayer_100']);
-	assert.equal(all.ledger.gems, STARTING_GEMS + 150);
-	assert.equal(all.ledger.granted.gems, 150);
+	assert.equal(all.ledger.gems, STARTING_GEMS + 200);
+	assert.equal(all.ledger.granted.gems, 200);
 	assert.deepEqual(all.ledger.stats.claimed, ['first_tile', 'castle_10', 'slayer_100']);
 	assert.equal(all.ledger.stats.claimedAt.castle_10, T0 + 20);
 	assert.deepEqual(claimAllAchievements(all.ledger, T0 + 30), { ok: false, reason: 'nothing_to_claim' });
@@ -399,15 +399,15 @@ test('a Claim all request over the wire pays once and replays on the same key', 
 	const before = m.ledgers.get('u1')!.gems;
 	const first = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3000, null));
 	assert.equal(first.ok, true);
-	assert.equal(first.paid, 75);
+	assert.equal(first.paid, 100);
 	assert.deepEqual(first.claimedIds, ['first_chest', 'golden_kill']);
-	assert.equal(first.gems, before + 75);
+	assert.equal(first.gems, before + 100);
 	assert.deepEqual(first.achievements?.claimed, ['first_chest', 'golden_kill']);
 	const replay = ok(await gemsStep(m.deps, 'u1', 'claimall-key-001', { action: 'claimAll' }, T0 + 3001, null));
 	assert.deepEqual(replay, first);
 	const again = ok(await gemsStep(m.deps, 'u1', 'claimall-key-002', { action: 'claimAll' }, T0 + 4000, null));
 	assert.equal(again.ok, false);
-	assert.equal(m.ledgers.get('u1')!.gems, before + 75);
+	assert.equal(m.ledgers.get('u1')!.gems, before + 100);
 });
 
 // IDL-309: a mastery claim over the wire

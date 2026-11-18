@@ -20792,12 +20792,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"code"
+		],
 		"name": "badge_star_bronze",
 		"category": "ui",
 		"subcategory": "achievement badges (not wired)",
 		"src": "/pixel/achievements/badge_star_bronze.png",
-		"status": "unused",
+		"status": "used",
 		"source": "achievements",
 		"size": [
 			64,
@@ -21471,110 +21473,6 @@
 		"size": [
 			143,
 			143
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_violet_1",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_violet_1.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_violet_2",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_violet_2.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_violet_3",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_violet_3.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_violet_4",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_violet_4.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			16,
-			16
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_yellow_1",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_yellow_1.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_yellow_2",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_yellow_2.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_yellow_3",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_yellow_3.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ui_crystal_yellow_4",
-		"category": "ui",
-		"subcategory": "frames and bars",
-		"src": "/pixel/ui/deeds/crystal_yellow_4.png",
-		"status": "used",
-		"source": "public/pixel/ui",
-		"size": [
-			16,
-			16
 		]
 	},
 	{
