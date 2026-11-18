@@ -23,6 +23,8 @@ import TileMonster from './TileMonster';
 import TileTooltip from './TileTooltip';
 import { openTileMenu } from './TileMenu';
 import { buildingDef } from '@/catalog/buildings';
+import { buildingUpgradeDuration } from '@/lib/buildings';
+import { idolEconomy } from '@/lib/idolEconomy';
 
 const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = false }) => {
 	const { game, onTile, drag } = useMapSource();
@@ -70,9 +72,19 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 	// A running upgrade of the building here ("to level 3" = 3) or the first build of an Idol on this empty tile (level 1): the badge shows the level with an up arrow, the first build is drawn faded with its timer
 	const upgradeKey = game((state) => {
 		const job = isOwned ? (state.buildingUpgrades ?? []).find((u) => u.x === x && u.y === y) : undefined;
-		return job ? `${job.toLevel}|${job.building ?? ''}|${castleTimerLabel({ remainingSec: job.remainingSec }) ?? ''}` : '';
+		if (!job) return '';
+		// the share of the whole timer that is done, for the purple bar under the building (read from the job's own building: a first Idol build has none on the tile yet)
+		const def = buildingDef(job.building ?? getTile(state.tiles, x, y)?.building);
+		const total = buildingUpgradeDuration(
+			job.toLevel - 1,
+			state.prestige,
+			idolEconomy(state.tiles, state.idolLevels ?? {}).buildTimePct,
+			def?.kind === 'idol' ? 'idol' : 'building',
+		);
+		const done = total > 0 ? Math.min(1, Math.max(0, 1 - job.remainingSec / total)) : 0;
+		return `${job.toLevel}|${job.building ?? ''}|${castleTimerLabel({ remainingSec: job.remainingSec }) ?? ''}|${done.toFixed(3)}`;
 	});
-	const [, upgradeBuildingId, upgradeLabel] = upgradeKey ? upgradeKey.split('|') : [];
+	const [, upgradeBuildingId, upgradeLabel, upgradeDone] = upgradeKey ? upgradeKey.split('|') : [];
 	const constructing = !building && upgradeBuildingId ? buildingDef(upgradeBuildingId) : undefined;
 	const upgrading = !!upgradeKey && !!building;
 
@@ -245,6 +257,11 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 						<span className='tile-badge' title={upgrading ? 'Being upgraded' : undefined}>
 							{buildingLevel}
 							{upgrading ? '↑' : ''}
+						</span>
+					)}
+					{upgradeKey && (
+						<span className='tile-build-bar' aria-hidden title={upgradeLabel ? `${upgradeLabel} left` : undefined}>
+							<span className='tile-build-bar-fill' style={{ transform: `scaleX(${upgradeDone})` }} />
 						</span>
 					)}
 					{constructing && (

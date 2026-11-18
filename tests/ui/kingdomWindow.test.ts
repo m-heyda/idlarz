@@ -6,6 +6,7 @@ import { DEFAULT_WINDOW_POS, useWindowStore, WIN_IDS } from '../../src/stores/wi
 import { kingdomSummary } from '../../src/lib/kingdomSummary';
 import { BUILDINGS } from '../../src/catalog/buildings';
 import { limitOf } from '../../src/lib/limits';
+import { useGameStore } from '../../src/stores/gameStore';
 import { api, freshGame } from '../helpers';
 
 // The Kingdom overview: a pure summary of the realm and the window that draws it. (node has no CSS loader: the imports are made no-ops before the component loads.)
@@ -54,4 +55,9 @@ test('an open Kingdom overview shows the castle, land, buildings and monsters se
 	assert.match(out, /Land/);
 	assert.match(out, /Buildings \(0 of /);
 	assert.match(out, /Monsters on the map/);
+	assert.match(out, /kingdom-heatmap/, 'the land is a heatmap of squares');
+	// (a static render reads the store's initial state, which already owns its starter land)
+	const landTiles = kingdomSummary(useGameStore.getInitialState()).land.byBiome.reduce((sum, row) => sum + row.count, 0);
+	assert.ok(landTiles > 0);
+	assert.equal((out.match(/class="kd-cell"/g) ?? []).length, landTiles, 'one square per owned tile');
 });

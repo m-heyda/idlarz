@@ -1,3 +1,4 @@
+import { slotlessItemLabel } from '@/lib/itemCategory';
 import React from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { ItemTooltip, TipLine, TipSection } from '../../../../packages/design-system/src/components/tooltips';
@@ -83,7 +84,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 	const baseSell = item ? sellValueOf(item) : def.sellValue;
 	const sellPrice = sellPayout(baseSell, 1, sellCtx);
 
-	const slotLabel = def.slot ? slotName(def.slot) : 'Consumable';
+	const slotLabel = def.slot ? slotName(def.slot) : slotlessItemLabel(def);
 	// With a comparison the set block previews the swap, so the hovered piece already counts as worn
 	const shown: Equipment = comparison ? comparison.after : equipment;
 	const equippedIds = Object.values(shown).map((worn) => worn?.base);
