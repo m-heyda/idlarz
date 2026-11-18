@@ -55,7 +55,7 @@ export const badgeOptions = (earned: readonly string[]): BadgeInfo[] => [
 export const titleOptions = (earned: readonly string[]): TitleOption[] => [
 	...ACHIEVEMENTS.filter((a) => a.rewards.titleId && earned.includes(a.id)).map((a) => ({
 		id: a.rewards.titleId as string,
-		name: a.title,
+		name: a.rewards.titleName ?? a.title,
 		achievementId: a.id,
 	})),
 	...(earned.includes(ADMIN_UNLOCK) ? [{ id: ADMIN_TITLE_ID, name: 'Dev', achievementId: ADMIN_UNLOCK }] : []),

@@ -14,7 +14,7 @@ article{background:var(--card);border:1px solid var(--line);border-radius:8px;pa
 small{color:var(--muted);font-weight:400;font-size:12px}table{border-collapse:collapse;display:block;overflow:auto;margin:8px 0}th,td{border:1px solid var(--line);padding:3px 8px;text-align:left;vertical-align:top}th{background:var(--code)}
 .hidden{display:none}.blurb{color:var(--muted)}
 @media (max-width:800px){.layout{display:block}nav{position:static;width:auto;height:auto;max-height:260px}main{padding:8px 16px 60px}}
-</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="rebirth-biome-output" href="#rebirth-biome-output">REBIRTH_BIOME_OUTPUT</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-ward" href="#castle-ward">CASTLE_WARD</a><a data-id="isinward" href="#isinward">isInWard</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="sellresource" href="#sellresource">sellResource</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><a data-id="buyresource" href="#buyresource">buyResource</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><div class="sub">Buildings</div><a data-id="buildings-flag" href="#buildings-flag">BUILDINGS_FLAG</a><a data-id="building-rules" href="#building-rules">BUILDING_RULES</a><a data-id="buildings" href="#buildings">BUILDINGS</a><a data-id="produceroutput" href="#produceroutput">producerOutput</a><a data-id="extractoroutput" href="#extractoroutput">extractorOutput</a><a data-id="buildingupgradeduration" href="#buildingupgradeduration">buildingUpgradeDuration</a><a data-id="idols" href="#idols">IDOLS</a><a data-id="buildinglevelcost" href="#buildinglevelcost">buildingLevelCost</a><a data-id="idol-rules" href="#idol-rules">IDOL_RULES</a><a data-id="buildercount" href="#buildercount">builderCount</a><a data-id="idoleconomy" href="#idoleconomy">idolEconomy</a><div class="sub">Gems</div><a data-id="gem-shop" href="#gem-shop">GEM_SHOP</a><a data-id="daily-bonus-gems" href="#daily-bonus-gems">DAILY_BONUS_GEMS</a><a data-id="daily-chest" href="#daily-chest">DAILY_CHEST</a><a data-id="dailyinfo" href="#dailyinfo">dailyInfo</a><a data-id="rolldailychest" href="#rolldailychest">rollDailyChest</a><a data-id="applyspend" href="#applyspend">applySpend</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="autouseunlocked" href="#autouseunlocked">autoUseUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="potioncooldownsec" href="#potioncooldownsec">potionCooldownSec</a><a data-id="potionpower" href="#potionpower">potionPower</a><a data-id="potionslotcount" href="#potionslotcount">potionSlotCount</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><div class="sub">Bestiary</div><a data-id="meta" href="#meta">META</a><a data-id="family-drops" href="#family-drops">FAMILY_DROPS</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><a data-id="boss-loot" href="#boss-loot">BOSS_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><div class="sub">Junk</div><a data-id="isjunk" href="#isjunk">isJunk</a><a data-id="junksale" href="#junksale">junkSale</a><a data-id="selljunkrule" href="#selljunkrule">sellJunkRule</a><a data-id="rolljunkdrops" href="#rolljunkdrops">rollJunkDrops</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="attributebudget" href="#attributebudget">attributeBudget</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="allocatepoints" href="#allocatepoints">allocatePoints</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><a data-id="keepref" href="#keepref">KeepRef</a><a data-id="rebirthunlockintro" href="#rebirthunlockintro">rebirthUnlockIntro</a><a data-id="rebirthrunsummary" href="#rebirthrunsummary">rebirthRunSummary</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><a data-id="beltslotsfor" href="#beltslotsfor">beltSlotsFor</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="craftxpof" href="#craftxpof">craftXpOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><div class="sub">Rankings</div><a data-id="ranking-boards" href="#ranking-boards">The boards</a><a data-id="movement" href="#movement">Movement arrows</a><div class="sub">Mastery</div><a data-id="boss-mastery-tiers" href="#boss-mastery-tiers">BOSS_MASTERY_TIERS</a><a data-id="biome-goals" href="#biome-goals">BIOME_GOALS</a><a data-id="mastery-caps" href="#mastery-caps">MASTERY_CAPS</a><a data-id="claimmastery" href="#claimmastery">claimMastery</a><a data-id="claimbiomegoal" href="#claimbiomegoal">claimBiomeGoal</a><a data-id="claimallmastery" href="#claimallmastery">claimAllMastery</a><a data-id="masterybonusesfor" href="#masterybonusesfor">masteryBonusesFor</a><a data-id="mastery-tiers" href="#mastery-tiers">Bestiary mastery</a><div class="sub">Avatars</div><a data-id="unlockedavatarids" href="#unlockedavatarids">unlockedAvatarIds</a><a data-id="checkavatar" href="#checkavatar">checkAvatar</a><a data-id="class-avatars" href="#class-avatars">CLASS_AVATARS</a><a data-id="avatarinfo" href="#avatarinfo">Avatars</a><a data-id="createavatarpicker" href="#createavatarpicker">createAvatarPicker</a><div class="sub">Pets</div><a data-id="petdef" href="#petdef">PetDef</a><a data-id="nextwanderstep" href="#nextwanderstep">nextWanderStep</a><a data-id="pickpetphrase" href="#pickpetphrase">pickPetPhrase</a><a data-id="applypets" href="#applypets">applyPets</a><div class="sub">Class passives</div><a data-id="classpassives" href="#classpassives">classPassives</a><a data-id="classxpbucket" href="#classxpbucket">classXpBucket</a><a data-id="starter-equipment-by-class" href="#starter-equipment-by-class">STARTER_EQUIPMENT_BY_CLASS</a><div class="sub">Achievements</div><a data-id="settleachievements" href="#settleachievements">settleAchievements</a><a data-id="claimachievement" href="#claimachievement">claimAchievement</a><a data-id="worldfacts" href="#worldfacts">worldFacts</a><a data-id="recordcuriosity" href="#recordcuriosity">recordCuriosity</a><a data-id="achievements" href="#achievements">Achievements</a><div class="sub">Guided tutorial</div><a data-id="guidevisiblefor" href="#guidevisiblefor">guideVisibleFor</a><a data-id="buildnumbers" href="#buildnumbers">buildNumbers</a><a data-id="readprogress" href="#readprogress">readProgress</a><a data-id="applytutorial" href="#applytutorial">applyTutorial</a><a data-id="tutorialguide" href="#tutorialguide">TutorialGuide</a><a data-id="tutorial-path" href="#tutorial-path">The guided tutorial</a><div class="sub">Badges</div><a data-id="nick-colors" href="#nick-colors">NICK_COLORS</a><a data-id="nick-effects" href="#nick-effects">NICK_EFFECTS</a><a data-id="badgeoptions" href="#badgeoptions">badgeOptions</a><div class="sub">Deeds</div><a data-id="claimallachievements" href="#claimallachievements">claimAllAchievements</a><a data-id="deeds" href="#deeds">Deeds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><a data-id="bodyupgrade" href="#bodyupgrade">BodyUpgrade</a><a data-id="upgradebody" href="#upgradebody">upgradeBody</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="restoretrust" href="#restoretrust">restoreTrust</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="settleidols" href="#settleidols">settleIdols</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><a data-id="finite" href="#finite">finite</a><a data-id="ledgerrowupgrade" href="#ledgerrowupgrade">LedgerRowUpgrade</a><a data-id="statswithouttutorial" href="#statswithouttutorial">statsWithoutTutorial</a><a data-id="loadbootsnapshot" href="#loadbootsnapshot">loadBootSnapshot</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><a data-id="get" href="#get">GET /api/rankings</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="awayblockof" href="#awayblockof">awayBlockOf</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><div class="sub">Migrations</div><a data-id="refundoldshop" href="#refundoldshop">refundOldShop</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Notifications</div><a data-id="notify" href="#notify">Short notices (notify)</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="npc-portraits" href="#npc-portraits">NPC_PORTRAITS</a><a data-id="biome-art" href="#biome-art">BIOME_ART</a><a data-id="animal-pixel-icons" href="#animal-pixel-icons">ANIMAL_PIXEL_ICONS</a><a data-id="animalicon" href="#animalicon">animalIcon</a><div class="sub">Guest mode</div><a data-id="guest-mode" href="#guest-mode">Guest mode</a><a data-id="guestpage" href="#guestpage">Guest game (/guest)</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><a data-id="the-class-picker-acceptance" href="#the-class-picker-acceptance">The class picker acceptance</a><a data-id="the-local-sim-runner" href="#the-local-sim-runner">The local sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><a data-id="the-generated-docs-inputs-hash" href="#the-generated-docs-inputs-hash">The generated-docs inputs hash</a><a data-id="the-local-verify-script-and-the-pre-push-hook" href="#the-local-verify-script-and-the-pre-push-hook">The local verify script and the pre-push hook</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="giving-a-flagged-account-its-trust-back-restore-trust" href="#giving-a-flagged-account-its-trust-back-restore-trust">Giving a flagged account its trust back (restore-trust)</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a><a data-id="turning-enforcement-and-the-server-run-rebirth-on-together" href="#turning-enforcement-and-the-server-run-rebirth-on-together">Turning enforcement and the server-run rebirth on together</a><a data-id="rehearsal-seeding-seed-rehearsal" href="#rehearsal-seeding-seed-rehearsal">Rehearsal seeding (seed-rehearsal)</a><a data-id="rehearsal-seeding-the-pure-part" href="#rehearsal-seeding-the-pure-part">Rehearsal seeding (the pure part)</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
+</style></head><body><div class="layout"><nav><input id="q" type="search" placeholder="Search the reference" aria-label="Search"><a href="symbols.md">Symbol index</a><a href="known-issues.md">Known issues</a><a href="code-map.md">Code map</a><h3><a href="#cat-overview">Overview</a></h3><div class="sub">The game</div><a data-id="the-game-at-a-glance" href="#the-game-at-a-glance">The game at a glance</a><a data-id="conventions" href="#conventions">Conventions</a><h3><a href="#cat-economy">Economy</a></h3><div class="sub">Basics</div><a data-id="tick-rate" href="#tick-rate">Basics: tick, caps, start</a><a data-id="max-catchup-sec" href="#max-catchup-sec">MAX_CATCHUP_SEC</a><a data-id="resource-cap" href="#resource-cap">RESOURCE_CAP</a><a data-id="initial-resources" href="#initial-resources">INITIAL_RESOURCES</a><div class="sub">Income</div><a data-id="calculateresourcebreakdown" href="#calculateresourcebreakdown">calculateResourceBreakdown</a><a data-id="calculatetileoutput" href="#calculatetileoutput">calculateTileOutput</a><a data-id="biome-yield" href="#biome-yield">BIOME_YIELD</a><a data-id="base-generation-rates" href="#base-generation-rates">BASE_GENERATION_RATES</a><div class="sub">Tiles</div><a data-id="tileprice" href="#tileprice">tilePrice</a><a data-id="tile-resource-cost" href="#tile-resource-cost">TILE_RESOURCE_COST</a><a data-id="calculatetilecost" href="#calculatetilecost">calculateTileCost</a><a data-id="effectivetilediscount" href="#effectivetilediscount">effectiveTileDiscount</a><a data-id="calculatexpgain" href="#calculatexpgain">calculateXpGain</a><a data-id="economytiles" href="#economytiles">economyTiles</a><div class="sub">Biomes</div><a data-id="rollbiome" href="#rollbiome">rollBiome</a><a data-id="biomes" href="#biomes">BIOMES</a><a data-id="rebirth-biome-output" href="#rebirth-biome-output">REBIRTH_BIOME_OUTPUT</a><a data-id="generatestartring" href="#generatestartring">generateStartRing</a><div class="sub">Castle</div><a data-id="castle-upgrade" href="#castle-upgrade">CASTLE_UPGRADE</a><a data-id="castlemodifier" href="#castlemodifier">castleModifier</a><a data-id="castleupgradeduration" href="#castleupgradeduration">castleUpgradeDuration</a><a data-id="castle-range" href="#castle-range">CASTLE_RANGE</a><a data-id="castle-area-bonus" href="#castle-area-bonus">CASTLE_AREA_BONUS</a><a data-id="castle-ward" href="#castle-ward">CASTLE_WARD</a><a data-id="isinward" href="#isinward">isInWard</a><a data-id="castlerangeradius" href="#castlerangeradius">castleRangeRadius</a><a data-id="castleareabonus" href="#castleareabonus">castleAreaBonus</a><div class="sub">Farm</div><a data-id="animals" href="#animals">ANIMALS</a><a data-id="animaloutput" href="#animaloutput">animalOutput</a><a data-id="farm-upgrades" href="#farm-upgrades">FARM_UPGRADES</a><a data-id="calculateanimalcost" href="#calculateanimalcost">calculateAnimalCost</a><a data-id="farmupgradecost" href="#farmupgradecost">farmUpgradeCost</a><a data-id="calculatefarmoutput" href="#calculatefarmoutput">calculateFarmOutput</a><div class="sub">Merchant</div><a data-id="merchant-resource-prices" href="#merchant-resource-prices">MERCHANT_RESOURCE_PRICES</a><a data-id="merchant-goods" href="#merchant-goods">MERCHANT_GOODS</a><a data-id="merchant-upgrades" href="#merchant-upgrades">MERCHANT_UPGRADES</a><a data-id="sellpayout" href="#sellpayout">sellPayout</a><a data-id="buycost" href="#buycost">buyCost</a><a data-id="merchant-buy-multiplier" href="#merchant-buy-multiplier">MERCHANT_BUY_MULTIPLIER</a><a data-id="merchantupgradecost" href="#merchantupgradecost">merchantUpgradeCost</a><a data-id="generatemerchantstock" href="#generatemerchantstock">generateMerchantStock</a><a data-id="shoppriceof" href="#shoppriceof">shopPriceOf</a><a data-id="refreshcost" href="#refreshcost">refreshCost</a><a data-id="sellresource" href="#sellresource">sellResource</a><a data-id="bestworngrade" href="#bestworngrade">bestWornGrade</a><a data-id="buyresource" href="#buyresource">buyResource</a><div class="sub">Clicks</div><a data-id="click-ladder" href="#click-ladder">CLICK_LADDER</a><a data-id="click-limit" href="#click-limit">CLICK_LIMIT</a><a data-id="clickgold" href="#clickgold">clickGold</a><a data-id="createclicklimiter" href="#createclicklimiter">createClickLimiter</a><div class="sub">Chests and Luck</div><a data-id="chest" href="#chest">CHEST</a><a data-id="luck" href="#luck">LUCK</a><a data-id="chestintervalsec" href="#chestintervalsec">chestIntervalSec</a><a data-id="chestspots" href="#chestspots">chestSpots</a><a data-id="rewardweights" href="#rewardweights">rewardWeights</a><a data-id="rollchestloot" href="#rollchestloot">rollChestLoot</a><a data-id="gemchance" href="#gemchance">gemChance</a><a data-id="rarityluckmultiplier" href="#rarityluckmultiplier">rarityLuckMultiplier</a><a data-id="dropchancemultiplier" href="#dropchancemultiplier">dropChanceMultiplier</a><a data-id="goldenmonsterchance" href="#goldenmonsterchance">goldenMonsterChance</a><div class="sub">Crafting</div><a data-id="trade-goods" href="#trade-goods">TRADE_GOODS</a><a data-id="gear-recipes" href="#gear-recipes">GEAR_RECIPES</a><a data-id="ingredients" href="#ingredients">INGREDIENTS</a><div class="sub">Buildings</div><a data-id="buildings-flag" href="#buildings-flag">BUILDINGS_FLAG</a><a data-id="building-rules" href="#building-rules">BUILDING_RULES</a><a data-id="buildings" href="#buildings">BUILDINGS</a><a data-id="produceroutput" href="#produceroutput">producerOutput</a><a data-id="extractoroutput" href="#extractoroutput">extractorOutput</a><a data-id="buildingupgradeduration" href="#buildingupgradeduration">buildingUpgradeDuration</a><a data-id="idols" href="#idols">IDOLS</a><a data-id="buildinglevelcost" href="#buildinglevelcost">buildingLevelCost</a><a data-id="idol-rules" href="#idol-rules">IDOL_RULES</a><a data-id="buildercount" href="#buildercount">builderCount</a><a data-id="idoleconomy" href="#idoleconomy">idolEconomy</a><div class="sub">Gems</div><a data-id="gem-shop" href="#gem-shop">GEM_SHOP</a><a data-id="daily-bonus-gems" href="#daily-bonus-gems">DAILY_BONUS_GEMS</a><a data-id="daily-chest" href="#daily-chest">DAILY_CHEST</a><a data-id="dailyinfo" href="#dailyinfo">dailyInfo</a><a data-id="rolldailychest" href="#rolldailychest">rollDailyChest</a><a data-id="applyspend" href="#applyspend">applySpend</a><div class="sub">Perk caps</div><a data-id="perk-caps" href="#perk-caps">PERK_CAPS</a><a data-id="legendary-perk-tiers" href="#legendary-perk-tiers">LEGENDARY_PERK_TIERS</a><a data-id="weapon-legendary-damage-top" href="#weapon-legendary-damage-top">WEAPON_LEGENDARY_DAMAGE_TOP</a><a data-id="capperks" href="#capperks">capPerks</a><a data-id="aggregatestats" href="#aggregatestats">aggregateStats</a><h3><a href="#cat-combat">Combat</a></h3><div class="sub">Overview</div><a data-id="combat" href="#combat">Combat overview and tunables</a><div class="sub">Player numbers</div><a data-id="maxhp" href="#maxhp">maxHp</a><a data-id="armorreduction" href="#armorreduction">armorReduction</a><a data-id="weapon-attack-speed" href="#weapon-attack-speed">WEAPON_ATTACK_SPEED</a><a data-id="damageperhit" href="#damageperhit">damagePerHit</a><a data-id="attackspersecond" href="#attackspersecond">attacksPerSecond</a><a data-id="critodds" href="#critodds">critOdds</a><a data-id="swing" href="#swing">swing</a><a data-id="armorof" href="#armorof">armorOf</a><a data-id="dodgechance" href="#dodgechance">dodgeChance</a><a data-id="lifeleechpercent" href="#lifeleechpercent">lifeLeechPercent</a><a data-id="regen" href="#regen">regen</a><a data-id="mitigate" href="#mitigate">mitigate</a><div class="sub">A fight</div><a data-id="runcombat" href="#runcombat">runCombat</a><a data-id="picktarget" href="#picktarget">pickTarget</a><a data-id="queueticket" href="#queueticket">queueTicket</a><a data-id="autobattleunlocked" href="#autobattleunlocked">autoBattleUnlocked</a><a data-id="autouseunlocked" href="#autouseunlocked">autoUseUnlocked</a><a data-id="playerprofile" href="#playerprofile">playerProfile</a><a data-id="fightstep" href="#fightstep">fightStep</a><a data-id="endfight" href="#endfight">endFight</a><a data-id="engage" href="#engage">engage</a><a data-id="dismissticket" href="#dismissticket">dismissTicket</a><a data-id="projectfight" href="#projectfight">projectFight</a><a data-id="paykill" href="#paykill">payKill</a><a data-id="rngfor" href="#rngfor">rngFor</a><div class="sub">Win chance</div><a data-id="winbucketof" href="#winbucketof">winBucketOf</a><a data-id="estimatewin" href="#estimatewin">estimateWin</a><div class="sub">Potions and skills</div><a data-id="healamount" href="#healamount">healAmount</a><a data-id="autouse" href="#autouse">autoUse</a><a data-id="potioncooldownsec" href="#potioncooldownsec">potionCooldownSec</a><a data-id="potionpower" href="#potionpower">potionPower</a><a data-id="potionslotcount" href="#potionslotcount">potionSlotCount</a><a data-id="skills" href="#skills">SKILLS</a><div class="sub">Results and rest</div><a data-id="restthrough" href="#restthrough">restThrough</a><a data-id="unclaimed-sec" href="#unclaimed-sec">UNCLAIMED_SEC</a><div class="sub">Consumables</div><a data-id="buff-families" href="#buff-families">BUFF_FAMILIES</a><a data-id="max-active-buffs" href="#max-active-buffs">MAX_ACTIVE_BUFFS</a><a data-id="readbuffs" href="#readbuffs">readBuffs</a><a data-id="addbuff" href="#addbuff">addBuff</a><a data-id="bufftotals" href="#bufftotals">buffTotals</a><a data-id="drink" href="#drink">drink</a><a data-id="withbuffs" href="#withbuffs">withBuffs</a><a data-id="applyuse" href="#applyuse">applyUse</a><h3><a href="#cat-monsters">Monsters</a></h3><div class="sub">Roster</div><a data-id="monsters" href="#monsters">MONSTERS</a><div class="sub">Level scaling</div><a data-id="monsterstats" href="#monsterstats">monsterStats</a><a data-id="spawnlevelrange" href="#spawnlevelrange">spawnLevelRange</a><a data-id="rollspawnlevel" href="#rollspawnlevel">rollSpawnLevel</a><a data-id="levelatage" href="#levelatage">levelAtAge</a><a data-id="dangerbonus" href="#dangerbonus">dangerBonus</a><div class="sub">Spawning</div><a data-id="advancebank" href="#advancebank">advanceBank</a><a data-id="canspawnon" href="#canspawnon">canSpawnOn</a><a data-id="typeweights" href="#typeweights">typeWeights</a><a data-id="placetickets" href="#placetickets">placeTickets</a><a data-id="ticketcap" href="#ticketcap">ticketCap</a><a data-id="distance-bands" href="#distance-bands">DISTANCE_BANDS</a><a data-id="boss-min-distance" href="#boss-min-distance">BOSS_MIN_DISTANCE</a><a data-id="bandof" href="#bandof">bandOf</a><div class="sub">Rewards</div><a data-id="killincome" href="#killincome">killIncome</a><div class="sub">Bestiary</div><a data-id="meta" href="#meta">META</a><a data-id="family-drops" href="#family-drops">FAMILY_DROPS</a><h3><a href="#cat-loot">Loot</a></h3><div class="sub">Pipeline</div><a data-id="generateloot" href="#generateloot">generateLoot</a><a data-id="validatelootdata" href="#validatelootdata">validateLootData</a><a data-id="resolvesourcelevel" href="#resolvesourcelevel">resolveSourceLevel</a><a data-id="rollitemlevel" href="#rollitemlevel">rollItemLevel</a><a data-id="receivedrops" href="#receivedrops">receiveDrops</a><a data-id="isautosold" href="#isautosold">isAutoSold</a><a data-id="eligiblecandidates" href="#eligiblecandidates">eligibleCandidates</a><a data-id="rollleaning" href="#rollleaning">rollLeaning</a><div class="sub">Config</div><a data-id="loot-sources" href="#loot-sources">LOOT_SOURCES</a><a data-id="loot-profiles" href="#loot-profiles">LOOT_PROFILES</a><a data-id="biome-loot" href="#biome-loot">BIOME_LOOT</a><a data-id="boss-loot" href="#boss-loot">BOSS_LOOT</a><div class="sub">Items</div><a data-id="rarities" href="#rarities">RARITIES</a><a data-id="levelscale" href="#levelscale">levelScale</a><a data-id="valuecurve" href="#valuecurve">valueCurve</a><a data-id="sellvalueof" href="#sellvalueof">sellValueOf</a><a data-id="live-grades" href="#live-grades">LIVE_GRADES</a><a data-id="gradelevels" href="#gradelevels">gradeLevels</a><a data-id="graderarities" href="#graderarities">gradeRarities</a><a data-id="gradelegacyitems" href="#gradelegacyitems">gradeLegacyItems</a><a data-id="kit" href="#kit">kit</a><div class="sub">Adding content</div><a data-id="loot-pools" href="#loot-pools">Adding loot content (data only)</a><a data-id="gear" href="#gear">gear</a><div class="sub">Junk</div><a data-id="isjunk" href="#isjunk">isJunk</a><a data-id="junksale" href="#junksale">junkSale</a><a data-id="selljunkrule" href="#selljunkrule">sellJunkRule</a><a data-id="rolljunkloot" href="#rolljunkloot">rollJunkLoot</a><h3><a href="#cat-progression">Progression</a></h3><div class="sub">Levels</div><a data-id="leveling" href="#leveling">LEVELING</a><a data-id="xptonextlevel" href="#xptonextlevel">xpToNextLevel</a><a data-id="totalstatpoints" href="#totalstatpoints">totalStatPoints</a><a data-id="attributebudget" href="#attributebudget">attributeBudget</a><a data-id="cumulativexp" href="#cumulativexp">cumulativeXp</a><a data-id="allocatepoints" href="#allocatepoints">allocatePoints</a><a data-id="calculatelevel" href="#calculatelevel">calculateLevel</a><a data-id="reconcilecharacter" href="#reconcilecharacter">reconcileCharacter</a><div class="sub">Attributes</div><a data-id="character-stat-config" href="#character-stat-config">CHARACTER_STAT_CONFIG</a><a data-id="calculatestatresourcemodifiers" href="#calculatestatresourcemodifiers">calculateStatResourceModifiers</a><a data-id="calculatecombatstats" href="#calculatecombatstats">calculateCombatStats</a><div class="sub">Rebirth</div><a data-id="rebirth" href="#rebirth">REBIRTH</a><a data-id="embergain" href="#embergain">emberGain</a><a data-id="emberincomebonus" href="#emberincomebonus">emberIncomeBonus</a><a data-id="rebirthstatus" href="#rebirthstatus">rebirthStatus</a><a data-id="keepref" href="#keepref">KeepRef</a><a data-id="rebirthunlockintro" href="#rebirthunlockintro">rebirthUnlockIntro</a><a data-id="rebirthrunsummary" href="#rebirthrunsummary">rebirthRunSummary</a><div class="sub">Ember shop</div><a data-id="ember-upgrades" href="#ember-upgrades">EMBER_UPGRADES</a><a data-id="emberupgradecost" href="#emberupgradecost">emberUpgradeCost</a><div class="sub">Limits</div><a data-id="limits" href="#limits">LIMITS</a><a data-id="limitof" href="#limitof">limitOf</a><a data-id="beltslotsfor" href="#beltslotsfor">beltSlotsFor</a><div class="sub">Gems</div><a data-id="starting-gems" href="#starting-gems">STARTING_GEMS</a><div class="sub">Crafting</div><a data-id="crafting" href="#crafting">CRAFTING</a><a data-id="craft-gear" href="#craft-gear">CRAFT_GEAR</a><a data-id="gearitemlevels" href="#gearitemlevels">gearItemLevels</a><a data-id="qualitybiasof" href="#qualitybiasof">qualityBiasOf</a><a data-id="craftxpof" href="#craftxpof">craftXpOf</a><a data-id="pitymultiplier" href="#pitymultiplier">pityMultiplier</a><a data-id="rollgear" href="#rollgear">rollGear</a><a data-id="gearodds" href="#gearodds">gearOdds</a><div class="sub">Rankings</div><a data-id="ranking-boards" href="#ranking-boards">The boards</a><a data-id="movement" href="#movement">Movement arrows</a><div class="sub">Mastery</div><a data-id="boss-mastery-tiers" href="#boss-mastery-tiers">BOSS_MASTERY_TIERS</a><a data-id="biome-goals" href="#biome-goals">BIOME_GOALS</a><a data-id="mastery-caps" href="#mastery-caps">MASTERY_CAPS</a><a data-id="claimmastery" href="#claimmastery">claimMastery</a><a data-id="claimbiomegoal" href="#claimbiomegoal">claimBiomeGoal</a><a data-id="claimallmastery" href="#claimallmastery">claimAllMastery</a><a data-id="masterybonusesfor" href="#masterybonusesfor">masteryBonusesFor</a><a data-id="mastery-tiers" href="#mastery-tiers">Bestiary mastery</a><div class="sub">Avatars</div><a data-id="unlockedavatarids" href="#unlockedavatarids">unlockedAvatarIds</a><a data-id="checkavatar" href="#checkavatar">checkAvatar</a><a data-id="class-avatars" href="#class-avatars">CLASS_AVATARS</a><a data-id="avatarinfo" href="#avatarinfo">Avatars</a><a data-id="createavatarpicker" href="#createavatarpicker">createAvatarPicker</a><div class="sub">Pets</div><a data-id="petdef" href="#petdef">PetDef</a><a data-id="nextwanderstep" href="#nextwanderstep">nextWanderStep</a><a data-id="pickpetphrase" href="#pickpetphrase">pickPetPhrase</a><a data-id="applypets" href="#applypets">applyPets</a><div class="sub">Class passives</div><a data-id="classpassives" href="#classpassives">classPassives</a><a data-id="classxpbucket" href="#classxpbucket">classXpBucket</a><a data-id="starter-equipment-by-class" href="#starter-equipment-by-class">STARTER_EQUIPMENT_BY_CLASS</a><div class="sub">Achievements</div><a data-id="settleachievements" href="#settleachievements">settleAchievements</a><a data-id="claimachievement" href="#claimachievement">claimAchievement</a><a data-id="worldfacts" href="#worldfacts">worldFacts</a><a data-id="recordcuriosity" href="#recordcuriosity">recordCuriosity</a><a data-id="recordrankplace" href="#recordrankplace">recordRankPlace</a><a data-id="achievements" href="#achievements">Achievements</a><div class="sub">Guided tutorial</div><a data-id="guidevisiblefor" href="#guidevisiblefor">guideVisibleFor</a><a data-id="buildnumbers" href="#buildnumbers">buildNumbers</a><a data-id="readprogress" href="#readprogress">readProgress</a><a data-id="applytutorial" href="#applytutorial">applyTutorial</a><a data-id="tutorialguide" href="#tutorialguide">TutorialGuide</a><a data-id="tutorial-path" href="#tutorial-path">The guided tutorial</a><div class="sub">Badges</div><a data-id="nick-colors" href="#nick-colors">NICK_COLORS</a><a data-id="nick-effects" href="#nick-effects">NICK_EFFECTS</a><a data-id="badgeoptions" href="#badgeoptions">badgeOptions</a><div class="sub">Deeds</div><a data-id="claimallachievements" href="#claimallachievements">claimAllAchievements</a><a data-id="deed-milestones" href="#deed-milestones">Deed milestones</a><a data-id="deedbonuses" href="#deedbonuses">deedBonuses</a><a data-id="claimmilestone" href="#claimmilestone">claimMilestone</a><a data-id="tiergems" href="#tiergems">tierGems</a><a data-id="deeds" href="#deeds">Deeds</a><h3><a href="#cat-saves-and-server">Saves & Server</a></h3><div class="sub">Threat model</div><a data-id="the-server-s-rule-and-the-threat-model" href="#the-server-s-rule-and-the-threat-model">The server's rule and the threat model</a><div class="sub">The save</div><a data-id="save-schema" href="#save-schema">SAVE_SCHEMA</a><a data-id="createsavestorage" href="#createsavestorage">createSaveStorage</a><a data-id="sanitizesave" href="#sanitizesave">sanitizeSave</a><a data-id="persisted-keys" href="#persisted-keys">PERSISTED_KEYS</a><a data-id="save-and-backup-dialog" href="#save-and-backup-dialog">Save and Backup dialog</a><a data-id="bodyupgrade" href="#bodyupgrade">BodyUpgrade</a><a data-id="upgradebody" href="#upgradebody">upgradeBody</a><div class="sub">Uploading</div><a data-id="sync" href="#sync">SYNC</a><a data-id="judgerebase" href="#judgerebase">judgeRebase</a><a data-id="manual-cloud-cooldown-ms" href="#manual-cloud-cooldown-ms">MANUAL_CLOUD_COOLDOWN_MS</a><a data-id="resolveconflict" href="#resolveconflict">resolveConflict</a><a data-id="withpushlock" href="#withpushlock">withPushLock</a><div class="sub">Accepting a save</div><a data-id="acceptsave" href="#acceptsave">acceptSave</a><a data-id="flag-policy" href="#flag-policy">FLAG_POLICY</a><a data-id="trustedeconomy" href="#trustedeconomy">trustedEconomy</a><a data-id="restoretrust" href="#restoretrust">restoreTrust</a><a data-id="xp-model" href="#xp-model">XP_MODEL</a><a data-id="ember-model" href="#ember-model">EMBER_MODEL</a><a data-id="min-save-interval-ms" href="#min-save-interval-ms">MIN_SAVE_INTERVAL_MS</a><a data-id="verifytransition" href="#verifytransition">verifyTransition</a><a data-id="isnonproduction" href="#isnonproduction">isNonProduction</a><a data-id="settleidols" href="#settleidols">settleIdols</a><a data-id="poison-flags" href="#poison-flags">POISON_FLAGS</a><a data-id="losesprogress" href="#losesprogress">losesProgress</a><a data-id="enforcement" href="#enforcement">ENFORCEMENT</a><div class="sub">The ledger</div><a data-id="ledger" href="#ledger">Ledger</a><a data-id="sealedrng" href="#sealedrng">sealedRng</a><a data-id="finite" href="#finite">finite</a><a data-id="ledgerrowupgrade" href="#ledgerrowupgrade">LedgerRowUpgrade</a><a data-id="statswithouttutorial" href="#statswithouttutorial">statsWithoutTutorial</a><a data-id="loadbootsnapshot" href="#loadbootsnapshot">loadBootSnapshot</a><div class="sub">Endpoints</div><a data-id="endpoints-the-api-routes" href="#endpoints-the-api-routes">Endpoints (the API routes)</a><a data-id="get" href="#get">GET /api/rankings</a><div class="sub">Away time</div><a data-id="computeofflinegrant" href="#computeofflinegrant">computeOfflineGrant</a><a data-id="awayblockof" href="#awayblockof">awayBlockOf</a><a data-id="ensureseasonreset" href="#ensureseasonreset">ensureSeasonReset</a><div class="sub">Epoch</div><a data-id="baseline-epoch" href="#baseline-epoch">BASELINE_EPOCH</a><a data-id="startnewchapter" href="#startnewchapter">startNewChapter</a><div class="sub">Browser state</div><a data-id="the-browser-s-half-of-the-data-epoch" href="#the-browser-s-half-of-the-data-epoch">The browser's half of the data epoch</a><div class="sub">Migrations</div><a data-id="refundoldshop" href="#refundoldshop">refundOldShop</a><h3><a href="#cat-architecture">Architecture</a></h3><div class="sub">The loop</div><a data-id="gameapp" href="#gameapp">The tick loop and persistence</a><div class="sub">State</div><a data-id="coord-limit" href="#coord-limit">The map (World)</a><a data-id="gamestate" href="#gamestate">GameState</a><div class="sub">Rendering</div><a data-id="rendering-the-map" href="#rendering-the-map">Rendering the map</a><div class="sub">Notifications</div><a data-id="notify" href="#notify">Short notices (notify)</a><div class="sub">Art</div><a data-id="pixel-art-pipeline" href="#pixel-art-pipeline">Pixel art pipeline</a><a data-id="map-lab" href="#map-lab">Map lab</a><a data-id="the-landing-world" href="#the-landing-world">The landing world</a><a data-id="asset-library" href="#asset-library">Asset library</a><a data-id="npc-portraits" href="#npc-portraits">NPC_PORTRAITS</a><a data-id="biome-art" href="#biome-art">BIOME_ART</a><a data-id="animal-pixel-icons" href="#animal-pixel-icons">ANIMAL_PIXEL_ICONS</a><a data-id="animalicon" href="#animalicon">animalIcon</a><div class="sub">Guest mode</div><a data-id="guest-mode" href="#guest-mode">Guest mode</a><a data-id="guestpage" href="#guestpage">Guest game (/guest)</a><div class="sub">Routes</div><a data-id="the-play-route-and-its-redirects" href="#the-play-route-and-its-redirects">The /play route and its redirects</a><h3><a href="#cat-pacing">Pacing</a></h3><div class="sub">Targets</div><a data-id="pacing-targets" href="#pacing-targets">Pacing targets</a><div class="sub">Magnitude targets</div><a data-id="magnitude-bands" href="#magnitude-bands">MAGNITUDE_BANDS</a><div class="sub">The sim</div><a data-id="the-bot-simulation" href="#the-bot-simulation">The bot simulation</a><a data-id="the-parallel-sim-runner" href="#the-parallel-sim-runner">The parallel sim runner</a><a data-id="the-class-picker-acceptance" href="#the-class-picker-acceptance">The class picker acceptance</a><a data-id="the-local-sim-runner" href="#the-local-sim-runner">The local sim runner</a><h3><a href="#cat-ops">Ops</a></h3><div class="sub">Commands</div><a data-id="commands-and-documentation-generation" href="#commands-and-documentation-generation">Commands and documentation generation</a><div class="sub">CI</div><a data-id="the-pacing-guard-and-ci-sharding" href="#the-pacing-guard-and-ci-sharding">The pacing guard and CI sharding</a><a data-id="the-generated-docs-inputs-hash" href="#the-generated-docs-inputs-hash">The generated-docs inputs hash</a><a data-id="the-local-verify-script-and-the-pre-push-hook" href="#the-local-verify-script-and-the-pre-push-hook">The local verify script and the pre-push hook</a><div class="sub">Operator guides</div><a data-id="season-restart-reset-players" href="#season-restart-reset-players">Season restart (reset-players)</a><a data-id="checking-live-saves-before-a-release" href="#checking-live-saves-before-a-release">Checking live saves before a release</a><a data-id="giving-a-flagged-account-its-trust-back-restore-trust" href="#giving-a-flagged-account-its-trust-back-restore-trust">Giving a flagged account its trust back (restore-trust)</a><a data-id="test-account-email" href="#test-account-email">The end-to-end test account</a><a data-id="turning-enforcement-and-the-server-run-rebirth-on-together" href="#turning-enforcement-and-the-server-run-rebirth-on-together">Turning enforcement and the server-run rebirth on together</a><a data-id="rehearsal-seeding-seed-rehearsal" href="#rehearsal-seeding-seed-rehearsal">Rehearsal seeding (seed-rehearsal)</a><a data-id="rehearsal-seeding-the-pure-part" href="#rehearsal-seeding-the-pure-part">Rehearsal seeding (the pure part)</a></nav><main><h1>Idle Realm reference</h1><p class="blurb">Generated from the JSDoc in the code (<code>npm run docs:code</code>). The code is the source of truth; this page is rebuilt on every commit.</p><section class="cat"><h2 class="cat" id="cat-overview">Overview</h2><p class="blurb">What the game is and how the loop fits together.</p><h2>The game</h2><article><p><a id="the-game-at-a-glance"></a></p>
 <h3>The game at a glance</h3>
 <p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:17</code></a></p>
 <p>Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. Everything here describes <strong>only what the code does now</strong>, with the symbol each number comes from.</p>
@@ -341,7 +341,7 @@ Buildings take Thrift only.</p>
 </code></pre>
 </article><article><p><a id="calculatexpgain"></a></p>
 <h3><code>calculateXpGain</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:85</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:80</code></a></p>
 <p>Calculate XP gain scaling based on owned tiles
 The more tiles owned, the more XP gained</p>
 <p>XP a tile purchase gives, for the <code>k</code>-th purchase (<code>BASE_XP_PER_TILE</code> 45, <code>XP_TILE</code> in <code>src/config/economy.ts</code>); multiplied by <code>1 + XP gain %</code> of the character.
@@ -1255,13 +1255,13 @@ gold weight -= shift;  boost += 0.8 x shift;  item += 0.2 x shift
 </code></pre>
 </article><h2>Crafting</h2><article><p><a id="trade-goods"></a></p>
 <h3><code>TRADE_GOODS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/recipes.ts"><code>src/catalog/recipes.ts:36</code></a></p>
+<p>Source: <a href="../../src/catalog/recipes.ts"><code>src/catalog/recipes.ts:40</code></a></p>
 <p>The trade goods crafting makes (IDL-227): plain bag stacks (<code>kind: &#39;consumable&#39;</code> with no effect) that exist to be sold. They join <code>ITEM_CATALOG</code> but not the loot
 pools, so nothing drops them. The value is set against the input value at merchant prices (<code>recipeCostGold</code>): at most 1.4x, so crafting a good pays a little
 better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, <code>npm run craft-sim</code>).</p>
 </article><article><p><a id="gear-recipes"></a></p>
 <h3><code>GEAR_RECIPES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/recipes.ts"><code>src/catalog/recipes.ts:337</code></a></p>
+<p>Source: <a href="../../src/catalog/recipes.ts"><code>src/catalog/recipes.ts:341</code></a></p>
 <p>The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the <code>craft</code> loot source (rarity by Luck and the
 pity counter, quality by Intelligence, item level by the crafting level inside the grade&#39;s window; see <a href="#craft-gear"><code>CRAFT_GEAR</code></a>). Every gear recipe is timed (<code>CRAFT_GEAR.timeSec</code>) and runs in the batch queue.
 Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</code> and <code>CRAFT_GEAR.timeSec</code>; adding a slot is one in the tables above.</p>
@@ -1366,6 +1366,129 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <td>21.3 K / 800</td>
 <td>223 K / 2500</td>
 <td>1.6 M / 6000</td>
+</tr>
+</tbody></table>
+</article><article><p><a id="ingredients"></a></p>
+<h3><code>INGREDIENTS</code> <small>const</small></h3>
+<p>Source: <a href="../../src/catalog/ingredients.ts"><code>src/catalog/ingredients.ts:31</code></a></p>
+<p>The ingredients and what is planned for each (none of it is built yet). Append only.</p>
+<p><strong>Crafting ingredients (18, no recipe uses them yet)</strong> <em>(computed from the code)</em></p>
+<table>
+<thead>
+<tr>
+<th>Ingredient</th>
+<th>Tier</th>
+<th>Planned for</th>
+<th>Dropped by</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Vial of Blood</td>
+<td>1</td>
+<td>healing and vitality potions (the base)</td>
+<td>Beast, Aquatic, Demon</td>
+</tr>
+<tr>
+<td>Wet Clay</td>
+<td>1</td>
+<td>glass vials and pottery</td>
+<td>Construct</td>
+</tr>
+<tr>
+<td>Dried Herb Bundle</td>
+<td>1</td>
+<td>herb extracts for potions</td>
+<td>Plant, Fungus</td>
+</tr>
+<tr>
+<td>Orange Caps</td>
+<td>1</td>
+<td>fungal extracts and night potions</td>
+<td>Fungus</td>
+</tr>
+<tr>
+<td>Wild Grapes</td>
+<td>1</td>
+<td>wine and elixirs</td>
+<td>a few monsters</td>
+</tr>
+<tr>
+<td>Hollow Log</td>
+<td>1</td>
+<td>planks</td>
+<td>Plant</td>
+</tr>
+<tr>
+<td>Glowberry</td>
+<td>2</td>
+<td>night-vision and luck potions</td>
+<td>Fungus</td>
+</tr>
+<tr>
+<td>Dark Horn</td>
+<td>2</td>
+<td>dark elixirs and enchanting powder</td>
+<td>Demon</td>
+</tr>
+<tr>
+<td>Copper Ore</td>
+<td>2</td>
+<td>ingots (smelted with coal)</td>
+<td>Construct</td>
+</tr>
+<tr>
+<td>Ember Coal</td>
+<td>2</td>
+<td>smelting fuel and fire potions</td>
+<td>Elemental, Dragon</td>
+</tr>
+<tr>
+<td>Obsidian Chip</td>
+<td>2</td>
+<td>blade edges for the Obsidian grade</td>
+<td>Elemental</td>
+</tr>
+<tr>
+<td>Geode</td>
+<td>2</td>
+<td>cut stones for jewelry</td>
+<td>Aquatic, Construct</td>
+</tr>
+<tr>
+<td>Dark Shard</td>
+<td>2</td>
+<td>enchanting</td>
+<td>Demon</td>
+</tr>
+<tr>
+<td>Murky Phial</td>
+<td>2</td>
+<td>cursed brews</td>
+<td>Undead</td>
+</tr>
+<tr>
+<td>Moonstone Sliver</td>
+<td>3</td>
+<td>jewelry and enchanting</td>
+<td>Undead</td>
+</tr>
+<tr>
+<td>Fire Drop</td>
+<td>3</td>
+<td>fire-ward jewelry</td>
+<td>Elemental, Dragon</td>
+</tr>
+<tr>
+<td>Emerald Star</td>
+<td>3</td>
+<td>jewelry gems</td>
+<td>a few monsters</td>
+</tr>
+<tr>
+<td>Heart Gem</td>
+<td>4</td>
+<td>the finest jewelry</td>
+<td>a few monsters</td>
 </tr>
 </tbody></table>
 </article><h2>Buildings</h2><article><p><a id="buildings-flag"></a></p>
@@ -2523,7 +2646,7 @@ spells to fly.
 Nothing of the ledger is written. Returns null with no fight open or one that does not end within <code>COMBAT.maxFightSec</code>.</p>
 </article><article><p><a id="paykill"></a></p>
 <h3><code>payKill</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/reward.ts"><code>src/lib/offline/reward.ts:37</code></a></p>
+<p>Source: <a href="../../src/lib/offline/reward.ts"><code>src/lib/offline/reward.ts:58</code></a></p>
 <p>Pays the kill of ticket <code>n</code>: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
 it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.</p>
 <p>The kill is paid from the ticket&#39;s spawn level and age (<a href="#levelatage"><code>levelAtAge</code></a>), never from a level the client claims; the roll is sealed on the number of kills this run (<a href="#sealedrng"><code>sealedRng</code></a>).</p>
@@ -3664,7 +3787,7 @@ that still have a free tile the pick is weighted by win chance and the boss&#39;
 <p>The band a castle distance falls in. Anything below the first band (the castle tile itself) or NaN is the first band.</p>
 </article><h2>Rewards</h2><article><p><a id="killincome"></a></p>
 <h3><code>killIncome</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/loot/kill.ts"><code>src/lib/loot/kill.ts:56</code></a></p>
+<p>Source: <a href="../../src/lib/loot/kill.ts"><code>src/lib/loot/kill.ts:61</code></a></p>
 <p>Rewards for a kill. Gold and XP are &quot;seconds of income&quot; (like chests) so they scale with the economy. The items come from
 the shared loot pipeline (<code>generateLoot</code>): the monster&#39;s loot profile decides how many rolls, which rarities and which
 item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.</p>
@@ -3672,8 +3795,8 @@ item level; this adapter only adds the gold and XP and keeps the call the game a
 Items: see <a href="#generateloot"><code>generateLoot</code></a>. Measured share of income: <code>docs/generated/kill-sim.md</code>.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
-gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%))
-xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
+gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%) x (1 + deed gold%))
+xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%) x (1 + deed XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
 hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
 </code></pre>
 <p><strong>Kill rewards per biome</strong> <em>(computed from the code)</em></p>
@@ -4783,7 +4906,7 @@ The uniques are the three legendary weapons, one per boss from the hardest down 
 </tbody></table>
 </article><article><p><a id="levelscale"></a></p>
 <h3><code>levelScale</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:213</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:211</code></a></p>
 <p>Power multiplier of an item level (1 at level 1).</p>
 <p>Item power grows linearly with item level: each level adds 7% of the level-1 power (1 at level 1, 1.63 at 10, 7.9 at 100). Gear is authored at its own <code>minItemLevel</code>; an instance of level L has
 <code>baseStats x levelScale(L) / levelScale(minItemLevel)</code>, then the quality roll (+/-8%). Affix values use the same curve. Boss stats use it too (<a href="#monsterstats"><code>monsterStats</code></a>).</p>
@@ -4793,7 +4916,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 </code></pre>
 </article><article><p><a id="valuecurve"></a></p>
 <h3><code>valueCurve</code> <small>function</small></h3>
-<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:186</code></a></p>
+<p>Source: <a href="../../src/catalog/stats.ts"><code>src/catalog/stats.ts:184</code></a></p>
 <p>Value multiplier of an item level (1 at level 1).</p>
 <p>What gear is worth in gold follows its own curve, because the economy grows far faster than gear power: steep up to the knee (level 10), flatter after it.</p>
 <p><strong>Formula</strong></p>
@@ -4888,9 +5011,9 @@ so their previews agree. <code>junk</code> is a parameter so a test can flip the
 <p>Source: <a href="../../src/lib/offline/inventory.ts"><code>src/lib/offline/inventory.ts:266</code></a></p>
 <p>The &quot;Sell junk&quot; button: sells every piece of gear in the bag that <code>junk</code> names (the junk rule, <code>isJunk</code>), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
 every bag until the rule is decided (IDL-312). <code>junk</code> is a parameter so a test can flip the rule.</p>
-</article><article><p><a id="rolljunkdrops"></a></p>
-<h3><code>rollJunkDrops</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/loot/junkDrops.ts"><code>src/lib/loot/junkDrops.ts:64</code></a></p>
+</article><article><p><a id="rolljunkloot"></a></p>
+<h3><code>rollJunkLoot</code> <small>function</small></h3>
+<p>Source: <a href="../../src/lib/loot/junkDrops.ts"><code>src/lib/loot/junkDrops.ts:71</code></a></p>
 <p>The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills <code>JUNK_GOLD_SHARE</code> of the kill&#39;s gold (between half and one and a half times). Pricey junk: each kind has its own small chance
 (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from <code>rng</code> <strong>after</strong> every other roll of the kill, so the rest of the kill&#39;s loot is the same as before junk existed.</p>
 <p><strong>Formula</strong></p>
@@ -4960,7 +5083,7 @@ The soft cap level is 80 (<code>softCapLevel</code>, informational). Retune the 
 <p>See also: <a href="#xptonextlevel"><code>xpToNextLevel</code></a>, <a href="#totalstatpoints"><code>totalStatPoints</code></a></p>
 </article><article><p><a id="xptonextlevel"></a></p>
 <h3><code>xpToNextLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:187</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:182</code></a></p>
 <p>XP to go from <code>level</code> to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
 everything that shows or checks a level threshold uses this.</p>
 <p><strong>Formula</strong></p>
@@ -4969,7 +5092,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 </code></pre>
 </article><article><p><a id="totalstatpoints"></a></p>
 <h3><code>totalStatPoints</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:152</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:147</code></a></p>
 <p>The attribute points a character that has reached <code>level</code> has earned in all (a level gives 1; the early levels give extra, see LEVELING).</p>
 <p><code>reconcileCharacter</code> hands every point back when a character holds more than its level has earned.</p>
 <p><strong>Formula</strong></p>
@@ -5015,7 +5138,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 <p>See also: <a href="#totalstatpoints"><code>totalStatPoints</code></a></p>
 </article><article><p><a id="cumulativexp"></a></p>
 <h3><code>cumulativeXp</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:199</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:194</code></a></p>
 <p>The total XP at which <code>level</code> is reached (level 1 is 0).</p>
 </article><article><p><a id="allocatepoints"></a></p>
 <h3><code>allocatePoints</code> <small>function</small></h3>
@@ -5023,11 +5146,11 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 <p>Puts points into attributes: <code>add</code> is how many per attribute. Refused (nothing changes) when it is empty or malformed, or when it would spend more than the level&#39;s budget holds.</p>
 </article><article><p><a id="calculatelevel"></a></p>
 <h3><code>calculateLevel</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:211</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:206</code></a></p>
 <p>Level from total XP: each level needs more than the one before (see <code>xpToNextLevel</code>), up to MAX_LEVEL, where the bar is full.</p>
 </article><article><p><a id="reconcilecharacter"></a></p>
 <h3><code>reconcileCharacter</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:167</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:162</code></a></p>
 <p>Puts a character&#39;s attributes in line with an XP total: when more points are spent (and left to spend) than that XP&#39;s level has earned
 (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
 point the level has earned is left to spend again. A character that is within its points is returned as it is.</p>
@@ -5073,14 +5196,14 @@ point the level has earned is left to spend again. A character that is within it
 <p>See also: <a href="#calculatestatresourcemodifiers"><code>calculateStatResourceModifiers</code></a>, <a href="#calculatecombatstats"><code>calculateCombatStats</code></a></p>
 </article><article><p><a id="calculatestatresourcemodifiers"></a></p>
 <h3><code>calculateStatResourceModifiers</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:235</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:230</code></a></p>
 <p>What the five attributes add to the income modifier of each resource (all points count, not only those above 5).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">modifier[r] += 0.025 per attribute point on each resource the attribute feeds; xp: +0.2% (Int) / +0.25% (Cha) per point
 </code></pre>
 </article><article><p><a id="calculatecombatstats"></a></p>
 <h3><code>calculateCombatStats</code> <small>function</small></h3>
-<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:257</code></a></p>
+<p>Source: <a href="../../src/utils/game/character.ts"><code>src/utils/game/character.ts:252</code></a></p>
 <p>The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.</p>
 </article><h2>Rebirth</h2><article><p><a id="rebirth"></a></p>
 <h3><code>REBIRTH</code> <small>const</small></h3>
@@ -5723,8 +5846,8 @@ Rarity: the <code>craft</code> profile&#39;s weights among the grade&#39;s rarit
 <p>What the Crafting window&#39;s odds panel shows for a recipe: the rarity chances at the player&#39;s Luck, pity and crafting level, the item level range, the pity multiplier and the quality lean. Read from the roll&#39;s own loot trace (<code>generateLoot</code> with a fixed rng), so the panel is the real odds and cannot drift from the roll.</p>
 </article><h2>Rankings</h2><article><p><a id="ranking-boards"></a></p>
 <h3>The boards</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:40</code></a></p>
-<p>The tabs of the Rankings window, in order. A board with <code>soon</code> is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).</p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:41</code></a></p>
+<p>The tabs of the Rankings window, in order. A board with <code>soon</code> is a placeholder (Quests: it needs the quest system first).</p>
 <p>Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player&#39;s own place below it. The places are rebuilt once per 24 hours (<code>refresh_rankings()</code>, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:</p>
 <ul>
@@ -5733,10 +5856,11 @@ Ties are broken in this order:</p>
 <li>Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.</li>
 <li>Tiles: the most tiles the player ever owned in one run (<code>player_stats.best_tiles</code>), so a rebirth does not lower it.</li>
 <li>Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).</li>
+<li>Deeds: deed points of the <strong>claimed</strong> tiers (an earned tier counts only after Claim; the ledger mirrors the number in <code>stats.deedPoints</code>), then who reached the total first.</li>
 </ul>
 </article><article><p><a id="movement"></a></p>
 <h3>Movement arrows</h3>
-<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:92</code></a></p>
+<p>Source: <a href="../../src/lib/rankings.ts"><code>src/lib/rankings.ts:93</code></a></p>
 <p>The change since the refresh before: a lower number is a better place, so a smaller rank is <code>up</code>; no earlier place is <code>new</code>.</p>
 </article><h2>Mastery</h2><article><p><a id="boss-mastery-tiers"></a></p>
 <h3><code>BOSS_MASTERY_TIERS</code> <small>const</small></h3>
@@ -6032,7 +6156,7 @@ bow and a staff take both hands). Their damage per second matches the sword&#39;
 &quot;A new chapter&quot; and a rebirth (<code>starterEquipmentFor</code>).</p>
 </article><h2>Achievements</h2><article><p><a id="settleachievements"></a></p>
 <h3><code>settleAchievements</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:177</code></a></p>
+<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:216</code></a></p>
 <p>Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into <code>player_achievements</code> with <code>insert ... on conflict do nothing</code> after the write lands (<code>AchievementRepo</code>).</p>
 <ul>
@@ -6044,7 +6168,7 @@ The caller mirrors the ids into <code>player_achievements</code> with <code>inse
 <p>See also: <code>achievementsDue</code>, <code>earnAchievements</code></p>
 </article><article><p><a id="claimachievement"></a></p>
 <h3><code>claimAchievement</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:96</code></a></p>
+<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:132</code></a></p>
 <p>The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by <code>GEMS_CAP</code>) and into <code>granted</code> (like a chest&#39;s gem find), and the id is recorded in <code>stats.claimed</code> with the time.
 Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.</p>
 </article><article><p><a id="worldfacts"></a></p>
@@ -6053,15 +6177,19 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 <p>The facts of a map and a farm. The largest group per biome is a flood fill over the owned tiles (each tile is visited once), so a map of tens of thousands of tiles costs one pass.</p>
 </article><article><p><a id="recordcuriosity"></a></p>
 <h3><code>recordCuriosity</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/curiosity.ts"><code>src/lib/offline/curiosity.ts:14</code></a></p>
+<p>Source: <a href="../../src/lib/offline/curiosity.ts"><code>src/lib/offline/curiosity.ts:20</code></a></p>
 <p>Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).</p>
+</article><article><p><a id="recordrankplace"></a></p>
+<h3><code>recordRankPlace</code> <small>function</small></h3>
+<p>Source: <a href="../../src/lib/offline/curiosity.ts"><code>src/lib/offline/curiosity.ts:31</code></a></p>
+<p>Records the podium place a player holds on a Ranking board (1 to 3, any board): <code>rank_&lt;place&gt;</code> once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.</p>
 </article><article><p><a id="achievements"></a></p>
 <h3>Achievements</h3>
-<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:100</code></a></p>
+<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:116</code></a></p>
 <p>The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 (<a href="#settleachievements"><code>settleAchievements</code></a>) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. &quot;Rat King defeated&quot; was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial&#39;s starter path ends. Later releases add grind ladders (R6) after these.</p>
-<p><strong>The launch achievements (135, 9850 gems in total)</strong> <em>(computed from the code)</em></p>
+<p><strong>The launch achievements (277, 24750 gems in total)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
 <tr>
@@ -6078,7 +6206,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>tutorial</code></td>
 <td>Learned the ropes</td>
 <td>last step of the starter path done</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6086,7 +6214,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_tile</code></td>
 <td>Landowner</td>
 <td>tiles &gt;= 1</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6094,7 +6222,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_building</code></td>
 <td>Builder</td>
 <td>buildings &gt;= 1</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6102,7 +6230,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_fight</code></td>
 <td>First blood</td>
 <td>kills &gt;= 1</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6110,7 +6238,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_chest</code></td>
 <td>Treasure hunter</td>
 <td>chests &gt;= 1</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6118,7 +6246,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>castle_2</code></td>
 <td>Growing keep</td>
 <td>castle level 2</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6142,7 +6270,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_rebirth</code></td>
 <td>Reborn</td>
 <td>rebirths &gt;= 1</td>
-<td>75</td>
+<td>50</td>
 <td>reborn</td>
 </tr>
 <tr>
@@ -6182,7 +6310,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>slayer_100</code></td>
 <td>Slayer I</td>
 <td>kills &gt;= 100</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6190,7 +6318,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>slayer_500</code></td>
 <td>Slayer II</td>
 <td>kills &gt;= 500</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6206,15 +6334,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>slayer_10000</code></td>
 <td>Slayer IV</td>
 <td>kills &gt;= 10000</td>
-<td>200</td>
-<td>-</td>
+<td>125</td>
+<td>slayer</td>
 </tr>
 <tr>
 <td>18</td>
 <td><code>wolfsbane_50</code></td>
 <td>Wolfsbane I</td>
 <td>50 x <code>mossbackWolf</code></td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6222,7 +6350,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>wolfsbane_200</code></td>
 <td>Wolfsbane II</td>
 <td>200 x <code>mossbackWolf</code></td>
-<td>40</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6230,15 +6358,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>wolfsbane_1000</code></td>
 <td>Wolfsbane III</td>
 <td>1000 x <code>mossbackWolf</code></td>
-<td>80</td>
-<td>-</td>
+<td>100</td>
+<td>wolfsbane</td>
 </tr>
 <tr>
 <td>21</td>
 <td><code>untouched_1</code></td>
 <td>Untouched I</td>
 <td>flawless &gt;= 1</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6246,7 +6374,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>untouched_25</code></td>
 <td>Untouched II</td>
 <td>flawless &gt;= 25</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6262,7 +6390,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>landlord_50</code></td>
 <td>Landlord I</td>
 <td>tiles &gt;= 50</td>
-<td>20</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6270,7 +6398,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>landlord_200</code></td>
 <td>Landlord II</td>
 <td>tiles &gt;= 200</td>
-<td>50</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6278,7 +6406,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>landlord_500</code></td>
 <td>Landlord III</td>
 <td>tiles &gt;= 500</td>
-<td>100</td>
+<td>125</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6286,15 +6414,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>landlord_1000</code></td>
 <td>Landlord IV</td>
 <td>tiles &gt;= 1000</td>
-<td>200</td>
-<td>-</td>
+<td>150</td>
+<td>landlord</td>
 </tr>
 <tr>
 <td>28</td>
 <td><code>hoarder_100k</code></td>
 <td>Hoarder I</td>
 <td>goldPeak &gt;= 100000</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6302,7 +6430,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>hoarder_1m</code></td>
 <td>Hoarder II</td>
 <td>goldPeak &gt;= 1000000</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6310,15 +6438,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>hoarder_10m</code></td>
 <td>Hoarder III</td>
 <td>goldPeak &gt;= 10000000</td>
-<td>120</td>
-<td>-</td>
+<td>100</td>
+<td>hoarder</td>
 </tr>
 <tr>
 <td>31</td>
 <td><code>market_1m</code></td>
 <td>Market Day I</td>
 <td>unitsSold &gt;= 1000000</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6326,7 +6454,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>market_10m</code></td>
 <td>Market Day II</td>
 <td>unitsSold &gt;= 10000000</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6334,15 +6462,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>market_100m</code></td>
 <td>Market Day III</td>
 <td>unitsSold &gt;= 100000000</td>
-<td>120</td>
-<td>-</td>
+<td>100</td>
+<td>merchant-prince</td>
 </tr>
 <tr>
 <td>34</td>
 <td><code>smith_100</code></td>
 <td>Apprentice Smith I</td>
 <td>crafted &gt;= 100</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6350,7 +6478,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>smith_1000</code></td>
 <td>Apprentice Smith II</td>
 <td>crafted &gt;= 1000</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6358,15 +6486,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>smith_10000</code></td>
 <td>Apprentice Smith III</td>
 <td>crafted &gt;= 10000</td>
-<td>120</td>
-<td>-</td>
+<td>100</td>
+<td>master-smith</td>
 </tr>
 <tr>
 <td>37</td>
 <td><code>reborn_5</code></td>
 <td>Reborn II</td>
 <td>rebirths &gt;= 5</td>
-<td>100</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6374,15 +6502,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>reborn_20</code></td>
 <td>Reborn III</td>
 <td>rebirths &gt;= 20</td>
-<td>250</td>
-<td>-</td>
+<td>100</td>
+<td>reborn</td>
 </tr>
 <tr>
 <td>39</td>
 <td><code>scholar_5</code></td>
 <td>Scholar I</td>
 <td>entries &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6390,7 +6518,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>scholar_15</code></td>
 <td>Scholar II</td>
 <td>entries &gt;= 15</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6398,7 +6526,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>scholar_30</code></td>
 <td>Scholar III</td>
 <td>entries &gt;= 30</td>
-<td>150</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6406,7 +6534,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>scholar_50</code></td>
 <td>Loremaster</td>
 <td>entries &gt;= 50</td>
-<td>250</td>
+<td>125</td>
 <td>loremaster</td>
 </tr>
 <tr>
@@ -6414,7 +6542,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>archivist_10</code></td>
 <td>Archivist I</td>
 <td>mastered &gt;= 10</td>
-<td>40</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6422,7 +6550,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>archivist_50</code></td>
 <td>Archivist II</td>
 <td>mastered &gt;= 50</td>
-<td>120</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6430,7 +6558,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>archivist_150</code></td>
 <td>Archivist III</td>
 <td>mastered &gt;= 150</td>
-<td>300</td>
+<td>125</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6438,7 +6566,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>archivist_all</code></td>
 <td>Grand Archivist</td>
 <td>mastered &gt;= 288</td>
-<td>100</td>
+<td>150</td>
 <td>grand-archivist</td>
 </tr>
 <tr>
@@ -6446,7 +6574,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>naturalist_1</code></td>
 <td>Field Naturalist I</td>
 <td>biomeGoals &gt;= 1</td>
-<td>40</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6454,7 +6582,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>naturalist_12</code></td>
 <td>Field Naturalist II</td>
 <td>biomeGoals &gt;= 12</td>
-<td>150</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6462,7 +6590,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>naturalist_48</code></td>
 <td>Warden of the Wilds</td>
 <td>biomeGoals &gt;= 48</td>
-<td>400</td>
+<td>100</td>
 <td>warden-of-the-wilds</td>
 </tr>
 <tr>
@@ -6470,7 +6598,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>archivist_1</code></td>
 <td>First Entry</td>
 <td>mastered &gt;= 1</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6478,7 +6606,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>bane_boar</code></td>
 <td>Boar Breaker</td>
 <td>1000 x <code>thistleBoar</code></td>
-<td>30</td>
+<td>50</td>
 <td>boar-breaker</td>
 </tr>
 <tr>
@@ -6486,7 +6614,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>bane_wyrm</code></td>
 <td>Wyrmbane</td>
 <td>10 x <code>bossWinterWyrm</code></td>
-<td>120</td>
+<td>50</td>
 <td>wyrmbane</td>
 </tr>
 <tr>
@@ -6534,7 +6662,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_forest_5</code></td>
 <td>Forest stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6542,7 +6670,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_forest_12</code></td>
 <td>Forest stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6550,7 +6678,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_forest_20</code></td>
 <td>Forest stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6558,7 +6686,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_plains_5</code></td>
 <td>Plains stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6566,7 +6694,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_plains_12</code></td>
 <td>Plains stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6574,7 +6702,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_plains_20</code></td>
 <td>Plains stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6582,7 +6710,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_hills_5</code></td>
 <td>Hills stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6590,7 +6718,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_hills_12</code></td>
 <td>Hills stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6598,7 +6726,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_hills_20</code></td>
 <td>Hills stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6606,7 +6734,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_swamp_5</code></td>
 <td>Swamp stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6614,7 +6742,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_swamp_12</code></td>
 <td>Swamp stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6622,7 +6750,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_swamp_20</code></td>
 <td>Swamp stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6630,7 +6758,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_tundra_5</code></td>
 <td>Tundra stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6638,7 +6766,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_tundra_12</code></td>
 <td>Tundra stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6646,7 +6774,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_tundra_20</code></td>
 <td>Tundra stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6654,7 +6782,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_lake_5</code></td>
 <td>Lake stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6662,7 +6790,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_lake_12</code></td>
 <td>Lake stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6670,7 +6798,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_lake_20</code></td>
 <td>Lake stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6678,7 +6806,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_coast_5</code></td>
 <td>Coast stretch I</td>
 <td>cluster &gt;= 5</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6686,7 +6814,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_coast_12</code></td>
 <td>Coast stretch II</td>
 <td>cluster &gt;= 12</td>
-<td>50</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6694,7 +6822,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>cluster_coast_20</code></td>
 <td>Coast stretch III</td>
 <td>cluster &gt;= 20</td>
-<td>80</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6702,7 +6830,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>kit_uncommon</code></td>
 <td>Fully kitted I</td>
 <td>kit uncommon</td>
-<td>40</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6710,7 +6838,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>kit_epic</code></td>
 <td>Fully kitted II</td>
 <td>kit epic</td>
-<td>120</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6718,15 +6846,15 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>kit_legendary</code></td>
 <td>Fully kitted III</td>
 <td>kit legendary</td>
-<td>400</td>
-<td>-</td>
+<td>100</td>
+<td>fully-kitted</td>
 </tr>
 <tr>
 <td>82</td>
 <td><code>ilvl_15</code></td>
 <td>Well equipped I</td>
 <td>wornLevel &gt;= 15</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6734,7 +6862,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>ilvl_35</code></td>
 <td>Well equipped II</td>
 <td>wornLevel &gt;= 35</td>
-<td>70</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6742,7 +6870,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>ilvl_60</code></td>
 <td>Well equipped III</td>
 <td>wornLevel &gt;= 60</td>
-<td>110</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6750,7 +6878,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>streak_3</code></td>
 <td>Regular I</td>
 <td>streak &gt;= 3</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6758,7 +6886,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>streak_7</code></td>
 <td>Regular II</td>
 <td>streak &gt;= 7</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6766,7 +6894,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>first_respec</code></td>
 <td>Second thoughts</td>
 <td>respecs &gt;= 1</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6774,7 +6902,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_strength_50</code></td>
 <td>Strength focus I</td>
 <td>attribute &gt;= 50</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6782,7 +6910,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_strength_100</code></td>
 <td>Strength focus II</td>
 <td>attribute &gt;= 100</td>
-<td>80</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6790,7 +6918,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_strength_200</code></td>
 <td>Strength focus III</td>
 <td>attribute &gt;= 200</td>
-<td>130</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6798,7 +6926,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_dexterity_50</code></td>
 <td>Dexterity focus I</td>
 <td>attribute &gt;= 50</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6806,7 +6934,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_dexterity_100</code></td>
 <td>Dexterity focus II</td>
 <td>attribute &gt;= 100</td>
-<td>80</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6814,7 +6942,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_dexterity_200</code></td>
 <td>Dexterity focus III</td>
 <td>attribute &gt;= 200</td>
-<td>130</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6822,7 +6950,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_intelligence_50</code></td>
 <td>Intelligence focus I</td>
 <td>attribute &gt;= 50</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6830,7 +6958,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_intelligence_100</code></td>
 <td>Intelligence focus II</td>
 <td>attribute &gt;= 100</td>
-<td>80</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6838,7 +6966,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_intelligence_200</code></td>
 <td>Intelligence focus III</td>
 <td>attribute &gt;= 200</td>
-<td>130</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6846,7 +6974,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_vitality_50</code></td>
 <td>Vitality focus I</td>
 <td>attribute &gt;= 50</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6854,7 +6982,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_vitality_100</code></td>
 <td>Vitality focus II</td>
 <td>attribute &gt;= 100</td>
-<td>80</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6862,7 +6990,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_vitality_200</code></td>
 <td>Vitality focus III</td>
 <td>attribute &gt;= 200</td>
-<td>130</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6870,7 +6998,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_charisma_50</code></td>
 <td>Charisma focus I</td>
 <td>attribute &gt;= 50</td>
-<td>30</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6878,7 +7006,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_charisma_100</code></td>
 <td>Charisma focus II</td>
 <td>attribute &gt;= 100</td>
-<td>80</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6886,7 +7014,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>attr_charisma_200</code></td>
 <td>Charisma focus III</td>
 <td>attribute &gt;= 200</td>
-<td>130</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6894,7 +7022,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_10</code></td>
 <td>Farmer I</td>
 <td>animals &gt;= 10</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6902,7 +7030,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_50</code></td>
 <td>Farmer II</td>
 <td>animals &gt;= 50</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6918,7 +7046,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_chicken_10</code></td>
 <td>Chicken keeper I</td>
 <td>animals &gt;= 10</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6926,7 +7054,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_chicken_50</code></td>
 <td>Chicken keeper II</td>
 <td>animals &gt;= 50</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6934,7 +7062,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_sheep_10</code></td>
 <td>Sheep keeper I</td>
 <td>animals &gt;= 10</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6942,7 +7070,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_sheep_50</code></td>
 <td>Sheep keeper II</td>
 <td>animals &gt;= 50</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6950,7 +7078,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_pig_10</code></td>
 <td>Pig keeper I</td>
 <td>animals &gt;= 10</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6958,7 +7086,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_pig_50</code></td>
 <td>Pig keeper II</td>
 <td>animals &gt;= 50</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6966,7 +7094,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_cow_10</code></td>
 <td>Cow keeper I</td>
 <td>animals &gt;= 10</td>
-<td>20</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6974,7 +7102,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>farm_cow_50</code></td>
 <td>Cow keeper II</td>
 <td>animals &gt;= 50</td>
-<td>60</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6982,7 +7110,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_forest_3</code></td>
 <td>Forest builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6990,7 +7118,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_forest_10</code></td>
 <td>Forest builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -6998,7 +7126,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_plains_3</code></td>
 <td>Plains builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7006,7 +7134,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_plains_10</code></td>
 <td>Plains builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7014,7 +7142,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_hills_3</code></td>
 <td>Hills builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7022,7 +7150,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_hills_10</code></td>
 <td>Hills builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7030,7 +7158,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_swamp_3</code></td>
 <td>Swamp builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7038,7 +7166,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_swamp_10</code></td>
 <td>Swamp builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7046,7 +7174,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_tundra_3</code></td>
 <td>Tundra builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7054,7 +7182,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_tundra_10</code></td>
 <td>Tundra builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7062,7 +7190,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_lake_3</code></td>
 <td>Lake builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7070,7 +7198,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_lake_10</code></td>
 <td>Lake builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7078,7 +7206,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_coast_3</code></td>
 <td>Coast builder I</td>
 <td>buildingsIn &gt;= 3</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7086,7 +7214,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_coast_10</code></td>
 <td>Coast builder II</td>
 <td>buildingsIn &gt;= 10</td>
-<td>65</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7094,7 +7222,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_max_1</code></td>
 <td>Master builder I</td>
 <td>buildingsMaxed &gt;= 1</td>
-<td>40</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7102,7 +7230,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_max_5</code></td>
 <td>Master builder II</td>
 <td>buildingsMaxed &gt;= 5</td>
-<td>100</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7110,7 +7238,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>build_max_20</code></td>
 <td>Master builder III</td>
 <td>buildingsMaxed &gt;= 20</td>
-<td>160</td>
+<td>100</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7118,7 +7246,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>boss_kills_5</code></td>
 <td>Bossbane I</td>
 <td>bosses &gt;= 5</td>
-<td>40</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7126,7 +7254,7 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>boss_kills_25</code></td>
 <td>Bossbane II</td>
 <td>bosses &gt;= 25</td>
-<td>100</td>
+<td>75</td>
 <td>-</td>
 </tr>
 <tr>
@@ -7134,23 +7262,1159 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 <td><code>boss_kills_100</code></td>
 <td>Bossbane III</td>
 <td>bosses &gt;= 100</td>
-<td>160</td>
-<td>-</td>
+<td>100</td>
+<td>boss-hunter</td>
 </tr>
 <tr>
 <td>134</td>
 <td><code>curious_gambler</code></td>
 <td>Just looking</td>
 <td>curiosity gambling_empty</td>
-<td>25</td>
+<td>50</td>
 <td>-</td>
 </tr>
 <tr>
 <td>135</td>
+<td><code>slayer_50000</code></td>
+<td>Slayer V</td>
+<td>kills &gt;= 50000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>136</td>
+<td><code>slayer_250000</code></td>
+<td>Slayer VI</td>
+<td>kills &gt;= 250000</td>
+<td>175</td>
+<td>-</td>
+</tr>
+<tr>
+<td>137</td>
+<td><code>slayer_1000000</code></td>
+<td>Slayer VII</td>
+<td>kills &gt;= 1000000</td>
+<td>200</td>
+<td>bane-of-beasts</td>
+</tr>
+<tr>
+<td>138</td>
+<td><code>slayer_5000000</code></td>
+<td>Slayer VIII</td>
+<td>kills &gt;= 5000000</td>
+<td>225</td>
+<td>-</td>
+</tr>
+<tr>
+<td>139</td>
+<td><code>hoarder_100000000</code></td>
+<td>Hoarder IV</td>
+<td>goldPeak &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>140</td>
+<td><code>hoarder_1000000000</code></td>
+<td>Hoarder V</td>
+<td>goldPeak &gt;= 1000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>141</td>
+<td><code>hoarder_10000000000</code></td>
+<td>Hoarder VI</td>
+<td>goldPeak &gt;= 10000000000</td>
+<td>175</td>
+<td>-</td>
+</tr>
+<tr>
+<td>142</td>
+<td><code>hoarder_100000000000</code></td>
+<td>Hoarder VII</td>
+<td>goldPeak &gt;= 100000000000</td>
+<td>200</td>
+<td>-</td>
+</tr>
+<tr>
+<td>143</td>
+<td><code>hoarder_1000000000000</code></td>
+<td>Hoarder VIII</td>
+<td>goldPeak &gt;= 1000000000000</td>
+<td>225</td>
+<td>dragons-hoard</td>
+</tr>
+<tr>
+<td>144</td>
+<td><code>market_1000000000</code></td>
+<td>Market Day IV</td>
+<td>unitsSold &gt;= 1000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>145</td>
+<td><code>market_10000000000</code></td>
+<td>Market Day V</td>
+<td>unitsSold &gt;= 10000000000</td>
+<td>150</td>
+<td>grand-merchant</td>
+</tr>
+<tr>
+<td>146</td>
+<td><code>smith_50000</code></td>
+<td>Apprentice Smith IV</td>
+<td>crafted &gt;= 50000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>147</td>
+<td><code>smith_250000</code></td>
+<td>Apprentice Smith V</td>
+<td>crafted &gt;= 250000</td>
+<td>150</td>
+<td>grandmaster-smith</td>
+</tr>
+<tr>
+<td>148</td>
+<td><code>reborn_50</code></td>
+<td>Reborn IV</td>
+<td>rebirths &gt;= 50</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>149</td>
+<td><code>reborn_100</code></td>
+<td>Reborn V</td>
+<td>rebirths &gt;= 100</td>
+<td>150</td>
+<td>eternal-phoenix</td>
+</tr>
+<tr>
+<td>150</td>
+<td><code>untouched_500</code></td>
+<td>Untouched IV</td>
+<td>flawless &gt;= 500</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>151</td>
+<td><code>untouched_2500</code></td>
+<td>Untouched V</td>
+<td>flawless &gt;= 2500</td>
+<td>150</td>
+<td>untouchable</td>
+</tr>
+<tr>
+<td>152</td>
+<td><code>wolfsbane_5000</code></td>
+<td>Wolfsbane IV</td>
+<td>5000 x <code>mossbackWolf</code></td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>153</td>
+<td><code>golden_10</code></td>
+<td>Golden touch II</td>
+<td>golden &gt;= 10</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>154</td>
+<td><code>golden_50</code></td>
+<td>Golden touch III</td>
+<td>golden &gt;= 50</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>155</td>
+<td><code>golden_250</code></td>
+<td>Golden touch IV</td>
+<td>golden &gt;= 250</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>156</td>
+<td><code>golden_1000</code></td>
+<td>Golden touch V</td>
+<td>golden &gt;= 1000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>157</td>
+<td><code>golden_5000</code></td>
+<td>Golden touch VI</td>
+<td>golden &gt;= 5000</td>
+<td>175</td>
+<td>midas</td>
+</tr>
+<tr>
+<td>158</td>
+<td><code>boss_kills_250</code></td>
+<td>Bossbane IV</td>
+<td>bosses &gt;= 250</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>159</td>
+<td><code>boss_kills_1000</code></td>
+<td>Bossbane V</td>
+<td>bosses &gt;= 1000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>160</td>
+<td><code>boss_kills_5000</code></td>
+<td>Bossbane VI</td>
+<td>bosses &gt;= 5000</td>
+<td>175</td>
+<td>worldbreaker</td>
+</tr>
+<tr>
+<td>161</td>
+<td><code>income_gold_100000</code></td>
+<td>Gold rush I</td>
+<td>income &gt;= 100000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>162</td>
+<td><code>income_gold_10000000</code></td>
+<td>Gold rush II</td>
+<td>income &gt;= 10000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>163</td>
+<td><code>income_gold_1000000000</code></td>
+<td>Gold rush III</td>
+<td>income &gt;= 1000000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>164</td>
+<td><code>income_gold_100000000000</code></td>
+<td>Gold rush IV</td>
+<td>income &gt;= 100000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>165</td>
+<td><code>income_gold_10000000000000</code></td>
+<td>Gold rush V</td>
+<td>income &gt;= 10000000000000</td>
+<td>150</td>
+<td>gold-baron</td>
+</tr>
+<tr>
+<td>166</td>
+<td><code>income_wood_10000</code></td>
+<td>Woodcutter I</td>
+<td>income &gt;= 10000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>167</td>
+<td><code>income_wood_1000000</code></td>
+<td>Woodcutter II</td>
+<td>income &gt;= 1000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>168</td>
+<td><code>income_wood_100000000</code></td>
+<td>Woodcutter III</td>
+<td>income &gt;= 100000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>169</td>
+<td><code>income_wood_10000000000</code></td>
+<td>Woodcutter IV</td>
+<td>income &gt;= 10000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>170</td>
+<td><code>income_wood_1000000000000</code></td>
+<td>Woodcutter V</td>
+<td>income &gt;= 1000000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>171</td>
+<td><code>income_stone_10000</code></td>
+<td>Quarryman I</td>
+<td>income &gt;= 10000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>172</td>
+<td><code>income_stone_1000000</code></td>
+<td>Quarryman II</td>
+<td>income &gt;= 1000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>173</td>
+<td><code>income_stone_100000000</code></td>
+<td>Quarryman III</td>
+<td>income &gt;= 100000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>174</td>
+<td><code>income_stone_10000000000</code></td>
+<td>Quarryman IV</td>
+<td>income &gt;= 10000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>175</td>
+<td><code>income_stone_1000000000000</code></td>
+<td>Quarryman V</td>
+<td>income &gt;= 1000000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>176</td>
+<td><code>income_coal_10000</code></td>
+<td>Coal baron I</td>
+<td>income &gt;= 10000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>177</td>
+<td><code>income_coal_1000000</code></td>
+<td>Coal baron II</td>
+<td>income &gt;= 1000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>178</td>
+<td><code>income_coal_100000000</code></td>
+<td>Coal baron III</td>
+<td>income &gt;= 100000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>179</td>
+<td><code>income_coal_10000000000</code></td>
+<td>Coal baron IV</td>
+<td>income &gt;= 10000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>180</td>
+<td><code>income_coal_1000000000000</code></td>
+<td>Coal baron V</td>
+<td>income &gt;= 1000000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>181</td>
+<td><code>income_food_10000</code></td>
+<td>Harvest king I</td>
+<td>income &gt;= 10000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>182</td>
+<td><code>income_food_1000000</code></td>
+<td>Harvest king II</td>
+<td>income &gt;= 1000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>183</td>
+<td><code>income_food_100000000</code></td>
+<td>Harvest king III</td>
+<td>income &gt;= 100000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>184</td>
+<td><code>income_food_10000000000</code></td>
+<td>Harvest king IV</td>
+<td>income &gt;= 10000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>185</td>
+<td><code>income_food_1000000000000</code></td>
+<td>Harvest king V</td>
+<td>income &gt;= 1000000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>186</td>
+<td><code>income_meat_10000</code></td>
+<td>Butcher I</td>
+<td>income &gt;= 10000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>187</td>
+<td><code>income_meat_1000000</code></td>
+<td>Butcher II</td>
+<td>income &gt;= 1000000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>188</td>
+<td><code>income_meat_100000000</code></td>
+<td>Butcher III</td>
+<td>income &gt;= 100000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>189</td>
+<td><code>income_meat_10000000000</code></td>
+<td>Butcher IV</td>
+<td>income &gt;= 10000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>190</td>
+<td><code>income_meat_1000000000000</code></td>
+<td>Butcher V</td>
+<td>income &gt;= 1000000000000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>191</td>
+<td><code>income_eggs_1000</code></td>
+<td>Egg collector I</td>
+<td>income &gt;= 1000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>192</td>
+<td><code>income_eggs_100000</code></td>
+<td>Egg collector II</td>
+<td>income &gt;= 100000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>193</td>
+<td><code>income_eggs_10000000</code></td>
+<td>Egg collector III</td>
+<td>income &gt;= 10000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>194</td>
+<td><code>income_eggs_1000000000</code></td>
+<td>Egg collector IV</td>
+<td>income &gt;= 1000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>195</td>
+<td><code>income_milk_1000</code></td>
+<td>Dairy baron I</td>
+<td>income &gt;= 1000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>196</td>
+<td><code>income_milk_100000</code></td>
+<td>Dairy baron II</td>
+<td>income &gt;= 100000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>197</td>
+<td><code>income_milk_10000000</code></td>
+<td>Dairy baron III</td>
+<td>income &gt;= 10000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>198</td>
+<td><code>income_milk_1000000000</code></td>
+<td>Dairy baron IV</td>
+<td>income &gt;= 1000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>199</td>
+<td><code>income_hide_1000</code></td>
+<td>Tanner I</td>
+<td>income &gt;= 1000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>200</td>
+<td><code>income_hide_100000</code></td>
+<td>Tanner II</td>
+<td>income &gt;= 100000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>201</td>
+<td><code>income_hide_10000000</code></td>
+<td>Tanner III</td>
+<td>income &gt;= 10000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>202</td>
+<td><code>income_hide_1000000000</code></td>
+<td>Tanner IV</td>
+<td>income &gt;= 1000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>203</td>
+<td><code>income_wool_1000</code></td>
+<td>Shearer I</td>
+<td>income &gt;= 1000</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>204</td>
+<td><code>income_wool_100000</code></td>
+<td>Shearer II</td>
+<td>income &gt;= 100000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>205</td>
+<td><code>income_wool_10000000</code></td>
+<td>Shearer III</td>
+<td>income &gt;= 10000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>206</td>
+<td><code>income_wool_1000000000</code></td>
+<td>Shearer IV</td>
+<td>income &gt;= 1000000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>207</td>
+<td><code>income_herbs_100</code></td>
+<td>Herbalist I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>208</td>
+<td><code>income_herbs_10000</code></td>
+<td>Herbalist II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>209</td>
+<td><code>income_herbs_1000000</code></td>
+<td>Herbalist III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>210</td>
+<td><code>income_herbs_100000000</code></td>
+<td>Herbalist IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>211</td>
+<td><code>income_sap_100</code></td>
+<td>Sap tapper I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>212</td>
+<td><code>income_sap_10000</code></td>
+<td>Sap tapper II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>213</td>
+<td><code>income_sap_1000000</code></td>
+<td>Sap tapper III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>214</td>
+<td><code>income_sap_100000000</code></td>
+<td>Sap tapper IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>215</td>
+<td><code>income_ironOre_100</code></td>
+<td>Prospector I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>216</td>
+<td><code>income_ironOre_10000</code></td>
+<td>Prospector II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>217</td>
+<td><code>income_ironOre_1000000</code></td>
+<td>Prospector III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>218</td>
+<td><code>income_ironOre_100000000</code></td>
+<td>Prospector IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>219</td>
+<td><code>income_spores_100</code></td>
+<td>Sporeling I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>220</td>
+<td><code>income_spores_10000</code></td>
+<td>Sporeling II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>221</td>
+<td><code>income_spores_1000000</code></td>
+<td>Sporeling III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>222</td>
+<td><code>income_spores_100000000</code></td>
+<td>Sporeling IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>223</td>
+<td><code>income_frostshard_100</code></td>
+<td>Frost miner I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>224</td>
+<td><code>income_frostshard_10000</code></td>
+<td>Frost miner II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>225</td>
+<td><code>income_frostshard_1000000</code></td>
+<td>Frost miner III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>226</td>
+<td><code>income_frostshard_100000000</code></td>
+<td>Frost miner IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>227</td>
+<td><code>income_pearls_100</code></td>
+<td>Pearl diver I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>228</td>
+<td><code>income_pearls_10000</code></td>
+<td>Pearl diver II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>229</td>
+<td><code>income_pearls_1000000</code></td>
+<td>Pearl diver III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>230</td>
+<td><code>income_pearls_100000000</code></td>
+<td>Pearl diver IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>231</td>
+<td><code>income_salt_100</code></td>
+<td>Salt of the earth I</td>
+<td>income &gt;= 100</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>232</td>
+<td><code>income_salt_10000</code></td>
+<td>Salt of the earth II</td>
+<td>income &gt;= 10000</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>233</td>
+<td><code>income_salt_1000000</code></td>
+<td>Salt of the earth III</td>
+<td>income &gt;= 1000000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>234</td>
+<td><code>income_salt_100000000</code></td>
+<td>Salt of the earth IV</td>
+<td>income &gt;= 100000000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>235</td>
+<td><code>craft_level_5</code></td>
+<td>Crafting mastery I</td>
+<td>craftLevel &gt;= 5</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>236</td>
+<td><code>craft_level_10</code></td>
+<td>Crafting mastery II</td>
+<td>craftLevel &gt;= 10</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>237</td>
+<td><code>craft_level_20</code></td>
+<td>Crafting mastery III</td>
+<td>craftLevel &gt;= 20</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>238</td>
+<td><code>craft_level_35</code></td>
+<td>Crafting mastery IV</td>
+<td>craftLevel &gt;= 35</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>239</td>
+<td><code>craft_level_50</code></td>
+<td>Crafting mastery V</td>
+<td>craftLevel &gt;= 50</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>240</td>
+<td><code>craft_level_65</code></td>
+<td>Crafting mastery VI</td>
+<td>craftLevel &gt;= 65</td>
+<td>175</td>
+<td>-</td>
+</tr>
+<tr>
+<td>241</td>
+<td><code>craft_level_80</code></td>
+<td>Crafting mastery VII</td>
+<td>craftLevel &gt;= 80</td>
+<td>200</td>
+<td>artisan</td>
+</tr>
+<tr>
+<td>242</td>
+<td><code>craft_epic_1</code></td>
+<td>Epic forger I</td>
+<td>craftedRarity &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>243</td>
+<td><code>craft_epic_10</code></td>
+<td>Epic forger II</td>
+<td>craftedRarity &gt;= 10</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>244</td>
+<td><code>craft_epic_50</code></td>
+<td>Epic forger III</td>
+<td>craftedRarity &gt;= 50</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>245</td>
+<td><code>craft_epic_250</code></td>
+<td>Epic forger IV</td>
+<td>craftedRarity &gt;= 250</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>246</td>
+<td><code>craft_legendary_1</code></td>
+<td>Legendary forger I</td>
+<td>craftedRarity &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>247</td>
+<td><code>craft_legendary_5</code></td>
+<td>Legendary forger II</td>
+<td>craftedRarity &gt;= 5</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>248</td>
+<td><code>craft_legendary_25</code></td>
+<td>Legendary forger III</td>
+<td>craftedRarity &gt;= 25</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>249</td>
+<td><code>craft_legendary_100</code></td>
+<td>Legendary forger IV</td>
+<td>craftedRarity &gt;= 100</td>
+<td>125</td>
+<td>legend-smith</td>
+</tr>
+<tr>
+<td>250</td>
+<td><code>worn_epic_1</code></td>
+<td>Epic wardrobe I</td>
+<td>wornRarity &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>251</td>
+<td><code>worn_epic_4</code></td>
+<td>Epic wardrobe II</td>
+<td>wornRarity &gt;= 4</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>252</td>
+<td><code>worn_epic_8</code></td>
+<td>Epic wardrobe III</td>
+<td>wornRarity &gt;= 8</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>253</td>
+<td><code>worn_epic_14</code></td>
+<td>Epic wardrobe IV</td>
+<td>wornRarity &gt;= 14</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>254</td>
+<td><code>worn_legendary_1</code></td>
+<td>Legendary wardrobe I</td>
+<td>wornRarity &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>255</td>
+<td><code>worn_legendary_3</code></td>
+<td>Legendary wardrobe II</td>
+<td>wornRarity &gt;= 3</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>256</td>
+<td><code>worn_legendary_7</code></td>
+<td>Legendary wardrobe III</td>
+<td>wornRarity &gt;= 7</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>257</td>
+<td><code>worn_legendary_14</code></td>
+<td>Legendary wardrobe IV</td>
+<td>wornRarity &gt;= 14</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>258</td>
+<td><code>embers_50</code></td>
+<td>Ember keeper I</td>
+<td>embers &gt;= 50</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>259</td>
+<td><code>embers_500</code></td>
+<td>Ember keeper II</td>
+<td>embers &gt;= 500</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>260</td>
+<td><code>embers_5000</code></td>
+<td>Ember keeper III</td>
+<td>embers &gt;= 5000</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>261</td>
+<td><code>embers_50000</code></td>
+<td>Ember keeper IV</td>
+<td>embers &gt;= 50000</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>262</td>
+<td><code>embers_500000</code></td>
+<td>Ember keeper V</td>
+<td>embers &gt;= 500000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>263</td>
+<td><code>embers_5000000</code></td>
+<td>Ember keeper VI</td>
+<td>embers &gt;= 5000000</td>
+<td>175</td>
+<td>-</td>
+</tr>
+<tr>
+<td>264</td>
+<td><code>embers_50000000</code></td>
+<td>Ember keeper VII</td>
+<td>embers &gt;= 50000000</td>
+<td>200</td>
+<td>ember-lord</td>
+</tr>
+<tr>
+<td>265</td>
+<td><code>losses_10</code></td>
+<td>Sore loser I</td>
+<td>deaths &gt;= 10</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>266</td>
+<td><code>losses_50</code></td>
+<td>Sore loser II</td>
+<td>deaths &gt;= 50</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>267</td>
+<td><code>losses_250</code></td>
+<td>Sore loser III</td>
+<td>deaths &gt;= 250</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>268</td>
+<td><code>losses_1000</code></td>
+<td>Sore loser IV</td>
+<td>deaths &gt;= 1000</td>
+<td>125</td>
+<td>sore-loser</td>
+</tr>
+<tr>
+<td>269</td>
+<td><code>podium_3</code></td>
+<td>On the podium Bronze</td>
+<td>curiosity rank_3</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>270</td>
+<td><code>podium_2</code></td>
+<td>On the podium Silver</td>
+<td>curiosity rank_2</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>271</td>
+<td><code>podium_1</code></td>
+<td>On the podium Gold</td>
+<td>curiosity rank_1</td>
+<td>100</td>
+<td>champion</td>
+</tr>
+<tr>
+<td>272</td>
+<td><code>window_min</code></td>
+<td>Are you insane?</td>
+<td>curiosity window_min</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>273</td>
+<td><code>map_zoom_max</code></td>
+<td>Nose on the glass</td>
+<td>curiosity map_zoom_max</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>274</td>
+<td><code>map_zoom_min</code></td>
+<td>Where did everything go?</td>
+<td>curiosity map_zoom_min</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>275</td>
+<td><code>boss_window</code></td>
+<td>Not yet, big guy</td>
+<td>curiosity boss_window</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>276</td>
+<td><code>castle_skin</code></td>
+<td>Fashion victim</td>
+<td>curiosity castle_skin</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>277</td>
 <td><code>castle_15</code></td>
 <td>Grand Architect</td>
 <td>castle level 15</td>
-<td>150</td>
+<td>125</td>
 <td>-</td>
 </tr>
 </tbody></table>
@@ -7365,12 +8629,96 @@ Stored on <code>profiles.name_color</code> like a plain colour; the look of each
 The choice lives on the profile (<code>badge_id</code>, <code>title_id</code>, written by the server after <code>checkBadgeChoice</code>): <code>null</code> badge = the default, <code>BADGE_NONE</code> = hidden.</p>
 </article><h2>Deeds</h2><article><p><a id="claimallachievements"></a></p>
 <h3><code>claimAllAchievements</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:124</code></a></p>
+<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:161</code></a></p>
 <p>Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by <code>GEMS_CAP</code>
 (what the cap cuts off is lost, as with a single claim), and each id is recorded in <code>stats.claimed</code> with the time. Refused when nothing is waiting.</p>
+</article><article><p><a id="deed-milestones"></a></p>
+<h3>Deed milestones</h3>
+<p>Source: <a href="../../src/catalog/deedMilestones.ts"><code>src/catalog/deedMilestones.ts:29</code></a></p>
+<p>The milestones, by claimed deed points (all tiers together are worth about 7,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+5% gold and +5% XP at the top, exactly at <code>DEED_BONUS_CAP_PCT</code>).
+Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.</p>
+<p><strong>Deed point milestones (10, bonuses capped at +5% each)</strong> <em>(computed from the code)</em></p>
+<table>
+<thead>
+<tr>
+<th>Claimed deed points</th>
+<th>Gems</th>
+<th>Bonus on kill rewards</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>50</td>
+<td>25</td>
+<td>+1% gold</td>
+</tr>
+<tr>
+<td>150</td>
+<td>50</td>
+<td>+1% xp</td>
+</tr>
+<tr>
+<td>300</td>
+<td>75</td>
+<td>+1% gold</td>
+</tr>
+<tr>
+<td>600</td>
+<td>100</td>
+<td>+1% xp</td>
+</tr>
+<tr>
+<td>1000</td>
+<td>150</td>
+<td>+1% gold</td>
+</tr>
+<tr>
+<td>1500</td>
+<td>200</td>
+<td>+1% xp</td>
+</tr>
+<tr>
+<td>2250</td>
+<td>300</td>
+<td>+1% gold</td>
+</tr>
+<tr>
+<td>3000</td>
+<td>500</td>
+<td>+1% xp</td>
+</tr>
+<tr>
+<td>4500</td>
+<td>600</td>
+<td>+1% gold</td>
+</tr>
+<tr>
+<td>6000</td>
+<td>800</td>
+<td>+1% xp</td>
+</tr>
+</tbody></table>
+</article><article><p><a id="deedbonuses"></a></p>
+<h3><code>deedBonuses</code> <small>function</small></h3>
+<p>Source: <a href="../../src/lib/deeds.ts"><code>src/lib/deeds.ts:223</code></a></p>
+<p>The bonuses the claimed milestones give on kill rewards, each stat cut at <code>DEED_BONUS_CAP_PCT</code>. One pure function for the server (<code>payKill</code>) and the window.</p>
+<p><strong>Formula</strong></p>
+<pre><code class="language-text">bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
+</code></pre>
+</article><article><p><a id="claimmilestone"></a></p>
+<h3><code>claimMilestone</code> <small>function</small></h3>
+<p>Source: <a href="../../src/lib/offline/achievements.ts"><code>src/lib/offline/achievements.ts:104</code></a></p>
+<p>Claims one deed point milestone: pays its gems once (capped by <code>GEMS_CAP</code>) and records it in <code>stats.milestonesClaimed</code>; its bonus is on from then (<a href="#deedbonuses"><code>deedBonuses</code></a>). Refused for an id that is not a milestone, one the claimed points
+have not reached yet, or one already claimed.</p>
+</article><article><p><a id="tiergems"></a></p>
+<h3><code>tierGems</code> <small>function</small></h3>
+<p>Source: <a href="../../src/catalog/deedRewards.ts"><code>src/catalog/deedRewards.ts:17</code></a></p>
+<p>Gems paid for tier <code>index</code> (0-based) of a deed: 50, 75, 100, 125 ...</p>
+<p><strong>Formula</strong></p>
+<pre><code class="language-text">gems(tier n) = 50 + 25 x (n - 1)      (n = 1 for the first tier of the deed)
+</code></pre>
 </article><article><p><a id="deeds"></a></p>
 <h3>Deeds</h3>
-<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:542</code></a></p>
+<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:560</code></a></p>
 <p>The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup&#39;s nine deeds, with placeholder rewards (balance pass: IDL-310).</p>
 <p>See also: <code>deedState</code>, <code>deedPoints</code></p>
@@ -8089,10 +9437,10 @@ and its gold is paid in the browser.</p>
 </tbody></table>
 </article><article><p><a id="get"></a></p>
 <h3>GET /api/rankings</h3>
-<p>Source: <a href="../../src/app/api/rankings/route.ts"><code>src/app/api/rankings/route.ts:18</code></a></p>
-<p>The Rankings: <code>GET /api/rankings?board=level|rebirths|crafting|tiles|kills</code>. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
+<p>Source: <a href="../../src/app/api/rankings/route.ts"><code>src/app/api/rankings/route.ts:23</code></a></p>
+<p>The Rankings: <code>GET /api/rankings?board=level|rebirths|crafting|tiles|kills|deeds</code>. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
 asking player&#39;s own place when it is further down. Every non-test account of the current chapter is ranked (<code>refresh_rankings()</code>), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (<code>refresh_rankings()</code>, a single
-SQL call, so no scheduled job is needed); the cosmetics are read live. The <code>quests</code> and <code>deeds</code> boards are not built and are a 400.</p>
+SQL call, so no scheduled job is needed); the cosmetics are read live. The <code>quests</code> board is not built and is a 400.</p>
 </article><h2>Away time</h2><article><p><a id="computeofflinegrant"></a></p>
 <h3><code>computeOfflineGrant</code> <small>function</small></h3>
 <p>Source: <a href="../../src/lib/offline/grant.ts"><code>src/lib/offline/grant.ts:76</code></a></p>

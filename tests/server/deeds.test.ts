@@ -34,7 +34,7 @@ test('the tiers of a deed climb: every goal is above the one before', () => {
 });
 
 test('the launch achievements keep their ids and rewards (they are tier 1 of their deeds)', () => {
-	assert.deepEqual(achievementById('first_rebirth')?.rewards, { gems: 75, avatarId: 'reborn', points: 20 });
+	assert.deepEqual(achievementById('first_rebirth')?.rewards, { gems: 50, avatarId: 'reborn', points: 20 });
 	assert.equal(achievementById('castle_10')?.rewards.avatarId, 'architect');
 	assert.equal(achievementById('beta_tester')?.rewards.gems, 200);
 	assert.equal(deed('reborn').tiers[0], 'first_rebirth');
@@ -55,8 +55,8 @@ test('deedState: a tier whose condition holds counts as earned before the server
 });
 
 test('deedState: a finished deed is complete with a full bar; a manual tier counts only when recorded', () => {
-	const done = deedState(deed('reborn'), facts({}, { rebirths: 20 }), [], []);
-	assert.deepEqual([done.complete, done.progress, done.goal], [true, 1, 20]);
+	const done = deedState(deed('reborn'), facts({}, { rebirths: 100 }), [], []);
+	assert.deepEqual([done.complete, done.progress, done.goal], [true, 1, 100]);
 	assert.equal(deedState(deed('early_tester'), facts(), [], []).earned, 0);
 	assert.equal(deedState(deed('early_tester'), facts(), ['early_tester'], []).earned, 1);
 });

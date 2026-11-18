@@ -26,7 +26,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `badge_scroll_check_silver` | <img src="../../public/pixel/achievements/badge_scroll_check_silver.png" width="96" alt="badge_scroll_check_silver"> | 64x64 | used | code | `pixel/achievements/badge_scroll_check_silver.png` |
 | `badge_shield_silver` | <img src="../../public/pixel/achievements/badge_shield_silver.png" width="96" alt="badge_shield_silver"> | 64x64 | used | code | `pixel/achievements/badge_shield_silver.png` |
 | `badge_skull_bronze` | <img src="../../public/pixel/achievements/badge_skull_bronze.png" width="96" alt="badge_skull_bronze"> | 64x64 | used | code | `pixel/achievements/badge_skull_bronze.png` |
-| `badge_star_bronze` | <img src="../../public/pixel/achievements/badge_star_bronze.png" width="96" alt="badge_star_bronze"> | 64x64 | unused |  | `pixel/achievements/badge_star_bronze.png` |
+| `badge_star_bronze` | <img src="../../public/pixel/achievements/badge_star_bronze.png" width="96" alt="badge_star_bronze"> | 64x64 | used | code | `pixel/achievements/badge_star_bronze.png` |
 | `badge_star_silver` | <img src="../../public/pixel/achievements/badge_star_silver.png" width="96" alt="badge_star_silver"> | 64x64 | used | code | `pixel/achievements/badge_star_silver.png` |
 | `badge_sword_shield_bronze` | <img src="../../public/pixel/achievements/badge_sword_shield_bronze.png" width="96" alt="badge_sword_shield_bronze"> | 64x64 | used | code | `pixel/achievements/badge_sword_shield_bronze.png` |
 | `badge_sword_silver` | <img src="../../public/pixel/achievements/badge_sword_silver.png" width="96" alt="badge_sword_silver"> | 64x64 | used | code | `pixel/achievements/badge_sword_silver.png` |
@@ -154,7 +154,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx | `pixel/icons/rank_trophy.png` |
+| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx, src/lib/offline/curiosity.ts | `pixel/icons/rank_trophy.png` |
 
 ## skill
 

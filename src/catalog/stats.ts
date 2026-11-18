@@ -66,15 +66,13 @@ export const STAT_DEFS = {
 export type StatKey = keyof typeof STAT_DEFS;
 export const STAT_KEYS = Object.keys(STAT_DEFS) as StatKey[];
 
-// ---- categories: how tooltips group stats so a long list is quick to scan -----------------------------------------------------
-export type StatCategory = 'combat' | 'defense' | 'magic' | 'economy';
+// ---- categories: how tooltips group stats so a long list is quick to scan: Combat (damage, defense, mana) and Economy (income, luck, finds) -----------------------------------------------------
+export type StatCategory = 'combat' | 'economy';
 
 /** In the order tooltips list them, with the heading and its color */
 export const STAT_CATEGORIES: readonly { id: StatCategory; label: string; color: string }[] = [
 	{ id: 'combat', label: 'Combat', color: '#e8894a' },
-	{ id: 'defense', label: 'Defense', color: '#6fb7e8' },
-	{ id: 'magic', label: 'Magic', color: '#b08cf0' },
-	{ id: 'economy', label: 'Generators', color: '#e6c04a' },
+	{ id: 'economy', label: 'Economy', color: '#e6c04a' },
 ];
 
 /** The category of every stat (a new stat must pick one: the type is complete) */
@@ -83,19 +81,19 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
-	potionCooldownPct: 'defense',
-	potionPowerPct: 'defense',
-	potionSlots: 'defense',
+	potionCooldownPct: 'combat',
+	potionPowerPct: 'combat',
+	potionSlots: 'combat',
 	bagSlots: 'economy',
 	damagePct: 'combat',
-	armor: 'defense',
-	maxHp: 'defense',
-	maxHpPct: 'defense',
-	regen: 'defense',
-	dodge: 'defense',
-	maxMana: 'magic',
-	manaRegen: 'magic',
-	spellPower: 'magic',
+	armor: 'combat',
+	maxHp: 'combat',
+	maxHpPct: 'combat',
+	regen: 'combat',
+	dodge: 'combat',
+	maxMana: 'combat',
+	manaRegen: 'combat',
+	spellPower: 'combat',
 	luck: 'economy',
 	goldFind: 'economy',
 	incomePct: 'economy',

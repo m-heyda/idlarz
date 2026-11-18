@@ -1,4 +1,6 @@
 import { ACHIEVEMENTS, achievementById, type AchievementCondition, type DeedDef } from '@/catalog/achievements';
+import { DEED_BONUS_CAP_PCT, DEED_MILESTONES, milestoneById, type DeedMilestone } from '@/catalog/deedMilestones';
+import { RARITIES } from '@/catalog';
 import { TUTORIAL_PATH } from '@/catalog/tutorial';
 import type { LifetimeStats } from '@/lib/offline/stats';
 import type { WorldFacts } from '@/lib/worldFacts';
@@ -23,6 +25,9 @@ export interface DeedFacts {
 	streak?: number;
 	castleLevel: number;
 	rebirths: number;
+	/** The crafting level and the Embers earned over all rebirths (absent on a row from before: 0) */
+	craftLevel?: number;
+	embers?: number;
 	/** Buildings built, lifetime. The building system has no counter yet, so this is 0 until it reports one. */
 	buildings: number;
 }
@@ -95,6 +100,23 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 			return { cur: f.stats.bosses, goal: when.min };
 		case 'curiosity':
 			return { cur: f.stats.curiosity.includes(when.id) ? 1 : 0, goal: 1 };
+		case 'deaths':
+			return { cur: Object.values(f.stats.deaths).reduce((sum, n) => sum + n, 0), goal: when.min };
+		case 'craftLevel':
+			return { cur: f.craftLevel ?? 0, goal: when.min };
+		case 'craftedRarity': {
+			const floor = RARITIES[when.rarity].order;
+			const made = Object.entries(f.stats.craftedRare)
+				.filter(([id]) => (RARITIES[id as keyof typeof RARITIES]?.order ?? 0) >= floor)
+				.reduce((sum, [, n]) => sum + n, 0);
+			return { cur: made, goal: when.min };
+		}
+		case 'wornRarity':
+			return { cur: f.kit?.[when.rarity] ?? 0, goal: when.min };
+		case 'embers':
+			return { cur: f.embers ?? 0, goal: when.min };
+		case 'income':
+			return { cur: f.stats.income[when.resource] ?? 0, goal: when.min };
 		case 'manual':
 			return { cur: 0, goal: 1 };
 	}
@@ -163,3 +185,53 @@ export const deedPoints = (claimed: readonly string[]): number => claimed.reduce
 
 /** The points every tier together would give (the total the window shows next to the player's). */
 export const TOTAL_DEED_POINTS: number = ACHIEVEMENTS.reduce((sum, a) => sum + (a.rewards.points ?? 0), 0);
+
+/** The permanent deed bonuses on kill rewards, in %. */
+export interface DeedBonuses {
+	gold: number;
+	xp: number;
+}
+
+/** Where one milestone stands: reached by claimed points, and claimed (paid, bonus on). */
+export interface MilestoneState {
+	milestone: DeedMilestone;
+	reached: boolean;
+	claimed: boolean;
+}
+
+/** Every milestone with where it stands for these claimed points and these claimed milestone ids. */
+export const milestoneStates = (points: number, claimed: readonly string[]): MilestoneState[] =>
+	DEED_MILESTONES.map((milestone) => ({ milestone, reached: points >= milestone.points, claimed: claimed.includes(milestone.id) }));
+
+/** The ids of the milestones that are reached and not claimed yet (the Claim button of the milestone strip), in order. */
+export const claimableMilestones = (points: number, claimed: readonly string[]): string[] =>
+	milestoneStates(points, claimed)
+		.filter((s) => s.reached && !s.claimed)
+		.map((s) => s.milestone.id);
+
+/** The first milestone not reached yet (null at the top), for the "next milestone" bar. */
+export const nextMilestone = (points: number): DeedMilestone | null => DEED_MILESTONES.find((m) => points < m.points) ?? null;
+
+/**
+ * The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
+ *
+ * @category Progression/Deeds
+ * @order 5
+ * @formula
+ * bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
+ */
+export const deedBonuses = (claimed: readonly string[]): DeedBonuses => {
+	const total: DeedBonuses = { gold: 0, xp: 0 };
+	for (const id of claimed) {
+		const bonus = milestoneById(id)?.bonus;
+		if (bonus) total[bonus.stat] += bonus.pct;
+	}
+	return { gold: Math.min(DEED_BONUS_CAP_PCT, total.gold), xp: Math.min(DEED_BONUS_CAP_PCT, total.xp) };
+};
+
+/** What the "Bonus from deeds" line says: the bonuses in force, or the first one on offer. */
+export const deedBonusText = (claimed: readonly string[]): string => {
+	const b = deedBonuses(claimed);
+	const parts = [b.gold > 0 && `+${b.gold}% kill gold`, b.xp > 0 && `+${b.xp}% kill XP`].filter(Boolean);
+	return parts.length > 0 ? parts.join(' · ') : 'None yet: claim a milestone';
+};

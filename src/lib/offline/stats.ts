@@ -36,6 +36,10 @@ export interface LifetimeStats {
 	/** When each achievement was earned and claimed (epoch ms), for the Achievements window; absent for the ones earned before this was kept */
 	earnedAt: Record<string, number>;
 	claimedAt: Record<string, number>;
+	/** Deed point milestones the player has claimed (`catalog/deedMilestones.ts` ids). Additive: absent reads as none. */
+	milestonesClaimed: string[];
+	/** The deed points of the claimed tiers, mirrored here for the Rankings SQL (it has no copy of the catalog). The server writes it at every claim and in the settle; the window and the report derive the number from `claimed`. Additive: absent reads as 0. */
+	deedPoints: number;
 	/** The manual achievements (the testers) held in `player_achievements` have been merged into `achievements` once */
 	manualSynced: boolean;
 	/** The most gold the player held at an accepted save (Hoarder). Additive: absent reads as 0. */
@@ -45,6 +49,8 @@ export interface LifetimeStats {
 	goldFromSales: number;
 	/** Crafts delivered, instant or claimed (Apprentice Smith). Additive. */
 	crafted: number;
+	/** Gear the player crafted, by rarity id (the Crafting deeds). Counted by the server when a craft is delivered. Additive: absent reads as none. */
+	craftedRare: Record<string, number>;
 	/** Fights won without taking a single hit (Untouched). Additive. */
 	flawless: number;
 	/** Respecs bought (attribute points taken back). Additive. */
@@ -96,11 +102,14 @@ export const emptyStats = (): LifetimeStats => ({
 	claimed: null,
 	earnedAt: {},
 	claimedAt: {},
+	milestonesClaimed: [],
+	deedPoints: 0,
 	manualSynced: false,
 	goldPeak: 0,
 	unitsSold: 0,
 	goldFromSales: 0,
 	crafted: 0,
+	craftedRare: {},
 	flawless: 0,
 	respecs: 0,
 	deaths: {},
@@ -149,11 +158,14 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		claimed: Array.isArray(r.claimed) ? ids(r.claimed) : null,
 		earnedAt: counts(r.earnedAt),
 		claimedAt: counts(r.claimedAt),
+		milestonesClaimed: ids(r.milestonesClaimed),
+		deedPoints: Math.floor(num(r.deedPoints)),
 		manualSynced: r.manualSynced === true,
 		goldPeak: num(r.goldPeak),
 		unitsSold: Math.floor(num(r.unitsSold)),
 		goldFromSales: num(r.goldFromSales),
 		crafted: Math.floor(num(r.crafted)),
+		craftedRare: counts(r.craftedRare),
 		flawless: Math.floor(num(r.flawless)),
 		respecs: Math.floor(num(r.respecs)),
 		deaths: counts(r.deaths),
@@ -171,11 +183,14 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		claimed,
 		earnedAt,
 		claimedAt,
+		milestonesClaimed,
+		deedPoints,
 		manualSynced,
 		goldPeak,
 		unitsSold,
 		goldFromSales,
 		crafted,
+		craftedRare,
 		flawless,
 		respecs,
 		deaths,
@@ -191,12 +206,15 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(claimed !== null ? { claimed } : {}),
 		...(Object.keys(earnedAt).length > 0 ? { earnedAt } : {}),
 		...(Object.keys(claimedAt).length > 0 ? { claimedAt } : {}),
+		...(milestonesClaimed.length > 0 ? { milestonesClaimed } : {}),
+		...(deedPoints > 0 ? { deedPoints } : {}),
 		...(manualSynced ? { manualSynced } : {}),
 		// the deeds counters (IDL-307) are left out while they hold nothing, so a row from before stays byte-for-byte what it was
 		...(goldPeak > 0 ? { goldPeak } : {}),
 		...(unitsSold > 0 ? { unitsSold } : {}),
 		...(goldFromSales > 0 ? { goldFromSales } : {}),
 		...(crafted > 0 ? { crafted } : {}),
+		...(Object.keys(craftedRare).length > 0 ? { craftedRare } : {}),
 		...(flawless > 0 ? { flawless } : {}),
 		...(respecs > 0 ? { respecs } : {}),
 		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
@@ -221,12 +239,15 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	isEmptyProgress(s.tutorial) &&
 	s.achievements.length === 0 &&
 	!s.manualSynced &&
+	s.milestonesClaimed.length === 0 &&
+	s.deedPoints === 0 &&
 	(s.claimed === null || s.claimed.length === 0) &&
 	Object.keys(s.earnedAt).length === 0 &&
 	s.goldPeak === 0 &&
 	s.unitsSold === 0 &&
 	s.goldFromSales === 0 &&
 	s.crafted === 0 &&
+	Object.keys(s.craftedRare).length === 0 &&
 	s.flawless === 0 &&
 	s.respecs === 0 &&
 	Object.keys(s.deaths).length === 0 &&
@@ -261,6 +282,15 @@ export const recordDeath = (stats: LifetimeStats, type: string): LifetimeStats =
 
 /** `n` crafts were delivered (a claim, a Collect all or an instant craft). */
 export const recordCraft = (stats: LifetimeStats, n: number): LifetimeStats => (n > 0 ? { ...stats, crafted: stats.crafted + Math.floor(n) } : stats);
+
+/** Gear the player crafted, by rarity: how many crafted pieces of each rarity the bag holds now beyond what it held before the delivery (a delivery only adds pieces). */
+export const recordCraftedRare = (stats: LifetimeStats, added: Readonly<Record<string, number>>): LifetimeStats => {
+	const entries = Object.entries(added).filter(([, n]) => n > 0);
+	if (entries.length === 0) return stats;
+	const craftedRare = { ...stats.craftedRare };
+	for (const [rarity, n] of entries) craftedRare[rarity] = (craftedRare[rarity] ?? 0) + Math.floor(n);
+	return { ...stats, craftedRare };
+};
 
 /** A respec was bought. */
 export const recordRespec = (stats: LifetimeStats): LifetimeStats => ({ ...stats, respecs: stats.respecs + 1 });

@@ -40,8 +40,8 @@
   "kind": "function",
   "category": "Saves & Server/Endpoints",
   "file": "src/app/api/rankings/route.ts",
-  "line": 18,
-  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` and `deeds` boards are not built and are a 400.",
+  "line": 23,
+  "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills|deeds`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` board is not built and is a 400.",
   "see": []
  },
  {
@@ -72,7 +72,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 100,
+  "line": 116,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 542,
+  "line": 560,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -160,6 +160,28 @@
   "see": []
  },
  {
+  "id": "deed-milestones",
+  "name": "Deed milestones",
+  "symbol": "DEED_MILESTONES",
+  "kind": "const",
+  "category": "Progression/Deeds",
+  "file": "src/catalog/deedMilestones.ts",
+  "line": 29,
+  "summary": "The milestones, by claimed deed points (all tiers together are worth about 7,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+5% gold and +5% XP at the top, exactly at `DEED_BONUS_CAP_PCT`). Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.",
+  "see": []
+ },
+ {
+  "id": "tiergems",
+  "name": "tierGems",
+  "symbol": "tierGems",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/catalog/deedRewards.ts",
+  "line": 17,
+  "summary": "Gems paid for tier `index` (0-based) of a deed: 50, 75, 100, 125 ...",
+  "see": []
+ },
+ {
   "id": "idols",
   "name": "IDOLS",
   "symbol": "IDOLS",
@@ -179,6 +201,17 @@
   "file": "src/catalog/index.ts",
   "line": 76,
   "summary": "What each class starts with, so the first gear fits the hero: the Warrior and the Paladin wear the sword and shield, the Ranger a bow and the Mage a staff (no off-hand: a bow and a staff take both hands). Their damage per second matches the sword's, so no class starts stronger; a Ranger or a Mage gives up the shield's 2 armor. Used by a new game, \"A new chapter\" and a rebirth (`starterEquipmentFor`).",
+  "see": []
+ },
+ {
+  "id": "ingredients",
+  "name": "INGREDIENTS",
+  "symbol": "INGREDIENTS",
+  "kind": "const",
+  "category": "Economy/Crafting",
+  "file": "src/catalog/ingredients.ts",
+  "line": 31,
+  "summary": "The ingredients and what is planned for each (none of it is built yet). Append only.",
   "see": []
  },
  {
@@ -443,7 +476,7 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/recipes.ts",
-  "line": 36,
+  "line": 40,
   "summary": "The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little better than selling its raw inputs and never turns into the main income (tests/crafting/recipes.test.ts, `npm run craft-sim`).",
   "see": []
  },
@@ -454,7 +487,7 @@
   "kind": "const",
   "category": "Economy/Crafting",
   "file": "src/catalog/recipes.ts",
-  "line": 337,
+  "line": 341,
   "summary": "The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the `craft` loot source (rarity by Luck and the pity counter, quality by Intelligence, item level by the crafting level inside the grade's window; see {@link CRAFT_GEAR}). Every gear recipe is timed (`CRAFT_GEAR.timeSec`) and runs in the batch queue. Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.timeSec`; adding a slot is one in the tables above.",
   "see": []
  },
@@ -476,7 +509,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 186,
+  "line": 184,
   "summary": "Value multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -487,7 +520,7 @@
   "kind": "function",
   "category": "Loot/Items",
   "file": "src/catalog/stats.ts",
-  "line": 213,
+  "line": 211,
   "summary": "Power multiplier of an item level (1 at level 1).",
   "see": []
  },
@@ -1805,6 +1838,17 @@
   "see": []
  },
  {
+  "id": "deedbonuses",
+  "name": "deedBonuses",
+  "symbol": "deedBonuses",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/deeds.ts",
+  "line": 223,
+  "summary": "The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.",
+  "see": []
+ },
+ {
   "id": "bandof",
   "name": "bandOf",
   "symbol": "bandOf",
@@ -1997,13 +2041,13 @@
   "see": []
  },
  {
-  "id": "rolljunkdrops",
-  "name": "rollJunkDrops",
-  "symbol": "rollJunkDrops",
+  "id": "rolljunkloot",
+  "name": "rollJunkLoot",
+  "symbol": "rollJunkLoot",
   "kind": "function",
   "category": "Loot/Junk",
   "file": "src/lib/loot/junkDrops.ts",
-  "line": 64,
+  "line": 71,
   "summary": "The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.",
   "see": []
  },
@@ -2014,7 +2058,7 @@
   "kind": "function",
   "category": "Monsters/Rewards",
   "file": "src/lib/loot/kill.ts",
-  "line": 56,
+  "line": 61,
   "summary": "Rewards for a kill. Gold and XP are \"seconds of income\" (like chests) so they scale with the economy. The items come from the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which item level; this adapter only adds the gold and XP and keeps the call the game and the tests have always made.",
   "see": []
  },
@@ -2254,13 +2298,24 @@
   "see": []
  },
  {
+  "id": "claimmilestone",
+  "name": "claimMilestone",
+  "symbol": "claimMilestone",
+  "kind": "function",
+  "category": "Progression/Deeds",
+  "file": "src/lib/offline/achievements.ts",
+  "line": 104,
+  "summary": "Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ({@link deedBonuses}). Refused for an id that is not a milestone, one the claimed points have not reached yet, or one already claimed.",
+  "see": []
+ },
+ {
   "id": "claimachievement",
   "name": "claimAchievement",
   "symbol": "claimAchievement",
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 96,
+  "line": 132,
   "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
   "see": []
  },
@@ -2271,7 +2326,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/offline/achievements.ts",
-  "line": 124,
+  "line": 161,
   "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
   "see": []
  },
@@ -2282,7 +2337,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 177,
+  "line": 216,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
@@ -2364,8 +2419,19 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/curiosity.ts",
-  "line": 14,
+  "line": 20,
   "summary": "Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).",
+  "see": []
+ },
+ {
+  "id": "recordrankplace",
+  "name": "recordRankPlace",
+  "symbol": "recordRankPlace",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/curiosity.ts",
+  "line": 31,
+  "summary": "Records the podium place a player holds on a Ranking board (1 to 3, any board): `rank_<place>` once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.",
   "see": []
  },
  {
@@ -2699,7 +2765,7 @@
   "kind": "function",
   "category": "Combat/A fight",
   "file": "src/lib/offline/reward.ts",
-  "line": 37,
+  "line": 58,
   "summary": "Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.",
   "see": []
  },
@@ -2908,8 +2974,8 @@
   "kind": "const",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 40,
-  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).",
+  "line": 41,
+  "summary": "The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests: it needs the quest system first).",
   "see": []
  },
  {
@@ -2919,7 +2985,7 @@
   "kind": "function",
   "category": "Progression/Rankings",
   "file": "src/lib/rankings.ts",
-  "line": 92,
+  "line": 93,
   "summary": "The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.",
   "see": []
  },
@@ -3137,7 +3203,7 @@
   "kind": "function",
   "category": "Economy/Tiles",
   "file": "src/utils/game/character.ts",
-  "line": 85,
+  "line": 80,
   "summary": "Calculate XP gain scaling based on owned tiles The more tiles owned, the more XP gained",
   "see": []
  },
@@ -3148,7 +3214,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 152,
+  "line": 147,
   "summary": "The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).",
   "see": [
    "reconcileCharacter"
@@ -3161,7 +3227,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 167,
+  "line": 162,
   "summary": "Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every point the level has earned is left to spend again. A character that is within its points is returned as it is.",
   "see": []
  },
@@ -3172,7 +3238,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 187,
+  "line": 182,
   "summary": "XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config); everything that shows or checks a level threshold uses this.",
   "see": []
  },
@@ -3183,7 +3249,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 199,
+  "line": 194,
   "summary": "The total XP at which `level` is reached (level 1 is 0).",
   "see": []
  },
@@ -3194,7 +3260,7 @@
   "kind": "function",
   "category": "Progression/Levels",
   "file": "src/utils/game/character.ts",
-  "line": 211,
+  "line": 206,
   "summary": "Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.",
   "see": []
  },
@@ -3205,7 +3271,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 235,
+  "line": 230,
   "summary": "What the five attributes add to the income modifier of each resource (all points count, not only those above 5).",
   "see": []
  },
@@ -3216,7 +3282,7 @@
   "kind": "function",
   "category": "Progression/Attributes",
   "file": "src/utils/game/character.ts",
-  "line": 257,
+  "line": 252,
   "summary": "The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.",
   "see": []
  },

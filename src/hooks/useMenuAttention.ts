@@ -9,6 +9,6 @@ import { farmHasPurchase } from '@/utils/game/farm';
 export function useMenuAttention() {
 	const stats = useGameStore((state) => state.characterStats.availablePoints > 0);
 	const farm = useGameStore((state) => farmHasPurchase(state.resources, state.farmLevels, state.farmUpgrades));
-	const achievements = useAchievementStore((state) => state.earned.some((id) => !state.claimed.includes(id)));
+	const achievements = useAchievementStore((state) => state.claimable > 0);
 	return { stats, farm, achievements, any: stats || farm || achievements };
 }

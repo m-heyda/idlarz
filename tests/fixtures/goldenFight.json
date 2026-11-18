@@ -444,7 +444,7 @@
 				"heal": 168,
 				"potion": 280
 			},
-			"digest": "0833c18d6ff7eeb2f9255b85759fc82a7f036e33",
+			"digest": "4a82082b62e534a154ea9288452ba02eab012da0",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|2",
 				"2|1000000.1|stun|10|||||",
@@ -464,7 +464,7 @@
 				"177|1000137.7|potion|35||potion_minor|||",
 				"191|1000145.7|potion|35||potion_minor|||",
 				"193|1000146.6|stun|10|||||",
-				"195|1000146.6|won||||2|thistleBoar|9 reward={\"gold\":166,\"xp\":233.2172064955172,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_scrap\\\",\\\"qty\\\":5}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_blood\\\",\\\"qty\\\":2}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_horn\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_scrap\",\"qty\":5},{\"kind\":\"consumable\",\"id\":\"junk_blood\",\"qty\":2},{\"kind\":\"consumable\",\"id\":\"junk_horn\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
+				"195|1000146.6|won||||2|thistleBoar|9 reward={\"gold\":166,\"xp\":233.2172064955172,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_scrap\\\",\\\"qty\\\":5}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_horn\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_scrap\",\"qty\":5},{\"kind\":\"consumable\",\"id\":\"junk_horn\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"196|1000164.6|engage||||4|bossGreatAuroch|15",
 				"214|1000176.6|stun|10|||||",
 				"228|1000186.7|heal|28|||||",

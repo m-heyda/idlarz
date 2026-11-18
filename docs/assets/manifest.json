@@ -20792,12 +20792,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"code"
+		],
 		"name": "badge_star_bronze",
 		"category": "ui",
 		"subcategory": "achievement badges (not wired)",
 		"src": "/pixel/achievements/badge_star_bronze.png",
-		"status": "unused",
+		"status": "used",
 		"source": "achievements",
 		"size": [
 			64,
@@ -21898,7 +21900,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/RankingsWindow.tsx"
+			"src/components/game/RankingsWindow.tsx",
+			"src/lib/offline/curiosity.ts"
 		],
 		"name": "rank_trophy",
 		"category": "ui",

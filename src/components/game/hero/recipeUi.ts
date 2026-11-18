@@ -1,5 +1,6 @@
 import { ITEMS, ITEM_CATALOG } from '@/catalog';
 import { gradeOfItem } from '@/catalog/items/grades';
+import { INGREDIENT_BY_ID } from '@/catalog/ingredients';
 import { COMPONENTS, type Recipe } from '@/catalog/recipes';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { itemIconName } from '../itemUi';
@@ -35,4 +36,6 @@ export const recipeIconUrl = (recipe: Recipe): string => pixelIconSrc(recipeIcon
 export const resourceIconUrl = (key: string): string => pixelIconSrc((RESOURCE_PIXEL_ICONS[key] ?? 'menu_bag_scroll') as PixelIconName);
 
 /** The picture file of a crafting component. */
-export const componentIconUrl = (id: string): string => pixelIconSrc(COMPONENT_ICONS[id] ?? 'comp_glass_vial');
+export const componentIconUrl = (id: string): string =>
+	// an ingredient wears the picture of the junk it came from (`ing_blood` -> `art_junk_blood`)
+	pixelIconSrc(COMPONENT_ICONS[id] ?? (INGREDIENT_BY_ID.has(id) ? (`art_${INGREDIENT_BY_ID.get(id)!.junkId}` as PixelIconName) : 'comp_glass_vial'));

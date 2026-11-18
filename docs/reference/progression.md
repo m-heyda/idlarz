@@ -18,10 +18,10 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
-- Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
+- Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [`recordRankPlace`](#recordrankplace), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
-- Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
+- Deeds: [`claimAllAchievements`](#claimallachievements), [Deed milestones](#deed-milestones), [`deedBonuses`](#deedbonuses), [`claimMilestone`](#claimmilestone), [`tierGems`](#tiergems), [Deeds](#deeds)
 
 ## Levels
 
@@ -62,7 +62,7 @@ See also: [`xpToNextLevel`](progression.md#xptonextlevel), [`totalStatPoints`](p
 
 ### `xpToNextLevel` <small>function</small>
 
-Source: [`src/utils/game/character.ts:187`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:182`](../../src/utils/game/character.ts)
 
 XP to go from `level` to the next one (Infinity at the maximum level). The one place the level curve lives (see LEVELING in the config);
 everything that shows or checks a level threshold uses this.
@@ -78,7 +78,7 @@ cumulativeXp(level)    = sum of steps up to level                         hits e
 
 ### `totalStatPoints` <small>function</small>
 
-Source: [`src/utils/game/character.ts:152`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:147`](../../src/utils/game/character.ts)
 
 The attribute points a character that has reached `level` has earned in all (a level gives 1; the early levels give extra, see LEVELING).
 
@@ -122,7 +122,7 @@ See also: [`totalStatPoints`](progression.md#totalstatpoints)
 
 ### `cumulativeXp` <small>function</small>
 
-Source: [`src/utils/game/character.ts:199`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:194`](../../src/utils/game/character.ts)
 
 The total XP at which `level` is reached (level 1 is 0).
 
@@ -138,7 +138,7 @@ Puts points into attributes: `add` is how many per attribute. Refused (nothing c
 
 ### `calculateLevel` <small>function</small>
 
-Source: [`src/utils/game/character.ts:211`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:206`](../../src/utils/game/character.ts)
 
 Level from total XP: each level needs more than the one before (see `xpToNextLevel`), up to MAX_LEVEL, where the bar is full.
 
@@ -146,7 +146,7 @@ Level from total XP: each level needs more than the one before (see `xpToNextLev
 
 ### `reconcileCharacter` <small>function</small>
 
-Source: [`src/utils/game/character.ts:167`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:162`](../../src/utils/game/character.ts)
 
 Puts a character's attributes in line with an XP total: when more points are spent (and left to spend) than that XP's level has earned
 (the XP was lowered: the server clamped an impossible total, or a curve change), the attributes go back to their start value and every
@@ -178,7 +178,7 @@ See also: [`calculateStatResourceModifiers`](progression.md#calculatestatresourc
 
 ### `calculateStatResourceModifiers` <small>function</small>
 
-Source: [`src/utils/game/character.ts:235`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:230`](../../src/utils/game/character.ts)
 
 What the five attributes add to the income modifier of each resource (all points count, not only those above 5).
 
@@ -192,7 +192,7 @@ modifier[r] += 0.025 per attribute point on each resource the attribute feeds; x
 
 ### `calculateCombatStats` <small>function</small>
 
-Source: [`src/utils/game/character.ts:257`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:252`](../../src/utils/game/character.ts)
 
 The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.
 
@@ -600,9 +600,9 @@ What the Crafting window's odds panel shows for a recipe: the rarity chances at 
 
 ### The boards
 
-Source: [`src/lib/rankings.ts:40`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:41`](../../src/lib/rankings.ts)
 
-The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests, Deeds: they need the quest and the deed-point systems first).
+The tabs of the Rankings window, in order. A board with `soon` is a placeholder (Quests: it needs the quest system first).
 
 Every board lists the first 50 places of the players on the current chapter (test accounts never; only games reset since the last full reset), plus the asking player's own place below it. The places are rebuilt once per 24 hours (`refresh_rankings()`, run by the first request after that), and each row shows the change since the rebuild before.
 Ties are broken in this order:
@@ -611,12 +611,13 @@ Ties are broken in this order:
 - Crafting: crafting XP (counted up to the maximum crafting level), then who reached the maximum level first.
 - Tiles: the most tiles the player ever owned in one run (`player_stats.best_tiles`), so a rebirth does not lower it.
 - Kills: every monster the player ever killed (the ledger counts them per monster type, the board adds the types up).
+- Deeds: deed points of the **claimed** tiers (an earned tier counts only after Claim; the ledger mirrors the number in `stats.deedPoints`), then who reached the total first.
 
 <a id="movement"></a>
 
 ### Movement arrows
 
-Source: [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts)
+Source: [`src/lib/rankings.ts:93`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
@@ -892,7 +893,7 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:177`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:216`](../../src/lib/offline/achievements.ts)
 
 Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
@@ -908,7 +909,7 @@ See also: `achievementsDue`, `earnAchievements`
 
 ### `claimAchievement` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:96`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:132`](../../src/lib/offline/achievements.ts)
 
 The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time.
 Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.
@@ -925,159 +926,309 @@ The facts of a map and a farm. The largest group per biome is a flood fill over 
 
 ### `recordCuriosity` <small>function</small>
 
-Source: [`src/lib/offline/curiosity.ts:14`](../../src/lib/offline/curiosity.ts)
+Source: [`src/lib/offline/curiosity.ts:20`](../../src/lib/offline/curiosity.ts)
 
 Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).
+
+<a id="recordrankplace"></a>
+
+### `recordRankPlace` <small>function</small>
+
+Source: [`src/lib/offline/curiosity.ts:31`](../../src/lib/offline/curiosity.ts)
+
+Records the podium place a player holds on a Ranking board (1 to 3, any board): `rank_<place>` once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.
 
 <a id="achievements"></a>
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:100`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:116`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (135, 9850 gems in total)** _(computed from the code)_
+**The launch achievements (277, 24750 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
-| 1 | `tutorial` | Learned the ropes | last step of the starter path done | 25 | - |
-| 2 | `first_tile` | Landowner | tiles >= 1 | 25 | - |
-| 3 | `first_building` | Builder | buildings >= 1 | 25 | - |
-| 4 | `first_fight` | First blood | kills >= 1 | 25 | - |
-| 5 | `first_chest` | Treasure hunter | chests >= 1 | 25 | - |
-| 6 | `castle_2` | Growing keep | castle level 2 | 25 | - |
+| 1 | `tutorial` | Learned the ropes | last step of the starter path done | 50 | - |
+| 2 | `first_tile` | Landowner | tiles >= 1 | 50 | - |
+| 3 | `first_building` | Builder | buildings >= 1 | 50 | - |
+| 4 | `first_fight` | First blood | kills >= 1 | 50 | - |
+| 5 | `first_chest` | Treasure hunter | chests >= 1 | 50 | - |
+| 6 | `castle_2` | Growing keep | castle level 2 | 50 | - |
 | 7 | `castle_6` | Stout walls | castle level 6 | 75 | - |
 | 8 | `castle_10` | Architect | castle level 10 | 100 | architect |
-| 9 | `first_rebirth` | Reborn | rebirths >= 1 | 75 | reborn |
+| 9 | `first_rebirth` | Reborn | rebirths >= 1 | 50 | reborn |
 | 10 | `boss_auroch` | Boss slayer | 1 x `bossGreatAuroch` | 50 | boss_slayer |
 | 11 | `golden_kill` | Golden touch | golden >= 1 | 50 | - |
 | 12 | `early_tester` | Early tester | granted by the new chapter reset | 100 | early_tester / early-tester |
 | 13 | `beta_tester` | Beta tester | granted by the new chapter reset | 200 | beta_tester / beta-tester |
-| 14 | `slayer_100` | Slayer I | kills >= 100 | 25 | - |
-| 15 | `slayer_500` | Slayer II | kills >= 500 | 50 | - |
+| 14 | `slayer_100` | Slayer I | kills >= 100 | 50 | - |
+| 15 | `slayer_500` | Slayer II | kills >= 500 | 75 | - |
 | 16 | `slayer_2500` | Slayer III | kills >= 2500 | 100 | - |
-| 17 | `slayer_10000` | Slayer IV | kills >= 10000 | 200 | - |
-| 18 | `wolfsbane_50` | Wolfsbane I | 50 x `mossbackWolf` | 20 | - |
-| 19 | `wolfsbane_200` | Wolfsbane II | 200 x `mossbackWolf` | 40 | - |
-| 20 | `wolfsbane_1000` | Wolfsbane III | 1000 x `mossbackWolf` | 80 | - |
-| 21 | `untouched_1` | Untouched I | flawless >= 1 | 20 | - |
-| 22 | `untouched_25` | Untouched II | flawless >= 25 | 50 | - |
+| 17 | `slayer_10000` | Slayer IV | kills >= 10000 | 125 | slayer |
+| 18 | `wolfsbane_50` | Wolfsbane I | 50 x `mossbackWolf` | 50 | - |
+| 19 | `wolfsbane_200` | Wolfsbane II | 200 x `mossbackWolf` | 75 | - |
+| 20 | `wolfsbane_1000` | Wolfsbane III | 1000 x `mossbackWolf` | 100 | wolfsbane |
+| 21 | `untouched_1` | Untouched I | flawless >= 1 | 50 | - |
+| 22 | `untouched_25` | Untouched II | flawless >= 25 | 75 | - |
 | 23 | `untouched_100` | Untouched III | flawless >= 100 | 100 | - |
-| 24 | `landlord_50` | Landlord I | tiles >= 50 | 20 | - |
-| 25 | `landlord_200` | Landlord II | tiles >= 200 | 50 | - |
-| 26 | `landlord_500` | Landlord III | tiles >= 500 | 100 | - |
-| 27 | `landlord_1000` | Landlord IV | tiles >= 1000 | 200 | - |
-| 28 | `hoarder_100k` | Hoarder I | goldPeak >= 100000 | 20 | - |
-| 29 | `hoarder_1m` | Hoarder II | goldPeak >= 1000000 | 50 | - |
-| 30 | `hoarder_10m` | Hoarder III | goldPeak >= 10000000 | 120 | - |
-| 31 | `market_1m` | Market Day I | unitsSold >= 1000000 | 20 | - |
-| 32 | `market_10m` | Market Day II | unitsSold >= 10000000 | 50 | - |
-| 33 | `market_100m` | Market Day III | unitsSold >= 100000000 | 120 | - |
-| 34 | `smith_100` | Apprentice Smith I | crafted >= 100 | 20 | - |
-| 35 | `smith_1000` | Apprentice Smith II | crafted >= 1000 | 50 | - |
-| 36 | `smith_10000` | Apprentice Smith III | crafted >= 10000 | 120 | - |
-| 37 | `reborn_5` | Reborn II | rebirths >= 5 | 100 | - |
-| 38 | `reborn_20` | Reborn III | rebirths >= 20 | 250 | - |
-| 39 | `scholar_5` | Scholar I | entries >= 5 | 20 | - |
-| 40 | `scholar_15` | Scholar II | entries >= 15 | 60 | - |
-| 41 | `scholar_30` | Scholar III | entries >= 30 | 150 | - |
-| 42 | `scholar_50` | Loremaster | entries >= 50 | 250 | loremaster |
-| 43 | `archivist_10` | Archivist I | mastered >= 10 | 40 | - |
-| 44 | `archivist_50` | Archivist II | mastered >= 50 | 120 | - |
-| 45 | `archivist_150` | Archivist III | mastered >= 150 | 300 | - |
-| 46 | `archivist_all` | Grand Archivist | mastered >= 288 | 100 | grand-archivist |
-| 47 | `naturalist_1` | Field Naturalist I | biomeGoals >= 1 | 40 | - |
-| 48 | `naturalist_12` | Field Naturalist II | biomeGoals >= 12 | 150 | - |
-| 49 | `naturalist_48` | Warden of the Wilds | biomeGoals >= 48 | 400 | warden-of-the-wilds |
-| 50 | `archivist_1` | First Entry | mastered >= 1 | 20 | - |
-| 51 | `bane_boar` | Boar Breaker | 1000 x `thistleBoar` | 30 | boar-breaker |
-| 52 | `bane_wyrm` | Wyrmbane | 10 x `bossWinterWyrm` | 120 | wyrmbane |
+| 24 | `landlord_50` | Landlord I | tiles >= 50 | 75 | - |
+| 25 | `landlord_200` | Landlord II | tiles >= 200 | 100 | - |
+| 26 | `landlord_500` | Landlord III | tiles >= 500 | 125 | - |
+| 27 | `landlord_1000` | Landlord IV | tiles >= 1000 | 150 | landlord |
+| 28 | `hoarder_100k` | Hoarder I | goldPeak >= 100000 | 50 | - |
+| 29 | `hoarder_1m` | Hoarder II | goldPeak >= 1000000 | 75 | - |
+| 30 | `hoarder_10m` | Hoarder III | goldPeak >= 10000000 | 100 | hoarder |
+| 31 | `market_1m` | Market Day I | unitsSold >= 1000000 | 50 | - |
+| 32 | `market_10m` | Market Day II | unitsSold >= 10000000 | 75 | - |
+| 33 | `market_100m` | Market Day III | unitsSold >= 100000000 | 100 | merchant-prince |
+| 34 | `smith_100` | Apprentice Smith I | crafted >= 100 | 50 | - |
+| 35 | `smith_1000` | Apprentice Smith II | crafted >= 1000 | 75 | - |
+| 36 | `smith_10000` | Apprentice Smith III | crafted >= 10000 | 100 | master-smith |
+| 37 | `reborn_5` | Reborn II | rebirths >= 5 | 75 | - |
+| 38 | `reborn_20` | Reborn III | rebirths >= 20 | 100 | reborn |
+| 39 | `scholar_5` | Scholar I | entries >= 5 | 50 | - |
+| 40 | `scholar_15` | Scholar II | entries >= 15 | 75 | - |
+| 41 | `scholar_30` | Scholar III | entries >= 30 | 100 | - |
+| 42 | `scholar_50` | Loremaster | entries >= 50 | 125 | loremaster |
+| 43 | `archivist_10` | Archivist I | mastered >= 10 | 75 | - |
+| 44 | `archivist_50` | Archivist II | mastered >= 50 | 100 | - |
+| 45 | `archivist_150` | Archivist III | mastered >= 150 | 125 | - |
+| 46 | `archivist_all` | Grand Archivist | mastered >= 288 | 150 | grand-archivist |
+| 47 | `naturalist_1` | Field Naturalist I | biomeGoals >= 1 | 50 | - |
+| 48 | `naturalist_12` | Field Naturalist II | biomeGoals >= 12 | 75 | - |
+| 49 | `naturalist_48` | Warden of the Wilds | biomeGoals >= 48 | 100 | warden-of-the-wilds |
+| 50 | `archivist_1` | First Entry | mastered >= 1 | 50 | - |
+| 51 | `bane_boar` | Boar Breaker | 1000 x `thistleBoar` | 50 | boar-breaker |
+| 52 | `bane_wyrm` | Wyrmbane | 10 x `bossWinterWyrm` | 50 | wyrmbane |
 | 53 | `biome_jungle` | New land: Jungle | biome jungle | 50 | - |
 | 54 | `biome_fields` | New land: Fields | biome fields | 50 | - |
 | 55 | `biome_orchard` | New land: Blossom Orchard | biome orchard | 50 | - |
 | 56 | `biome_blight` | New land: Blight | biome blight | 50 | - |
 | 57 | `biome_battlefield` | New land: Battlefield | biome battlefield | 50 | - |
-| 58 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 20 | - |
-| 59 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 50 | - |
-| 60 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 80 | - |
-| 61 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 20 | - |
-| 62 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 50 | - |
-| 63 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 80 | - |
-| 64 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 20 | - |
-| 65 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 50 | - |
-| 66 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 80 | - |
-| 67 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 20 | - |
-| 68 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 50 | - |
-| 69 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 80 | - |
-| 70 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 20 | - |
-| 71 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 50 | - |
-| 72 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 80 | - |
-| 73 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 20 | - |
-| 74 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 50 | - |
-| 75 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 80 | - |
-| 76 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 20 | - |
-| 77 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 50 | - |
-| 78 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 80 | - |
-| 79 | `kit_uncommon` | Fully kitted I | kit uncommon | 40 | - |
-| 80 | `kit_epic` | Fully kitted II | kit epic | 120 | - |
-| 81 | `kit_legendary` | Fully kitted III | kit legendary | 400 | - |
-| 82 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 30 | - |
-| 83 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 70 | - |
-| 84 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 110 | - |
-| 85 | `streak_3` | Regular I | streak >= 3 | 20 | - |
-| 86 | `streak_7` | Regular II | streak >= 7 | 60 | - |
-| 87 | `first_respec` | Second thoughts | respecs >= 1 | 20 | - |
-| 88 | `attr_strength_50` | Strength focus I | attribute >= 50 | 30 | - |
-| 89 | `attr_strength_100` | Strength focus II | attribute >= 100 | 80 | - |
-| 90 | `attr_strength_200` | Strength focus III | attribute >= 200 | 130 | - |
-| 91 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 30 | - |
-| 92 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 80 | - |
-| 93 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 130 | - |
-| 94 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 30 | - |
-| 95 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 80 | - |
-| 96 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 130 | - |
-| 97 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 30 | - |
-| 98 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 80 | - |
-| 99 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 130 | - |
-| 100 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 30 | - |
-| 101 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 80 | - |
-| 102 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 130 | - |
-| 103 | `farm_10` | Farmer I | animals >= 10 | 20 | - |
-| 104 | `farm_50` | Farmer II | animals >= 50 | 60 | - |
+| 58 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 50 | - |
+| 59 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 75 | - |
+| 60 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 100 | - |
+| 61 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 50 | - |
+| 62 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 75 | - |
+| 63 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 100 | - |
+| 64 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 50 | - |
+| 65 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 75 | - |
+| 66 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 100 | - |
+| 67 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 50 | - |
+| 68 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 75 | - |
+| 69 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 100 | - |
+| 70 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 50 | - |
+| 71 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 75 | - |
+| 72 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 100 | - |
+| 73 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 50 | - |
+| 74 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 75 | - |
+| 75 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 100 | - |
+| 76 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 50 | - |
+| 77 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 75 | - |
+| 78 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 100 | - |
+| 79 | `kit_uncommon` | Fully kitted I | kit uncommon | 50 | - |
+| 80 | `kit_epic` | Fully kitted II | kit epic | 75 | - |
+| 81 | `kit_legendary` | Fully kitted III | kit legendary | 100 | fully-kitted |
+| 82 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 50 | - |
+| 83 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 75 | - |
+| 84 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 100 | - |
+| 85 | `streak_3` | Regular I | streak >= 3 | 50 | - |
+| 86 | `streak_7` | Regular II | streak >= 7 | 75 | - |
+| 87 | `first_respec` | Second thoughts | respecs >= 1 | 50 | - |
+| 88 | `attr_strength_50` | Strength focus I | attribute >= 50 | 50 | - |
+| 89 | `attr_strength_100` | Strength focus II | attribute >= 100 | 75 | - |
+| 90 | `attr_strength_200` | Strength focus III | attribute >= 200 | 100 | - |
+| 91 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 50 | - |
+| 92 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 75 | - |
+| 93 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 100 | - |
+| 94 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 50 | - |
+| 95 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 75 | - |
+| 96 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 100 | - |
+| 97 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 50 | - |
+| 98 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 75 | - |
+| 99 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 100 | - |
+| 100 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 50 | - |
+| 101 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 75 | - |
+| 102 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 100 | - |
+| 103 | `farm_10` | Farmer I | animals >= 10 | 50 | - |
+| 104 | `farm_50` | Farmer II | animals >= 50 | 75 | - |
 | 105 | `farm_200` | Farmer III | animals >= 200 | 100 | - |
-| 106 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 20 | - |
-| 107 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 60 | - |
-| 108 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 20 | - |
-| 109 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 60 | - |
-| 110 | `farm_pig_10` | Pig keeper I | animals >= 10 | 20 | - |
-| 111 | `farm_pig_50` | Pig keeper II | animals >= 50 | 60 | - |
-| 112 | `farm_cow_10` | Cow keeper I | animals >= 10 | 20 | - |
-| 113 | `farm_cow_50` | Cow keeper II | animals >= 50 | 60 | - |
-| 114 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 25 | - |
-| 115 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 65 | - |
-| 116 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 25 | - |
-| 117 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 65 | - |
-| 118 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 25 | - |
-| 119 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 65 | - |
-| 120 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 25 | - |
-| 121 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 65 | - |
-| 122 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 25 | - |
-| 123 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 65 | - |
-| 124 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 25 | - |
-| 125 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 65 | - |
-| 126 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 25 | - |
-| 127 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 65 | - |
-| 128 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 40 | - |
-| 129 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 100 | - |
-| 130 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 160 | - |
-| 131 | `boss_kills_5` | Bossbane I | bosses >= 5 | 40 | - |
-| 132 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
-| 133 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
-| 134 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
-| 135 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
+| 106 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 50 | - |
+| 107 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 75 | - |
+| 108 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 50 | - |
+| 109 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 75 | - |
+| 110 | `farm_pig_10` | Pig keeper I | animals >= 10 | 50 | - |
+| 111 | `farm_pig_50` | Pig keeper II | animals >= 50 | 75 | - |
+| 112 | `farm_cow_10` | Cow keeper I | animals >= 10 | 50 | - |
+| 113 | `farm_cow_50` | Cow keeper II | animals >= 50 | 75 | - |
+| 114 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 50 | - |
+| 115 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 75 | - |
+| 116 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 50 | - |
+| 117 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 75 | - |
+| 118 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 50 | - |
+| 119 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 75 | - |
+| 120 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 50 | - |
+| 121 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 75 | - |
+| 122 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 50 | - |
+| 123 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 75 | - |
+| 124 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 50 | - |
+| 125 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 75 | - |
+| 126 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 50 | - |
+| 127 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 75 | - |
+| 128 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 50 | - |
+| 129 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 75 | - |
+| 130 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 100 | - |
+| 131 | `boss_kills_5` | Bossbane I | bosses >= 5 | 50 | - |
+| 132 | `boss_kills_25` | Bossbane II | bosses >= 25 | 75 | - |
+| 133 | `boss_kills_100` | Bossbane III | bosses >= 100 | 100 | boss-hunter |
+| 134 | `curious_gambler` | Just looking | curiosity gambling_empty | 50 | - |
+| 135 | `slayer_50000` | Slayer V | kills >= 50000 | 150 | - |
+| 136 | `slayer_250000` | Slayer VI | kills >= 250000 | 175 | - |
+| 137 | `slayer_1000000` | Slayer VII | kills >= 1000000 | 200 | bane-of-beasts |
+| 138 | `slayer_5000000` | Slayer VIII | kills >= 5000000 | 225 | - |
+| 139 | `hoarder_100000000` | Hoarder IV | goldPeak >= 100000000 | 125 | - |
+| 140 | `hoarder_1000000000` | Hoarder V | goldPeak >= 1000000000 | 150 | - |
+| 141 | `hoarder_10000000000` | Hoarder VI | goldPeak >= 10000000000 | 175 | - |
+| 142 | `hoarder_100000000000` | Hoarder VII | goldPeak >= 100000000000 | 200 | - |
+| 143 | `hoarder_1000000000000` | Hoarder VIII | goldPeak >= 1000000000000 | 225 | dragons-hoard |
+| 144 | `market_1000000000` | Market Day IV | unitsSold >= 1000000000 | 125 | - |
+| 145 | `market_10000000000` | Market Day V | unitsSold >= 10000000000 | 150 | grand-merchant |
+| 146 | `smith_50000` | Apprentice Smith IV | crafted >= 50000 | 125 | - |
+| 147 | `smith_250000` | Apprentice Smith V | crafted >= 250000 | 150 | grandmaster-smith |
+| 148 | `reborn_50` | Reborn IV | rebirths >= 50 | 125 | - |
+| 149 | `reborn_100` | Reborn V | rebirths >= 100 | 150 | eternal-phoenix |
+| 150 | `untouched_500` | Untouched IV | flawless >= 500 | 125 | - |
+| 151 | `untouched_2500` | Untouched V | flawless >= 2500 | 150 | untouchable |
+| 152 | `wolfsbane_5000` | Wolfsbane IV | 5000 x `mossbackWolf` | 125 | - |
+| 153 | `golden_10` | Golden touch II | golden >= 10 | 75 | - |
+| 154 | `golden_50` | Golden touch III | golden >= 50 | 100 | - |
+| 155 | `golden_250` | Golden touch IV | golden >= 250 | 125 | - |
+| 156 | `golden_1000` | Golden touch V | golden >= 1000 | 150 | - |
+| 157 | `golden_5000` | Golden touch VI | golden >= 5000 | 175 | midas |
+| 158 | `boss_kills_250` | Bossbane IV | bosses >= 250 | 125 | - |
+| 159 | `boss_kills_1000` | Bossbane V | bosses >= 1000 | 150 | - |
+| 160 | `boss_kills_5000` | Bossbane VI | bosses >= 5000 | 175 | worldbreaker |
+| 161 | `income_gold_100000` | Gold rush I | income >= 100000 | 50 | - |
+| 162 | `income_gold_10000000` | Gold rush II | income >= 10000000 | 75 | - |
+| 163 | `income_gold_1000000000` | Gold rush III | income >= 1000000000 | 100 | - |
+| 164 | `income_gold_100000000000` | Gold rush IV | income >= 100000000000 | 125 | - |
+| 165 | `income_gold_10000000000000` | Gold rush V | income >= 10000000000000 | 150 | gold-baron |
+| 166 | `income_wood_10000` | Woodcutter I | income >= 10000 | 50 | - |
+| 167 | `income_wood_1000000` | Woodcutter II | income >= 1000000 | 75 | - |
+| 168 | `income_wood_100000000` | Woodcutter III | income >= 100000000 | 100 | - |
+| 169 | `income_wood_10000000000` | Woodcutter IV | income >= 10000000000 | 125 | - |
+| 170 | `income_wood_1000000000000` | Woodcutter V | income >= 1000000000000 | 150 | - |
+| 171 | `income_stone_10000` | Quarryman I | income >= 10000 | 50 | - |
+| 172 | `income_stone_1000000` | Quarryman II | income >= 1000000 | 75 | - |
+| 173 | `income_stone_100000000` | Quarryman III | income >= 100000000 | 100 | - |
+| 174 | `income_stone_10000000000` | Quarryman IV | income >= 10000000000 | 125 | - |
+| 175 | `income_stone_1000000000000` | Quarryman V | income >= 1000000000000 | 150 | - |
+| 176 | `income_coal_10000` | Coal baron I | income >= 10000 | 50 | - |
+| 177 | `income_coal_1000000` | Coal baron II | income >= 1000000 | 75 | - |
+| 178 | `income_coal_100000000` | Coal baron III | income >= 100000000 | 100 | - |
+| 179 | `income_coal_10000000000` | Coal baron IV | income >= 10000000000 | 125 | - |
+| 180 | `income_coal_1000000000000` | Coal baron V | income >= 1000000000000 | 150 | - |
+| 181 | `income_food_10000` | Harvest king I | income >= 10000 | 50 | - |
+| 182 | `income_food_1000000` | Harvest king II | income >= 1000000 | 75 | - |
+| 183 | `income_food_100000000` | Harvest king III | income >= 100000000 | 100 | - |
+| 184 | `income_food_10000000000` | Harvest king IV | income >= 10000000000 | 125 | - |
+| 185 | `income_food_1000000000000` | Harvest king V | income >= 1000000000000 | 150 | - |
+| 186 | `income_meat_10000` | Butcher I | income >= 10000 | 50 | - |
+| 187 | `income_meat_1000000` | Butcher II | income >= 1000000 | 75 | - |
+| 188 | `income_meat_100000000` | Butcher III | income >= 100000000 | 100 | - |
+| 189 | `income_meat_10000000000` | Butcher IV | income >= 10000000000 | 125 | - |
+| 190 | `income_meat_1000000000000` | Butcher V | income >= 1000000000000 | 150 | - |
+| 191 | `income_eggs_1000` | Egg collector I | income >= 1000 | 50 | - |
+| 192 | `income_eggs_100000` | Egg collector II | income >= 100000 | 75 | - |
+| 193 | `income_eggs_10000000` | Egg collector III | income >= 10000000 | 100 | - |
+| 194 | `income_eggs_1000000000` | Egg collector IV | income >= 1000000000 | 125 | - |
+| 195 | `income_milk_1000` | Dairy baron I | income >= 1000 | 50 | - |
+| 196 | `income_milk_100000` | Dairy baron II | income >= 100000 | 75 | - |
+| 197 | `income_milk_10000000` | Dairy baron III | income >= 10000000 | 100 | - |
+| 198 | `income_milk_1000000000` | Dairy baron IV | income >= 1000000000 | 125 | - |
+| 199 | `income_hide_1000` | Tanner I | income >= 1000 | 50 | - |
+| 200 | `income_hide_100000` | Tanner II | income >= 100000 | 75 | - |
+| 201 | `income_hide_10000000` | Tanner III | income >= 10000000 | 100 | - |
+| 202 | `income_hide_1000000000` | Tanner IV | income >= 1000000000 | 125 | - |
+| 203 | `income_wool_1000` | Shearer I | income >= 1000 | 50 | - |
+| 204 | `income_wool_100000` | Shearer II | income >= 100000 | 75 | - |
+| 205 | `income_wool_10000000` | Shearer III | income >= 10000000 | 100 | - |
+| 206 | `income_wool_1000000000` | Shearer IV | income >= 1000000000 | 125 | - |
+| 207 | `income_herbs_100` | Herbalist I | income >= 100 | 50 | - |
+| 208 | `income_herbs_10000` | Herbalist II | income >= 10000 | 75 | - |
+| 209 | `income_herbs_1000000` | Herbalist III | income >= 1000000 | 100 | - |
+| 210 | `income_herbs_100000000` | Herbalist IV | income >= 100000000 | 125 | - |
+| 211 | `income_sap_100` | Sap tapper I | income >= 100 | 50 | - |
+| 212 | `income_sap_10000` | Sap tapper II | income >= 10000 | 75 | - |
+| 213 | `income_sap_1000000` | Sap tapper III | income >= 1000000 | 100 | - |
+| 214 | `income_sap_100000000` | Sap tapper IV | income >= 100000000 | 125 | - |
+| 215 | `income_ironOre_100` | Prospector I | income >= 100 | 50 | - |
+| 216 | `income_ironOre_10000` | Prospector II | income >= 10000 | 75 | - |
+| 217 | `income_ironOre_1000000` | Prospector III | income >= 1000000 | 100 | - |
+| 218 | `income_ironOre_100000000` | Prospector IV | income >= 100000000 | 125 | - |
+| 219 | `income_spores_100` | Sporeling I | income >= 100 | 50 | - |
+| 220 | `income_spores_10000` | Sporeling II | income >= 10000 | 75 | - |
+| 221 | `income_spores_1000000` | Sporeling III | income >= 1000000 | 100 | - |
+| 222 | `income_spores_100000000` | Sporeling IV | income >= 100000000 | 125 | - |
+| 223 | `income_frostshard_100` | Frost miner I | income >= 100 | 50 | - |
+| 224 | `income_frostshard_10000` | Frost miner II | income >= 10000 | 75 | - |
+| 225 | `income_frostshard_1000000` | Frost miner III | income >= 1000000 | 100 | - |
+| 226 | `income_frostshard_100000000` | Frost miner IV | income >= 100000000 | 125 | - |
+| 227 | `income_pearls_100` | Pearl diver I | income >= 100 | 50 | - |
+| 228 | `income_pearls_10000` | Pearl diver II | income >= 10000 | 75 | - |
+| 229 | `income_pearls_1000000` | Pearl diver III | income >= 1000000 | 100 | - |
+| 230 | `income_pearls_100000000` | Pearl diver IV | income >= 100000000 | 125 | - |
+| 231 | `income_salt_100` | Salt of the earth I | income >= 100 | 50 | - |
+| 232 | `income_salt_10000` | Salt of the earth II | income >= 10000 | 75 | - |
+| 233 | `income_salt_1000000` | Salt of the earth III | income >= 1000000 | 100 | - |
+| 234 | `income_salt_100000000` | Salt of the earth IV | income >= 100000000 | 125 | - |
+| 235 | `craft_level_5` | Crafting mastery I | craftLevel >= 5 | 50 | - |
+| 236 | `craft_level_10` | Crafting mastery II | craftLevel >= 10 | 75 | - |
+| 237 | `craft_level_20` | Crafting mastery III | craftLevel >= 20 | 100 | - |
+| 238 | `craft_level_35` | Crafting mastery IV | craftLevel >= 35 | 125 | - |
+| 239 | `craft_level_50` | Crafting mastery V | craftLevel >= 50 | 150 | - |
+| 240 | `craft_level_65` | Crafting mastery VI | craftLevel >= 65 | 175 | - |
+| 241 | `craft_level_80` | Crafting mastery VII | craftLevel >= 80 | 200 | artisan |
+| 242 | `craft_epic_1` | Epic forger I | craftedRarity >= 1 | 50 | - |
+| 243 | `craft_epic_10` | Epic forger II | craftedRarity >= 10 | 75 | - |
+| 244 | `craft_epic_50` | Epic forger III | craftedRarity >= 50 | 100 | - |
+| 245 | `craft_epic_250` | Epic forger IV | craftedRarity >= 250 | 125 | - |
+| 246 | `craft_legendary_1` | Legendary forger I | craftedRarity >= 1 | 50 | - |
+| 247 | `craft_legendary_5` | Legendary forger II | craftedRarity >= 5 | 75 | - |
+| 248 | `craft_legendary_25` | Legendary forger III | craftedRarity >= 25 | 100 | - |
+| 249 | `craft_legendary_100` | Legendary forger IV | craftedRarity >= 100 | 125 | legend-smith |
+| 250 | `worn_epic_1` | Epic wardrobe I | wornRarity >= 1 | 50 | - |
+| 251 | `worn_epic_4` | Epic wardrobe II | wornRarity >= 4 | 75 | - |
+| 252 | `worn_epic_8` | Epic wardrobe III | wornRarity >= 8 | 100 | - |
+| 253 | `worn_epic_14` | Epic wardrobe IV | wornRarity >= 14 | 125 | - |
+| 254 | `worn_legendary_1` | Legendary wardrobe I | wornRarity >= 1 | 50 | - |
+| 255 | `worn_legendary_3` | Legendary wardrobe II | wornRarity >= 3 | 75 | - |
+| 256 | `worn_legendary_7` | Legendary wardrobe III | wornRarity >= 7 | 100 | - |
+| 257 | `worn_legendary_14` | Legendary wardrobe IV | wornRarity >= 14 | 125 | - |
+| 258 | `embers_50` | Ember keeper I | embers >= 50 | 50 | - |
+| 259 | `embers_500` | Ember keeper II | embers >= 500 | 75 | - |
+| 260 | `embers_5000` | Ember keeper III | embers >= 5000 | 100 | - |
+| 261 | `embers_50000` | Ember keeper IV | embers >= 50000 | 125 | - |
+| 262 | `embers_500000` | Ember keeper V | embers >= 500000 | 150 | - |
+| 263 | `embers_5000000` | Ember keeper VI | embers >= 5000000 | 175 | - |
+| 264 | `embers_50000000` | Ember keeper VII | embers >= 50000000 | 200 | ember-lord |
+| 265 | `losses_10` | Sore loser I | deaths >= 10 | 50 | - |
+| 266 | `losses_50` | Sore loser II | deaths >= 50 | 75 | - |
+| 267 | `losses_250` | Sore loser III | deaths >= 250 | 100 | - |
+| 268 | `losses_1000` | Sore loser IV | deaths >= 1000 | 125 | sore-loser |
+| 269 | `podium_3` | On the podium Bronze | curiosity rank_3 | 50 | - |
+| 270 | `podium_2` | On the podium Silver | curiosity rank_2 | 75 | - |
+| 271 | `podium_1` | On the podium Gold | curiosity rank_1 | 100 | champion |
+| 272 | `window_min` | Are you insane? | curiosity window_min | 50 | - |
+| 273 | `map_zoom_max` | Nose on the glass | curiosity map_zoom_max | 50 | - |
+| 274 | `map_zoom_min` | Where did everything go? | curiosity map_zoom_min | 50 | - |
+| 275 | `boss_window` | Not yet, big guy | curiosity boss_window | 50 | - |
+| 276 | `castle_skin` | Fashion victim | curiosity castle_skin | 50 | - |
+| 277 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -1220,16 +1371,77 @@ The choice lives on the profile (`badge_id`, `title_id`, written by the server a
 
 ### `claimAllAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:124`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:161`](../../src/lib/offline/achievements.ts)
 
 Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP`
 (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.
+
+<a id="deed-milestones"></a>
+
+### Deed milestones
+
+Source: [`src/catalog/deedMilestones.ts:29`](../../src/catalog/deedMilestones.ts)
+
+The milestones, by claimed deed points (all tiers together are worth about 7,800). Each pays gems once on Claim and switches on a small permanent bonus on kill gold or kill XP; the bonuses add up (+5% gold and +5% XP at the top, exactly at `DEED_BONUS_CAP_PCT`).
+Points count only after their tier was claimed, so a milestone is reached by claiming, and a milestone is claimed on its own button or by Claim all. The numbers are placeholders for the balance pass.
+
+**Deed point milestones (10, bonuses capped at +5% each)** _(computed from the code)_
+
+| Claimed deed points | Gems | Bonus on kill rewards |
+| --- | --- | --- |
+| 50 | 25 | +1% gold |
+| 150 | 50 | +1% xp |
+| 300 | 75 | +1% gold |
+| 600 | 100 | +1% xp |
+| 1000 | 150 | +1% gold |
+| 1500 | 200 | +1% xp |
+| 2250 | 300 | +1% gold |
+| 3000 | 500 | +1% xp |
+| 4500 | 600 | +1% gold |
+| 6000 | 800 | +1% xp |
+
+<a id="deedbonuses"></a>
+
+### `deedBonuses` <small>function</small>
+
+Source: [`src/lib/deeds.ts:223`](../../src/lib/deeds.ts)
+
+The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
+
+**Formula**
+
+```text
+bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
+```
+
+<a id="claimmilestone"></a>
+
+### `claimMilestone` <small>function</small>
+
+Source: [`src/lib/offline/achievements.ts:104`](../../src/lib/offline/achievements.ts)
+
+Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ([`deedBonuses`](progression.md#deedbonuses)). Refused for an id that is not a milestone, one the claimed points
+have not reached yet, or one already claimed.
+
+<a id="tiergems"></a>
+
+### `tierGems` <small>function</small>
+
+Source: [`src/catalog/deedRewards.ts:17`](../../src/catalog/deedRewards.ts)
+
+Gems paid for tier `index` (0-based) of a deed: 50, 75, 100, 125 ...
+
+**Formula**
+
+```text
+gems(tier n) = 50 + 25 x (n - 1)      (n = 1 for the first tier of the deed)
+```
 
 <a id="deeds"></a>
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:542`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:560`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

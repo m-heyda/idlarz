@@ -4,7 +4,7 @@ import { isBoss, monsterDef, rewardLevelMult } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
 import { generateLoot } from './generate';
-import { rollJunkDrops } from './junkDrops';
+import { rollJunkLoot } from './junkDrops';
 
 export interface KillContext {
 	goldPerSec: number;
@@ -26,6 +26,9 @@ export interface KillContext {
 	masteryGoldPct?: number;
 	masteryXpPct?: number;
 	masteryLootPct?: number;
+	/** The deed bonuses (`deedBonuses`, claimed point milestones), in %: extra kill gold and kill XP, on every monster */
+	deedGoldPct?: number;
+	deedXpPct?: number;
 }
 
 export interface KillLoot {
@@ -33,6 +36,8 @@ export interface KillLoot {
 	xp: number;
 	hide: number;
 	items: Drop[];
+	/** Crafting ingredients the kill dropped, for the crafting bag (key -> amount); they never touch the bag or the merchant */
+	stash: Record<string, number>;
 	/** The pity counters after this kill */
 	pity: Record<string, number>;
 }
@@ -48,8 +53,8 @@ export interface KillLoot {
  * @category Monsters/Rewards
  * @formula
  * goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
- * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%))
- * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
+ * gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%) x (1 + deed gold%))
+ * xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%) x (1 + deed XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
  * hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
  * @table kill-rewards
  */
@@ -62,12 +67,14 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	const kills = 1 + (ctx.killRewardPct ?? 0) / 100;
 	const masteryGold = 1 + (ctx.masteryGoldPct ?? 0) / 100;
 	const masteryXp = 1 + (ctx.masteryXpPct ?? 0) / 100;
+	const deedGold = 1 + (ctx.deedGoldPct ?? 0) / 100;
+	const deedXp = 1 + (ctx.deedXpPct ?? 0) / 100;
 	// the monster's part first (income share, capped, times its level), the player's investment (Luck, Gold Find, Kill Rewards %) after the cap
 	const goldBase = Math.min(ctx.goldPerSec * reward.gold.rewardSec, reward.gold.cap) * levelMult;
 	const xpBase = Math.min(ctx.xpPerSec * reward.xp.rewardSec, reward.xp.cap) * levelMult * COMBAT.rewards.xpScale;
 	return {
-		gold: Math.floor(Math.max(COMBAT.rewards.minGold, goldBase * luckBonus * goldFind) * bonus * kills * masteryGold),
-		xp: Math.max(COMBAT.rewards.minXp, xpBase) * bonus * kills * masteryXp,
+		gold: Math.floor(Math.max(COMBAT.rewards.minGold, goldBase * luckBonus * goldFind) * bonus * kills * masteryGold * deedGold),
+		xp: Math.max(COMBAT.rewards.minXp, xpBase) * bonus * kills * masteryXp * deedXp,
 		// pelts stay a share of the farm's hide income (uncapped; goods per family are a separate task)
 		hide: Math.floor((ctx.hidePerSec ?? 0) * reward.gold.rewardSec * levelMult * COMBAT.rewards.hideShare * bonus),
 	};
@@ -90,6 +97,6 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 	);
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	// junk materials come last, so the rest of the kill's rolls are untouched
-	const junk = rollJunkDrops({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky, type: monster.type }, rng);
-	return { gold, xp, hide, items: [...result.drops, ...junk], pity: result.pity };
+	const junk = rollJunkLoot({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky, type: monster.type }, rng);
+	return { gold, xp, hide, items: [...result.drops, ...junk.drops], stash: junk.stash, pity: result.pity };
 };

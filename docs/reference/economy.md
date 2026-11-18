@@ -15,7 +15,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
-- Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes)
+- Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes), [`INGREDIENTS`](#ingredients)
 - Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`builderCount`](#buildercount), [`idolEconomy`](#idoleconomy)
 - Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
@@ -236,7 +236,7 @@ discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x T
 
 ### `calculateXpGain` <small>function</small>
 
-Source: [`src/utils/game/character.ts:85`](../../src/utils/game/character.ts)
+Source: [`src/utils/game/character.ts:80`](../../src/utils/game/character.ts)
 
 Calculate XP gain scaling based on owned tiles
 The more tiles owned, the more XP gained
@@ -967,7 +967,7 @@ golden monster chance = min(10%, 2% + 0.05% x Luck)
 
 ### `TRADE_GOODS` <small>const</small>
 
-Source: [`src/catalog/recipes.ts:36`](../../src/catalog/recipes.ts)
+Source: [`src/catalog/recipes.ts:40`](../../src/catalog/recipes.ts)
 
 The trade goods crafting makes (IDL-227): plain bag stacks (`kind: 'consumable'` with no effect) that exist to be sold. They join `ITEM_CATALOG` but not the loot
 pools, so nothing drops them. The value is set against the input value at merchant prices (`recipeCostGold`): at most 1.4x, so crafting a good pays a little
@@ -977,7 +977,7 @@ better than selling its raw inputs and never turns into the main income (tests/c
 
 ### `GEAR_RECIPES` <small>const</small>
 
-Source: [`src/catalog/recipes.ts:337`](../../src/catalog/recipes.ts)
+Source: [`src/catalog/recipes.ts:341`](../../src/catalog/recipes.ts)
 
 The gear recipes (IDL-241): one per grade G1-G4 and slot, 13 slots, 52 recipes. The player picks the grade and the slot; the server rolls the base, rarity and affixes at claim time through the `craft` loot source (rarity by Luck and the
 pity counter, quality by Intelligence, item level by the crafting level inside the grade's window; see [`CRAFT_GEAR`](progression.md#craft-gear)). Every gear recipe is timed (`CRAFT_GEAR.timeSec`) and runs in the batch queue.
@@ -1000,6 +1000,37 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 | charm | 2,425 / 60 | 21.5 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | cape | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
 | belt | 2,395 / 60 | 21.3 K / 800 | 223 K / 2500 | 1.6 M / 6000 |
+
+<a id="ingredients"></a>
+
+### `INGREDIENTS` <small>const</small>
+
+Source: [`src/catalog/ingredients.ts:31`](../../src/catalog/ingredients.ts)
+
+The ingredients and what is planned for each (none of it is built yet). Append only.
+
+**Crafting ingredients (18, no recipe uses them yet)** _(computed from the code)_
+
+| Ingredient | Tier | Planned for | Dropped by |
+| --- | --- | --- | --- |
+| Vial of Blood | 1 | healing and vitality potions (the base) | Beast, Aquatic, Demon |
+| Wet Clay | 1 | glass vials and pottery | Construct |
+| Dried Herb Bundle | 1 | herb extracts for potions | Plant, Fungus |
+| Orange Caps | 1 | fungal extracts and night potions | Fungus |
+| Wild Grapes | 1 | wine and elixirs | a few monsters |
+| Hollow Log | 1 | planks | Plant |
+| Glowberry | 2 | night-vision and luck potions | Fungus |
+| Dark Horn | 2 | dark elixirs and enchanting powder | Demon |
+| Copper Ore | 2 | ingots (smelted with coal) | Construct |
+| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon |
+| Obsidian Chip | 2 | blade edges for the Obsidian grade | Elemental |
+| Geode | 2 | cut stones for jewelry | Aquatic, Construct |
+| Dark Shard | 2 | enchanting | Demon |
+| Murky Phial | 2 | cursed brews | Undead |
+| Moonstone Sliver | 3 | jewelry and enchanting | Undead |
+| Fire Drop | 3 | fire-ward jewelry | Elemental, Dragon |
+| Emerald Star | 3 | jewelry gems | a few monsters |
+| Heart Gem | 4 | the finest jewelry | a few monsters |
 
 ## Buildings
 

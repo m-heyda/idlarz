@@ -22,6 +22,8 @@ export interface BestiaryDropRow {
 	value: string;
 	/** `rare` and `epic` tint the value like the item rarities; default is plain ink */
 	tone?: 'plain' | 'good' | 'rare' | 'epic';
+	/** The heading the row sits under ("Rewards", "Junk", "Crafting ingredients"); a new one starts a new group */
+	section?: string;
 }
 
 export interface BestiaryEntry {
@@ -237,11 +239,14 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 				<div>
 					<div className='ds-capi'>{dropsOpen ? 'Drops' : `Drops · ${dropsAt > 0 ? compact(e.tiers[dropsAt - 1].kills) : '?'} kills`}</div>
 					{dropsOpen ? (
-						e.drops(lv).map((d) => (
-							<div className='ds-paper-row' key={d.label}>
-								<span>{d.label}</span>
-								<b style={{ color: d.tone === 'rare' ? '#1f4fa8' : d.tone === 'epic' ? '#4d2490' : d.tone === 'good' ? '#17561f' : INK }}>{d.value}</b>
-							</div>
+						e.drops(lv).map((d, i, all) => (
+							<React.Fragment key={d.label}>
+								{d.section && d.section !== all[i - 1]?.section ? <div className='ds-bst-dropsec'>{d.section}</div> : null}
+								<div className='ds-paper-row'>
+									<span>{d.label}</span>
+									<b style={{ color: d.tone === 'rare' ? '#1f4fa8' : d.tone === 'epic' ? '#4d2490' : d.tone === 'good' ? '#17561f' : INK }}>{d.value}</b>
+								</div>
+							</React.Fragment>
 						))
 					) : (
 						<div className='ds-paper-row'>
@@ -255,7 +260,7 @@ const Detail: React.FC<{ e: BestiaryEntry; busy?: boolean; onClaim?: (id: string
 };
 
 /** A dropdown drawn like the rest of the window (the native select is not styleable): a button that opens a list of options, closes on an outside press or Escape. */
-const Dropdown: React.FC<{ value: string; options: readonly [string, string][]; onChange: (v: string) => void; label: string }> = ({
+export const Dropdown: React.FC<{ value: string; options: readonly [string, string][]; onChange: (v: string) => void; label: string }> = ({
 	value,
 	options,
 	onChange,

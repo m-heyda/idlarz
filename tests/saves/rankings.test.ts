@@ -32,13 +32,14 @@ const profile = (patch: Partial<RankingProfile> = {}): RankingProfile => ({
 });
 const entry = (patch: Partial<RankingEntry> = {}): RankingEntry => ({ userId: 'u1', rank: 1, previousRank: null, value: 50, xp: 0, ...patch });
 
-test('five boards are live and Quests and Deeds are coming-soon placeholders', () => {
-	assert.deepEqual(LIVE_BOARD_IDS, ['level', 'rebirths', 'crafting', 'tiles', 'kills']);
+test('six boards are live and Quests is a coming-soon placeholder', () => {
+	assert.deepEqual(LIVE_BOARD_IDS, ['level', 'rebirths', 'crafting', 'tiles', 'kills', 'deeds']);
 	assert.deepEqual(
 		RANKING_BOARDS.filter((b) => b.soon).map((b) => b.id),
-		['quests', 'deeds'],
+		['quests'],
 	);
 	assert.equal(isLiveBoard('tiles'), true);
+	assert.equal(isLiveBoard('deeds'), true);
 	assert.equal(isLiveBoard('quests'), false, 'a placeholder is not served');
 	assert.equal(isLiveBoard('gold'), false);
 	assert.equal(isLiveBoard(undefined), false);

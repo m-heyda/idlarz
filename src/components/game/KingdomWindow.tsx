@@ -29,7 +29,7 @@ const KingdomWindow: React.FC = () => {
 	);
 	const summary = useMemo(() => kingdomSummary(input), [input]);
 	const { castle, builders, land, buildings, monsters } = summary;
-	// the land heatmap: one square per tile (or per `perCell` tiles on a huge realm), the biomes in runs like the weeks of a contribution graph
+	// the land heatmap: one square per tile (or per `perCell` tiles on a huge realm), the biomes in runs, left to right and wrapping to the width of the window
 	const perCell = Math.max(1, Math.ceil(land.owned / HEAT_MAX_CELLS));
 	const cells = land.byBiome.flatMap((row) =>
 		Array.from({ length: Math.max(1, Math.round(row.count / perCell)) }, () => ({ biome: row.biome, label: `${row.label}: ${formatNumber(row.count)}` })),

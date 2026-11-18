@@ -206,6 +206,21 @@ const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number
 	return { n, inv, craft: { ...craft, xp: craft.xp + craftXpOf(recipe, n, env?.xpPct), ord: craft.ord + n, stock, queue } };
 };
 
+/** How many crafted pieces of each rarity the bag holds (the server marks a crafted piece `crafted`). */
+const craftedGearOf = (inv: Inventory): Record<string, number> => {
+	const out: Record<string, number> = {};
+	for (const slot of inv.bag) if (slot && 'item' in slot && slot.item.crafted) out[slot.item.rarity] = (out[slot.item.rarity] ?? 0) + 1;
+	return out;
+};
+
+/** The crafted pieces a delivery added to the bag, by rarity (a delivery only adds pieces), for the Crafting deeds. */
+export const craftedGearAdded = (before: Inventory, after: Inventory): Record<string, number> => {
+	const was = craftedGearOf(before);
+	const out: Record<string, number> = {};
+	for (const [rarity, n] of Object.entries(craftedGearOf(after))) if (n > (was[rarity] ?? 0)) out[rarity] = n - (was[rarity] ?? 0);
+	return out;
+};
+
 /** Delivers what is finished in batch `slot`. Whatever does not fit stays in the batch and is delivered by a later claim. */
 export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowMs: number, env?: CraftEnv): CraftResult => {
 	const entry = Number.isInteger(slot) ? craft.queue[slot] : undefined;

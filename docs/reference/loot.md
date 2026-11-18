@@ -10,7 +10,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 - Config: [`LOOT_SOURCES`](#loot-sources), [`LOOT_PROFILES`](#loot-profiles), [`BIOME_LOOT`](#biome-loot), [`BOSS_LOOT`](#boss-loot)
 - Items: [`RARITIES`](#rarities), [`levelScale`](#levelscale), [`valueCurve`](#valuecurve), [`sellValueOf`](#sellvalueof), [`LIVE_GRADES`](#live-grades), [`gradeLevels`](#gradelevels), [`gradeRarities`](#graderarities), [`gradeLegacyItems`](#gradelegacyitems), [`kit`](#kit)
 - Adding content: [Adding loot content (data only)](#loot-pools), [`gear`](#gear)
-- Junk: [`isJunk`](#isjunk), [`junkSale`](#junksale), [`sellJunkRule`](#selljunkrule), [`rollJunkDrops`](#rolljunkdrops)
+- Junk: [`isJunk`](#isjunk), [`junkSale`](#junksale), [`sellJunkRule`](#selljunkrule), [`rollJunkLoot`](#rolljunkloot)
 
 ## Pipeline
 
@@ -291,7 +291,7 @@ Rarities: everything the game knows about one, in one place: label, colour, glow
 
 ### `levelScale` <small>function</small>
 
-Source: [`src/catalog/stats.ts:213`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:211`](../../src/catalog/stats.ts)
 
 Power multiplier of an item level (1 at level 1).
 
@@ -309,7 +309,7 @@ stats(instance) = baseStats x levelScale(L) / levelScale(minItemLevel) x (1 + (q
 
 ### `valueCurve` <small>function</small>
 
-Source: [`src/catalog/stats.ts:186`](../../src/catalog/stats.ts)
+Source: [`src/catalog/stats.ts:184`](../../src/catalog/stats.ts)
 
 Value multiplier of an item level (1 at level 1).
 
@@ -466,11 +466,11 @@ Source: [`src/lib/offline/inventory.ts:266`](../../src/lib/offline/inventory.ts)
 The "Sell junk" button: sells every piece of gear in the bag that `junk` names (the junk rule, `isJunk`), paid through the same Haggler path as any sale. Refused with nothing changed when no piece is junk, which is
 every bag until the rule is decided (IDL-312). `junk` is a parameter so a test can flip the rule.
 
-<a id="rolljunkdrops"></a>
+<a id="rolljunkloot"></a>
 
-### `rollJunkDrops` <small>function</small>
+### `rollJunkLoot` <small>function</small>
 
-Source: [`src/lib/loot/junkDrops.ts:64`](../../src/lib/loot/junkDrops.ts)
+Source: [`src/lib/loot/junkDrops.ts:71`](../../src/lib/loot/junkDrops.ts)
 
 The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance
 (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.
