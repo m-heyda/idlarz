@@ -2,8 +2,10 @@ import { ACHIEVEMENTS, DEEDS, achievementById, type AchievementDef } from '@/cat
 import { GEMS_CAP } from '@/config/economy';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
-import { conditionHolds, conditionProgress, deedPoints, type DeedFacts } from '@/lib/deeds';
+import { isMilestoneId, milestoneById } from '@/catalog/deedMilestones';
+import { claimableMilestones, conditionHolds, conditionProgress, deedBonuses, deedBonusText, deedPoints, type DeedBonuses, type DeedFacts } from '@/lib/deeds';
 import { RARITIES } from '@/catalog';
+import { craftLevelOf } from '@/lib/crafting';
 import { wornLevelOf } from '@/lib/loot/junk';
 import { readWorldFacts } from '@/lib/worldFacts';
 import type { ItemInstance } from '@/types/game';
@@ -38,6 +40,8 @@ export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): Achieve
 		world,
 		attrs: ledger.attrs?.alloc,
 		streak: ledger.gemShop.daily.streak,
+		craftLevel: craftLevelOf(ledger.craft.xp).level,
+		embers: summary.legacyEarned,
 		...wornOf(ledger.inv?.equipment),
 	};
 };
@@ -56,6 +60,12 @@ export interface AchievementUnlock {
 	id: string;
 	gems: number;
 }
+
+/** Keeps `stats.deedPoints` (the Rankings mirror) equal to the points of the claimed tiers. Returns the same ledger when it already is. */
+const withPoints = (ledger: Ledger): Ledger => {
+	const points = deedPoints(ledger.stats.claimed ?? ledger.stats.achievements);
+	return ledger.stats.deedPoints === points ? ledger : { ...ledger, stats: { ...ledger.stats, deedPoints: points } };
+};
 
 /** A ledger from before claiming existed paid every achievement when it was earned: its earned ids all count as claimed (nothing is paid again). */
 const withClaimMode = (ledger: Ledger): Ledger =>
@@ -84,6 +94,32 @@ export const earnAchievements = (ledger: Ledger, ids: readonly string[], nowMs: 
 	};
 };
 
+/**
+ * Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ({@link deedBonuses}). Refused for an id that is not a milestone, one the claimed points
+ * have not reached yet, or one already claimed.
+ *
+ * @category Progression/Deeds
+ * @order 6
+ */
+export const claimMilestone = (ledger: Ledger, id: string): ClaimOutcome => {
+	const milestone = milestoneById(id);
+	if (!milestone) return { ok: false, reason: 'unknown' };
+	const base = withClaimMode(ledger);
+	if (base.stats.milestonesClaimed.includes(id)) return { ok: false, reason: 'already_claimed' };
+	if (deedPoints(base.stats.claimed!) < milestone.points) return { ok: false, reason: 'not_earned' };
+	const gems = Math.min(GEMS_CAP, base.gems + milestone.gems) - base.gems;
+	return {
+		ok: true,
+		gems,
+		ledger: {
+			...base,
+			gems: base.gems + gems,
+			granted: addTotals(base.granted, { gems }),
+			stats: { ...base.stats, milestonesClaimed: [...base.stats.milestonesClaimed, id] },
+		},
+	};
+};
+
 export type ClaimOutcome = { ok: true; ledger: Ledger; gems: number } | { ok: false; reason: 'unknown' | 'not_earned' | 'already_claimed' };
 
 /**
@@ -94,6 +130,7 @@ export type ClaimOutcome = { ok: true; ledger: Ledger; gems: number } | { ok: fa
  * @order 2
  */
 export const claimAchievement = (ledger: Ledger, id: string, nowMs: number): ClaimOutcome => {
+	if (isMilestoneId(id)) return claimMilestone(ledger, id);
 	const def = achievementById(id);
 	if (!def) return { ok: false, reason: 'unknown' };
 	const base = withClaimMode(ledger);
@@ -103,12 +140,12 @@ export const claimAchievement = (ledger: Ledger, id: string, nowMs: number): Cla
 	return {
 		ok: true,
 		gems,
-		ledger: {
+		ledger: withPoints({
 			...base,
 			gems: base.gems + gems,
 			granted: addTotals(base.granted, { gems }),
 			stats: { ...base.stats, claimed: [...base.stats.claimed!, id], claimedAt: { ...base.stats.claimedAt, [id]: nowMs } },
-		},
+		}),
 	};
 };
 
@@ -125,21 +162,23 @@ export const claimAllAchievements = (ledger: Ledger, nowMs: number): ClaimAllOut
 	const base = withClaimMode(ledger);
 	const done = new Set(base.stats.claimed!);
 	const waiting = base.stats.achievements.filter((id) => !done.has(id) && !!achievementById(id));
-	if (waiting.length === 0) return { ok: false, reason: 'nothing_to_claim' };
-	const owed = waiting.reduce((sum, id) => sum + achievementById(id)!.rewards.gems, 0);
+	// the milestones the points reach once these tiers are claimed (points count only after the claim), paid in the same request
+	const milestones = claimableMilestones(deedPoints([...base.stats.claimed!, ...waiting]), base.stats.milestonesClaimed);
+	if (waiting.length === 0 && milestones.length === 0) return { ok: false, reason: 'nothing_to_claim' };
+	const owed = waiting.reduce((sum, id) => sum + achievementById(id)!.rewards.gems, 0) + milestones.reduce((sum, id) => sum + milestoneById(id)!.gems, 0);
 	const gems = Math.min(GEMS_CAP, base.gems + owed) - base.gems;
 	const claimedAt = { ...base.stats.claimedAt };
 	for (const id of waiting) claimedAt[id] = nowMs;
 	return {
 		ok: true,
 		gems,
-		claimed: waiting,
-		ledger: {
+		claimed: [...waiting, ...milestones],
+		ledger: withPoints({
 			...base,
 			gems: base.gems + gems,
 			granted: addTotals(base.granted, { gems }),
-			stats: { ...base.stats, claimed: [...base.stats.claimed!, ...waiting], claimedAt },
-		},
+			stats: { ...base.stats, claimed: [...base.stats.claimed!, ...waiting], claimedAt, milestonesClaimed: [...base.stats.milestonesClaimed, ...milestones] },
+		}),
 	};
 };
 
@@ -177,11 +216,15 @@ export const mergeManual = (ledger: Ledger, held: readonly string[], nowMs: numb
 export const settleAchievements = (ledger: Ledger, summary: StoredSave['summary'], nowMs: number): { ledger: Ledger; unlocked: AchievementUnlock[] } =>
 	!guideLive()
 		? { ledger, unlocked: [] }
-		: earnAchievements(
-				ledger,
-				achievementsDue(factsOf(ledger, summary)).map((a) => a.id),
-				nowMs,
-			);
+		: (() => {
+				const earned = earnAchievements(
+					ledger,
+					achievementsDue(factsOf(ledger, summary)).map((a) => a.id),
+					nowMs,
+				);
+				// a ledger from before the Rankings mirror (or from before claiming) gets its points number here, once
+				return { ...earned, ledger: withPoints(earned.ledger) };
+			})();
 
 /** What the browser gets about achievements: the newly earned ones (for the toast) and, on a poll, the full state. */
 export interface AchievementReport {
@@ -199,14 +242,13 @@ export interface AchievementReport {
 	/** Deed points of the claimed tiers (derived, never stored) and how many earned tiers wait for Claim */
 	points: number;
 	claimable: number;
-	/** What the "bonus from deeds" line says. A placeholder until the bonus model exists (IDL-310): no stat bonus is applied. */
+	/** The milestones claimed, the bonuses they give on kill rewards and the line the window shows for them */
+	milestonesClaimed: string[];
+	bonus: DeedBonuses;
 	bonusText: string;
 	/** The player's number towards each deed (deed id -> `cur`, as the Hall of Deeds bar reads it). Present when the last accepted save is known. */
 	progress?: Record<string, number>;
 }
-
-/** The placeholder the window shows for the bonus the deeds will give. */
-export const DEED_BONUS_PLACEHOLDER = 'Bonus from deeds: coming soon';
 
 /** Each deed's current number, from the same facts the conditions read. */
 export const deedProgressOf = (facts: AchievementFacts): Record<string, number> => {
@@ -229,8 +271,11 @@ export const reportOf = (ledger: Ledger, fresh: AchievementUnlock[], summary?: S
 		claimedAt: { ...ledger.stats.claimedAt },
 		gemsTotal: ledger.gems,
 		points: deedPoints(claimed),
-		claimable: ledger.stats.achievements.filter((id) => !claimed.includes(id)).length,
-		bonusText: DEED_BONUS_PLACEHOLDER,
+		claimable:
+			ledger.stats.achievements.filter((id) => !claimed.includes(id)).length + claimableMilestones(deedPoints(claimed), ledger.stats.milestonesClaimed).length,
+		milestonesClaimed: [...ledger.stats.milestonesClaimed],
+		bonus: deedBonuses(ledger.stats.milestonesClaimed),
+		bonusText: deedBonusText(ledger.stats.milestonesClaimed),
 		...(summary ? { progress: deedProgressOf(factsOf(ledger, summary)) } : {}),
 	};
 };

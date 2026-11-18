@@ -52,9 +52,10 @@ export const tidy = (text: string): string => {
 	return out;
 };
 
-/** Short number format: 1.2K, 3.4M, 1K (never 1.0K or 3.40M). */
+/** Short number format: 1.2K, 3.4M, 5B, 1T (never 1.0K or 3.40M). */
 export const compact = (n: number): string => {
 	const abs = Math.abs(n);
+	if (abs >= 1e12) return `${tidy((n / 1e12).toFixed(2))}T`;
 	if (abs >= 1e9) return `${tidy((n / 1e9).toFixed(2))}B`;
 	if (abs >= 1e6) return `${tidy((n / 1e6).toFixed(2))}M`;
 	if (abs >= 1e3) return `${tidy((n / 1e3).toFixed(abs >= 1e5 ? 0 : 1))}K`;
@@ -127,4 +128,33 @@ export const dockMagnification = (distance: number, peak = 1.25, reach = 100): n
 	if (!Number.isFinite(distance) || distance >= reach) return 1;
 	const t = 1 - Math.max(0, distance) / reach;
 	return 1 + (peak - 1) * (0.5 - 0.5 * Math.cos(Math.PI * t));
+};
+
+/** The top of the screen a tooltip keeps clear of: the resource top bar (px). */
+export const TIP_TOP_INSET = 56;
+
+/**
+ * Where a tooltip of size `tip` goes next to the `anchor` box so that it is fully visible: on the preferred side (`above` or `below`), flipped to the other when it does not fit there (the top edge is `topInset`, under the
+ * HUD bar), then slid inside the viewport on both axes. A card taller than the room is pinned to the top inset. `align: 'center'` centres it on the anchor, `'start'` lines it up with the anchor's left edge and flips to its right
+ * edge when that would leave the screen.
+ */
+export const placeHoverTip = (
+	anchor: { left: number; top: number; right: number; bottom: number },
+	tip: Size,
+	viewport: Size,
+	opts: { placement?: 'above' | 'below'; align?: 'start' | 'center'; gap?: number; margin?: number; topInset?: number } = {},
+): Point => {
+	const { placement = 'below', align = 'start', gap = 8, margin = 4, topInset = 0 } = opts;
+	const minTop = Math.max(margin, topInset);
+	const above = anchor.top - tip.h - gap;
+	const below = anchor.bottom + gap;
+	const fitsAbove = above >= minTop;
+	const fitsBelow = below + tip.h <= viewport.h - margin;
+	const preferAbove = placement === 'above' ? fitsAbove || !fitsBelow : !fitsBelow && fitsAbove;
+	let top = preferAbove ? above : below;
+	top = clamp(top, minTop, viewport.h - margin - tip.h);
+	let left = align === 'center' ? anchor.left + (anchor.right - anchor.left) / 2 - tip.w / 2 : anchor.left;
+	if (align === 'start' && left + tip.w > viewport.w - margin) left = anchor.right - tip.w;
+	left = clamp(left, margin, viewport.w - margin - tip.w);
+	return { x: left, y: top };
 };

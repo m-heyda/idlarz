@@ -32,7 +32,7 @@ test('seen reads back from the column: missing, malformed and valid values', () 
 test('the report lists the discovered types and the kills', () => {
 	let s = recordEncounter(emptyStats(), 'thistleBoar', 1000);
 	s = recordKill(s, { type: 'thistleBoar', lucky: false, boss: false });
-	assert.deepEqual(bestiaryOf(s), { seen: ['thistleBoar'], kills: { thistleBoar: 1 }, claimed: {}, deaths: {}, bestMs: {} });
+	assert.deepEqual(bestiaryOf(s), { seen: ['thistleBoar'], kills: { thistleBoar: 1 }, claimed: {}, biomeClaimed: {}, deaths: {}, bestMs: {} });
 });
 
 test('starting a fight discovers the monster, and a won fight counts a kill', () => {

@@ -181,7 +181,7 @@ export const RESOURCES = {
 		source: 'Rebirthing from castle level 6: the higher your castle and land, the more you get.',
 		color: '#ffb04a',
 	},
-	// T3 extracts (docs/plan/18-biome-buildings-and-material-tiers.md): one per home biome, made only by that biome's Extractor building. The merchant never trades them. Appended after the old entries so the saved order of the others is unchanged.
+	// T3 extracts (docs/plan/18-biome-buildings-and-material-tiers.md): one per home biome, made only by that biome's Extractor building. The merchant buys them (sell only: he never sells them back, see `MERCHANT_BUYABLE`). Appended after the old entries so the saved order of the others is unchanged.
 	herbs: {
 		stored: true,
 		optionalInSave: true,
@@ -190,8 +190,9 @@ export const RESOURCES = {
 		label: 'Herbs',
 		description: 'A crafting extract of the plains.',
 		usedFor: 'Crafting (potions and enchants) and, later, building upgrades.',
-		source: 'The Herb Garden on a plains tile. Cannot be bought or sold.',
+		source: 'The Herb Garden on a plains tile. Sells to the merchant (he does not sell it back).',
 		color: '#8fd16a',
+		merchant: { price: 5, description: 'Fresh-cut herbs from the plains.', pitch: 'Apothecaries pay for good herbs.' },
 	},
 	sap: {
 		stored: true,
@@ -201,8 +202,9 @@ export const RESOURCES = {
 		label: 'Sap',
 		description: 'A crafting extract of the forest.',
 		usedFor: 'Crafting (arrow and blade coatings) and, later, building upgrades.',
-		source: 'The Sap Tapper on a forest tile. Cannot be bought or sold.',
+		source: 'The Sap Tapper on a forest tile. Sells to the merchant (he does not sell it back).',
 		color: '#e0a64a',
+		merchant: { price: 5, description: 'Thick sap from the forest.', pitch: 'Used for coatings and glues.' },
 	},
 	ironOre: {
 		stored: true,
@@ -212,8 +214,9 @@ export const RESOURCES = {
 		label: 'Iron Ore',
 		description: 'A crafting extract of the hills.',
 		usedFor: 'Crafting (steel weapons and armor) and, later, building upgrades.',
-		source: 'The Deep Mine on a hills tile. Cannot be bought or sold.',
+		source: 'The Deep Mine on a hills tile. Sells to the merchant (he does not sell it back).',
 		color: '#b8c0d0',
+		merchant: { price: 5, description: 'Raw ore from the deep mines.', pitch: 'Smiths always need more ore.' },
 	},
 	spores: {
 		stored: true,
@@ -223,8 +226,9 @@ export const RESOURCES = {
 		label: 'Spores',
 		description: 'A crafting extract of the swamp.',
 		usedFor: 'Crafting (potions and enchants) and, later, building upgrades.',
-		source: 'The Spore Cellar on a swamp tile. Cannot be bought or sold.',
+		source: 'The Spore Cellar on a swamp tile. Sells to the merchant (he does not sell it back).',
 		color: '#b88ad8',
+		merchant: { price: 5, description: 'Cellar-grown spores from the swamp.', pitch: 'Alchemists buy them by the sack.' },
 	},
 	frostshard: {
 		stored: true,
@@ -234,8 +238,9 @@ export const RESOURCES = {
 		label: 'Frostshard',
 		description: 'A crafting extract of the tundra.',
 		usedFor: 'Crafting (rings and trinkets) and, later, building upgrades.',
-		source: 'The Ice Cutter on a tundra tile. Cannot be bought or sold.',
+		source: 'The Ice Cutter on a tundra tile. Sells to the merchant (he does not sell it back).',
 		color: '#8fdcff',
+		merchant: { price: 5, description: 'Glittering shards cut from the ice.', pitch: 'Enchanters like the cold glow.' },
 	},
 	pearls: {
 		stored: true,
@@ -245,8 +250,9 @@ export const RESOURCES = {
 		label: 'Pearls',
 		description: 'A crafting extract of the lakes.',
 		usedFor: 'Crafting (rings and trinkets) and, later, building upgrades.',
-		source: 'The Pearl Diver on a lake tile. Cannot be bought or sold.',
+		source: 'The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back).',
 		color: '#f0e8f8',
+		merchant: { price: 5, description: 'Pearls from the lake bed.', pitch: 'Jewellers pay a fair price.' },
 	},
 	salt: {
 		stored: true,
@@ -256,8 +262,9 @@ export const RESOURCES = {
 		label: 'Salt',
 		description: 'A crafting extract of the coast.',
 		usedFor: 'Crafting (leather armor) and, later, building upgrades.',
-		source: 'The Salt Works on a coast tile. Cannot be bought or sold.',
+		source: 'The Salt Works on a coast tile. Sells to the merchant (he does not sell it back).',
 		color: '#f4f0e4',
+		merchant: { price: 5, description: 'Coarse salt from the coast.', pitch: 'Every kitchen and tannery needs it.' },
 	},
 	wool: {
 		stored: true,

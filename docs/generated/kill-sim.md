@@ -8,402 +8,582 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 2 | 100 % | 194 | 45 | 97 s | 16.2 % | 0.87 % |
-| Burrow Badger | 2 | 100 % | 194 | 45 | 97 s | 16.2 % | 0.87 % |
-| Dust Strider | 2 | 100 % | 194 | 45 | 97 s | 16.2 % | 0.87 % |
-| The Great Auroch (boss) | 17 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
+| Thistle Boar | 2 | 100 % | 194 | 136 | 97 s | 16.2 % | 0.52 % |
+| Burrow Badger | 2 | 100 % | 194 | 136 | 97 s | 16.2 % | 0.52 % |
+| Dust Strider | 2 | 100 % | 194 | 136 | 97 s | 16.2 % | 0.53 % |
+| Gravel Quail | 2 | 100 % | 194 | 136 | 97 s | 16.2 % | 0.52 % |
+| Stonehorn Bison | 2 | 100 % | 194 | 136 | 97 s | 16.2 % | 0.53 % |
+| The Great Auroch (boss) | 17 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *plains total (if every spawn were here)* | | | | | | | *10.8 %* |
-| Wreck Crab | 3 | 100 % | 233 | 75 | 117 s | 19.4 % | 1.06 % |
-| Net Gull | 3 | 95 % | 233 | 75 | 117 s | 19.4 % | 1.31 % |
-| Drowned Sailor | 3 | 99 % | 233 | 75 | 117 s | 19.4 % | 1.09 % |
-| The Reef Leviathan (boss) | 19 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
-| *coast total (if every spawn were here)* | | | | | | | *12.6 %* |
-| Mossback Wolf | 5 | 8 % | 299 | 116 | 150 s | 24.9 % | 0.03 % |
-| Bramble Imp | 5 | 22 % | 299 | 116 | 150 s | 24.9 % | 0.20 % |
-| Rotcap Stag | 5 | 33 % | 299 | 116 | 150 s | 24.9 % | 0.47 % |
-| The Elder Stag (boss) | 22 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
-| *forest total (if every spawn were here)* | | | | | | | *4.3 %* |
-| Granite Ram | 7 | 0 % | 380 | 181 | 190 s | 31.7 % | 0.00 % |
-| Cave Goblin Miner | 7 | 0 % | 380 | 181 | 190 s | 31.7 % | 0.00 % |
-| Boulder Beetle | 7 | 1 % | 380 | 181 | 190 s | 31.7 % | 0.00 % |
-| The Hill Giant (boss) | 24 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
+| Wreck Crab | 3 | 100 % | 233 | 224 | 117 s | 19.4 % | 0.64 % |
+| Net Gull | 3 | 95 % | 233 | 224 | 117 s | 19.4 % | 0.79 % |
+| Drowned Sailor | 3 | 99 % | 233 | 224 | 117 s | 19.4 % | 0.66 % |
+| Tideglass Jelly | 3 | 97 % | 233 | 224 | 117 s | 19.4 % | 0.73 % |
+| Barnacle Brute | 3 | 94 % | 233 | 224 | 117 s | 19.4 % | 0.78 % |
+| The Reef Leviathan (boss) | 19 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
+| *coast total (if every spawn were here)* | | | | | | | *12.5 %* |
+| Mossback Wolf | 5 | 8 % | 299 | 347 | 150 s | 24.9 % | 0.02 % |
+| Bramble Imp | 5 | 22 % | 299 | 347 | 150 s | 24.9 % | 0.12 % |
+| Rotcap Stag | 5 | 33 % | 299 | 347 | 150 s | 24.9 % | 0.29 % |
+| Ember Squirrel | 5 | 14 % | 299 | 347 | 150 s | 24.9 % | 0.05 % |
+| Pinecone Warden | 5 | 3 % | 299 | 347 | 150 s | 24.9 % | 0.00 % |
+| The Elder Stag (boss) | 22 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
+| *forest total (if every spawn were here)* | | | | | | | *3.8 %* |
+| Granite Ram | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Cave Goblin Miner | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Boulder Beetle | 7 | 1 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Magma Knight | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Magma Crab | 7 | 1 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Mawhorn Brute | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Quarry Drake | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Cairn Sentinel | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Quarry Rat Knight | 7 | 1 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| Highland Gnoll | 7 | 0 % | 380 | 543 | 190 s | 31.7 % | 0.00 % |
+| The Hill Giant (boss) | 24 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
+| The Ironhorn (boss) | 24 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Garbage Ogre | 9 | 0 % | 499 | 300 | 250 s | 41.6 % | 0.00 % |
-| Dumpback | 9 | 0 % | 499 | 300 | 250 s | 41.6 % | 0.00 % |
-| Rot Heron | 9 | 0 % | 499 | 300 | 250 s | 41.6 % | 0.00 % |
-| Scrap Golem | 9 | 0 % | 499 | 300 | 250 s | 41.6 % | 0.00 % |
-| The Mire Matriarch (boss) | 27 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
+| Garbage Ogre | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Toxic Zombie | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Dumpback | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Rot Heron | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Scrap Golem | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Bogfire Wisp | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| The Mire Matriarch (boss) | 27 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Moss Snapper | 11 | 0 % | 690 | 415 | 345 s | 57.5 % | 0.00 % |
-| Reed Nymph | 11 | 0 % | 690 | 415 | 345 s | 57.5 % | 0.00 % |
-| Pike Lurker | 11 | 0 % | 690 | 415 | 345 s | 57.5 % | 0.00 % |
-| The Lake Hydra (boss) | 29 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
+| Moss Snapper | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| Reed Nymph | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| Pike Lurker | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| Tidepool Golem | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| Silt Eel | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| Lilypad Warden | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
+| The Lake Hydra (boss) | 29 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Frost Hare | 13 | 0 % | 956 | 574 | 478 s | 79.7 % | 0.00 % |
-| Icetusk Calf | 13 | 0 % | 956 | 574 | 478 s | 79.7 % | 0.00 % |
-| Rime Wraith | 13 | 0 % | 956 | 574 | 478 s | 79.7 % | 0.00 % |
-| Frost Moth | 13 | 0 % | 956 | 574 | 478 s | 79.7 % | 0.00 % |
-| The Winter Wyrm (boss) | 32 | 0 % | 7,638 | 4,583 | 3,819 s | 636.5 % | 0.00 % |
+| Frost Hare | 13 | 0 % | 956 | 1,722 | 478 s | 79.7 % | 0.00 % |
+| Icetusk Calf | 13 | 0 % | 956 | 1,722 | 478 s | 79.7 % | 0.00 % |
+| Rime Wraith | 13 | 0 % | 956 | 1,722 | 478 s | 79.7 % | 0.00 % |
+| Frost Moth | 13 | 0 % | 956 | 1,722 | 478 s | 79.7 % | 0.00 % |
+| Glacier Yeti | 13 | 0 % | 956 | 1,722 | 478 s | 79.7 % | 0.00 % |
+| The Winter Wyrm (boss) | 32 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **6.8 %** (bosses 0.0 %; XP 3.3 %) |
+| **All kills together** | | | | | | | **6.7 %** (bosses 0.0 %; XP 9.8 %) |
 
 ## castle 2: hero level 9, woodland + club, 12 gold/s, 3.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 3 | 100 % | 349 | 49 | 29 s | 4.8 % | 0.23 % |
-| Burrow Badger | 3 | 100 % | 349 | 49 | 29 s | 4.8 % | 0.23 % |
-| Dust Strider | 3 | 100 % | 349 | 49 | 29 s | 4.8 % | 0.23 % |
-| The Great Auroch (boss) | 17 | 54 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 1.58 % |
+| Thistle Boar | 3 | 100 % | 349 | 147 | 29 s | 4.8 % | 0.13 % |
+| Burrow Badger | 3 | 100 % | 349 | 147 | 29 s | 4.8 % | 0.13 % |
+| Dust Strider | 3 | 100 % | 349 | 147 | 29 s | 4.8 % | 0.13 % |
+| Gravel Quail | 3 | 100 % | 349 | 147 | 29 s | 4.8 % | 0.13 % |
+| Stonehorn Bison | 3 | 100 % | 349 | 147 | 29 s | 4.8 % | 0.13 % |
+| The Great Auroch (boss) | 17 | 54 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 1.36 % |
 | *plains total (if every spawn were here)* | | | | | | | *3.2 %* |
-| Wreck Crab | 4 | 100 % | 566 | 81 | 47 s | 7.9 % | 0.37 % |
-| Net Gull | 4 | 100 % | 566 | 81 | 47 s | 7.9 % | 0.37 % |
-| Drowned Sailor | 4 | 100 % | 566 | 81 | 47 s | 7.9 % | 0.37 % |
-| The Reef Leviathan (boss) | 19 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
+| Wreck Crab | 4 | 100 % | 566 | 242 | 47 s | 7.9 % | 0.21 % |
+| Net Gull | 4 | 100 % | 566 | 242 | 47 s | 7.9 % | 0.22 % |
+| Drowned Sailor | 4 | 100 % | 566 | 242 | 47 s | 7.9 % | 0.21 % |
+| Tideglass Jelly | 4 | 100 % | 566 | 242 | 47 s | 7.9 % | 0.21 % |
+| Barnacle Brute | 4 | 100 % | 566 | 242 | 47 s | 7.9 % | 0.22 % |
+| The Reef Leviathan (boss) | 19 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *coast total (if every spawn were here)* | | | | | | | *5.2 %* |
-| Mossback Wolf | 6 | 74 % | 881 | 125 | 73 s | 12.2 % | 0.57 % |
-| Bramble Imp | 6 | 93 % | 881 | 125 | 73 s | 12.2 % | 0.71 % |
-| Rotcap Stag | 6 | 97 % | 881 | 125 | 73 s | 12.2 % | 0.68 % |
-| The Elder Stag (boss) | 22 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
-| *forest total (if every spawn were here)* | | | | | | | *7.1 %* |
-| Granite Ram | 8 | 1 % | 1,371 | 195 | 114 s | 19.0 % | 0.00 % |
-| Cave Goblin Miner | 8 | 4 % | 1,371 | 195 | 114 s | 19.0 % | 0.01 % |
-| Boulder Beetle | 8 | 14 % | 1,371 | 195 | 114 s | 19.0 % | 0.06 % |
-| The Hill Giant (boss) | 24 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
+| Mossback Wolf | 6 | 74 % | 881 | 375 | 73 s | 12.2 % | 0.33 % |
+| Bramble Imp | 6 | 93 % | 881 | 375 | 73 s | 12.2 % | 0.41 % |
+| Rotcap Stag | 6 | 97 % | 881 | 375 | 73 s | 12.2 % | 0.39 % |
+| Ember Squirrel | 6 | 86 % | 881 | 375 | 73 s | 12.2 % | 0.38 % |
+| Pinecone Warden | 6 | 60 % | 881 | 375 | 73 s | 12.2 % | 0.27 % |
+| The Elder Stag (boss) | 22 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
+| *forest total (if every spawn were here)* | | | | | | | *6.7 %* |
+| Granite Ram | 8 | 1 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Cave Goblin Miner | 8 | 4 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Boulder Beetle | 8 | 14 % | 1,371 | 586 | 114 s | 19.0 % | 0.03 % |
+| Magma Knight | 8 | 1 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Magma Crab | 8 | 14 % | 1,371 | 586 | 114 s | 19.0 % | 0.03 % |
+| Mawhorn Brute | 8 | 4 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Quarry Drake | 8 | 3 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Cairn Sentinel | 8 | 1 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| Quarry Rat Knight | 8 | 14 % | 1,371 | 586 | 114 s | 19.0 % | 0.03 % |
+| Highland Gnoll | 8 | 4 % | 1,371 | 586 | 114 s | 19.0 % | 0.00 % |
+| The Hill Giant (boss) | 24 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
+| The Ironhorn (boss) | 24 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *hills total (if every spawn were here)* | | | | | | | *1.2 %* |
-| Garbage Ogre | 10 | 0 % | 2,398 | 342 | 200 s | 33.3 % | 0.00 % |
-| Dumpback | 10 | 0 % | 2,398 | 342 | 200 s | 33.3 % | 0.00 % |
-| Rot Heron | 10 | 0 % | 2,398 | 342 | 200 s | 33.3 % | 0.00 % |
-| Scrap Golem | 10 | 0 % | 2,398 | 342 | 200 s | 33.3 % | 0.00 % |
-| The Mire Matriarch (boss) | 27 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
+| Garbage Ogre | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Toxic Zombie | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Dumpback | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Rot Heron | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Scrap Golem | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Bogfire Wisp | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| The Mire Matriarch (boss) | 27 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Moss Snapper | 12 | 0 % | 4,196 | 599 | 350 s | 58.3 % | 0.00 % |
-| Reed Nymph | 12 | 0 % | 4,196 | 599 | 350 s | 58.3 % | 0.00 % |
-| Pike Lurker | 12 | 0 % | 4,196 | 599 | 350 s | 58.3 % | 0.00 % |
-| The Lake Hydra (boss) | 29 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
+| Moss Snapper | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| Reed Nymph | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| Pike Lurker | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| Tidepool Golem | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| Silt Eel | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| Lilypad Warden | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
+| The Lake Hydra (boss) | 29 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Frost Hare | 13 | 0 % | 5,741 | 861 | 478 s | 79.7 % | 0.00 % |
-| Icetusk Calf | 13 | 0 % | 5,741 | 861 | 478 s | 79.7 % | 0.00 % |
-| Rime Wraith | 13 | 0 % | 5,741 | 861 | 478 s | 79.7 % | 0.00 % |
-| Frost Moth | 13 | 0 % | 5,741 | 861 | 478 s | 79.7 % | 0.00 % |
-| The Winter Wyrm (boss) | 32 | 0 % | 45,830 | 11,458 | 3,819 s | 636.5 % | 0.00 % |
+| Frost Hare | 13 | 0 % | 5,741 | 2,584 | 478 s | 79.7 % | 0.00 % |
+| Icetusk Calf | 13 | 0 % | 5,741 | 2,584 | 478 s | 79.7 % | 0.00 % |
+| Rime Wraith | 13 | 0 % | 5,741 | 2,584 | 478 s | 79.7 % | 0.00 % |
+| Frost Moth | 13 | 0 % | 5,741 | 2,584 | 478 s | 79.7 % | 0.00 % |
+| Glacier Yeti | 13 | 0 % | 5,741 | 2,584 | 478 s | 79.7 % | 0.00 % |
+| The Winter Wyrm (boss) | 32 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **5.4 %** (bosses 1.6 %; XP 3.7 %) |
+| **All kills together** | | | | | | | **5.0 %** (bosses 1.4 %; XP 10.2 %) |
 
 ## castle 3: hero level 14, knight + mace, 40 gold/s, 6.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 4 | 100 % | 377 | 53 | 9.4 s | 1.6 % | 0.06 % |
-| Burrow Badger | 4 | 100 % | 377 | 53 | 9.4 s | 1.6 % | 0.06 % |
-| Dust Strider | 4 | 100 % | 377 | 53 | 9.4 s | 1.6 % | 0.06 % |
-| The Great Auroch (boss) | 18 | 98 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 2.98 % |
+| Thistle Boar | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.03 % |
+| Burrow Badger | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.03 % |
+| Dust Strider | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.03 % |
+| Gravel Quail | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.03 % |
+| Stonehorn Bison | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.03 % |
+| The Great Auroch (boss) | 18 | 98 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.56 % |
 | *plains total (if every spawn were here)* | | | | | | | *1.0 %* |
-| Wreck Crab | 5 | 100 % | 612 | 87 | 15 s | 2.5 % | 0.09 % |
-| Net Gull | 5 | 100 % | 612 | 87 | 15 s | 2.5 % | 0.09 % |
-| Drowned Sailor | 5 | 100 % | 612 | 87 | 15 s | 2.5 % | 0.09 % |
-| The Reef Leviathan (boss) | 20 | 90 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 2.72 % |
+| Wreck Crab | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.05 % |
+| Net Gull | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.05 % |
+| Drowned Sailor | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.05 % |
+| Tideglass Jelly | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.05 % |
+| Barnacle Brute | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.05 % |
+| The Reef Leviathan (boss) | 20 | 90 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.33 % |
 | *coast total (if every spawn were here)* | | | | | | | *1.7 %* |
-| Mossback Wolf | 7 | 100 % | 952 | 135 | 24 s | 4.0 % | 0.15 % |
-| Bramble Imp | 7 | 100 % | 952 | 135 | 24 s | 4.0 % | 0.15 % |
-| Rotcap Stag | 7 | 100 % | 952 | 135 | 24 s | 4.0 % | 0.15 % |
-| The Elder Stag (boss) | 23 | 65 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 1.99 % |
+| Mossback Wolf | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.07 % |
+| Bramble Imp | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.07 % |
+| Rotcap Stag | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.07 % |
+| Ember Squirrel | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.07 % |
+| Pinecone Warden | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.08 % |
+| The Elder Stag (boss) | 23 | 65 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 1.70 % |
 | *forest total (if every spawn were here)* | | | | | | | *2.6 %* |
-| Granite Ram | 9 | 79 % | 1,480 | 211 | 37 s | 6.2 % | 0.24 % |
-| Cave Goblin Miner | 9 | 93 % | 1,480 | 211 | 37 s | 6.2 % | 0.28 % |
-| Boulder Beetle | 9 | 96 % | 1,480 | 211 | 37 s | 6.2 % | 0.27 % |
-| The Hill Giant (boss) | 25 | 0 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 0.00 % |
-| *hills total (if every spawn were here)* | | | | | | | *3.7 %* |
-| Garbage Ogre | 11 | 22 % | 2,590 | 369 | 65 s | 10.8 % | 0.06 % |
-| Dumpback | 11 | 15 % | 2,590 | 369 | 65 s | 10.8 % | 0.03 % |
-| Rot Heron | 11 | 4 % | 2,590 | 369 | 65 s | 10.8 % | 0.00 % |
-| Scrap Golem | 11 | 22 % | 2,590 | 369 | 65 s | 10.8 % | 0.06 % |
-| The Mire Matriarch (boss) | 28 | 0 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 0.00 % |
-| *swamp total (if every spawn were here)* | | | | | | | *1.4 %* |
-| Moss Snapper | 13 | 0 % | 4,532 | 647 | 113 s | 18.9 % | 0.00 % |
-| Reed Nymph | 13 | 0 % | 4,532 | 647 | 113 s | 18.9 % | 0.00 % |
-| Pike Lurker | 13 | 0 % | 4,532 | 647 | 113 s | 18.9 % | 0.00 % |
-| The Lake Hydra (boss) | 30 | 0 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 0.00 % |
+| Granite Ram | 9 | 79 % | 1,480 | 633 | 37 s | 6.2 % | 0.12 % |
+| Cave Goblin Miner | 9 | 93 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Boulder Beetle | 9 | 96 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Magma Knight | 9 | 79 % | 1,480 | 633 | 37 s | 6.2 % | 0.12 % |
+| Magma Crab | 9 | 96 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Mawhorn Brute | 9 | 93 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Quarry Drake | 9 | 91 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Cairn Sentinel | 9 | 61 % | 1,480 | 633 | 37 s | 6.2 % | 0.09 % |
+| Quarry Rat Knight | 9 | 96 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| Highland Gnoll | 9 | 93 % | 1,480 | 633 | 37 s | 6.2 % | 0.14 % |
+| The Hill Giant (boss) | 25 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
+| The Ironhorn (boss) | 25 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
+| *hills total (if every spawn were here)* | | | | | | | *3.6 %* |
+| Garbage Ogre | 11 | 22 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.03 % |
+| Toxic Zombie | 11 | 22 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.03 % |
+| Dumpback | 11 | 15 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.01 % |
+| Rot Heron | 11 | 4 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.00 % |
+| Scrap Golem | 11 | 22 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.03 % |
+| Bogfire Wisp | 11 | 8 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.00 % |
+| The Mire Matriarch (boss) | 28 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
+| *swamp total (if every spawn were here)* | | | | | | | *1.3 %* |
+| Moss Snapper | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| Reed Nymph | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| Pike Lurker | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| Tidepool Golem | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| Silt Eel | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| Lilypad Warden | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
+| The Lake Hydra (boss) | 30 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Frost Hare | 14 | 0 % | 6,527 | 930 | 163 s | 27.2 % | 0.00 % |
-| Icetusk Calf | 14 | 0 % | 6,527 | 930 | 163 s | 27.2 % | 0.00 % |
-| Rime Wraith | 14 | 0 % | 6,527 | 930 | 163 s | 27.2 % | 0.00 % |
-| Frost Moth | 14 | 0 % | 6,527 | 930 | 163 s | 27.2 % | 0.00 % |
-| The Winter Wyrm (boss) | 33 | 0 % | 157,352 | 23,603 | 3,934 s | 655.6 % | 0.00 % |
+| Frost Hare | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
+| Icetusk Calf | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
+| Rime Wraith | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
+| Frost Moth | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
+| Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
+| The Winter Wyrm (boss) | 33 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **9.5 %** (bosses 7.7 %; XP 9.4 %) |
+| **All kills together** | | | | | | | **8.8 %** (bosses 6.6 %; XP 25.9 %) |
 
 ## castle 4: hero level 17, knight + mace, 100 gold/s, 12.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 5 | 100 % | 408 | 57 | 4.1 s | 0.7 % | 0.03 % |
-| Burrow Badger | 5 | 100 % | 408 | 57 | 4.1 s | 0.7 % | 0.03 % |
-| Dust Strider | 5 | 100 % | 408 | 57 | 4.1 s | 0.7 % | 0.03 % |
-| The Great Auroch (boss) | 19 | 99 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 3.09 % |
+| Thistle Boar | 5 | 100 % | 408 | 171 | 4.1 s | 0.7 % | 0.01 % |
+| Burrow Badger | 5 | 100 % | 408 | 171 | 4.1 s | 0.7 % | 0.01 % |
+| Dust Strider | 5 | 100 % | 408 | 171 | 4.1 s | 0.7 % | 0.01 % |
+| Gravel Quail | 5 | 100 % | 408 | 171 | 4.1 s | 0.7 % | 0.01 % |
+| Stonehorn Bison | 5 | 100 % | 408 | 171 | 4.1 s | 0.7 % | 0.01 % |
+| The Great Auroch (boss) | 19 | 99 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.65 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.5 %* |
-| Wreck Crab | 6 | 100 % | 661 | 94 | 6.6 s | 1.1 % | 0.04 % |
-| Net Gull | 6 | 100 % | 661 | 94 | 6.6 s | 1.1 % | 0.04 % |
-| Drowned Sailor | 6 | 100 % | 661 | 94 | 6.6 s | 1.1 % | 0.04 % |
-| The Reef Leviathan (boss) | 21 | 93 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 2.91 % |
+| Wreck Crab | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.02 % |
+| Net Gull | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.02 % |
+| Drowned Sailor | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.02 % |
+| Tideglass Jelly | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.02 % |
+| Barnacle Brute | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.02 % |
+| The Reef Leviathan (boss) | 21 | 93 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.49 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.7 %* |
-| Mossback Wolf | 8 | 100 % | 1,028 | 146 | 10 s | 1.7 % | 0.07 % |
-| Bramble Imp | 8 | 100 % | 1,028 | 146 | 10 s | 1.7 % | 0.07 % |
-| Rotcap Stag | 8 | 100 % | 1,028 | 146 | 10 s | 1.7 % | 0.07 % |
-| The Elder Stag (boss) | 24 | 75 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 2.33 % |
+| Mossback Wolf | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.03 % |
+| Bramble Imp | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.03 % |
+| Rotcap Stag | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.03 % |
+| Ember Squirrel | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.03 % |
+| Pinecone Warden | 8 | 99 % | 1,028 | 437 | 10 s | 1.7 % | 0.03 % |
+| The Elder Stag (boss) | 24 | 75 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.00 % |
 | *forest total (if every spawn were here)* | | | | | | | *1.1 %* |
-| Granite Ram | 10 | 62 % | 1,599 | 228 | 16 s | 2.7 % | 0.08 % |
-| Cave Goblin Miner | 10 | 83 % | 1,599 | 228 | 16 s | 2.7 % | 0.11 % |
-| Boulder Beetle | 10 | 96 % | 1,599 | 228 | 16 s | 2.7 % | 0.13 % |
-| The Hill Giant (boss) | 26 | 52 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 1.62 % |
+| Granite Ram | 10 | 62 % | 1,599 | 684 | 16 s | 2.7 % | 0.04 % |
+| Cave Goblin Miner | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Boulder Beetle | 10 | 96 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Magma Knight | 10 | 62 % | 1,599 | 684 | 16 s | 2.7 % | 0.04 % |
+| Magma Crab | 10 | 96 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Mawhorn Brute | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Quarry Drake | 10 | 82 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Cairn Sentinel | 10 | 55 % | 1,599 | 684 | 16 s | 2.7 % | 0.04 % |
+| Quarry Rat Knight | 10 | 96 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| Highland Gnoll | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
+| The Hill Giant (boss) | 26 | 52 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.39 % |
+| The Ironhorn (boss) | 26 | 52 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.39 % |
 | *hills total (if every spawn were here)* | | | | | | | *1.4 %* |
-| Garbage Ogre | 12 | 18 % | 2,797 | 399 | 28 s | 4.7 % | 0.02 % |
-| Dumpback | 12 | 7 % | 2,797 | 399 | 28 s | 4.7 % | 0.00 % |
-| Rot Heron | 12 | 2 % | 2,797 | 399 | 28 s | 4.7 % | 0.00 % |
-| Scrap Golem | 12 | 18 % | 2,797 | 399 | 28 s | 4.7 % | 0.02 % |
-| The Mire Matriarch (boss) | 29 | 0 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 0.00 % |
+| Garbage Ogre | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
+| Toxic Zombie | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
+| Dumpback | 12 | 7 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
+| Rot Heron | 12 | 2 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
+| Scrap Golem | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
+| Bogfire Wisp | 12 | 3 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
+| The Mire Matriarch (boss) | 29 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.5 %* |
-| Moss Snapper | 14 | 0 % | 4,895 | 699 | 49 s | 8.2 % | 0.00 % |
-| Reed Nymph | 14 | 0 % | 4,895 | 699 | 49 s | 8.2 % | 0.00 % |
-| Pike Lurker | 14 | 0 % | 4,895 | 699 | 49 s | 8.2 % | 0.00 % |
-| The Lake Hydra (boss) | 31 | 0 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 0.00 % |
+| Moss Snapper | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| Reed Nymph | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| Pike Lurker | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| Tidepool Golem | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| Silt Eel | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| Lilypad Warden | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
+| The Lake Hydra (boss) | 31 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Frost Hare | 14 | 0 % | 6,527 | 930 | 65 s | 10.9 % | 0.00 % |
-| Icetusk Calf | 14 | 0 % | 6,527 | 930 | 65 s | 10.9 % | 0.00 % |
-| Rime Wraith | 14 | 0 % | 6,527 | 930 | 65 s | 10.9 % | 0.00 % |
-| Frost Moth | 14 | 0 % | 6,527 | 930 | 65 s | 10.9 % | 0.00 % |
-| The Winter Wyrm (boss) | 34 | 0 % | 405,183 | 48,622 | 4,052 s | 675.3 % | 0.00 % |
+| Frost Hare | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
+| Icetusk Calf | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
+| Rime Wraith | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
+| Frost Moth | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
+| Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
+| The Winter Wyrm (boss) | 34 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **10.7 %** (bosses 10.0 %; XP 10.9 %) |
+| **All kills together** | | | | | | | **10.8 %** (bosses 9.9 %; XP 32.9 %) |
 
 ## castle 5: hero level 30, obsidian + maul, 300 gold/s, 20.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.01 % |
-| Burrow Badger | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.01 % |
-| Dust Strider | 6 | 100 % | 440 | 62 | 1.5 s | 0.2 % | 0.01 % |
-| The Great Auroch (boss) | 20 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.79 % |
+| Thistle Boar | 6 | 100 % | 440 | 185 | 1.5 s | 0.2 % | 0.00 % |
+| Burrow Badger | 6 | 100 % | 440 | 185 | 1.5 s | 0.2 % | 0.00 % |
+| Dust Strider | 6 | 100 % | 440 | 185 | 1.5 s | 0.2 % | 0.00 % |
+| Gravel Quail | 6 | 100 % | 440 | 185 | 1.5 s | 0.2 % | 0.00 % |
+| Stonehorn Bison | 6 | 100 % | 440 | 185 | 1.5 s | 0.2 % | 0.00 % |
+| The Great Auroch (boss) | 20 | 100 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.53 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Wreck Crab | 7 | 100 % | 714 | 102 | 2.4 s | 0.4 % | 0.01 % |
-| Net Gull | 7 | 100 % | 714 | 102 | 2.4 s | 0.4 % | 0.01 % |
-| Drowned Sailor | 7 | 100 % | 714 | 102 | 2.4 s | 0.4 % | 0.01 % |
-| The Reef Leviathan (boss) | 22 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.79 % |
+| Wreck Crab | 7 | 100 % | 714 | 305 | 2.4 s | 0.4 % | 0.01 % |
+| Net Gull | 7 | 100 % | 714 | 305 | 2.4 s | 0.4 % | 0.01 % |
+| Drowned Sailor | 7 | 100 % | 714 | 305 | 2.4 s | 0.4 % | 0.01 % |
+| Tideglass Jelly | 7 | 100 % | 714 | 305 | 2.4 s | 0.4 % | 0.01 % |
+| Barnacle Brute | 7 | 100 % | 714 | 305 | 2.4 s | 0.4 % | 0.01 % |
+| The Reef Leviathan (boss) | 22 | 100 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.53 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.3 %* |
-| Mossback Wolf | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.02 % |
-| Bramble Imp | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.02 % |
-| Rotcap Stag | 9 | 100 % | 1,110 | 157 | 3.7 s | 0.6 % | 0.02 % |
-| The Elder Stag (boss) | 25 | 100 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.78 % |
+| Mossback Wolf | 9 | 100 % | 1,110 | 472 | 3.7 s | 0.6 % | 0.01 % |
+| Bramble Imp | 9 | 100 % | 1,110 | 472 | 3.7 s | 0.6 % | 0.01 % |
+| Rotcap Stag | 9 | 100 % | 1,110 | 472 | 3.7 s | 0.6 % | 0.01 % |
+| Ember Squirrel | 9 | 100 % | 1,110 | 472 | 3.7 s | 0.6 % | 0.01 % |
+| Pinecone Warden | 9 | 100 % | 1,110 | 472 | 3.7 s | 0.6 % | 0.01 % |
+| The Elder Stag (boss) | 25 | 100 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.53 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.4 %* |
-| Granite Ram | 11 | 100 % | 1,727 | 246 | 5.8 s | 1.0 % | 0.03 % |
-| Cave Goblin Miner | 11 | 100 % | 1,727 | 246 | 5.8 s | 1.0 % | 0.03 % |
-| Boulder Beetle | 11 | 100 % | 1,727 | 246 | 5.8 s | 1.0 % | 0.03 % |
-| The Hill Giant (boss) | 27 | 99 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.77 % |
+| Granite Ram | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Cave Goblin Miner | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Boulder Beetle | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Magma Knight | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Magma Crab | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Mawhorn Brute | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Quarry Drake | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Cairn Sentinel | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Quarry Rat Knight | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| Highland Gnoll | 11 | 100 % | 1,727 | 738 | 5.8 s | 1.0 % | 0.02 % |
+| The Hill Giant (boss) | 27 | 99 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.52 % |
+| The Ironhorn (boss) | 27 | 99 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.52 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.6 %* |
-| Garbage Ogre | 13 | 100 % | 3,021 | 431 | 10 s | 1.7 % | 0.05 % |
-| Dumpback | 13 | 99 % | 3,021 | 431 | 10 s | 1.7 % | 0.05 % |
-| Rot Heron | 13 | 95 % | 3,021 | 431 | 10 s | 1.7 % | 0.06 % |
-| Scrap Golem | 13 | 100 % | 3,021 | 431 | 10 s | 1.7 % | 0.05 % |
-| The Mire Matriarch (boss) | 30 | 98 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.76 % |
+| Garbage Ogre | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| Toxic Zombie | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| Dumpback | 13 | 99 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| Rot Heron | 13 | 95 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| Scrap Golem | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| Bogfire Wisp | 13 | 98 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.03 % |
+| The Mire Matriarch (boss) | 30 | 98 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.50 % |
 | *swamp total (if every spawn were here)* | | | | | | | *1.1 %* |
-| Moss Snapper | 15 | 62 % | 5,286 | 755 | 18 s | 2.9 % | 0.07 % |
-| Reed Nymph | 15 | 32 % | 5,286 | 755 | 18 s | 2.9 % | 0.03 % |
-| Pike Lurker | 15 | 16 % | 5,286 | 755 | 18 s | 2.9 % | 0.01 % |
-| The Lake Hydra (boss) | 32 | 72 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 1.29 % |
+| Moss Snapper | 15 | 62 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.04 % |
+| Reed Nymph | 15 | 32 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.02 % |
+| Pike Lurker | 15 | 16 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.00 % |
+| Tidepool Golem | 15 | 62 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.04 % |
+| Silt Eel | 15 | 31 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.01 % |
+| Lilypad Warden | 15 | 11 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.00 % |
+| The Lake Hydra (boss) | 32 | 72 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 1.11 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.8 %* |
-| Frost Hare | 15 | 5 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
-| Icetusk Calf | 15 | 28 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.03 % |
-| Rime Wraith | 15 | 0 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.00 % |
-| Frost Moth | 15 | 16 % | 7,049 | 1,005 | 23 s | 3.9 % | 0.01 % |
-| The Winter Wyrm (boss) | 35 | 0 % | 695,564 | 52,167 | 2,319 s | 386.4 % | 0.00 % |
+| Frost Hare | 15 | 5 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
+| Icetusk Calf | 15 | 28 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.02 % |
+| Rime Wraith | 15 | 0 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
+| Frost Moth | 15 | 16 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.01 % |
+| Glacier Yeti | 15 | 0 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
+| The Winter Wyrm (boss) | 35 | 0 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.5 %* |
-| **All kills together** | | | | | | | **10.7 %** (bosses 10.2 %; XP 12.6 %) |
+| **All kills together** | | | | | | | **10.8 %** (bosses 10.2 %; XP 38.1 %) |
 
 ## castle 6: hero level 42, obsidian + titan maul, 700 gold/s, 50.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 7 | 100 % | 476 | 67 | 0.7 s | 0.1 % | 0.00 % |
-| Burrow Badger | 7 | 100 % | 476 | 67 | 0.7 s | 0.1 % | 0.00 % |
-| Dust Strider | 7 | 100 % | 476 | 67 | 0.7 s | 0.1 % | 0.00 % |
-| The Great Auroch (boss) | 21 | 100 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.79 % |
+| Thistle Boar | 7 | 100 % | 476 | 200 | 0.7 s | 0.1 % | 0.00 % |
+| Burrow Badger | 7 | 100 % | 476 | 200 | 0.7 s | 0.1 % | 0.00 % |
+| Dust Strider | 7 | 100 % | 476 | 200 | 0.7 s | 0.1 % | 0.00 % |
+| Gravel Quail | 7 | 100 % | 476 | 200 | 0.7 s | 0.1 % | 0.00 % |
+| Stonehorn Bison | 7 | 100 % | 476 | 200 | 0.7 s | 0.1 % | 0.00 % |
+| The Great Auroch (boss) | 21 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Wreck Crab | 8 | 100 % | 771 | 110 | 1.1 s | 0.2 % | 0.00 % |
-| Net Gull | 8 | 100 % | 771 | 110 | 1.1 s | 0.2 % | 0.00 % |
-| Drowned Sailor | 8 | 100 % | 771 | 110 | 1.1 s | 0.2 % | 0.00 % |
-| The Reef Leviathan (boss) | 23 | 100 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.79 % |
+| Wreck Crab | 8 | 100 % | 771 | 329 | 1.1 s | 0.2 % | 0.00 % |
+| Net Gull | 8 | 100 % | 771 | 329 | 1.1 s | 0.2 % | 0.00 % |
+| Drowned Sailor | 8 | 100 % | 771 | 329 | 1.1 s | 0.2 % | 0.00 % |
+| Tideglass Jelly | 8 | 100 % | 771 | 329 | 1.1 s | 0.2 % | 0.00 % |
+| Barnacle Brute | 8 | 100 % | 771 | 329 | 1.1 s | 0.2 % | 0.00 % |
+| The Reef Leviathan (boss) | 23 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Mossback Wolf | 10 | 100 % | 1,199 | 170 | 1.7 s | 0.3 % | 0.01 % |
-| Bramble Imp | 10 | 100 % | 1,199 | 170 | 1.7 s | 0.3 % | 0.01 % |
-| Rotcap Stag | 10 | 100 % | 1,199 | 170 | 1.7 s | 0.3 % | 0.01 % |
-| The Elder Stag (boss) | 26 | 100 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.79 % |
+| Mossback Wolf | 10 | 100 % | 1,199 | 510 | 1.7 s | 0.3 % | 0.00 % |
+| Bramble Imp | 10 | 100 % | 1,199 | 510 | 1.7 s | 0.3 % | 0.00 % |
+| Rotcap Stag | 10 | 100 % | 1,199 | 510 | 1.7 s | 0.3 % | 0.00 % |
+| Ember Squirrel | 10 | 100 % | 1,199 | 510 | 1.7 s | 0.3 % | 0.00 % |
+| Pinecone Warden | 10 | 100 % | 1,199 | 510 | 1.7 s | 0.3 % | 0.00 % |
+| The Elder Stag (boss) | 26 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Granite Ram | 12 | 100 % | 1,865 | 266 | 2.7 s | 0.4 % | 0.01 % |
-| Cave Goblin Miner | 12 | 100 % | 1,865 | 266 | 2.7 s | 0.4 % | 0.01 % |
-| Boulder Beetle | 12 | 100 % | 1,865 | 266 | 2.7 s | 0.4 % | 0.01 % |
-| The Hill Giant (boss) | 28 | 100 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.79 % |
+| Granite Ram | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Cave Goblin Miner | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Boulder Beetle | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Magma Knight | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Magma Crab | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Mawhorn Brute | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Quarry Drake | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Cairn Sentinel | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Quarry Rat Knight | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| Highland Gnoll | 12 | 100 % | 1,865 | 797 | 2.7 s | 0.4 % | 0.01 % |
+| The Hill Giant (boss) | 28 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
+| The Ironhorn (boss) | 28 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.3 %* |
-| Garbage Ogre | 14 | 100 % | 3,263 | 465 | 4.7 s | 0.8 % | 0.02 % |
-| Dumpback | 14 | 100 % | 3,263 | 465 | 4.7 s | 0.8 % | 0.02 % |
-| Rot Heron | 14 | 100 % | 3,263 | 465 | 4.7 s | 0.8 % | 0.02 % |
-| Scrap Golem | 14 | 100 % | 3,263 | 465 | 4.7 s | 0.8 % | 0.02 % |
-| The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.79 % |
+| Garbage Ogre | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| Toxic Zombie | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| Dumpback | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| Rot Heron | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| Scrap Golem | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| Bogfire Wisp | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.01 % |
+| The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.68 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.5 %* |
-| Moss Snapper | 16 | 94 % | 5,709 | 815 | 8.2 s | 1.4 % | 0.04 % |
-| Reed Nymph | 16 | 84 % | 5,709 | 815 | 8.2 s | 1.4 % | 0.04 % |
-| Pike Lurker | 16 | 62 % | 5,709 | 815 | 8.2 s | 1.4 % | 0.03 % |
-| The Lake Hydra (boss) | 33 | 99 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.78 % |
+| Moss Snapper | 16 | 94 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| Reed Nymph | 16 | 84 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| Pike Lurker | 16 | 62 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| Tidepool Golem | 16 | 94 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| Silt Eel | 16 | 81 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| Lilypad Warden | 16 | 46 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.01 % |
+| The Lake Hydra (boss) | 33 | 99 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.67 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.7 %* |
-| Frost Hare | 15 | 70 % | 7,049 | 1,005 | 10 s | 1.7 % | 0.04 % |
-| Icetusk Calf | 15 | 94 % | 7,049 | 1,005 | 10 s | 1.7 % | 0.05 % |
-| Rime Wraith | 15 | 1 % | 7,049 | 1,005 | 10 s | 1.7 % | 0.00 % |
-| Frost Moth | 15 | 89 % | 7,049 | 1,005 | 10 s | 1.7 % | 0.05 % |
-| The Winter Wyrm (boss) | 36 | 92 % | 716,431 | 53,732 | 1,023 s | 170.6 % | 0.72 % |
+| Frost Hare | 15 | 70 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.02 % |
+| Icetusk Calf | 15 | 94 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.03 % |
+| Rime Wraith | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
+| Frost Moth | 15 | 89 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.03 % |
+| Glacier Yeti | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
+| The Winter Wyrm (boss) | 36 | 92 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.62 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.9 %* |
-| **All kills together** | | | | | | | **6.6 %** (bosses 6.2 %; XP 7.3 %) |
+| **All kills together** | | | | | | | **6.9 %** (bosses 6.6 %; XP 22.9 %) |
 
 ## castle 7: hero level 58, obsidian + titan maul, 1,300 gold/s, 80.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 8 | 100 % | 514 | 72 | 0.4 s | 0.1 % | 0.00 % |
-| Burrow Badger | 8 | 100 % | 514 | 72 | 0.4 s | 0.1 % | 0.00 % |
-| Dust Strider | 8 | 100 % | 514 | 72 | 0.4 s | 0.1 % | 0.00 % |
-| The Great Auroch (boss) | 21 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.43 % |
+| Thistle Boar | 8 | 100 % | 514 | 216 | 0.4 s | 0.1 % | 0.00 % |
+| Burrow Badger | 8 | 100 % | 514 | 216 | 0.4 s | 0.1 % | 0.00 % |
+| Dust Strider | 8 | 100 % | 514 | 216 | 0.4 s | 0.1 % | 0.00 % |
+| Gravel Quail | 8 | 100 % | 514 | 216 | 0.4 s | 0.1 % | 0.00 % |
+| Stonehorn Bison | 8 | 100 % | 514 | 216 | 0.4 s | 0.1 % | 0.00 % |
+| The Great Auroch (boss) | 21 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Wreck Crab | 9 | 100 % | 832 | 118 | 0.6 s | 0.1 % | 0.00 % |
-| Net Gull | 9 | 100 % | 832 | 118 | 0.6 s | 0.1 % | 0.00 % |
-| Drowned Sailor | 9 | 100 % | 832 | 118 | 0.6 s | 0.1 % | 0.00 % |
-| The Reef Leviathan (boss) | 23 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.43 % |
+| Wreck Crab | 9 | 100 % | 832 | 355 | 0.6 s | 0.1 % | 0.00 % |
+| Net Gull | 9 | 100 % | 832 | 355 | 0.6 s | 0.1 % | 0.00 % |
+| Drowned Sailor | 9 | 100 % | 832 | 355 | 0.6 s | 0.1 % | 0.00 % |
+| Tideglass Jelly | 9 | 100 % | 832 | 355 | 0.6 s | 0.1 % | 0.00 % |
+| Barnacle Brute | 9 | 100 % | 832 | 355 | 0.6 s | 0.1 % | 0.00 % |
+| The Reef Leviathan (boss) | 23 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Mossback Wolf | 11 | 100 % | 1,295 | 184 | 1.0 s | 0.2 % | 0.00 % |
-| Bramble Imp | 11 | 100 % | 1,295 | 184 | 1.0 s | 0.2 % | 0.00 % |
-| Rotcap Stag | 11 | 100 % | 1,295 | 184 | 1.0 s | 0.2 % | 0.00 % |
-| The Elder Stag (boss) | 26 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.43 % |
+| Mossback Wolf | 11 | 100 % | 1,295 | 551 | 1.0 s | 0.2 % | 0.00 % |
+| Bramble Imp | 11 | 100 % | 1,295 | 551 | 1.0 s | 0.2 % | 0.00 % |
+| Rotcap Stag | 11 | 100 % | 1,295 | 551 | 1.0 s | 0.2 % | 0.00 % |
+| Ember Squirrel | 11 | 100 % | 1,295 | 551 | 1.0 s | 0.2 % | 0.00 % |
+| Pinecone Warden | 11 | 100 % | 1,295 | 551 | 1.0 s | 0.2 % | 0.00 % |
+| The Elder Stag (boss) | 26 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Granite Ram | 13 | 100 % | 2,014 | 287 | 1.5 s | 0.3 % | 0.01 % |
-| Cave Goblin Miner | 13 | 100 % | 2,014 | 287 | 1.5 s | 0.3 % | 0.01 % |
-| Boulder Beetle | 13 | 100 % | 2,014 | 287 | 1.5 s | 0.3 % | 0.01 % |
-| The Hill Giant (boss) | 28 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.43 % |
+| Granite Ram | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Cave Goblin Miner | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Boulder Beetle | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Magma Knight | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Magma Crab | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Mawhorn Brute | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Quarry Drake | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Cairn Sentinel | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Quarry Rat Knight | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| Highland Gnoll | 13 | 100 % | 2,014 | 861 | 1.5 s | 0.3 % | 0.00 % |
+| The Hill Giant (boss) | 28 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
+| The Ironhorn (boss) | 28 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Garbage Ogre | 15 | 100 % | 3,524 | 502 | 2.7 s | 0.5 % | 0.01 % |
-| Dumpback | 15 | 100 % | 3,524 | 502 | 2.7 s | 0.5 % | 0.01 % |
-| Rot Heron | 15 | 99 % | 3,524 | 502 | 2.7 s | 0.5 % | 0.01 % |
-| Scrap Golem | 15 | 100 % | 3,524 | 502 | 2.7 s | 0.5 % | 0.01 % |
-| The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.43 % |
+| Garbage Ogre | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Toxic Zombie | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Dumpback | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Rot Heron | 15 | 99 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Scrap Golem | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Bogfire Wisp | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.3 %* |
-| Moss Snapper | 17 | 90 % | 6,166 | 880 | 4.7 s | 0.8 % | 0.02 % |
-| Reed Nymph | 17 | 70 % | 6,166 | 880 | 4.7 s | 0.8 % | 0.02 % |
-| Pike Lurker | 17 | 46 % | 6,166 | 880 | 4.7 s | 0.8 % | 0.01 % |
-| The Lake Hydra (boss) | 33 | 100 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.42 % |
+| Moss Snapper | 17 | 90 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Reed Nymph | 17 | 70 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Pike Lurker | 17 | 46 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Tidepool Golem | 17 | 90 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Silt Eel | 17 | 66 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Lilypad Warden | 17 | 35 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.00 % |
+| The Lake Hydra (boss) | 33 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.4 %* |
-| Frost Hare | 16 | 55 % | 7,613 | 1,085 | 5.9 s | 1.0 % | 0.02 % |
-| Icetusk Calf | 16 | 91 % | 7,613 | 1,085 | 5.9 s | 1.0 % | 0.03 % |
-| Rime Wraith | 16 | 0 % | 7,613 | 1,085 | 5.9 s | 1.0 % | 0.00 % |
-| Frost Moth | 16 | 79 % | 7,613 | 1,085 | 5.9 s | 1.0 % | 0.03 % |
-| The Winter Wyrm (boss) | 36 | 96 % | 716,431 | 53,732 | 551 s | 91.9 % | 0.41 % |
+| Frost Hare | 16 | 55 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.01 % |
+| Icetusk Calf | 16 | 91 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
+| Rime Wraith | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
+| Frost Moth | 16 | 79 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.01 % |
+| Glacier Yeti | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
+| The Winter Wyrm (boss) | 36 | 96 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.5 %* |
-| **All kills together** | | | | | | | **3.7 %** (bosses 3.5 %; XP 4.8 %) |
+| **All kills together** | | | | | | | **4.0 %** (bosses 3.8 %; XP 15.2 %) |
 
 ## castle 8: hero level 70, obsidian + titan maul, 2,200 gold/s, 120.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 9 | 100 % | 555 | 78 | 0.3 s | 0.0 % | 0.00 % |
-| Burrow Badger | 9 | 100 % | 555 | 78 | 0.3 s | 0.0 % | 0.00 % |
-| Dust Strider | 9 | 100 % | 555 | 78 | 0.3 s | 0.0 % | 0.00 % |
-| The Great Auroch (boss) | 22 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Thistle Boar | 9 | 100 % | 555 | 233 | 0.3 s | 0.0 % | 0.00 % |
+| Burrow Badger | 9 | 100 % | 555 | 233 | 0.3 s | 0.0 % | 0.00 % |
+| Dust Strider | 9 | 100 % | 555 | 233 | 0.3 s | 0.0 % | 0.00 % |
+| Gravel Quail | 9 | 100 % | 555 | 233 | 0.3 s | 0.0 % | 0.00 % |
+| Stonehorn Bison | 9 | 100 % | 555 | 233 | 0.3 s | 0.0 % | 0.00 % |
+| The Great Auroch (boss) | 22 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Wreck Crab | 10 | 100 % | 899 | 128 | 0.4 s | 0.1 % | 0.00 % |
-| Net Gull | 10 | 100 % | 899 | 128 | 0.4 s | 0.1 % | 0.00 % |
-| Drowned Sailor | 10 | 100 % | 899 | 128 | 0.4 s | 0.1 % | 0.00 % |
-| The Reef Leviathan (boss) | 24 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Wreck Crab | 10 | 100 % | 899 | 384 | 0.4 s | 0.1 % | 0.00 % |
+| Net Gull | 10 | 100 % | 899 | 384 | 0.4 s | 0.1 % | 0.00 % |
+| Drowned Sailor | 10 | 100 % | 899 | 384 | 0.4 s | 0.1 % | 0.00 % |
+| Tideglass Jelly | 10 | 100 % | 899 | 384 | 0.4 s | 0.1 % | 0.00 % |
+| Barnacle Brute | 10 | 100 % | 899 | 384 | 0.4 s | 0.1 % | 0.00 % |
+| The Reef Leviathan (boss) | 24 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Mossback Wolf | 12 | 100 % | 1,398 | 198 | 0.6 s | 0.1 % | 0.00 % |
-| Bramble Imp | 12 | 100 % | 1,398 | 198 | 0.6 s | 0.1 % | 0.00 % |
-| Rotcap Stag | 12 | 100 % | 1,398 | 198 | 0.6 s | 0.1 % | 0.00 % |
-| The Elder Stag (boss) | 27 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Mossback Wolf | 12 | 100 % | 1,398 | 595 | 0.6 s | 0.1 % | 0.00 % |
+| Bramble Imp | 12 | 100 % | 1,398 | 595 | 0.6 s | 0.1 % | 0.00 % |
+| Rotcap Stag | 12 | 100 % | 1,398 | 595 | 0.6 s | 0.1 % | 0.00 % |
+| Ember Squirrel | 12 | 100 % | 1,398 | 595 | 0.6 s | 0.1 % | 0.00 % |
+| Pinecone Warden | 12 | 100 % | 1,398 | 595 | 0.6 s | 0.1 % | 0.00 % |
+| The Elder Stag (boss) | 27 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Granite Ram | 14 | 100 % | 2,175 | 310 | 1.0 s | 0.2 % | 0.00 % |
-| Cave Goblin Miner | 14 | 100 % | 2,175 | 310 | 1.0 s | 0.2 % | 0.00 % |
-| Boulder Beetle | 14 | 100 % | 2,175 | 310 | 1.0 s | 0.2 % | 0.00 % |
-| The Hill Giant (boss) | 29 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Granite Ram | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Cave Goblin Miner | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Boulder Beetle | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Magma Knight | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Magma Crab | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Mawhorn Brute | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Quarry Drake | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Cairn Sentinel | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Quarry Rat Knight | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| Highland Gnoll | 14 | 100 % | 2,175 | 930 | 1.0 s | 0.2 % | 0.00 % |
+| The Hill Giant (boss) | 29 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
+| The Ironhorn (boss) | 29 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Garbage Ogre | 16 | 100 % | 3,806 | 542 | 1.7 s | 0.3 % | 0.01 % |
-| Dumpback | 16 | 99 % | 3,806 | 542 | 1.7 s | 0.3 % | 0.01 % |
-| Rot Heron | 16 | 98 % | 3,806 | 542 | 1.7 s | 0.3 % | 0.01 % |
-| Scrap Golem | 16 | 100 % | 3,806 | 542 | 1.7 s | 0.3 % | 0.01 % |
-| The Mire Matriarch (boss) | 32 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Garbage Ogre | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| Toxic Zombie | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| Dumpback | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| Rot Heron | 16 | 98 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| Scrap Golem | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| Bogfire Wisp | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.00 % |
+| The Mire Matriarch (boss) | 32 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Moss Snapper | 18 | 73 % | 6,660 | 951 | 3.0 s | 0.5 % | 0.01 % |
-| Reed Nymph | 18 | 53 % | 6,660 | 951 | 3.0 s | 0.5 % | 0.01 % |
-| Pike Lurker | 18 | 25 % | 6,660 | 951 | 3.0 s | 0.5 % | 0.00 % |
-| The Lake Hydra (boss) | 34 | 100 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.26 % |
+| Moss Snapper | 18 | 73 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Reed Nymph | 18 | 53 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Pike Lurker | 18 | 25 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
+| Tidepool Golem | 18 | 73 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Silt Eel | 18 | 41 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
+| Lilypad Warden | 18 | 15 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
+| The Lake Hydra (boss) | 34 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Frost Hare | 16 | 77 % | 7,613 | 1,085 | 3.5 s | 0.6 % | 0.01 % |
-| Icetusk Calf | 16 | 97 % | 7,613 | 1,085 | 3.5 s | 0.6 % | 0.02 % |
-| Rime Wraith | 16 | 1 % | 7,613 | 1,085 | 3.5 s | 0.6 % | 0.00 % |
-| Frost Moth | 16 | 88 % | 7,613 | 1,085 | 3.5 s | 0.6 % | 0.02 % |
-| The Winter Wyrm (boss) | 37 | 97 % | 737,924 | 55,344 | 335 s | 55.9 % | 0.25 % |
+| Frost Hare | 16 | 77 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Icetusk Calf | 16 | 97 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Rime Wraith | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
+| Frost Moth | 16 | 88 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Glacier Yeti | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
+| The Winter Wyrm (boss) | 37 | 97 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.3 %* |
-| **All kills together** | | | | | | | **2.3 %** (bosses 2.2 %; XP 3.3 %) |
+| **All kills together** | | | | | | | **2.5 %** (bosses 2.4 %; XP 10.7 %) |
 
 ## castle 9: hero level 84, obsidian + titan maul, 3,300 gold/s, 200.00 XP/s
 
 | Monster | Level | Win | Gold | XP | Seconds | % of 10 min | Spawn share |
 |---|---|---|---|---|---|---|---|
-| Thistle Boar | 9 | 100 % | 555 | 78 | 0.2 s | 0.0 % | 0.00 % |
-| Burrow Badger | 9 | 100 % | 555 | 78 | 0.2 s | 0.0 % | 0.00 % |
-| Dust Strider | 9 | 100 % | 555 | 78 | 0.2 s | 0.0 % | 0.00 % |
-| The Great Auroch (boss) | 23 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Thistle Boar | 9 | 100 % | 555 | 233 | 0.2 s | 0.0 % | 0.00 % |
+| Burrow Badger | 9 | 100 % | 555 | 233 | 0.2 s | 0.0 % | 0.00 % |
+| Dust Strider | 9 | 100 % | 555 | 233 | 0.2 s | 0.0 % | 0.00 % |
+| Gravel Quail | 9 | 100 % | 555 | 233 | 0.2 s | 0.0 % | 0.00 % |
+| Stonehorn Bison | 9 | 100 % | 555 | 233 | 0.2 s | 0.0 % | 0.00 % |
+| The Great Auroch (boss) | 23 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *plains total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Wreck Crab | 11 | 100 % | 971 | 138 | 0.3 s | 0.0 % | 0.00 % |
-| Net Gull | 11 | 100 % | 971 | 138 | 0.3 s | 0.0 % | 0.00 % |
-| Drowned Sailor | 11 | 100 % | 971 | 138 | 0.3 s | 0.0 % | 0.00 % |
-| The Reef Leviathan (boss) | 25 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Wreck Crab | 11 | 100 % | 971 | 415 | 0.3 s | 0.0 % | 0.00 % |
+| Net Gull | 11 | 100 % | 971 | 415 | 0.3 s | 0.0 % | 0.00 % |
+| Drowned Sailor | 11 | 100 % | 971 | 415 | 0.3 s | 0.0 % | 0.00 % |
+| Tideglass Jelly | 11 | 100 % | 971 | 415 | 0.3 s | 0.0 % | 0.00 % |
+| Barnacle Brute | 11 | 100 % | 971 | 415 | 0.3 s | 0.0 % | 0.00 % |
+| The Reef Leviathan (boss) | 25 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *coast total (if every spawn were here)* | | | | | | | *0.0 %* |
-| Mossback Wolf | 13 | 100 % | 1,510 | 214 | 0.5 s | 0.1 % | 0.00 % |
-| Bramble Imp | 13 | 100 % | 1,510 | 214 | 0.5 s | 0.1 % | 0.00 % |
-| Rotcap Stag | 13 | 100 % | 1,510 | 214 | 0.5 s | 0.1 % | 0.00 % |
-| The Elder Stag (boss) | 28 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Mossback Wolf | 13 | 100 % | 1,510 | 642 | 0.5 s | 0.1 % | 0.00 % |
+| Bramble Imp | 13 | 100 % | 1,510 | 642 | 0.5 s | 0.1 % | 0.00 % |
+| Rotcap Stag | 13 | 100 % | 1,510 | 642 | 0.5 s | 0.1 % | 0.00 % |
+| Ember Squirrel | 13 | 100 % | 1,510 | 642 | 0.5 s | 0.1 % | 0.00 % |
+| Pinecone Warden | 13 | 100 % | 1,510 | 642 | 0.5 s | 0.1 % | 0.00 % |
+| The Elder Stag (boss) | 28 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *forest total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Granite Ram | 15 | 100 % | 2,349 | 335 | 0.7 s | 0.1 % | 0.00 % |
-| Cave Goblin Miner | 15 | 100 % | 2,349 | 335 | 0.7 s | 0.1 % | 0.00 % |
-| Boulder Beetle | 15 | 100 % | 2,349 | 335 | 0.7 s | 0.1 % | 0.00 % |
-| The Hill Giant (boss) | 30 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Granite Ram | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Cave Goblin Miner | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Boulder Beetle | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Magma Knight | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Magma Crab | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Mawhorn Brute | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Quarry Drake | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Cairn Sentinel | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Quarry Rat Knight | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| Highland Gnoll | 15 | 100 % | 2,349 | 1,005 | 0.7 s | 0.1 % | 0.00 % |
+| The Hill Giant (boss) | 30 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
+| The Ironhorn (boss) | 30 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Garbage Ogre | 17 | 99 % | 4,111 | 586 | 1.2 s | 0.2 % | 0.01 % |
-| Dumpback | 17 | 98 % | 4,111 | 586 | 1.2 s | 0.2 % | 0.01 % |
-| Rot Heron | 17 | 95 % | 4,111 | 586 | 1.2 s | 0.2 % | 0.01 % |
-| Scrap Golem | 17 | 99 % | 4,111 | 586 | 1.2 s | 0.2 % | 0.01 % |
-| The Mire Matriarch (boss) | 33 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Garbage Ogre | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Toxic Zombie | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Dumpback | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Rot Heron | 17 | 95 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Scrap Golem | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Bogfire Wisp | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| The Mire Matriarch (boss) | 33 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Moss Snapper | 18 | 90 % | 6,660 | 951 | 2.0 s | 0.3 % | 0.01 % |
-| Reed Nymph | 18 | 71 % | 6,660 | 951 | 2.0 s | 0.3 % | 0.01 % |
-| Pike Lurker | 18 | 41 % | 6,660 | 951 | 2.0 s | 0.3 % | 0.00 % |
-| The Lake Hydra (boss) | 35 | 100 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
-| *lake total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Frost Hare | 17 | 51 % | 8,222 | 1,172 | 2.5 s | 0.4 % | 0.01 % |
-| Icetusk Calf | 17 | 91 % | 8,222 | 1,172 | 2.5 s | 0.4 % | 0.01 % |
-| Rime Wraith | 17 | 0 % | 8,222 | 1,172 | 2.5 s | 0.4 % | 0.00 % |
-| Frost Moth | 17 | 80 % | 8,222 | 1,172 | 2.5 s | 0.4 % | 0.01 % |
-| The Winter Wyrm (boss) | 38 | 98 % | 760,062 | 57,005 | 230 s | 38.4 % | 0.18 % |
+| Moss Snapper | 18 | 90 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Reed Nymph | 18 | 71 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| Pike Lurker | 18 | 41 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| Tidepool Golem | 18 | 90 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Silt Eel | 18 | 59 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| Lilypad Warden | 18 | 27 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| The Lake Hydra (boss) | 35 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
+| *lake total (if every spawn were here)* | | | | | | | *0.1 %* |
+| Frost Hare | 17 | 51 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
+| Icetusk Calf | 17 | 91 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
+| Rime Wraith | 17 | 0 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
+| Frost Moth | 17 | 80 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
+| Glacier Yeti | 17 | 0 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
+| The Winter Wyrm (boss) | 38 | 98 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.2 %* |
-| **All kills together** | | | | | | | **1.7 %** (bosses 1.6 %; XP 2.2 %) |
+| **All kills together** | | | | | | | **1.8 %** (bosses 1.7 %; XP 7.0 %) |
 
 ## Summary
 
 | Stage | Gold/s | All kills (target ~15 %) | Bosses | Normal monsters | XP, all kills | Weakest monster | Its kill, % of 10 min of income |
 |---|---|---|---|---|---|---|---|
-| castle 1 | 2.0 | 6.8 % | 0.0 % | 6.8 % | 3.3 % | Thistle Boar (level 2) | 16.2 % |
-| castle 2 | 12 | 5.4 % | 1.6 % | 3.8 % | 3.7 % | Thistle Boar (level 3) | 4.8 % |
-| castle 3 | 40 | 9.5 % | 7.7 % | 1.9 % | 9.4 % | Thistle Boar (level 4) | 1.6 % |
-| castle 4 | 100 | 10.7 % | 10.0 % | 0.8 % | 10.9 % | Thistle Boar (level 5) | 0.7 % |
-| castle 5 | 300 | 10.7 % | 10.2 % | 0.5 % | 12.6 % | Thistle Boar (level 6) | 0.2 % |
-| castle 6 | 700 | 6.6 % | 6.2 % | 0.4 % | 7.3 % | Thistle Boar (level 7) | 0.1 % |
-| castle 7 | 1,300 | 3.7 % | 3.5 % | 0.2 % | 4.8 % | Thistle Boar (level 8) | 0.1 % |
-| castle 8 | 2,200 | 2.3 % | 2.2 % | 0.1 % | 3.3 % | Thistle Boar (level 9) | 0.0 % |
-| castle 9 | 3,300 | 1.7 % | 1.6 % | 0.1 % | 2.2 % | Thistle Boar (level 9) | 0.0 % |
+| castle 1 | 2.0 | 6.7 % | 0.0 % | 6.7 % | 9.8 % | Thistle Boar (level 2) | 16.2 % |
+| castle 2 | 12 | 5.0 % | 1.4 % | 3.6 % | 10.2 % | Thistle Boar (level 3) | 4.8 % |
+| castle 3 | 40 | 8.8 % | 6.6 % | 2.2 % | 25.9 % | Thistle Boar (level 4) | 1.6 % |
+| castle 4 | 100 | 10.8 % | 9.9 % | 0.9 % | 32.9 % | Thistle Boar (level 5) | 0.7 % |
+| castle 5 | 300 | 10.8 % | 10.2 % | 0.6 % | 38.1 % | Thistle Boar (level 6) | 0.2 % |
+| castle 6 | 700 | 6.9 % | 6.6 % | 0.4 % | 22.9 % | Thistle Boar (level 7) | 0.1 % |
+| castle 7 | 1,300 | 4.0 % | 3.8 % | 0.2 % | 15.2 % | Thistle Boar (level 8) | 0.1 % |
+| castle 8 | 2,200 | 2.5 % | 2.4 % | 0.1 % | 10.7 % | Thistle Boar (level 9) | 0.0 % |
+| castle 9 | 3,300 | 1.8 % | 1.7 % | 0.1 % | 7.0 % | Thistle Boar (level 9) | 0.0 % |
 
 ## Caps
 
@@ -414,51 +594,82 @@ Gold and XP caps at the monster's reference level and the multiplier per level (
 | Thistle Boar | 1 - 20 (grown) | 90 | 300 | 42 | 1.08 | 1,295 |
 | Burrow Badger | 1 - 20 (grown) | 90 | 300 | 42 | 1.08 | 1,295 |
 | Dust Strider | 1 - 20 (grown) | 90 | 300 | 42 | 1.08 | 1,295 |
+| Gravel Quail | 1 - 20 (grown) | 90 | 300 | 42 | 1.08 | 1,295 |
+| Stonehorn Bison | 1 - 20 (grown) | 90 | 300 | 42 | 1.08 | 1,295 |
 | The Great Auroch | 15 - 33 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Mossback Wolf | 4 - 23 (grown) | 110 | 600 | 85 | 1.08 | 3,262 |
 | Bramble Imp | 4 - 23 (grown) | 110 | 600 | 85 | 1.08 | 3,262 |
 | Rotcap Stag | 4 - 23 (grown) | 110 | 600 | 85 | 1.08 | 3,262 |
+| Ember Squirrel | 4 - 23 (grown) | 110 | 600 | 85 | 1.08 | 3,262 |
+| Pinecone Warden | 4 - 23 (grown) | 110 | 600 | 85 | 1.08 | 3,262 |
 | The Elder Stag | 20 - 38 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Garbage Ogre | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
+| Toxic Zombie | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | Dumpback | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | Rot Heron | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | Scrap Golem | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
+| Bogfire Wisp | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | The Mire Matriarch | 25 - 43 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Frost Hare | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
 | Icetusk Calf | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
 | Rime Wraith | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
 | Frost Moth | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
+| Glacier Yeti | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
 | The Winter Wyrm | 30 - 48 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Granite Ram | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
 | Cave Goblin Miner | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
 | Boulder Beetle | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
 | The Hill Giant | 22 - 40 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
+| Magma Knight | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Magma Crab | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Mawhorn Brute | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Quarry Drake | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Cairn Sentinel | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Quarry Rat Knight | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| Highland Gnoll | 6 - 25 (grown) | 120 | 800 | 114 | 1.08 | 5,073 |
+| The Ironhorn | 22 - 40 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Wreck Crab | 2 - 21 (grown) | 100 | 450 | 64 | 1.08 | 2,097 |
 | Net Gull | 2 - 21 (grown) | 100 | 450 | 64 | 1.08 | 2,097 |
 | Drowned Sailor | 2 - 21 (grown) | 100 | 450 | 64 | 1.08 | 2,097 |
+| Tideglass Jelly | 2 - 21 (grown) | 100 | 450 | 64 | 1.08 | 2,097 |
+| Barnacle Brute | 2 - 21 (grown) | 100 | 450 | 64 | 1.08 | 2,097 |
 | The Reef Leviathan | 17 - 35 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Moss Snapper | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
 | Reed Nymph | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
 | Pike Lurker | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
+| Tidepool Golem | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
+| Silt Eel | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
+| Lilypad Warden | 10 - 29 (grown) | 160 | 1,800 | 257 | 1.08 | 15,529 |
 | The Lake Hydra | 27 - 45 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Skull Vine | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Eye Horror | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| Zombie Triceratops | 14 - 29 (grown) | 210 | 3,000 | 430 | 1.08 | 25,881 |
-| The Hardwood Colossus | 32 - 50 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Barn Gargoyle | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Bucket Knight | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| Hedge Bandit | 17 - 32 (grown) | 250 | 4,000 | 560 | 1.08 | 43,471 |
-| The Harvest Matron | 37 - 55 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Greenscale Warden | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Blossom Ronin | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| Gray Gleaner | 20 - 35 (grown) | 290 | 5,200 | 720 | 1.08 | 71,189 |
-| The Blossom Reaper | 42 - 60 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Gasket Goblin | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Blighted Husk | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Mothwing Hexer | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| Gloom Cerberus | 23 - 38 (grown) | 330 | 6,600 | 900 | 1.08 | 113,821 |
-| The Eyed Maw | 47 - 65 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
-| Bone Cleaver | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Frostguard Knight | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| Gilded Champion | 26 - 41 (grown) | 380 | 8,400 | 1,150 | 1.08 | 182,486 |
-| The Cinder Warlord | 52 - 70 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
+| Skull Vine | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Eye Horror | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Zombie Triceratops | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Vinewhip Panther | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| Mossback Idol | 16 - 33 (grown) | 210 | 3,000 | 430 | 1.08 | 35,211 |
+| The Hardwood Colossus | 38 - 56 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,219,676 |
+| The Brainstorm | 38 - 56 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,219,676 |
+| Barn Gargoyle | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Bucket Knight | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Hedge Bandit | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Crow Marshal | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| Millstone Golem | 20 - 37 (grown) | 250 | 4,000 | 560 | 1.08 | 63,873 |
+| The Harvest Matron | 46 - 64 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,332,773 |
+| Greenscale Warden | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Blossom Ronin | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Gray Gleaner | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Mushroom Wizard | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| Rootbound Gardener | 24 - 41 (grown) | 290 | 5,200 | 720 | 1.08 | 112,968 |
+| The Blossom Reaper | 54 - 72 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,456,357 |
+| Gasket Goblin | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Blighted Husk | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Mothwing Hexer | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Gloom Cerberus | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Sporeback Ogre | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| Spore Hound | 28 - 45 (grown) | 330 | 6,600 | 900 | 1.08 | 195,069 |
+| The Eyed Maw | 60 - 78 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,500,048 |
+| Bone Cleaver | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Frostguard Knight | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Gilded Champion | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Banner Wraith | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| Frost-Flame Knight | 32 - 49 (grown) | 380 | 8,400 | 1,150 | 1.08 | 337,769 |
+| The Cinder Warlord | 68 - 86 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,639,143 |

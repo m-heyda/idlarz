@@ -26,7 +26,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `badge_scroll_check_silver` | <img src="../../public/pixel/achievements/badge_scroll_check_silver.png" width="96" alt="badge_scroll_check_silver"> | 64x64 | used | code | `pixel/achievements/badge_scroll_check_silver.png` |
 | `badge_shield_silver` | <img src="../../public/pixel/achievements/badge_shield_silver.png" width="96" alt="badge_shield_silver"> | 64x64 | used | code | `pixel/achievements/badge_shield_silver.png` |
 | `badge_skull_bronze` | <img src="../../public/pixel/achievements/badge_skull_bronze.png" width="96" alt="badge_skull_bronze"> | 64x64 | used | code | `pixel/achievements/badge_skull_bronze.png` |
-| `badge_star_bronze` | <img src="../../public/pixel/achievements/badge_star_bronze.png" width="96" alt="badge_star_bronze"> | 64x64 | unused |  | `pixel/achievements/badge_star_bronze.png` |
+| `badge_star_bronze` | <img src="../../public/pixel/achievements/badge_star_bronze.png" width="96" alt="badge_star_bronze"> | 64x64 | used | code | `pixel/achievements/badge_star_bronze.png` |
 | `badge_star_silver` | <img src="../../public/pixel/achievements/badge_star_silver.png" width="96" alt="badge_star_silver"> | 64x64 | used | code | `pixel/achievements/badge_star_silver.png` |
 | `badge_sword_shield_bronze` | <img src="../../public/pixel/achievements/badge_sword_shield_bronze.png" width="96" alt="badge_sword_shield_bronze"> | 64x64 | used | code | `pixel/achievements/badge_sword_shield_bronze.png` |
 | `badge_sword_silver` | <img src="../../public/pixel/achievements/badge_sword_silver.png" width="96" alt="badge_sword_silver"> | 64x64 | used | code | `pixel/achievements/badge_sword_silver.png` |
@@ -108,7 +108,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `ui_bar_fill` | <img src="../../public/pixel/ui/bar_fill.png" width="48" alt="ui_bar_fill"> | 8x6 | used |  | `pixel/ui/bar_fill.png` |
 | `ui_bar_frame` | <img src="../../public/pixel/ui/bar_frame.png" width="48" alt="ui_bar_frame"> | 16x14 | used |  | `pixel/ui/bar_frame.png` |
 | `ui_coin_pouch` | <img src="../../public/pixel/ui/coin_pouch.png" width="96" alt="ui_coin_pouch"> | 143x143 | used | code | `pixel/ui/coin_pouch.png` |
-| `ui_daily_chest` | <img src="../../public/pixel/ui/daily_chest.png" width="96" alt="ui_daily_chest"> | 62x51 | used | code | `pixel/ui/daily_chest.png` |
+| `ui_daily_gift` | <img src="../../public/pixel/ui/daily_gift.png" width="96" alt="ui_daily_gift"> | 384x48 | used |  | `pixel/ui/daily_gift.png` |
 | `ui_frame_modal` | <img src="../../public/pixel/ui/frame_modal.png" width="72" alt="ui_frame_modal"> | 36x36 | used | code | `pixel/ui/frame_modal.png` |
 | `ui_frame_panel` | <img src="../../public/pixel/ui/frame_panel.png" width="48" alt="ui_frame_panel"> | 12x12 | used | code | `pixel/ui/frame_panel.png` |
 | `ui_frame_tip` | <img src="../../public/pixel/ui/frame_tip.png" width="48" alt="ui_frame_tip"> | 12x12 | used | code | `pixel/ui/frame_tip.png` |
@@ -154,7 +154,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx | `pixel/icons/rank_trophy.png` |
+| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx, src/lib/offline/curiosity.ts | `pixel/icons/rank_trophy.png` |
 
 ## skill
 

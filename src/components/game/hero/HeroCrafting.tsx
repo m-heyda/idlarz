@@ -1,10 +1,10 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button, HoverTip, Inset, Panel, ProgressBar, SearchInput, Slot } from '../../../../packages/design-system/src/components/primitives';
 import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
-import { Tooltip, TipCostList, TipLine } from '../../../../packages/design-system/src/components/tooltips';
-import { RARITIES, RESOURCES } from '@/catalog';
+import { Tooltip, TipLine, TipRows } from '../../../../packages/design-system/src/components/tooltips';
+import { ITEM_CATALOG, RARITIES, formatStatValue, statLabel } from '@/catalog';
 import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
-import { gearOdds } from '@/lib/craftGear';
+import { gearBaseStats, gearItemLevels, gearOdds } from '@/lib/craftGear';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { craftGroups } from '@/lib/craftCategories';
 import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
@@ -29,34 +29,41 @@ interface Have {
 /** What a recipe's kind is called in a tooltip (one thing, capitalised). */
 const KIND_NAME: Record<RecipeKind, string> = { component: 'Component', potion: 'Potion', good: 'Trade good', gear: 'Gear', legendary: 'Legendary weapon' };
 
-/** The cost card of a recipe tile: what one craft takes (green when you have it, red when not) and the XP, or the level it unlocks at. */
+/** "+4 to 7" style range text of a base stat, or the single value when the range is one number */
+const rangeText = (key: string, min: number, max: number): string =>
+	min === max ? formatStatValue(key, min) : `${formatStatValue(key, min)} - ${formatStatValue(key, max)}`;
+
+/** The base stats of a gear recipe as rows (the lowest to the highest any base of this slot and grade gives at the item levels it rolls in now). */
+const baseStatRows = (recipe: Recipe, craftLevel: number): { label: string; value: string }[] => {
+	if (!('gear' in recipe.output)) return [];
+	const env = { craftLevel, luck: 0, intelligence: 0 };
+	return gearBaseStats(recipe.output.gear, env).map((row) => ({ label: statLabel(row.stat), value: rangeText(row.stat, row.min, row.max) }));
+};
+
+/**
+ * The hover card of a recipe tile: what the recipe makes, not what it costs (the cost is on the ticket next to the list). A component or a potion says what it is for; a gear recipe gives its item level and base stats;
+ * the XP is the last line, or the level it unlocks at.
+ */
 const RecipeTip: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const locked = have.craftLevel < recipe.unlock;
-	const needs = craftNeeds(recipe, 1);
+	const item = 'item' in recipe.output ? ITEM_CATALOG[recipe.output.item] : undefined;
+	const description = 'component' in recipe.output ? COMPONENTS[recipe.output.component].description : (item?.description ?? null);
+	const gear = 'gear' in recipe.output ? recipe.output.gear : null;
+	const levels = gear ? gearItemLevels(gear.grade as never, have.craftLevel) : null;
+	const rows = baseStatRows(recipe, have.craftLevel);
 	return (
-		<Tooltip icon={recipeIconUrl(recipe)} title={outputName(recipe)} subtitle={KIND_NAME[recipe.kind]}>
+		<Tooltip className='ds-tip-wide' icon={recipeIconUrl(recipe)} title={outputName(recipe)} subtitle={KIND_NAME[recipe.kind]}>
 			{locked ? (
 				<TipLine tone='red'>Unlocks at crafting level {recipe.unlock}</TipLine>
 			) : (
 				<>
-					<TipCostList
-						costs={[
-							...needs.resources.map((n) => ({
-								label: RESOURCES[n.key as keyof typeof RESOURCES].label,
-								icon: resourceIconUrl(n.key),
-								have: have.resources[n.key] ?? 0,
-								cost: n.qty,
-								text: formatInt(n.qty),
-							})),
-							...needs.components.map((n) => ({
-								label: COMPONENTS[n.id].name,
-								icon: componentIconUrl(n.id),
-								have: have.stock[n.id] ?? 0,
-								cost: n.qty,
-								text: String(n.qty),
-							})),
-						]}
-					/>
+					{description ? <TipLine>{description}</TipLine> : null}
+					{levels ? (
+						<TipLine>
+							{levels.min === levels.max ? `Item level ${levels.min}` : `Item level ${levels.min}-${levels.max}`} (it grows with your crafting level)
+						</TipLine>
+					) : null}
+					{rows.length ? <TipRows rows={rows} /> : null}
 					<TipLine tone='green'>+{formatXp(craftXpOf(recipe, 1))} XP</TipLine>
 				</>
 			)}
@@ -77,6 +84,7 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 	const odds = gearOdds(target, { craftLevel, luck, intelligence: characterStats.intelligence, pity: pity?.[target.grade] ?? 0 });
 	const levels = odds.itemLevel.min === odds.itemLevel.max ? `${odds.itemLevel.min}` : `${odds.itemLevel.min}-${odds.itemLevel.max}`;
 	const best = odds.rarities[odds.rarities.length - 1];
+	const baseRows = baseStatRows(recipe, craftLevel);
 	return (
 		<div data-slot='gear-odds'>
 			<div className='ds-capi'>Odds (Luck {formatInt(Math.round(luck))})</div>
@@ -89,6 +97,18 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 				))}
 			</div>
 			<div className='ds-paper-note'>Item level {levels} (it grows with your crafting level)</div>
+			{baseRows.length > 0 && (
+				<div data-slot='gear-base-stats'>
+					<div className='ds-paper-note'>Base stats (before affixes, common rarity, middle quality):</div>
+					<div className='ds-odds-rows'>
+						{baseRows.map((row) => (
+							<span key={row.label} className='ds-odds-row'>
+								{row.label} {row.value}
+							</span>
+						))}
+					</div>
+				</div>
+			)}
 			<div className='ds-paper-note'>
 				Quality leans up +{Math.round(odds.qualityBias * 100)}% (Intelligence)
 				{odds.pityMultiplier > 1 && best
@@ -130,7 +150,7 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 					</div>
 					<div className='ds-paper-sub'>
 						{KIND_NAME[recipe.kind]}
-						{isGear ? ' · goes to your bag' : ` · you hold ${formatInt(held)}`}
+						{isGear || 'item' in recipe.output ? ' · goes to your bag' : ` · you hold ${formatInt(held)}`}
 					</div>
 				</div>
 			</div>

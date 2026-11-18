@@ -256,6 +256,8 @@ test('an earned achievement puts a reward card in the notice stack, at most thre
 		points: 0,
 		claimable: 4,
 		bonusText: '',
+		milestonesClaimed: [],
+		bonus: { gold: 0, xp: 0 },
 	});
 	const shown = useUiStore.getState().achievementNotices;
 	assert.equal(shown.length, 3, 'the oldest is dropped');

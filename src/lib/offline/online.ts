@@ -3,7 +3,7 @@ import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
-import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
+import { claimAllMastery, claimBiomeGoal, claimMastery } from '@/lib/offline/mastery';
 import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
@@ -19,7 +19,7 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
-import { recordChest, recordCraft } from '@/lib/offline/stats';
+import { recordChest, recordCraft, recordCraftedRare } from '@/lib/offline/stats';
 import { buyResource, sellResource } from '@/lib/offline/trade';
 import {
 	UNCLAIMED_SEC,
@@ -33,7 +33,7 @@ import {
 	type StepOutcome,
 } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type CraftEnv } from '@/lib/offline/craft';
+import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -331,7 +331,17 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			craft: result.craft,
 			serverNowSec: ctx.nowSec,
 		};
-		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft, stats: recordCraft(ledger.stats, result.crafted ?? 0) } : ledger, value };
+		return {
+			ledger: result.ok
+				? {
+						...ledger,
+						inv: result.inv,
+						craft: result.craft,
+						stats: recordCraftedRare(recordCraft(ledger.stats, result.crafted ?? 0), craftedGearAdded(ledger.inv!, result.inv)),
+					}
+				: ledger,
+			value,
+		};
 	});
 
 /**
@@ -547,7 +557,12 @@ export const masteryStep = (deps: ServiceDeps, userId: string, key: string, requ
 			serverNowSec: ctx.nowSec,
 			...over,
 		});
-		const done = request.action === 'claimAll' ? claimAllMastery(ledger) : claimMastery(ledger, request.type, request.tier);
+		const done =
+			request.action === 'claimAll'
+				? claimAllMastery(ledger)
+				: request.action === 'claimBiome'
+					? claimBiomeGoal(ledger, request.biome, request.tier)
+					: claimMastery(ledger, request.type, request.tier);
 		if (!done.ok) {
 			const message =
 				done.reason === 'already_claimed'

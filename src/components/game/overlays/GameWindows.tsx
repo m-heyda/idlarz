@@ -8,10 +8,11 @@ import CastleUpgradeDialog from '../CastleUpgradeDialog';
 import HeroWindow from '../hero/HeroWindow';
 import MerchantWindow from '../merchant/MerchantWindow';
 import FarmOverlay from './FarmOverlay';
-import AchievementsOverlay from './AchievementsOverlay';
+import DeedsWindow from '../DeedsWindow';
 import BestiaryWindow from '../BestiaryWindow';
 import BossWindow from '../BossWindow';
 import RankingsWindow from '../RankingsWindow';
+import KingdomWindow from '../KingdomWindow';
 import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
@@ -51,9 +52,7 @@ const GameWindows: React.FC = () => {
 			)}
 			{open.includes('achievements') && (
 				<WindowErrorBoundary name='Deeds'>
-					<GameWindow id='achievements' title='Deeds' width={620} height={640}>
-						<AchievementsOverlay />
-					</GameWindow>
+					<DeedsWindow />
 				</WindowErrorBoundary>
 			)}
 			{open.includes('bestiary') && (
@@ -69,6 +68,11 @@ const GameWindows: React.FC = () => {
 			{open.includes('rankings') && (
 				<WindowErrorBoundary name='Rankings'>
 					<RankingsWindow />
+				</WindowErrorBoundary>
+			)}
+			{open.includes('kingdom') && (
+				<WindowErrorBoundary name='Kingdom overview'>
+					<KingdomWindow />
 				</WindowErrorBoundary>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}

@@ -43,8 +43,7 @@ const DailyBoard: React.FC<{ daily: DailyInfo | undefined; busy: boolean; onClai
 						</div>
 						<div className='dd-day-body'>
 							{last ? (
-								// eslint-disable-next-line @next/next/no-img-element
-								<img className='dd-day-chest' src='/pixel/ui/daily_chest.png' alt='' title='A chest of materials on top of the gems' draggable={false} />
+								<span className='dd-day-chest' role='img' aria-label='A gift of materials on top of the gems' title='A chest of materials on top of the gems' />
 							) : null}
 							<div className='dd-day-prize'>
 								<span className='dd-day-gems'>

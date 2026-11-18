@@ -203,20 +203,20 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
 - **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_jungle level 14** (profile `normal_monster_jungle`, item level 14): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_jungle level 32** (profile `normal_monster_jungle`, item level 32): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_jungle level 16** (profile `normal_monster_jungle`, item level 16): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_jungle level 47** (profile `normal_monster_jungle`, item level 47): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_fields level 17** (profile `normal_monster_fields`, item level 17): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_fields level 35** (profile `normal_monster_fields`, item level 35): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_fields level 20** (profile `normal_monster_fields`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_fields level 52** (profile `normal_monster_fields`, item level 52): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_orchard level 20** (profile `normal_monster_orchard`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_orchard level 38** (profile `normal_monster_orchard`, item level 38): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_orchard level 24** (profile `normal_monster_orchard`, item level 24): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_orchard level 56** (profile `normal_monster_orchard`, item level 56): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_blight level 23** (profile `normal_monster_blight`, item level 23): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_blight level 41** (profile `normal_monster_blight`, item level 41): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_blight level 28** (profile `normal_monster_blight`, item level 28): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_blight level 60** (profile `normal_monster_blight`, item level 60): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_battlefield level 26** (profile `normal_monster_battlefield`, item level 26): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_battlefield level 44** (profile `normal_monster_battlefield`, item level 44): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_battlefield level 32** (profile `normal_monster_battlefield`, item level 32): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_battlefield level 64** (profile `normal_monster_battlefield`, item level 64): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
 - **boss level 15** (profile `boss`, item level 15): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss level 45** (profile `boss`, item level 45): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
@@ -245,25 +245,25 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **boss_lake level 27** (profile `boss_lake`, item level 27): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_lake level 47** (profile `boss_lake`, item level 47): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
-- **boss_jungle level 32** (profile `boss_jungle`, item level 32): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss_jungle level 52** (profile `boss_jungle`, item level 52): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_jungle level 38** (profile `boss_jungle`, item level 38): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_jungle level 68** (profile `boss_jungle`, item level 68): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
-- **boss_fields level 37** (profile `boss_fields`, item level 37): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss_fields level 57** (profile `boss_fields`, item level 57): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_fields level 46** (profile `boss_fields`, item level 46): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_fields level 76** (profile `boss_fields`, item level 76): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
-- **boss_orchard level 42** (profile `boss_orchard`, item level 42): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss_orchard level 62** (profile `boss_orchard`, item level 62): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_orchard level 54** (profile `boss_orchard`, item level 54): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_orchard level 84** (profile `boss_orchard`, item level 84): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
-- **boss_blight level 47** (profile `boss_blight`, item level 47): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss_blight level 67** (profile `boss_blight`, item level 67): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_blight level 60** (profile `boss_blight`, item level 60): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_blight level 92** (profile `boss_blight`, item level 92): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
-- **boss_battlefield level 52** (profile `boss_battlefield`, item level 52): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
-- **boss_battlefield level 72** (profile `boss_battlefield`, item level 72): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_battlefield level 68** (profile `boss_battlefield`, item level 68): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+- **boss_battlefield level 100** (profile `boss_battlefield`, item level 100): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
 - **chest** (profile `basic_chest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
   - bonus `chest_legendary` from pool `legendary_weapons`, chance 0.019, replace
   - bonus `chest_potion` from pool `potions_chest`, fallback
-- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 60.0%, Uncommon 40.0%
+- **merchant** (profile `merchant_stock`, item level 4): 33 bases eligible; Common 57.7%, Uncommon 38.5%, Rare 3.8%
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 - **craft level 41** (profile `craft`, item level 41): 32 bases eligible; Common 71.4%, Uncommon 22.4%, Rare 6.1%
 
@@ -290,11 +290,11 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `xp` | XP |  | The castle, buying tiles and your stats. |
 | `gems` | Gems |  | Your starting purse; more ways to earn them are coming. |
 | `embers` | Embers |  | Rebirthing from castle level 6: the higher your castle and land, the more you get. |
-| `herbs` | Herbs |  | The Herb Garden on a plains tile. Cannot be bought or sold. |
-| `sap` | Sap |  | The Sap Tapper on a forest tile. Cannot be bought or sold. |
-| `ironOre` | Iron Ore |  | The Deep Mine on a hills tile. Cannot be bought or sold. |
-| `spores` | Spores |  | The Spore Cellar on a swamp tile. Cannot be bought or sold. |
-| `frostshard` | Frostshard |  | The Ice Cutter on a tundra tile. Cannot be bought or sold. |
-| `pearls` | Pearls |  | The Pearl Diver on a lake tile. Cannot be bought or sold. |
-| `salt` | Salt |  | The Salt Works on a coast tile. Cannot be bought or sold. |
+| `herbs` | Herbs | 5 | The Herb Garden on a plains tile. Sells to the merchant (he does not sell it back). |
+| `sap` | Sap | 5 | The Sap Tapper on a forest tile. Sells to the merchant (he does not sell it back). |
+| `ironOre` | Iron Ore | 5 | The Deep Mine on a hills tile. Sells to the merchant (he does not sell it back). |
+| `spores` | Spores | 5 | The Spore Cellar on a swamp tile. Sells to the merchant (he does not sell it back). |
+| `frostshard` | Frostshard | 5 | The Ice Cutter on a tundra tile. Sells to the merchant (he does not sell it back). |
+| `pearls` | Pearls | 5 | The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back). |
+| `salt` | Salt | 5 | The Salt Works on a coast tile. Sells to the merchant (he does not sell it back). |
 | `wool` | Wool | 2 | Sheep on the farm. Cannot be bought. |

@@ -22,7 +22,10 @@ import type { BiomeType, Equipment, MonsterType } from '../../src/types/game';
 (COMBAT.auto as { minWinChance: number }).minWinChance = 0;
 
 const HOME_NEW = ['hills', 'coast', 'lake'] as const;
-const newTypes = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => (HOME_NEW as readonly string[]).includes(MONSTERS[type].spawn.biomes[0]));
+// the live monsters only: the retired stand-ins (`retired`) never spawn
+const newTypes = (Object.keys(MONSTERS) as MonsterType[]).filter(
+	(type) => !('retired' in MONSTERS[type]) && (HOME_NEW as readonly string[]).includes(MONSTERS[type].spawn.biomes[0]),
+);
 const rollFor = (kind: string, n: number) => sealedRng('home-roster-secret-0123456789', 'u1', 1, kind, n);
 
 /** A castle with one tile of every home biome at the given offsets (x, y from the castle), all owned */
@@ -33,11 +36,11 @@ const land = (tiles: [BiomeType, number, number][]) => {
 };
 const ticket = (n: number, kind: MonsterTicket['kind'] = 'normal'): MonsterTicket => ({ n, at: 0, kind, lucky: false });
 
-test('the three rosters are in: twelve monsters, three normal ones and a boss in each of hills, coast and lake, all on their own biome', () => {
-	assert.equal(newTypes.length, 12);
+test('the three rosters are in: five normal monsters and a boss on each of the hills, the coast and the lake, all on their own biome', () => {
+	assert.equal(newTypes.length, 18);
 	for (const biome of HOME_NEW) {
 		const own = newTypes.filter((type) => MONSTERS[type].spawn.biomes[0] === biome);
-		assert.equal(own.filter((type) => MONSTERS[type].grade === 'normal').length, 3, biome);
+		assert.equal(own.filter((type) => MONSTERS[type].grade === 'normal').length, 5, biome);
 		assert.equal(own.filter((type) => MONSTERS[type].grade === 'boss').length, 1, biome);
 		for (const type of own) assert.deepEqual([...MONSTERS[type].spawn.biomes], [biome], `${type} stands on its own biome only`);
 	}
@@ -52,16 +55,17 @@ test('a hills monster stands on hills only, a coast monster on coast and a lake 
 		['forest', 4, 4],
 	]);
 	const spots = (type: MonsterType) => spawnTiles(type, world, new Set()).map(({ x, y }) => `${x - CASTLE_X},${y - CASTLE_Y}`);
-	assert.deepEqual(spots('graniteRam'), ['3,0']);
+	assert.deepEqual(spots('mawhornBrute'), ['3,0']);
+	assert.deepEqual(spots('graniteRam'), [], 'a retired stand-in never appears');
 	assert.deepEqual(spots('wreckCrab'), ['0,4']);
 	assert.deepEqual(spots('reedNymph'), ['-3,0']);
 	assert.deepEqual(spots('thistleBoar'), ['0,-3'], 'the old rosters are untouched');
 	assert.deepEqual(spots('mossbackWolf'), ['4,4']);
 	// a boss needs a tile 8 or more tiles out
-	assert.deepEqual(spots('bossHillGiant'), []);
-	assert.equal(canSpawnOn('bossHillGiant', CASTLE_X + 8, CASTLE_Y, { biome: 'hills' }, 1), true);
-	assert.equal(canSpawnOn('bossHillGiant', CASTLE_X + 7, CASTLE_Y, { biome: 'hills' }, 1), false);
-	assert.equal(canSpawnOn('graniteRam', CASTLE_X + 10, CASTLE_Y, { biome: 'hills' }, 1), false, 'normal monsters stay within 9');
+	assert.deepEqual(spots('bossIronhorn'), []);
+	assert.equal(canSpawnOn('bossIronhorn', CASTLE_X + 8, CASTLE_Y, { biome: 'hills' }, 1), true);
+	assert.equal(canSpawnOn('bossIronhorn', CASTLE_X + 7, CASTLE_Y, { biome: 'hills' }, 1), false);
+	assert.equal(canSpawnOn('mawhornBrute', CASTLE_X + 10, CASTLE_Y, { biome: 'hills' }, 1), false, 'normal monsters stay within 9');
 	assert.equal(BOSS_MIN_DISTANCE, 8);
 });
 
@@ -108,7 +112,7 @@ test('a boss of a new biome appears only on a tile of its biome 8 or more tiles 
 	]);
 	const boss = placeTickets({ ...emptyBank(0), monsters: [ticket(1, 'boss')] }, far, 'k', 0, rollFor).monsters[0];
 	assert.ok(boss.x !== undefined, 'it found a tile');
-	assert.ok(['bossHillGiant', 'bossLakeHydra'].includes(monsterTypeOf(boss)));
+	assert.ok(['bossIronhorn', 'bossLakeHydra'].includes(monsterTypeOf(boss)));
 	assert.ok(castleDistance({ x: boss.x!, y: boss.y! }) >= BOSS_MIN_DISTANCE);
 });
 
@@ -162,13 +166,14 @@ const winRate = (equipment: Equipment, type: MonsterType, level: number) =>
 
 test('the easy coast and the hills start within the starter kit, the lake does not (it starts where the swamp does)', () => {
 	for (const type of ['wreckCrab', 'netGull', 'drownedSailor'] as const) assert.equal(winRate(STARTER_EQUIPMENT, type, spawnLevelRange(type, 1).min), 1, type);
-	for (const type of ['graniteRam', 'caveGoblinMiner', 'boulderBeetle'] as const)
+	for (const type of ['quarryRatKnight', 'highlandGnoll', 'mawhornBrute'] as const)
 		assert.ok(winRate(STARTER_EQUIPMENT, type, spawnLevelRange(type, 1).min) >= 0.9, type);
-	for (const type of ['mossSnapper', 'reedNymph', 'pikeLurker'] as const) assert.equal(winRate(STARTER_EQUIPMENT, type, spawnLevelRange(type, 1).min), 0, type);
+	for (const type of ['mossSnapper', 'reedNymph', 'tidepoolGolem'] as const)
+		assert.equal(winRate(STARTER_EQUIPMENT, type, spawnLevelRange(type, 1).min), 0, type);
 });
 
 test('a grown monster of the new biomes outgrows a mid kit like the old ones do: the grade of its level wins at the bottom of the window, not at the top of the growth', () => {
-	for (const type of ['graniteRam', 'wreckCrab', 'mossSnapper'] as const) {
+	for (const type of ['quarryRatKnight', 'wreckCrab', 'mossSnapper'] as const) {
 		const top = MONSTERS[type].spawnWindow.cap + 10;
 		assert.ok(winRate(kit('G3', 'mace'), type, spawnLevelRange(type, 1).min) >= 0.9, `${type}: G3 beats the bottom of the window`);
 		assert.equal(winRate(kit('G3', 'mace'), type, top), 0, `${type}: but not the grown one`);
@@ -178,8 +183,8 @@ test('a grown monster of the new biomes outgrows a mid kit like the old ones do:
 test('the bosses climb: the Reef Leviathan asks for G2 (the grade below loses), the Hill Giant and the Lake Hydra for more than G3, the Hydra for the best gear there is', () => {
 	assert.equal(winRate(kit('G1', 'mace'), 'bossReefLeviathan', 17), 0);
 	assert.ok(winRate(kit('G2', 'mace'), 'bossReefLeviathan', 17) >= 0.9);
-	assert.equal(winRate(kit('G3', 'mace'), 'bossHillGiant', 22), 0);
-	assert.ok(winRate(fullSet('obsidian', 'obsidian_maul'), 'bossHillGiant', 22) >= 0.9);
+	assert.equal(winRate(kit('G3', 'mace'), 'bossIronhorn', 22), 0);
+	assert.ok(winRate(fullSet('obsidian', 'obsidian_maul'), 'bossIronhorn', 22) >= 0.9);
 	assert.equal(winRate(kit('G3', 'mace'), 'bossLakeHydra', 27), 0);
 	assert.equal(winRate(fullSet('obsidian', 'obsidian_maul'), 'bossLakeHydra', 27), 0, 'the Hydra beats the plain G6 set');
 	assert.ok(winRate(fullSet('obsidian', 'titan_maul'), 'bossLakeHydra', 27) >= 0.5, 'and gives way to the best gear');
@@ -187,10 +192,10 @@ test('the bosses climb: the Reef Leviathan asks for G2 (the grade below loses), 
 
 // ------------------------------------------------------------------------------------------------ jungle (IDL-107)
 
-const JUNGLE = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => MONSTERS[type].spawn.biomes[0] === 'jungle');
+const JUNGLE = (Object.keys(MONSTERS) as MonsterType[]).filter((type) => !('retired' in MONSTERS[type]) && MONSTERS[type].spawn.biomes[0] === 'jungle');
 
-test('the jungle roster: three monsters and a boss on jungle tiles, from the first rebirth and not before', () => {
-	assert.equal(JUNGLE.length, 4);
+test('the jungle roster: five monsters and a boss on jungle tiles, from the first rebirth and not before', () => {
+	assert.equal(JUNGLE.length, 6);
 	const world = land([
 		['jungle', 3, 0],
 		['jungle', 9, 0],
@@ -213,7 +218,7 @@ test('the jungle roster: three monsters and a boss on jungle tiles, from the fir
 		.map((t) => monsterTypeOf(t));
 	assert.ok(later.length > 0);
 	const boss = placeTickets({ ...emptyBank(0), monsters: [ticket(1, 'boss')] }, world, 'k', 1, rollFor).monsters[0];
-	assert.equal(monsterTypeOf(boss), 'bossHardwoodColossus');
+	assert.equal(monsterTypeOf(boss), 'bossBrainstorm');
 	assert.equal(
 		placeTickets({ ...emptyBank(0), monsters: [ticket(1, 'boss')] }, world, 'k', 0, rollFor).monsters[0].x,
 		undefined,

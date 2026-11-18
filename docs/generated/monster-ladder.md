@@ -15,6 +15,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Dust Strider | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 70% | 100% |
+| Gravel Quail | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Gravel Quail | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Gravel Quail | 20 (grown) | 0% | 0% | 0% | 0% | 83% | 100% |
+| Stonehorn Bison | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Stonehorn Bison | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 48% | 100% |
 | The Great Auroch | 15 (castle 1) | 80% | 88% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 23 (castle 8) | 5% | 35% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 33 (grown) | 0% | 3% | 100% | 100% | 100% | 100% |
@@ -27,12 +33,21 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rotcap Stag | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 13 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Ember Squirrel | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Ember Squirrel | 13 (castle 8) | 0% | 0% | 93% | 100% | 100% | 100% |
+| Ember Squirrel | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Pinecone Warden | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Pinecone Warden | 13 (castle 8) | 0% | 0% | 3% | 100% | 100% | 100% |
+| Pinecone Warden | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 10% | 100% |
 | Garbage Ogre | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Toxic Zombie | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Toxic Zombie | 17 (castle 8) | 0% | 0% | 0% | 0% | 8% | 100% |
+| Toxic Zombie | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Dumpback | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Dumpback | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 75% |
 | Dumpback | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -42,6 +57,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Scrap Golem | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
 | Scrap Golem | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bogfire Wisp | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Bogfire Wisp | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
+| Bogfire Wisp | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 90% | 100% |
 | The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 75% | 100% |
 | The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 50% | 100% |
@@ -57,6 +75,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Frost Moth | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Moth | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Glacier Yeti | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
+| Glacier Yeti | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Glacier Yeti | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
 | The Winter Wyrm | 38 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 48 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -72,6 +93,30 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Hill Giant | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Magma Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Magma Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 88% | 100% |
+| Magma Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Magma Crab | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Magma Crab | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Magma Crab | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mawhorn Brute | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Mawhorn Brute | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Mawhorn Brute | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Quarry Drake | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Quarry Drake | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Drake | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Cairn Sentinel | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Cairn Sentinel | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Cairn Sentinel | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Quarry Rat Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Quarry Rat Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Rat Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Highland Gnoll | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Highland Gnoll | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Highland Gnoll | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
@@ -81,6 +126,12 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Drowned Sailor | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 20% |
+| Tideglass Jelly | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Tideglass Jelly | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Barnacle Brute | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
+| Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
 | The Reef Leviathan | 25 (castle 8) | 0% | 0% | 73% | 98% | 100% | 100% |
 | The Reef Leviathan | 35 (grown) | 0% | 0% | 25% | 80% | 100% | 100% |
@@ -93,69 +144,111 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Pike Lurker | 10 (castle 1) | 0% | 0% | 5% | 100% | 100% | 100% |
 | Pike Lurker | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Pike Lurker | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Tidepool Golem | 10 (castle 1) | 0% | 95% | 100% | 100% | 100% | 100% |
+| Tidepool Golem | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Tidepool Golem | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Silt Eel | 10 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
+| Silt Eel | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Silt Eel | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Lilypad Warden | 10 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
+| Lilypad Warden | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Lilypad Warden | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 93% |
 | The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 80% |
-| Skull Vine | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 95% |
-| Skull Vine | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Skull Vine | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Eye Horror | 14 (castle 1) | 0% | 0% | 0% | 0% | 0% | 50% |
-| Eye Horror | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Eye Horror | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Zombie Triceratops | 14 (castle 1) | 0% | 0% | 0% | 0% | 60% | 100% |
-| Zombie Triceratops | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Zombie Triceratops | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 40 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hardwood Colossus | 50 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Barn Gargoyle | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bucket Knight | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 17 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 22 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Hedge Bandit | 32 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 37 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 45 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Harvest Matron | 55 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Greenscale Warden | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blossom Ronin | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 25 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gray Gleaner | 35 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 42 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 50 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Blossom Reaper | 60 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gasket Goblin | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Blighted Husk | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Mothwing Hexer | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 23 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 28 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gloom Cerberus | 38 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 47 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 55 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Eyed Maw | 65 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bone Cleaver | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frostguard Knight | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 26 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Gilded Champion | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 52 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 60 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Cinder Warlord | 70 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Skull Vine | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Eye Horror | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Zombie Triceratops | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Zombie Triceratops | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mossback Idol | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 38 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 46 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Hardwood Colossus | 56 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 38 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 46 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Brainstorm | 56 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barn Gargoyle | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bucket Knight | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Hedge Bandit | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Crow Marshal | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 20 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 27 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Millstone Golem | 37 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 46 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 54 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Harvest Matron | 64 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Greenscale Warden | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blossom Ronin | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gray Gleaner | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mushroom Wizard | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 24 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 31 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rootbound Gardener | 41 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 54 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 62 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Blossom Reaper | 72 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gasket Goblin | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Blighted Husk | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Mothwing Hexer | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gloom Cerberus | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sporeback Ogre | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 28 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Spore Hound | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 60 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 68 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Eyed Maw | 78 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Bone Cleaver | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frostguard Knight | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Gilded Champion | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Banner Wraith | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 32 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 39 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Frost-Flame Knight | 49 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 68 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 76 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
+| The Cinder Warlord | 86 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

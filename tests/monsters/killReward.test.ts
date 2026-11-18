@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { MONSTERS } from '../../src/config/combatConfig';
+import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
 import { CHEST } from '../../src/config/spawns';
 import { killIncome } from '../../src/lib/loot/kill';
 
@@ -15,7 +15,7 @@ test('below the cap a kill pays rewardSec seconds of income, at any level multip
 	assert.equal(killIncome({ type: 'thistleBoar', level: 1 }, ctx).gold, rat.reward.gold.rewardSec);
 	const l10 = killIncome({ type: 'thistleBoar', level: 10 }, ctx);
 	assert.equal(l10.gold, Math.floor(rat.reward.gold.rewardSec * 1.08 ** 9));
-	assert.ok(Math.abs(l10.xp - 0.1 * rat.reward.xp.rewardSec * 1.08 ** 9) < 1e-9);
+	assert.ok(Math.abs(l10.xp - 0.1 * rat.reward.xp.rewardSec * COMBAT.rewards.xpScale * 1.08 ** 9) < 1e-9);
 });
 
 test('the cap binds at high income: the pay stops growing with the income', () => {
@@ -26,7 +26,7 @@ test('the cap binds at high income: the pay stops growing with the income', () =
 	assert.deepEqual(a, { ...a, gold: Math.floor(rat.reward.gold.cap * 1.08 ** 4) });
 	assert.equal(a.gold, b.gold);
 	assert.equal(a.xp, b.xp);
-	assert.ok(Math.abs(a.xp - rat.reward.xp.cap * 1.08 ** 4) < 1e-9);
+	assert.ok(Math.abs(a.xp - rat.reward.xp.cap * COMBAT.rewards.xpScale * 1.08 ** 4) < 1e-9);
 });
 
 test('Luck, Gold Find and Kill Rewards % come after the cap', () => {
@@ -44,7 +44,7 @@ test('Luck, Gold Find and Kill Rewards % come after the cap', () => {
 	assert.equal(killIncome({ type: 'thistleBoar', level: 1 }, { ...rich, luck: 0, goldFind: 50 }).gold, Math.floor(rat.reward.gold.cap * 1.5));
 	const kr = killIncome({ type: 'thistleBoar', level: 1 }, { ...rich, luck: 0, killRewardPct: 50 });
 	assert.equal(kr.gold, Math.floor(rat.reward.gold.cap * 1.5));
-	assert.ok(Math.abs(kr.xp - rat.reward.xp.cap * 1.5) < 1e-9);
+	assert.ok(Math.abs(kr.xp - rat.reward.xp.cap * COMBAT.rewards.xpScale * 1.5) < 1e-9);
 });
 
 test('a boss keeps 3600 s of income and 1.03 per level, with a cap far above a normal monster', () => {

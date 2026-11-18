@@ -280,10 +280,10 @@ export const EMBER_UPGRADES = {
 	},
 	extrabuilder: {
 		label: 'Extra Builder',
-		maxLevel: 2,
+		maxLevel: 1,
 		baseCost: 40,
 		costGrowth: 3,
-		effectPerLevel: 1, // +1 builder per level (the gem shop sells the second one)
+		effectPerLevel: 1, // one-time: +1 builder (base 1 + the gem shop's Builder #2 + this one = 3 at most)
 	},
 	questrarity: {
 		label: 'Quest Rarity',
@@ -302,7 +302,7 @@ export const EMBER_UPGRADES = {
 } as const;
 
 /**
- * Shop upgrades that cannot be bought yet: the two quest upgrades (the quest system is not built) and Extra Builder (until the second builder exists in the game; the gem shop sells it first). Shown greyed, refused by `buyEmberUpgrade`, and
+ * Shop upgrades that cannot be bought yet: the two quest upgrades (the quest system is not built) (Extra Builder is on sale now). Shown greyed, refused by `buyEmberUpgrade`, and
  * `emberEffect` counts them as 0.
  */
 export const EMBER_DISABLED: ReadonlySet<string> = new Set(['questrarity', 'questslots']);

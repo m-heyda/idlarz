@@ -53,14 +53,9 @@ export const getStatDescription = (stat: keyof Omit<CharacterStats, 'availablePo
 };
 
 /** Which kind of effect one line of a stat description is (the same categories item tooltips group by) */
-const descriptionCategory = (line: string): StatCategory => {
-	if (/production|XP gained|Discount|Luck|chest/i.test(line)) return 'economy';
-	if (/Mana|magic weapons/i.test(line)) return 'magic';
-	if (/damage|DMG|Crit|ATK Speed/i.test(line)) return 'combat';
-	return 'defense';
-};
+const descriptionCategory = (line: string): StatCategory => (/production|XP gained|Discount|Luck|chest/i.test(line) ? 'economy' : 'combat');
 
-/** The description of an attribute split into its effects and grouped by kind: Generators (income, XP), Combat, Defense, Magic. */
+/** The description of an attribute split into its effects and grouped by kind: Economy (income, XP, luck) and Combat (everything else). */
 export const getStatDescriptionGroups = (stat: keyof Omit<CharacterStats, 'availablePoints'>) => {
 	const lines = getStatDescription(stat)
 		.split(' / ')
@@ -80,12 +75,12 @@ export const getStatDescriptionGroups = (stat: keyof Omit<CharacterStats, 'avail
  * @category Economy/Tiles
  * @order 5
  * @formula
- * xp(k) = 45 x 1.02^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
+ * xp(k) = 45 x 1.016^(min(k,300) - 1) x min(k,300) / 4        times (k / 300)^1.5 beyond 300
  */
 export const calculateXpGain = (ownedTiles: number): number => {
 	/**
 	 * Basic XP gain increases with the number of tiles owned: each tile contributes XP that grows slightly with more tiles.
-	 * Up to XP_TILE.growthUntil tiles that is exponential (1.02 per tile); beyond it a polynomial tail keeps it finite.
+	 * Up to XP_TILE.growthUntil tiles that is exponential (1.016 per tile); beyond it a polynomial tail keeps it finite.
 	 */
 	const k = Math.min(ownedTiles, XP_TILE.growthUntil);
 	const xp = BASE_XP_PER_TILE * Math.pow(XP_TILE.growth, k - 1) * (k / 4);

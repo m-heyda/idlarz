@@ -34,8 +34,14 @@ import { MERCHANT_BUY_MULTIPLIER, MERCHANT_RESOURCE_PRICES, MERCHANT_UPGRADE_GRO
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
 import { MONSTERS } from '../../src/config/combatConfig';
+import { BIOME_GOALS, BOSS_MASTERY_TIERS, MASTERY_CAPS, MASTERY_TIERS, bonusText, type MasteryTier } from '../../src/catalog/mastery';
+import { MONSTER_CATALOG } from '../../src/catalog/monsters';
+import { ingredientsOf } from '../../src/catalog/monsterDrops';
 import { SKILLS } from '../../src/catalog/skills';
 import { ACHIEVEMENTS, type AchievementCondition } from '../../src/catalog/achievements';
+import { DEED_BONUS_CAP_PCT, DEED_MILESTONES } from '../../src/catalog/deedMilestones';
+import { INGREDIENTS, sourcesOf } from '../../src/catalog/ingredients';
+import { JUNK_ITEMS } from '../../src/catalog/items/junk';
 import { TUTORIAL_LESSONS, TUTORIAL_PATH, type TutorialReward } from '../../src/catalog/tutorial';
 import { RARITIES } from '../../src/catalog/rarity';
 import { RESOURCE_TIERS, resourcesInTier } from '../../src/catalog/resources';
@@ -523,6 +529,22 @@ TABLES['achievement-list'] = () => {
 	};
 };
 
+TABLES['crafting-ingredients'] = () => ({
+	title: `Crafting ingredients (${INGREDIENTS.length}, no recipe uses them yet)`,
+	md: mdTable(
+		['Ingredient', 'Tier', 'Planned for', 'Dropped by'],
+		INGREDIENTS.map((i) => [JUNK_ITEMS.find((j) => j.id === i.junkId)?.name ?? i.id, i.tier, i.planned, sourcesOf(i.junkId).join(', ') || '-']),
+	),
+});
+
+TABLES['deed-milestones'] = () => ({
+	title: `Deed point milestones (${DEED_MILESTONES.length}, bonuses capped at +${DEED_BONUS_CAP_PCT}% each)`,
+	md: mdTable(
+		['Claimed deed points', 'Gems', 'Bonus on kill rewards'],
+		DEED_MILESTONES.map((m) => [m.points, m.gems, m.bonus ? `+${m.bonus.pct}% ${m.bonus.stat}` : '-']),
+	),
+});
+
 TABLES['stack-versions'] = () => {
 	const pkg = JSON.parse(readFileSync(join(ROOT, 'package.json'), 'utf8')) as { dependencies: Record<string, string>; devDependencies: Record<string, string> };
 	const all = { ...pkg.dependencies, ...pkg.devDependencies };
@@ -571,6 +593,47 @@ TABLES['craft-gear-recipes'] = () => ({
 				const r = GEAR_RECIPES.find((x) => 'gear' in x.output && x.output.gear.grade === grade && x.output.gear.slot === slot)!;
 				return `${fmt(recipeCostGold(r))} / ${r.xp}`;
 			}),
+		]),
+	),
+});
+
+const tierRows = (tiers: readonly MasteryTier[]) =>
+	tiers.map((t, i) => [i + 1, t.kills.toLocaleString('en'), t.reveal === 'stats' ? 'Stats' : t.reveal === 'drops' ? 'Drop table' : '-', t.bonuses.map(bonusText).join(', '), t.gems || '-']);
+
+TABLES['bestiary-tiers'] = () => ({
+	title: 'Bestiary mastery tiers',
+	md: [
+		'Shared ladder (every normal monster):',
+		'',
+		mdTable(['Tier', 'Kills', 'Reveals', 'Bonus against that monster', 'Gems'], tierRows(MASTERY_TIERS)),
+		'',
+		'Boss ladder:',
+		'',
+		mdTable(['Tier', 'Kills', 'Reveals', 'Bonus against that boss', 'Gems'], tierRows(BOSS_MASTERY_TIERS)),
+		'',
+		'Biome collection goals (every live monster of the biome, its boss included, at the tier):',
+		'',
+		mdTable(
+			['Tier', 'Bonus against every monster of the biome', 'Gems'],
+			BIOME_GOALS.map((g, i) => [i + 1, g.bonuses.map(bonusText).join(', '), g.gems || '-']),
+		),
+		'',
+		`Caps against one monster: ${Object.entries(MASTERY_CAPS)
+			.map(([stat, cap]) => `${stat} ${cap}%`)
+			.join(', ')}.`,
+	].join('\n'),
+});
+
+TABLES['bestiary-ingredients'] = () => ({
+	title: 'Monster ingredients (Bestiary drops)',
+	md: mdTable(
+		['Monster', 'Family', 'Ingredients (chance per kill, from level)'],
+		MONSTER_CATALOG.filter((m) => m.enabled).map((m) => [
+			m.label,
+			m.family,
+			ingredientsOf(m.id)
+				.map((d) => `${d.id.replace('junk_', '')} ${d.chance >= 1 ? 'always' : `${+(d.chance * 100).toFixed(1)}%`}${d.minLevel > 1 ? ` (L${d.minLevel}+)` : ''}`)
+				.join(', '),
 		]),
 	),
 });

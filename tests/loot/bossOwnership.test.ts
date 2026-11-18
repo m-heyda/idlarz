@@ -41,7 +41,8 @@ const reachable = (data: LootData, sourceId: string): Map<string, Set<string>> =
 
 test('every boss of the roster has a loot source of its own, one per biome', () => {
 	assert.deepEqual(biomes.sort(), Object.keys(BIOME_LOOT).sort());
-	const bosses = Object.entries(MONSTERS).filter(([, m]) => m.grade === 'boss');
+	// the retired stand-in bosses keep their loot source but never spawn: one live boss per biome
+	const bosses = Object.entries(MONSTERS).filter(([, m]) => m.grade === 'boss' && !('retired' in m));
 	assert.equal(bosses.length, biomes.length, 'one boss per biome');
 	for (const [id, boss] of bosses) {
 		const biome = boss.spawn.biomes[0];

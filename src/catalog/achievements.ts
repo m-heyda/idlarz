@@ -1,5 +1,7 @@
 import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2';
-import { MASTERY_ENTRY_KILLS } from '@/catalog/mastery';
+import { BATCH3_TIERS, buildBatch3 } from '@/catalog/achievementsBatch3';
+import { BATCH4_ACHIEVEMENTS, BATCH4_DEEDS } from '@/catalog/achievementsBatch4';
+import { MASTERY_ENTRY_KILLS, TOTAL_MASTERY_TIERS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 // `lib/offline/achievements.ts` checks against numbers the server already holds; nothing here imports the config or the server.
@@ -32,6 +34,10 @@ export type AchievementCondition =
 	| { kind: 'flawless'; min: number }
 	/** Bestiary entries filled: monster types with at least `kills` kills each (the first mastery step, `catalog/mastery.ts`) */
 	| { kind: 'entries'; kills: number; min: number }
+	/** Bestiary mastery tiers claimed, all monsters together (`LifetimeStats.masteryClaimed`) */
+	| { kind: 'mastered'; min: number }
+	/** Bestiary biome collection goals claimed, all biomes together (`LifetimeStats.biomeClaimed`) */
+	| { kind: 'biomeGoals'; min: number }
 	/** The first tile of a biome owned (batch 2) */
 	| { kind: 'biome'; biome: string }
 	/** The largest connected group of tiles of one biome */
@@ -54,6 +60,18 @@ export type AchievementCondition =
 	| { kind: 'bosses'; min: number }
 	/** A one-off event the server recorded (`LifetimeStats.curiosity`) */
 	| { kind: 'curiosity'; id: string }
+	/** Fights lost, all monsters together (the sum of `LifetimeStats.deaths`) */
+	| { kind: 'deaths'; min: number }
+	/** The crafting level (from the ledger's crafting XP) */
+	| { kind: 'craftLevel'; min: number }
+	/** Pieces of gear crafted of this rarity or better (`LifetimeStats.craftedRare`) */
+	| { kind: 'craftedRarity'; rarity: 'epic' | 'legendary'; min: number }
+	/** Pieces of this rarity or better worn at once (of the 14 slots) */
+	| { kind: 'wornRarity'; rarity: 'epic' | 'legendary'; min: number }
+	/** Embers earned over all rebirths (`prestige.legacyEarned`) */
+	| { kind: 'embers'; min: number }
+	/** Lifetime income of one resource while playing (`LifetimeStats.income`) */
+	| { kind: 'income'; resource: string; min: number }
 	/** Never checked by the lazy evaluator: granted by a one-off server step (the early tester by the new chapter reset) */
 	| { kind: 'manual' };
 
@@ -62,6 +80,8 @@ export interface AchievementRewards {
 	gems: number;
 	avatarId?: string;
 	titleId?: string;
+	/** The words of the title when they differ from the achievement's name ("Dragon's Hoard") */
+	titleName?: string;
 	/** Deed points this tier adds once claimed (the Hall of Deeds total; absent: 0). Placeholder numbers until the balance pass. */
 	points?: number;
 	/** A bonus the tier will grant, as the text the window shows. **Placeholder only**: no stat bonus is applied until the bonus model exists (IDL-310). */
@@ -100,7 +120,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Finish the guided tutorial.',
 		when: { kind: 'tutorial' },
 		badge: 'badge_scroll_check_silver',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'first_tile',
@@ -108,7 +128,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy your first tile.',
 		when: { kind: 'tiles', min: 1 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'first_building',
@@ -116,7 +136,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Build your first building.',
 		when: { kind: 'buildings', min: 1 },
 		badge: 'badge_hammer_bronze',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'first_fight',
@@ -124,7 +144,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Win your first fight.',
 		when: { kind: 'kills', min: 1 },
 		badge: 'badge_sword_shield_bronze',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'first_chest',
@@ -132,7 +152,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Open your first chest.',
 		when: { kind: 'chests', min: 1 },
 		badge: 'badge_chest_bronze',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'castle_2',
@@ -140,7 +160,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Upgrade the castle to level 2.',
 		when: { kind: 'castle', level: 2 },
 		badge: 'badge_tower_silver',
-		rewards: { gems: 25, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'castle_6',
@@ -164,7 +184,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Rebirth for the first time.',
 		when: { kind: 'rebirths', min: 1 },
 		badge: 'badge_first_rebirth_fire',
-		rewards: { gems: 75, avatarId: 'reborn', points: 20 },
+		rewards: { gems: 50, avatarId: 'reborn', points: 20 },
 	},
 	{
 		id: 'boss_auroch',
@@ -188,7 +208,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Played before the new chapter.',
 		when: { kind: 'manual' },
 		badge: 'badge_early_tester_special',
-		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester' },
+		rewards: { gems: 100, avatarId: 'early_tester', titleId: 'early-tester', points: 25 },
 	},
 	{
 		id: 'beta_tester', // granted with the Early tester (`withAchievement`): by the reset, and for the accounts that already had it
@@ -197,7 +217,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		when: { kind: 'manual' },
 		withAchievement: 'early_tester',
 		badge: 'badge_early_tester_wireframe',
-		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester' },
+		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester', points: 50 },
 	},
 	// The tiers of the Hall of Deeds (IDL-306), appended after the launch list. Goals are the mockup's; gems and points are placeholders until the balance pass (IDL-310) and bonuses are text only.
 	{
@@ -206,7 +226,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Defeat 100 monsters.',
 		when: { kind: 'kills', min: 100 },
 		badge: 'badge_skull_bronze',
-		rewards: { gems: 25, points: 10 },
+		rewards: { gems: 50, points: 10 },
 	},
 	{
 		id: 'slayer_500',
@@ -214,7 +234,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Defeat 500 monsters.',
 		when: { kind: 'kills', min: 500 },
 		badge: 'badge_skull_bronze',
-		rewards: { gems: 50, points: 25, bonus: '+1% gold' },
+		rewards: { gems: 75, points: 25, bonus: '+1% gold' },
 	},
 	{
 		id: 'slayer_2500',
@@ -230,7 +250,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Defeat 10,000 monsters.',
 		when: { kind: 'kills', min: 10000 },
 		badge: 'badge_skull_bronze',
-		rewards: { gems: 200, points: 100 },
+		rewards: { gems: 125, points: 100, titleId: 'slayer', titleName: 'Slayer' },
 	},
 	{
 		id: 'wolfsbane_50',
@@ -238,7 +258,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Slay 50 Mossback Wolves.',
 		when: { kind: 'kill', monster: 'mossbackWolf', min: 50 },
 		badge: 'badge_sword_silver',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'wolfsbane_200',
@@ -246,7 +266,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Slay 200 Mossback Wolves.',
 		when: { kind: 'kill', monster: 'mossbackWolf', min: 200 },
 		badge: 'badge_sword_silver',
-		rewards: { gems: 40, points: 15, bonus: '+2% hide' },
+		rewards: { gems: 75, points: 15, bonus: '+2% hide' },
 	},
 	{
 		id: 'wolfsbane_1000',
@@ -254,7 +274,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Slay 1,000 Mossback Wolves.',
 		when: { kind: 'kill', monster: 'mossbackWolf', min: 1000 },
 		badge: 'badge_sword_silver',
-		rewards: { gems: 80, points: 40, bonus: 'wolf pet' },
+		rewards: { gems: 100, points: 40, bonus: 'wolf pet', titleId: 'wolfsbane', titleName: 'Wolfsbane' },
 	},
 	{
 		id: 'untouched_1',
@@ -262,7 +282,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Win a fight without taking damage.',
 		when: { kind: 'flawless', min: 1 },
 		badge: 'badge_shield_silver',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'untouched_25',
@@ -270,7 +290,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Win 25 fights without taking damage.',
 		when: { kind: 'flawless', min: 25 },
 		badge: 'badge_shield_silver',
-		rewards: { gems: 50, points: 20, bonus: '+1% dodge' },
+		rewards: { gems: 75, points: 20, bonus: '+1% dodge' },
 	},
 	{
 		id: 'untouched_100',
@@ -286,7 +306,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 50 tiles.',
 		when: { kind: 'tiles', min: 50 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 75, points: 5 },
 	},
 	{
 		id: 'landlord_200',
@@ -294,7 +314,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 200 tiles.',
 		when: { kind: 'tiles', min: 200 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 50, points: 15 },
+		rewards: { gems: 100, points: 15 },
 	},
 	{
 		id: 'landlord_500',
@@ -302,7 +322,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 500 tiles.',
 		when: { kind: 'tiles', min: 500 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 100, points: 40, bonus: '-1% tile cost' },
+		rewards: { gems: 125, points: 40, bonus: '-1% tile cost' },
 	},
 	{
 		id: 'landlord_1000',
@@ -310,7 +330,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 1,000 tiles.',
 		when: { kind: 'tiles', min: 1000 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 200, points: 100, bonus: '-3% tile cost' },
+		rewards: { gems: 150, points: 100, bonus: '-3% tile cost', titleId: 'landlord', titleName: 'Landlord' },
 	},
 	{
 		id: 'hoarder_100k',
@@ -318,7 +338,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Hold 100,000 gold at once.',
 		when: { kind: 'goldPeak', min: 100_000 },
 		badge: 'badge_chest_bronze',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'hoarder_1m',
@@ -326,7 +346,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Hold 1,000,000 gold at once.',
 		when: { kind: 'goldPeak', min: 1_000_000 },
 		badge: 'badge_chest_bronze',
-		rewards: { gems: 50, points: 20, bonus: '+1% gold find' },
+		rewards: { gems: 75, points: 20, bonus: '+1% gold find' },
 	},
 	{
 		id: 'hoarder_10m',
@@ -334,7 +354,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Hold 10,000,000 gold at once.',
 		when: { kind: 'goldPeak', min: 10_000_000 },
 		badge: 'badge_chest_bronze',
-		rewards: { gems: 120, points: 60 },
+		rewards: { gems: 100, points: 60, titleId: 'hoarder', titleName: 'Hoarder' },
 	},
 	{
 		id: 'market_1m',
@@ -342,7 +362,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Sell 1,000,000 resources to the merchant.',
 		when: { kind: 'unitsSold', min: 1_000_000 },
 		badge: 'badge_star_silver',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'market_10m',
@@ -350,7 +370,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Sell 10,000,000 resources to the merchant.',
 		when: { kind: 'unitsSold', min: 10_000_000 },
 		badge: 'badge_star_silver',
-		rewards: { gems: 50, points: 20, bonus: '+1% sell price' },
+		rewards: { gems: 75, points: 20, bonus: '+1% sell price' },
 	},
 	{
 		id: 'market_100m',
@@ -358,7 +378,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Sell 100,000,000 resources to the merchant.',
 		when: { kind: 'unitsSold', min: 100_000_000 },
 		badge: 'badge_star_silver',
-		rewards: { gems: 120, points: 60 },
+		rewards: { gems: 100, points: 60, titleId: 'merchant-prince', titleName: 'Merchant Prince' },
 	},
 	{
 		id: 'smith_100',
@@ -366,7 +386,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Craft 100 items.',
 		when: { kind: 'crafted', min: 100 },
 		badge: 'badge_hammer_bronze',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'smith_1000',
@@ -374,7 +394,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Craft 1,000 items.',
 		when: { kind: 'crafted', min: 1000 },
 		badge: 'badge_hammer_bronze',
-		rewards: { gems: 50, points: 20, bonus: '+5% craft speed' },
+		rewards: { gems: 75, points: 20, bonus: '+5% craft speed' },
 	},
 	{
 		id: 'smith_10000',
@@ -382,7 +402,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Craft 10,000 items.',
 		when: { kind: 'crafted', min: 10000 },
 		badge: 'badge_hammer_bronze',
-		rewards: { gems: 120, points: 60 },
+		rewards: { gems: 100, points: 60, titleId: 'master-smith', titleName: 'Master Smith' },
 	},
 	{
 		id: 'reborn_5',
@@ -390,7 +410,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Rebirth 5 times.',
 		when: { kind: 'rebirths', min: 5 },
 		badge: 'badge_first_rebirth_fire',
-		rewards: { gems: 100, points: 50 },
+		rewards: { gems: 75, points: 50 },
 	},
 	{
 		id: 'reborn_20',
@@ -398,7 +418,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Rebirth 20 times.',
 		when: { kind: 'rebirths', min: 20 },
 		badge: 'badge_first_rebirth_fire',
-		rewards: { gems: 250, points: 150 },
+		rewards: { gems: 100, points: 150, titleId: 'reborn', titleName: 'Reborn' },
 	},
 	{
 		id: 'scholar_5',
@@ -406,7 +426,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Fill 5 bestiary entries.',
 		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 5 },
 		badge: 'badge_scroll_check_silver',
-		rewards: { gems: 20, points: 5 },
+		rewards: { gems: 50, points: 5 },
 	},
 	{
 		id: 'scholar_15',
@@ -414,7 +434,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Fill 15 bestiary entries.',
 		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 15 },
 		badge: 'badge_scroll_check_silver',
-		rewards: { gems: 60, points: 25, bonus: '+5% XP' },
+		rewards: { gems: 75, points: 25, bonus: '+5% XP' },
 	},
 	{
 		id: 'scholar_30',
@@ -422,9 +442,99 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Fill 30 bestiary entries.',
 		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 30 },
 		badge: 'badge_scroll_check_silver',
-		rewards: { gems: 150, points: 80 },
+		rewards: { gems: 100, points: 80 },
+	},
+	{
+		id: 'scholar_50',
+		title: 'Loremaster',
+		description: 'Fill 50 bestiary entries.',
+		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 50 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 125, points: 120, titleId: 'loremaster' },
+	},
+	{
+		id: 'archivist_10',
+		title: 'Archivist I',
+		description: 'Claim 10 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 10 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 75, points: 15 },
+	},
+	{
+		id: 'archivist_50',
+		title: 'Archivist II',
+		description: 'Claim 50 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 50 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 100, points: 60 },
+	},
+	{
+		id: 'archivist_150',
+		title: 'Archivist III',
+		description: 'Claim 150 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 150 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 125, points: 150 },
+	},
+	{
+		id: 'archivist_all',
+		title: 'Grand Archivist',
+		description: 'Claim every mastery tier of every monster: the Bestiary is complete.',
+		when: { kind: 'mastered', min: TOTAL_MASTERY_TIERS },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 150, points: 120, titleId: 'grand-archivist' },
+	},
+	{
+		id: 'naturalist_1',
+		title: 'Field Naturalist I',
+		description: 'Claim a biome collection goal in the Bestiary.',
+		when: { kind: 'biomeGoals', min: 1 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 50, points: 20 },
+	},
+	{
+		id: 'naturalist_12',
+		title: 'Field Naturalist II',
+		description: 'Claim 12 biome collection goals.',
+		when: { kind: 'biomeGoals', min: 12 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 75, points: 80 },
+	},
+	{
+		id: 'naturalist_48',
+		title: 'Warden of the Wilds',
+		description: 'Claim every biome collection goal (all four tiers in all twelve biomes).',
+		when: { kind: 'biomeGoals', min: 48 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 100, points: 250, titleId: 'warden-of-the-wilds' },
+	},
+	{
+		id: 'archivist_1',
+		title: 'First Entry',
+		description: 'Claim your first bestiary mastery tier.',
+		when: { kind: 'mastered', min: 1 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 50, points: 5 },
+	},
+	{
+		id: 'bane_boar',
+		title: 'Boar Breaker',
+		description: 'Defeat 1,000 Thistle Boars.',
+		when: { kind: 'kill', monster: 'thistleBoar', min: 1000 },
+		badge: 'badge_skull_bronze',
+		rewards: { gems: 50, points: 15, titleId: 'boar-breaker' },
+	},
+	{
+		id: 'bane_wyrm',
+		title: 'Wyrmbane',
+		description: 'Defeat The Winter Wyrm 10 times.',
+		when: { kind: 'kill', monster: 'bossWinterWyrm', min: 10 },
+		badge: 'badge_great_auroch_boss',
+		rewards: { gems: 50, points: 80, titleId: 'wyrmbane' },
 	},
 	...BATCH2_ACHIEVEMENTS,
+	...buildBatch3(),
+	...BATCH4_ACHIEVEMENTS,
 	{
 		id: 'castle_15',
 		title: 'Grand Architect',
@@ -432,7 +542,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		when: { kind: 'castle', level: 15 },
 		badge: 'badge_castle_10_gold',
 		badgePlaceholder: true, // a stand-in until the level 11-15 castle art and its own badge exist
-		rewards: { gems: 150, points: 40 },
+		rewards: { gems: 125, points: 40 },
 	},
 ];
 
@@ -457,7 +567,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_skull_bronze',
 		lore: 'Every blade grows dull before its wielder does. Count the fallen and the realm will remember you.',
 		how: 'Any kill counts, including auto-fights while you are away.',
-		tiers: ['slayer_100', 'slayer_500', 'slayer_2500', 'slayer_10000'],
+		tiers: ['slayer_100', 'slayer_500', 'slayer_2500', 'slayer_10000', ...BATCH3_TIERS.slayer],
 	},
 	{
 		id: 'wolfsbane',
@@ -468,7 +578,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_sword_silver',
 		lore: 'The forests east of your keep howl at night. Make them quiet.',
 		how: 'Wolves roam forest tiles. Send your hero to a forest tile and let the fight run.',
-		tiers: ['wolfsbane_50', 'wolfsbane_200', 'wolfsbane_1000'],
+		tiers: ['wolfsbane_50', 'wolfsbane_200', 'wolfsbane_1000', ...BATCH3_TIERS.wolfsbane],
 	},
 	{
 		id: 'untouched',
@@ -479,7 +589,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_shield_silver',
 		lore: 'Armor is for those who get hit.',
 		how: 'High dodge, or killing before the first enemy swing, both count.',
-		tiers: ['untouched_1', 'untouched_25', 'untouched_100'],
+		tiers: ['untouched_1', 'untouched_25', 'untouched_100', ...BATCH3_TIERS.untouched],
 	},
 	{
 		id: 'first_blood',
@@ -512,7 +622,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_golden_monster_gold',
 		lore: 'Rare, shiny and worth the swing.',
 		how: 'Golden monsters appear now and then among the others.',
-		tiers: ['golden_kill'],
+		tiers: ['golden_kill', ...BATCH3_TIERS.golden_touch],
 	},
 	{
 		id: 'landlord',
@@ -567,7 +677,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_chest_bronze',
 		lore: 'Dragons had the right idea.',
 		how: 'Your purse at any moment, not total earned. Selling resources is the fastest way.',
-		tiers: ['hoarder_100k', 'hoarder_1m', 'hoarder_10m'],
+		tiers: ['hoarder_100k', 'hoarder_1m', 'hoarder_10m', ...BATCH3_TIERS.hoarder],
 	},
 	{
 		id: 'market',
@@ -578,7 +688,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_star_silver',
 		lore: 'He will always take it. The price is the question.',
 		how: 'Counts units sold, any resource. Use the trade ticket with Max to move stock in bulk.',
-		tiers: ['market_1m', 'market_10m', 'market_100m'],
+		tiers: ['market_1m', 'market_10m', 'market_100m', ...BATCH3_TIERS.market],
 	},
 	{
 		id: 'smith',
@@ -589,7 +699,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_hammer_bronze',
 		lore: 'Ten thousand vials before the first potion worth drinking.',
 		how: 'Every crafted unit counts, components included.',
-		tiers: ['smith_100', 'smith_1000', 'smith_10000'],
+		tiers: ['smith_100', 'smith_1000', 'smith_10000', ...BATCH3_TIERS.smith],
 	},
 	{
 		id: 'reborn',
@@ -600,7 +710,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_first_rebirth_fire',
 		lore: 'The realm ends. You do not.',
 		how: 'Rebirth is offered from level 40. You keep deeds, bestiary and merchant upgrades.',
-		tiers: ['first_rebirth', 'reborn_5', 'reborn_20'],
+		tiers: ['first_rebirth', 'reborn_5', 'reborn_20', ...BATCH3_TIERS.reborn],
 	},
 	{
 		id: 'scholar',
@@ -611,7 +721,51 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_scroll_check_silver',
 		lore: 'Know a thing and it is half beaten.',
 		how: 'An entry counts as filled when its first mastery step is reached. See the Bestiary.',
-		tiers: ['scholar_5', 'scholar_15', 'scholar_30'],
+		tiers: ['scholar_5', 'scholar_15', 'scholar_30', 'scholar_50'],
+	},
+	{
+		id: 'archivist',
+		title: 'Archivist',
+		description: 'Claim bestiary mastery tiers.',
+		category: 'bestiary',
+		tags: ['bestiary', 'mastery'],
+		badge: 'badge_scroll_check_silver',
+		lore: 'Every tier is a page. The book is long and the monsters keep writing it.',
+		how: 'Reach a mastery tier of a monster (10, 100, 500 and 2,500 kills; a boss at 1, 5, 25 and 100) and press Claim in the Bestiary.',
+		tiers: ['archivist_1', 'archivist_10', 'archivist_50', 'archivist_150', 'archivist_all'],
+	},
+	{
+		id: 'boar_breaker',
+		title: 'Boar Breaker',
+		description: 'Defeat 1,000 Thistle Boars.',
+		category: 'bestiary',
+		tags: ['bestiary', 'kills'],
+		badge: 'badge_skull_bronze',
+		lore: 'Every farmer in the valley owes you a fence.',
+		how: 'Defeat Thistle Boars. Gives a title.',
+		tiers: ['bane_boar'],
+	},
+	{
+		id: 'wyrmbane',
+		title: 'Wyrmbane',
+		description: 'Defeat The Winter Wyrm 10 times.',
+		category: 'bestiary',
+		tags: ['bestiary', 'kills'],
+		badge: 'badge_great_auroch_boss',
+		lore: 'Winter outlasts everyone, except you.',
+		how: 'Defeat The Winter Wyrm, the tundra boss. Gives a title.',
+		tiers: ['bane_wyrm'],
+	},
+	{
+		id: 'naturalist',
+		title: 'Field Naturalist',
+		description: 'Complete the Bestiary collection goals of the biomes.',
+		category: 'bestiary',
+		tags: ['bestiary', 'mastery'],
+		badge: 'badge_scroll_check_silver',
+		lore: 'Not one wolf, but every wolf, and the stag, and the very large thing in the lake.',
+		how: 'A biome goal needs every monster of the biome, its boss included, at the same mastery tier. Claim it in the Bestiary for a bonus against all of them.',
+		tiers: ['naturalist_1', 'naturalist_12', 'naturalist_48'],
 	},
 	{
 		id: 'ropes',
@@ -646,7 +800,9 @@ export const DEEDS: readonly DeedDef[] = [
 		how: 'Granted to the players of the closed beta.',
 		tiers: ['beta_tester'],
 	},
-	...BATCH2_DEEDS,
+	// the tiers batch 3 appends to the deeds of batch 2
+	...BATCH2_DEEDS.map((d) => ({ ...d, tiers: [...d.tiers, ...(BATCH3_TIERS[d.id] ?? [])] })),
+	...BATCH4_DEEDS,
 ];
 
 export const deedById = (id: string): DeedDef | undefined => DEEDS.find((d) => d.id === id);

@@ -13,7 +13,6 @@ import GameWindow from './GameWindow';
 
 const SOON_TEXT: Partial<Record<RankingBoardId, string>> = {
 	quests: 'Who has finished the most quests. Quests are not in the game yet, so there is nothing to rank.',
-	deeds: 'Who has earned the most Deed points. Every deed will get a point value first, then this board opens.',
 };
 
 /** The number of a row: level and crafting level read "Lv 87", the rest is a plain count */
@@ -116,8 +115,8 @@ const LiveBoard: React.FC<{ board: RankingBoardId }> = ({ board }) => {
 };
 
 /**
- * The Rankings: one tab per board (`RANKING_BOARDS`), a zebra list of the best heroes with their avatar, coloured name, admin mark, title and badge, the board's number and the move since the last daily rebuild. Quests and Deeds are
- * "coming soon" tabs. The data is `GET /api/rankings`, cached per board by `useRankings`.
+ * The Rankings: one tab per board (`RANKING_BOARDS`), a zebra list of the best heroes with their avatar, coloured name, admin mark, title and badge, the board's number and the move since the last daily rebuild. Quests is a
+ * "coming soon" tab. The data is `GET /api/rankings`, cached per board by `useRankings`.
  */
 const RankingsWindow: React.FC = () => {
 	const [tab, setTab] = useState<RankingBoardId>('level');

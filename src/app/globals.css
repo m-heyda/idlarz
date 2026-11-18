@@ -1473,6 +1473,28 @@ body {
 	pointer-events: none;
 }
 
+/* a building being upgraded or built: a thin purple bar under it that fills as the timer runs (the monsters' growth bar, in purple) */
+.tile-build-bar {
+	position: absolute;
+	left: 8%;
+	right: 8%;
+	bottom: -5px;
+	height: 3px;
+	z-index: 7;
+	background: rgba(0, 0, 0, 0.55);
+	border: 1px solid rgba(0, 0, 0, 0.7);
+	overflow: hidden;
+	pointer-events: none;
+}
+
+.tile-build-bar-fill {
+	position: absolute;
+	inset: 0;
+	background: #b07bff;
+	transform-origin: left center;
+	transition: transform 1s linear;
+}
+
 /* --- Notify dot: universal, understated "needs attention" marker, pinned to the top-right of a positioned parent --- */
 .notify-dot {
 	position: absolute;

@@ -480,7 +480,14 @@
 		"boneCleaver",
 		"frostguardKnight",
 		"gildedChampion",
-		"bossCinderWarlord"
+		"bossCinderWarlord",
+		"toxicZombie",
+		"magmaKnight",
+		"magmaCrab",
+		"mawhornBrute",
+		"bossIronhorn",
+		"tidepoolGolem",
+		"bossBrainstorm"
 	],
 	"recipeIds": [
 		"glass_vial",
@@ -789,13 +796,14 @@
 		"hard.idolMaxLevel": 100,
 		"hard.buildingMaxLevel": 15,
 		"hard.castleMaxLevel": 15,
+		"hard.builders": 8,
 		"castle.maxLevel": 10,
 		"clickLadder.length": 6,
 		"merchant.haggler": 10,
 		"merchant.bulk": 8,
 		"merchant.charm": 10,
 		"merchant.packrat": 6,
-		"merchant.packrat2": 6,
+		"merchant.packrat2": 10,
 		"merchant.foreman": 10,
 		"merchant.skinner": 8,
 		"merchant.swift": 8,
@@ -843,7 +851,7 @@
 		"ember.buildcap": 5,
 		"ember.idolcap": 10,
 		"ember.decree": 1,
-		"ember.extrabuilder": 2,
+		"ember.extrabuilder": 1,
 		"ember.questrarity": 10,
 		"ember.questslots": 5
 	}

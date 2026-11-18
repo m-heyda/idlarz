@@ -594,12 +594,13 @@ test('timer_jump: a completion is bound to its own building, an Idol floor is th
 	});
 });
 
-test('Extra Builder (Ember shop): each level adds a builder, and two parallel timers pass verify without the Gem shop one', () => {
+test('Extra Builder (Ember shop): one level adds one builder (3 with the Gem shop one), and two parallel timers pass verify without the Gem shop one', () => {
 	withBuildings(() => {
 		const prestige = (level: number) => ({ ...api().prestige, upgrades: { extrabuilder: level } });
 		assert.equal(builderCount({ prestige: prestige(1) }), 2);
-		assert.equal(builderCount({ prestige: prestige(2) }), 3);
-		assert.equal(builderCount({ prestige: prestige(2), gemBuilders: 1 }), 4, 'with Builder #2 from the Gem shop');
+		assert.equal(builderCount({ prestige: prestige(2) }), 2, 'the shop sells one level; a stored higher one is cut to it');
+		assert.equal(builderCount({ prestige: prestige(1), gemBuilders: 1 }), 3, 'with Builder #2 from the Gem shop: the most there is');
+		assert.equal(builderCount({ prestige: prestige(5), gemBuilders: 9 }), 3);
 
 		const [a, b] = gameWith('forest', 2, 5);
 		api().buildBuilding(a.x, a.y, 'lumberyard');

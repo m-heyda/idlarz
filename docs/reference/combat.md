@@ -262,7 +262,7 @@ Freezes everything a fight needs about the player into a `PlayerProfile` (max HP
 
 ### `fightStep` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:127`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:139`](../../src/lib/offline/fightSteps.ts)
 
 One tick of the open fight. Returns when the fight ended.
 
@@ -272,7 +272,7 @@ One tick of the open fight, in the order of the numbered list on [`runCombat`](c
 
 ### `endFight` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:96`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:108`](../../src/lib/offline/fightSteps.ts)
 
 Closes the open fight as `defeated`, `timeout` or `retreat`: a defeat sets HP to 30% of max, a defeat or timeout starts the monster's retry cooldown (300 s, a boss 600 s) and the queue is cleared; the monster stays on the map.
 
@@ -309,7 +309,7 @@ Nothing of the ledger is written. Returns null with no fight open or one that do
 
 ### `payKill` <small>function</small>
 
-Source: [`src/lib/offline/reward.ts:36`](../../src/lib/offline/reward.ts)
+Source: [`src/lib/offline/reward.ts:58`](../../src/lib/offline/reward.ts)
 
 Pays the kill of ticket `n`: the ticket leaves the bank, the roll is sealed on the number of kills this run (so a replay cannot roll
 it again), and the gold, XP and hide go into what the server has granted. Null when the ticket is not there.
@@ -383,7 +383,7 @@ heal = 25% of max HP x (1 + magic damage% / 100) x (1 + (gear Spell Power + clas
 
 ### `autoUse` <small>function</small>
 
-Source: [`src/lib/offline/fightSteps.ts:75`](../../src/lib/offline/fightSteps.ts)
+Source: [`src/lib/offline/fightSteps.ts:87`](../../src/lib/offline/fightSteps.ts)
 
 Auto-use's rules for one tick: a potion below the HP line, Heal below its line, Stun whenever it is ready. It drinks the best-fitting potion by what the potion restores for this hero (the belt's Potion Power included) and waits out the shared cooldown the belt shortens (`profile.potionCooldownSec`); it picks among every healing potion in the bag, not only the ones on the hotkey bar.
 

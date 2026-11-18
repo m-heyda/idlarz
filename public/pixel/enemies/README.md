@@ -15,4 +15,12 @@ On-map size: `src/config/monsterArtSize.ts` (px per monster id, with a default p
 
 ## Unsorted files (2026-11-16)
 
-Drops from Sprite Fusion that still carry their tool names and are not named by the catalog: `sprite-fusion-<hash>.png` in `battlefield/`, `blight/`, `fields/`, `lava/`, `orchard/`, `swamp/` and `tundra/`; `boss.png` in `battlefield/`, `blight/`, `fields/` and `orchard/`; `blight/xas.png`; `BRAINSTORM.png` in `jungle/` and `lake/` (a sheet of ideas, not a sprite); `hills/Gemini_Generated_Image_*.jpg`. Rename each to its `<monster-id>.png` when its monster is added to `src/catalog/monsters.ts`, or delete it. `lava/` has no biome in the game yet.
+Drops from Sprite Fusion that still carry their tool names and are not named by the catalog: `sprite-fusion-<hash>.png` in `battlefield/`, `blight/`, `fields/`, `lava/`, `orchard/`, `swamp/` and `tundra/`; `boss.png` in `battlefield/`, `blight/`, `fields/` and `orchard/`; `blight/xas.png`. Rename each to its `<monster-id>.png` when its monster is added to `src/catalog/monsters.ts`, or delete it. `lava/` has no biome in the game yet.
+
+## Hills, jungle and lake (2026-11-18)
+
+The hills sheet was cut into the nine hills sprites (`hill-ogre`, `highland-gnoll`, `ridge-gryphon`, `cliff-harpy`, `crag-mantis`, `stony-kobold`, `slate-gargoyle`, `heather-drake` and the boss `boss-rock-troll`, each with a clear 1 px margin) and `mawhorn-brute.png` came in from `assets_to_assess_and_use/monsters/`; `jungle/boss-brainstorm.png` and `lake/tidepool-golem.png` are the two former `BRAINSTORM.png` files. The stand-in monsters they replace stay in the code as retired ids (`RETIRED_MONSTERS` in `src/config/combatConfig.ts`) and never spawn.
+
+## Hills and blight art swap (2026-11-18)
+
+`hills/magma-knight.png` was a byte-for-byte copy of `battlefield/boss-cinder-warlord.png` and `blight/blighted-husk.png` of `swamp/toxic-zombie.png`; both, and `hills/magma-crab.png`, were removed (the Magma Knight, Magma Crab and Blighted Husk are retired ids now, `RETIRED_MONSTERS`). New: `hills/quarry-rat-knight.png` and `blight/sporeback-ogre.png` (supplied by the owner in chat), `battlefield/frost-flame-knight.png` and `orchard/mushroom-wizard.png` (from `assets_to_assess_and_use/monsters/`). No two monsters share a picture.

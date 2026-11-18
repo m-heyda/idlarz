@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
-import { dockMagnification, gemStates, type Point, type Rarity, type Size } from '../logic';
+import { TIP_TOP_INSET, dockMagnification, gemStates, placeHoverTip, type Point, type Rarity, type Size } from '../logic';
 
 const cx = (...parts: (string | false | undefined)[]) => parts.filter(Boolean).join(' ');
 
@@ -178,7 +178,8 @@ export const Stat: React.FC<{ label: string; value: React.ReactNode; tone?: 'dam
 export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'className'> {
 	icon?: string;
 	rarity?: Rarity;
-	count?: number;
+	/** Stack count in the corner: a number (shown above 1) or a ready-made label such as "46.9K" */
+	count?: number | string;
 	/** Show a faded placeholder icon for an empty equipment slot */
 	empty?: boolean;
 	locked?: boolean;
@@ -239,7 +240,7 @@ export const Slot: React.FC<SlotProps> = ({
 					{sub ? <small>{sub}</small> : null}
 				</span>
 			) : null}
-			{count && count > 1 ? <span className='ds-slot-count'>{count}</span> : null}
+			{count && (typeof count === 'string' || count > 1) ? <span className='ds-slot-count'>{count}</span> : null}
 			{levelBadge !== undefined ? <span className='ds-slot-lvl'>{levelBadge}</span> : null}
 			{junk ? <i className='ds-slot-junk' aria-hidden /> : null}
 		</button>
@@ -555,13 +556,8 @@ export const HoverTip: React.FC<HoverTipProps> = ({
 			setAt(place({ left: r.left, top: r.top, right: r.right, bottom: r.bottom }, { w, h }, viewport));
 			return;
 		}
-		let left = align === 'center' ? r.left + r.width / 2 - w / 2 : r.left;
-		let top = placement === 'above' ? r.top - h - 8 : r.bottom + 8;
-		if (top < 4) top = r.bottom + 8;
-		if (top + h > viewport.h - 4) top = Math.max(4, r.top - h - 8);
-		left = Math.max(4, Math.min(left, viewport.w - w - 4));
-		setAt({ x: left, y: top });
-	}, [open, placement, align, place]);
+		setAt(placeHoverTip({ left: r.left, top: r.top, right: r.right, bottom: r.bottom }, { w, h }, viewport, { placement, align, topInset: TIP_TOP_INSET }));
+	}, [open, placement, align, place, tip]);
 	return (
 		<span
 			ref={host}

@@ -18,6 +18,7 @@ import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monst
 import { useBestiaryStore, useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
 import { useMapTipLayer } from './MapTipLayer';
+import MapTip from './MapTip';
 import { TileStatus } from './TileStatus';
 
 /** Hover card of a monster, the design system's MonsterTooltip with the game's numbers: level, HP and attack, kills, growth, boss traits and the call to fight. Reads the age at render time. */
@@ -39,7 +40,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 	const biomeLabel = entry ? (BIOMES[entry.biomes[0] as keyof typeof BIOMES]?.label ?? '') : '';
 	if (wip) {
 		return (
-			<div className={place}>
+			<MapTip className={place}>
 				<MonsterTooltip
 					icon={icon}
 					name={wip.label}
@@ -49,7 +50,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 					boss={wip.grade === 'boss'}
 					wip
 				/>
-			</div>
+			</MapTip>
 		);
 	}
 	const monster = state.monsters.find((m) => m.id === id);
@@ -79,7 +80,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 		...(boss && MONSTERS[type].timeLimitSec ? [{ label: 'Time limit', value: `${MONSTERS[type].timeLimitSec} s` }] : []),
 	];
 	return (
-		<div className={place}>
+		<MapTip className={place}>
 			<MonsterTooltip
 				icon={icon}
 				name={MONSTERS[type].label}
@@ -96,7 +97,7 @@ const MonsterTip: React.FC<{ id: number; type: MonsterType; level: number; art?:
 				growth={growth}
 				cta={queued > 0 ? `In the queue (${queued}) - click to leave it` : lineOpen ? 'Click to add to the queue' : 'Click to fight'}
 			/>
-		</div>
+		</MapTip>
 	);
 };
 
@@ -178,34 +179,34 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 	return createPortal(
 		<div className='absolute' style={{ left: x * TILE_SIZE, top: y * TILE_SIZE, width: TILE_SIZE, height: TILE_SIZE }}>
 			{isOwned && monster && !tipMonster && (
-				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
+				<MapTip className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
 					<Tooltip title='Unknown creature' subtitle='Not discovered yet' className='ds-tip-compact'>
 						<TipLine>Something is lurking here. Fight it once to find out what it is.</TipLine>
 						<TipLine tone='gold'>Click to fight</TipLine>
 					</Tooltip>
-				</div>
+				</MapTip>
 			)}
 			{isOwned && tipMonster && monster && (
 				<MonsterTip id={monster.id} type={monster.type} level={monster.level} art={monster.art} queued={queued} lineOpen={lineOpen} />
 			)}
 			{isOwned && hasChest && showChestTip && (
-				<div className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
+				<MapTip className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
 					<ChestTooltip
 						icon='/pixel/ui/treasure_chest.png'
 						subtitle={biome === 'lake' ? 'Something glints in the water' : 'Opens with a click'}
 						cta={biome === 'lake' ? 'Click to open' : undefined}
 					/>
-				</div>
+				</MapTip>
 			)}
 			{/* a monster has its own tooltip: the biome card would only cover it */}
 			{!(isOwned && monster) && (
-				<div className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max'>
+				<MapTip className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max'>
 					{isOwned && building ? (
 						<BuildingTile id={building.id} level={building.level} tile={<BiomeTooltip biome={biome} level={level} x={x} y={y} />} />
 					) : (
 						<TileStatus biome={biome} isOwned={isOwned} isAdjacent={isAdjacent} level={level} x={x} y={y} />
 					)}
-				</div>
+				</MapTip>
 			)}
 		</div>,
 		tipLayer,

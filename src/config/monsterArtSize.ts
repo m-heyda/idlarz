@@ -17,8 +17,11 @@ export const MONSTER_ART_SIZE = {
 		brambleImp: 52,
 		mossSnapper: 52,
 		reedNymph: 52,
+
+		tidepoolGolem: 50,
 		// already big or tall: the default is plenty
 		garbageOgre: 50,
+		toxicZombie: 50,
 		thistleBoar: 49,
 		mossbackWolf: 49,
 		icetuskCalf: 50,

@@ -40,6 +40,7 @@ import TerrainLayer from './TerrainLayer';
 import WaterLayer from './WaterLayer';
 import HighlightLayer from './HighlightLayer';
 import MapLoadingOverlay from './MapLoadingOverlay';
+import { reportCuriosity } from '@/lib/curiosityClient';
 import { useUiStore } from '@/stores/uiStore';
 import '@/styles/MapLoading.css';
 
@@ -140,6 +141,9 @@ const Grid: React.FC = () => {
 			const base = idx === -1 ? ZOOM_LEVELS.findIndex((l) => l >= from) : idx;
 			const next = ZOOM_LEVELS[Math.max(0, Math.min(ZOOM_LEVELS.length - 1, (base === -1 ? ZOOM_LEVELS.length - 1 : base) + dir))];
 			if (next === from) return;
+			// the most and the least the map can be zoomed are secret deeds
+			if (next === ZOOM_LEVELS[ZOOM_LEVELS.length - 1]) reportCuriosity('map_zoom_max');
+			if (next === ZOOM_LEVELS[0]) reportCuriosity('map_zoom_min');
 
 			velocityRef.current = { x: 0, y: 0 };
 			view.getState().setZoom(next, { x: e.clientX, y: e.clientY });

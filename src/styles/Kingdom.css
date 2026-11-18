@@ -1,0 +1,128 @@
+/* The Kingdom overview window: a few stacked sections (castle, land, buildings, monsters) */
+.kd-root {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	padding: 4px;
+}
+
+.kd-castle {
+	display: flex;
+	align-items: center;
+	gap: 14px;
+}
+
+.kd-castle img {
+	width: 56px;
+	height: 56px;
+	image-rendering: pixelated;
+}
+
+.kd-castle-main {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.kd-line {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 10px;
+	font-size: 13px;
+	color: #a89878;
+}
+
+.kd-line b {
+	color: #f1e6c8;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+}
+
+.kd-rows {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.kd-heat {
+	/* one square per tile, filled left to right and wrapping to the width of the window, the biomes in runs */
+	display: grid;
+	grid-template-columns: repeat(auto-fill, 12px);
+	grid-auto-rows: 12px;
+	gap: 3px;
+	justify-content: start;
+}
+
+.kd-cell {
+	width: 12px;
+	height: 12px;
+	border: 1px solid rgba(0, 0, 0, 0.45);
+	box-sizing: border-box;
+}
+
+.kd-heat-note {
+	margin-top: 4px;
+}
+
+.kd-legend {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px 18px;
+	margin-top: 10px;
+}
+
+.kd-biome {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	font-size: 13px;
+	color: #f1e6c8;
+}
+
+.kd-swatch {
+	width: 14px;
+	height: 14px;
+	border: 1px solid rgba(0, 0, 0, 0.6);
+}
+
+.kd-count {
+	font-variant-numeric: tabular-nums;
+}
+
+.kd-rows-wide {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+	gap: 6px 24px;
+}
+
+.kd-building {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 110px 90px;
+	align-items: center;
+	gap: 10px;
+	font-size: 13px;
+	color: #f1e6c8;
+}
+
+.kd-building[data-built='false'] {
+	opacity: 0.55;
+}
+
+.kd-sub {
+	color: #a89878;
+	font-size: 11px;
+}
+
+.kd-lvl {
+	text-align: right;
+	font-variant-numeric: tabular-nums;
+	color: #a89878;
+}
+
+.kd-stats {
+	display: flex;
+	justify-content: space-around;
+}

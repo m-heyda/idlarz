@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { PREF_DEFAULTS, readPref, readStringPref, writePref, writeStringPref, type UiPrefKey } from '@/lib/uiPrefs';
+import { CASTLE_SKINS } from '@/config/castleSkins';
 import type { Drop, MerchantTab } from '@/types/game';
 import type { OfflineReport } from '@/lib/offline/apply';
 import { useWindowStore } from '@/stores/windowStore';
@@ -131,10 +132,9 @@ interface UiState {
 	settingsOpen: boolean;
 	toggleSettings: () => void;
 	closeSettings: () => void;
-	rebirthOpen: boolean;
+	/** Rebirth and the Ember shop: a game window (`windowStore`, id `rebirth`), these act on it */
 	toggleRebirth: () => void;
-	/** The Gem shop window (the header gem chip opens it) */
-	gemShopOpen: boolean;
+	/** The Gem shop: a game window (`windowStore`, id `gems`; the header gem chip opens it) */
 	toggleGemShop: () => void;
 	closeGemShop: () => void;
 	closeRebirth: () => void;
@@ -209,6 +209,12 @@ interface UiState {
 	clearMerchantSelect: () => void;
 	setPref: (key: UiPrefKey, value: boolean) => void;
 	loadPrefs: () => void;
+	/** The castle skin the player picked (1-based, null = the level castles); drawn only while it is owned (`ownedSkins`). Remembered on this device. */
+	castleSkin: number | null;
+	setCastleSkin: (skin: number | null) => void;
+	/** The skins the account owns, mirrored from the Gem shop's last answer (the server's ledger is the record) */
+	ownedSkins: number[];
+	setOwnedSkins: (skins: number[]) => void;
 }
 
 export const useUiStore = create<UiState>((set, get) => ({
@@ -228,12 +234,10 @@ export const useUiStore = create<UiState>((set, get) => ({
 	settingsOpen: false,
 	toggleSettings: () => set((state) => ({ settingsOpen: !state.settingsOpen })),
 	closeSettings: () => set({ settingsOpen: false }),
-	gemShopOpen: false,
-	toggleGemShop: () => set((state) => ({ gemShopOpen: !state.gemShopOpen })),
-	closeGemShop: () => set({ gemShopOpen: false }),
-	rebirthOpen: false,
-	toggleRebirth: () => set((state) => ({ rebirthOpen: !state.rebirthOpen })),
-	closeRebirth: () => set({ rebirthOpen: false }),
+	toggleGemShop: () => useWindowStore.getState().toggleWindow('gems'),
+	closeGemShop: () => useWindowStore.getState().closeWindow('gems'),
+	toggleRebirth: () => useWindowStore.getState().toggleWindow('rebirth'),
+	closeRebirth: () => useWindowStore.getState().closeWindow('rebirth'),
 	saveMenuOpen: false,
 	toggleSaveMenu: () => set((state) => ({ saveMenuOpen: !state.saveMenuOpen })),
 	closeSaveMenu: () => set({ saveMenuOpen: false }),
@@ -351,8 +355,16 @@ export const useUiStore = create<UiState>((set, get) => ({
 	mapReady: false,
 	setMapReady: (ready) => set((state) => (state.mapReady === ready ? state : { mapReady: ready })),
 	// read after mount (the server render has no localStorage): keeps hydration identical
+	castleSkin: null,
+	setCastleSkin: (skin) => {
+		writeStringPref('castleSkin', skin === null ? '' : String(skin));
+		set({ castleSkin: skin });
+	},
+	ownedSkins: [],
+	setOwnedSkins: (skins) => set({ ownedSkins: skins }),
 	loadPrefs: () =>
 		set({
+			castleSkin: ((raw) => (CASTLE_SKINS.some((skin) => String(skin.n) === raw) ? Number(raw) : null))(readStringPref('castleSkin')),
 			merchantTab: readMerchantTab(),
 			merchantPreset: readMerchantPreset(),
 			merchantCustom: (readStringPref('merchantCustom') ?? '').slice(0, MERCHANT_CUSTOM_MAX),

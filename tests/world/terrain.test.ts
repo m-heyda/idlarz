@@ -4,6 +4,7 @@ import {
 	ATLAS,
 	CELL,
 	decorSprites,
+	detailSprites,
 	MAX_DEPTH,
 	RANK,
 	allPads,
@@ -340,4 +341,24 @@ test('landmarks: isLandmarkTile covers exactly the 6x6 window', async () => {
 	assert.equal(isLandmarkTile(w, 35, 35), true);
 	assert.equal(isLandmarkTile(w, 36, 35), false);
 	assert.equal(isLandmarkTile(w, 29, 30), false);
+});
+
+test('the battlefield skeleton shows up now and then, only inside a battlefield and never on a prop', () => {
+	const rows = Array.from({ length: 60 }, () => 'V'.repeat(60));
+	const g = buildGroundGrid(grid(rows));
+	const detail = ATLAS.details!.battlefield;
+	assert.ok(ATLAS.sprites[detail.id], 'the sprite is in the atlas');
+	let found = 0;
+	for (let y = 0; y < 60; y++)
+		for (let x = 0; x < 60; x++) {
+			const props = tileSprites(g, x, y);
+			const got = detailSprites(g, x, y, props);
+			if (got.length) {
+				found++;
+				assert.equal(props.length, 0, 'no prop on its tile');
+				assert.deepEqual(got[0], { id: detail.id, x: x * CELL, bottom: (y + 1) * CELL });
+			}
+		}
+	assert.ok(found > 5 && found < 120, `${found} of 3600 tiles`);
+	assert.deepEqual(detailSprites(buildGroundGrid(grid(['FFF', 'FFF', 'FFF'])), 1, 1, []), [], 'other grounds have none');
 });
