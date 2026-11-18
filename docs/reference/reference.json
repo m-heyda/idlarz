@@ -322,7 +322,7 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 65,
+  "line": 79,
   "summary": "The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster's and the top tier pays more gems.",
   "see": []
  },
@@ -333,7 +333,7 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 95,
+  "line": 123,
   "summary": "The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.",
   "see": []
  },
@@ -344,7 +344,7 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 110,
+  "line": 156,
   "summary": "The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).",
   "see": []
  },

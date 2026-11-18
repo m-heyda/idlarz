@@ -110,7 +110,11 @@ test('IDL-267: the login claim carries the bestiary like every online answer, no
 	assert.equal(out.kind, 'ok');
 	const result = (out as { kind: 'ok'; result: ClaimResult }).result;
 	assert.ok(result.tickets.monsters.length > 0, 'monsters were placed by the claim itself');
-	assert.deepEqual(result.bestiary, { seen: [], kills: {}, claimed: {}, biomeClaimed: {}, deaths: {}, bestMs: {} }, 'and the browser is told that none of them has been met');
+	assert.deepEqual(
+		result.bestiary,
+		{ seen: [], kills: {}, claimed: {}, biomeClaimed: {}, deaths: {}, bestMs: {} },
+		'and the browser is told that none of them has been met',
+	);
 });
 
 test('IDL-267: a replayed claim (a lost answer) still says what is known', async () => {

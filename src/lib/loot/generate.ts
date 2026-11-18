@@ -336,7 +336,9 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 
 	let drops: LootDrop[] = [];
 	if (profile.generalPoolId) {
-		const hits = countSuccesses(profile.rolls, level, rng, dropChanceMultiplier(req.luck ?? 0) * (1 + (req.dropChancePct ?? 0) / 100)) + Math.max(0, Math.floor(req.extraGearRolls ?? 0));
+		const hits =
+			countSuccesses(profile.rolls, level, rng, dropChanceMultiplier(req.luck ?? 0) * (1 + (req.dropChancePct ?? 0) / 100)) +
+			Math.max(0, Math.floor(req.extraGearRolls ?? 0));
 		for (let i = 0; i < hits; i++) {
 			const itemLevel = rollItemLevel(sourceLevel, capped(ctx, profile.itemLevel), rng);
 			const drop = rollRarityGear(ctx, 'general', profile.generalPoolId, itemLevel);

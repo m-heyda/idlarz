@@ -71,7 +71,11 @@ const addBonuses = (into: MasteryTotals, bonuses: readonly MasteryBonus[]): void
  * @formula
  * bonus[stat] = min(MASTERY_CAPS[stat], sum of the bonuses of the claimed tiers of the type + sum of the bonuses of the claimed biome goals of its biome)
  */
-export const masteryBonusesFor = (type: string, claimed: Readonly<Record<string, number>>, biomeClaimed: Readonly<Record<string, number>> = {}): MasteryTotals => {
+export const masteryBonusesFor = (
+	type: string,
+	claimed: Readonly<Record<string, number>>,
+	biomeClaimed: Readonly<Record<string, number>> = {},
+): MasteryTotals => {
 	const total = noBonuses();
 	const tiers = masteryTiersOf(type);
 	const taken = Math.max(0, Math.min(tiers.length, Math.floor(claimed[type] ?? 0)));

@@ -626,7 +626,7 @@ The change since the refresh before: a lower number is a better place, so a smal
 
 ### `BOSS_MASTERY_TIERS` <small>const</small>
 
-Source: [`src/catalog/mastery.ts:65`](../../src/catalog/mastery.ts)
+Source: [`src/catalog/mastery.ts:79`](../../src/catalog/mastery.ts)
 
 The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster's and the top tier pays more gems.
 
@@ -634,7 +634,7 @@ The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5
 
 ### `BIOME_GOALS` <small>const</small>
 
-Source: [`src/catalog/mastery.ts:95`](../../src/catalog/mastery.ts)
+Source: [`src/catalog/mastery.ts:123`](../../src/catalog/mastery.ts)
 
 The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.
 
@@ -642,7 +642,7 @@ The biome collection goals, one per ladder tier (decided 2026-11-17): the same r
 
 ### `MASTERY_CAPS` <small>const</small>
 
-Source: [`src/catalog/mastery.ts:110`](../../src/catalog/mastery.ts)
+Source: [`src/catalog/mastery.ts:156`](../../src/catalog/mastery.ts)
 
 The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).
 

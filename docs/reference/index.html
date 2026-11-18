@@ -5710,15 +5710,15 @@ Ties are broken in this order:</p>
 <p>The change since the refresh before: a lower number is a better place, so a smaller rank is <code>up</code>; no earlier place is <code>new</code>.</p>
 </article><h2>Mastery</h2><article><p><a id="boss-mastery-tiers"></a></p>
 <h3><code>BOSS_MASTERY_TIERS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:65</code></a></p>
+<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:79</code></a></p>
 <p>The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster&#39;s and the top tier pays more gems.</p>
 </article><article><p><a id="biome-goals"></a></p>
 <h3><code>BIOME_GOALS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:95</code></a></p>
+<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:123</code></a></p>
 <p>The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome&#39;s progress is the lowest tier reached by any of its monsters.</p>
 </article><article><p><a id="mastery-caps"></a></p>
 <h3><code>MASTERY_CAPS</code> <small>const</small></h3>
-<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:110</code></a></p>
+<p>Source: <a href="../../src/catalog/mastery.ts"><code>src/catalog/mastery.ts:156</code></a></p>
 <p>The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (<code>PERK_CAPS.damagePct</code> 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">bonus vs one monster = min(cap, tier bonuses of that monster + biome goal bonuses of its biome)       multiplier = 1 + bonus / 100 (defense: damage taken x (1 - bonus / 100))

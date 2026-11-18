@@ -15,7 +15,20 @@ export type PlannedBiome = 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlef
 export type CatalogBiome = BiomeType | PlannedBiome;
 
 /** What a monster is, for the Bestiary filters and the "+x% against beasts" mastery bonuses (IDL-336). One family per monster. */
-export const MONSTER_FAMILIES = ['Beast', 'Bird', 'Vermin', 'Aquatic', 'Undead', 'Plant', 'Fungus', 'Demon', 'Construct', 'Humanoid', 'Elemental', 'Dragon'] as const;
+export const MONSTER_FAMILIES = [
+	'Beast',
+	'Bird',
+	'Vermin',
+	'Aquatic',
+	'Undead',
+	'Plant',
+	'Fungus',
+	'Demon',
+	'Construct',
+	'Humanoid',
+	'Elemental',
+	'Dragon',
+] as const;
 export type MonsterFamily = (typeof MONSTER_FAMILIES)[number];
 
 /** Short traits shown as chips on a Bestiary entry (flavour and filters; no rule hangs on them yet) */

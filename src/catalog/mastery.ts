@@ -52,8 +52,22 @@ export const bonusText = (b: MasteryBonus): string => `${b.stat === 'defense' ? 
 export const MASTERY_TIERS: readonly MasteryTier[] = [
 	{ kills: 10, reveal: 'stats', bonuses: [{ stat: 'damage', value: 2 }], gems: 0 },
 	{ kills: 100, reveal: 'drops', bonuses: [{ stat: 'xp', value: 5 }], gems: 0 },
-	{ kills: 500, bonuses: [{ stat: 'loot', value: 5 }, { stat: 'defense', value: 3 }], gems: 0 },
-	{ kills: 2500, bonuses: [{ stat: 'damage', value: 4 }, { stat: 'gold', value: 5 }], gems: 10 },
+	{
+		kills: 500,
+		bonuses: [
+			{ stat: 'loot', value: 5 },
+			{ stat: 'defense', value: 3 },
+		],
+		gems: 0,
+	},
+	{
+		kills: 2500,
+		bonuses: [
+			{ stat: 'damage', value: 4 },
+			{ stat: 'gold', value: 5 },
+		],
+		gems: 10,
+	},
 ];
 
 /**
@@ -65,8 +79,22 @@ export const MASTERY_TIERS: readonly MasteryTier[] = [
 export const BOSS_MASTERY_TIERS: readonly MasteryTier[] = [
 	{ kills: 1, reveal: 'stats', bonuses: [{ stat: 'damage', value: 3 }], gems: 0 },
 	{ kills: 5, reveal: 'drops', bonuses: [{ stat: 'xp', value: 8 }], gems: 0 },
-	{ kills: 25, bonuses: [{ stat: 'loot', value: 8 }, { stat: 'defense', value: 5 }], gems: 0 },
-	{ kills: 100, bonuses: [{ stat: 'damage', value: 6 }, { stat: 'gold', value: 8 }], gems: 40 },
+	{
+		kills: 25,
+		bonuses: [
+			{ stat: 'loot', value: 8 },
+			{ stat: 'defense', value: 5 },
+		],
+		gems: 0,
+	},
+	{
+		kills: 100,
+		bonuses: [
+			{ stat: 'damage', value: 6 },
+			{ stat: 'gold', value: 8 },
+		],
+		gems: 40,
+	},
 ];
 
 /** Kills that fill a Bestiary entry: the first tier of the shared ladder (the Scholar deed counts the entries that reached it). */
@@ -94,9 +122,27 @@ export interface BiomeGoal {
  */
 export const BIOME_GOALS: readonly BiomeGoal[] = [
 	{ bonuses: [{ stat: 'damage', value: 1 }], gems: 0 },
-	{ bonuses: [{ stat: 'xp', value: 3 }, { stat: 'gold', value: 3 }], gems: 0 },
-	{ bonuses: [{ stat: 'loot', value: 4 }, { stat: 'defense', value: 2 }], gems: 0 },
-	{ bonuses: [{ stat: 'damage', value: 3 }, { stat: 'gold', value: 4 }], gems: 25 },
+	{
+		bonuses: [
+			{ stat: 'xp', value: 3 },
+			{ stat: 'gold', value: 3 },
+		],
+		gems: 0,
+	},
+	{
+		bonuses: [
+			{ stat: 'loot', value: 4 },
+			{ stat: 'defense', value: 2 },
+		],
+		gems: 0,
+	},
+	{
+		bonuses: [
+			{ stat: 'damage', value: 3 },
+			{ stat: 'gold', value: 4 },
+		],
+		gems: 25,
+	},
 ];
 
 /**

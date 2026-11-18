@@ -28,7 +28,10 @@ test('the ladder is the decided hybrid one and the entry fills at the first tier
 		[false, false, false, true],
 		'only the top tier pays gems (decided 2026-11-17)',
 	);
-	assert.ok(MASTERY_TIERS.every((t) => t.bonuses.length > 0), 'every tier gives a structured bonus');
+	assert.ok(
+		MASTERY_TIERS.every((t) => t.bonuses.length > 0),
+		'every tier gives a structured bonus',
+	);
 });
 
 test('tier from kills, and what the entry may show once tiers are claimed', () => {
@@ -116,7 +119,10 @@ import { claimBiomeGoal } from '../../src/lib/offline/mastery';
 const everyKill = (biome: string, kills: number) => Object.fromEntries(biomeRoster(biome).map((id) => [id, kills]));
 
 test('a boss has its own low ladder (1 / 5 / 25 / 100) and a normal monster the shared one', () => {
-	assert.deepEqual(BOSS_MASTERY_TIERS.map((t) => t.kills), [1, 5, 25, 100]);
+	assert.deepEqual(
+		BOSS_MASTERY_TIERS.map((t) => t.kills),
+		[1, 5, 25, 100],
+	);
 	assert.equal(masteryTiersOf('bossGreatAuroch'), BOSS_MASTERY_TIERS);
 	assert.equal(masteryTiersOf('thistleBoar'), MASTERY_TIERS);
 	assert.equal(masteryTiersOf('someRetiredType'), MASTERY_TIERS, 'a type the catalog does not list reads on the shared ladder');
@@ -143,7 +149,11 @@ test('a biome goal needs every live monster of the biome, its boss included, at 
 	const roster = biomeRoster('plains');
 	assert.ok(roster.includes('bossGreatAuroch') && roster.length === 6);
 	const kills = everyKill('plains', 10);
-	assert.equal(biomeState('plains', kills, 0).reached, 1, 'ten kills of each: the normals reach tier 1, the boss tier 2 (1 / 5 / 25 / 100), so the biome is at tier 1');
+	assert.equal(
+		biomeState('plains', kills, 0).reached,
+		1,
+		'ten kills of each: the normals reach tier 1, the boss tier 2 (1 / 5 / 25 / 100), so the biome is at tier 1',
+	);
 	assert.equal(biomeState('plains', everyKill('plains', 0), 0).reached, 0);
 	const near = { ...everyKill('plains', 10), bossGreatAuroch: 1 };
 	assert.equal(biomeState('plains', near, 0).reached, 1);
