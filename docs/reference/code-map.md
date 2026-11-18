@@ -237,6 +237,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`BuffRow.tsx`](../../src/components/game/BuffRow.tsx) — ~ The potion buffs running, each with the time left (the server's list from the last combat answer, counted down by this browser's clock).
 - [`CastleCompass.tsx`](../../src/components/game/CastleCompass.tsx) — ~ Breathing room (px) between the header and the free part of the screen
 - [`CastleRange.tsx`](../../src/components/game/CastleRange.tsx) — ~ Violet patch drawn over the tiles the castle's range bonus covers (the bonus itself comes later):
+- [`CastleSkinsSection.tsx`](../../src/components/game/CastleSkinsSection.tsx) — ~ The castle skins:
 - [`CastleSprite.tsx`](../../src/components/game/CastleSprite.tsx) — ~ `tile`:
 - [`CastleTimerBadge.tsx`](../../src/components/game/CastleTimerBadge.tsx) — ~ The castle upgrade's remaining time, drawn on the castle tile (no need to open the dialog).
 - [`CastleUpgradeDialog.tsx`](../../src/components/game/CastleUpgradeDialog.tsx) — ~ The castle upgrade window (opened from the castle tile):

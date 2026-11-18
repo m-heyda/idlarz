@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
-import { CASTLE_SKINS, castleSkinItemId } from '@/config/castleSkins';
-import { pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { NICK_EFFECTS, nickColorValue } from '@/config/nickColors';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
@@ -16,6 +14,7 @@ import { Button, SectionLabel, Tabs } from '../../../../packages/design-system/s
 import { NickName } from '../../../../packages/design-system/src/components/composites';
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import GemIcon from '../GemIcon';
+import CastleSkinsSection from '../CastleSkinsSection';
 import DailyBoard from '../DailyBoard';
 import '@/styles/GemShop.css';
 
@@ -72,8 +71,6 @@ const GemShopDialog: React.FC = () => {
 	const [tab, setTab] = useState<ShopView>('daily');
 	/** The name effect shown on the preview strip of the Cosmetics tab (an effect id; none = the plain name) */
 	const [previewFx, setPreviewFx] = useState<string | null>(null);
-	const castleSkin = useUiStore((state) => state.castleSkin);
-	const setCastleSkin = useUiStore((state) => state.setCastleSkin);
 
 	useEffect(() => {
 		if (open) void useGemStore.getState().refresh();
@@ -224,30 +221,20 @@ const GemShopDialog: React.FC = () => {
 		const owned = ownedOf(item);
 		const { price, blocked } = owned ? { price: item.price, blocked: null } : stateOf(item);
 		const effect = NICK_EFFECTS.find((entry) => entry.item === item.id);
-		const skin = CASTLE_SKINS.find((entry) => castleSkinItemId(entry.n) === item.id);
 		return (
 			<div
 				key={item.id}
 				className='gem-card gem-cosmetic'
 				data-owned={owned}
-				data-on={effect ? previewFx === effect.id : skin ? castleSkin === skin.n : undefined}
+				data-on={effect ? previewFx === effect.id : undefined}
 				onMouseEnter={effect ? () => setPreviewFx(effect.id) : undefined}
 				onClick={effect ? () => setPreviewFx(effect.id) : undefined}
 			>
-				{skin && (
-					// eslint-disable-next-line @next/next/no-img-element
-					<img className='gem-skin-art' src={pixelIconSrc(`castle_skin_${skin.n}` as PixelIconName)} alt='' draggable={false} />
-				)}
 				<div className='gem-card-name'>{item.name}</div>
 				<div className='gem-card-foot'>
 					{owned ? (
 						<>
 							<span className='gem-card-owned'>Owned</span>
-							{skin && (
-								<Button tone={castleSkin === skin.n ? 'dark' : 'stone'} onClick={() => setCastleSkin(castleSkin === skin.n ? null : skin.n)}>
-									{castleSkin === skin.n ? 'In use' : 'Use'}
-								</Button>
-							)}
 						</>
 					) : (
 						<>
@@ -321,13 +308,10 @@ const GemShopDialog: React.FC = () => {
 							</div>
 						</div>
 						<div className='gem-preview-hint'>Hover a name to preview it. You can also pick them in your character window.</div>
-						<div className='gem-cos-grid'>{items.filter((item) => (item.category ?? 'nicknames') === 'nicknames').map(cosmeticTile)}</div>
+						<div className='gem-cos-grid'>{items.filter((item) => item.category !== 'skins').map(cosmeticTile)}</div>
 
 						<SectionLabel>Castle skins</SectionLabel>
-						<div className='gem-preview-hint'>
-							A skin replaces your castle on the map at every level. Pick it with Use; press In use again to go back to the level castles.
-						</div>
-						<div className='gem-cos-grid gem-skins'>{items.filter((item) => item.category === 'skins').map(cosmeticTile)}</div>
+						<CastleSkinsSection />
 					</div>
 				)}
 			</div>
