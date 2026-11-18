@@ -18,7 +18,7 @@ The loot pipeline, rarities, affixes, sets, sell values and how to add content.
 
 ### `generateLoot` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:320`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:322`](../../src/lib/loot/generate.ts)
 
 Everything one source gives. `data` and `rng` are injectable so tests and the simulator are reproducible.
 
@@ -61,7 +61,7 @@ level windows, known slots/tags/rarities, no empty enabled pool, that something 
 
 ### `resolveSourceLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:99`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:101`](../../src/lib/loot/generate.ts)
 
 The level of a chest or shelf: its base plus steps for the world (castle) level. Never the player's level.
 
@@ -75,7 +75,7 @@ source level = clamp(base + perCastleLevel x (castle level - 1), 1..100)
 
 ### `rollItemLevel` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:110`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:112`](../../src/lib/loot/generate.ts)
 
 Rolls the item level around the source level, inside the profile's bounds.
 
@@ -113,7 +113,7 @@ Members that exist at this item level (item window and the pool's own minimum), 
 
 ### `rollLeaning` <small>function</small>
 
-Source: [`src/lib/loot/generate.ts:88`](../../src/lib/loot/generate.ts)
+Source: [`src/lib/loot/generate.ts:90`](../../src/lib/loot/generate.ts)
 
 A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). Used for the quality and the affix magnitudes of crafted gear (Intelligence).
 
@@ -470,7 +470,7 @@ every bag until the rule is decided (IDL-312). `junk` is a parameter so a test c
 
 ### `rollJunkDrops` <small>function</small>
 
-Source: [`src/lib/loot/junkDrops.ts:60`](../../src/lib/loot/junkDrops.ts)
+Source: [`src/lib/loot/junkDrops.ts:64`](../../src/lib/loot/junkDrops.ts)
 
 The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). Cheap junk: one kind, in the number that fills `JUNK_GOLD_SHARE` of the kill's gold (between half and one and a half times). Pricey junk: each kind has its own small chance
 (Luck raises it, 0.5% per point) from its minimum monster level. A boss drops its guaranteed pricey stack on top. Drawn from `rng` **after** every other roll of the kill, so the rest of the kill's loot is the same as before junk existed.
@@ -481,4 +481,5 @@ The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by r
 cheap qty   = max(1, round(gold x 0.15 x (0.5 + roll) / sellValue))        (x3 for a golden monster)
 rare chance = base x (1 + 0.005 x Luck)
 boss qty    = floor((base + level x perLevel) x (1 + 0.005 x Luck))       (guaranteed, x3 for a golden one)
+ingredient  = chance x (1 + 0.005 x Luck) per kill; qty = (min..max) + floor(perLevel x (level - 1))        (the monster's own table, x3 for a golden one)
 ```

@@ -10,7 +10,7 @@ The roster, levels, growth, spawning and what a kill pays.
 - Level scaling: [`monsterStats`](#monsterstats), [`spawnLevelRange`](#spawnlevelrange), [`rollSpawnLevel`](#rollspawnlevel), [`levelAtAge`](#levelatage), [`dangerBonus`](#dangerbonus)
 - Spawning: [`advanceBank`](#advancebank), [`canSpawnOn`](#canspawnon), [`typeWeights`](#typeweights), [`placeTickets`](#placetickets), [`ticketCap`](#ticketcap), [`DISTANCE_BANDS`](#distance-bands), [`BOSS_MIN_DISTANCE`](#boss-min-distance), [`bandOf`](#bandof)
 - Rewards: [`killIncome`](#killincome)
-- Bestiary: [`META`](#meta)
+- Bestiary: [`META`](#meta), [`FAMILY_DROPS`](#family-drops)
 
 ## Roster
 
@@ -306,7 +306,7 @@ The band a castle distance falls in. Anything below the first band (the castle t
 
 ### `killIncome` <small>function</small>
 
-Source: [`src/lib/loot/kill.ts:52`](../../src/lib/loot/kill.ts)
+Source: [`src/lib/loot/kill.ts:56`](../../src/lib/loot/kill.ts)
 
 Rewards for a kill. Gold and XP are "seconds of income" (like chests) so they scale with the economy. The items come from
 the shared loot pipeline (`generateLoot`): the monster's loot profile decides how many rolls, which rarities and which
@@ -319,8 +319,8 @@ Items: see [`generateLoot`](loot.md#generateloot). Measured share of income: `do
 
 ```text
 goldBase = min(gold/s x rewardSec, goldCap) x levelMult^(level - refLevel)
-gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%))
-xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
+gold     = floor(max(10, goldBase x (1 + 0.005 x Luck) x (1 + Gold Find%)) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery gold%))
+xp       = max(5, min(xp/s x rewardSec, xpCap) x levelMult^(level - refLevel) x xpScale) x (lucky ? 3 : 1) x (1 + Kill Rewards%) x (1 + mastery XP%)      (xpScale 3: kills carry the levelling, tile XP is small)      (xp/s includes the XP gain %)
 hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (lucky ? 3 : 1))
 ```
 
@@ -351,3 +351,88 @@ hide     = floor(hide/s x rewardSec x levelMult^(level - refLevel) x 0.6 x (luck
 Source: [`src/catalog/monsterMeta.ts:11`](../../src/catalog/monsterMeta.ts)
 
 Family and tags of every monster. The family drives the Bestiary's family filter and the family bonuses of mastery ("+x% against beasts"); the tags are flavour chips. A monster without a row here reads as a Beast with no tags (a test fails on the gap).
+
+<a id="family-drops"></a>
+
+### `FAMILY_DROPS` <small>const</small>
+
+Source: [`src/catalog/monsterDrops.ts:29`](../../src/catalog/monsterDrops.ts)
+
+What each family leaves (two or three ingredients), so a bear and a boar share a theme and the Bestiary can explain it.
+
+**Monster ingredients (Bestiary drops)** _(computed from the code)_
+
+| Monster | Family | Ingredients (chance per kill, from level) |
+| --- | --- | --- |
+| Thistle Boar | Beast | bacon 12%, blood 9%, horn 4% (L3+), carrot 10%, bacon 8% |
+| Burrow Badger | Beast | bacon 12%, blood 9%, horn 4% (L3+), carrot 10%, clay 10% |
+| Dust Strider | Bird | feather 16%, bacon 5%, sticks 8% |
+| Gravel Quail | Bird | feather 16%, bacon 5%, carrot 6% |
+| Stonehorn Bison | Beast | bacon 12%, blood 9%, horn 4% (L3+), horn 10% |
+| The Great Auroch | Beast | bacon 12%, blood 9%, horn 4% (L3+), horn always, bacon always |
+| Mossback Wolf | Beast | bacon 12%, blood 9%, horn 4% (L3+), sticks 6% |
+| Bramble Imp | Demon | blood 8%, horn_dark 4% (L8+), dark_shard 2% (L14+) |
+| Rotcap Stag | Beast | bacon 12%, blood 9%, horn 4% (L3+), orange_mushrooms 10%, horn 6% (L2+) |
+| Ember Squirrel | Beast | bacon 12%, blood 9%, horn 4% (L3+), ember_coal 5%, sticks 8% |
+| Pinecone Warden | Plant | sticks 16%, dried_herbs 14%, hollow_log 8%, sticks 14% |
+| The Elder Stag | Beast | bacon 12%, blood 9%, horn 4% (L3+), horn always, glowberry always |
+| Magma Knight | Humanoid | coins 12%, jug 8%, bacon 6%, obsidian 5% (L6+), copper_ore 8% |
+| Magma Crab | Vermin | claw 7%, tar 6%, ember_coal 10%, geode 4% (L6+) |
+| Mawhorn Brute | Demon | blood 8%, horn_dark 4% (L8+), dark_shard 2% (L14+), horn_dark 6% (L6+) |
+| Quarry Drake | Dragon | claw 8%, ember_coal 6%, fire_drop 2% (L10+), copper_ore 8%, geode 4% (L8+) |
+| Cairn Sentinel | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), geode 5% (L6+), copper_ore 10% |
+| The Ironhorn | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), copper_ore always, ember_coal always, geode always |
+| Toxic Zombie | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), dark_potion 5% (L6+) |
+| Dumpback | Beast | bacon 12%, blood 9%, horn 4% (L3+), jug 8%, scrap 10% |
+| Rot Heron | Bird | feather 16%, bacon 5%, blood 6% |
+| Scrap Golem | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+) |
+| Bogfire Wisp | Elemental | ember_coal 10%, obsidian 3% (L8+), fire_drop 1.5% (L10+), moon 2% (L10+), glowberry 8% (L5+) |
+| The Mire Matriarch | Aquatic | sand 10%, blood 5%, geode 2% (L10+), blood always, dark_potion always |
+| Frost Hare | Beast | bacon 12%, blood 9%, horn 4% (L3+) |
+| Icetusk Calf | Beast | bacon 12%, blood 9%, horn 4% (L3+) |
+| Rime Wraith | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), moon 3% (L10+) |
+| Frost Moth | Vermin | claw 7%, tar 6% |
+| Glacier Yeti | Beast | bacon 12%, blood 9%, horn 4% (L3+), horn 8% (L6+), bacon 10% |
+| The Winter Wyrm | Dragon | claw 8%, ember_coal 6%, fire_drop 2% (L10+), horn_dark always, moon always |
+| Wreck Crab | Vermin | claw 7%, tar 6%, jug 8%, coins 6% |
+| Net Gull | Bird | feather 16%, bacon 5%, grapes 5% |
+| Drowned Sailor | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), coins 14%, jug 10% |
+| Tideglass Jelly | Aquatic | sand 10%, blood 5%, geode 2% (L10+), glowberry 6% (L4+) |
+| Barnacle Brute | Aquatic | sand 10%, blood 5%, geode 2% (L10+), copper_ore 6%, clay 8% |
+| The Reef Leviathan | Aquatic | sand 10%, blood 5%, geode 2% (L10+), geode always, sand always |
+| Moss Snapper | Aquatic | sand 10%, blood 5%, geode 2% (L10+), hollow_log 8% |
+| Reed Nymph | Plant | sticks 16%, dried_herbs 14%, hollow_log 8%, glowberry 8% (L4+), grapes 6% |
+| Tidepool Golem | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), geode 6% (L8+) |
+| Silt Eel | Aquatic | sand 10%, blood 5%, geode 2% (L10+), geode 3% (L8+) |
+| Lilypad Warden | Aquatic | sand 10%, blood 5%, geode 2% (L10+), hollow_log 8%, beet 8% |
+| The Lake Hydra | Aquatic | sand 10%, blood 5%, geode 2% (L10+), horn always, dark_potion always |
+| Skull Vine | Plant | sticks 16%, dried_herbs 14%, hollow_log 8%, bones 12%, hollow_log 8% |
+| Eye Horror | Demon | blood 8%, horn_dark 4% (L8+), dark_shard 2% (L14+), emerald_star 2% (L14+) |
+| Zombie Triceratops | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), horn 10% (L6+), bones 14% |
+| Vinewhip Panther | Beast | bacon 12%, blood 9%, horn 4% (L3+), emerald_star 1.5% (L14+) |
+| Mossback Idol | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), emerald_star 2% (L14+), geode 5% (L10+) |
+| The Brainstorm | Fungus | orange_mushrooms 14%, glowberry 6% (L5+), dried_herbs 5%, orange_mushrooms always, emerald_star always |
+| Barn Gargoyle | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), clay 10%, wheat_sheaf 8% |
+| Bucket Knight | Humanoid | coins 12%, jug 8%, bacon 6%, wheat_sheaf 12%, beet 10%, jug 6% |
+| Hedge Bandit | Humanoid | coins 12%, jug 8%, bacon 6%, coins 16%, jug 10% |
+| Crow Marshal | Bird | feather 16%, bacon 5%, wheat_sheaf 10%, feather 12% |
+| Millstone Golem | Construct | clay 12%, scrap 12%, copper_ore 6% (L3+), geode 2% (L8+), wheat_sheaf 14%, clay 12% |
+| The Harvest Matron | Bird | feather 16%, bacon 5%, wheat_sheaf always, feather always |
+| Greenscale Warden | Dragon | claw 8%, ember_coal 6%, fire_drop 2% (L10+), grapes 12%, horn 5% (L6+) |
+| Blossom Ronin | Humanoid | coins 12%, jug 8%, bacon 6%, grapes 10% |
+| Gray Gleaner | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), grapes 14%, beet 10%, carrot 10% |
+| Mushroom Wizard | Fungus | orange_mushrooms 14%, glowberry 6% (L5+), dried_herbs 5%, glowberry 10% (L4+), dark_potion 4% (L10+) |
+| Rootbound Gardener | Plant | sticks 16%, dried_herbs 14%, hollow_log 8%, carrot 14%, beet 12%, grapes 10% |
+| The Blossom Reaper | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), grapes always, moon always |
+| Gasket Goblin | Humanoid | coins 12%, jug 8%, bacon 6%, scrap 14%, copper_ore 8% |
+| Blighted Husk | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), dark_potion 6% (L10+) |
+| Mothwing Hexer | Vermin | claw 7%, tar 6%, dark_shard 3% (L14+) |
+| Gloom Cerberus | Demon | blood 8%, horn_dark 4% (L8+), dark_shard 2% (L14+), dark_shard 5% (L14+), horn_dark 8% (L10+) |
+| Sporeback Ogre | Fungus | orange_mushrooms 14%, glowberry 6% (L5+), dried_herbs 5%, orange_mushrooms 16%, dark_shard 4% (L14+) |
+| The Eyed Maw | Demon | blood 8%, horn_dark 4% (L8+), dark_shard 2% (L14+), dark_shard always, orange_mushrooms always |
+| Bone Cleaver | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), bones 20%, blood 10% |
+| Frostguard Knight | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), copper_ore 10%, coins 10% |
+| Gilded Champion | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), coins 20%, heart_gem 0.4% (L20+) |
+| Banner Wraith | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), moon 3% (L12+), coins 10% |
+| Frost-Flame Knight | Elemental | ember_coal 10%, obsidian 3% (L8+), fire_drop 1.5% (L10+), ember_coal 12%, obsidian 5% (L12+) |
+| The Cinder Warlord | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), fire_drop always, heart_gem always, coins always |

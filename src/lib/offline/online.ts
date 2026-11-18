@@ -3,7 +3,7 @@ import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
 import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
-import { claimAllMastery, claimMastery } from '@/lib/offline/mastery';
+import { claimAllMastery, claimBiomeGoal, claimMastery } from '@/lib/offline/mastery';
 import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
@@ -547,7 +547,12 @@ export const masteryStep = (deps: ServiceDeps, userId: string, key: string, requ
 			serverNowSec: ctx.nowSec,
 			...over,
 		});
-		const done = request.action === 'claimAll' ? claimAllMastery(ledger) : claimMastery(ledger, request.type, request.tier);
+		const done =
+			request.action === 'claimAll'
+				? claimAllMastery(ledger)
+				: request.action === 'claimBiome'
+					? claimBiomeGoal(ledger, request.biome, request.tier)
+					: claimMastery(ledger, request.type, request.tier);
 		if (!done.ok) {
 			const message =
 				done.reason === 'already_claimed'

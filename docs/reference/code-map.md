@@ -193,7 +193,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`loot.ts`](../../src/catalog/loot.ts) — ~ Items the merchant sells, cheapest first (a disabled item is never sold, whatever its `shop` price).
 - [`lootConfig.ts`](../../src/catalog/lootConfig.ts) — ~ A set of items a profile can draw from.
-- [`mastery.ts`](../../src/catalog/mastery.ts) — Bestiary mastery as data (IDL-309, decided 2026-11-12: the hybrid ladder). A monster type has the same ladder of kill tiers; reaching a tier lets the player claim it. Appending a tier later (the
+- [`mastery.ts`](../../src/catalog/mastery.ts) — ~ What a tier unlocks in the Bestiary window.
+- [`monsterDrops.ts`](../../src/catalog/monsterDrops.ts) — ~ One ingredient a monster may leave.
 - [`monsterMeta.ts`](../../src/catalog/monsterMeta.ts) — ~ Family and tags of every monster.
 - [`monsters.ts`](../../src/catalog/monsters.ts) — ~ The monster roster:
 - [`perkCaps.ts`](../../src/catalog/perkCaps.ts) — ~ The stat families whose gear bucket is capped (IDL-149 / IDL-252).
@@ -549,7 +550,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off or not bought yet), for the win estimate.
 - [`fightProject.ts`](../../src/lib/offline/fightProject.ts) — ~ The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player commands something first), as the picture the browser animates:
-- [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ The profile a potion is judged on:
+- [`fightSteps.ts`](../../src/lib/offline/fightSteps.ts) — ~ The mastery bonuses against the monster of an open fight, worked out once per fight (the claimed tiers cannot change while it runs).
 - [`fightTargets.ts`](../../src/lib/offline/fightTargets.ts) — ~ A placed monster by ticket number, with what it is (null:
 - [`fightTypes.ts`](../../src/lib/offline/fightTypes.ts) — ~ What the player brings to a fight, worked out from the last accepted save when the fight starts and then frozen for that fight.
 - [`fightView.ts`](../../src/lib/offline/fightView.ts) — ~ The picture the browser is given:
@@ -564,7 +565,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ledgerRead.ts`](../../src/lib/offline/ledgerRead.ts) — ~ Tolerant readers for the two ledger columns that hold catalog ids (`inv`:
 - [`ledgerUpgrade.ts`](../../src/lib/offline/ledgerUpgrade.ts) — ~ The upgrade path of a `player_ledger` row.
 - [`limits.ts`](../../src/lib/offline/limits.ts) — ~ Hours of absence the kingdom works for the player (base 8, plus Night Watch), never above the hard ceiling.
-- [`mastery.ts`](../../src/lib/offline/mastery.ts) — ~ The gems the tiers `from` (exclusive) to `to` (inclusive, 1-based) pay.
+- [`mastery.ts`](../../src/lib/offline/mastery.ts) — ~ The gems the tiers `from` (exclusive) to `to` (inclusive, 1-based) of a ladder pay.
 - [`online.ts`](../../src/lib/offline/online.ts) — ~ The most time one online call will run the spawn timers forward.
 - [`petLetters.ts`](../../src/lib/offline/petLetters.ts) — SERVER ONLY. The welcome letters that come with a special pet. They are kept out of `src/catalog/pets.ts` (which is in the browser bundle for everyone) so the text reaches only the account it is for: `applyPets` puts a letter in the answer for the account that was granted the pet, nobody else.
 - [`pets.ts`](../../src/lib/offline/pets.ts) — ~ The pets this account owns (ids of the catalog)
@@ -927,6 +928,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`biomeSpawn.test.ts`](../../tests/monsters/biomeSpawn.test.ts) — ~ A 5x5 map with the given owned tiles around the centre (2,2):
 - [`homeRoster.test.ts`](../../tests/monsters/homeRoster.test.ts) — ~ A castle with one tile of every home biome at the given offsets (x, y from the castle), all owned
+- [`ingredientDrops.test.ts`](../../tests/monsters/ingredientDrops.test.ts)
 - [`killReward.test.ts`](../../tests/monsters/killReward.test.ts)
 - [`monsterCatalog.test.ts`](../../tests/monsters/monsterCatalog.test.ts)
 - [`monsterConfig.test.ts`](../../tests/monsters/monsterConfig.test.ts)

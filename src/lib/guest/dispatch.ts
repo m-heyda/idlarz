@@ -185,7 +185,9 @@ export const createGuestTransport = (getGame: () => GameState): GuestTransport =
 						? { action: 'claimAll' }
 						: body.action === 'claim' && typeof body.type === 'string' && body.type.length > 0 && body.type.length <= 40 && Number.isInteger(body.tier)
 							? { action: 'claim', type: body.type, tier: body.tier as number }
-							: null;
+							: body.action === 'claimBiome' && typeof body.biome === 'string' && body.biome.length > 0 && body.biome.length <= 40 && Number.isInteger(body.tier)
+								? { action: 'claimBiome', biome: body.biome, tier: body.tier as number }
+								: null;
 				return request ? answered(await masteryStep(deps, userId, k, request, nowMs)) : bad();
 			}
 			case '/api/character': {

@@ -101,8 +101,8 @@ export interface CharacterReply {
 
 export type CharacterRequest = { action: 'allocate'; add: Record<string, number> } | { action: 'sync' };
 
-/** The Bestiary mastery: claim one tier of one monster type, or every tier that is waiting. */
-export type MasteryRequest = { action: 'claim'; type: string; tier: number } | { action: 'claimAll' };
+/** The Bestiary mastery: claim one tier of one monster type, one collection tier of a biome, or every tier that is waiting. */
+export type MasteryRequest = { action: 'claim'; type: string; tier: number } | { action: 'claimBiome'; biome: string; tier: number } | { action: 'claimAll' };
 
 /** What /api/mastery answers. The bestiary (kills, claimed tiers, deaths, best times) rides along on every online answer; `paid` is the gems the claim added (0 while no tier pays gems). */
 export interface MasteryReply {

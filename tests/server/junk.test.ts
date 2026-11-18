@@ -16,7 +16,7 @@ const seeded = (n: number) => mulberry32(n);
 const ctx = { level: 10, gold: 400, luck: 0, boss: false, lucky: false };
 
 test('every junk material is a consumable that stacks by rarity with art, lore and a price, and the ladder runs cheap to very pricey', () => {
-	assert.equal(JUNK_ITEMS.length, 11);
+	assert.equal(JUNK_ITEMS.length, 37);
 	for (const item of JUNK_ITEMS) {
 		assert.equal(item.stackMax, { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 }[item.rarity as string], item.id);
 		assert.equal(ITEM_CATALOG[item.id], item, `${item.id} is in the catalog`);

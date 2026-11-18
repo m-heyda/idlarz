@@ -91,6 +91,54 @@
 	},
 	{
 		"usedBy": [
+			"junk_bacon"
+		],
+		"name": "art_junk_bacon",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_bacon.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_beet"
+		],
+		"name": "art_junk_beet",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_beet.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_blood"
+		],
+		"name": "art_junk_blood",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_blood.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_bones"
 		],
 		"name": "art_junk_bones",
@@ -123,6 +171,22 @@
 	},
 	{
 		"usedBy": [
+			"junk_carrot"
+		],
+		"name": "art_junk_carrot",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_carrot.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_claw"
 		],
 		"name": "art_junk_claw",
@@ -139,12 +203,332 @@
 	},
 	{
 		"usedBy": [
+			"junk_clay"
+		],
+		"name": "art_junk_clay",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_clay.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_coins"
+		],
+		"name": "art_junk_coins",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_coins.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_copper_ore"
+		],
+		"name": "art_junk_copper_ore",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_copper_ore.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_dark_potion"
+		],
+		"name": "art_junk_dark_potion",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_dark_potion.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_dark_shard"
+		],
+		"name": "art_junk_dark_shard",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_dark_shard.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_dried_herbs"
+		],
+		"name": "art_junk_dried_herbs",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_dried_herbs.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_ember_coal"
+		],
+		"name": "art_junk_ember_coal",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_ember_coal.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_emerald_star"
+		],
+		"name": "art_junk_emerald_star",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_emerald_star.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_feather"
 		],
 		"name": "art_junk_feather",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_feather.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_fire_drop"
+		],
+		"name": "art_junk_fire_drop",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_fire_drop.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_geode"
+		],
+		"name": "art_junk_geode",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_geode.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_glowberry"
+		],
+		"name": "art_junk_glowberry",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_glowberry.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_grapes"
+		],
+		"name": "art_junk_grapes",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_grapes.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_heart_gem"
+		],
+		"name": "art_junk_heart_gem",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_heart_gem.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_hollow_log"
+		],
+		"name": "art_junk_hollow_log",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_hollow_log.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_horn"
+		],
+		"name": "art_junk_horn",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_horn.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_horn_dark"
+		],
+		"name": "art_junk_horn_dark",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_horn_dark.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_jug"
+		],
+		"name": "art_junk_jug",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_jug.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_moon"
+		],
+		"name": "art_junk_moon",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_moon.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_obsidian"
+		],
+		"name": "art_junk_obsidian",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_obsidian.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_orange_mushrooms"
+		],
+		"name": "art_junk_orange_mushrooms",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_orange_mushrooms.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -219,6 +603,22 @@
 	},
 	{
 		"usedBy": [
+			"junk_sticks"
+		],
+		"name": "art_junk_sticks",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_sticks.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_tar"
 		],
 		"name": "art_junk_tar",
@@ -241,6 +641,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_teal_crystals.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_wheat_sheaf"
+		],
+		"name": "art_junk_wheat_sheaf",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_wheat_sheaf.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",

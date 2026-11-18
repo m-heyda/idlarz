@@ -444,11 +444,11 @@
 				"heal": 168,
 				"potion": 280
 			},
-			"digest": "a6c9c891c647af56396e7a4128235f4f7bb02ed0",
+			"digest": "0833c18d6ff7eeb2f9255b85759fc82a7f036e33",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|2",
 				"2|1000000.1|stun|10|||||",
-				"24|1000015.9|won||||1|thistleBoar|2 reward={\"gold\":97,\"xp\":136.07999999999998,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_feather\\\",\\\"qty\\\":2}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_feather\",\"qty\":2}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
+				"24|1000015.9|won||||1|thistleBoar|2 reward={\"gold\":97,\"xp\":136.07999999999998,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_feather\\\",\\\"qty\\\":2}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bacon\\\",\\\"qty\\\":2}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_feather\",\"qty\":2},{\"kind\":\"consumable\",\"id\":\"junk_bacon\",\"qty\":2}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"25|1000015.9|engage||||3|thistleBoar|4",
 				"49|1000030.1|stun|10|||||",
 				"65|1000041.8|won||||3|thistleBoar|4 reward={\"gold\":340,\"xp\":476.1711360000001,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"patched_mantle\\\",\\\"level\\\":3,\\\"rarity\\\":\\\"common\\\",\\\"quality\\\":80,\\\"affixes\\\":[]}}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":38}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"patched_mantle\",\"level\":3,\"rarity\":\"common\",\"quality\":80,\"affixes\":[]}},{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":38}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":true}",
@@ -464,7 +464,7 @@
 				"177|1000137.7|potion|35||potion_minor|||",
 				"191|1000145.7|potion|35||potion_minor|||",
 				"193|1000146.6|stun|10|||||",
-				"195|1000146.6|won||||2|thistleBoar|9 reward={\"gold\":166,\"xp\":233.2172064955172,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_scrap\\\",\\\"qty\\\":5}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_scrap\",\"qty\":5}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
+				"195|1000146.6|won||||2|thistleBoar|9 reward={\"gold\":166,\"xp\":233.2172064955172,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_scrap\\\",\\\"qty\\\":5}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_blood\\\",\\\"qty\\\":2}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_horn\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_scrap\",\"qty\":5},{\"kind\":\"consumable\",\"id\":\"junk_blood\",\"qty\":2},{\"kind\":\"consumable\",\"id\":\"junk_horn\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"196|1000164.6|engage||||4|bossGreatAuroch|15",
 				"214|1000176.6|stun|10|||||",
 				"228|1000186.7|heal|28|||||",
@@ -696,11 +696,11 @@
 				"hit": 2211.2,
 				"hurt": 128
 			},
-			"digest": "05da5c1b765b143f33662975a041ca469579ef53",
+			"digest": "d4029d495497d99523135dc028631daa233b5298",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|11",
 				"2|1000000.1|stun|10|||||",
-				"19|1000020|won||||1|thistleBoar|11 reward={\"gold\":194,\"xp\":272.02454965637133,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":6}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":6}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
+				"19|1000020|won||||1|thistleBoar|11 reward={\"gold\":194,\"xp\":272.02454965637133,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":6}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_carrot\\\",\\\"qty\\\":2}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":6},{\"kind\":\"consumable\",\"id\":\"junk_carrot\",\"qty\":2}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"20|1000020|engage||||2|thistleBoar|12",
 				"32|1000030.1|stun|10|||||",
 				"48|1000048.4|won||||2|thistleBoar|12 reward={\"gold\":209,\"xp\":293.78651362888104,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":3}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":3}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
@@ -737,7 +737,9 @@
 				"wool": 0,
 				"gems": 0
 			},
-			"ratsLeft": [3],
+			"ratsLeft": [
+				3
+			],
 			"king": 5,
 			"retryAt": {},
 			"potions": {

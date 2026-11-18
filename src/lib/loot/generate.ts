@@ -32,6 +32,8 @@ export interface LootRequest {
 	pity?: Readonly<Record<string, number>>;
 	/** The player's Luck: raises the chance of the general gear roll and moves the rarity odds toward rare and better (src/lib/luck.ts) */
 	luck?: number;
+	/** Percent more chance on the general gear roll (Bestiary mastery against the monster); 0 or absent changes nothing */
+	dropChancePct?: number;
 	/** Extra guaranteed rolls on the general pool (a lucky monster) */
 	extraGearRolls?: number;
 	/** Only items of this slot are eligible (a crafting recipe picks the slot, not the item) */
@@ -334,7 +336,7 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 
 	let drops: LootDrop[] = [];
 	if (profile.generalPoolId) {
-		const hits = countSuccesses(profile.rolls, level, rng, dropChanceMultiplier(req.luck ?? 0)) + Math.max(0, Math.floor(req.extraGearRolls ?? 0));
+		const hits = countSuccesses(profile.rolls, level, rng, dropChanceMultiplier(req.luck ?? 0) * (1 + (req.dropChancePct ?? 0) / 100)) + Math.max(0, Math.floor(req.extraGearRolls ?? 0));
 		for (let i = 0; i < hits; i++) {
 			const itemLevel = rollItemLevel(sourceLevel, capped(ctx, profile.itemLevel), rng);
 			const drop = rollRarityGear(ctx, 'general', profile.generalPoolId, itemLevel);

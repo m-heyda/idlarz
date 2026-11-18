@@ -14,11 +14,11 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Gems: [`STARTING_GEMS`](#starting-gems)
 - Crafting: [`CRAFTING`](#crafting), [`CRAFT_GEAR`](#craft-gear), [`gearItemLevels`](#gearitemlevels), [`qualityBiasOf`](#qualitybiasof), [`craftXpOf`](#craftxpof), [`pityMultiplier`](#pitymultiplier), [`rollGear`](#rollgear), [`gearOdds`](#gearodds)
 - Rankings: [The boards](#ranking-boards), [Movement arrows](#movement)
+- Mastery: [`BOSS_MASTERY_TIERS`](#boss-mastery-tiers), [`BIOME_GOALS`](#biome-goals), [`MASTERY_CAPS`](#mastery-caps), [`claimMastery`](#claimmastery), [`claimBiomeGoal`](#claimbiomegoal), [`claimAllMastery`](#claimallmastery), [`masteryBonusesFor`](#masterybonusesfor), [Bestiary mastery](#mastery-tiers)
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
 - Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
-- Mastery: [`claimMastery`](#claimmastery), [`claimAllMastery`](#claimallmastery), [Bestiary mastery](#mastery-tiers)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deeds](#deeds)
@@ -620,6 +620,119 @@ Source: [`src/lib/rankings.ts:92`](../../src/lib/rankings.ts)
 
 The change since the refresh before: a lower number is a better place, so a smaller rank is `up`; no earlier place is `new`.
 
+## Mastery
+
+<a id="boss-mastery-tiers"></a>
+
+### `BOSS_MASTERY_TIERS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:65`](../../src/catalog/mastery.ts)
+
+The ladder of a boss: a boss is rare and fights alone, so its tiers come at 1, 5, 25 and 100 kills (decided 2026-11-17). The bonuses are a step above a normal monster's and the top tier pays more gems.
+
+<a id="biome-goals"></a>
+
+### `BIOME_GOALS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:95`](../../src/catalog/mastery.ts)
+
+The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.
+
+<a id="mastery-caps"></a>
+
+### `MASTERY_CAPS` <small>const</small>
+
+Source: [`src/catalog/mastery.ts:110`](../../src/catalog/mastery.ts)
+
+The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).
+
+**Formula**
+
+```text
+bonus vs one monster = min(cap, tier bonuses of that monster + biome goal bonuses of its biome)       multiplier = 1 + bonus / 100 (defense: damage taken x (1 - bonus / 100))
+```
+
+<a id="claimmastery"></a>
+
+### `claimMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:39`](../../src/lib/offline/mastery.ts)
+
+Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached on the type's own ladder (a boss reaches its tiers at 1 / 5 / 25 / 100 kills). Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one
+that skips a tier; a repeated or forged claim therefore pays nothing.
+
+<a id="claimbiomegoal"></a>
+
+### `claimBiomeGoal` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:57`](../../src/lib/offline/mastery.ts)
+
+Claims the next collection tier of a biome: every live monster of the biome, its boss included, must have reached that tier by its kills (each on its own ladder). In order, like the monster tiers; refused with nothing changed otherwise.
+
+<a id="claimallmastery"></a>
+
+### `claimAllMastery` <small>function</small>
+
+Source: [`src/lib/offline/mastery.ts:73`](../../src/lib/offline/mastery.ts)
+
+Claim all: every tier every monster type has reached and not claimed, then every biome goal that became reachable, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.
+
+<a id="masterybonusesfor"></a>
+
+### `masteryBonusesFor` <small>function</small>
+
+Source: [`src/lib/mastery.ts:74`](../../src/lib/mastery.ts)
+
+What the mastery gives against one monster type: the bonuses of its claimed tiers plus the biome goal tiers claimed for its biome, each stat cut at `MASTERY_CAPS`. One pure function, used by the fight (damage dealt and taken), the kill reward (gold, XP, gear chance) and the Bestiary.
+
+**Formula**
+
+```text
+bonus[stat] = min(MASTERY_CAPS[stat], sum of the bonuses of the claimed tiers of the type + sum of the bonuses of the claimed biome goals of its biome)
+```
+
+<a id="mastery-tiers"></a>
+
+### Bestiary mastery
+
+Source: [`src/catalog/mastery.ts:52`](../../src/catalog/mastery.ts)
+
+The mastery ladder shared by every normal monster: 10 kills open the entry and reveal the stats, 100 reveal the drop table, 500 and 2,500 are Mastery I and II. Every tier gives a permanent bonus against that monster and the top tier also pays gems.
+The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.
+
+**Bestiary mastery tiers** _(computed from the code)_
+
+Shared ladder (every normal monster):
+
+| Tier | Kills | Reveals | Bonus against that monster | Gems |
+| --- | --- | --- | --- | --- |
+| 1 | 10 | Stats | +2% damage dealt | - |
+| 2 | 100 | Drop table | +5% XP | - |
+| 3 | 500 | - | +5% gear drop chance, -3% damage taken | - |
+| 4 | 2,500 | - | +4% damage dealt, +5% gold | 10 |
+
+Boss ladder:
+
+| Tier | Kills | Reveals | Bonus against that boss | Gems |
+| --- | --- | --- | --- | --- |
+| 1 | 1 | Stats | +3% damage dealt | - |
+| 2 | 5 | Drop table | +8% XP | - |
+| 3 | 25 | - | +8% gear drop chance, -5% damage taken | - |
+| 4 | 100 | - | +6% damage dealt, +8% gold | 40 |
+
+Biome collection goals (every live monster of the biome, its boss included, at the tier):
+
+| Tier | Bonus against every monster of the biome | Gems |
+| --- | --- | --- |
+| 1 | +1% damage dealt | - |
+| 2 | +3% XP, +3% gold | - |
+| 3 | +4% gear drop chance, -2% damage taken | - |
+| 4 | +3% damage dealt, +4% gold | 25 |
+
+Caps against one monster: damage 20%, defense 20%, gold 25%, xp 25%, loot 20%.
+
+See also: `masteryState`, [`claimMastery`](progression.md#claimmastery), [`BOSS_MASTERY_TIERS`](progression.md#boss-mastery-tiers), [`BIOME_GOALS`](progression.md#biome-goals)
+
 ## Avatars
 
 <a id="unlockedavatarids"></a>
@@ -956,36 +1069,6 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 124 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
-
-## Mastery
-
-<a id="claimmastery"></a>
-
-### `claimMastery` <small>function</small>
-
-Source: [`src/lib/offline/mastery.ts:37`](../../src/lib/offline/mastery.ts)
-
-Claims tier `tier` (1-based) of monster `type`. It must be the next one to take (tiers are claimed in order), and its kills must be reached. Refused with nothing changed for an unknown type (no kills recorded), a tier not reached, one already claimed, or one
-that skips a tier; a repeated or forged claim therefore pays nothing.
-
-<a id="claimallmastery"></a>
-
-### `claimAllMastery` <small>function</small>
-
-Source: [`src/lib/offline/mastery.ts:54`](../../src/lib/offline/mastery.ts)
-
-Claim all: every tier every monster type has reached and not claimed, in one ledger write (all or nothing; the gems are capped once). Refused as `not_reached` when nothing is waiting.
-
-<a id="mastery-tiers"></a>
-
-### Bestiary mastery
-
-Source: [`src/catalog/mastery.ts:27`](../../src/catalog/mastery.ts)
-
-The mastery ladder shared by every monster type: 10 kills reveal the stats, 100 the drop table (with a small bonus), 500 is Mastery I (the decided +10% XP and +5% loot chance, as text for now), 2,500 is Mastery II
-with a title or pet. The decided 1,000 and 5,000 steps (up to +50% XP per type) are appended later as tiers 5 and 6.
-
-See also: `masteryState`, [`claimMastery`](progression.md#claimmastery)
 
 ## Guided tutorial
 

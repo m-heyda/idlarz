@@ -5,6 +5,7 @@ import { quickHealOf } from '@/catalog/buffs';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
 import { isBoss, monsterStats } from '@/lib/monsters';
+import { masteryBonusesFor, type MasteryTotals } from '@/lib/mastery';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatCommand, PlayerProfile, QueueResult } from '@/lib/offline/fightTypes';
 import { engageTicket, queueTicket, restFor, unqueueTicket } from '@/lib/offline/fightTargets';
@@ -17,6 +18,17 @@ import { recordDeath } from '@/lib/offline/stats';
 // pays, a potion leaves the bag).
 
 const round1 = (value: number): number => Math.round(value * 10) / 10;
+
+/** The mastery bonuses against the monster of an open fight, worked out once per fight (the claimed tiers cannot change while it runs). */
+const masteryByFight = new WeakMap<object, MasteryTotals>();
+const masteryOf = (ctx: FightCtx, f: NonNullable<FightCtx['c']['fight']>): MasteryTotals => {
+	let totals = masteryByFight.get(f);
+	if (!totals) {
+		totals = masteryBonusesFor(f.type, ctx.ledger.stats.masteryClaimed, ctx.ledger.stats.biomeClaimed);
+		masteryByFight.set(f, totals);
+	}
+	return totals;
+};
 
 const tickCooldowns = (ctx: FightCtx, dt: number): void => {
 	const c = ctx.c;
@@ -146,7 +158,8 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		f.playerTimer -= period;
 		const rolled = swing(p.hit, { crit: p.crit, superCrit: p.superCrit }, p.critExtra, rngFor(ctx, f));
 		const kind = rolled.crit === 'none' ? 'hit' : rolled.crit;
-		const raw = rolled.damage;
+		// Bestiary mastery: a permanent bonus against this monster (and its biome once the goal is claimed), `masteryBonusesFor`
+		const raw = rolled.damage * (1 + masteryOf(ctx, f).damage / 100);
 		const damage = monster.armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(monster.armor)))) : raw;
 		f.monsterHp = Math.max(0, f.monsterHp - damage);
 		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + (damage * p.leechPct) / 100);
@@ -188,7 +201,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 			continue;
 		}
 		const crit = monster.critChance > 0 && rng() >= 1 - monster.critChance / 100;
-		const amount = mitigate(crit ? Math.round(monster.attack * monster.critMult) : monster.attack, p.armor);
+		const amount = round1(mitigate(crit ? Math.round(monster.attack * monster.critMult) : monster.attack, p.armor) * (1 - masteryOf(ctx, f).defense / 100));
 		c.hp = Math.max(0, c.hp - amount);
 		f.hurt = (f.hurt ?? 0) + amount;
 		pushEvent(ctx, t, 'hurt', { amount, crit });
