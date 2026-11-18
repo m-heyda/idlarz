@@ -40,6 +40,7 @@ const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 	vigil: (n) => (n > 0 ? 'Away income 100% and up to 72 h of away time' : 'Away income 100% and up to 72 h of away time (one-time)'),
 	deeppockets: (n) => `+${n * EMBER_UPGRADES.deeppockets.effectPerLevel} bag slots, kept through every rebirth`,
 	mastery: (n) => `+${pct(n * EMBER_UPGRADES.mastery.effectPerLevel)} gold per click`,
+	miningpower: () => 'Every click on a rock counts as 2 clicks (one-time)',
 	startgold: (n) => `Every new run starts at ${EMBER_UPGRADES.startgold.steps[Math.min(n, EMBER_UPGRADES.startgold.steps.length - 1)]} base gold per second`,
 	provisions: (n) =>
 		`Every new run starts with ${sortedCostEntries(EMBER_UPGRADES.provisions.bundle)
@@ -78,7 +79,7 @@ const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly Embe
 	{
 		id: 'economy',
 		label: 'Economy',
-		ids: ['mastery', 'overseer', 'haggler', 'skinner', 'fortune', 'artisan', 'tithe', 'thrift', 'charter', 'startgold', 'provisions'],
+		ids: ['mastery', 'miningpower', 'overseer', 'haggler', 'skinner', 'fortune', 'artisan', 'tithe', 'thrift', 'charter', 'startgold', 'provisions'],
 	},
 	{ id: 'time', label: 'Build and away time', ids: ['builders', 'buildtime', 'idoltime', 'nightwatch', 'steward', 'vigil'] },
 	{ id: 'caps', label: 'Caps and builders', ids: ['castlecap', 'buildcap', 'idolcap', 'extrabuilder', 'decree'] },

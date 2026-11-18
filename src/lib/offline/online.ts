@@ -34,7 +34,7 @@ import {
 } from '@/lib/offline/service';
 import { advanceBank, rockAt, rocksOf, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
 import { ROCK_TIERS } from '@/config/rocks';
-import { rollRockLoot, takeClicks } from '@/lib/rocks';
+import { miningPower, rollRockLoot, takeClicks } from '@/lib/rocks';
 import { stashIn } from '@/lib/offline/reward';
 import { moveIngredientStacks } from '@/lib/offline/ingredientMove';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
@@ -288,7 +288,8 @@ export const hitRock = (
 			}
 			const need = ROCK_TIERS[rock.tier].clicks;
 			const { accepted, tokens } = takeClicks(rock, clicks, nowSec);
-			const hits = Math.min(need, rock.hits + accepted);
+			// Mining Power (Ember shop): each click that gets in counts for more hits; the rate cap above counted real clicks
+			const hits = Math.min(need, rock.hits + accepted * miningPower(prestigeOfCore(stored.core)));
 			if (hits < need) {
 				const next: TicketBank = { ...bank, rocks: rocksOf(bank).map((r) => (r.n === rock.n ? { ...r, hits, tokens, hitAt: nowSec } : r)) };
 				return {

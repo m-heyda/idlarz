@@ -3,6 +3,7 @@ import { RESOURCE_CAP } from '@/config/economy';
 import { ROCK_TIERS } from '@/config/rocks';
 import { formatCompact } from '@/utils/formatters';
 import { notify } from '@/lib/notices';
+import { miningPower } from '@/lib/rocks';
 import { newClaimId } from '@/lib/offlineClient';
 import type { RockReply } from '@/lib/offline/types';
 import { requestRock, type Reply } from '@/lib/rewardsClient';
@@ -30,6 +31,9 @@ const inflight = new Set<string>();
 let busy = false;
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 let lastSound = 0;
+
+/** Hits one click counts for (the Ember shop's Mining Power): the picture of the rock moves by this much per click, the server decides the real count */
+const powerNow = (): number => miningPower(useGameStore.getState().prestige);
 
 /** What a broken rock gives the player: the stone and coal go into the resources at once (the server has already counted them as granted), ingredients are told and the crafting bag is read again. */
 const received = (x: number, y: number, reply: Extract<RockReply, { ok: true; broken: true }>) => {
@@ -88,7 +92,7 @@ const flush = async (x: number, y: number): Promise<void> => {
 	const store = useRockStore.getState();
 	if (reply.status === 'ok') {
 		if (reply.value.ok) {
-			store.ack(x, y, sent, reply.value.hits, reply.value.broken, reply.value.need);
+			store.ack(x, y, sent * powerNow(), reply.value.hits, reply.value.broken, reply.value.need);
 			if (reply.value.broken) {
 				unsent.delete(key);
 				received(x, y, reply.value);
@@ -106,7 +110,7 @@ const flush = async (x: number, y: number): Promise<void> => {
 		schedule(x, y);
 		return;
 	} else {
-		store.lose(x, y, sent);
+		store.lose(x, y, sent * powerNow());
 		if (reply.status === 'need_claim') {
 			signalNeedClaim();
 			notify('Catching up with the server, try again in a moment.', 'error');
@@ -130,7 +134,7 @@ const schedule = (x: number, y: number) => {
 
 /** One click on the rock at (x, y): counted and drawn at once, sent with the next batch. False when there is no rock to hit. */
 export const hitRockAt = (x: number, y: number): boolean => {
-	const rock = useRockStore.getState().localHit(x, y);
+	const rock = useRockStore.getState().localHit(x, y, powerNow());
 	if (!rock) return false;
 	const now = Date.now();
 	if (now - lastSound >= SOUND_GAP_MS) {

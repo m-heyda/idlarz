@@ -208,6 +208,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `merchantUpgradeCost` | Economy / Merchant | [`src/utils/game/merchant.ts:26`](../../src/utils/game/merchant.ts) | Gold price of the next level of a merchant upgrade. |
 | `META` | Monsters / Bestiary | [`src/catalog/monsterMeta.ts:11`](../../src/catalog/monsterMeta.ts) | Family and tags of every monster. |
 | `MIN_SAVE_INTERVAL_MS` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:92`](../../src/lib/cloudSave/pipeline.ts) | Saves from one player are accepted at most this often (an honest client sends every ~90 s). |
+| `miningPower` | Economy / Rocks and Mining | [`src/lib/rocks.ts:134`](../../src/lib/rocks.ts) | How many hits one click on a rock counts for: |
 | `mitigate` | Combat / Player numbers | [`src/lib/combat.ts:244`](../../src/lib/combat.ts) | Damage of one monster hit after armor: |
 | `MONSTERS` | Monsters / Roster | [`src/config/combatConfig.ts:592`](../../src/config/combatConfig.ts) | The roster: |
 | `monsterStats` | Monsters / Level scaling | [`src/lib/monsters.ts:132`](../../src/lib/monsters.ts) | HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`). |
@@ -265,9 +266,9 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `ROCK` | Economy / Rocks and Mining | [`src/config/rocks.ts:51`](../../src/config/rocks.ts) | How rocks appear and how fast they may be mined (server rules). |
 | `ROCK_DROPS` | Economy / Rocks and Mining | [`src/config/rocks.ts:75`](../../src/config/rocks.ts) | What each tier drops. |
 | `ROCK_TIERS` | Economy / Rocks and Mining | [`src/config/rocks.ts:25`](../../src/config/rocks.ts) | The rock tiers. |
-| `rockCap` | Economy / Rocks and Mining | [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts) | The most rocks that wait at once on a map with `free` tiles a monster could stand on. |
-| `rockIntervalSec` | Economy / Rocks and Mining | [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts) | Seconds of play time between two new rocks. |
-| `rockSpots` | Economy / Rocks and Mining | [`src/lib/rocks.ts:15`](../../src/lib/rocks.ts) | The tiles a rock could stand on: |
+| `rockCap` | Economy / Rocks and Mining | [`src/lib/rocks.ts:51`](../../src/lib/rocks.ts) | The most rocks that wait at once on a map with `free` tiles a monster could stand on. |
+| `rockIntervalSec` | Economy / Rocks and Mining | [`src/lib/rocks.ts:41`](../../src/lib/rocks.ts) | Seconds of play time between two new rocks. |
+| `rockSpots` | Economy / Rocks and Mining | [`src/lib/rocks.ts:17`](../../src/lib/rocks.ts) | The tiles a rock could stand on: |
 | `rollBiome` | Economy / Biomes | [`src/utils/biomeRules.ts:149`](../../src/utils/biomeRules.ts) | The biome of a random purchase on (x, y): |
 | `rollChestLoot` | Economy / Chests and Luck | [`src/lib/chests.ts:107`](../../src/lib/chests.ts) | Rolls the contents of a chest. |
 | `rollDailyChest` | Economy / Gems | [`src/lib/offline/gems.ts:37`](../../src/lib/offline/gems.ts) | The materials in the day 7 chest of the daily bonus: |
@@ -275,8 +276,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rollItemLevel` | Loot / Pipeline | [`src/lib/loot/generate.ts:112`](../../src/lib/loot/generate.ts) | Rolls the item level around the source level, inside the profile's bounds. |
 | `rollJunkLoot` | Loot / Junk | [`src/lib/loot/junkDrops.ts:71`](../../src/lib/loot/junkDrops.ts) | The junk a kill drops, as consumable drops (a stack holds 10,000 to 100,000 by rarity). |
 | `rollLeaning` | Loot / Pipeline | [`src/lib/loot/generate.ts:90`](../../src/lib/loot/generate.ts) | A 0-100 roll that leans toward the top with `bias` (0 is the plain uniform roll with the same single draw, so nothing else shifts). |
-| `rollRockLoot` | Economy / Rocks and Mining | [`src/lib/rocks.ts:108`](../../src/lib/rocks.ts) | Rolls what a broken rock drops, line by line of its tier's table (ROCK_DROPS); |
-| `rollRockTier` | Economy / Rocks and Mining | [`src/lib/rocks.ts:59`](../../src/lib/rocks.ts) | The tier of a new rock: |
+| `rollRockLoot` | Economy / Rocks and Mining | [`src/lib/rocks.ts:110`](../../src/lib/rocks.ts) | Rolls what a broken rock drops, line by line of its tier's table (ROCK_DROPS); |
+| `rollRockTier` | Economy / Rocks and Mining | [`src/lib/rocks.ts:61`](../../src/lib/rocks.ts) | The tier of a new rock: |
 | `rollSpawnLevel` | Monsters / Level scaling | [`src/lib/monsters.ts:68`](../../src/lib/monsters.ts) | The level a new monster starts at. |
 | `runCombat` | Combat / A fight | [`src/lib/offline/fight.ts:61`](../../src/lib/offline/fight.ts) | Brings the player's combat up to `env.nowSec`, then applies what the player asked for (switches, hotkeys) and starts the next fight when auto-battl... |
 | `sanitizeSave` | Saves & Server / The save | [`src/lib/sanitizeSave.ts:219`](../../src/lib/sanitizeSave.ts) | Validates and normalises a loaded/imported save. |
@@ -300,7 +301,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `statsWithoutTutorial` | Saves & Server / The ledger | [`src/lib/offline/statsReset.ts:11`](../../src/lib/offline/statsReset.ts) | The lifetime counters of a stored `player_ledger.stats` column with the **tutorial progress wiped** and everything else kept (kills, glossary, ches... |
 | `swing` | Combat / Player numbers | [`src/lib/combat.ts:173`](../../src/lib/combat.ts) | One swing: |
 | `SYNC` | Saves & Server / Uploading | [`src/lib/syncPolicy.ts:17`](../../src/lib/syncPolicy.ts) | When the game is copied to the account's cloud save. |
-| `takeClicks` | Economy / Rocks and Mining | [`src/lib/rocks.ts:84`](../../src/lib/rocks.ts) | How many of `clicks` the server lets in for a rock at `nowSec`: |
+| `takeClicks` | Economy / Rocks and Mining | [`src/lib/rocks.ts:86`](../../src/lib/rocks.ts) | How many of `clicks` the server lets in for a rock at `nowSec`: |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
 | The boards | Progression / Rankings | [`src/lib/rankings.ts:41`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
 | The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |

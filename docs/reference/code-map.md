@@ -1039,7 +1039,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
 - [`rockDeeds.test.ts`](../../tests/server/rockDeeds.test.ts)
-- [`rocks.test.ts`](../../tests/server/rocks.test.ts)
+- [`rocks.test.ts`](../../tests/server/rocks.test.ts) — ~ The first rock on the map made a Legendary one (1,000 clicks), so a few batches never break it whatever the roll gave
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)
 - [`serverRebirth.test.ts`](../../tests/server/serverRebirth.test.ts) — IDL-102: the server runs the rebirth. POST /api/rebirth judges the last stored save, computes the Embers, wipes the server's bag and gear once,

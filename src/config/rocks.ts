@@ -39,7 +39,7 @@ export const rockSprite = (tier: RockTier, n: number): string => {
 /**
  * How rocks appear and how fast they may be mined (server rules).
  *
- * - **Timer**: one new rock every 150 s of play time (shorter with Luck, never under 60% of it), much faster than a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
+ * - **Timer**: one new rock every 1,200 s (20 minutes) of play time (shorter with Luck, never under 60% of it), half as often as a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
  * - **Room**: at most `maxOnMap` rocks wait at once, and no more than `landShare` of the free land (at least `minAllowed`).
  * - **Tiles**: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.
  * - **Clicks**: the browser sends its clicks in batches. The server lets in at most `maxCps` clicks per second (a bucket of `burst` clicks), so a rock cannot be broken faster than a person can click.
@@ -49,9 +49,9 @@ export const rockSprite = (tier: RockTier, n: number): string => {
  * @table rock-rules
  */
 export const ROCK = {
-	intervalSec: 150,
-	maxOnMap: 15,
-	landShare: 0.12,
+	intervalSec: 1200,
+	maxOnMap: 5,
+	landShare: 0.03,
 	minAllowed: 2,
 	maxCps: 24,
 	burst: 48,

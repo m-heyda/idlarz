@@ -392,6 +392,7 @@ const EMBER_EFFECT: Record<string, (n: number) => string> = {
 	idolcap: (n) => `+${n} Idol level of cap (5 to 15)`,
 	decree: () => 'one-time: the castle bonus counts double',
 	extrabuilder: (n) => `+${n} builder`,
+	miningpower: () => 'one-time: a click on a rock counts as 2',
 	questrarity: () => 'disabled until quests exist',
 	questslots: () => 'disabled until quests exist',
 };

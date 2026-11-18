@@ -108,6 +108,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.4,
 		effectPerLevel: 0.5, // +50% gold per click per level (merchant Click Power is the cheaper, weaker twin)
 	},
+	miningpower: {
+		label: 'Mining Power',
+		maxLevel: 1,
+		baseCost: 50,
+		costGrowth: 1,
+		effectPerLevel: 1, // one-time: every click on a rock counts as 2 clicks (1 + this)
+	},
 	startgold: {
 		label: 'Starting Treasury',
 		maxLevel: 5,

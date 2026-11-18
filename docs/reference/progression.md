@@ -356,6 +356,7 @@ Thrift shares the tile-discount cap with Charisma and Bulk Discount; buildings t
 | buildtime | Mason's Guild | 3 | -5% Producer and Extractor build time |
 | idoltime | Shrine Keepers | 3 | -5% Idol build time |
 | mastery | Click Mastery | 2 | +50% gold per click |
+| miningpower | Mining Power | 50 | one-time: a click on a rock counts as 2 |
 | startgold | Starting Treasury | 6 | base gold per second at the start of a run: 1 / 5 / 10 / 20 / 35 by level |
 | provisions | Provisions | 2 | start every run with +1 bundle(s) of gold 1,500, wood 400, stone 400, food 200, coal 100 |
 | nightwatch | Night Watch | 2 | +1 hour of paid away time |

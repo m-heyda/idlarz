@@ -52,22 +52,32 @@ const ok = <T>(out: Online<T>): T => {
 	return (out as { kind: 'ok'; value: T }).value;
 };
 
-const playing = async (minutes: number, id = 'u1') => {
+const playing = async (minutes: number, id = 'u1', miningPower = false) => {
 	const m = memory();
-	await acceptSave(m.saves, id, 'Zoë', encodeSave(game()), 0, T0, false, m.ledgerRepo);
+	const save = game();
+	await acceptSave(m.saves, id, 'Zoë', encodeSave(save), 0, T0, false, m.ledgerRepo);
+	// the server reads the shop from its stored save (a rebirth is a server step, so the test puts the owned upgrade there)
+	if (miningPower) (await m.saves.load(id))!.core.prestige = { rebirths: 1, legacyPoints: 0, legacyEarned: 50, upgrades: { miningpower: 1 }, shopVersion: 2 };
 	ok(await fightStep(m.deps, id, null, { action: 'auto', autoBattle: false }, T0 + 1000));
 	for (let t = 10; t < minutes; t += 10) ok(await syncTickets(m.deps, id, T0 + t * MIN));
 	return { m, now: T0 + minutes * MIN };
 };
 
+/** The first rock on the map made a Legendary one (1,000 clicks), so a few batches never break it whatever the roll gave */
+const legendary = async (m: ReturnType<typeof memory>, now: number): Promise<PublicRock> => {
+	const [rock] = await rocksOf(m, now);
+	const stored = m.ledgers.get('u1')!.bank.rocks!.find((r) => r.n === rock.n)!;
+	stored.tier = 'legendary';
+	return { ...rock, tier: 'legendary', need: ROCK_TIERS.legendary.clicks };
+};
+
 const rocksOf = async (m: ReturnType<typeof memory>, now: number): Promise<PublicRock[]> => ok(await syncTickets(m.deps, 'u1', now)).tickets.rocks ?? [];
 
-test('rocks appear on their own clock, far more often than chests, each on a tile of its own', async () => {
-	const { m, now } = await playing(25);
+test('rocks appear on their own clock, each on a tile of its own', async () => {
+	const { m, now } = await playing(125);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
 	const rocks = sync.tickets.rocks ?? [];
-	assert.ok(rocks.length >= 4, `a rock every 150 s: ${rocks.length} after 25 minutes`);
-	assert.ok(rocks.length > sync.tickets.chests.length, 'more rocks than chests');
+	assert.ok(rocks.length >= 2 && rocks.length <= ROCK.maxOnMap, `a rock every 20 minutes: ${rocks.length} after 125 minutes`);
 	const tiles = new Set(rocks.map((r) => `${r.x},${r.y}`));
 	assert.equal(tiles.size, rocks.length, 'no two rocks on one tile');
 	for (const rock of rocks) {
@@ -81,16 +91,15 @@ test('rocks appear on their own clock, far more often than chests, each on a til
 });
 
 test('a click on a tile with no rock does nothing', async () => {
-	const { m, now } = await playing(25);
+	const { m, now } = await playing(125);
 	const reply = ok(await hitRock(m.deps, 'u1', 'rock-key-0001', { x: 999, y: 999 }, 10, now + SEC));
 	assert.equal(reply.ok, false);
 	assert.equal(m.ledgers.get('u1')!.granted.stone, 0);
 });
 
 test('clicks are let in at a person’s pace: a burst, then 24 a second', async () => {
-	const { m, now } = await playing(25);
-	// the toughest rock on the map, so the three batches below do not break it
-	const [rock] = [...(await rocksOf(m, now))].sort((a, b) => b.need - a.need);
+	const { m, now } = await playing(125);
+	const rock = await legendary(m, now);
 	assert.ok(rock.need > ROCK.burst + ROCK.maxCps, 'a rock that takes more clicks than the three batches');
 	const first = ok(await hitRock(m.deps, 'u1', 'rock-key-0010', rock, 200, now + SEC));
 	assert.ok(first.ok && !first.broken);
@@ -104,7 +113,7 @@ test('clicks are let in at a person’s pace: a burst, then 24 a second', async 
 });
 
 test('a rock breaks after the clicks its tier needs, pays once from a secret, and a replayed key pays nothing more', async () => {
-	const { m, now } = await playing(25);
+	const { m, now } = await playing(125);
 	const rocks = await rocksOf(m, now);
 	const rock = [...rocks].sort((a, b) => a.need - b.need)[0];
 	let t = now + SEC;
@@ -149,4 +158,19 @@ test('what a rock drops is sealed per account: another player’s rocks roll oth
 	const second = await loot(b.m, 'u2', b.now);
 	assert.ok(first && second);
 	assert.ok(first.stone !== second.stone || first.coal !== second.coal || JSON.stringify(first.stash) !== JSON.stringify(second.stash), 'not the same roll');
+});
+
+test('Mining Power from the Ember shop makes every click that gets in count as 2 hits, with the same click-rate cap', async () => {
+	const plain = await playing(125);
+	const strong = await playing(125, 'u1', true);
+	const a = await legendary(plain.m, plain.now);
+	const b = await legendary(strong.m, strong.now);
+	const slow = ok(await hitRock(plain.m.deps, 'u1', 'rock-key-0201', a, 200, plain.now + SEC));
+	const fast = ok(await hitRock(strong.m.deps, 'u1', 'rock-key-0202', b, 200, strong.now + SEC));
+	assert.ok(slow.ok && fast.ok);
+	if (!(slow.ok && fast.ok)) return;
+	assert.equal(slow.accepted, ROCK.burst);
+	assert.equal(fast.accepted, ROCK.burst, 'the click-rate cap counts real clicks');
+	assert.equal(slow.hits, ROCK.burst);
+	assert.equal(fast.hits, ROCK.burst * 2, 'each accepted click counts twice');
 });
