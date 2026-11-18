@@ -994,6 +994,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`lifetimeStats.test.ts`](../../tests/server/lifetimeStats.test.ts)
 - [`lootSecret.test.ts`](../../tests/server/lootSecret.test.ts)
 - [`mastery.test.ts`](../../tests/server/mastery.test.ts)
+- [`masteryApplied.test.ts`](../../tests/server/masteryApplied.test.ts) — ~ One fight against a level-3 Thistle Boar, run to its end; the ledger may carry claimed tiers.
 - [`offline.test.ts`](../../tests/server/offline.test.ts) — ~ A bank whose land has plenty of tiles for monsters (a bank that has never looked at the land mints none).
 - [`offlineClient.test.ts`](../../tests/server/offlineClient.test.ts) — ~ `n` chests the server has put on owned tiles (not the castle):
 - [`offlineOnline.test.ts`](../../tests/server/offlineOnline.test.ts) — ~ A player who has been playing for `minutes` (so tickets have appeared), with the ledger seeded by the first save.

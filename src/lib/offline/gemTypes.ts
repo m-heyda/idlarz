@@ -1,3 +1,4 @@
+import type { BestiaryReport } from '@/lib/offline/stats';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { Attrs } from '@/lib/offline/attrs';
 
@@ -114,4 +115,6 @@ export interface MasteryReply {
 	paid: number;
 	gems: number;
 	serverNowSec: number;
+	/** The bestiary as it stands after the claim (every online answer carries it) */
+	bestiary?: BestiaryReport;
 }

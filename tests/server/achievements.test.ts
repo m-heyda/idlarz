@@ -8,6 +8,7 @@ import { acceptSave, type SaveRepo, type StoredSave, type WorldPart } from '../.
 import type { ServiceDeps } from '../../src/lib/offline/service';
 import { gemsStep, masteryStep, syncTickets, tutorialStep, type Online } from '../../src/lib/offline/online';
 import { ACHIEVEMENTS } from '../../src/catalog/achievements';
+import { biomeRoster } from '../../src/catalog/mastery';
 import { TUTORIAL_PATH } from '../../src/catalog/tutorial';
 import { GEMS_CAP, STARTING_GEMS } from '../../src/config/economy';
 import {
@@ -429,6 +430,23 @@ test('a mastery claim request judges the tier from the server kills, pays once a
 	const all = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0004', { action: 'claimAll' }, T0 + 5000));
 	assert.equal(all.ok && all.tiers, 1, 'tier 2 (100 kills) was still waiting');
 	assert.equal(m.ledgers.get('u1')!.stats.masteryClaimed.thistleBoar, 2);
+});
+
+test('over the wire: the top tier pays its gems once, a biome goal is claimed in one request and the answer carries the new bestiary', async () => {
+	const m = await player();
+	ok(await syncTickets(m.deps, 'u1', T0 + 1000));
+	const plains = biomeRoster('plains');
+	count(m, { kills: Object.fromEntries(plains.map((id) => [id, id.startsWith('boss') ? 100 : 2500])) });
+	const before = m.ledgers.get('u1')!.gems;
+	const all = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0010', { action: 'claimAll' }, T0 + 2000));
+	assert.ok(all.ok, 'everything waiting is claimed');
+	// 5 normals x 10 gems + the boss's 40 + the plains goal tiers (25 at the top) , capped by GEMS_CAP
+	assert.equal(m.ledgers.get('u1')!.gems - before, 5 * 10 + 40 + 25);
+	assert.equal(m.ledgers.get('u1')!.stats.biomeClaimed.plains, 4);
+	assert.equal(all.bestiary?.biomeClaimed?.plains, 4, 'the answer carries the new bestiary');
+	assert.equal(all.bestiary?.claimed?.thistleBoar, 4);
+	const again = ok(await masteryStep(m.deps, 'u1', 'mastery-key-0011', { action: 'claimBiome', biome: 'plains', tier: 4 }, T0 + 3000));
+	assert.equal(again.reason, 'already_claimed');
 });
 
 // IDL-305: the secret deed over the wire

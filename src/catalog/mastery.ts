@@ -105,6 +105,9 @@ const GRADE_OF: ReadonlyMap<string, 'normal' | 'boss'> = new Map(MONSTER_CATALOG
 /** The ladder of one monster type: the boss ladder for a boss, the shared one for everything else (including a type the catalog no longer lists, so old kill counts still read). */
 export const masteryTiersOf = (type: string): readonly MasteryTier[] => (GRADE_OF.get(type) === 'boss' ? BOSS_MASTERY_TIERS : MASTERY_TIERS);
 
+/** Every mastery tier of every live monster: claiming them all completes the Bestiary (the Complete Record deed). */
+export const TOTAL_MASTERY_TIERS: number = MONSTER_CATALOG.filter((m) => m.enabled).reduce((n, m) => n + masteryTiersOf(m.id).length, 0);
+
 /** The most tiers any ladder has (the highest tier a claim may name). */
 export const MAX_MASTERY_TIERS: number = Math.max(MASTERY_TIERS.length, BOSS_MASTERY_TIERS.length);
 

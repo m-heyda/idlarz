@@ -1,5 +1,5 @@
 import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2';
-import { MASTERY_ENTRY_KILLS } from '@/catalog/mastery';
+import { MASTERY_ENTRY_KILLS, TOTAL_MASTERY_TIERS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
 // `lib/offline/achievements.ts` checks against numbers the server already holds; nothing here imports the config or the server.
@@ -461,6 +461,14 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		rewards: { gems: 300, points: 150 },
 	},
 	{
+		id: 'archivist_all',
+		title: 'Complete Record',
+		description: 'Claim every mastery tier of every monster: the Bestiary is complete.',
+		when: { kind: 'mastered', min: TOTAL_MASTERY_TIERS },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 100, points: 120 },
+	},
+	{
 		id: 'naturalist_1',
 		title: 'Field Naturalist I',
 		description: 'Claim a biome collection goal in the Bestiary.',
@@ -682,7 +690,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_scroll_check_silver',
 		lore: 'Every tier is a page. The book is long and the monsters keep writing it.',
 		how: 'Reach a mastery tier of a monster (10, 100, 500 and 2,500 kills; a boss at 1, 5, 25 and 100) and press Claim in the Bestiary.',
-		tiers: ['archivist_10', 'archivist_50', 'archivist_150'],
+		tiers: ['archivist_10', 'archivist_50', 'archivist_150', 'archivist_all'],
 	},
 	{
 		id: 'naturalist',

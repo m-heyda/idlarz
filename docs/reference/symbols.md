@@ -40,7 +40,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Bestiary mastery | Progression / Mastery | [`src/catalog/mastery.ts:52`](../../src/catalog/mastery.ts) | The mastery ladder shared by every normal monster: |
 | `bestWornGrade` | Economy / Merchant | [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts) | The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). |
 | `BIOME_ART` | Architecture / Art | [`src/config/biomeArt.ts:11`](../../src/config/biomeArt.ts) | The picture of each rebirth biome: |
-| `BIOME_GOALS` | Progression / Mastery | [`src/catalog/mastery.ts:123`](../../src/catalog/mastery.ts) | The biome collection goals, one per ladder tier (decided 2026-11-17): |
+| `BIOME_GOALS` | Progression / Mastery | [`src/catalog/mastery.ts:126`](../../src/catalog/mastery.ts) | The biome collection goals, one per ladder tier (decided 2026-11-17): |
 | `BIOME_LOOT` | Loot / Config | [`src/catalog/lootConfig.ts:125`](../../src/catalog/lootConfig.ts) | The grades a biome's normal monsters may drop (docs/plan/26-next-updates-plan.md C1: |
 | `BIOME_YIELD` | Economy / Income | [`src/config/economy.ts:141`](../../src/config/economy.ts) | Biome and building output is multiplied by `scale` (1.3). |
 | `BIOMES` | Economy / Biomes | [`src/config/biomes.ts:53`](../../src/config/biomes.ts) | Every biome with its config output per second. |
@@ -112,7 +112,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `dailyInfo` | Economy / Gems | [`src/lib/offline/gems.ts:21`](../../src/lib/offline/gems.ts) | The daily first-login bonus as it stands: |
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:123`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
-| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:510`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
+| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:518`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
 | `dismissTicket` | Combat / A fight | [`src/lib/offline/fight.ts:145`](../../src/lib/offline/fight.ts) | Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). |
 | `DISTANCE_BANDS` | Monsters / Spawning | [`src/config/distanceBands.ts:25`](../../src/config/distanceBands.ts) | Distance bands: |
 | `dodgeChance` | Combat / Player numbers | [`src/lib/combat.ts:255`](../../src/lib/combat.ts) | Chance (0-1) that a monster's hit misses: |
@@ -190,7 +190,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:986`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
 | `MANUAL_CLOUD_COOLDOWN_MS` | Saves & Server / Uploading | [`src/lib/manualCloudSave.ts:15`](../../src/lib/manualCloudSave.ts) | "Save game" in the menu: |
 | Map lab | Architecture / Art | [`src/app/map-lab/page.tsx:2`](../../src/app/map-lab/page.tsx) | Map lab (`/map-lab`): |
-| `MASTERY_CAPS` | Progression / Mastery | [`src/catalog/mastery.ts:156`](../../src/catalog/mastery.ts) | The most each stat may add against one monster, monster tiers and biome goal together, in percent. |
+| `MASTERY_CAPS` | Progression / Mastery | [`src/catalog/mastery.ts:159`](../../src/catalog/mastery.ts) | The most each stat may add against one monster, monster tiers and biome goal together, in percent. |
 | `masteryBonusesFor` | Progression / Mastery | [`src/lib/mastery.ts:74`](../../src/lib/mastery.ts) | What the mastery gives against one monster type: |
 | `MAX_ACTIVE_BUFFS` | Combat / Consumables | [`src/lib/buffs.ts:18`](../../src/lib/buffs.ts) | How many different buffs can run at once. |
 | `MAX_CATCHUP_SEC` | Economy / Basics | [`src/config/economy.ts:35`](../../src/config/economy.ts) | A tick never advances the game by more than this many seconds (device sleep, clock edits). |

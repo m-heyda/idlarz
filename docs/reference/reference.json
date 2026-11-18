@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 510,
+  "line": 518,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -333,7 +333,7 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 123,
+  "line": 126,
   "summary": "The biome collection goals, one per ladder tier (decided 2026-11-17): the same rewards for every biome, a step bigger each tier. The biome's progress is the lowest tier reached by any of its monsters.",
   "see": []
  },
@@ -344,7 +344,7 @@
   "kind": "const",
   "category": "Progression/Mastery",
   "file": "src/catalog/mastery.ts",
-  "line": 156,
+  "line": 159,
   "summary": "The most each stat may add against one monster, monster tiers and biome goal together, in percent. The damage cap sits under the gear damage cap (`PERK_CAPS.damagePct` 50) and none of these ever reaches a global bucket: a mastery bonus only works against the monster it was earned on (or the biomes it completes).",
   "see": []
  },
