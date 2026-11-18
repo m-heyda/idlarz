@@ -87,6 +87,13 @@ const closeness = (d: DeedVM): number => {
 	return Math.max(0, Math.min(1, (d.cur - from) / Math.max(1, d.tiers[i].goal - from)));
 };
 
+/** A green tick: the reward is claimed */
+const Check: React.FC = () => (
+	<svg className='ds-dh-check' viewBox='0 0 16 16' role='img' aria-label='Claimed'>
+		<path d='M2.5 8.5 6.5 12.5 13.5 3.5' fill='none' stroke='currentColor' strokeWidth='2.6' strokeLinecap='square' />
+	</svg>
+);
+
 /** The list shows points only; the gems are the extra the Claim button pays */
 const pointsText = (t: Pick<DeedTierVM, 'points'>) => `${t.points} pts`;
 const ladderText = (t: Pick<DeedTierVM, 'gems' | 'points'>) => `${t.points} pts · +${t.gems} gems on claim`;
@@ -189,7 +196,7 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 										Claim
 									</Button>
 								) : (
-									<em>{m.state === 'claimed' ? 'Claimed' : `${Math.max(0, m.points - points).toLocaleString('en-US')} to go`}</em>
+									<em>{m.state === 'claimed' ? <Check /> : `${Math.max(0, m.points - points).toLocaleString('en-US')} to go`}</em>
 								)}
 							</div>
 						))}
@@ -292,7 +299,7 @@ export const DeedsPanel: React.FC<DeedsPanelProps> = ({
 												Claim
 											</Button>
 										) : (
-											<em>{t.state === 'claimed' ? 'Claimed' : ''}</em>
+											<em>{t.state === 'claimed' ? <Check /> : ''}</em>
 										)}
 									</div>
 								))}

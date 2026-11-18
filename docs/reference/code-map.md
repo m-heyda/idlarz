@@ -164,13 +164,15 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 **src/catalog/**
 
 - [`achievements.ts`](../../src/catalog/achievements.ts) — ~ What has to hold.
-- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts) — ~ Adds a deed whose tiers are `{ suffix, id, when, text, points }`; the gems come from the tier position (`tierGems`).
+- [`achievementsBatch2.ts`](../../src/catalog/achievementsBatch2.ts)
 - [`achievementsBatch3.ts`](../../src/catalog/achievementsBatch3.ts) — ~ Goal; the id is `<prefix>_<goal>`
+- [`achievementsBatch4.ts`](../../src/catalog/achievementsBatch4.ts) — ~ A ladder over one condition:
 - [`affixes.ts`](../../src/catalog/affixes.ts) — ~ Affixes:
 - [`avatars.ts`](../../src/catalog/avatars.ts) — ~ Avatars (IDL-71, class lock IDL-269):
 - [`badges.ts`](../../src/catalog/badges.ts) — ~ The stored `profiles.badge_id` that hides the badge completely (null = the default).
 - [`buffs.ts`](../../src/catalog/buffs.ts) — Consumable effects and the buff families (IDL-155).
 - [`buildings.ts`](../../src/catalog/buildings.ts) — ~ Where the first-pass building art lives:
+- [`deedBuilder.ts`](../../src/catalog/deedBuilder.ts) — ~ Added to the deed's title for the tier ("I", "II", "Bronze")
 - [`deedMilestones.ts`](../../src/catalog/deedMilestones.ts) — The deed point milestones of the Hall of Deeds (IDL-321, decided in IDL-310: points are a score plus milestone rewards; nothing is spent). Pure data: no server and no store imports.
 - [`deedRewards.ts`](../../src/catalog/deedRewards.ts) — The gems of a deed tier (IDL-321, owner rule): every tier pays the same base, and each further tier of a deed pays a little more. Points are the score and the headline; gems are the extra the Claim button pays.
 - [`idols.ts`](../../src/catalog/idols.ts) — Where the Idol statues live:
@@ -488,6 +490,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`craftCategories.ts`](../../src/lib/craftCategories.ts) — ~ The Crafting tab's navigation as data.
 - [`craftGear.ts`](../../src/lib/craftGear.ts) — Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 - [`crafting.ts`](../../src/lib/crafting.ts) — Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
+- [`curiosityClient.ts`](../../src/lib/curiosityClient.ts) — ~ Reports a one-off event for a deed.
 - [`dailyPrompt.ts`](../../src/lib/dailyPrompt.ts) — Where the daily bonus window remembers "Don't show again today" (per browser).
 - [`deeds.ts`](../../src/lib/deeds.ts) — ~ Equipment slots a full kit must fill.
 - [`deedsView.ts`](../../src/lib/deedsView.ts) — ~ The report fields the window reads (the store's state).
@@ -557,7 +560,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`chapter.ts`](../../src/lib/offline/chapter.ts) — ~ The account's profile as the reset needs it:
 - [`consumables.ts`](../../src/lib/offline/consumables.ts) — ~ Drinks the potion in bag slot `index`, at the server clock `nowSec` (the combat in `input` has already been brought up to now).
 - [`craft.ts`](../../src/lib/offline/craft.ts) — ~ What rolling a gear craft needs besides the ledger:
-- [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events a deed may be waiting for.
+- [`curiosity.ts`](../../src/lib/offline/curiosity.ts) — ~ The events the browser may report for a deed (`visit`):
 - [`fight.ts`](../../src/lib/offline/fight.ts) — ~ What the last `fight` or `unqueue` command did to the queue (left out when there was none)
 - [`fightContext.ts`](../../src/lib/offline/fightContext.ts) — ~ Server clock, epoch seconds
 - [`fightProfile.ts`](../../src/lib/offline/fightProfile.ts) — ~ The potions auto-use would drink (none with auto-use off or not bought yet), for the win estimate.
@@ -993,6 +996,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`deedMilestones.test.ts`](../../tests/server/deedMilestones.test.ts)
 - [`deeds.test.ts`](../../tests/server/deeds.test.ts)
 - [`deedsBatch2.test.ts`](../../tests/server/deedsBatch2.test.ts)
+- [`deedsBatch4.test.ts`](../../tests/server/deedsBatch4.test.ts)
 - [`discovery.test.ts`](../../tests/server/discovery.test.ts) — ~ A game that meets the first rebirth's requirements on the server's reading:
 - [`gems.test.ts`](../../tests/server/gems.test.ts) — The gem shop (IDL-189/190/194) and the server-held attribute points: the daily bonus, purchases (class, name, respec), idempotency, the identity write, and how an upload meets the ledger's allocation and balance.
 - [`guestMode.test.ts`](../../tests/server/guestMode.test.ts)
@@ -1084,6 +1088,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`ember_refund_v2_rollback.sql`](../../supabase/migrations/ember_refund_v2_rollback.sql)
 - [`gems_attrs_ledger.sql`](../../supabase/migrations/gems_attrs_ledger.sql)
 - [`gems_attrs_ledger_rollback.sql`](../../supabase/migrations/gems_attrs_ledger_rollback.sql)
+- [`grant_testers_to_all_players.sql`](../../supabase/migrations/grant_testers_to_all_players.sql)
+- [`grant_testers_to_all_players_rollback.sql`](../../supabase/migrations/grant_testers_to_all_players_rollback.sql)
 - [`identity_server_only.sql`](../../supabase/migrations/identity_server_only.sql)
 - [`identity_server_only_rollback.sql`](../../supabase/migrations/identity_server_only_rollback.sql)
 - [`idols_v1.sql`](../../supabase/migrations/idols_v1.sql)

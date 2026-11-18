@@ -1,6 +1,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { WindowShell } from '../../../packages/design-system/src/components/primitives';
 import { clampWindowPosition, clampWindowSize } from '../../../packages/design-system/src/logic';
+import { reportCuriosity } from '@/lib/curiosityClient';
 import { useWindowStore, type WinId } from '@/stores/windowStore';
 import { hasOpenModal } from './PixelModal';
 
@@ -99,6 +100,8 @@ const GameWindow: React.FC<GameWindowProps> = ({ id, title, icon, width = 820, h
 			onSizeChange={(s) => {
 				const next = clampWindowSize(size, { x: s.w - size.w, y: s.h - size.h }, MIN_SIZE, { w: window.innerWidth - pos.x, h: window.innerHeight - pos.y });
 				resizeWindow(id, next.w, next.h);
+				// dragging a window to its smallest is a secret deed ("Are you insane?")
+				if (next.w <= MIN_SIZE.w && next.h <= MIN_SIZE.h) reportCuriosity('window_min');
 			}}
 			minWidth={MIN_SIZE.w}
 			minHeight={MIN_SIZE.h}

@@ -644,7 +644,7 @@ and its gold is paid in the browser.
 
 ### GET /api/rankings
 
-Source: [`src/app/api/rankings/route.ts:18`](../../src/app/api/rankings/route.ts)
+Source: [`src/app/api/rankings/route.ts:23`](../../src/app/api/rankings/route.ts)
 
 The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills|deeds`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the
 asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single

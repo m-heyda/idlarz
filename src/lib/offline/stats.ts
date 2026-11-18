@@ -49,6 +49,8 @@ export interface LifetimeStats {
 	goldFromSales: number;
 	/** Crafts delivered, instant or claimed (Apprentice Smith). Additive. */
 	crafted: number;
+	/** Gear the player crafted, by rarity id (the Crafting deeds). Counted by the server when a craft is delivered. Additive: absent reads as none. */
+	craftedRare: Record<string, number>;
 	/** Fights won without taking a single hit (Untouched). Additive. */
 	flawless: number;
 	/** Respecs bought (attribute points taken back). Additive. */
@@ -107,6 +109,7 @@ export const emptyStats = (): LifetimeStats => ({
 	unitsSold: 0,
 	goldFromSales: 0,
 	crafted: 0,
+	craftedRare: {},
 	flawless: 0,
 	respecs: 0,
 	deaths: {},
@@ -162,6 +165,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		unitsSold: Math.floor(num(r.unitsSold)),
 		goldFromSales: num(r.goldFromSales),
 		crafted: Math.floor(num(r.crafted)),
+		craftedRare: counts(r.craftedRare),
 		flawless: Math.floor(num(r.flawless)),
 		respecs: Math.floor(num(r.respecs)),
 		deaths: counts(r.deaths),
@@ -186,6 +190,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		unitsSold,
 		goldFromSales,
 		crafted,
+		craftedRare,
 		flawless,
 		respecs,
 		deaths,
@@ -209,6 +214,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(unitsSold > 0 ? { unitsSold } : {}),
 		...(goldFromSales > 0 ? { goldFromSales } : {}),
 		...(crafted > 0 ? { crafted } : {}),
+		...(Object.keys(craftedRare).length > 0 ? { craftedRare } : {}),
 		...(flawless > 0 ? { flawless } : {}),
 		...(respecs > 0 ? { respecs } : {}),
 		...(Object.keys(deaths).length > 0 ? { deaths } : {}),
@@ -241,6 +247,7 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.unitsSold === 0 &&
 	s.goldFromSales === 0 &&
 	s.crafted === 0 &&
+	Object.keys(s.craftedRare).length === 0 &&
 	s.flawless === 0 &&
 	s.respecs === 0 &&
 	Object.keys(s.deaths).length === 0 &&
@@ -275,6 +282,15 @@ export const recordDeath = (stats: LifetimeStats, type: string): LifetimeStats =
 
 /** `n` crafts were delivered (a claim, a Collect all or an instant craft). */
 export const recordCraft = (stats: LifetimeStats, n: number): LifetimeStats => (n > 0 ? { ...stats, crafted: stats.crafted + Math.floor(n) } : stats);
+
+/** Gear the player crafted, by rarity: how many crafted pieces of each rarity the bag holds now beyond what it held before the delivery (a delivery only adds pieces). */
+export const recordCraftedRare = (stats: LifetimeStats, added: Readonly<Record<string, number>>): LifetimeStats => {
+	const entries = Object.entries(added).filter(([, n]) => n > 0);
+	if (entries.length === 0) return stats;
+	const craftedRare = { ...stats.craftedRare };
+	for (const [rarity, n] of entries) craftedRare[rarity] = (craftedRare[rarity] ?? 0) + Math.floor(n);
+	return { ...stats, craftedRare };
+};
 
 /** A respec was bought. */
 export const recordRespec = (stats: LifetimeStats): LifetimeStats => ({ ...stats, respecs: stats.respecs + 1 });

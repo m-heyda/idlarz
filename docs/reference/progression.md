@@ -18,7 +18,7 @@ Levels, attributes, skills, rebirth, Embers, limits and gems.
 - Avatars: [`unlockedAvatarIds`](#unlockedavatarids), [`checkAvatar`](#checkavatar), [`CLASS_AVATARS`](#class-avatars), [Avatars](#avatarinfo), [`createAvatarPicker`](#createavatarpicker)
 - Pets: [`PetDef`](#petdef), [`nextWanderStep`](#nextwanderstep), [`pickPetPhrase`](#pickpetphrase), [`applyPets`](#applypets)
 - Class passives: [`classPassives`](#classpassives), [`classXpBucket`](#classxpbucket), [`STARTER_EQUIPMENT_BY_CLASS`](#starter-equipment-by-class)
-- Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [Achievements](#achievements)
+- Achievements: [`settleAchievements`](#settleachievements), [`claimAchievement`](#claimachievement), [`worldFacts`](#worldfacts), [`recordCuriosity`](#recordcuriosity), [`recordRankPlace`](#recordrankplace), [Achievements](#achievements)
 - Guided tutorial: [`guideVisibleFor`](#guidevisiblefor), [`buildNumbers`](#buildnumbers), [`readProgress`](#readprogress), [`applyTutorial`](#applytutorial), [`TutorialGuide`](#tutorialguide), [The guided tutorial](#tutorial-path)
 - Badges: [`NICK_COLORS`](#nick-colors), [`NICK_EFFECTS`](#nick-effects), [`badgeOptions`](#badgeoptions)
 - Deeds: [`claimAllAchievements`](#claimallachievements), [Deed milestones](#deed-milestones), [`deedBonuses`](#deedbonuses), [`claimMilestone`](#claimmilestone), [`tierGems`](#tiergems), [Deeds](#deeds)
@@ -893,7 +893,7 @@ bow and a staff take both hands). Their damage per second matches the sword's, s
 
 ### `settleAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:213`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:216`](../../src/lib/offline/achievements.ts)
 
 Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing).
 The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).
@@ -909,7 +909,7 @@ See also: `achievementsDue`, `earnAchievements`
 
 ### `claimAchievement` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:129`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:132`](../../src/lib/offline/achievements.ts)
 
 The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time.
 Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.
@@ -926,21 +926,29 @@ The facts of a map and a farm. The largest group per biome is a flood fill over 
 
 ### `recordCuriosity` <small>function</small>
 
-Source: [`src/lib/offline/curiosity.ts:14`](../../src/lib/offline/curiosity.ts)
+Source: [`src/lib/offline/curiosity.ts:20`](../../src/lib/offline/curiosity.ts)
 
 Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).
+
+<a id="recordrankplace"></a>
+
+### `recordRankPlace` <small>function</small>
+
+Source: [`src/lib/offline/curiosity.ts:31`](../../src/lib/offline/curiosity.ts)
+
+Records the podium place a player holds on a Ranking board (1 to 3, any board): `rank_<place>` once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.
 
 <a id="achievements"></a>
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:103`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:116`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (153, 12850 gems in total)** _(computed from the code)_
+**The launch achievements (277, 24750 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -1096,7 +1104,131 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 150 | `untouched_500` | Untouched IV | flawless >= 500 | 125 | - |
 | 151 | `untouched_2500` | Untouched V | flawless >= 2500 | 150 | untouchable |
 | 152 | `wolfsbane_5000` | Wolfsbane IV | 5000 x `mossbackWolf` | 125 | - |
-| 153 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
+| 153 | `golden_10` | Golden touch II | golden >= 10 | 75 | - |
+| 154 | `golden_50` | Golden touch III | golden >= 50 | 100 | - |
+| 155 | `golden_250` | Golden touch IV | golden >= 250 | 125 | - |
+| 156 | `golden_1000` | Golden touch V | golden >= 1000 | 150 | - |
+| 157 | `golden_5000` | Golden touch VI | golden >= 5000 | 175 | midas |
+| 158 | `boss_kills_250` | Bossbane IV | bosses >= 250 | 125 | - |
+| 159 | `boss_kills_1000` | Bossbane V | bosses >= 1000 | 150 | - |
+| 160 | `boss_kills_5000` | Bossbane VI | bosses >= 5000 | 175 | worldbreaker |
+| 161 | `income_gold_100000` | Gold rush I | income >= 100000 | 50 | - |
+| 162 | `income_gold_10000000` | Gold rush II | income >= 10000000 | 75 | - |
+| 163 | `income_gold_1000000000` | Gold rush III | income >= 1000000000 | 100 | - |
+| 164 | `income_gold_100000000000` | Gold rush IV | income >= 100000000000 | 125 | - |
+| 165 | `income_gold_10000000000000` | Gold rush V | income >= 10000000000000 | 150 | gold-baron |
+| 166 | `income_wood_10000` | Woodcutter I | income >= 10000 | 50 | - |
+| 167 | `income_wood_1000000` | Woodcutter II | income >= 1000000 | 75 | - |
+| 168 | `income_wood_100000000` | Woodcutter III | income >= 100000000 | 100 | - |
+| 169 | `income_wood_10000000000` | Woodcutter IV | income >= 10000000000 | 125 | - |
+| 170 | `income_wood_1000000000000` | Woodcutter V | income >= 1000000000000 | 150 | - |
+| 171 | `income_stone_10000` | Quarryman I | income >= 10000 | 50 | - |
+| 172 | `income_stone_1000000` | Quarryman II | income >= 1000000 | 75 | - |
+| 173 | `income_stone_100000000` | Quarryman III | income >= 100000000 | 100 | - |
+| 174 | `income_stone_10000000000` | Quarryman IV | income >= 10000000000 | 125 | - |
+| 175 | `income_stone_1000000000000` | Quarryman V | income >= 1000000000000 | 150 | - |
+| 176 | `income_coal_10000` | Coal baron I | income >= 10000 | 50 | - |
+| 177 | `income_coal_1000000` | Coal baron II | income >= 1000000 | 75 | - |
+| 178 | `income_coal_100000000` | Coal baron III | income >= 100000000 | 100 | - |
+| 179 | `income_coal_10000000000` | Coal baron IV | income >= 10000000000 | 125 | - |
+| 180 | `income_coal_1000000000000` | Coal baron V | income >= 1000000000000 | 150 | - |
+| 181 | `income_food_10000` | Harvest king I | income >= 10000 | 50 | - |
+| 182 | `income_food_1000000` | Harvest king II | income >= 1000000 | 75 | - |
+| 183 | `income_food_100000000` | Harvest king III | income >= 100000000 | 100 | - |
+| 184 | `income_food_10000000000` | Harvest king IV | income >= 10000000000 | 125 | - |
+| 185 | `income_food_1000000000000` | Harvest king V | income >= 1000000000000 | 150 | - |
+| 186 | `income_meat_10000` | Butcher I | income >= 10000 | 50 | - |
+| 187 | `income_meat_1000000` | Butcher II | income >= 1000000 | 75 | - |
+| 188 | `income_meat_100000000` | Butcher III | income >= 100000000 | 100 | - |
+| 189 | `income_meat_10000000000` | Butcher IV | income >= 10000000000 | 125 | - |
+| 190 | `income_meat_1000000000000` | Butcher V | income >= 1000000000000 | 150 | - |
+| 191 | `income_eggs_1000` | Egg collector I | income >= 1000 | 50 | - |
+| 192 | `income_eggs_100000` | Egg collector II | income >= 100000 | 75 | - |
+| 193 | `income_eggs_10000000` | Egg collector III | income >= 10000000 | 100 | - |
+| 194 | `income_eggs_1000000000` | Egg collector IV | income >= 1000000000 | 125 | - |
+| 195 | `income_milk_1000` | Dairy baron I | income >= 1000 | 50 | - |
+| 196 | `income_milk_100000` | Dairy baron II | income >= 100000 | 75 | - |
+| 197 | `income_milk_10000000` | Dairy baron III | income >= 10000000 | 100 | - |
+| 198 | `income_milk_1000000000` | Dairy baron IV | income >= 1000000000 | 125 | - |
+| 199 | `income_hide_1000` | Tanner I | income >= 1000 | 50 | - |
+| 200 | `income_hide_100000` | Tanner II | income >= 100000 | 75 | - |
+| 201 | `income_hide_10000000` | Tanner III | income >= 10000000 | 100 | - |
+| 202 | `income_hide_1000000000` | Tanner IV | income >= 1000000000 | 125 | - |
+| 203 | `income_wool_1000` | Shearer I | income >= 1000 | 50 | - |
+| 204 | `income_wool_100000` | Shearer II | income >= 100000 | 75 | - |
+| 205 | `income_wool_10000000` | Shearer III | income >= 10000000 | 100 | - |
+| 206 | `income_wool_1000000000` | Shearer IV | income >= 1000000000 | 125 | - |
+| 207 | `income_herbs_100` | Herbalist I | income >= 100 | 50 | - |
+| 208 | `income_herbs_10000` | Herbalist II | income >= 10000 | 75 | - |
+| 209 | `income_herbs_1000000` | Herbalist III | income >= 1000000 | 100 | - |
+| 210 | `income_herbs_100000000` | Herbalist IV | income >= 100000000 | 125 | - |
+| 211 | `income_sap_100` | Sap tapper I | income >= 100 | 50 | - |
+| 212 | `income_sap_10000` | Sap tapper II | income >= 10000 | 75 | - |
+| 213 | `income_sap_1000000` | Sap tapper III | income >= 1000000 | 100 | - |
+| 214 | `income_sap_100000000` | Sap tapper IV | income >= 100000000 | 125 | - |
+| 215 | `income_ironOre_100` | Prospector I | income >= 100 | 50 | - |
+| 216 | `income_ironOre_10000` | Prospector II | income >= 10000 | 75 | - |
+| 217 | `income_ironOre_1000000` | Prospector III | income >= 1000000 | 100 | - |
+| 218 | `income_ironOre_100000000` | Prospector IV | income >= 100000000 | 125 | - |
+| 219 | `income_spores_100` | Sporeling I | income >= 100 | 50 | - |
+| 220 | `income_spores_10000` | Sporeling II | income >= 10000 | 75 | - |
+| 221 | `income_spores_1000000` | Sporeling III | income >= 1000000 | 100 | - |
+| 222 | `income_spores_100000000` | Sporeling IV | income >= 100000000 | 125 | - |
+| 223 | `income_frostshard_100` | Frost miner I | income >= 100 | 50 | - |
+| 224 | `income_frostshard_10000` | Frost miner II | income >= 10000 | 75 | - |
+| 225 | `income_frostshard_1000000` | Frost miner III | income >= 1000000 | 100 | - |
+| 226 | `income_frostshard_100000000` | Frost miner IV | income >= 100000000 | 125 | - |
+| 227 | `income_pearls_100` | Pearl diver I | income >= 100 | 50 | - |
+| 228 | `income_pearls_10000` | Pearl diver II | income >= 10000 | 75 | - |
+| 229 | `income_pearls_1000000` | Pearl diver III | income >= 1000000 | 100 | - |
+| 230 | `income_pearls_100000000` | Pearl diver IV | income >= 100000000 | 125 | - |
+| 231 | `income_salt_100` | Salt of the earth I | income >= 100 | 50 | - |
+| 232 | `income_salt_10000` | Salt of the earth II | income >= 10000 | 75 | - |
+| 233 | `income_salt_1000000` | Salt of the earth III | income >= 1000000 | 100 | - |
+| 234 | `income_salt_100000000` | Salt of the earth IV | income >= 100000000 | 125 | - |
+| 235 | `craft_level_5` | Crafting mastery I | craftLevel >= 5 | 50 | - |
+| 236 | `craft_level_10` | Crafting mastery II | craftLevel >= 10 | 75 | - |
+| 237 | `craft_level_20` | Crafting mastery III | craftLevel >= 20 | 100 | - |
+| 238 | `craft_level_35` | Crafting mastery IV | craftLevel >= 35 | 125 | - |
+| 239 | `craft_level_50` | Crafting mastery V | craftLevel >= 50 | 150 | - |
+| 240 | `craft_level_65` | Crafting mastery VI | craftLevel >= 65 | 175 | - |
+| 241 | `craft_level_80` | Crafting mastery VII | craftLevel >= 80 | 200 | artisan |
+| 242 | `craft_epic_1` | Epic forger I | craftedRarity >= 1 | 50 | - |
+| 243 | `craft_epic_10` | Epic forger II | craftedRarity >= 10 | 75 | - |
+| 244 | `craft_epic_50` | Epic forger III | craftedRarity >= 50 | 100 | - |
+| 245 | `craft_epic_250` | Epic forger IV | craftedRarity >= 250 | 125 | - |
+| 246 | `craft_legendary_1` | Legendary forger I | craftedRarity >= 1 | 50 | - |
+| 247 | `craft_legendary_5` | Legendary forger II | craftedRarity >= 5 | 75 | - |
+| 248 | `craft_legendary_25` | Legendary forger III | craftedRarity >= 25 | 100 | - |
+| 249 | `craft_legendary_100` | Legendary forger IV | craftedRarity >= 100 | 125 | legend-smith |
+| 250 | `worn_epic_1` | Epic wardrobe I | wornRarity >= 1 | 50 | - |
+| 251 | `worn_epic_4` | Epic wardrobe II | wornRarity >= 4 | 75 | - |
+| 252 | `worn_epic_8` | Epic wardrobe III | wornRarity >= 8 | 100 | - |
+| 253 | `worn_epic_14` | Epic wardrobe IV | wornRarity >= 14 | 125 | - |
+| 254 | `worn_legendary_1` | Legendary wardrobe I | wornRarity >= 1 | 50 | - |
+| 255 | `worn_legendary_3` | Legendary wardrobe II | wornRarity >= 3 | 75 | - |
+| 256 | `worn_legendary_7` | Legendary wardrobe III | wornRarity >= 7 | 100 | - |
+| 257 | `worn_legendary_14` | Legendary wardrobe IV | wornRarity >= 14 | 125 | - |
+| 258 | `embers_50` | Ember keeper I | embers >= 50 | 50 | - |
+| 259 | `embers_500` | Ember keeper II | embers >= 500 | 75 | - |
+| 260 | `embers_5000` | Ember keeper III | embers >= 5000 | 100 | - |
+| 261 | `embers_50000` | Ember keeper IV | embers >= 50000 | 125 | - |
+| 262 | `embers_500000` | Ember keeper V | embers >= 500000 | 150 | - |
+| 263 | `embers_5000000` | Ember keeper VI | embers >= 5000000 | 175 | - |
+| 264 | `embers_50000000` | Ember keeper VII | embers >= 50000000 | 200 | ember-lord |
+| 265 | `losses_10` | Sore loser I | deaths >= 10 | 50 | - |
+| 266 | `losses_50` | Sore loser II | deaths >= 50 | 75 | - |
+| 267 | `losses_250` | Sore loser III | deaths >= 250 | 100 | - |
+| 268 | `losses_1000` | Sore loser IV | deaths >= 1000 | 125 | sore-loser |
+| 269 | `podium_3` | On the podium Bronze | curiosity rank_3 | 50 | - |
+| 270 | `podium_2` | On the podium Silver | curiosity rank_2 | 75 | - |
+| 271 | `podium_1` | On the podium Gold | curiosity rank_1 | 100 | champion |
+| 272 | `window_min` | Are you insane? | curiosity window_min | 50 | - |
+| 273 | `map_zoom_max` | Nose on the glass | curiosity map_zoom_max | 50 | - |
+| 274 | `map_zoom_min` | Where did everything go? | curiosity map_zoom_min | 50 | - |
+| 275 | `boss_window` | Not yet, big guy | curiosity boss_window | 50 | - |
+| 276 | `castle_skin` | Fashion victim | curiosity castle_skin | 50 | - |
+| 277 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -1239,7 +1371,7 @@ The choice lives on the profile (`badge_id`, `title_id`, written by the server a
 
 ### `claimAllAchievements` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:158`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:161`](../../src/lib/offline/achievements.ts)
 
 Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP`
 (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.
@@ -1272,7 +1404,7 @@ Points count only after their tier was claimed, so a milestone is reached by cla
 
 ### `deedBonuses` <small>function</small>
 
-Source: [`src/lib/deeds.ts:202`](../../src/lib/deeds.ts)
+Source: [`src/lib/deeds.ts:223`](../../src/lib/deeds.ts)
 
 The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
 
@@ -1286,7 +1418,7 @@ bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed mileston
 
 ### `claimMilestone` <small>function</small>
 
-Source: [`src/lib/offline/achievements.ts:101`](../../src/lib/offline/achievements.ts)
+Source: [`src/lib/offline/achievements.ts:104`](../../src/lib/offline/achievements.ts)
 
 Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ([`deedBonuses`](progression.md#deedbonuses)). Refused for an id that is not a milestone, one the claimed points
 have not reached yet, or one already claimed.
@@ -1309,7 +1441,7 @@ gems(tier n) = 50 + 25 x (n - 1)      (n = 1 for the first tier of the deed)
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:546`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:560`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

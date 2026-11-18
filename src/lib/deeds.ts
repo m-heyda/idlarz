@@ -1,5 +1,6 @@
 import { ACHIEVEMENTS, achievementById, type AchievementCondition, type DeedDef } from '@/catalog/achievements';
 import { DEED_BONUS_CAP_PCT, DEED_MILESTONES, milestoneById, type DeedMilestone } from '@/catalog/deedMilestones';
+import { RARITIES } from '@/catalog';
 import { TUTORIAL_PATH } from '@/catalog/tutorial';
 import type { LifetimeStats } from '@/lib/offline/stats';
 import type { WorldFacts } from '@/lib/worldFacts';
@@ -24,6 +25,9 @@ export interface DeedFacts {
 	streak?: number;
 	castleLevel: number;
 	rebirths: number;
+	/** The crafting level and the Embers earned over all rebirths (absent on a row from before: 0) */
+	craftLevel?: number;
+	embers?: number;
 	/** Buildings built, lifetime. The building system has no counter yet, so this is 0 until it reports one. */
 	buildings: number;
 }
@@ -96,6 +100,23 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 			return { cur: f.stats.bosses, goal: when.min };
 		case 'curiosity':
 			return { cur: f.stats.curiosity.includes(when.id) ? 1 : 0, goal: 1 };
+		case 'deaths':
+			return { cur: Object.values(f.stats.deaths).reduce((sum, n) => sum + n, 0), goal: when.min };
+		case 'craftLevel':
+			return { cur: f.craftLevel ?? 0, goal: when.min };
+		case 'craftedRarity': {
+			const floor = RARITIES[when.rarity].order;
+			const made = Object.entries(f.stats.craftedRare)
+				.filter(([id]) => (RARITIES[id as keyof typeof RARITIES]?.order ?? 0) >= floor)
+				.reduce((sum, [, n]) => sum + n, 0);
+			return { cur: made, goal: when.min };
+		}
+		case 'wornRarity':
+			return { cur: f.kit?.[when.rarity] ?? 0, goal: when.min };
+		case 'embers':
+			return { cur: f.embers ?? 0, goal: when.min };
+		case 'income':
+			return { cur: f.stats.income[when.resource] ?? 0, goal: when.min };
 		case 'manual':
 			return { cur: 0, goal: 1 };
 	}

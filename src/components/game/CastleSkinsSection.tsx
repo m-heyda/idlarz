@@ -8,6 +8,7 @@ import { useGemStore } from '@/stores/gemStore';
 import { useUiStore } from '@/stores/uiStore';
 import { formatNumber } from '@/utils/formatters';
 import { Button } from '../../../packages/design-system/src/components/primitives';
+import { reportCuriosity } from '@/lib/curiosityClient';
 import GemIcon from './GemIcon';
 import '@/styles/GemShop.css';
 
@@ -56,7 +57,14 @@ const CastleSkinsSection: React.FC = () => {
 								{owned ? (
 									<>
 										<span className='gem-card-owned'>Owned</span>
-										<Button tone={using ? 'dark' : 'stone'} onClick={() => setCastleSkin(using ? null : skin.n)}>
+										<Button
+											tone={using ? 'dark' : 'stone'}
+											onClick={() => {
+												setCastleSkin(using ? null : skin.n);
+												// putting a skin on the castle is a secret deed
+												if (!using) reportCuriosity('castle_skin');
+											}}
+										>
 											{using ? 'In use' : 'Use'}
 										</Button>
 									</>

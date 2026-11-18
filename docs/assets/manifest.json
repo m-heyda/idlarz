@@ -21900,7 +21900,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/RankingsWindow.tsx"
+			"src/components/game/RankingsWindow.tsx",
+			"src/lib/offline/curiosity.ts"
 		],
 		"name": "rank_trophy",
 		"category": "ui",

@@ -1,42 +1,10 @@
 import type { AchievementDef, DeedDef } from './achievements';
-import { tierGems } from './deedRewards';
+import { createDeedBuilder } from './deedBuilder';
 
 // Deeds batch 2 (IDL-305, owner list of 2026-11-12): new biomes, adjacency clusters, full kits, item level, login streaks, the first respec, attribute thresholds, farm animals, buildings, bosses and one secret. Every id is new and appended after
 // the first batch (never reordered). Points are placeholders for the balance pass (IDL-310), gems follow the tier position; badges are stand-ins from the existing set (`badgePlaceholder`) until real art exists. Each tier is an ordinary achievement; a deed groups them.
 
-const badge = (name: string) => `badge_${name}`;
-
-interface Built {
-	achievements: AchievementDef[];
-	deeds: DeedDef[];
-}
-
-const out: Built = { achievements: [], deeds: [] };
-
-/** Adds a deed whose tiers are `{ suffix, id, when, text, points }`; the gems come from the tier position (`tierGems`). */
-const deed = (
-	id: string,
-	title: string,
-	description: string,
-	category: DeedDef['category'],
-	tags: string[],
-	art: string,
-	lore: string,
-	how: string,
-	tiers: { suffix: string; id: string; when: AchievementDef['when']; text: string; points: number; title?: { id: string; name: string } }[],
-) => {
-	out.deeds.push({ id, title, description, category, tags, badge: badge(art), lore, how, tiers: tiers.map((t) => t.id) });
-	for (const [i, t] of tiers.entries())
-		out.achievements.push({
-			id: t.id,
-			title: tiers.length > 1 ? `${title} ${t.suffix}` : title,
-			description: t.text,
-			when: t.when,
-			badge: badge(art),
-			badgePlaceholder: true,
-			rewards: { gems: tierGems(i), points: t.points, ...(t.title ? { titleId: t.title.id, titleName: t.title.name } : {}) },
-		});
-};
+const { out, deed } = createDeedBuilder();
 
 const ROMAN = ['I', 'II', 'III', 'IV', 'V'];
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);

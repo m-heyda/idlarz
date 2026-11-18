@@ -1,5 +1,6 @@
 import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2';
 import { BATCH3_TIERS, buildBatch3 } from '@/catalog/achievementsBatch3';
+import { BATCH4_ACHIEVEMENTS, BATCH4_DEEDS } from '@/catalog/achievementsBatch4';
 import { MASTERY_ENTRY_KILLS, TOTAL_MASTERY_TIERS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
@@ -59,6 +60,18 @@ export type AchievementCondition =
 	| { kind: 'bosses'; min: number }
 	/** A one-off event the server recorded (`LifetimeStats.curiosity`) */
 	| { kind: 'curiosity'; id: string }
+	/** Fights lost, all monsters together (the sum of `LifetimeStats.deaths`) */
+	| { kind: 'deaths'; min: number }
+	/** The crafting level (from the ledger's crafting XP) */
+	| { kind: 'craftLevel'; min: number }
+	/** Pieces of gear crafted of this rarity or better (`LifetimeStats.craftedRare`) */
+	| { kind: 'craftedRarity'; rarity: 'epic' | 'legendary'; min: number }
+	/** Pieces of this rarity or better worn at once (of the 14 slots) */
+	| { kind: 'wornRarity'; rarity: 'epic' | 'legendary'; min: number }
+	/** Embers earned over all rebirths (`prestige.legacyEarned`) */
+	| { kind: 'embers'; min: number }
+	/** Lifetime income of one resource while playing (`LifetimeStats.income`) */
+	| { kind: 'income'; resource: string; min: number }
 	/** Never checked by the lazy evaluator: granted by a one-off server step (the early tester by the new chapter reset) */
 	| { kind: 'manual' };
 
@@ -521,6 +534,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 	},
 	...BATCH2_ACHIEVEMENTS,
 	...buildBatch3(),
+	...BATCH4_ACHIEVEMENTS,
 	{
 		id: 'castle_15',
 		title: 'Grand Architect',
@@ -608,7 +622,7 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_golden_monster_gold',
 		lore: 'Rare, shiny and worth the swing.',
 		how: 'Golden monsters appear now and then among the others.',
-		tiers: ['golden_kill'],
+		tiers: ['golden_kill', ...BATCH3_TIERS.golden_touch],
 	},
 	{
 		id: 'landlord',
@@ -786,7 +800,9 @@ export const DEEDS: readonly DeedDef[] = [
 		how: 'Granted to the players of the closed beta.',
 		tiers: ['beta_tester'],
 	},
-	...BATCH2_DEEDS,
+	// the tiers batch 3 appends to the deeds of batch 2
+	...BATCH2_DEEDS.map((d) => ({ ...d, tiers: [...d.tiers, ...(BATCH3_TIERS[d.id] ?? [])] })),
+	...BATCH4_DEEDS,
 ];
 
 export const deedById = (id: string): DeedDef | undefined => DEEDS.find((d) => d.id === id);

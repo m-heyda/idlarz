@@ -7,7 +7,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | Name | Category | Source | What |
 | --- | --- | --- | --- |
 | `acceptSave` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:211`](../../src/lib/cloudSave/pipeline.ts) | Accepts a save from a client that says it was based on revision `baseRev` (0 = this account has no save yet). |
-| Achievements | Progression / Achievements | [`src/catalog/achievements.ts:103`](../../src/catalog/achievements.ts) | The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). |
+| Achievements | Progression / Achievements | [`src/catalog/achievements.ts:116`](../../src/catalog/achievements.ts) | The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). |
 | `addBuff` | Combat / Consumables | [`src/lib/buffs.ts:63`](../../src/lib/buffs.ts) | Adds one buff effect to the running buffs. |
 | Adding loot content (data only) | Loot / Adding content | [`src/catalog/lootConfig.ts:310`](../../src/catalog/lootConfig.ts) | Adding loot content is data only; |
 | `advanceBank` | Monsters / Spawning | [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts) | Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes (shorter with Luck), a n... |
@@ -84,12 +84,12 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `CHEST` | Economy / Chests and Luck | [`src/config/spawns.ts:34`](../../src/config/spawns.ts) | Chests. |
 | `chestIntervalSec` | Economy / Chests and Luck | [`src/lib/luck.ts:16`](../../src/lib/luck.ts) | Seconds between two chests: |
 | `chestSpots` | Economy / Chests and Luck | [`src/lib/chests.ts:28`](../../src/lib/chests.ts) | The tiles a chest could go on, with their weights. |
-| `claimAchievement` | Progression / Achievements | [`src/lib/offline/achievements.ts:129`](../../src/lib/offline/achievements.ts) | The Claim button: |
-| `claimAllAchievements` | Progression / Deeds | [`src/lib/offline/achievements.ts:158`](../../src/lib/offline/achievements.ts) | Claim all: |
+| `claimAchievement` | Progression / Achievements | [`src/lib/offline/achievements.ts:132`](../../src/lib/offline/achievements.ts) | The Claim button: |
+| `claimAllAchievements` | Progression / Deeds | [`src/lib/offline/achievements.ts:161`](../../src/lib/offline/achievements.ts) | Claim all: |
 | `claimAllMastery` | Progression / Mastery | [`src/lib/offline/mastery.ts:73`](../../src/lib/offline/mastery.ts) | Claim all: |
 | `claimBiomeGoal` | Progression / Mastery | [`src/lib/offline/mastery.ts:57`](../../src/lib/offline/mastery.ts) | Claims the next collection tier of a biome: |
 | `claimMastery` | Progression / Mastery | [`src/lib/offline/mastery.ts:39`](../../src/lib/offline/mastery.ts) | Claims tier `tier` (1-based) of monster `type`. |
-| `claimMilestone` | Progression / Deeds | [`src/lib/offline/achievements.ts:101`](../../src/lib/offline/achievements.ts) | Claims one deed point milestone: |
+| `claimMilestone` | Progression / Deeds | [`src/lib/offline/achievements.ts:104`](../../src/lib/offline/achievements.ts) | Claims one deed point milestone: |
 | `CLASS_AVATARS` | Progression / Avatars | [`src/catalog/avatars.ts:124`](../../src/catalog/avatars.ts) | The two starter avatars each class owns, derived from `classId` on the catalog entries (warrior: |
 | `classPassives` | Progression / Class passives | [`src/lib/classPassives.ts:24`](../../src/lib/classPassives.ts) | The passives of a hero class (`CLASS_PASSIVES`, `src/config/playerClasses.ts`): |
 | `classXpBucket` | Progression / Class passives | [`src/lib/classPassives.ts:46`](../../src/lib/classPassives.ts) | The gear's XP bucket with the class's XP added, held under the XP perk-family cap: |
@@ -114,8 +114,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `damagePerHit` | Combat / Player numbers | [`src/lib/combat.ts:123`](../../src/lib/combat.ts) | Damage of one swing (before crits): |
 | `dangerBonus` | Monsters / Level scaling | [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts) | Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: |
 | Deed milestones | Progression / Deeds | [`src/catalog/deedMilestones.ts:29`](../../src/catalog/deedMilestones.ts) | The milestones, by claimed deed points (all tiers together are worth about 7,800). |
-| `deedBonuses` | Progression / Deeds | [`src/lib/deeds.ts:202`](../../src/lib/deeds.ts) | The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. |
-| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:546`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
+| `deedBonuses` | Progression / Deeds | [`src/lib/deeds.ts:223`](../../src/lib/deeds.ts) | The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. |
+| Deeds | Progression / Deeds | [`src/catalog/achievements.ts:560`](../../src/catalog/achievements.ts) | The Hall of Deeds (IDL-306): |
 | `dismissTicket` | Combat / A fight | [`src/lib/offline/fight.ts:145`](../../src/lib/offline/fight.ts) | Takes a monster off the map without a fight (a monster that cannot be beaten, or that is in the way). |
 | `DISTANCE_BANDS` | Monsters / Spawning | [`src/config/distanceBands.ts:25`](../../src/config/distanceBands.ts) | Distance bands: |
 | `dodgeChance` | Combat / Player numbers | [`src/lib/combat.ts:255`](../../src/lib/combat.ts) | Chance (0-1) that a monster's hit misses: |
@@ -152,7 +152,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `generateLoot` | Loot / Pipeline | [`src/lib/loot/generate.ts:322`](../../src/lib/loot/generate.ts) | Everything one source gives. |
 | `generateMerchantStock` | Economy / Merchant | [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts) | A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made. |
 | `generateStartRing` | Economy / Biomes | [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts) | The castle's four starting neighbours for a new game: |
-| GET /api/rankings | Saves & Server / Endpoints | [`src/app/api/rankings/route.ts:18`](../../src/app/api/rankings/route.ts) | The Rankings: |
+| GET /api/rankings | Saves & Server / Endpoints | [`src/app/api/rankings/route.ts:23`](../../src/app/api/rankings/route.ts) | The Rankings: |
 | Giving a flagged account its trust back (restore-trust) | Ops / Operator guides | [`scripts/restore-trust.ts:1`](../../scripts/restore-trust.ts) | The way back for a false-positive flag (IDL-209): |
 | `goldenMonsterChance` | Economy / Chests and Luck | [`src/lib/luck.ts:67`](../../src/lib/luck.ts) | Chance (0-1) that a newly arrived rat is a lucky one. |
 | `gradeLegacyItems` | Loot / Items | [`src/catalog/items/ladder.ts:316`](../../src/catalog/items/ladder.ts) | Puts the legacy families on the ladder (IDL-243), so the grade ceilings of the biome pools and the merchant hold for every piece: |
@@ -243,7 +243,8 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rebirthUnlockIntro` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:40`](../../src/utils/game/rebirthUnlocks.ts) | The biome a rebirth unlocks, with what its tiles make, for the small modal shown right after the rebirth. |
 | `receiveDrops` | Loot / Pipeline | [`src/lib/loot/receive.ts:24`](../../src/lib/loot/receive.ts) | Hands drops to the player: |
 | `reconcileCharacter` | Progression / Levels | [`src/utils/game/character.ts:167`](../../src/utils/game/character.ts) | Puts a character's attributes in line with an XP total: |
-| `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:14`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
+| `recordCuriosity` | Progression / Achievements | [`src/lib/offline/curiosity.ts:20`](../../src/lib/offline/curiosity.ts) | Records a curiosity once. |
+| `recordRankPlace` | Progression / Achievements | [`src/lib/offline/curiosity.ts:31`](../../src/lib/offline/curiosity.ts) | Records the podium place a player holds on a Ranking board (1 to 3, any board): |
 | `refreshCost` | Economy / Merchant | [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts) | The gold the next paid refresh costs, when `refreshesBought` have been bought: |
 | `refundOldShop` | Saves & Server / Migrations | [`src/lib/emberShopMigration.ts:37`](../../src/lib/emberShopMigration.ts) | The Ember shop was reworked (new ids, costs and effects). |
 | `regen` | Combat / Player numbers | [`src/lib/combat.ts:244`](../../src/lib/combat.ts) | HP regeneration outside fights: |
@@ -275,7 +276,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `sellPayout` | Economy / Merchant | [`src/utils/game/merchant.ts:65`](../../src/utils/game/merchant.ts) | Gold for selling `qty` of something worth `unit` each. |
 | `sellResource` | Economy / Merchant | [`src/lib/offline/trade.ts:99`](../../src/lib/offline/trade.ts) | Sells `qty` units of `resource` to the merchant: |
 | `sellValueOf` | Loot / Items | [`src/lib/itemInstance.ts:106`](../../src/lib/itemInstance.ts) | What a merchant pays for an instance: |
-| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:213`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
+| `settleAchievements` | Progression / Achievements | [`src/lib/offline/achievements.ts:216`](../../src/lib/offline/achievements.ts) | Lazy evaluation, once per online request: |
 | `settleIdols` | Saves & Server / Accepting a save | [`src/lib/cloudSave/idolTrust.ts:19`](../../src/lib/cloudSave/idolTrust.ts) | The server's say over the Idol levels (the account's `idolLevels`). |
 | `shopPriceOf` | Economy / Merchant | [`src/lib/merchant.ts:22`](../../src/lib/merchant.ts) | What a piece of gear costs at the merchant: |
 | Short notices (notify) | Architecture / Notifications | [`src/lib/notices.ts:14`](../../src/lib/notices.ts) | THE way to tell the player something short: |

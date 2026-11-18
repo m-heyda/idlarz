@@ -115,6 +115,34 @@ const LADDERS: Ladder[] = [
 		text: (min) => `Slay ${n(min)} Mossback Wolves.`,
 		steps: [{ min: 5000, points: 80 }],
 	},
+	{
+		deed: 'golden_touch',
+		from: 1,
+		prefix: 'golden',
+		name: 'Golden touch',
+		when: (min) => ({ kind: 'golden', min }),
+		text: (min) => `Kill ${n(min)} golden monsters.`,
+		steps: [
+			{ min: 10, points: 20 },
+			{ min: 50, points: 40 },
+			{ min: 250, points: 80 },
+			{ min: 1000, points: 150 },
+			{ min: 5000, points: 300, title: { id: 'midas', name: 'Midas' } },
+		],
+	},
+	{
+		deed: 'bossbane',
+		from: 3,
+		prefix: 'boss_kills',
+		name: 'Bossbane',
+		when: (min) => ({ kind: 'bosses', min }),
+		text: (min) => `Defeat ${n(min)} bosses.`,
+		steps: [
+			{ min: 250, points: 100 },
+			{ min: 1000, points: 200 },
+			{ min: 5000, points: 400, title: { id: 'worldbreaker', name: 'Worldbreaker' } },
+		],
+	},
 ];
 
 /** The badge a deed already uses (the new tiers keep it) */
@@ -126,6 +154,8 @@ export const BATCH3_BADGES: Readonly<Record<string, string>> = {
 	reborn: 'badge_first_rebirth_fire',
 	untouched: 'badge_shield_silver',
 	wolfsbane: 'badge_sword_silver',
+	golden_touch: 'badge_golden_monster_gold',
+	bossbane: 'badge_great_auroch_boss',
 };
 
 /** The new tier achievements, in order. */

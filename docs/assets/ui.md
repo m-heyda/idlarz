@@ -154,7 +154,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx | `pixel/icons/rank_trophy.png` |
+| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx, src/lib/offline/curiosity.ts | `pixel/icons/rank_trophy.png` |
 
 ## skill
 

@@ -40,7 +40,7 @@
   "kind": "function",
   "category": "Saves & Server/Endpoints",
   "file": "src/app/api/rankings/route.ts",
-  "line": 18,
+  "line": 23,
   "summary": "The Rankings: `GET /api/rankings?board=level|rebirths|crafting|tiles|kills|deeds`. Answers the first 50 places of the board (rank, the change since the last rebuild, the name with its colour, badge, title and avatar, the value) and the asking player's own place when it is further down. Every non-test account of the current chapter is ranked (`refresh_rankings()`), and no account id is sent. The places are rebuilt at most once per 24 hours, by the first request after that (`refresh_rankings()`, a single SQL call, so no scheduled job is needed); the cosmetics are read live. The `quests` board is not built and is a 400.",
   "see": []
  },
@@ -72,7 +72,7 @@
   "kind": "const",
   "category": "Progression/Achievements",
   "file": "src/catalog/achievements.ts",
-  "line": 103,
+  "line": 116,
   "summary": "The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds ({@link settleAchievements}) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. \"Rat King defeated\" was replaced by the first boss, The Great Auroch. The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.",
   "see": [
    "settleAchievements",
@@ -86,7 +86,7 @@
   "kind": "const",
   "category": "Progression/Deeds",
   "file": "src/catalog/achievements.ts",
-  "line": 546,
+  "line": 560,
   "summary": "The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).",
   "see": [
    "deedState",
@@ -1833,7 +1833,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/deeds.ts",
-  "line": 202,
+  "line": 223,
   "summary": "The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.",
   "see": []
  },
@@ -2293,7 +2293,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/offline/achievements.ts",
-  "line": 101,
+  "line": 104,
   "summary": "Claims one deed point milestone: pays its gems once (capped by `GEMS_CAP`) and records it in `stats.milestonesClaimed`; its bonus is on from then ({@link deedBonuses}). Refused for an id that is not a milestone, one the claimed points have not reached yet, or one already claimed.",
   "see": []
  },
@@ -2304,7 +2304,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 129,
+  "line": 132,
   "summary": "The Claim button: pays the rewards of one earned achievement once. The gems go onto the authoritative balance (capped by `GEMS_CAP`) and into `granted` (like a chest's gem find), and the id is recorded in `stats.claimed` with the time. Refused (nothing changes) for an id that is not in the catalog, was not earned, or was claimed already, so a repeated or forged claim pays nothing. The avatar and the title of an achievement are available from the moment it is earned; they do not wait for the claim.",
   "see": []
  },
@@ -2315,7 +2315,7 @@
   "kind": "function",
   "category": "Progression/Deeds",
   "file": "src/lib/offline/achievements.ts",
-  "line": 158,
+  "line": 161,
   "summary": "Claim all: pays every earned tier that is not claimed yet in one go (one request, one idempotency key, one ledger write, so it is all or nothing). The gems of all of them are added together and capped once by `GEMS_CAP` (what the cap cuts off is lost, as with a single claim), and each id is recorded in `stats.claimed` with the time. Refused when nothing is waiting.",
   "see": []
  },
@@ -2326,7 +2326,7 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/achievements.ts",
-  "line": 213,
+  "line": 216,
   "summary": "Lazy evaluation, once per online request: the achievements that became due are recorded as earned in the same ledger write (a compare-and-swap, so two requests at once cannot both record; a replayed request finds the id recorded and records nothing). The caller mirrors the ids into `player_achievements` with `insert ... on conflict do nothing` after the write lands (`AchievementRepo`).",
   "see": [
    "achievementsDue",
@@ -2408,8 +2408,19 @@
   "kind": "function",
   "category": "Progression/Achievements",
   "file": "src/lib/offline/curiosity.ts",
-  "line": 14,
+  "line": 20,
   "summary": "Records a curiosity once. An id that is not on the list, or one already recorded, changes nothing (the same ledger comes back).",
+  "see": []
+ },
+ {
+  "id": "recordrankplace",
+  "name": "recordRankPlace",
+  "symbol": "recordRankPlace",
+  "kind": "function",
+  "category": "Progression/Achievements",
+  "file": "src/lib/offline/curiosity.ts",
+  "line": 31,
+  "summary": "Records the podium place a player holds on a Ranking board (1 to 3, any board): `rank_<place>` once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.",
   "see": []
  },
  {

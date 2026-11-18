@@ -19,7 +19,7 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
-import { recordChest, recordCraft } from '@/lib/offline/stats';
+import { recordChest, recordCraft, recordCraftedRare } from '@/lib/offline/stats';
 import { buyResource, sellResource } from '@/lib/offline/trade';
 import {
 	UNCLAIMED_SEC,
@@ -33,7 +33,7 @@ import {
 	type StepOutcome,
 } from '@/lib/offline/service';
 import { advanceBank, secondsToNext, takeChestAt, type TicketBank } from '@/lib/offline/tickets';
-import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, type CraftEnv } from '@/lib/offline/craft';
+import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
 import type { ChestReward, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -331,7 +331,17 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			craft: result.craft,
 			serverNowSec: ctx.nowSec,
 		};
-		return { ledger: result.ok ? { ...ledger, inv: result.inv, craft: result.craft, stats: recordCraft(ledger.stats, result.crafted ?? 0) } : ledger, value };
+		return {
+			ledger: result.ok
+				? {
+						...ledger,
+						inv: result.inv,
+						craft: result.craft,
+						stats: recordCraftedRare(recordCraft(ledger.stats, result.crafted ?? 0), craftedGearAdded(ledger.inv!, result.inv)),
+					}
+				: ledger,
+			value,
+		};
 	});
 
 /**
