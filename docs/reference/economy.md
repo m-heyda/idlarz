@@ -1412,16 +1412,16 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 
 Source: [`src/config/rocks.ts:25`](../../src/config/rocks.ts)
 
-The rock tiers. A common rock takes 100 clicks, an uncommon one 250, a rare one 500 and an epic one 1,000. Weights: 70 / 22 / 7 / 1 before Luck.
+The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.
 
 **Rock tiers** _(computed from the code)_
 
 | Tier | Name | Clicks to break | Weight | Share without Luck |
 | --- | --- | --- | --- | --- |
-| common | Rock | 100 | 70 | 70% |
-| uncommon | Silver ore | 250 | 22 | 22% |
-| rare | Rich ore | 500 | 7 | 7% |
-| epic | Crystal | 1,000 | 1 | 1% |
+| common | Rock | 50 | 70 | 70% |
+| uncommon | Silver ore | 125 | 22 | 22% |
+| rare | Rich ore | 250 | 7 | 7% |
+| epic | Crystal | 500 | 1 | 1% |
 
 <a id="rock"></a>
 
@@ -1463,12 +1463,12 @@ Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.
 | --- | --- | --- | --- |
 | common | stone | 2-4 min of income (at least 25) | always |
 | common | coal | 1-2 min of income (at least 15) | always |
-| common | ing_copper_ore | 1 | 4% |
+| common | ing_copper_ore | 1 | 10% |
 | common | ing_ember_coal | 1 | 2% |
 | uncommon | stone | 5-8 min of income (at least 60) | always |
 | uncommon | coal | 3-5 min of income (at least 35) | always |
 | uncommon | ing_silver_ore | 1 | 12% |
-| uncommon | ing_copper_ore | 1 | 6% |
+| uncommon | ing_copper_ore | 1 | 10% |
 | uncommon | ing_ember_coal | 1 | 4% |
 | rare | stone | 10-15 min of income (at least 120) | always |
 | rare | coal | 6-10 min of income (at least 70) | always |

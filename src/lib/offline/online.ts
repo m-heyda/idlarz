@@ -19,7 +19,7 @@ import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
 import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
-import { recordChest, recordCraft, recordCraftedRare } from '@/lib/offline/stats';
+import { recordChest, recordCraft, recordCraftedRare, recordRock } from '@/lib/offline/stats';
 import { buyResource, sellResource } from '@/lib/offline/trade';
 import {
 	UNCLAIMED_SEC,
@@ -314,6 +314,7 @@ export const hitRock = (
 				ledger: {
 					...ledger,
 					bank: next,
+					stats: recordRock(ledger.stats, rock.tier, stashed.stored.ing_ember_coal ?? 0),
 					craft: Object.keys(stashed.stored).length > 0 ? { ...ledger.craft, stock: stashed.stock } : ledger.craft,
 					granted: addTotals(ledger.granted, loot.resources),
 				},

@@ -59,10 +59,10 @@ test('rocks come much more often than chests (every 150 s), faster with Luck but
 	assert.equal(rockIntervalSec(1_000_000), 150 * 0.6);
 });
 
-test('the tiers need 100, 250, 500 and 1,000 clicks, and a better rock is rarer', () => {
+test('the tiers need 50, 125, 250 and 500 clicks, and a better rock is rarer', () => {
 	assert.deepEqual(
 		ROCK_TIER_ORDER.map((t) => ROCK_TIERS[t].clicks),
-		[100, 250, 500, 1000],
+		[50, 125, 250, 500],
 	);
 	const weights = ROCK_TIER_ORDER.map((t) => ROCK_TIERS[t].weight);
 	assert.deepEqual(
@@ -92,7 +92,7 @@ test('every tier has a picture, and the picture of a rock never changes', () => 
 		for (let n = 1; n <= 6; n++) assert.equal(rockSprite(tier, n), rockSprite(tier, n));
 		assert.match(rockSprite(tier, 1), /^\/pixel\/rocks\/rock_[a-z]+\.png$/);
 	}
-	assert.notEqual(rockSprite('rare', 0), rockSprite('rare', 1), 'a rare rock is gold or copper');
+	assert.match(rockSprite('rare', 3), /rock_gold/, 'a rich ore is gold');
 });
 
 test('the click bucket: a new rock lets a burst in, then only what a person could click', () => {

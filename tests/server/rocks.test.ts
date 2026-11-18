@@ -89,7 +89,9 @@ test('a click on a tile with no rock does nothing', async () => {
 
 test('clicks are let in at a person’s pace: a burst, then 24 a second', async () => {
 	const { m, now } = await playing(25);
-	const [rock] = await rocksOf(m, now);
+	// the toughest rock on the map, so the three batches below do not break it
+	const [rock] = [...(await rocksOf(m, now))].sort((a, b) => b.need - a.need);
+	assert.ok(rock.need > ROCK.burst + ROCK.maxCps, 'a rock that takes more clicks than the three batches');
 	const first = ok(await hitRock(m.deps, 'u1', 'rock-key-0010', rock, 200, now + SEC));
 	assert.ok(first.ok && !first.broken);
 	if (first.ok) assert.equal(first.accepted, ROCK.burst, 'a fresh rock takes the burst and no more');
@@ -119,6 +121,8 @@ test('a rock breaks after the clicks its tier needs, pays once from a secret, an
 	assert.ok(!ledger.bank.rocks!.some((r) => r.n === rock.n), 'the ticket is spent');
 	assert.equal(ledger.granted.stone, last.loot.stone, 'what the rock paid is in the ledger, so the next save passes the checks');
 	assert.equal(ledger.granted.coal, last.loot.coal);
+	assert.equal(ledger.stats.rocks, 1, 'counted for the deeds');
+	assert.equal(ledger.stats.rocksByTier[rock.tier], 1);
 	const keyOfLast = `rock-key-${100 + Math.floor((t - now - SEC) / (2 * SEC))}`;
 	const replay = ok(await hitRock(m.deps, 'u1', keyOfLast, rock, ROCK.maxBatch, t + SEC));
 	assert.deepEqual(replay, last, 'a lost answer is replayed, never rolled or paid again');

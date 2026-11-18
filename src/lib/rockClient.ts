@@ -1,7 +1,7 @@
 import { INGREDIENT_COMPONENTS } from '@/catalog/ingredients';
 import { RESOURCE_CAP } from '@/config/economy';
 import { ROCK_TIERS } from '@/config/rocks';
-import { emitFloat } from '@/lib/floatText';
+import { formatCompact } from '@/utils/formatters';
 import { notify } from '@/lib/notices';
 import { newClaimId } from '@/lib/offlineClient';
 import type { RockReply } from '@/lib/offline/types';
@@ -27,13 +27,6 @@ const inflight = new Set<string>();
 const timers = new Map<string, ReturnType<typeof setTimeout>>();
 let lastSound = 0;
 
-const screenCentreOf = (x: number, y: number): { x: number; y: number } | null => {
-	const el = typeof document === 'undefined' ? null : document.getElementById(`tile-${x}-${y}`);
-	if (!el) return null;
-	const box = el.getBoundingClientRect();
-	return { x: box.left + box.width / 2, y: box.top + box.height / 3 };
-};
-
 /** What a broken rock gives the player: the stone and coal go into the resources at once (the server has already counted them as granted), ingredients are told and the crafting bag is read again. */
 const received = (x: number, y: number, reply: Extract<RockReply, { ok: true; broken: true }>) => {
 	const { stone, coal, stash } = reply.loot;
@@ -45,12 +38,10 @@ const received = (x: number, y: number, reply: Extract<RockReply, { ok: true; br
 		},
 	}));
 	useRockStore.getState().pushBurst({ x, y, tier: reply.tier, stone, coal, stash });
-	const at = screenCentreOf(x, y);
-	if (at) {
-		const items = [...(stone > 0 ? [{ resource: 'stone', amount: stone }] : []), ...(coal > 0 ? [{ resource: 'coal', amount: coal }] : [])];
-		if (items.length) emitFloat({ ...at, items });
-	}
-	for (const [id, amount] of Object.entries(stash)) notify(`Found ${INGREDIENT_COMPONENTS[id]?.name ?? id} x${amount}`);
+	// one notice says what the rock gave (the pieces themselves fall on the map, see RockLayer)
+	const found = Object.entries(stash).map(([id, amount]) => `${INGREDIENT_COMPONENTS[id]?.name ?? id} x${amount}`);
+	const gave = [stone > 0 ? `${formatCompact(stone)} stone` : '', coal > 0 ? `${formatCompact(coal)} coal` : '', ...found].filter(Boolean);
+	notify(`${ROCK_TIERS[reply.tier].label} broken: ${gave.join(', ')}`);
 	if (Object.keys(stash).length > 0) {
 		const craft = useCraftStore.getState();
 		if (craft.craft) void craft.refresh();

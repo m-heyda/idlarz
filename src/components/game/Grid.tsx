@@ -39,6 +39,7 @@ import CastleRange from './CastleRange';
 import TerrainLayer from './TerrainLayer';
 import WaterLayer from './WaterLayer';
 import HighlightLayer from './HighlightLayer';
+import MapMarkers from './MapMarkers';
 import MapLoadingOverlay from './MapLoadingOverlay';
 import RockLayer from './RockLayer';
 import { reportCuriosity } from '@/lib/curiosityClient';
@@ -315,6 +316,7 @@ const Grid: React.FC = () => {
 				<div ref={setTipLayer} className='map-tip-layer' />
 			</div>
 			<HighlightLayer />
+			<MapMarkers />
 			<MapLoadingOverlay show={!mapReady} />
 		</div>
 	);

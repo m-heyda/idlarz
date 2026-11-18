@@ -67,6 +67,10 @@ export interface LifetimeStats {
 	 * an accepted save that accounts for them drops them (`settleTrades`, trade.ts). Additive: absent reads as none.
 	 */
 	tradeSince: TradeSince;
+	/** Rocks the server has seen broken (mining), in all and per tier (`common` ... `epic`), and the Ember Coal they gave. Additive: absent reads as 0. */
+	rocks: number;
+	rocksByTier: Record<string, number>;
+	emberCoal: number;
 	/** One-off events the server recorded for the secret deeds (`curiosity` ids from a short allowlist, `lib/offline/curiosity.ts`). Additive: absent reads as none. */
 	curiosity: string[];
 }
@@ -117,6 +121,9 @@ export const emptyStats = (): LifetimeStats => ({
 	masteryClaimed: {},
 	biomeClaimed: {},
 	tradeSince: emptyTrade(),
+	rocks: 0,
+	rocksByTier: {},
+	emberCoal: 0,
 	curiosity: [],
 });
 
@@ -173,6 +180,9 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		masteryClaimed: counts(r.masteryClaimed),
 		biomeClaimed: counts(r.biomeClaimed),
 		tradeSince: tradeOf(r.tradeSince),
+		rocks: Math.floor(num(r.rocks)),
+		rocksByTier: counts(r.rocksByTier),
+		emberCoal: Math.floor(num(r.emberCoal)),
 		curiosity: ids(r.curiosity),
 	};
 };
@@ -198,6 +208,9 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		masteryClaimed,
 		biomeClaimed,
 		tradeSince,
+		rocks,
+		rocksByTier,
+		emberCoal,
 		curiosity,
 		...rest
 	} = s;
@@ -222,6 +235,9 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(Object.keys(masteryClaimed).length > 0 ? { masteryClaimed } : {}),
 		...(Object.keys(biomeClaimed).length > 0 ? { biomeClaimed } : {}),
 		...(!isEmptyTrade(tradeSince) ? { tradeSince } : {}),
+		...(rocks > 0 ? { rocks } : {}),
+		...(Object.keys(rocksByTier).length > 0 ? { rocksByTier } : {}),
+		...(emberCoal > 0 ? { emberCoal } : {}),
 		...(curiosity.length > 0 ? { curiosity } : {}),
 	};
 };
@@ -255,6 +271,9 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	Object.keys(s.masteryClaimed).length === 0 &&
 	Object.keys(s.biomeClaimed).length === 0 &&
 	isEmptyTrade(s.tradeSince) &&
+	s.rocks === 0 &&
+	Object.keys(s.rocksByTier).length === 0 &&
+	s.emberCoal === 0 &&
 	s.curiosity.length === 0;
 
 /**
@@ -330,6 +349,14 @@ export const bestiaryOf = (stats: LifetimeStats): BestiaryReport => ({
 });
 
 /** A chest opened: counted once, when the server pays it. */
+/** A rock broken on the server (counted once, when its loot is paid): in all, per tier, and the Ember Coal it held. */
+export const recordRock = (stats: LifetimeStats, tier: string, emberCoal = 0): LifetimeStats => ({
+	...stats,
+	rocks: stats.rocks + 1,
+	rocksByTier: { ...stats.rocksByTier, [tier]: (stats.rocksByTier[tier] ?? 0) + 1 },
+	emberCoal: stats.emberCoal + Math.max(0, Math.floor(emberCoal)),
+});
+
 export const recordChest = (stats: LifetimeStats): LifetimeStats => ({ ...stats, chests: stats.chests + 1 });
 
 /** What an accepted save tells the counters. */

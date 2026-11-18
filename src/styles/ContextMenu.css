@@ -219,3 +219,12 @@
 		animation: none;
 	}
 }
+
+/* the soft markers of the Chests / Ores / Monsters buttons under the map (MapMarkers): above the tint of the tile menu, below every window */
+.map-markers-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 9;
+	pointer-events: none;
+}

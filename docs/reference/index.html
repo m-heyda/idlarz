@@ -2338,7 +2338,7 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 </article><h2>Rocks and Mining</h2><article><p><a id="rock-tiers"></a></p>
 <h3><code>ROCK_TIERS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/config/rocks.ts"><code>src/config/rocks.ts:25</code></a></p>
-<p>The rock tiers. A common rock takes 100 clicks, an uncommon one 250, a rare one 500 and an epic one 1,000. Weights: 70 / 22 / 7 / 1 before Luck.</p>
+<p>The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.</p>
 <p><strong>Rock tiers</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
@@ -2353,28 +2353,28 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 <tbody><tr>
 <td>common</td>
 <td>Rock</td>
-<td>100</td>
+<td>50</td>
 <td>70</td>
 <td>70%</td>
 </tr>
 <tr>
 <td>uncommon</td>
 <td>Silver ore</td>
-<td>250</td>
+<td>125</td>
 <td>22</td>
 <td>22%</td>
 </tr>
 <tr>
 <td>rare</td>
 <td>Rich ore</td>
-<td>500</td>
+<td>250</td>
 <td>7</td>
 <td>7%</td>
 </tr>
 <tr>
 <td>epic</td>
 <td>Crystal</td>
-<td>1,000</td>
+<td>500</td>
 <td>1</td>
 <td>1%</td>
 </tr>
@@ -2457,7 +2457,7 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>common</td>
 <td>ing_copper_ore</td>
 <td>1</td>
-<td>4%</td>
+<td>10%</td>
 </tr>
 <tr>
 <td>common</td>
@@ -2487,7 +2487,7 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>uncommon</td>
 <td>ing_copper_ore</td>
 <td>1</td>
-<td>6%</td>
+<td>10%</td>
 </tr>
 <tr>
 <td>uncommon</td>
@@ -6574,11 +6574,11 @@ Refused (nothing changes) for an id that is not in the catalog, was not earned, 
 <p>Records the podium place a player holds on a Ranking board (1 to 3, any board): <code>rank_&lt;place&gt;</code> once. Called by the server when it reads a board for the player, never from a request body. Other places change nothing.</p>
 </article><article><p><a id="achievements"></a></p>
 <h3>Achievements</h3>
-<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:116</code></a></p>
+<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:122</code></a></p>
 <p>The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 (<a href="#settleachievements"><code>settleAchievements</code></a>) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. &quot;Rat King defeated&quot; was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial&#39;s starter path ends. Later releases add grind ladders (R6) after these.</p>
-<p><strong>The launch achievements (277, 24750 gems in total)</strong> <em>(computed from the code)</em></p>
+<p><strong>The launch achievements (292, 26250 gems in total)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
 <tr>
@@ -8800,6 +8800,126 @@ The first one ends where the guided tutorial&#39;s starter path ends. Later rele
 </tr>
 <tr>
 <td>277</td>
+<td><code>rocks_10</code></td>
+<td>Rock breaker I</td>
+<td>rocks &gt;= 10</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>278</td>
+<td><code>rocks_100</code></td>
+<td>Rock breaker II</td>
+<td>rocks &gt;= 100</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>279</td>
+<td><code>rocks_500</code></td>
+<td>Rock breaker III</td>
+<td>rocks &gt;= 500</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>280</td>
+<td><code>rocks_2500</code></td>
+<td>Rock breaker IV</td>
+<td>rocks &gt;= 2500</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>281</td>
+<td><code>rocks_10000</code></td>
+<td>Rock breaker V</td>
+<td>rocks &gt;= 10000</td>
+<td>150</td>
+<td>rock-breaker</td>
+</tr>
+<tr>
+<td>282</td>
+<td><code>rocks_rich_1</code></td>
+<td>Ore hoarder I</td>
+<td>rocksTier &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>283</td>
+<td><code>rocks_rich_10</code></td>
+<td>Ore hoarder II</td>
+<td>rocksTier &gt;= 10</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>284</td>
+<td><code>rocks_rich_50</code></td>
+<td>Ore hoarder III</td>
+<td>rocksTier &gt;= 50</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>285</td>
+<td><code>rocks_rich_250</code></td>
+<td>Ore hoarder IV</td>
+<td>rocksTier &gt;= 250</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>286</td>
+<td><code>rocks_rich_1000</code></td>
+<td>Ore hoarder V</td>
+<td>rocksTier &gt;= 1000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>287</td>
+<td><code>ember_coal_1</code></td>
+<td>Ember Coal finder I</td>
+<td>emberCoal &gt;= 1</td>
+<td>50</td>
+<td>-</td>
+</tr>
+<tr>
+<td>288</td>
+<td><code>ember_coal_10</code></td>
+<td>Ember Coal finder II</td>
+<td>emberCoal &gt;= 10</td>
+<td>75</td>
+<td>-</td>
+</tr>
+<tr>
+<td>289</td>
+<td><code>ember_coal_50</code></td>
+<td>Ember Coal finder III</td>
+<td>emberCoal &gt;= 50</td>
+<td>100</td>
+<td>-</td>
+</tr>
+<tr>
+<td>290</td>
+<td><code>ember_coal_250</code></td>
+<td>Ember Coal finder IV</td>
+<td>emberCoal &gt;= 250</td>
+<td>125</td>
+<td>-</td>
+</tr>
+<tr>
+<td>291</td>
+<td><code>ember_coal_1000</code></td>
+<td>Ember Coal finder V</td>
+<td>emberCoal &gt;= 1000</td>
+<td>150</td>
+<td>-</td>
+</tr>
+<tr>
+<td>292</td>
 <td><code>castle_15</code></td>
 <td>Grand Architect</td>
 <td>castle level 15</td>
@@ -9088,7 +9208,7 @@ Points count only after their tier was claimed, so a milestone is reached by cla
 </tbody></table>
 </article><article><p><a id="deedbonuses"></a></p>
 <h3><code>deedBonuses</code> <small>function</small></h3>
-<p>Source: <a href="../../src/lib/deeds.ts"><code>src/lib/deeds.ts:223</code></a></p>
+<p>Source: <a href="../../src/lib/deeds.ts"><code>src/lib/deeds.ts:233</code></a></p>
 <p>The bonuses the claimed milestones give on kill rewards, each stat cut at <code>DEED_BONUS_CAP_PCT</code>. One pure function for the server (<code>payKill</code>) and the window.</p>
 <p><strong>Formula</strong></p>
 <pre><code class="language-text">bonus[stat] = min(DEED_BONUS_CAP_PCT, sum of the bonus % of the claimed milestones for that stat)
@@ -9107,7 +9227,7 @@ have not reached yet, or one already claimed.</p>
 </code></pre>
 </article><article><p><a id="deeds"></a></p>
 <h3>Deeds</h3>
-<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:560</code></a></p>
+<p>Source: <a href="../../src/catalog/achievements.ts"><code>src/catalog/achievements.ts:566</code></a></p>
 <p>The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup&#39;s nine deeds, with placeholder rewards (balance pass: IDL-310).</p>
 <p>See also: <code>deedState</code>, <code>deedPoints</code></p>
@@ -9917,7 +10037,7 @@ the browser last saw (<code>lib/epochFetch</code>) and a lower one is refused wi
 <p>Pure, idempotent, and part of reading a save (<code>sanitizeSave</code>), so every path that loads or accepts a save applies it.</p>
 </article></section><section class="cat"><h2 class="cat" id="cat-architecture">Architecture</h2><p class="blurb">Stack, state, the tick loop, the map, rendering and the art pipeline.</p><h2>The loop</h2><article><p><a id="gameapp"></a></p>
 <h3>The tick loop and persistence</h3>
-<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:125</code></a></p>
+<p>Source: <a href="../../src/app/GameApp.tsx"><code>src/app/GameApp.tsx:126</code></a></p>
 <p>The tick loop. <code>GameApp</code> runs <code>setInterval(..., 100 ms)</code> <strong>only</strong> in the owning tab (one tab owns the game through a Web Lock, <code>useSingleTab</code>) and only after the save is loaded and the offline claim is done.
 Each interval computes <code>deltaTime = performance.now() - last</code> (monotonic) and calls <code>store.tick(deltaTime)</code>; <code>tick</code> clamps the delta to <code>0 ... MAX_CATCHUP_SEC</code> (300 s), so a throttled background tab catches up in 5-minute steps
 but a changed system clock can neither skip nor reverse time. Offline progress is not computed here: a player&#39;s absence is claimed from the server before the loop starts (<a href="#computeofflinegrant"><code>computeOfflineGrant</code></a>).</p>

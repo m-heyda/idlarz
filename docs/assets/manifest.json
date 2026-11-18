@@ -16482,21 +16482,6 @@
 		"usedBy": [
 			"rocks"
 		],
-		"name": "rock_copper",
-		"category": "map-details",
-		"subcategory": "mineable rocks",
-		"src": "/pixel/rocks/rock_copper.png",
-		"status": "used",
-		"source": "rocks",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [
-			"rocks"
-		],
 		"name": "rock_crystal",
 		"category": "map-details",
 		"subcategory": "mineable rocks",
@@ -21048,12 +21033,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/components/game/MapHighlightBar.tsx"
+		],
 		"name": "bonus_chest",
 		"category": "ui",
 		"subcategory": "bonus",
 		"src": "/pixel/icons/bonus_chest.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			32,
@@ -21894,7 +21881,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"code"
+		],
 		"name": "menu_bestiary",
 		"category": "ui",
 		"subcategory": "menu",

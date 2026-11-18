@@ -16,17 +16,17 @@ export interface RockTierDef {
 }
 
 /**
- * The rock tiers. A common rock takes 100 clicks, an uncommon one 250, a rare one 500 and an epic one 1,000. Weights: 70 / 22 / 7 / 1 before Luck.
+ * The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500. Weights: 70 / 22 / 7 / 1 before Luck.
  *
  * @category Economy/Rocks and Mining
  * @order 1
  * @table rock-tiers
  */
 export const ROCK_TIERS: Record<RockTier, RockTierDef> = {
-	common: { label: 'Rock', clicks: 100, weight: 70, sprites: ['rock_stone'] },
-	uncommon: { label: 'Silver ore', clicks: 250, weight: 22, sprites: ['rock_silver'] },
-	rare: { label: 'Rich ore', clicks: 500, weight: 7, sprites: ['rock_gold', 'rock_copper'] },
-	epic: { label: 'Crystal', clicks: 1000, weight: 1, sprites: ['rock_crystal'] },
+	common: { label: 'Rock', clicks: 50, weight: 70, sprites: ['rock_stone'] },
+	uncommon: { label: 'Silver ore', clicks: 125, weight: 22, sprites: ['rock_silver'] },
+	rare: { label: 'Rich ore', clicks: 250, weight: 7, sprites: ['rock_gold'] },
+	epic: { label: 'Crystal', clicks: 500, weight: 1, sprites: ['rock_crystal'] },
 };
 
 /** The picture of a rock: one of its tier's sprites, chosen from the ticket number so a rock never changes its look. */
@@ -75,14 +75,14 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 	common: [
 		{ kind: 'resource', id: 'stone', minutes: [2, 4], floor: 25 },
 		{ kind: 'resource', id: 'coal', minutes: [1, 2], floor: 15 },
-		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.04, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.1, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.02, qty: [1, 1] },
 	],
 	uncommon: [
 		{ kind: 'resource', id: 'stone', minutes: [5, 8], floor: 60 },
 		{ kind: 'resource', id: 'coal', minutes: [3, 5], floor: 35 },
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.12, qty: [1, 1] },
-		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.06, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.1, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.04, qty: [1, 1] },
 	],
 	rare: [

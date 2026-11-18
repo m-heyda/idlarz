@@ -274,7 +274,9 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`KingdomWindow.tsx`](../../src/components/game/KingdomWindow.tsx) — ~ The Kingdom overview window (the crown icon next to the settings gear):
 - [`LevelOrb.tsx`](../../src/components/game/LevelOrb.tsx) — ~ The level shown inside the orb; leave out for a plain orb
 - [`LevelUpTimer.tsx`](../../src/components/game/LevelUpTimer.tsx)
+- [`MapHighlightBar.tsx`](../../src/components/game/MapHighlightBar.tsx)
 - [`MapLoadingOverlay.tsx`](../../src/components/game/MapLoadingOverlay.tsx) — ~ The eight pixels of the spinner ring (8 px squares on a 64 px grid); each one lights up a step after the one before it (see `.map-spinner` in MapLoading.css).
+- [`MapMarkers.tsx`](../../src/components/game/MapMarkers.tsx) — ~ The edge arrow keeps this far from the borders of the screen (the dock is below, the header above)
 - [`MapTip.tsx`](../../src/components/game/MapTip.tsx) — ~ A hover card on the map, kept on screen.
 - [`MapTipLayer.tsx`](../../src/components/game/MapTipLayer.tsx) — ~ The layer that map tooltips are drawn into.
 - [`Minimap.tsx`](../../src/components/game/Minimap.tsx) — ~ Size of the overview (css px)
@@ -285,7 +287,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
 - [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
-- [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ A small repeatable pseudo-random number from a seed, so a burst looks the same on every render.
+- [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ The ore a rock of each tier is made of:
 - [`StableNumber.tsx`](../../src/components/game/StableNumber.tsx) — ~ Reserve room for at least this much text (CSS length), so a short number does not make the chip shrink and grow
 - [`TerrainLayer.tsx`](../../src/components/game/TerrainLayer.tsx) — ~ The map's ground:
 - [`Tile.tsx`](../../src/components/game/Tile.tsx)
@@ -1033,6 +1035,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`pets.test.ts`](../../tests/server/pets.test.ts) — ~ A random source that walks through a fixed list, then repeats it.
 - [`playerReset.test.ts`](../../tests/server/playerReset.test.ts) — ~ A tiny in-memory app_settings table behind the two calls season.ts makes
 - [`restoreTrust.test.ts`](../../tests/server/restoreTrust.test.ts) — The way back for a false-positive flag (IDL-209) and proof that the save path is unchanged while enforcement is off.
+- [`rockDeeds.test.ts`](../../tests/server/rockDeeds.test.ts)
 - [`rocks.test.ts`](../../tests/server/rocks.test.ts)
 - [`serverBoundary.test.ts`](../../tests/server/serverBoundary.test.ts)
 - [`serverInventory.test.ts`](../../tests/server/serverInventory.test.ts) — ~ A loot table that keeps a bad-luck counter (the only keys a save may hold in `lootPity`)

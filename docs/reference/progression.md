@@ -942,13 +942,13 @@ Records the podium place a player holds on a Ranking board (1 to 3, any board): 
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:116`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:122`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (277, 24750 gems in total)** _(computed from the code)_
+**The launch achievements (292, 26250 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -1228,7 +1228,22 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 274 | `map_zoom_min` | Where did everything go? | curiosity map_zoom_min | 50 | - |
 | 275 | `boss_window` | Not yet, big guy | curiosity boss_window | 50 | - |
 | 276 | `castle_skin` | Fashion victim | curiosity castle_skin | 50 | - |
-| 277 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
+| 277 | `rocks_10` | Rock breaker I | rocks >= 10 | 50 | - |
+| 278 | `rocks_100` | Rock breaker II | rocks >= 100 | 75 | - |
+| 279 | `rocks_500` | Rock breaker III | rocks >= 500 | 100 | - |
+| 280 | `rocks_2500` | Rock breaker IV | rocks >= 2500 | 125 | - |
+| 281 | `rocks_10000` | Rock breaker V | rocks >= 10000 | 150 | rock-breaker |
+| 282 | `rocks_rich_1` | Ore hoarder I | rocksTier >= 1 | 50 | - |
+| 283 | `rocks_rich_10` | Ore hoarder II | rocksTier >= 10 | 75 | - |
+| 284 | `rocks_rich_50` | Ore hoarder III | rocksTier >= 50 | 100 | - |
+| 285 | `rocks_rich_250` | Ore hoarder IV | rocksTier >= 250 | 125 | - |
+| 286 | `rocks_rich_1000` | Ore hoarder V | rocksTier >= 1000 | 150 | - |
+| 287 | `ember_coal_1` | Ember Coal finder I | emberCoal >= 1 | 50 | - |
+| 288 | `ember_coal_10` | Ember Coal finder II | emberCoal >= 10 | 75 | - |
+| 289 | `ember_coal_50` | Ember Coal finder III | emberCoal >= 50 | 100 | - |
+| 290 | `ember_coal_250` | Ember Coal finder IV | emberCoal >= 250 | 125 | - |
+| 291 | `ember_coal_1000` | Ember Coal finder V | emberCoal >= 1000 | 150 | - |
+| 292 | `castle_15` | Grand Architect | castle level 15 | 125 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -1404,7 +1419,7 @@ Points count only after their tier was claimed, so a milestone is reached by cla
 
 ### `deedBonuses` <small>function</small>
 
-Source: [`src/lib/deeds.ts:223`](../../src/lib/deeds.ts)
+Source: [`src/lib/deeds.ts:233`](../../src/lib/deeds.ts)
 
 The bonuses the claimed milestones give on kill rewards, each stat cut at `DEED_BONUS_CAP_PCT`. One pure function for the server (`payKill`) and the window.
 
@@ -1441,7 +1456,7 @@ gems(tier n) = 50 + 25 x (n - 1)      (n = 1 for the first tier of the deed)
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:560`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:566`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

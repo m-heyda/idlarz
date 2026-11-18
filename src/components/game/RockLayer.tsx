@@ -5,9 +5,15 @@ import '@/styles/Rocks.css';
 
 // The break effect of a rock (IDL-376): a flash, a spray of chips in the colour of the stone, and a few pieces (stone, coal and what else came out) that are thrown out of the rock and fall. Purely a picture of what the server already paid.
 
-const LIFE_MS = 1500;
+const LIFE_MS = 2100;
 const STONE = '/pixel/icons/stone.png';
 const COAL = '/pixel/icons/coal.png';
+/** The ore a rock of each tier is made of: pieces of it fall with the stone and coal (the same pictures as the bag icons of the ingredients) */
+const TIER_ORE: Partial<Record<RockBurst['tier'], string>> = {
+	uncommon: '/pixel/items/junk/junk_silver_ore.png',
+	rare: '/pixel/items/junk/junk_gold_ore.png',
+	epic: '/pixel/items/junk/junk_crystal.png',
+};
 const CHIP_COLOURS: Record<RockBurst['tier'], string[]> = {
 	common: ['#8b867a', '#a8a293', '#6f6a60'],
 	uncommon: ['#b9c4cf', '#8f9aa8', '#e6edf3'],
@@ -24,8 +30,18 @@ const rand = (seed: number): number => {
 /** The picture of an ingredient from the crafting bag key (`ing_ember_coal` -> the junk art of the same name) */
 const stashArt = (key: string): string => `/pixel/items/junk/junk_${key.replace(/^ing_/, '')}.png`;
 
-const piecesOf = (burst: RockBurst): string[] =>
-	[STONE, STONE, ...(burst.stone > 0 ? [STONE] : []), COAL, ...(burst.coal > 0 ? [COAL] : []), ...Object.keys(burst.stash).map(stashArt)].slice(0, 8);
+/** What falls out of the rock: stone and coal for what it paid, pieces of its own ore (silver, gold, crystal) and one piece of every ingredient it held, in a fan from the left to the right. */
+const piecesOf = (burst: RockBurst): string[] => {
+	const ore = TIER_ORE[burst.tier];
+	return [
+		STONE,
+		...(burst.stone > 0 ? [STONE] : []),
+		...(ore ? [ore, ore] : []),
+		COAL,
+		...(burst.coal > 0 ? [COAL] : []),
+		...Object.keys(burst.stash).map(stashArt),
+	].slice(0, 9);
+};
 
 const Burst: React.FC<{ burst: RockBurst }> = ({ burst }) => {
 	const drop = useRockStore((s) => s.dropBurst);
@@ -64,8 +80,8 @@ const Burst: React.FC<{ burst: RockBurst }> = ({ burst }) => {
 					'--dx': `${dir * 34 + (rand(burst.id + i) - 0.5) * 10}px`,
 					'--up': `${-26 - rand(burst.id * 3 + i) * 12}px`,
 					'--down': `${14 + rand(burst.id * 5 + i) * 6}px`,
-					'--t': `${850 + rand(i + burst.id) * 250}ms`,
-					'--delay': `${i * 35}ms`,
+					'--t': `${1350 + rand(i + burst.id) * 250}ms`,
+					'--delay': `${i * 40}ms`,
 				} as React.CSSProperties;
 				return (
 					<span key={`p${i}`} className='rock-fx-x' style={style}>

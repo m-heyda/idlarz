@@ -4,8 +4,10 @@
  *   npm run grant-test-rocks -- --email <address>                  DRY RUN: finds the account, reads its map and ledger, says what it would add, writes nothing
  *   npm run grant-test-rocks -- --email <address> --yes            backs the ledger row up (`backups/grant-test-rocks-<time>.json`) and writes the change
  *   options: --count <1..5>   how many rocks of each tier (default 1; 4 tiers, so 4 rocks by default)
+ *            --chests <0..20>  how many treasure chests to put on the map as well (default 0)
+ *            --clear           first takes every monster, the boss, every chest and every rock off the map (their tickets are dropped from the bank), so only what this run adds is there
  *
- * What it changes (only the `player_ledger` row, through the same compare-and-swap the server uses, so a browser saving at the same moment makes it refuse instead of overwrite): the bank gets `--count` rocks of each tier, each already on a free tile
+ * What it changes (only the `player_ledger` row, through the same compare-and-swap the server uses, so a browser saving at the same moment makes it refuse instead of overwrite): the bank gets `--count` rocks of each tier and `--chests` chests, each already on a free tile
  * (owned land that is not water, the castle, its ward, a building, a chest, a monster or another rock). They count like rocks the server made: mine them from the browser and the server pays them. It refuses when the account has no ledger or no map yet
  * (sign in and play for a moment first) or when the land has too few free tiles.
  * Undo: put the old `bank` of the backup file back into the row, or reset the account with `npm run reset-test-account` (only for the documented test account).
@@ -17,6 +19,7 @@ import { createClient } from '@supabase/supabase-js';
 import { ROCK_TIER_ORDER } from '../src/config/rocks';
 import { castleLevelOf } from '../src/lib/castleWard';
 import { mulberry32 } from '../src/lib/rng';
+import { pickChestSpot } from '../src/lib/chests';
 import { pickRockSpot } from '../src/lib/rocks';
 import { supabaseLedgerRepo } from '../src/lib/offline/supabaseLedger';
 import { worldFromPart } from '../src/lib/offline/placement';
@@ -32,6 +35,8 @@ const execute = args.includes('--yes');
 // the e-mail is `--email <address>` or just the first bare word (PowerShell and npm can swallow the `--` that npm needs, so the plain form works too)
 const email = (option('--email') ?? args.find((a) => a.includes('@')))?.toLowerCase();
 const count = Math.min(5, Math.max(1, Math.floor(Number(option('--count') ?? 1)) || 1));
+const chestCount = Math.min(20, Math.max(0, Math.floor(Number(option('--chests') ?? 0)) || 0));
+const clear = args.includes('--clear');
 
 for (const file of ['.env.local', '.env']) {
 	try {
@@ -72,12 +77,13 @@ const run = async (): Promise<void> => {
 
 	const nowSec = Math.floor(Date.now() / 1000);
 	const castleLevel = castleLevelOf(world);
+	// with --clear the map starts empty: no monster (the boss too), no chest, no rock
+	const bank = clear ? { ...ledger.bank, monsters: [], chests: [], rocks: [], monsterAcc: 0, bossAcc: 0, chestAcc: 0, rockAcc: 0 } : ledger.bank;
 	const taken = new Set<string>();
-	for (const t of [...ledger.bank.monsters, ...ledger.bank.chests, ...rocksOf(ledger.bank)])
-		if (t.x !== undefined && t.y !== undefined) taken.add(`${t.x},${t.y}`);
+	for (const t of [...bank.monsters, ...bank.chests, ...rocksOf(bank)]) if (t.x !== undefined && t.y !== undefined) taken.add(`${t.x},${t.y}`);
 	const rng = mulberry32(Date.now() & 0x7fffffff);
 	const added: RockTicket[] = [];
-	let n = ledger.bank.nextRockN ?? 1;
+	let n = bank.nextRockN ?? 1;
 	for (let round = 0; round < count; round++) {
 		for (const tier of ROCK_TIER_ORDER) {
 			const spot = pickRockSpot(world, taken, castleLevel, rng);
@@ -86,10 +92,27 @@ const run = async (): Promise<void> => {
 			added.push({ n: n++, at: nowSec, tier, hits: 0, x: spot.x, y: spot.y });
 		}
 	}
-	const next: Ledger = { ...ledger, ver: ledger.ver + 1, bank: { ...ledger.bank, rocks: [...rocksOf(ledger.bank), ...added], nextRockN: n } };
+	const chestTickets: { n: number; at: number; x: number; y: number }[] = [];
+	let nextN = bank.nextN;
+	for (let i = 0; i < chestCount; i++) {
+		const spot = pickChestSpot(world, taken, castleLevel, rng);
+		if (!spot) return stop(`The land has no more free tiles for chests (${chestTickets.length} placed so far). Nothing was changed.`);
+		taken.add(`${spot.x},${spot.y}`);
+		chestTickets.push({ n: nextN++, at: nowSec, x: spot.x, y: spot.y });
+	}
+	const next: Ledger = {
+		...ledger,
+		ver: ledger.ver + 1,
+		bank: { ...bank, rocks: [...rocksOf(bank), ...added], nextRockN: n, chests: [...bank.chests, ...chestTickets], nextN },
+	};
 
 	console.log(`${execute ? 'GRANTING' : 'DRY RUN (nothing is written)'} on ${new URL(url!).host}, account ${email}.`);
+	if (clear)
+		console.log(
+			`Would clear ${ledger.bank.monsters.length} monster ticket(s), ${ledger.bank.chests.length} chest(s) and ${rocksOf(ledger.bank).length} rock(s) first.`,
+		);
 	for (const rock of added) console.log(`  ${rock.tier.padEnd(9)} rock #${rock.n} on tile ${rock.x},${rock.y}`);
+	for (const chest of chestTickets) console.log(`  chest #${chest.n} on tile ${chest.x},${chest.y}`);
 	if (!execute) return void console.log('\nNothing changed. Re-run with --yes to apply.');
 
 	mkdirSync(resolve(process.cwd(), 'backups'), { recursive: true });

@@ -17,6 +17,12 @@ export type AchievementCondition =
 	/** Monsters killed, all types */
 	| { kind: 'kills'; min: number }
 	| { kind: 'chests'; min: number }
+	/** Rocks broken (mining), all kinds */
+	| { kind: 'rocks'; min: number }
+	/** Rocks of this tier or a better one broken (`common` ... `epic`) */
+	| { kind: 'rocksTier'; tier: 'uncommon' | 'rare' | 'epic'; min: number }
+	/** Ember Coal found in rocks */
+	| { kind: 'emberCoal'; min: number }
 	/** The castle has reached this level in the last accepted save */
 	| { kind: 'castle'; level: number }
 	| { kind: 'rebirths'; min: number }
