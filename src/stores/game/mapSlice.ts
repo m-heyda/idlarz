@@ -6,6 +6,7 @@ import { applyOfflineGrant } from '@/lib/offline/apply';
 import { reconcileTickets } from '@/lib/offline/reconcile';
 import type { ClaimResult, SyncResult } from '@/lib/offline/types';
 import type { GameState } from '@/types/game';
+import { useRockStore } from '@/stores/rockStore';
 import { getTile, setTile } from '@/utils/world';
 import { limitCtx, type GameGet, type GameSet } from './base';
 import type { ChestSync } from './chestSync';
@@ -57,6 +58,7 @@ export const createMapSlice = (set: GameSet, get: GameGet, inv: InventorySync, m
 				limitCtx(state),
 			);
 			set({ ...patch, tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests, gems: result.gems });
+			useRockStore.getState().setFromServer(result.tickets.rocks ?? []);
 			emitSaveEvent('offlineClaimed');
 			if (!result.grant) return null;
 			return {

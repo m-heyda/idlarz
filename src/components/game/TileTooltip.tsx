@@ -17,6 +17,7 @@ import { formatCompact, formatNumber } from '@/utils/formatters';
 import { growthSecondsLeft, isBoss, maxLevelOf, monsterStats } from '@/lib/monsters';
 import { useBestiaryStore, useIsDiscovered } from '@/stores/bestiaryStore';
 import { useMapSource } from './mapSource';
+import { ROCK_TIERS, rockSprite, type RockTier } from '@/config/rocks';
 import { useMapTipLayer } from './MapTipLayer';
 import MapTip from './MapTip';
 import { TileStatus } from './TileStatus';
@@ -156,6 +157,8 @@ export interface TileTooltipProps {
 	y: number;
 	level?: number;
 	hasChest: boolean;
+	/** A mineable rock on the tile: its tier and the clicks it has taken of the clicks it needs */
+	rock?: { tier: RockTier; hits: number; need: number };
 	/** The chest line shows only while the pointer is on the tile itself */
 	showChestTip: boolean;
 	/** The monster on the tile, as the parts of the tile's monster key; undefined: none */
@@ -170,7 +173,21 @@ export interface TileTooltipProps {
  * The tile's tooltips, mounted only while the pointer is on the tile. They live in the map's tooltip layer (above the ambient
  * critters), anchored to the tile, so nothing here costs a tile that is not hovered.
  */
-const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x, y, level, hasChest, showChestTip, monster, queued, lineOpen, building }) => {
+const TileTooltip: React.FC<TileTooltipProps> = ({
+	biome,
+	isOwned,
+	isAdjacent,
+	x,
+	y,
+	level,
+	hasChest,
+	rock,
+	showChestTip,
+	monster,
+	queued,
+	lineOpen,
+	building,
+}) => {
 	const tipLayer = useMapTipLayer();
 	const discovered = useIsDiscovered(monster?.type ?? '');
 	if (!tipLayer || !(isOwned || isAdjacent)) return null;
@@ -198,8 +215,24 @@ const TileTooltip: React.FC<TileTooltipProps> = ({ biome, isOwned, isAdjacent, x
 					/>
 				</MapTip>
 			)}
+			{isOwned && rock && (
+				<MapTip className='map-tip map-tip-up map-tip-in absolute bottom-full mb-1 left-1/2 -translate-x-1/2 w-max'>
+					<Tooltip
+						rarity={rock.tier}
+						icon={rockSprite(rock.tier, 0)}
+						title={ROCK_TIERS[rock.tier].label}
+						subtitle={`${rock.tier[0].toUpperCase()}${rock.tier.slice(1)} rock`}
+						className='ds-tip-compact'
+					>
+						<TipLine>
+							{formatNumber(Math.max(0, rock.need - rock.hits))} of {formatNumber(rock.need)} clicks left
+						</TipLine>
+						<TipLine tone='gold'>Click to mine</TipLine>
+					</Tooltip>
+				</MapTip>
+			)}
 			{/* a monster has its own tooltip: the biome card would only cover it */}
-			{!(isOwned && monster) && (
+			{!(isOwned && monster) && !(isOwned && rock) && (
 				<MapTip className='map-tip map-tip-in absolute -bottom-2 left-1/2 transform -translate-x-1/2 translate-y-full w-max'>
 					{isOwned && building ? (
 						<BuildingTile id={building.id} level={building.level} tile={<BiomeTooltip biome={biome} level={level} x={x} y={y} />} />

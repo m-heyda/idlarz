@@ -12,12 +12,13 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_WARD`](#castle-ward), [`isInWard`](#isinward), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
 - Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
-- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
+- Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`paidRefreshesNow`](#paidrefreshesnow), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
 - Crafting: [`TRADE_GOODS`](#trade-goods), [`GEAR_RECIPES`](#gear-recipes), [`INGREDIENTS`](#ingredients)
 - Buildings: [`BUILDINGS_FLAG`](#buildings-flag), [`BUILDING_RULES`](#building-rules), [`BUILDINGS`](#buildings), [`producerOutput`](#produceroutput), [`extractorOutput`](#extractoroutput), [`buildingUpgradeDuration`](#buildingupgradeduration), [`IDOLS`](#idols), [`buildingLevelCost`](#buildinglevelcost), [`IDOL_RULES`](#idol-rules), [`builderCount`](#buildercount), [`idolEconomy`](#idoleconomy)
 - Gems: [`GEM_SHOP`](#gem-shop), [`DAILY_BONUS_GEMS`](#daily-bonus-gems), [`DAILY_CHEST`](#daily-chest), [`dailyInfo`](#dailyinfo), [`rollDailyChest`](#rolldailychest), [`applySpend`](#applyspend)
+- Rocks and Mining: [`ROCK_TIERS`](#rock-tiers), [`ROCK`](#rock), [`ROCK_DROPS`](#rock-drops), [`rockSpots`](#rockspots), [`rockIntervalSec`](#rockintervalsec), [`rockCap`](#rockcap), [`rollRockTier`](#rollrocktier), [`takeClicks`](#takeclicks), [`rollRockLoot`](#rollrockloot)
 - Perk caps: [`PERK_CAPS`](#perk-caps), [`LEGENDARY_PERK_TIERS`](#legendary-perk-tiers), [`WEAPON_LEGENDARY_DAMAGE_TOP`](#weapon-legendary-damage-top), [`capPerks`](#capperks), [`aggregateStats`](#aggregatestats)
 
 ## Basics
@@ -272,7 +273,7 @@ economyTiles = owned tiles - freeTiles + 1       (freeTiles = STARTER_FREE_TILES
 
 ### `rollBiome` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:129`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:149`](../../src/utils/biomeRules.ts)
 
 The biome of a random purchase on (x, y): first a chance to continue an adjoining area (stronger with every extra
 same-biome neighbour), otherwise a weighted roll among everything the rules allow. Water still pulls water and shore
@@ -280,13 +281,16 @@ same-biome neighbour), otherwise a weighted roll among everything the rules allo
 
 Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
 
-- Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
+- Plains, forest, hills and lake from the start; swamp after 12 purchases (and 6 tiles from the castle), tundra after 25 (and 10 tiles out); coast only beside a lake or coast.
 - The rebirth biomes need completed rebirths (`BIOME_RULES.unlockAfterRebirths`): jungle after 1, fields 2, blossom orchard 3, blight 4, battlefield 5. `rebirths` is `prestige.rebirths`;
   below it the biome is never allowed, so it can neither be rolled nor copied from a neighbour.
 - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
 - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
-- Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water.
+- Swamp, tundra and the rebirth biomes also need distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): swamp 6, tundra 10, jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
+  so it cannot be rolled or copied from a neighbour there.
+- Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance (`distanceWeight`): basic biomes fade
+  from x1 at 10 tiles to x0.25 at 30, a biome with a minimum distance ramps from x3/8 at that distance to x3 eight tiles further.
 - The start ring (the four free tiles) is plains and forest only, at least two plains ([`generateStartRing`](economy.md#generatestartring)).
 
 <a id="biomes"></a>
@@ -340,7 +344,7 @@ output of the basic tile it is measured against (per second, before `BIOME_YIELD
 
 ### `generateStartRing` <small>function</small>
 
-Source: [`src/utils/biomeRules.ts:189`](../../src/utils/biomeRules.ts)
+Source: [`src/utils/biomeRules.ts:210`](../../src/utils/biomeRules.ts)
 
 The castle's four starting neighbours for a new game: the basic biomes (plains most), always at least `minPlains`
 plains and never more than `maxOfOther` of any other biome. Retries with the same random source until it fits.
@@ -608,7 +612,7 @@ The goods shelf and its refresh rules ([`generateMerchantStock`](economy.md#gene
 - **Shelf**: 6 pieces of gear (`LIMITS.merchantOffers`) from the loot source `merchant` (common 60 / uncommon 40, see [`generateLoot`](loot.md#generateloot)), item level centred at most 3 above the average worn item
   level and never more than 5 above it, otherwise built from the castle level (4 + 3 per castle level above 1). Price is `ceil(sell value x 5)` ([`shopPriceOf`](economy.md#shoppriceof)). Reshuffled every 1,800 s of play time.
 - **Refresh**: 3 free per 12 h of play time (`windowSec` 43,200), 30 s between any two, then the paid price `10,000 x 2^(paid refreshes)` capped at 1e9 ([`refreshCost`](economy.md#refreshcost)).
-  The count is never reset, not even by a rebirth.
+  The count starts again at 0 (price back to base) 24 h of play time after the first paid refresh of the run (`escalationResetSec` 86,400), and at a rebirth.
 - **Item sale value**: see [`sellValueOf`](loot.md#sellvalueof).
 
 <a id="merchant-upgrades"></a>
@@ -695,7 +699,7 @@ cost of level N+1 = ceil(baseCost x growth^N)
 
 ### `generateMerchantStock` <small>function</small>
 
-Source: [`src/lib/merchant.ts:90`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:110`](../../src/lib/merchant.ts)
 
 A new shelf of goods, rolled at the world (castle) level and the player's gear, and stamped with the play time it was made.
 `grade` is the best grade the player wears (`bestWornGrade`): nothing above it is on the shelf. Pure, so the server can take it as is.
@@ -716,18 +720,33 @@ What a piece of gear costs at the merchant: far above what he pays for it, so bu
 shelf price = ceil(sellValueOf(item) x 5)
 ```
 
-<a id="refreshcost"></a>
+<a id="paidrefreshesnow"></a>
 
-### `refreshCost` <small>function</small>
+### `paidRefreshesNow` <small>function</small>
 
-Source: [`src/lib/merchant.ts:32`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:33`](../../src/lib/merchant.ts)
 
-The gold the next paid refresh costs, when `refreshesBought` have been bought: it doubles each time, up to a cap of 1b.
+The paid refreshes that still count towards the price: all of `refreshesBought`, until 24 h of play time (`escalationResetSec`) have
+passed since the first of them (`paidAt`), then none, so the price starts from its base again. A rebirth sets the count to 0 itself.
 
 **Formula**
 
 ```text
-paid refresh price = min(1e9, 10,000 x 2^(paid refreshes so far))
+paid refreshes counted = 0 if play time - paidAt >= 86,400 s, otherwise the paid refreshes bought
+```
+
+<a id="refreshcost"></a>
+
+### `refreshCost` <small>function</small>
+
+Source: [`src/lib/merchant.ts:44`](../../src/lib/merchant.ts)
+
+The gold the next paid refresh costs, when `refreshesBought` (see [`paidRefreshesNow`](economy.md#paidrefreshesnow)) have been bought: it doubles each time, up to a cap of 1b.
+
+**Formula**
+
+```text
+paid refresh price = min(1e9, 10,000 x 2^(paid refreshes counted))
 ```
 
 <a id="sellresource"></a>
@@ -743,7 +762,7 @@ Sells `qty` units of `resource` to the merchant: the gold is `sellPayout` with t
 
 ### `bestWornGrade` <small>function</small>
 
-Source: [`src/lib/merchant.ts:61`](../../src/lib/merchant.ts)
+Source: [`src/lib/merchant.ts:81`](../../src/lib/merchant.ts)
 
 The best ladder grade the player wears (G1 with nothing worn, or only pieces outside the ladder). The shelf never sells above it:
 the next grade stays a reward for fights and chests until the player has worn the one before it (IDL-48).
@@ -1005,11 +1024,11 @@ Adding a grade is one entry in `GEAR_UNLOCK`, `GEAR_GRADE_COST` and `CRAFT_GEAR.
 
 ### `INGREDIENTS` <small>const</small>
 
-Source: [`src/catalog/ingredients.ts:31`](../../src/catalog/ingredients.ts)
+Source: [`src/catalog/ingredients.ts:32`](../../src/catalog/ingredients.ts)
 
 The ingredients and what is planned for each (none of it is built yet). Append only.
 
-**Crafting ingredients (18, no recipe uses them yet)** _(computed from the code)_
+**Crafting ingredients (21, no recipe uses them yet)** _(computed from the code)_
 
 | Ingredient | Tier | Planned for | Dropped by |
 | --- | --- | --- | --- |
@@ -1021,8 +1040,8 @@ The ingredients and what is planned for each (none of it is built yet). Append o
 | Hollow Log | 1 | planks | Plant |
 | Glowberry | 2 | night-vision and luck potions | Fungus |
 | Dark Horn | 2 | dark elixirs and enchanting powder | Demon |
-| Copper Ore | 2 | ingots (smelted with coal) | Construct |
-| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon |
+| Copper Ore | 2 | ingots (smelted with coal) | Construct, mining rocks |
+| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon, mining rocks |
 | Obsidian Chip | 2 | blade edges for the Obsidian grade | Elemental |
 | Geode | 2 | cut stones for jewelry | Aquatic, Construct |
 | Dark Shard | 2 | enchanting | Demon |
@@ -1031,6 +1050,9 @@ The ingredients and what is planned for each (none of it is built yet). Append o
 | Fire Drop | 3 | fire-ward jewelry | Elemental, Dragon |
 | Emerald Star | 3 | jewelry gems | a few monsters |
 | Heart Gem | 4 | the finest jewelry | a few monsters |
+| Silver Ore | 2 | silver ingots and fine jewelry | mining rocks |
+| Gold Ore | 3 | gold ingots and jewelry | mining rocks |
+| Raw Crystal | 3 | enchanting and jewelry gems | mining rocks |
 
 ## Buildings
 
@@ -1154,7 +1176,7 @@ See also: [`BUILDING_RULES`](economy.md#building-rules), `producerBonus`
 
 ### `buildingUpgradeDuration` <small>function</small>
 
-Source: [`src/lib/buildings.ts:48`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:55`](../../src/lib/buildings.ts)
 
 Seconds the next level takes, from `fromLevel` to `fromLevel + 1`. Producers and Extractors: 10 min, 45 min, 3 h, 8 h (level 1 is built at once). **Idols** are slower and have a timer from the first level: 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5
 (`fromLevel` 0 is the first build), then x1.35 per level up to 7 days. Master Builders (Ember shop) and the Dwarf Statue shorten it like the castle's timer. Placing an Idol the account has learned again stays instant.
@@ -1196,7 +1218,7 @@ An Idol's level is kept across rebirths (the building is not): see [`IDOL_RULES`
 
 ### `buildingLevelCost` <small>function</small>
 
-Source: [`src/lib/buildings.ts:102`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:109`](../../src/lib/buildings.ts)
 
 The price of reaching `level` (1 = building it): `tilePrices` times the price of the next tile at the current tile count (counted up to `priceTileCap`), times `levelGrowth` per level above 1. Gold, wood and stone like a tile.
 
@@ -1218,7 +1240,7 @@ The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
 - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
 - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
 - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
-  An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 1,000 / 2,000 / 4,000 for levels 3 / 4 / 5.
+  An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 10,000 / 20,000 / 40,000 for levels 3 / 4 / 5 (an Extractor makes 0.3 a second at level 1, so the first one is hours of work, and the Extractors' material is for crafting too).
   **Timers** (`durationsSec`, indexed by the level reached): 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5, then x1.35 per level up to 7 days. Even the **first** build of an Idol takes one (a builder works on it and the tile shows it under construction); placing an Idol the account has already learned stays instant, at the level it remembers.
   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
 - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
@@ -1241,20 +1263,20 @@ For scale, the income bonus of the Embers ever earned (`emberIncomeBonus`, every
 | --- | --- | --- | --- |
 | 1 | 20 | wood 2,016, stone 1,344, gold 6,748 | 30 min |
 | 2 | 40 | wood 15.7 K, stone 10.4 K, coal 10.4 K, food 5,208, gold 52.2 K | 1 h |
-| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 1,000 | 4 h |
-| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 2,000 | 12 h |
-| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 4,000 | 1 d |
-| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 8,000 | 1.35 d |
-| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 16 K | 1.82 d |
-| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 32 K | 2.46 d |
-| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 64 K | 3.32 d |
-| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 128 K | 4.48 d |
+| 3 | 60 | wood 121 K, stone 80.9 K, coal 80.9 K, food 40.4 K, gold 405 K, herbs 10 K | 4 h |
+| 4 | 80 | wood 939 K, stone 626 K, coal 626 K, food 313 K, gold 3.13 M, herbs 20 K | 12 h |
+| 5 | 100 | wood 7.27 M, stone 4.85 M, coal 4.85 M, food 2.42 M, hide 485 K, gold 24.2 M, herbs 40 K | 1 d |
+| 6 | 140 | wood 19.2 M, stone 12.8 M, coal 12.8 M, food 6.41 M, hide 1.28 M, gold 64.1 M, herbs 80 K | 1.35 d |
+| 7 | 180 | wood 50.8 M, stone 33.9 M, coal 33.9 M, food 16.9 M, hide 3.39 M, gold 169 M, herbs 160 K | 1.82 d |
+| 8 | 220 | wood 134 M, stone 89.5 M, coal 89.5 M, food 44.8 M, hide 8.95 M, gold 448 M, herbs 320 K | 2.46 d |
+| 9 | 260 | wood 355 M, stone 237 M, coal 237 M, food 118 M, hide 23.7 M, gold 1.18 B, herbs 640 K | 3.32 d |
+| 10 | 300 | wood 939 M, stone 626 M, coal 626 M, food 313 M, hide 62.6 M, gold 3.13 B, herbs 1.28 M | 4.48 d |
 
 <a id="buildercount"></a>
 
 ### `builderCount` <small>function</small>
 
-Source: [`src/lib/buildings.ts:71`](../../src/lib/buildings.ts)
+Source: [`src/lib/buildings.ts:78`](../../src/lib/buildings.ts)
 
 How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
 
@@ -1396,6 +1418,173 @@ when it is refused. A paid purchase takes the gems, counts the purchase and reco
 - **Name change**: `value` is the new name, already checked against the name rules and the unique index by the caller (the cooldown is the profile's, checked by the caller too).
 - **Attribute respec**: not during a fight; refused when nothing is spent; the first one of an account is free.
 - **A one-time item** (`kind: 'once'`, Name colours): refused when already owned; the purchase count in `bought` is the record of ownership.
+
+## Rocks and Mining
+
+<a id="rock-tiers"></a>
+
+### `ROCK_TIERS` <small>const</small>
+
+Source: [`src/config/rocks.ts:25`](../../src/config/rocks.ts)
+
+The rock tiers. A common rock takes 50 clicks, an uncommon one 125, a rare one 250 and an epic one 500 and a legendary one 1,000. Weights: 70 / 22 / 7 / 1 / 0.25 before Luck.
+
+**Rock tiers** _(computed from the code)_
+
+| Tier | Name | Clicks to break | Weight | Share without Luck |
+| --- | --- | --- | --- | --- |
+| common | Rock | 50 | 70 | 70% |
+| uncommon | Silver ore | 125 | 22 | 22% |
+| rare | Rich ore | 250 | 7 | 7% |
+| epic | Crystal | 500 | 1 | 1% |
+| legendary | Legendary ore | 1,000 | 0.25 | 0% |
+
+<a id="rock"></a>
+
+### `ROCK` <small>const</small>
+
+Source: [`src/config/rocks.ts:51`](../../src/config/rocks.ts)
+
+How rocks appear and how fast they may be mined (server rules).
+
+- **Timer**: one new rock every 150 s of play time (shorter with Luck, never under 60% of it), much faster than a chest's 600 s. It runs apart from the chest and monster timers and has its own room, so rocks never take the place of a chest or a monster.
+- **Room**: at most `maxOnMap` rocks wait at once, and no more than `landShare` of the free land (at least `minAllowed`).
+- **Tiles**: owned land that is not water, the castle, its ward or a tile holding a monster, boss, chest, building or another rock.
+- **Clicks**: the browser sends its clicks in batches. The server lets in at most `maxCps` clicks per second (a bucket of `burst` clicks), so a rock cannot be broken faster than a person can click.
+
+**Rock rules** _(computed from the code)_
+
+| Rule | Value |
+| --- | --- |
+| Seconds between two rocks (no Luck) | 150 |
+| Most rocks on the map | 15 |
+| Share of the free land | 12% |
+| Room on 20 / 100 / 1,000 free tiles | 2 / 12 / 15 |
+| Clicks let in per second | 24 |
+| Burst of a fresh rock | 48 |
+| Most clicks in one request | 200 |
+
+<a id="rock-drops"></a>
+
+### `ROCK_DROPS` <small>const</small>
+
+Source: [`src/config/rocks.ts:75`](../../src/config/rocks.ts)
+
+What each tier drops. Stone and coal always drop (minutes of income); the ingredients are chances per rock (Luck raises them like the monsters' ingredients). To add a loot or a new ore, add a line here: the server rolls every line of the tier's table.
+Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.ts`). Ember Coal is the rare one: 1 to 3 at a low chance.
+
+**What a rock drops** _(computed from the code)_
+
+| Tier | Drop | Amount | Chance |
+| --- | --- | --- | --- |
+| common | stone | 2-4 min of income (at least 25) | always |
+| common | coal | 1-2 min of income (at least 15) | always |
+| common | ing_copper_ore | 1 | 10% |
+| common | ing_ember_coal | 1 | 2% |
+| uncommon | stone | 5-8 min of income (at least 60) | always |
+| uncommon | coal | 3-5 min of income (at least 35) | always |
+| uncommon | ing_silver_ore | 1 | 12% |
+| uncommon | ing_copper_ore | 1 | 10% |
+| uncommon | ing_ember_coal | 1 | 4% |
+| rare | stone | 10-15 min of income (at least 120) | always |
+| rare | coal | 6-10 min of income (at least 70) | always |
+| rare | ing_gold_ore | 1 | 12% |
+| rare | ing_silver_ore | 1 | 20% |
+| rare | ing_copper_ore | 1-2 | 15% |
+| rare | ing_ember_coal | 1-2 | 8% |
+| epic | stone | 20-30 min of income (at least 250) | always |
+| epic | coal | 12-20 min of income (at least 150) | always |
+| epic | ing_crystal | 1 | 25% |
+| epic | ing_gold_ore | 1 | 25% |
+| epic | ing_silver_ore | 1-2 | 30% |
+| epic | ing_ember_coal | 1-3 | 15% |
+| legendary | stone | 40-60 min of income (at least 500) | always |
+| legendary | coal | 25-40 min of income (at least 300) | always |
+| legendary | ing_crystal | 1-2 | 40% |
+| legendary | ing_gold_ore | 1-2 | 40% |
+| legendary | ing_silver_ore | 1-3 | 50% |
+| legendary | ing_copper_ore | 1-2 | 30% |
+| legendary | ing_ember_coal | 1-3 | 10% |
+
+<a id="rockspots"></a>
+
+### `rockSpots` <small>function</small>
+
+Source: [`src/lib/rocks.ts:15`](../../src/lib/rocks.ts)
+
+The tiles a rock could stand on: owned land that is not the castle, water (a lake), the castle's ward, nor taken (`taken` holds the "x,y" keys of the monsters, boss, chests and rocks already standing) and has no building.
+
+<a id="rockintervalsec"></a>
+
+### `rockIntervalSec` <small>function</small>
+
+Source: [`src/lib/rocks.ts:39`](../../src/lib/rocks.ts)
+
+Seconds of play time between two new rocks.
+
+**Formula**
+
+```text
+interval = 150 s x max(0.6, 1 / (1 + 0.004 x Luck))
+```
+
+<a id="rockcap"></a>
+
+### `rockCap` <small>function</small>
+
+Source: [`src/lib/rocks.ts:49`](../../src/lib/rocks.ts)
+
+The most rocks that wait at once on a map with `free` tiles a monster could stand on.
+
+**Formula**
+
+```text
+room = min(15, max(2, floor(free land x 12%)))
+```
+
+<a id="rollrocktier"></a>
+
+### `rollRockTier` <small>function</small>
+
+Source: [`src/lib/rocks.ts:59`](../../src/lib/rocks.ts)
+
+The tier of a new rock: weighted, with the rare and better tiers made likelier by Luck like the rarity of gear.
+
+**Formula**
+
+```text
+weight(tier) = base weight x (min(1.6, 1 + 0.004 x Luck) for every tier but common)
+```
+
+<a id="takeclicks"></a>
+
+### `takeClicks` <small>function</small>
+
+Source: [`src/lib/rocks.ts:84`](../../src/lib/rocks.ts)
+
+How many of `clicks` the server lets in for a rock at `nowSec`: a bucket of `burst` clicks that refills at `maxCps` per second (a new rock starts full). The rest are dropped, so a rock cannot be broken faster than a person clicks.
+
+**Formula**
+
+```text
+allowed = min(48, tokens + seconds since the last batch x 24);  accepted = min(clicks, floor(allowed))
+```
+
+<a id="rollrockloot"></a>
+
+### `rollRockLoot` <small>function</small>
+
+Source: [`src/lib/rocks.ts:108`](../../src/lib/rocks.ts)
+
+Rolls what a broken rock drops, line by line of its tier's table ([`ROCK_DROPS`](economy.md#rock-drops)); every line draws the same number of random values whether it hits or not, so adding a line later never shifts the rest.
+Stone and coal are minutes of the player's income (never under the floor of the line); an ingredient has a chance per rock, raised by Luck.
+
+**Formula**
+
+```text
+stone or coal = max(floor, floor(income per second x U(minutes) x 60 x (1 + 0.005 x Luck)))
+ingredient    = chance x (1 + 0.005 x Luck) per rock;  quantity = U(min..max)
+```
 
 ## Perk caps
 

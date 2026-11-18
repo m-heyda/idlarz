@@ -653,8 +653,9 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 		const windowAt = num(r.windowAt, 0, playSeconds);
 		const freeUsed = int(r.freeUsed, 0, MERCHANT_GOODS.refresh.freePerWindow);
 		const lastAt = num(r.lastAt, 0, playSeconds);
-		if (windowAt === null || freeUsed === null || lastAt === null) return fail('merchant refresh');
-		merchantRefresh = { windowAt, freeUsed, lastAt };
+		const paidAt = r.paidAt === undefined ? 0 : num(r.paidAt, -MERCHANT_GOODS.refresh.escalationResetSec, playSeconds);
+		if (windowAt === null || freeUsed === null || lastAt === null || paidAt === null) return fail('merchant refresh');
+		merchantRefresh = { windowAt, freeUsed, lastAt, paidAt };
 	}
 
 	const rawName = typeof raw.playerName === 'string' ? raw.playerName.trim().slice(0, 9) : '';

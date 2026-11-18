@@ -11,6 +11,7 @@ The roster, levels, growth, spawning and what a kill pays.
 - Spawning: [`advanceBank`](#advancebank), [`canSpawnOn`](#canspawnon), [`typeWeights`](#typeweights), [`placeTickets`](#placetickets), [`ticketCap`](#ticketcap), [`DISTANCE_BANDS`](#distance-bands), [`BOSS_MIN_DISTANCE`](#boss-min-distance), [`bandOf`](#bandof)
 - Rewards: [`killIncome`](#killincome)
 - Bestiary: [`META`](#meta), [`FAMILY_DROPS`](#family-drops)
+- Boss modifiers: [`BossModifiers`](#bossmodifiers), [`describeModifiers`](#describemodifiers)
 
 ## Roster
 
@@ -18,7 +19,7 @@ The roster, levels, growth, spawning and what a kill pays.
 
 ### `MONSTERS` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:561`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:592`](../../src/config/combatConfig.ts)
 
 The roster: 72 monsters in twelve biomes that can appear, five normal ones and a boss each (IDL-360: a glass cannon and an armored wall or a brute were added to every biome), plus seven retired stand-ins and duplicates that never do (`RETIRED_MONSTERS`): plains, forest, swamp and tundra, since IDL-201 hills, coast and lake, and the five rebirth biomes (each only after its rebirth, the jungle after the first). A monster may only stand on a biome in its `spawn.biomes`, which is its own biome, water included (an owned coast or lake tile holds a monster like any other). The rebirth biomes only get tiles once `config/biomeStage.ts` turns them on; until then their monsters wait.
 Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`](monsters.md#monsterstats); speed is attacks per second; the spawn window shows castle level 1 to castle level 10.
@@ -68,13 +69,13 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | hills | Cairn Sentinel | 1 | 310 | 6 | 6 | 0.4 | 6-8 -> 14-16 |
 | hills | Quarry Rat Knight | 1 | 247 | 5 | 1.5 | 0.4 | 6-8 -> 14-16 |
 | hills | Highland Gnoll | 1 | 190 | 7 | 1.5 | 0.5 | 6-8 -> 14-16 |
-| hills | The Ironhorn (boss) | 22 | 2,300 | 18 | 28 | 0.33 | 22-25 -> 29-32 |
+| hills | The Ironhorn (boss) | 22 | 2,300 | 23 | 28 | 0.33 | 22-25 -> 29-32 |
 | coast | Wreck Crab | 1 | 169 | 4 | 0 | 0.4 | 2-4 -> 10-12 |
 | coast | Net Gull | 1 | 104 | 6 | 0 | 0.6 | 2-4 -> 10-12 |
 | coast | Drowned Sailor | 1 | 130 | 5 | 0 | 0.5 | 2-4 -> 10-12 |
 | coast | Tideglass Jelly | 1 | 73 | 8 | 0 | 0.6 | 2-4 -> 10-12 |
 | coast | Barnacle Brute | 1 | 212 | 5 | 3 | 0.4 | 2-4 -> 10-12 |
-| coast | The Reef Leviathan (boss) | 17 | 1,400 | 13 | 20 | 0.33 | 17-20 -> 24-27 |
+| coast | The Reef Leviathan (boss) | 17 | 1,400 | 17 | 20 | 0.33 | 17-20 -> 24-27 |
 | lake | Moss Snapper | 1 | 338 | 6 | 2.5 | 0.4 | 10-12 -> 17-19 |
 | lake | Reed Nymph | 1 | 260 | 8 | 2.5 | 0.5 | 10-12 -> 17-19 |
 | lake | Pike Lurker | 1 | 208 | 9 | 2.5 | 0.6 | 10-12 -> 17-19 |
@@ -100,7 +101,7 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | orchard | Gray Gleaner | 1 | 470 | 12 | 6 | 0.5 | 24-26 -> 31-33 |
 | orchard | Mushroom Wizard | 1 | 263 | 19 | 6 | 0.6 | 24-26 -> 31-33 |
 | orchard | Rootbound Gardener | 1 | 766 | 11 | 15 | 0.4 | 24-26 -> 31-33 |
-| orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 64 | 98 | 0.33 | 54-57 -> 61-64 |
+| orchard | The Blossom Reaper (boss) | 42 | 16.5 K | 77 | 98 | 0.33 | 54-57 -> 61-64 |
 | blight | Gasket Goblin | 1 | 550 | 14 | 7.5 | 0.5 | 28-30 -> 35-37 |
 | blight | Blighted Husk | 1 | 715 | 11 | 7.5 | 0.4 | 28-30 -> 35-37 |
 | blight | Mothwing Hexer | 1 | 440 | 17 | 7.5 | 0.6 | 28-30 -> 35-37 |
@@ -113,7 +114,7 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 | battlefield | Gilded Champion | 1 | 512 | 19 | 9 | 0.6 | 32-34 -> 39-41 |
 | battlefield | Banner Wraith | 1 | 358 | 24 | 9 | 0.6 | 32-34 -> 39-41 |
 | battlefield | Frost-Flame Knight | 1 | 1,043 | 14 | 21 | 0.4 | 32-34 -> 39-41 |
-| battlefield | The Cinder Warlord (boss) | 52 | 50 M | 9000 | 50000 | 0.33 | 68-71 -> 75-78 |
+| battlefield | The Cinder Warlord (boss) | 52 | 50 M | 10800 | 50000 | 0.33 | 68-71 -> 75-78 |
 
 ## Level scaling
 
@@ -121,7 +122,7 @@ Stats are at level 1 (bosses at their `refLevel`), straight from [`monsterStats`
 
 ### `monsterStats` <small>function</small>
 
-Source: [`src/lib/monsters.ts:117`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:132`](../../src/lib/monsters.ts)
 
 HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`).
 
@@ -130,6 +131,7 @@ Level scaling: a monster has an integer level. Stats follow `monsterStats`.
 - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
 - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
 - Reference levels: plains 15, coast 17, forest 20, hills 22, swamp 25, lake 27, tundra 30.
+- Boss modifiers ([`BossModifiers`](monsters.md#bossmodifiers)): **Brutal** raises `attack` by its %, **Enrage** raises `attackSpeed` by its % for every step the fight has reached (`elapsedSec`, one step per `everySec`, a maximum of `maxSteps`).
 
 **Formula**
 
@@ -139,13 +141,15 @@ normal: HP     = round(hp     x sqrt(1.5)^(level - 1))
         armor  = armor + 0.5 x (level - 1)
 boss:   HP, attack = base x levelScale(level) / levelScale(refLevel)         levelScale(L) = 1 + 0.07 x (L - 1)
         armor  = armor + 0.5 x (level - refLevel)
+Brutal: attack      x (1 + attackPct / 100)
+Enrage: attackSpeed x (1 + speedPct / 100 x steps)        steps = min(maxSteps, floor(elapsedSec / everySec))
 ```
 
 <a id="spawnlevelrange"></a>
 
 ### `spawnLevelRange` <small>function</small>
 
-Source: [`src/lib/monsters.ts:39`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:51`](../../src/lib/monsters.ts)
 
 The levels a new monster of this type can appear at in a world of this castle level (both ends included).
 
@@ -162,7 +166,7 @@ max = min(cap, min + spread)
 
 ### `rollSpawnLevel` <small>function</small>
 
-Source: [`src/lib/monsters.ts:56`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:68`](../../src/lib/monsters.ts)
 
 The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from
 Math.random (the rest of the game's randomness is the same with or without it) and the same monster always rolls the same.
@@ -175,7 +179,7 @@ The per-band `dangerOffset` in `DISTANCE_BANDS` is 0 everywhere and unused.
 
 ### `levelAtAge` <small>function</small>
 
-Source: [`src/lib/monsters.ts:93`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:105`](../../src/lib/monsters.ts)
 
 The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.
 
@@ -192,7 +196,7 @@ level = spawnLevel + min(growthLevels, floor(ageSec / 1800))
 
 ### `dangerBonus` <small>function</small>
 
-Source: [`src/lib/monsters.ts:74`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:86`](../../src/lib/monsters.ts)
 
 Levels added to a monster that appears `distance` tiles (Chebyshev) from the castle: danger grows toward the frontier.
 
@@ -208,7 +212,7 @@ danger bonus = floor(Chebyshev distance from the castle / 8) levels
 
 ### `advanceBank` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:154`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:182`](../../src/lib/offline/tickets.ts)
 
 Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
 (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
@@ -228,7 +232,7 @@ Where and when monsters appear (server only).
 
 ### `canSpawnOn` <small>function</small>
 
-Source: [`src/lib/monsters.ts:150`](../../src/lib/monsters.ts)
+Source: [`src/lib/monsters.ts:165`](../../src/lib/monsters.ts)
 
 Whether a monster of this type may stand on this tile: the biome is on its allowlist, the tile is within its castle distance
 (Chebyshev), and nothing else is there (castle ward, chest, another monster). The rules are `MonsterDef.spawn`.
@@ -252,7 +256,7 @@ for new spawns only. Bosses follow the same rules (IDL-222): among the boss type
 
 ### `placeTickets` <small>function</small>
 
-Source: [`src/lib/offline/placement.ts:74`](../../src/lib/offline/placement.ts)
+Source: [`src/lib/offline/placement.ts:82`](../../src/lib/offline/placement.ts)
 
 Looks at the land: counts the tiles each kind may stand on, takes a monster or chest off a tile that stopped being valid (it is placed
 again), and gives every waiting monster a tile and the level it appears at and every waiting chest a tile. Tickets with no tile left stay hidden until the land
@@ -266,7 +270,7 @@ that still have a free tile the pick is weighted by win chance and the boss's sp
 
 ### `ticketCap` <small>function</small>
 
-Source: [`src/lib/offline/tickets.ts:114`](../../src/lib/offline/tickets.ts)
+Source: [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts)
 
 How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
 (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.
@@ -285,7 +289,7 @@ Distance bands: home 1-6, outskirts 7-12, frontier 13-21, wilds 22+, read by [`b
 
 ### `BOSS_MIN_DISTANCE` <small>const</small>
 
-Source: [`src/config/combatConfig.ts:489`](../../src/config/combatConfig.ts)
+Source: [`src/config/combatConfig.ts:517`](../../src/config/combatConfig.ts)
 
 The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
 
@@ -439,3 +443,45 @@ What each family leaves (two or three ingredients), so a bear and a boar share a
 | Banner Wraith | Undead | bones 18%, dark_potion 3% (L8+), moon 3% (L12+), coins 10% |
 | Frost-Flame Knight | Elemental | ember_coal 12%, obsidian 5% (L12+), fire_drop 1.5% (L10+) |
 | The Cinder Warlord | Undead | bones 18%, dark_potion 3% (L8+), moon 1% (L14+), fire_drop always, heart_gem always, coins always |
+
+## Boss modifiers
+
+<a id="bossmodifiers"></a>
+
+### `BossModifiers` <small>interface</small>
+
+Source: [`src/config/combatConfig.ts:145`](../../src/config/combatConfig.ts)
+
+What makes a boss fight different (all optional; a boss may carry one to three). The numbers are looked up from the monster's definition during the fight, so tuning them is a config edit.
+The browser shows each one as a chip in the fight panel ([`describeModifiers`](monsters.md#describemodifiers), `src/lib/bossModifiers.ts`).
+
+- **Venom**: poison stacks from every landed hit; each stack costs a share of the hero's max HP per second and the hero's regeneration is cut. Ticks in `fightStep`, reported as `poison` events (one per second). No random numbers.
+- **Sluggish**: the shared potion cooldown of the fight is longer (`potionCooldownAgainst`).
+- **Enrage**: the boss's attack speed rises a step every few seconds (`monsterStats` with the fight's `elapsedSec`).
+- **Brutal**: the boss's attack is higher at every level (`monsterStats`).
+
+The win estimate (`estimateWin`) counts all four, so auto-battle does not pick fights it would lose to them.
+
+**Boss modifiers by boss** _(computed from the code)_
+
+| Boss | Biome | Modifiers |
+| --- | --- | --- |
+| The Elder Stag | forest | **Enrage**: Attacks 12% faster every 15 s of the fight, up to 5 times (+60%). |
+| The Mire Matriarch | swamp | **Venom**: Every hit that lands adds a poison stack (up to 5, 8 s): each costs 0.4% of your max HP per second, and your regeneration is cut by 50% while poisoned. |
+| The Winter Wyrm | tundra | **Sluggish**: Potions take 50% longer to come off cooldown in this fight. |
+| The Ironhorn | hills | **Brutal**: Hits 25% harder. |
+| The Reef Leviathan | coast | **Brutal**: Hits 30% harder. |
+| The Lake Hydra | lake | **Venom**: Every hit that lands adds a poison stack (up to 4, 8 s): each costs 0.15% of your max HP per second, and your regeneration is cut by 25% while poisoned. |
+| The Brainstorm | jungle | **Venom**: Every hit that lands adds a poison stack (up to 4, 8 s): each costs 0.3% of your max HP per second, and your regeneration is cut by 40% while poisoned.<br>**Sluggish**: Potions take 30% longer to come off cooldown in this fight. |
+| The Harvest Matron | fields | **Enrage**: Attacks 10% faster every 15 s of the fight, up to 5 times (+50%). |
+| The Blossom Reaper | orchard | **Enrage**: Attacks 10% faster every 20 s of the fight, up to 4 times (+40%).<br>**Brutal**: Hits 20% harder. |
+| The Eyed Maw | blight | **Venom**: Every hit that lands adds a poison stack (up to 5, 8 s): each costs 0.4% of your max HP per second, and your regeneration is cut by 50% while poisoned.<br>**Sluggish**: Potions take 30% longer to come off cooldown in this fight. |
+| The Cinder Warlord | battlefield | **Enrage**: Attacks 10% faster every 20 s of the fight, up to 4 times (+40%).<br>**Brutal**: Hits 20% harder. |
+
+<a id="describemodifiers"></a>
+
+### `describeModifiers` <small>function</small>
+
+Source: [`src/lib/bossModifiers.ts:18`](../../src/lib/bossModifiers.ts)
+
+The chips a boss shows in the fight panel, one per modifier it carries (none for a monster without). Pure text from the config, so a retune needs no edit here.

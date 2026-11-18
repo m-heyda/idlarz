@@ -8,6 +8,7 @@ import type { ChestReward, SyncResult } from '@/lib/offline/types';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestChest, type Reply } from '@/lib/rewardsClient';
 import { signalNeedClaim } from '@/lib/serverSession';
+import { useRockStore } from '@/stores/rockStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { getTile, setTile } from '@/utils/world';
@@ -94,6 +95,8 @@ export const createChestSync = (set: GameSet, get: GameGet, inv: InventorySync) 
 			placeChests: chestsMayBePlaced(tickets),
 		});
 		set({ tiles: map.tiles, monsters: map.monsters, activeChests: map.activeChests });
+		// the rocks the server lists (it owns them: where they stand, their tier and the clicks they have taken)
+		useRockStore.getState().setFromServer(tickets.rocks ?? []);
 		return map;
 	};
 

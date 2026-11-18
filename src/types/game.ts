@@ -292,11 +292,15 @@ export interface MerchantStock {
 	offers: ItemInstance[];
 }
 
-/** When the current 12 h window of free refreshes began, how many of them are used, and when the last refresh of any kind was (play seconds). */
+/**
+ * When the current 12 h window of free refreshes began, how many of them are used, and when the last refresh of any kind was (play seconds).
+ * `paidAt` is when the 24 h run of rising paid prices began (play seconds; optional, an older save has none: it counts as 0).
+ */
 export interface MerchantRefresh {
 	windowAt: number;
 	freeUsed: number;
 	lastAt: number;
+	paidAt?: number;
 }
 
 export interface MerchantTabInfo {

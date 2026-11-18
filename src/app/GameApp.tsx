@@ -78,6 +78,7 @@ import BuildingModal from '@/components/game/overlays/BuildingModal';
 import BottomRightStack from '@/components/game/BottomRightStack';
 import BuildTimers from '@/components/game/hud/BuildTimers';
 import CastleCompass from '@/components/game/CastleCompass';
+import PickaxeCursor from '@/components/game/PickaxeCursor';
 import Toast from '@/components/game/Toast';
 import type { Profile } from '@/lib/authClient';
 import { useCloudSync } from '@/hooks/useCloudSync';
@@ -234,6 +235,7 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 			<BottomRightStack />
 			<BuildTimers />
 			<CastleCompass />
+			<PickaxeCursor />
 			<ContextMenu />
 			{tabStatus === 'blocked' && <TabLockOverlay onTakeOver={takeOver} />}
 			{/* one stack for every notice: chest rewards, fight loot, and the short messages (merchant, bag, saves) */}

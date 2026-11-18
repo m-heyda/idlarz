@@ -124,7 +124,7 @@ const BadgeDialog: React.FC = () => {
 	const previewColor = hovered !== undefined ? hovered : tried !== undefined && lockedColor(tried) ? tried : badge.nameColor;
 
 	return (
-		<GameModal title='Name, badge and title' width={972} onClose={close}>
+		<GameModal title='Name, badge and title' width={1100} onClose={close}>
 			<div className='ds-nick-stage' data-testid='nick-preview'>
 				<div className='ds-nick-preview'>
 					<NickName color={nickColorValue(previewColor)}>{playerName}</NickName>

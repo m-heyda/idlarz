@@ -1,0 +1,102 @@
+/* The map markers (IDL-376): the rings inside the map, the edge arrow canvas and the three small buttons under the minimap. */
+
+/* ring on the tile of each marked chest, ore or monster: in the map's world, so it is centred on the tile at every zoom, above the tiles and below the tooltips (the tip layer is above) */
+.map-mark {
+	position: absolute;
+	pointer-events: none;
+	z-index: 12;
+	--mark: #f6d77a;
+}
+.map-mark[data-kind='ores'] {
+	--mark: #b98cff;
+}
+.map-mark[data-kind='monsters'] {
+	--mark: #ff8f7d;
+}
+.map-mark-ring {
+	position: absolute;
+	inset: -2px;
+	border: 3px solid var(--mark);
+	border-radius: 50%;
+	box-shadow:
+		0 0 10px 1px var(--mark),
+		inset 0 0 9px 0 var(--mark);
+	background: radial-gradient(circle, transparent 55%, color-mix(in srgb, var(--mark) 22%, transparent) 100%);
+	animation: map-mark-pulse 1.7s ease-in-out infinite;
+}
+@keyframes map-mark-pulse {
+	0%,
+	100% {
+		transform: scale(0.94);
+		opacity: 0.7;
+	}
+	50% {
+		transform: scale(1.08);
+		opacity: 1;
+	}
+}
+
+/* the edge arrow: a screen-space canvas, under the windows */
+.map-markers-layer {
+	position: absolute;
+	left: 0;
+	top: 0;
+	z-index: 9;
+	pointer-events: none;
+}
+
+/* the three buttons under the minimap: small slabs with an icon, gold when lit */
+.map-mark-bar {
+	display: flex;
+	gap: 5px;
+	margin-top: 6px;
+	/* the stack is right-aligned: stretch to the width of the minimap (its widest child) and centre the buttons under it */
+	align-self: stretch;
+	justify-content: center;
+}
+.map-mark-btn {
+	width: 30px;
+	height: 30px;
+	padding: 0;
+	display: grid;
+	place-items: center;
+	background: rgba(26, 22, 17, 0.72);
+	border: 1px solid rgba(150, 126, 78, 0.45);
+	border-radius: 4px;
+	cursor: pointer;
+	transition:
+		border-color 120ms,
+		background 120ms,
+		box-shadow 120ms,
+		transform 80ms;
+}
+.map-mark-btn img {
+	display: block;
+	image-rendering: pixelated;
+	opacity: 0.8;
+	pointer-events: none;
+}
+.map-mark-btn:hover {
+	border-color: rgba(190, 160, 96, 0.8);
+	background: rgba(40, 33, 24, 0.82);
+}
+.map-mark-btn:hover img {
+	opacity: 1;
+}
+.map-mark-btn:active {
+	transform: translateY(1px);
+}
+.map-mark-btn[data-active='true'] {
+	border-color: rgba(240, 210, 122, 0.85);
+	background: rgba(64, 52, 28, 0.85);
+	box-shadow: 0 0 6px rgba(240, 210, 122, 0.35);
+}
+.map-mark-btn[data-active='true'] img {
+	opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.map-mark-ring {
+		animation: none;
+	}
+}

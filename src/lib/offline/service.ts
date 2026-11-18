@@ -20,12 +20,13 @@ import { mergeManual, settleAchievements, type AchievementRepo, type Achievement
 import { attrsFromCore, coreWithAttrs, levelOfXp } from '@/lib/offline/attrs';
 import { restThrough } from '@/lib/offline/fight';
 import { coreWithInventory, fitInventory, inventoryFromCore } from '@/lib/offline/inventory';
-import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
+import { isChestPlaced, isPlaced, isRockPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '@/lib/offline/placement';
 import { playerProfile } from '@/lib/offline/profile';
 import { powerKey } from '@/lib/offline/spawnWeights';
 import { sealedRng } from '@/lib/offline/seal';
 import { bestiaryOf } from '@/lib/offline/stats';
-import { advanceBank, bossOf, normalsOf, type BankContext, type TicketBank } from '@/lib/offline/tickets';
+import { advanceBank, bossOf, normalsOf, rocksOf, type BankContext, type TicketBank } from '@/lib/offline/tickets';
+import { ROCK_TIERS } from '@/config/rocks';
 import { offlineMinGapSec } from '@/lib/offline/limits';
 import type { Rng } from '@/lib/rng';
 import type { World } from '@/utils/world';
@@ -49,6 +50,9 @@ export { UNCLAIMED_SEC };
 /** The tickets as the browser may see them: a monster or chest shows once the server has given it a tile. */
 export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets => ({
 	chests: bank.chests.filter(isChestPlaced).map(({ n, x, y }) => ({ n, x: x!, y: y! })),
+	rocks: rocksOf(bank)
+		.filter(isRockPlaced)
+		.map(({ n, x, y, tier, hits }) => ({ n, x: x!, y: y!, tier, hits, need: ROCK_TIERS[tier].clicks })),
 	...(opened === undefined ? {} : { opened }),
 	monsters: normalsOf(bank)
 		.filter(isPlaced)
@@ -149,7 +153,7 @@ export interface StepOutcome<T> {
 export const ANCHOR_REFRESH_MS = 120_000;
 
 /**
- * Whether `next` differs from the stored ledger only in what the clock moves: the anchor and the spawn timers (`advanceBank` is additive
+ * Whether `next` differs from the stored ledger only in what the clock moves: the anchor and the spawn timers (chest, monster, boss and rock; `advanceBank` is additive
  * in time, so recomputing them from the older values gives the same result) and the idle combat clock, and the anchor has not fallen more than `ANCHOR_REFRESH_MS` behind.
  */
 const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
@@ -160,7 +164,7 @@ const onlyTimeMoved = (stored: Ledger, next: Ledger): boolean => {
 			...l,
 			ver: 0,
 			anchorAt: 0,
-			bank: { ...l.bank, accAt: 0, chestAcc: 0, monsterAcc: 0, bossAcc: 0 },
+			bank: { ...l.bank, accAt: 0, chestAcc: 0, monsterAcc: 0, bossAcc: 0, rockAcc: 0 },
 			combat: l.combat && !l.combat.fight ? { ...l.combat, at: 0 } : l.combat,
 		});
 	return frozen(stored) === frozen(next);

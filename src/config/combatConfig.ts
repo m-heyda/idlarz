@@ -128,6 +128,32 @@ export interface MonsterReward {
 }
 
 /**
+ * What makes a boss fight different (all optional; a boss may carry one to three). The numbers are looked up from the monster's definition during the fight, so tuning them is a config edit.
+ * The browser shows each one as a chip in the fight panel ({@link describeModifiers}, `src/lib/bossModifiers.ts`).
+ *
+ * - **Venom**: poison stacks from every landed hit; each stack costs a share of the hero's max HP per second and the hero's regeneration is cut. Ticks in `fightStep`, reported as `poison` events (one per second). No random numbers.
+ * - **Sluggish**: the shared potion cooldown of the fight is longer (`potionCooldownAgainst`).
+ * - **Enrage**: the boss's attack speed rises a step every few seconds (`monsterStats` with the fight's `elapsedSec`).
+ * - **Brutal**: the boss's attack is higher at every level (`monsterStats`).
+ *
+ * The win estimate (`estimateWin`) counts all four, so auto-battle does not pick fights it would lose to them.
+ *
+ * @category Monsters/Boss modifiers
+ * @order 1
+ * @table boss-modifiers
+ */
+export interface BossModifiers {
+	/** **Venom**: every hit that lands adds a poison stack (up to `maxStacks`, the clock refreshed to `durationSec`). Each stack costs `pctPerSec` % of the hero's max HP per second, and the hero's regeneration works at `100 - regenCutPct` % while poisoned. */
+	venom?: { pctPerSec: number; durationSec: number; maxStacks: number; regenCutPct: number };
+	/** **Sluggish**: the potion cooldown of the fight is multiplied by this. */
+	sluggish?: { potionCooldownMult: number };
+	/** **Enrage**: every `everySec` seconds of the fight the boss attacks `speedPct` % faster than its base speed, up to `maxSteps` times. */
+	enrage?: { everySec: number; speedPct: number; maxSteps: number };
+	/** **Brutal**: the boss's attack (and so every hit) is this % higher, at every level. */
+	brutal?: { attackPct: number };
+}
+
+/**
  * A kind of monster. The numbers are for `refLevel`; other levels follow `scaling`: `exp` multiplies by the `*PerLevel` factors for
  * every level away from `refLevel`, `gear` follows the item level curve (`levelScale`), so a boss keeps pace with the gear that drops
  * at his level. Armor is additive per level. `spawnWindow` says at which levels a new one appears: it starts at `base`, rises
@@ -168,6 +194,8 @@ export interface MonsterDef {
 	lootSourceId: string;
 	/** Bosses with a clock: the fight is lost when it runs out */
 	timeLimitSec?: number;
+	/** What sets this boss apart in a fight (poison, a slower potion cooldown, rising attack speed, more attack). Absent: none. */
+	modifiers?: BossModifiers;
 	taunts?: readonly string[];
 }
 
@@ -521,6 +549,9 @@ const boss = (
 	};
 };
 
+/** The same boss with modifiers (kept apart from {@link boss} so the factory keeps its shape). */
+const withModifiers = <T extends MonsterDef>(def: T, modifiers: BossModifiers): T & { modifiers: BossModifiers } => ({ ...def, modifiers });
+
 /**
  * Monsters that no longer appear: the stand-ins the real art replaced (2026-11-18). They stay in `MONSTERS` because a save, a ticket or the Bestiary may still name them (ids are append-only), but nothing ever places one.
  * They keep their own biome and numbers, and carry `retired: true`, which `canSpawnOn` refuses. `catalog/monsters.ts` lists them as not enabled.
@@ -572,7 +603,9 @@ export const MONSTERS = {
 	rotcapStag: normal('forest', 'Rotcap Stag', 'tough'),
 	emberSquirrel: normal('forest', 'Ember Squirrel', 'glass'),
 	pineconeWarden: normal('forest', 'Pinecone Warden', 'armored'),
-	bossElderStag: boss('forest', 'The Elder Stag', ['The Elder Stag lowers its antlers.', 'The forest remembers every trespasser.']),
+	bossElderStag: withModifiers(boss('forest', 'The Elder Stag', ['The Elder Stag lowers its antlers.', 'The forest remembers every trespasser.']), {
+		enrage: { everySec: 15, speedPct: 12, maxSteps: 5 },
+	}),
 	// swamp
 	garbageOgre: retire(normal('swamp', 'Garbage Ogre', 'tough')),
 	toxicZombie: normal('swamp', 'Toxic Zombie', 'tough'),
@@ -580,14 +613,18 @@ export const MONSTERS = {
 	rotHeron: normal('swamp', 'Rot Heron', 'fierce'),
 	scrapGolem: normal('swamp', 'Scrap Golem', 'tough'),
 	bogfireWisp: normal('swamp', 'Bogfire Wisp', 'glass'),
-	bossMireMatriarch: boss('swamp', 'The Mire Matriarch', ['The Matriarch gurgles with laughter.', 'The mire swallows the proud.']),
+	bossMireMatriarch: withModifiers(boss('swamp', 'The Mire Matriarch', ['The Matriarch gurgles with laughter.', 'The mire swallows the proud.']), {
+		venom: { pctPerSec: 0.4, durationSec: 8, maxStacks: 5, regenCutPct: 50 },
+	}),
 	// tundra
 	frostHare: normal('tundra', 'Frost Hare', 'fierce'),
 	icetuskCalf: normal('tundra', 'Icetusk Calf', 'tough'),
 	rimeWraith: normal('tundra', 'Rime Wraith', 'elite'),
 	frostMoth: normal('tundra', 'Frost Moth', 'even'),
 	glacierYeti: normal('tundra', 'Glacier Yeti', 'brute'),
-	bossWinterWyrm: boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']),
+	bossWinterWyrm: withModifiers(boss('tundra', 'The Winter Wyrm', ['The Wyrm exhales a cold breath.', 'Winter outlasts everyone.']), {
+		sluggish: { potionCooldownMult: 1.5 },
+	}),
 	// hills (IDL-201; the first three and the giant were stand-ins, now retired: see `RETIRED_MONSTERS`)
 	graniteRam: retire(normal('hills', 'Granite Ram', 'fierce')),
 	caveGoblinMiner: retire(normal('hills', 'Cave Goblin Miner', 'even')),
@@ -600,18 +637,23 @@ export const MONSTERS = {
 	cairnSentinel: normal('hills', 'Cairn Sentinel', 'armored'),
 	quarryRatKnight: normal('hills', 'Quarry Rat Knight', 'tough'),
 	highlandGnoll: normal('hills', 'Highland Gnoll', 'even'),
-	bossIronhorn: boss('hills', 'The Ironhorn', [
-		'The Ironhorn lowers its plated head and steam hisses from its joints.',
-		'The dwarves built it to guard the pass. Nobody told it they left.',
-		'Turn back, or be ground into the road.',
-	]),
+	bossIronhorn: withModifiers(
+		boss('hills', 'The Ironhorn', [
+			'The Ironhorn lowers its plated head and steam hisses from its joints.',
+			'The dwarves built it to guard the pass. Nobody told it they left.',
+			'Turn back, or be ground into the road.',
+		]),
+		{ brutal: { attackPct: 25 } },
+	),
 	// coast
 	wreckCrab: normal('coast', 'Wreck Crab', 'tough'),
 	netGull: normal('coast', 'Net Gull', 'fierce'),
 	drownedSailor: normal('coast', 'Drowned Sailor', 'even'),
 	tideglassJelly: normal('coast', 'Tideglass Jelly', 'glass'),
 	barnacleBrute: normal('coast', 'Barnacle Brute', 'armored'),
-	bossReefLeviathan: boss('coast', 'The Reef Leviathan', ['The Leviathan rises out of the surf.', 'The tide takes everything in the end.']),
+	bossReefLeviathan: withModifiers(boss('coast', 'The Reef Leviathan', ['The Leviathan rises out of the surf.', 'The tide takes everything in the end.']), {
+		brutal: { attackPct: 30 },
+	}),
 	// lake
 	mossSnapper: normal('lake', 'Moss Snapper', 'tough'),
 	reedNymph: normal('lake', 'Reed Nymph', 'even'),
@@ -619,7 +661,9 @@ export const MONSTERS = {
 	tidepoolGolem: normal('lake', 'Tidepool Golem', 'tough'),
 	siltEel: normal('lake', 'Silt Eel', 'glass'),
 	lilypadWarden: normal('lake', 'Lilypad Warden', 'armored'),
-	bossLakeHydra: boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']),
+	bossLakeHydra: withModifiers(boss('lake', 'The Lake Hydra', ['Heads hiss from the reeds.', 'Cut one down and two more watch you.']), {
+		venom: { pctPerSec: 0.15, durationSec: 8, maxStacks: 4, regenCutPct: 25 },
+	}),
 	// jungle: only after the first rebirth, like the biome itself (`BIOME_RULES.unlockAfterRebirths`)
 	skullVine: normal('jungle', 'Skull Vine', 'even', 1),
 	eyeHorror: normal('jungle', 'Eye Horror', 'fierce', 1),
@@ -629,11 +673,14 @@ export const MONSTERS = {
 	bossHardwoodColossus: retire(
 		boss('jungle', 'The Hardwood Colossus', ['The Colossus groans as it straightens.', 'The jungle has been growing a long time.'], 1),
 	),
-	bossBrainstorm: boss(
-		'jungle',
-		'The Brainstorm',
-		['Spores drift from the cap and the air begins to hum.', 'Every thought you have was already thought here.', 'The jungle thinks. You are in the way.'],
-		1,
+	bossBrainstorm: withModifiers(
+		boss(
+			'jungle',
+			'The Brainstorm',
+			['Spores drift from the cap and the air begins to hum.', 'Every thought you have was already thought here.', 'The jungle thinks. You are in the way.'],
+			1,
+		),
+		{ venom: { pctPerSec: 0.3, durationSec: 8, maxStacks: 4, regenCutPct: 40 }, sluggish: { potionCooldownMult: 1.3 } },
 	),
 	// fields (rebirth 2)
 	barnGargoyle: normal('fields', 'Barn Gargoyle', 'fierce', 2),
@@ -641,14 +688,22 @@ export const MONSTERS = {
 	hedgeBandit: normal('fields', 'Hedge Bandit', 'even', 2),
 	crowMarshal: normal('fields', 'Crow Marshal', 'glass', 2),
 	millstoneGolem: normal('fields', 'Millstone Golem', 'armored', 2),
-	bossHarvestMatron: boss('fields', 'The Harvest Matron', ['The Matron ruffles her scarf and clucks.', 'Every egg in the valley is hers.'], 2),
+	bossHarvestMatron: withModifiers(boss('fields', 'The Harvest Matron', ['The Matron ruffles her scarf and clucks.', 'Every egg in the valley is hers.'], 2), {
+		enrage: { everySec: 15, speedPct: 10, maxSteps: 5 },
+	}),
 	// orchard (rebirth 3)
 	greenscaleWarden: normal('orchard', 'Greenscale Warden', 'tough', 3),
 	blossomRonin: normal('orchard', 'Blossom Ronin', 'fierce', 3),
 	grayGleaner: normal('orchard', 'Gray Gleaner', 'even', 3),
 	mushroomWizard: normal('orchard', 'Mushroom Wizard', 'glass', 3),
 	rootboundGardener: normal('orchard', 'Rootbound Gardener', 'armored', 3),
-	bossBlossomReaper: boss('orchard', 'The Blossom Reaper', ['The Reaper lifts a scythe of blue fire.', 'Every blossom falls in its own time.'], 3),
+	bossBlossomReaper: withModifiers(
+		boss('orchard', 'The Blossom Reaper', ['The Reaper lifts a scythe of blue fire.', 'Every blossom falls in its own time.'], 3),
+		{
+			brutal: { attackPct: 20 },
+			enrage: { everySec: 20, speedPct: 10, maxSteps: 4 },
+		},
+	),
 	// blight (rebirth 4)
 	gasketGoblin: normal('blight', 'Gasket Goblin', 'even', 4),
 	blightedHusk: retire(normal('blight', 'Blighted Husk', 'tough', 4)),
@@ -656,17 +711,18 @@ export const MONSTERS = {
 	gloomCerberus: normal('blight', 'Gloom Cerberus', 'elite', 4),
 	sporebackOgre: normal('blight', 'Sporeback Ogre', 'brute', 4),
 	sporeHound: normal('blight', 'Spore Hound', 'fierce', 4),
-	bossEyedMaw: boss('blight', 'The Eyed Maw', ['A dozen eyes open at once.', 'The Blight does not hate you. It only hungers.'], 4),
+	bossEyedMaw: withModifiers(boss('blight', 'The Eyed Maw', ['A dozen eyes open at once.', 'The Blight does not hate you. It only hungers.'], 4), {
+		venom: { pctPerSec: 0.4, durationSec: 8, maxStacks: 5, regenCutPct: 50 },
+		sluggish: { potionCooldownMult: 1.3 },
+	}),
 	// battlefield (rebirth 5)
 	boneCleaver: normal('battlefield', 'Bone Cleaver', 'even', 5),
 	frostguardKnight: normal('battlefield', 'Frostguard Knight', 'tough', 5),
 	gildedChampion: normal('battlefield', 'Gilded Champion', 'fierce', 5),
 	bannerWraith: normal('battlefield', 'Banner Wraith', 'glass', 5),
 	frostFlameKnight: normal('battlefield', 'Frost-Flame Knight', 'armored', 5),
-	bossCinderWarlord: boss(
-		'battlefield',
-		'The Cinder Warlord',
-		['The Warlord drags his cleaver through the ash.', 'Kneel, or be the next to fall on this field.'],
-		5,
+	bossCinderWarlord: withModifiers(
+		boss('battlefield', 'The Cinder Warlord', ['The Warlord drags his cleaver through the ash.', 'Kneel, or be the next to fall on this field.'], 5),
+		{ brutal: { attackPct: 20 }, enrage: { everySec: 20, speedPct: 10, maxSteps: 4 } },
 	),
 } as const satisfies Record<string, MonsterDef>;

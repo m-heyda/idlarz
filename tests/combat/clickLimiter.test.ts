@@ -90,3 +90,15 @@ test('time going backwards never refills', () => {
 	for (let i = 0; i < CLICK_LIMIT.capacity; i++) l.take({ eventId: i, now: 10_000, trusted: true });
 	assert.equal(l.take({ eventId: 99, now: 0, trusted: true }), false);
 });
+
+test('a click made at exactly the sustained rate is not refused for float rounding', () => {
+	const limiter = createClickLimiter({ ...CLICK_LIMIT, capacity: 1 });
+	let now = 0;
+	// one click every 200 ms is the refill rate of 5 per second: every one of them is a person clicking at the sustained pace
+	let paid = 0;
+	for (let i = 0; i < 200; i++) {
+		if (limiter.take({ eventId: i + 1, now, trusted: true })) paid++;
+		now += 1000 / CLICK_LIMIT.refillPerSec;
+	}
+	assert.equal(paid, 200);
+});

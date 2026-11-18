@@ -6,6 +6,7 @@ export type CombatFx =
 	| { kind: 'hit'; damage: number; killed: boolean; crit: 'none' | 'crit' | 'super' }
 	| { kind: 'hurt'; amount: number; crit?: boolean }
 	| { kind: 'heal'; amount: number }
+	| { kind: 'poison'; amount: number }
 	| { kind: 'stun'; sec: number }
 	| { kind: 'resist' };
 

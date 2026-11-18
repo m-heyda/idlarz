@@ -46,6 +46,12 @@ const ROLLERS = [
 	'payKill',
 	'pickChestSpot',
 	'chestSpots',
+	'rollRockLoot',
+	'rollRockTier',
+	'pickRockSpot',
+	'rockSpots',
+	'advanceRocks',
+	'hitRock',
 	'receiveInto',
 	'applyOp',
 ];

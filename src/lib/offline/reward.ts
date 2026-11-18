@@ -30,7 +30,7 @@ export interface KillPayout {
 }
 
 /** Adds ingredients to the crafting bag stock, each key up to `CRAFTING.componentCap` (what does not fit is lost, like the other component deliveries). Returns the new stock and what was stored. */
-const stashIn = (
+export const stashIn = (
 	stock: Readonly<Record<string, number>>,
 	add: Readonly<Record<string, number>>,
 ): { stock: Record<string, number>; stored: Record<string, number> } => {

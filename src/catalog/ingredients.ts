@@ -1,5 +1,6 @@
 import { JUNK_ITEMS } from '@/catalog/items/junk';
 import { FAMILY_DROPS, MONSTER_DROPS } from '@/catalog/monsterDrops';
+import { ROCK_DROPS } from '@/config/rocks';
 
 // Crafting ingredients (owner request 2026-11-18, IDL-358): the rarer monster ingredients are no longer junk. They drop straight into the **crafting bag** (`craft.stock`, under the key `ing_<name>`), cannot be sold and
 // have **no recipe yet**: they are the base for the chains the crafting brainstorm plans (potions, ingots, planks, jewelry). The cheap, plentiful drops stay junk for the merchant. Pure data.
@@ -47,6 +48,9 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('fire_drop', 3, 'fire-ward jewelry'),
 	ing('emerald_star', 3, 'jewelry gems'),
 	ing('heart_gem', 4, 'the finest jewelry'),
+	ing('silver_ore', 2, 'silver ingots and fine jewelry'),
+	ing('gold_ore', 3, 'gold ingots and jewelry'),
+	ing('crystal', 3, 'enchanting and jewelry gems'),
 ];
 
 export const INGREDIENT_BY_JUNK = new Map(INGREDIENTS.map((i) => [i.junkId, i]));
@@ -61,7 +65,9 @@ export const sourcesOf = (junkId: string): string[] => {
 		.filter(([, drops]) => drops.some((d) => d.id === junkId))
 		.map(([family]) => family);
 	const monsters = Object.entries(MONSTER_DROPS).filter(([, drops]) => drops.some((d) => d.id === junkId)).length;
-	return monsters > 0 && families.length === 0 ? ['a few monsters'] : families;
+	const rocks = Object.values(ROCK_DROPS).some((table) => table.some((drop) => drop.kind === 'ingredient' && INGREDIENT_BY_JUNK.get(junkId)?.id === drop.id));
+	const from = monsters > 0 && families.length === 0 ? ['a few monsters'] : families;
+	return rocks ? [...from, 'mining rocks'] : from;
 };
 
 const TIER_LABEL: Record<IngredientTier, string> = { 1: 'Tier 1', 2: 'Tier 2', 3: 'Tier 3', 4: 'Tier 4' };

@@ -193,6 +193,10 @@ interface UiState {
 	farmAnimalsOpen: boolean;
 	farmHudOpen: boolean;
 	farmUpgradesOpen: boolean;
+	/** The buttons under the map: mark the chests, the ores and the monsters (remembered, see MapMarkers) */
+	markChests: boolean;
+	markOres: boolean;
+	markMonsters: boolean;
 	/** The Merchant window remembers its tab and the amount you set (also across visits): the typed value is not lost when you switch windows */
 	merchantTab: MerchantTab;
 	setMerchantTab: (tab: MerchantTab) => void;
@@ -374,5 +378,8 @@ export const useUiStore = create<UiState>((set, get) => ({
 			farmAnimalsOpen: readPref('farmAnimalsOpen'),
 			farmHudOpen: readPref('farmHudOpen'),
 			farmUpgradesOpen: readPref('farmUpgradesOpen'),
+			markChests: readPref('markChests'),
+			markOres: readPref('markOres'),
+			markMonsters: readPref('markMonsters'),
 		}),
 }));

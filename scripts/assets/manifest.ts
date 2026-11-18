@@ -587,6 +587,18 @@ export const buildManifest = (): AssetEntry[] => {
 			usedBy: ['hero:crafting-tab'],
 			source: 'ui',
 		});
+	// The mineable rocks on the map (supplied 64 px art): one picture per rock look, used by `config/rocks.ts`
+	for (const f of walk(join(PUBLIC, 'pixel', 'rocks')))
+		if (f.endsWith('.png'))
+			add({
+				name: snake(basename(f)),
+				category: 'map-details',
+				subcategory: 'mineable rocks',
+				src: url(f),
+				status: 'used',
+				usedBy: ['rocks'],
+				source: 'rocks',
+			});
 	for (const f of walk(join(PUBLIC, 'pixel', 'idols')))
 		if (f.endsWith('.png'))
 			add({

@@ -85,8 +85,8 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			autoSellUpTo: state.autoSellUpTo, // a setting, not gear
 			merchantUpgrades,
 			merchantStock: state.merchantStock, // the shelf and its rotation clock carry over: a rebirth is no free reshuffle
-			merchantRefreshes: state.merchantRefreshes, // the refresh price and the free window are not reset by a rebirth
-			merchantRefresh: state.merchantRefresh,
+			merchantRefreshes: 0, // the Restock price starts from its base again, and so does the free window (the 30 s cooldown stays)
+			merchantRefresh: { windowAt: 0, freeUsed: 0, lastAt: state.merchantRefresh.lastAt, paidAt: 0 },
 			playerHp: maxHp(characterStats, kit.equipment),
 			playerMp: maxMana(characterStats, kit.equipment, state.playerClass),
 			playerName: state.playerName,

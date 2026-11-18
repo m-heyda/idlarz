@@ -1,6 +1,6 @@
 import { COMBAT } from '@/config/combatConfig';
 import { armorReduction, mitigate } from '@/lib/combat';
-import { monsterDef, monsterStats } from '@/lib/monsters';
+import { modifiersOf, monsterDef, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
 
@@ -37,11 +37,23 @@ const expectedHit = (p: PlayerProfile, armor: number): number => {
 };
 
 /** Expected damage per second the monster does to this player (dodges, crits and armor in). */
-const monsterDps = (p: PlayerProfile, type: MonsterType, level: number): number => {
-	const m = monsterStats(type, level);
+const monsterDps = (p: PlayerProfile, type: MonsterType, level: number, elapsedSec = 0, fightSec = Infinity): number => {
+	const m = monsterStats(type, level, elapsedSec);
 	const crit = Math.min(1, Math.max(0, m.critChance / 100));
 	const perHit = (1 - crit) * mitigate(m.attack, p.armor) + crit * mitigate(Math.round(m.attack * m.critMult), p.armor);
-	return perHit * m.attackSpeed * (1 - Math.min(1, Math.max(0, p.dodge)));
+	const hits = m.attackSpeed * (1 - Math.min(1, Math.max(0, p.dodge)));
+	const venom = modifiersOf(type).venom;
+	// Venom: every landed hit adds a stack and refreshes the shared clock (`durationSec`), so with hits closer than the clock the stacks build up one per hit to the maximum and cost nothing before the first hit;
+	// with hits farther apart than the clock a single stack is on for the share of the time the clock runs. The stacks are averaged over the fight.
+	let stacks = 0;
+	if (venom && hits > 0) {
+		const gap = 1 / hits;
+		if (gap >= venom.durationSec) stacks = Math.min(1, venom.durationSec * hits);
+		else if (Number.isFinite(fightSec) && fightSec > 0) {
+			for (let k = 1; k <= venom.maxStacks; k++) stacks += Math.max(0, fightSec - k * gap) / fightSec;
+		} else stacks = venom.maxStacks;
+	}
+	return perHit * hits + (venom ? (stacks * venom.pctPerSec * p.maxHp) / 100 : 0);
 };
 
 /**
@@ -66,13 +78,17 @@ export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, lev
 	if (killSec > limit) return { chance: 0, killSec, surviveSec: 0 };
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown
-	const healPerSec = Math.max(0, p.hpRegen) + (dps * Math.max(0, p.leechPct)) / 100;
-	const potionHp = potions.reduce(
-		(sum, potion) =>
-			sum + potion.healHp * (p.potionPower ?? 1) * Math.min(potion.count, Math.floor(killSec / (p.potionCooldownSec ?? COMBAT.potionCooldownSec)) + 1),
-		0,
-	);
-	const net = monsterDps(p, type, level) - healPerSec;
+	const venomCut = 1 - (modifiersOf(type).venom?.regenCutPct ?? 0) / 100;
+	const healPerSec = Math.max(0, p.hpRegen) * venomCut + (dps * Math.max(0, p.leechPct)) / 100;
+	// one shared cooldown: the fight allows this many drinks in all, however many kinds are in the bag (the best potions go first)
+	let drinks = Math.floor(killSec / potionCooldownAgainst(type, p.potionCooldownSec ?? COMBAT.potionCooldownSec)) + 1;
+	let potionHp = 0;
+	for (const potion of [...potions].sort((a, b) => b.healHp - a.healHp)) {
+		const used = Math.min(potion.count, drinks);
+		potionHp += potion.healHp * (p.potionPower ?? 1) * used;
+		drinks -= used;
+	}
+	const net = monsterDps(p, type, level, killSec / 2, killSec) - healPerSec; // Enrage: the attack speed of the middle of the fight stands for the whole
 	const surviveSec = net <= 0 ? Infinity : (Math.max(0, hp) + potionHp) / net;
 	if (!Number.isFinite(surviveSec)) return { chance: 1, killSec, surviveSec };
 

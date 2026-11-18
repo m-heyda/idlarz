@@ -1,3 +1,4 @@
+import { BUILDINGS_FLAG } from '@/config/buildings';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
 import { chestSpots, pickChestSpot } from '@/lib/chests';
 import { MONSTERS } from '@/config/combatConfig';
@@ -5,7 +6,8 @@ import { castleDistance } from '@/lib/distance';
 import { canSpawnOn, rollSpawnLevel, spawnTiles } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import { growthCap, pickWeighted, spawnLevelCap, typeWeights } from '@/lib/offline/spawnWeights';
-import { monsterTypeOf, type ChestTicket, type MonsterKind, type MonsterTicket, type TicketBank } from '@/lib/offline/tickets';
+import { monsterTypeOf, rocksOf, type ChestTicket, type MonsterKind, type MonsterTicket, type RockTicket, type TicketBank } from '@/lib/offline/tickets';
+import { pickRockSpot, rockSpots } from '@/lib/rocks';
 import type { Rng } from '@/lib/rng';
 import { unpackBody, type SaveBody } from '@/lib/saveFormat';
 import type { MonsterType, Tile } from '@/types/game';
@@ -22,13 +24,13 @@ import { createWorld, getTile, type Placed, type World } from '@/utils/world';
 export const siteKey = (summary: { tilesOwned: number; castleLevel: number; rebirths: number }): string =>
 	`${summary.tilesOwned}:${summary.castleLevel}:${summary.rebirths}:r${Object.keys(MONSTERS).length}`;
 
-type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean };
+type LandEntry = { x: number; y: number; biome: Tile['biome']; level?: number; chest?: boolean; building?: string; bl?: number };
 
 /** The owned tiles of a stored map (`land` and `extra` of a save, see saveFormat), or null when it cannot be read. */
 export const worldFromPart = (part: { land: unknown; extra: unknown }): World | null => {
 	const unpacked = unpackBody({ land: part.land, extra: part.extra } as SaveBody);
 	if ('error' in unpacked) return null;
-	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, chest }) => ({
+	const placed: Placed[] = (unpacked.raw.land as LandEntry[]).map(({ x, y, biome, level, chest, building, bl }) => ({
 		x,
 		y,
 		tile: {
@@ -36,6 +38,8 @@ export const worldFromPart = (part: { land: unknown; extra: unknown }): World | 
 			isOwned: true,
 			...(level !== undefined ? { level } : {}),
 			...(chest ? { hasChest: true } : {}),
+			// a stored building (while the building system is on) keeps its tile occupied, so rocks are never placed on it or kept on it
+			...(BUILDINGS_FLAG.enabled && building ? { building, ...(bl !== undefined ? { buildingLevel: bl } : {}) } : {}),
 		},
 	}));
 	return createWorld(placed);
@@ -51,11 +55,15 @@ export const isPlaced = (ticket: MonsterTicket): boolean => ticket.x !== undefin
 /** A chest that is on the map (it has a tile). */
 export const isChestPlaced = (ticket: ChestTicket): boolean => ticket.x !== undefined && ticket.y !== undefined;
 
+/** A rock that is on the map (it has a tile). */
+export const isRockPlaced = (ticket: RockTicket): boolean => ticket.x !== undefined && ticket.y !== undefined;
+
 /** Whether the map has to be looked at: the land changed since the last look, or a monster or chest is waiting for its tile and there may be room. */
 export const needsLook = (bank: TicketBank, key: string): boolean => {
 	if (bank.sitesKey !== key || !bank.sites) return true;
 	const waiting = bank.monsters.some((ticket) => !isPlaced(ticket));
 	if (waiting && bank.sites.monster > 0) return true;
+	if (rocksOf(bank).some((rock) => !isRockPlaced(rock)) && (bank.sites.rock ?? 0) > rocksOf(bank).filter(isRockPlaced).length) return true;
 	return bank.chests.some((chest) => !isChestPlaced(chest)) && bank.chests.length + bank.monsters.length < (bank.sites.chest ?? 0);
 };
 
@@ -88,6 +96,7 @@ export const placeTickets = (
 		monster: siteCount('normal'),
 		boss: siteCount('boss'),
 		chest: chestSpots(world, noneTaken, castleLevel).length,
+		rock: rockSpots(world, noneTaken, castleLevel).length,
 	};
 
 	const taken = new Set<string>();
@@ -158,10 +167,35 @@ export const placeTickets = (
 				return [ticket.n, { ...ticket, x: spot.x, y: spot.y }];
 			}),
 	);
+	// rocks come last: a rock never takes a tile a monster or a chest stands on, and the ones that stand keep their tile while it is still free
+	const keptRocks = rocksOf(bank).map((rock): RockTicket => {
+		if (!isRockPlaced(rock)) return rock;
+		const spot = `${rock.x},${rock.y}`;
+		const tile = getTile(world, rock.x!, rock.y!);
+		if (tile && tile.biome !== 'castle' && tile.biome !== 'lake' && !tile.building && !taken.has(spot) && !isInWard(rock.x!, rock.y!, castleLevel)) {
+			taken.add(spot);
+			return rock;
+		}
+		const { x: _x, y: _y, ...rest } = rock;
+		void _x;
+		void _y;
+		return rest;
+	});
+	const placedRocks = [...keptRocks]
+		.sort((a, b) => a.n - b.n)
+		.map((rock): [number, RockTicket] => {
+			if (isRockPlaced(rock)) return [rock.n, rock];
+			const spot = pickRockSpot(world, taken, castleLevel, rollFor('rockpos', rock.n));
+			if (!spot) return [rock.n, rock];
+			taken.add(`${spot.x},${spot.y}`);
+			return [rock.n, { ...rock, x: spot.x, y: spot.y }];
+		});
+	const rockByN = new Map(placedRocks);
 	return {
 		...bank,
 		monsters: settledMonsters.map((ticket) => placed.get(ticket.n)!),
 		chests: settledChests.map((ticket) => placedChests.get(ticket.n)!),
+		...(bank.rocks ? { rocks: keptRocks.map((rock) => rockByN.get(rock.n)!) } : {}),
 		sites,
 		sitesKey: key,
 	};

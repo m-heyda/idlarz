@@ -1,6 +1,7 @@
 import { ITEM_CATALOG } from '@/catalog';
 import { drink } from '@/lib/buffs';
 import { COMBAT } from '@/config/combatConfig';
+import { potionCooldownAgainst } from '@/lib/monsters';
 import { removeFromBag, stackOf } from '@/lib/inventory';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
 import type { Ledger } from '@/lib/offline/ledger';
@@ -40,7 +41,7 @@ export const applyUse = (input: Ledger, env: CombatEnv, index: number): UseResul
 		...c,
 		hp: drunk.hp,
 		mp: drunk.mp,
-		cd: c.fight ? { ...c.cd, potion: profile.potionCooldownSec ?? COMBAT.potionCooldownSec } : c.cd,
+		cd: c.fight ? { ...c.cd, potion: potionCooldownAgainst(c.fight.type, profile.potionCooldownSec ?? COMBAT.potionCooldownSec) } : c.cd,
 		...(drunk.regen ? { regen: { hpPerSec: drunk.regen.hpPerSec, untilSec: now + drunk.regen.durationSec } } : {}),
 	};
 	const ledger: Ledger = {

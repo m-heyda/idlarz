@@ -51,6 +51,8 @@ export interface FightRecord {
 	stunLeft: number;
 	/** Damage the hero has taken in this fight (absent: none yet); a win with none counts towards Untouched (`LifetimeStats.flawless`) */
 	hurt?: number;
+	/** Venom (a boss modifier): the poison on the hero, `stacks` of it for `leftSec` more seconds; `acc` is the damage not yet reported as an event. Absent: not poisoned. */
+	poison?: { stacks: number; leftSec: number; acc: number };
 	/** Seconds the fight has lasted, and what is left of a boss's clock (null: no clock) */
 	elapsed: number;
 	timeLeftSec: number | null;
@@ -74,7 +76,23 @@ export interface FightEvent {
 	no: number;
 	/** Server clock (epoch seconds) */
 	t: number;
-	kind: 'engage' | 'hit' | 'crit' | 'super' | 'hurt' | 'dodged' | 'heal' | 'potion' | 'stun' | 'resist' | 'won' | 'defeated' | 'timeout' | 'retreat' | 'paused';
+	kind:
+		| 'engage'
+		| 'hit'
+		| 'crit'
+		| 'super'
+		| 'hurt'
+		| 'dodged'
+		| 'heal'
+		| 'potion'
+		| 'stun'
+		| 'resist'
+		| 'poison'
+		| 'won'
+		| 'defeated'
+		| 'timeout'
+		| 'retreat'
+		| 'paused';
 	/** Damage dealt/taken or HP healed */
 	amount?: number;
 	/** `hurt` by a crit */
@@ -130,7 +148,7 @@ export interface CombatState {
 /** The log keeps this many events, dropping the cosmetic ones (swings) first: a result (a win with its loot, a potion drunk) stays until the browser has acknowledged it, up to the hard cap. */
 export const LOG_KEEP = 40;
 export const LOG_HARD_CAP = 100;
-export const COSMETIC_EVENTS: ReadonlySet<FightEvent['kind']> = new Set(['hit', 'crit', 'super', 'hurt', 'dodged']);
+export const COSMETIC_EVENTS: ReadonlySet<FightEvent['kind']> = new Set(['hit', 'crit', 'super', 'hurt', 'dodged', 'poison']);
 
 export const freshCooldowns = (): Cooldowns => ({ heal: 0, stun: 0, potion: 0 });
 
@@ -170,7 +188,7 @@ export interface FightView {
 }
 
 /** The kinds of animated event a plan carries, by the index its `fx` rows use. */
-export const PLAN_FX_KINDS = ['hit', 'crit', 'super', 'hurt', 'hurtCrit', 'heal', 'stun', 'resist'] as const;
+export const PLAN_FX_KINDS = ['hit', 'crit', 'super', 'hurt', 'hurtCrit', 'heal', 'stun', 'resist', 'poison'] as const;
 
 /**
  * Where an open fight is going, so the browser can animate it and ask again only when it is over: the server runs the fight to its end on a copy.

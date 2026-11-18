@@ -1,4 +1,4 @@
-import { COMBAT, MONSTERS, type MonsterDef } from '@/config/combatConfig';
+import { COMBAT, MONSTERS, type BossModifiers, type MonsterDef } from '@/config/combatConfig';
 import { levelScale } from '@/catalog/stats';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
 import { castleDistance } from '@/lib/distance';
@@ -24,6 +24,18 @@ export interface MonsterStats {
 export const monsterDef = (type: MonsterType): MonsterDef => MONSTERS[type];
 
 export const isBoss = (type: MonsterType): boolean => MONSTERS[type].grade === 'boss';
+
+/** What sets a boss apart in a fight (`MonsterDef.modifiers`); empty for every monster without any. */
+export const modifiersOf = (type: MonsterType): BossModifiers => (MONSTERS[type] as MonsterDef).modifiers ?? {};
+
+/** The shared potion cooldown inside a fight with this monster: `base` times the Sluggish multiplier, if it has one. */
+export const potionCooldownAgainst = (type: MonsterType, base: number): number => base * (modifiersOf(type).sluggish?.potionCooldownMult ?? 1);
+
+/** How many Enrage steps a fight has reached after `elapsedSec`: one per `everySec`, up to `maxSteps` (0 without the modifier). */
+export const enrageSteps = (type: MonsterType, elapsedSec: number): number => {
+	const e = modifiersOf(type).enrage;
+	return e ? Math.min(e.maxSteps, Math.max(0, Math.floor(elapsedSec / e.everySec))) : 0;
+};
 
 /**
  * The levels a new monster of this type can appear at in a world of this castle level (both ends included).
@@ -104,6 +116,7 @@ const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
  * - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
  * - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
  * - Reference levels: plains 15, coast 17, forest 20, hills 22, swamp 25, lake 27, tundra 30.
+ * - Boss modifiers ({@link BossModifiers}): **Brutal** raises `attack` by its %, **Enrage** raises `attackSpeed` by its % for every step the fight has reached (`elapsedSec`, one step per `everySec`, a maximum of `maxSteps`).
  *
  * @category Monsters/Level scaling
  * @order 1
@@ -113,19 +126,21 @@ const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
  *         armor  = armor + 0.5 x (level - 1)
  * boss:   HP, attack = base x levelScale(level) / levelScale(refLevel)         levelScale(L) = 1 + 0.07 x (L - 1)
  *         armor  = armor + 0.5 x (level - refLevel)
+ * Brutal: attack      x (1 + attackPct / 100)
+ * Enrage: attackSpeed x (1 + speedPct / 100 x steps)        steps = min(maxSteps, floor(elapsedSec / everySec))
  */
-export const monsterStats = (type: MonsterType, level: number): MonsterStats => {
+export const monsterStats = (type: MonsterType, level: number, elapsedSec = 0): MonsterStats => {
 	const d = monsterDef(type);
 	const steps = Math.max(1, Math.floor(level)) - d.refLevel;
 	const gear = d.scaling === 'gear' ? levelScale(Math.max(1, Math.floor(level))) / levelScale(d.refLevel) : null;
 	return {
 		maxHp: roundHalfUp(d.hp * (gear ?? Math.pow(d.hpPerLevel, steps))),
-		attack: roundHalfUp(d.attack * (gear ?? Math.pow(d.attackPerLevel, steps))),
+		attack: roundHalfUp(d.attack * (gear ?? Math.pow(d.attackPerLevel, steps)) * (1 + (d.modifiers?.brutal?.attackPct ?? 0) / 100)),
 		armor: Math.max(0, d.armor + d.armorPerLevel * steps),
 		critChance: d.critChance,
 		critMult: d.critMult,
 		stunResist: d.stunResist,
-		attackSpeed: d.attackSpeed,
+		attackSpeed: d.attackSpeed * (1 + ((d.modifiers?.enrage?.speedPct ?? 0) / 100) * enrageSteps(type, elapsedSec)),
 	};
 };
 

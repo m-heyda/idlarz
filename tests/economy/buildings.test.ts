@@ -11,6 +11,7 @@ import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MAX_CATCHUP_SEC } from '../../src/config/economy';
 import {
 	buildingLevelCap,
+	maxLevelOf,
 	buildingLevelCost,
 	buildingTotalCost,
 	builderBusy,
@@ -130,6 +131,13 @@ test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 
 		[3, 6, 10],
 	);
 	assert.equal(buildingLevelCap(15, 99), 15, 'never above the hard ceiling');
+	// the top level a building can reach does not look at the castle at all
+	const producer = BUILDINGS.find((b) => b.kind === 'producer');
+	const idol = BUILDINGS.find((b) => b.kind === 'idol');
+	assert.equal(maxLevelOf(producer, 5, 5), 5);
+	assert.equal(maxLevelOf(producer, 5, 8), 8);
+	assert.equal(maxLevelOf(producer, 5, 99), 15, 'a producer never passes its hard limit');
+	assert.equal(maxLevelOf(idol, 8, 5), 8);
 	assert.deepEqual(BUILDING_RULES.durationsSec, [600, 2700, 10800, 28800]);
 	assert.deepEqual(
 		[1, 2, 3, 4].map((l) => buildingUpgradeDuration(l)),
