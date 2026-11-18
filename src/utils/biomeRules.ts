@@ -131,16 +131,16 @@ function weighted<T>(items: [T, number][], roll: number): T {
  *
  * Which biome a purchase becomes is **rolled when you buy; there is no picker**. Rules and numbers are `BIOME_RULES` in `src/config/biomeRules.ts` and `BIOME_SPAWN` in `src/config/biomes.ts`.
  *
- * - Plains, forest, hills and lake from the start; swamp after 6 purchases, tundra after 10; coast only beside a lake or coast.
+ * - Plains, forest, hills and lake from the start; swamp after 12 purchases (and 6 tiles from the castle), tundra after 25 (and 10 tiles out); coast only beside a lake or coast.
  * - The rebirth biomes need completed rebirths (`BIOME_RULES.unlockAfterRebirths`): jungle after 1, fields 2, blossom orchard 3, blight 4, battlefield 5. `rebirths` is `prestige.rebirths`;
  *   below it the biome is never allowed, so it can neither be rolled nor copied from a neighbour.
  * - Never adjacent (8 neighbours): tundra-swamp, tundra-coast, hills-coast, blight-lake, blight-coast, blight-orchard, battlefield-swamp, jungle-tundra. Plains is neutral.
  * - Clustering: a base chance to copy a neighbouring biome (forest 60, hills 55, lake 50, swamp 55, tundra 65, plains 45, coast 40, jungle 55, fields 55, orchard 55, blight 60, battlefield 55)
  *   plus 10 per extra same-biome 4-neighbour, capped at 90%; a lone tile joins a neighbour with `buddyPct` 100.
- * - A rebirth biome also needs distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
+ * - Swamp, tundra and the rebirth biomes also need distance from the castle (`BIOME_RULES.minCastleDistance`, Chebyshev): swamp 6, tundra 10, jungle 10, fields 14, orchard 18, blight 22, battlefield 22. Nearer it is never allowed,
  *   so it cannot be rolled or copied from a neighbour there.
  * - Otherwise a weighted roll: every biome 1, coast 0.6, lake and coast likelier beside water. The weight then leans with the castle distance (`distanceWeight`): basic biomes fade
- *   from x1 at 10 tiles to x0.25 at 30, a rebirth biome ramps from x3/8 at its minimum distance to x3 eight tiles further.
+ *   from x1 at 10 tiles to x0.25 at 30, a biome with a minimum distance ramps from x3/8 at that distance to x3 eight tiles further.
  * - The start ring (the four free tiles) is plains and forest only, at least two plains ({@link generateStartRing}).
  *
  * @category Economy/Biomes

@@ -38,11 +38,15 @@ test('the unlock table: one biome per rebirth, 1 to 5, and all five are live', (
 test('a biome is never rolled (or even allowed) before its rebirth', () => {
 	for (let rebirths = 0; rebirths <= 6; rebirths++) {
 		const seen = new Set<string>();
-		for (let seed = 1; seed <= 12; seed++) for (const e of ownedEntries(growWorld(220, seed, 'nearest', rebirths))) seen.add(e.tile.biome);
-		for (const b of NEW_BIOMES) {
-			if (needs(b) > rebirths) assert.ok(!seen.has(b), `${b} appeared at rebirth ${rebirths}`);
-			else assert.ok(!seen.has(b) || BIOME_RULES.minCastleDistance[b] <= 7, `${b} appeared near the castle at rebirth ${rebirths}`);
+		for (let seed = 1; seed <= 12; seed++) {
+			for (const e of ownedEntries(growWorld(220, seed, 'nearest', rebirths))) {
+				seen.add(e.tile.biome);
+				const min = BIOME_RULES.minCastleDistance[e.tile.biome as string];
+				if (min !== undefined)
+					assert.ok(Math.max(Math.abs(e.x - CASTLE_X), Math.abs(e.y - CASTLE_Y)) >= min, `${e.tile.biome} at ${e.x},${e.y} is inside its minimum distance`);
+			}
 		}
+		for (const b of NEW_BIOMES) if (needs(b) > rebirths) assert.ok(!seen.has(b), `${b} appeared at rebirth ${rebirths}`);
 	}
 });
 

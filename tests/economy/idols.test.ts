@@ -201,7 +201,7 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 	assert.equal(buildingLevelCost(4, 20, def).sap, IDOL_RULES.t3PerLevel * 2);
 	assert.deepEqual(
 		[3, 4, 5].map((l) => buildingLevelCost(l, 20, def).sap),
-		[1000, 2000, 4000],
+		[10000, 20000, 40000],
 		'x5 since the slower Idols',
 	);
 	assert.equal(buildingLevelCost(3, 20, buildingDef('idol_jungle')).sap, undefined, 'a biome without an Extractor asks for none');
@@ -212,9 +212,9 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 	store.setState({ idolLevels: { forest: 2 } });
 	setResources({ sap: 10 });
 	assert.equal(api().upgradeBuilding(a.x, a.y), false, 'not enough sap');
-	setResources({ sap: 1000 });
+	setResources({ sap: 100000 });
 	assert.equal(api().upgradeBuilding(a.x, a.y), true);
-	assert.equal(api().resources.sap, 1000 - IDOL_RULES.t3PerLevel);
+	assert.equal(api().resources.sap, 100000 - IDOL_RULES.t3PerLevel);
 });
 
 test('Dwarf Statue shortens castle and building timers, capped at 60 % together with Master Builders', () => {

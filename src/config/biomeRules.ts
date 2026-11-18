@@ -15,7 +15,7 @@ export const BIOME_RULES = {
 	},
 
 	/** Purchases needed before a biome can turn up or be picked. Not listed = available from the start. */
-	unlockAfterPurchases: { swamp: 6, tundra: 10 } as Record<string, number>,
+	unlockAfterPurchases: { swamp: 12, tundra: 25 } as Record<string, number>,
 
 	/**
 	 * Rebirths a biome needs before it can turn up (the count of completed rebirths, `prestige.rebirths`). Not listed = no rebirth needed. The map resets on every
@@ -24,10 +24,10 @@ export const BIOME_RULES = {
 	unlockAfterRebirths: { jungle: 1, fields: 2, orchard: 3, blight: 4, battlefield: 5 } as Record<string, number>,
 
 	/**
-	 * How far from the castle (Chebyshev, `castleDistance`) a rebirth biome may first turn up; nearer tiles are never that biome (not rolled, not copied from a neighbour).
+	 * How far from the castle (Chebyshev, `castleDistance`) a swamp, tundra or rebirth biome may first turn up; nearer tiles are never that biome (not rolled, not copied from a neighbour).
 	 * Not listed = no distance rule. Numbers from docs/plan/12-rebirth-biomes.md section 3.
 	 */
-	minCastleDistance: { jungle: 10, fields: 14, orchard: 18, blight: 22, battlefield: 22 } as Record<string, number>,
+	minCastleDistance: { swamp: 6, tundra: 10, jungle: 10, fields: 14, orchard: 18, blight: 22, battlefield: 22 } as Record<string, number>,
 
 	/** How the weighted roll leans with the castle distance d of the tile (the cluster-copy chance is not affected). */
 	distanceWeights: {
