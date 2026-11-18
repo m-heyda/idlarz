@@ -32,6 +32,10 @@ export type AchievementCondition =
 	| { kind: 'flawless'; min: number }
 	/** Bestiary entries filled: monster types with at least `kills` kills each (the first mastery step, `catalog/mastery.ts`) */
 	| { kind: 'entries'; kills: number; min: number }
+	/** Bestiary mastery tiers claimed, all monsters together (`LifetimeStats.masteryClaimed`) */
+	| { kind: 'mastered'; min: number }
+	/** Bestiary biome collection goals claimed, all biomes together (`LifetimeStats.biomeClaimed`) */
+	| { kind: 'biomeGoals'; min: number }
 	/** The first tile of a biome owned (batch 2) */
 	| { kind: 'biome'; biome: string }
 	/** The largest connected group of tiles of one biome */
@@ -424,6 +428,62 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		badge: 'badge_scroll_check_silver',
 		rewards: { gems: 150, points: 80 },
 	},
+	{
+		id: 'scholar_50',
+		title: 'Scholar IV',
+		description: 'Fill 50 bestiary entries.',
+		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 50 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 250, points: 120 },
+	},
+	{
+		id: 'archivist_10',
+		title: 'Archivist I',
+		description: 'Claim 10 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 10 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 40, points: 15 },
+	},
+	{
+		id: 'archivist_50',
+		title: 'Archivist II',
+		description: 'Claim 50 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 50 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 120, points: 60 },
+	},
+	{
+		id: 'archivist_150',
+		title: 'Archivist III',
+		description: 'Claim 150 bestiary mastery tiers.',
+		when: { kind: 'mastered', min: 150 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 300, points: 150 },
+	},
+	{
+		id: 'naturalist_1',
+		title: 'Field Naturalist I',
+		description: 'Claim a biome collection goal in the Bestiary.',
+		when: { kind: 'biomeGoals', min: 1 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 40, points: 20 },
+	},
+	{
+		id: 'naturalist_12',
+		title: 'Field Naturalist II',
+		description: 'Claim 12 biome collection goals.',
+		when: { kind: 'biomeGoals', min: 12 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 150, points: 80 },
+	},
+	{
+		id: 'naturalist_48',
+		title: 'Field Naturalist III',
+		description: 'Claim every biome collection goal (all four tiers in all twelve biomes).',
+		when: { kind: 'biomeGoals', min: 48 },
+		badge: 'badge_scroll_check_silver',
+		rewards: { gems: 400, points: 250 },
+	},
 	...BATCH2_ACHIEVEMENTS,
 	{
 		id: 'castle_15',
@@ -611,7 +671,29 @@ export const DEEDS: readonly DeedDef[] = [
 		badge: 'badge_scroll_check_silver',
 		lore: 'Know a thing and it is half beaten.',
 		how: 'An entry counts as filled when its first mastery step is reached. See the Bestiary.',
-		tiers: ['scholar_5', 'scholar_15', 'scholar_30'],
+		tiers: ['scholar_5', 'scholar_15', 'scholar_30', 'scholar_50'],
+	},
+	{
+		id: 'archivist',
+		title: 'Archivist',
+		description: 'Claim bestiary mastery tiers.',
+		category: 'bestiary',
+		tags: ['bestiary', 'mastery'],
+		badge: 'badge_scroll_check_silver',
+		lore: 'Every tier is a page. The book is long and the monsters keep writing it.',
+		how: 'Reach a mastery tier of a monster (10, 100, 500 and 2,500 kills; a boss at 1, 5, 25 and 100) and press Claim in the Bestiary.',
+		tiers: ['archivist_10', 'archivist_50', 'archivist_150'],
+	},
+	{
+		id: 'naturalist',
+		title: 'Field Naturalist',
+		description: 'Complete the Bestiary collection goals of the biomes.',
+		category: 'bestiary',
+		tags: ['bestiary', 'mastery'],
+		badge: 'badge_scroll_check_silver',
+		lore: 'Not one wolf, but every wolf, and the stag, and the very large thing in the lake.',
+		how: 'A biome goal needs every monster of the biome, its boss included, at the same mastery tier. Claim it in the Bestiary for a bonus against all of them.',
+		tiers: ['naturalist_1', 'naturalist_12', 'naturalist_48'],
 	},
 	{
 		id: 'ropes',

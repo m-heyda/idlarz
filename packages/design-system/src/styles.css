@@ -5486,3 +5486,160 @@ button.ds-income-head:hover {
 	white-space: nowrap;
 	border-left: 6px solid var(--grade, transparent);
 }
+
+/* ---- Bestiary panel (IDL-322): lays itself out from its own width, so dragging the window's resize corner re-flows it ---- */
+.ds-bst {
+	container: ds-bst / inline-size;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	height: 100%;
+	min-height: 0;
+}
+
+.ds-bst-bar {
+	flex: none;
+	flex-wrap: wrap;
+	gap: 8px 14px;
+}
+
+.ds-bst-bar .ds-filters {
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.ds-bst-family {
+	font: inherit;
+	font-size: 12px;
+	color: var(--ds-text);
+	background: rgba(0, 0, 0, 0.45);
+	border: 1px solid var(--ds-line-dk);
+	padding: 3px 6px;
+}
+
+.ds-bst-body {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+	gap: 10px;
+}
+
+.ds-bst-body > * {
+	min-height: 0;
+	overflow: auto;
+}
+
+.ds-bst-biomes {
+	flex: none;
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+	gap: 6px;
+	max-height: 168px;
+	overflow: auto;
+}
+
+.ds-bst-biome {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	padding: 6px 8px;
+	background: rgba(0, 0, 0, 0.4);
+	border: 1px solid var(--ds-line-dk);
+}
+
+.ds-bst-biome[data-ready='true'] {
+	border-color: var(--ds-gold);
+}
+
+.ds-bst-biome-head {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-bst-biome-text {
+	font-size: 11px;
+	line-height: 1.3;
+}
+
+.ds-lv-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 6px;
+}
+
+.ds-lv-ctl {
+	display: inline-flex;
+	gap: 3px;
+}
+
+.ds-lv-ctl button {
+	width: 22px;
+	height: 20px;
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--ds-text);
+	background: rgba(0, 0, 0, 0.5);
+	border: 1px solid var(--ds-line-dk);
+}
+
+.ds-lv-ctl button:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+/* medium: the detail drops under the grid and takes the rest of the height */
+@container ds-bst (max-width: 760px) {
+	.ds-bst-body {
+		grid-template-columns: minmax(0, 1fr);
+		grid-template-rows: minmax(140px, 0.9fr) minmax(220px, 1.3fr);
+	}
+	.ds-mons {
+		grid-template-columns: repeat(auto-fill, minmax(104px, 1fr));
+	}
+}
+
+/* narrow: one column that scrolls as a whole, the grid shows two rows */
+@container ds-bst (max-width: 480px) {
+	.ds-bst-body {
+		grid-template-rows: none;
+		grid-auto-rows: min-content;
+		overflow: auto;
+	}
+	.ds-bst-body > * {
+		overflow: visible;
+	}
+	.ds-bst-body > .ds-mons {
+		max-height: 260px;
+		overflow: auto;
+	}
+	.ds-bst-bar .ds-sum-cell {
+		border-left: 0;
+		padding-left: 0;
+		flex-basis: 100%;
+	}
+	.ds-bst-bar .ds-sum-progress {
+		max-width: none;
+	}
+	.ds-bst-bar .ds-filters {
+		margin-left: 0;
+	}
+	.ds-paper-cols {
+		grid-template-columns: minmax(0, 1fr) !important;
+	}
+}
+
+.ds-bst-active {
+	flex: 1 1 220px;
+	min-width: 0;
+}
+
+.ds-bst-active b {
+	font-size: 13px;
+	line-height: 1.25;
+	overflow-wrap: anywhere;
+}

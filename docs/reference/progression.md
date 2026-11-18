@@ -933,13 +933,13 @@ Records a curiosity once. An id that is not on the list, or one already recorded
 
 ### Achievements
 
-Source: [`src/catalog/achievements.ts:96`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:100`](../../src/catalog/achievements.ts)
 
 The 12 launch achievements (600 gems in total and 4 avatars, docs/plan/21 section 3) and the Beta tester (200 gems, its own avatar). The server records an achievement once per account when its condition first holds
 ([`settleAchievements`](progression.md#settleachievements)) and pays its gems when the player claims it; the two testers are granted by the new chapter reset (and for the accounts that already had the Early tester) instead of being checked. "Rat King defeated" was replaced by the first boss, The Great Auroch.
 The first one ends where the guided tutorial's starter path ends. Later releases add grind ladders (R6) after these.
 
-**The launch achievements (124, 8280 gems in total)** _(computed from the code)_
+**The launch achievements (131, 9580 gems in total)** _(computed from the code)_
 
 | # | Id | Title | Condition | Gems | Avatar / title |
 | --- | --- | --- | --- | --- | --- |
@@ -984,89 +984,96 @@ The first one ends where the guided tutorial's starter path ends. Later releases
 | 39 | `scholar_5` | Scholar I | entries >= 5 | 20 | - |
 | 40 | `scholar_15` | Scholar II | entries >= 15 | 60 | - |
 | 41 | `scholar_30` | Scholar III | entries >= 30 | 150 | - |
-| 42 | `biome_jungle` | New land: Jungle | biome jungle | 50 | - |
-| 43 | `biome_fields` | New land: Fields | biome fields | 50 | - |
-| 44 | `biome_orchard` | New land: Blossom Orchard | biome orchard | 50 | - |
-| 45 | `biome_blight` | New land: Blight | biome blight | 50 | - |
-| 46 | `biome_battlefield` | New land: Battlefield | biome battlefield | 50 | - |
-| 47 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 20 | - |
-| 48 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 50 | - |
-| 49 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 80 | - |
-| 50 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 20 | - |
-| 51 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 50 | - |
-| 52 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 80 | - |
-| 53 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 20 | - |
-| 54 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 50 | - |
-| 55 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 80 | - |
-| 56 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 20 | - |
-| 57 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 50 | - |
-| 58 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 80 | - |
-| 59 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 20 | - |
-| 60 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 50 | - |
-| 61 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 80 | - |
-| 62 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 20 | - |
-| 63 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 50 | - |
-| 64 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 80 | - |
-| 65 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 20 | - |
-| 66 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 50 | - |
-| 67 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 80 | - |
-| 68 | `kit_uncommon` | Fully kitted I | kit uncommon | 40 | - |
-| 69 | `kit_epic` | Fully kitted II | kit epic | 120 | - |
-| 70 | `kit_legendary` | Fully kitted III | kit legendary | 400 | - |
-| 71 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 30 | - |
-| 72 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 70 | - |
-| 73 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 110 | - |
-| 74 | `streak_3` | Regular I | streak >= 3 | 20 | - |
-| 75 | `streak_7` | Regular II | streak >= 7 | 60 | - |
-| 76 | `first_respec` | Second thoughts | respecs >= 1 | 20 | - |
-| 77 | `attr_strength_50` | Strength focus I | attribute >= 50 | 30 | - |
-| 78 | `attr_strength_100` | Strength focus II | attribute >= 100 | 80 | - |
-| 79 | `attr_strength_200` | Strength focus III | attribute >= 200 | 130 | - |
-| 80 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 30 | - |
-| 81 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 80 | - |
-| 82 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 130 | - |
-| 83 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 30 | - |
-| 84 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 80 | - |
-| 85 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 130 | - |
-| 86 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 30 | - |
-| 87 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 80 | - |
-| 88 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 130 | - |
-| 89 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 30 | - |
-| 90 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 80 | - |
-| 91 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 130 | - |
-| 92 | `farm_10` | Farmer I | animals >= 10 | 20 | - |
-| 93 | `farm_50` | Farmer II | animals >= 50 | 60 | - |
-| 94 | `farm_200` | Farmer III | animals >= 200 | 100 | - |
-| 95 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 20 | - |
-| 96 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 60 | - |
-| 97 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 20 | - |
-| 98 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 60 | - |
-| 99 | `farm_pig_10` | Pig keeper I | animals >= 10 | 20 | - |
-| 100 | `farm_pig_50` | Pig keeper II | animals >= 50 | 60 | - |
-| 101 | `farm_cow_10` | Cow keeper I | animals >= 10 | 20 | - |
-| 102 | `farm_cow_50` | Cow keeper II | animals >= 50 | 60 | - |
-| 103 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 25 | - |
-| 104 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 65 | - |
-| 105 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 25 | - |
-| 106 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 65 | - |
-| 107 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 25 | - |
-| 108 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 65 | - |
-| 109 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 25 | - |
-| 110 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 65 | - |
-| 111 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 25 | - |
-| 112 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 65 | - |
-| 113 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 25 | - |
-| 114 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 65 | - |
-| 115 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 25 | - |
-| 116 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 65 | - |
-| 117 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 40 | - |
-| 118 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 100 | - |
-| 119 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 160 | - |
-| 120 | `boss_kills_5` | Bossbane I | bosses >= 5 | 40 | - |
-| 121 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
-| 122 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
-| 123 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
-| 124 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
+| 42 | `scholar_50` | Scholar IV | entries >= 50 | 250 | - |
+| 43 | `archivist_10` | Archivist I | mastered >= 10 | 40 | - |
+| 44 | `archivist_50` | Archivist II | mastered >= 50 | 120 | - |
+| 45 | `archivist_150` | Archivist III | mastered >= 150 | 300 | - |
+| 46 | `naturalist_1` | Field Naturalist I | biomeGoals >= 1 | 40 | - |
+| 47 | `naturalist_12` | Field Naturalist II | biomeGoals >= 12 | 150 | - |
+| 48 | `naturalist_48` | Field Naturalist III | biomeGoals >= 48 | 400 | - |
+| 49 | `biome_jungle` | New land: Jungle | biome jungle | 50 | - |
+| 50 | `biome_fields` | New land: Fields | biome fields | 50 | - |
+| 51 | `biome_orchard` | New land: Blossom Orchard | biome orchard | 50 | - |
+| 52 | `biome_blight` | New land: Blight | biome blight | 50 | - |
+| 53 | `biome_battlefield` | New land: Battlefield | biome battlefield | 50 | - |
+| 54 | `cluster_forest_5` | Forest stretch I | cluster >= 5 | 20 | - |
+| 55 | `cluster_forest_12` | Forest stretch II | cluster >= 12 | 50 | - |
+| 56 | `cluster_forest_20` | Forest stretch III | cluster >= 20 | 80 | - |
+| 57 | `cluster_plains_5` | Plains stretch I | cluster >= 5 | 20 | - |
+| 58 | `cluster_plains_12` | Plains stretch II | cluster >= 12 | 50 | - |
+| 59 | `cluster_plains_20` | Plains stretch III | cluster >= 20 | 80 | - |
+| 60 | `cluster_hills_5` | Hills stretch I | cluster >= 5 | 20 | - |
+| 61 | `cluster_hills_12` | Hills stretch II | cluster >= 12 | 50 | - |
+| 62 | `cluster_hills_20` | Hills stretch III | cluster >= 20 | 80 | - |
+| 63 | `cluster_swamp_5` | Swamp stretch I | cluster >= 5 | 20 | - |
+| 64 | `cluster_swamp_12` | Swamp stretch II | cluster >= 12 | 50 | - |
+| 65 | `cluster_swamp_20` | Swamp stretch III | cluster >= 20 | 80 | - |
+| 66 | `cluster_tundra_5` | Tundra stretch I | cluster >= 5 | 20 | - |
+| 67 | `cluster_tundra_12` | Tundra stretch II | cluster >= 12 | 50 | - |
+| 68 | `cluster_tundra_20` | Tundra stretch III | cluster >= 20 | 80 | - |
+| 69 | `cluster_lake_5` | Lake stretch I | cluster >= 5 | 20 | - |
+| 70 | `cluster_lake_12` | Lake stretch II | cluster >= 12 | 50 | - |
+| 71 | `cluster_lake_20` | Lake stretch III | cluster >= 20 | 80 | - |
+| 72 | `cluster_coast_5` | Coast stretch I | cluster >= 5 | 20 | - |
+| 73 | `cluster_coast_12` | Coast stretch II | cluster >= 12 | 50 | - |
+| 74 | `cluster_coast_20` | Coast stretch III | cluster >= 20 | 80 | - |
+| 75 | `kit_uncommon` | Fully kitted I | kit uncommon | 40 | - |
+| 76 | `kit_epic` | Fully kitted II | kit epic | 120 | - |
+| 77 | `kit_legendary` | Fully kitted III | kit legendary | 400 | - |
+| 78 | `ilvl_15` | Well equipped I | wornLevel >= 15 | 30 | - |
+| 79 | `ilvl_35` | Well equipped II | wornLevel >= 35 | 70 | - |
+| 80 | `ilvl_60` | Well equipped III | wornLevel >= 60 | 110 | - |
+| 81 | `streak_3` | Regular I | streak >= 3 | 20 | - |
+| 82 | `streak_7` | Regular II | streak >= 7 | 60 | - |
+| 83 | `first_respec` | Second thoughts | respecs >= 1 | 20 | - |
+| 84 | `attr_strength_50` | Strength focus I | attribute >= 50 | 30 | - |
+| 85 | `attr_strength_100` | Strength focus II | attribute >= 100 | 80 | - |
+| 86 | `attr_strength_200` | Strength focus III | attribute >= 200 | 130 | - |
+| 87 | `attr_dexterity_50` | Dexterity focus I | attribute >= 50 | 30 | - |
+| 88 | `attr_dexterity_100` | Dexterity focus II | attribute >= 100 | 80 | - |
+| 89 | `attr_dexterity_200` | Dexterity focus III | attribute >= 200 | 130 | - |
+| 90 | `attr_intelligence_50` | Intelligence focus I | attribute >= 50 | 30 | - |
+| 91 | `attr_intelligence_100` | Intelligence focus II | attribute >= 100 | 80 | - |
+| 92 | `attr_intelligence_200` | Intelligence focus III | attribute >= 200 | 130 | - |
+| 93 | `attr_vitality_50` | Vitality focus I | attribute >= 50 | 30 | - |
+| 94 | `attr_vitality_100` | Vitality focus II | attribute >= 100 | 80 | - |
+| 95 | `attr_vitality_200` | Vitality focus III | attribute >= 200 | 130 | - |
+| 96 | `attr_charisma_50` | Charisma focus I | attribute >= 50 | 30 | - |
+| 97 | `attr_charisma_100` | Charisma focus II | attribute >= 100 | 80 | - |
+| 98 | `attr_charisma_200` | Charisma focus III | attribute >= 200 | 130 | - |
+| 99 | `farm_10` | Farmer I | animals >= 10 | 20 | - |
+| 100 | `farm_50` | Farmer II | animals >= 50 | 60 | - |
+| 101 | `farm_200` | Farmer III | animals >= 200 | 100 | - |
+| 102 | `farm_chicken_10` | Chicken keeper I | animals >= 10 | 20 | - |
+| 103 | `farm_chicken_50` | Chicken keeper II | animals >= 50 | 60 | - |
+| 104 | `farm_sheep_10` | Sheep keeper I | animals >= 10 | 20 | - |
+| 105 | `farm_sheep_50` | Sheep keeper II | animals >= 50 | 60 | - |
+| 106 | `farm_pig_10` | Pig keeper I | animals >= 10 | 20 | - |
+| 107 | `farm_pig_50` | Pig keeper II | animals >= 50 | 60 | - |
+| 108 | `farm_cow_10` | Cow keeper I | animals >= 10 | 20 | - |
+| 109 | `farm_cow_50` | Cow keeper II | animals >= 50 | 60 | - |
+| 110 | `build_forest_3` | Forest builder I | buildingsIn >= 3 | 25 | - |
+| 111 | `build_forest_10` | Forest builder II | buildingsIn >= 10 | 65 | - |
+| 112 | `build_plains_3` | Plains builder I | buildingsIn >= 3 | 25 | - |
+| 113 | `build_plains_10` | Plains builder II | buildingsIn >= 10 | 65 | - |
+| 114 | `build_hills_3` | Hills builder I | buildingsIn >= 3 | 25 | - |
+| 115 | `build_hills_10` | Hills builder II | buildingsIn >= 10 | 65 | - |
+| 116 | `build_swamp_3` | Swamp builder I | buildingsIn >= 3 | 25 | - |
+| 117 | `build_swamp_10` | Swamp builder II | buildingsIn >= 10 | 65 | - |
+| 118 | `build_tundra_3` | Tundra builder I | buildingsIn >= 3 | 25 | - |
+| 119 | `build_tundra_10` | Tundra builder II | buildingsIn >= 10 | 65 | - |
+| 120 | `build_lake_3` | Lake builder I | buildingsIn >= 3 | 25 | - |
+| 121 | `build_lake_10` | Lake builder II | buildingsIn >= 10 | 65 | - |
+| 122 | `build_coast_3` | Coast builder I | buildingsIn >= 3 | 25 | - |
+| 123 | `build_coast_10` | Coast builder II | buildingsIn >= 10 | 65 | - |
+| 124 | `build_max_1` | Master builder I | buildingsMaxed >= 1 | 40 | - |
+| 125 | `build_max_5` | Master builder II | buildingsMaxed >= 5 | 100 | - |
+| 126 | `build_max_20` | Master builder III | buildingsMaxed >= 20 | 160 | - |
+| 127 | `boss_kills_5` | Bossbane I | bosses >= 5 | 40 | - |
+| 128 | `boss_kills_25` | Bossbane II | bosses >= 25 | 100 | - |
+| 129 | `boss_kills_100` | Bossbane III | bosses >= 100 | 160 | - |
+| 130 | `curious_gambler` | Just looking | curiosity gambling_empty | 25 | - |
+| 131 | `castle_15` | Grand Architect | castle level 15 | 150 | - |
 
 See also: [`settleAchievements`](progression.md#settleachievements), `achievementsDue`
 
@@ -1218,7 +1225,7 @@ Claim all: pays every earned tier that is not claimed yet in one go (one request
 
 ### Deeds
 
-Source: [`src/catalog/achievements.ts:450`](../../src/catalog/achievements.ts)
+Source: [`src/catalog/achievements.ts:510`](../../src/catalog/achievements.ts)
 
 The Hall of Deeds (IDL-306): the achievements grouped into tiered deeds, in the order of the list. Every achievement above belongs to exactly one deed. The launch single-goal ones are deeds of their own (their ids and rewards are
 unchanged, so a ledger that earned or claimed one reads exactly as before); the castle and rebirth ones become tiers of a longer deed. The tiers are the mockup's nine deeds, with placeholder rewards (balance pass: IDL-310).

@@ -232,7 +232,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`AvatarPicker.tsx`](../../src/components/game/AvatarPicker.tsx) — ~ The grid is four rows of four:
 - [`AwayBar.tsx`](../../src/components/game/AwayBar.tsx) — ~ 1 until it has run, then counts down to 0; stays at 0 for a player who asked for reduced motion.
 - [`BadgeDialog.tsx`](../../src/components/game/BadgeDialog.tsx) — ~ Loads the badge choice into the store once per session (the Character window and this dialog both call it).
-- [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ The Bestiary:
+- [`BestiaryWindow.tsx`](../../src/components/game/BestiaryWindow.tsx) — ~ What the Bestiary store holds, as the input of the entry builder (the server's numbers; the browser decides nothing).
 - [`BiomeTooltip.tsx`](../../src/components/game/BiomeTooltip.tsx) — ~ The body of a tile card (the caller wraps it in the design-system Tooltip):
 - [`BossWindow.tsx`](../../src/components/game/BossWindow.tsx) — ~ The Boss window:
 - [`BottomRightStack.tsx`](../../src/components/game/BottomRightStack.tsx) — ~ The corners of the screen outside the map's click area (using them never pays gold):
@@ -435,6 +435,13 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`avatarQuery.ts`](../../src/lib/avatarQuery.ts) — ~ The hero's class and the avatars the account may pick, read once and kept (`GET /api/auth/avatar`).
 - [`avatarServer.ts`](../../src/lib/avatarServer.ts) — ~ The achievement ids this account has earned (`player_achievements`); a failed read throws, so an outage never turns into "nothing unlocked".
 - [`badgeServer.ts`](../../src/lib/badgeServer.ts) — ~ `profiles.is_admin`:
+
+**src/lib/bestiary/**
+
+- [`entries.ts`](../../src/lib/bestiary/entries.ts) — ~ What the server tells the browser (`useBestiaryStore`):
+
+**src/lib/**
+
 - [`bootSnapshot.ts`](../../src/lib/bootSnapshot.ts) — ~ The browser's hand-over of the game's first load:
 - [`buffs.ts`](../../src/lib/buffs.ts) — ~ One running buff as it is stored (the `player_ledger.buffs` column of PR 2):
 - [`buildTimers.ts`](../../src/lib/buildTimers.ts) — ~ One running construction as the bottom-left timer list shows it.

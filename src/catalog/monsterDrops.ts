@@ -17,7 +17,13 @@ export interface IngredientDrop {
 	perLevel: number;
 }
 
-const d = (id: string, chance: number, qty: readonly [number, number] = [1, 2], perLevel = 0.1, minLevel = 1): IngredientDrop => ({ id: `junk_${id}`, chance, minLevel, qty, perLevel });
+const d = (id: string, chance: number, qty: readonly [number, number] = [1, 2], perLevel = 0.1, minLevel = 1): IngredientDrop => ({
+	id: `junk_${id}`,
+	chance,
+	minLevel,
+	qty,
+	perLevel,
+});
 
 /**
  * What each family leaves (two or three ingredients), so a bear and a boar share a theme and the Bestiary can explain it.
@@ -128,11 +134,14 @@ export const BOSS_DROPS: Readonly<Record<string, readonly IngredientDrop[]>> = {
 	bossCinderWarlord: [d('fire_drop', 1, [1, 2], 0.05), d('heart_gem', 1, [1, 1], 0.015), d('coins', 1, [6, 10], 0.3)],
 };
 
-/** The ingredient table of a monster: its family's, its own, and for a boss the guaranteed ones. Empty for a type the catalog does not know. */
+/** The ingredient table of a monster: its family's, its own, and for a boss the guaranteed ones (an ingredient listed twice keeps the most specific row). Empty for a type the catalog does not know. */
 export const ingredientsOf = (type: string): readonly IngredientDrop[] => {
 	const entry = MONSTER_CATALOG.find((m) => m.id === type);
 	if (!entry) return [];
-	return [...FAMILY_DROPS[entry.family], ...(MONSTER_DROPS[type] ?? []), ...(BOSS_DROPS[type] ?? [])];
+	// one row per ingredient: the monster's own row replaces its family's, a boss's guaranteed row replaces both
+	const byId = new Map<string, IngredientDrop>();
+	for (const row of [...FAMILY_DROPS[entry.family], ...(MONSTER_DROPS[type] ?? []), ...(BOSS_DROPS[type] ?? [])]) byId.set(row.id, row);
+	return [...byId.values()];
 };
 
 /** How many of an ingredient one drop gives at this monster level (before the golden-monster multiplier): the range at level 1 plus `perLevel` per level above, rounded down. */
