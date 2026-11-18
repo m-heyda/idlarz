@@ -418,6 +418,7 @@ Shop (cost in points of the next level, by current level):
 | Mason's Guild | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Shrine Keepers | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Click Mastery | 0.5 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
+| Mining Power | 1 | 1 | 50 | 50 | 50 | 50 | 50 | 50 |
 | Starting Treasury | 1 | 5 | 6 | 12 | 22 | 42 | 149 | 1937 |
 | Provisions | 1500 gold + 400 wood + 400 stone + 200 food + 100 coal | 15 | 2 | 3 | 4 | 6 | 11 | 42 |
 | Night Watch | 1 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |

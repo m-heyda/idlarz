@@ -180,6 +180,9 @@
 	width: 22px;
 	height: 22px;
 	margin: -11px 0 0 -11px;
+	max-width: none; /* the global img rule (max-width: 100%) squeezed the picture beside a narrow label: it keeps its own size and its ratio */
+	flex: none;
+	object-fit: contain;
 	image-rendering: pixelated;
 	filter: drop-shadow(0 2px 0 rgba(0, 0, 0, 0.35));
 }

@@ -39,7 +39,7 @@ interface RockStore {
 	/** Takes the server's list of rocks. A rock the server no longer lists is gone; for one the player is still clicking the larger count wins until the server has caught up. */
 	setFromServer: (rocks: readonly PublicRock[]) => void;
 	/** One click, counted at once. Returns the rock, or null when there is none (or it is already being confirmed). */
-	localHit: (x: number, y: number) => RockView | null;
+	localHit: (x: number, y: number, power?: number) => RockView | null;
 	/** The server answered a batch of `sent` clicks: its total is `hits` out of `need` (the server's number, so a browser that loaded an older rule list still shows the right count); the clicks still pending are added on top. */
 	ack: (x: number, y: number, sent: number, hits: number, broken: boolean, need?: number) => void;
 	/** A batch was lost: its clicks are not counted */
@@ -79,11 +79,11 @@ export const useRockStore = create<RockStore>((set, get) => ({
 		}
 		set({ rocks: next });
 	},
-	localHit: (x, y) => {
+	localHit: (x, y, power = 1) => {
 		const rock = get().rocks[rockKey(x, y)];
 		if (!rock || rock.breaking) return null;
-		const hits = Math.min(rock.need, rock.hits + 1);
-		const next: RockView = { ...rock, hits, pending: rock.pending + 1, chop: rock.chop + 1, breaking: hits >= rock.need };
+		const hits = Math.min(rock.need, rock.hits + power);
+		const next: RockView = { ...rock, hits, pending: rock.pending + power, chop: rock.chop + 1, breaking: hits >= rock.need };
 		set({ rocks: { ...get().rocks, [rockKey(x, y)]: next } });
 		return next;
 	},

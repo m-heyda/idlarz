@@ -2,6 +2,8 @@ import { ROCK, ROCK_DROPS, ROCK_TIERS, ROCK_TIER_ORDER, type RockTier } from '@/
 import { isInWard } from '@/lib/castleWard';
 import { rarityLuckMultiplier } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
+import type { PrestigeState } from '@/types/game';
+import { emberEffect } from '@/utils/game/emberEffects';
 import { ownedRowMajor, type World } from '@/utils/world';
 
 // Mineable rocks: where they stand, how rare they are, how fast they may be hit and what they drop. Pure, with an injectable random source; the server runs it (`src/lib/offline/*`) and tests/rocks has the unit tests.
@@ -34,7 +36,7 @@ export const pickRockSpot = (world: World, taken: ReadonlySet<string>, castleLev
  * @category Economy/Rocks and Mining
  * @order 5
  * @formula
- * interval = 150 s x max(0.6, 1 / (1 + 0.004 x Luck))
+ * interval = 1200 s x max(0.6, 1 / (1 + 0.004 x Luck))
  */
 export const rockIntervalSec = (luck: number): number => ROCK.intervalSec * Math.max(0.6, 1 / (1 + Math.max(0, luck) * 0.004));
 
@@ -120,3 +122,13 @@ export const rollRockLoot = (tier: RockTier, ctx: { rates: { stone: number; coal
 	}
 	return loot;
 };
+
+/**
+ * How many hits one click on a rock counts for: 1, or 2 with the Ember shop's Mining Power. The server applies it to the clicks it lets in (the click-rate cap counts real clicks), and the browser shows it at once.
+ *
+ * @category Economy/Rocks and Mining
+ * @order 10
+ * @formula
+ * hits per click = 1 + Mining Power effect (0 or 1)
+ */
+export const miningPower = (prestige: PrestigeState | undefined): number => 1 + emberEffect(prestige, 'miningpower');
