@@ -62,10 +62,6 @@ body {
 	line-height: 0;
 }
 
-.px-name {
-	font-weight: 700;
-}
-
 /* --- header currencies: a bronze-edged group holds a few pills (icon + amount), everything else is in the tooltip --- */
 
 /* one resource in a group: its icon, and a small fixed-width amount (hidden by the cog menu's compact header) */
@@ -444,231 +440,11 @@ body {
 }
 
 /* ======================================================================================
-   Pixel UI kit - modals, panels, buttons, tooltips, sliders, hero card
+   Pixel UI kit - panels, buttons, tooltips, hero card (windows and dialogs are the design system now)
    Art: public/pixel/ui (scripts/pixel/ui_art.py). Style guide: scripts/pixel/reference/STYLE.md
    ====================================================================================== */
 
-/* --- modal shell: one frame, three sizes, same head/body layout everywhere --- */
-.px-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 45; /* under the header (z-50) so resources stay visible */
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: calc(var(--header-h, 76px) + 28px) 16px 16px;
-	background: rgba(4, 3, 6, 0.7);
-	animation: px-fade 0.15s ease-out;
-}
-
-.px-modal {
-	position: relative;
-	display: flex;
-	flex-direction: column;
-	max-width: 100%;
-	max-height: 100%;
-	border: 24px solid transparent;
-	border-image: url('/pixel/ui/frame_modal.png') 12 / 24px round;
-	image-rendering: pixelated;
-	background: linear-gradient(rgba(10, 7, 5, 0.86), rgba(10, 7, 5, 0.86)), url('/pixel/bg/crack.png');
-	/* under the frame too: its edge pixels are see-through, and the map showed along the top and right */
-	background-clip: border-box;
-	background-origin: padding-box;
-	color: var(--px-parch);
-	box-shadow: 0 14px 44px rgba(0, 0, 0, 0.65);
-	animation: px-pop 0.18s cubic-bezier(0.2, 0.9, 0.3, 1.1);
-}
-
-.px-modal-sm {
-	width: 440px;
-}
-
-.px-modal-md {
-	width: 760px;
-}
-
-.px-modal-lg {
-	width: 1080px;
-	height: 100%;
-}
-
-/* a game window (PixelWindow): the modal frame, but positioned by the window store and not blocking the screen, so several can be open and dragged */
-.px-window {
-	position: fixed;
-	width: min(var(--win-w, 820px), calc(100vw - 16px));
-	max-width: none;
-	max-height: calc(100vh - var(--header-h, 76px) - 16px);
-	animation: none;
-	box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
-
-	&[data-fixed-height='true'] {
-		height: min(var(--win-h, 640px), calc(100vh - var(--header-h, 76px) - 16px));
-	}
-
-	/* the ones behind sit a little dimmer, so the front one reads at a glance */
-	&[data-front='false'] {
-		filter: brightness(0.82);
-	}
-}
-
-/* a small screen has no room for side-by-side windows: each one fills the width under the header, the front one on top */
-.px-window-narrow {
-	left: 8px;
-	top: calc(var(--header-h, 76px) + 8px);
-	width: calc(100vw - 16px);
-}
-
-.px-resize {
-	position: absolute;
-	right: -20px;
-	bottom: -20px;
-	z-index: 2;
-	width: 28px;
-	height: 28px;
-	cursor: nwse-resize;
-	touch-action: none;
-	background: linear-gradient(135deg, transparent 50%, #c08a30 50%, #c08a30 58%, transparent 58%, transparent 70%, #c08a30 70%, #c08a30 78%, transparent 78%);
-	opacity: 0.8;
-
-	&:hover {
-		opacity: 1;
-	}
-}
-
-.px-window-handle {
-	cursor: grab;
-	touch-action: none;
-	user-select: none;
-
-	&:active {
-		cursor: grabbing;
-	}
-}
-
-.px-modal-head {
-	display: flex;
-	align-items: center;
-	gap: 14px;
-	margin-bottom: 14px;
-	flex-shrink: 0;
-}
-
-.px-title {
-	display: flex;
-	align-items: center;
-	gap: 10px;
-	font-size: 1.5rem;
-	font-weight: 700;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-	color: var(--px-gold);
-	text-shadow:
-		0 2px 0 #3a1708,
-		0 0 12px rgba(255, 190, 70, 0.25);
-}
-
-.px-title-line {
-	flex: 1;
-	height: 4px;
-	background: linear-gradient(90deg, transparent, #7a5224 45%, #c08a30);
-	border-top: 1px solid #080504;
-	border-bottom: 1px solid #080504;
-
-	&.rev {
-		transform: scaleX(-1);
-	}
-}
-
-.px-modal-body {
-	flex: 1;
-	min-height: 0;
-	overflow-y: auto;
-	padding-right: 8px;
-}
-
-.px-modal-body-flush {
-	position: relative;
-	padding-right: 0;
-	overflow: hidden;
-}
-
-.px-close {
-	position: absolute;
-	top: -20px;
-	right: -20px;
-	z-index: 2;
-	width: 36px;
-	height: 36px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	font-size: 1.1rem;
-	line-height: 1;
-	color: #fff;
-	background: #b02e2e;
-	border: 2px solid var(--px-ink);
-	box-shadow:
-		inset 2px 2px 0 rgba(255, 255, 255, 0.35),
-		inset -2px -2px 0 rgba(0, 0, 0, 0.4);
-	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.5);
-	cursor: pointer;
-	clip-path: polygon(
-		0 3px,
-		3px 3px,
-		3px 0,
-		calc(100% - 3px) 0,
-		calc(100% - 3px) 3px,
-		100% 3px,
-		100% calc(100% - 3px),
-		calc(100% - 3px) calc(100% - 3px),
-		calc(100% - 3px) 100%,
-		3px 100%,
-		3px calc(100% - 3px),
-		0 calc(100% - 3px)
-	);
-
-	&:hover {
-		filter: brightness(1.2);
-	}
-
-	&:active {
-		transform: translateY(2px);
-	}
-}
-
-@keyframes px-fade {
-	from {
-		opacity: 0;
-	}
-}
-
-@keyframes px-pop {
-	from {
-		opacity: 0;
-		transform: translateY(10px) scale(0.97);
-	}
-}
-
-/* pixel scrollbars */
-.px-modal-body::-webkit-scrollbar {
-	width: 12px;
-}
-
-.px-modal-body::-webkit-scrollbar-track {
-	background: #0a0605;
-	border: 2px solid #2b1d0e;
-}
-
-.px-modal-body::-webkit-scrollbar-thumb {
-	background: #8a5f26;
-	border: 2px solid #0a0605;
-	box-shadow:
-		inset 2px 2px 0 #d9a850,
-		inset -2px -2px 0 #4a3014;
-}
-
 /* --- panels & cards (9-slice bronze inset) --- */
-.px-panel,
 .px-card {
 	border: 8px solid transparent;
 	border-image: url('/pixel/ui/frame_panel.png') 4 / 8px stretch;
@@ -681,18 +457,6 @@ body {
 .px-card {
 	background: rgba(36, 26, 18, 0.7);
 	background-clip: padding-box;
-}
-
-.px-h {
-	margin-bottom: 8px;
-	padding-bottom: 4px;
-	font-size: 1rem;
-	font-weight: 700;
-	letter-spacing: 0.5px;
-	text-transform: uppercase;
-	color: var(--px-gold);
-	border-bottom: 2px solid #3a2810;
-	text-shadow: 0 2px 0 #1a0e04;
 }
 
 .px-rule {
@@ -754,97 +518,13 @@ body {
 	background: #b07c20;
 }
 
-.px-btn-red {
-	background: #a82a2a;
-}
-
 .px-btn-blue {
 	background: #2c5cae;
-}
-
-.px-btn-gray {
-	background: #5a5048;
 }
 
 .px-btn-sm {
 	padding: 3px 10px;
 	font-size: 0.8125rem;
-}
-
-/* --- tabs --- */
-.px-tab {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	width: 100%;
-	padding: 8px 10px;
-	text-align: left;
-	font-size: 0.9375rem;
-	color: #c8b890;
-	background: rgba(20, 14, 10, 0.6);
-	border: 2px solid #2b1d0e;
-	box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.06);
-	cursor: pointer;
-
-	&:hover {
-		background: rgba(60, 40, 18, 0.7);
-		color: #fff;
-	}
-
-	&[data-active='true'] {
-		color: #fff1c0;
-		background: #6a4414;
-		border-color: #c08a30;
-		box-shadow:
-			inset 2px 2px 0 #a8783a,
-			inset -2px -2px 0 #3a2410;
-	}
-}
-
-/* --- range slider --- */
-.px-range {
-	appearance: none;
-	-webkit-appearance: none;
-	height: 16px;
-	background: transparent;
-	cursor: pointer;
-
-	&:disabled {
-		opacity: 0.45;
-		cursor: not-allowed;
-	}
-
-	&::-webkit-slider-runnable-track {
-		height: 10px;
-		background: repeating-linear-gradient(90deg, #1a120c 0 6px, #120c08 6px 8px);
-		border: 2px solid #3a2810;
-	}
-
-	&::-moz-range-track {
-		height: 6px;
-		background: #1a120c;
-		border: 2px solid #3a2810;
-	}
-
-	&::-webkit-slider-thumb {
-		-webkit-appearance: none;
-		width: 14px;
-		height: 20px;
-		margin-top: -7px;
-		background: #c08a30;
-		border: 2px solid var(--px-ink);
-		box-shadow:
-			inset 2px 2px 0 #f0d27a,
-			inset -2px -2px 0 #6a4414;
-	}
-
-	&::-moz-range-thumb {
-		width: 10px;
-		height: 16px;
-		border-radius: 0;
-		background: #c08a30;
-		border: 2px solid var(--px-ink);
-	}
 }
 
 /* --- text input --- */
@@ -1036,17 +716,6 @@ body {
 	color: #d8c8a0;
 }
 
-/* --- toasts (chest, level-up) --- */
-.px-toast {
-	border: 8px solid transparent;
-	border-image: url('/pixel/ui/frame_tip.png') 4 / 8px stretch;
-	image-rendering: pixelated;
-	background: rgba(14, 10, 8, 0.95);
-	background-clip: padding-box;
-	box-shadow: 0 0 18px rgba(255, 185, 0, 0.35);
-	font-family: var(--font-pixel);
-}
-
 .px-equip-empty {
 	filter: grayscale(1) brightness(0.55) contrast(0.8);
 	opacity: 0.55;
@@ -1117,12 +786,6 @@ body {
 
 /* --- Hero card: the stony XP bar (the alcove scene and the potion flasks are gone) --- */
 /* stony XP bar: 9-slice chiselled frame, emerald fill that flows, tick marks every 10% */
-
-@keyframes bar-flow {
-	to {
-		background-position-x: 16px;
-	}
-}
 
 /* name plate hanging at the top of the alcove */
 
