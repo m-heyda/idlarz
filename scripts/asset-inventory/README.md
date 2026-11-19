@@ -1,9 +1,9 @@
 # Pixel asset inventory
 
-A one-file page (`pixel-asset-inventory.html`) that lists every non-armor picture that can be a resource, material, junk, component or ore: used, planned and unused. Open it in a browser (no server).
+A one-file page (`pixel-asset-inventory.html`) that lists the non-armor pictures that can be a resource, material, junk, component or ore and still need a decision: the **planned** and **unused** tabs. The used ones were reviewed first (`decisions.json`) and are left out; `INCLUDE_USED=1 npm run assets:inventory` adds them back. Open it in a browser (no server).
 
 - Tag each picture: status, category, tier, grade, rarity, add to game, found in ores (per rock tier), chest, delete, reviewed. Tick **hide reviewed** to leave only what still needs a decision.
-- **Copy edited / "add to game" / full config** puts JSON on the clipboard; **Copy delete list** gives the files marked safe to remove.
+- **Copy edited / "add to game" / full config** puts JSON of the **open tab** on the clipboard; **Copy delete list** gives that tab's files marked safe to remove.
 - **Import config** applies a copied config on top of the current tags.
 
 ## Keeping it current

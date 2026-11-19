@@ -130,7 +130,7 @@ const KEY='pixel-inv-v1';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
-const state={};let tab='used',sel=new Set();
+const state={};let tab='planned',sel=new Set();
 for(const it of ITEMS){it.def.foundOres=it.def.ores.length>0;it.def.ok=!!it.def.ok;state[it.id]=clone(it.def)}
 try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');for(const id in s)if(state[id])Object.assign(state[id],s[id])}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
@@ -169,13 +169,13 @@ function card(it){
 function visible(){
   const q=$('#q').value.trim().toLowerCase(),fc=$('#fCat').value,fg=$('#fGroup').value,fx=$('#fChanged').checked,fd=$('#fDup').checked,ho=$('#hideOk').checked;
   return ITEMS.filter(it=>{const s=state[it.id];
-    if(tab==='del'){if(!s.del)return false}else if(tab!=='all'&&s.status!==tab)return false;
+    if(it.def.status!==tab)return false;
     if(tab!=='del'&&tab!=='all'&&s.del&&false)return false;
     if(ho&&s.ok)return false;if(fc&&s.category!==fc)return false;if(fg&&it.group!==fg)return false;if(fx&&!changed(it))return false;if(fd&&!it.also)return false;
     if(q&&!(it.label+' '+it.src+' '+it.id+' '+s.purpose).toLowerCase().includes(q))return false;return true}).sort((a,b)=>a.group.localeCompare(b.group)||a.label.localeCompare(b.label));
 }
-function counts(){const c={used:0,planned:0,unused:0,del:0,all:ITEMS.length,edited:0,ok:0};for(const it of ITEMS){const s=state[it.id];c[s.status]++;if(s.del)c.del++;if(changed(it))c.edited++;if(s.ok)c.ok++}return c}
-function renderTabs(){const c=counts();$('#tabs').innerHTML=[['used','Used'],['planned','Planned'],['unused','Unused'],['del','Marked for delete'],['all','All']].map(t=>`<button class="tab" data-tab="${t[0]}" aria-pressed="${tab===t[0]}">${t[1]}<b>${c[t[0]]}</b></button>`).join('');$('#stat').textContent=`${c.ok} reviewed · ${c.edited} edited · ${c.del} marked for delete`}
+function counts(){const c={used:0,planned:0,unused:0,del:0,all:ITEMS.length,edited:0,ok:0};for(const it of ITEMS){const s=state[it.id];c[it.def.status]++;if(s.del)c.del++;if(changed(it))c.edited++;if(s.ok)c.ok++}return c}
+function renderTabs(){const c=counts();$('#tabs').innerHTML=[['planned','Planned'],['unused','Unused']].map(t=>`<button class="tab" data-tab="${t[0]}" aria-pressed="${tab===t[0]}">${t[1]}<b>${c[t[0]]}</b></button>`).join('');$('#stat').textContent=`${c.ok} reviewed · ${c.edited} edited · ${c.del} marked for delete (all tabs). Copy buttons use the open tab only.`}
 function render(){renderTabs();const v=visible();$('#grid').innerHTML=v.map(card).join('');$('#empty').hidden=v.length>0;renderBatch()}
 function renderBatch(){const n=sel.size;$('#batch').classList.toggle('on',n>0);$('#bn').textContent=n+' selected'}
 function refreshCard(id){const it=ITEMS.find(i=>i.id===id),el=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);if(el){const t=document.createElement('div');t.innerHTML=card(it);el.replaceWith(t.firstElementChild)}renderTabs()}
@@ -229,16 +229,17 @@ $('#fGroup').innerHTML='<option value="">All folders</option>'+groups.map(g=>`<o
 // config export
 function entry(it){const s=state[it.id];return {file:'public/pixel/'+it.src,name:it.label,status:s.status,category:s.category,tier:s.tier||null,grade:s.grade||null,rarity:s.rarity||null,addToGame:s.add,foundInOres:s.foundOres?s.ores:false,inChest:s.chest,delete:s.del,reviewed:s.ok,purpose:s.purpose}}
 function build(kind){
-  const base={generated:new Date().toISOString().slice(0,10),kind};
-  if(kind==='del')return {...base,deleteFiles:ITEMS.filter(i=>state[i.id].del).map(i=>'public/pixel/'+i.src),note:'Marked safe to remove. Check the registries (pixelIcons.ts, itemIcons/*.json, resourceArt.ts) first.'};
-  const pick={changes:i=>changed(i),add:i=>state[i.id].add&&!state[i.id].del,all:()=>true}[kind];
+  const base={generated:new Date().toISOString().slice(0,10),kind,tab};
+  const inTab=i=>i.def.status===tab;
+  if(kind==='del')return {...base,deleteFiles:ITEMS.filter(i=>inTab(i)&&state[i.id].del).map(i=>'public/pixel/'+i.src),note:'Marked safe to remove. Check the registries (pixelIcons.ts, itemIcons/*.json, resourceArt.ts) first.'};
+  const pick={changes:i=>inTab(i)&&changed(i),add:i=>inTab(i)&&state[i.id].add&&!state[i.id].del,all:inTab}[kind];
   const items={};ITEMS.filter(pick).forEach(i=>items[i.id]=entry(i));
   return {...base,count:Object.keys(items).length,items};
 }
 function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('on');setTimeout(()=>el.classList.remove('on'),1800)}
 function copy(kind){const text=JSON.stringify(build(kind),null,2),n=kind==='del'?build(kind).deleteFiles.length:build(kind).count;
   const fallback=()=>{$('#out').classList.add('on');const ta=$('#ta');ta.value=text;ta.select();toast('Select and copy from the box at the bottom')};
-  try{navigator.clipboard.writeText(text).then(()=>{$('#out').classList.remove('on');toast(`Copied ${n} ${kind==='del'?'files':'entries'}`)},fallback)}catch(e){fallback()}}
+  try{navigator.clipboard.writeText(text).then(()=>{$('#out').classList.remove('on');toast(`Copied ${n} ${kind==='del'?'files':'entries'} from ${tab}`)},fallback)}catch(e){fallback()}}
 document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copy(b.dataset.copy));
 $('#reset').onclick=()=>{if(!$('#reset').dataset.arm){$('#reset').dataset.arm=1;$('#reset').textContent='Click again to reset';setTimeout(()=>{delete $('#reset').dataset.arm;$('#reset').textContent='Reset all edits'},2500);return}
   for(const it of ITEMS)state[it.id]=Object.assign(clone(it.def),{foundOres:it.def.ores.length>0});save();sel.clear();delete $('#reset').dataset.arm;$('#reset').textContent='Reset all edits';render()};
