@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { GAME_TITLE } from '@/config/branding';
 import { startChapter, type Profile } from '@/lib/authClient';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import HeroCreator from './HeroCreator';
 import { creatorAvatar } from '@/catalog/avatars';
 
@@ -46,7 +46,7 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 
 	return (
 		<div className='fixed inset-0 bg-[#14100c]'>
-			<PixelModal title='A new chapter' size='md' hideClose closeOnBackdrop={false} onClose={NOOP}>
+			<GameModal title='A new chapter' size='md' hideClose closeOnBackdrop={false} onClose={NOOP}>
 				<form onSubmit={confirm} className='flex flex-col gap-3'>
 					<p className='text-[#d8c8a0] text-sm text-center'>
 						{GAME_TITLE} starts a new chapter. Your old game is archived and kept safe, and your realm begins again. Your account, your name and your gems stay
@@ -78,7 +78,7 @@ const NewChapterScreen: React.FC<Props> = ({ profile, onDone, onLogout }) => {
 						Log out
 					</button>
 				</form>
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 };

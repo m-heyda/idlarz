@@ -122,14 +122,12 @@ test('every monster has a family and every live one has tags and lore (the Besti
 	}
 });
 
-test('no two monsters share a picture (a copy under another name is a duplicate), and the spare monster art folder holds no copy of one in use', () => {
+test('no two monsters share a picture (a copy under another name is a duplicate)', () => {
 	const root = path.join(__dirname, '..', '..', 'public', 'pixel');
 	const seen = new Map<string, string>();
 	const files: string[] = [];
 	for (const dir of fs.readdirSync(path.join(root, 'enemies'), { withFileTypes: true }).filter((d) => d.isDirectory() && d.name !== 'placeholder'))
 		for (const f of fs.readdirSync(path.join(root, 'enemies', dir.name)).filter((n) => n.endsWith('.png'))) files.push(path.join(root, 'enemies', dir.name, f));
-	const spare = path.join(root, 'assets_to_assess_and_use', 'monsters');
-	for (const f of fs.readdirSync(spare).filter((n) => n.endsWith('.png'))) files.push(path.join(spare, f));
 	for (const file of files) {
 		const hash = createHash('md5').update(fs.readFileSync(file)).digest('hex');
 		assert.equal(seen.get(hash), undefined, `${path.relative(root, file)} is the same picture as ${seen.get(hash)}`);

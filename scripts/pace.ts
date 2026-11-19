@@ -96,7 +96,7 @@ const main = async () => {
 
 	const md = renderMarkdown(results, magnitudes, tileWaits, seeds > 1 ? spreads : undefined);
 	console.log(localRun ? renderOptimiser(results, selected, magnitudes) : md);
-	if (!localRun) for (const w of renderMagnitudes(selected, magnitudes).warnings) console.error(`WARNING outside the docs/reference/pacing.md band: ${w}`);
+	if (!localRun) for (const w of renderMagnitudes(selected, magnitudes).warnings) console.error(`WARNING outside the @category Pacing band: ${w}`);
 	// only a run of every shared profile with the neutral class writes the docs: a partial run would turn the baseline into a subset
 	const complete = shared.every((n) => selected.includes(n));
 	if (playerClass === 'none' && !localRun && complete && !args.includes('--no-write') && !flag('maxdays') && !args.some((a) => a.startsWith('--set='))) {

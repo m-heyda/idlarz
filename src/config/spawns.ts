@@ -15,7 +15,7 @@ export const SPAWN_LIMIT = {
 /**
  * Chests. The server mints and places them (see {@link ticketCap} and {@link advanceBank}); data is `CHEST`, `LUCK` and `SPAWN_LIMIT` in `src/config/spawns.ts`, rolls are in `src/lib/chests.ts` and `src/lib/luck.ts`.
  *
- * - **Timer**: one chest ticket every 600 s of server time, faster with Luck ({@link chestIntervalSec}).
+ * - **Timer**: one chest ticket every 720 s of server time, faster with Luck ({@link chestIntervalSec}).
  * - **Room**: monsters and chests together never exceed 30% of the free tiles (minimum 2), and at most 40 tickets wait in all, chests, monsters and the boss counted together
  *   (`ticketCap` on the server, which estimates free land from the owned-tile count; `spawnCap` in the browser, which counts it from the map).
  * - **Where** (`CHEST.placement`, {@link chestSpots}): every eligible owned tile weighs 1, +3 if it touches unowned land, +1 per 4 tiles of Chebyshev distance from the castle, x0.3 if another chest is within 2 tiles.
@@ -29,10 +29,10 @@ export const SPAWN_LIMIT = {
  * @category Economy/Chests and Luck
  * @order 1
  * @formula
- * interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck))       seconds between chest tickets
+ * interval = 720 x max(0.5, 1 / (1 + 0.006 x Luck))       seconds between chest tickets
  */
 export const CHEST = {
-	intervalSec: 600,
+	intervalSec: 720,
 	minMinutes: 10,
 	maxMinutes: 60,
 	luckBonusPerPoint: 0.005,
@@ -72,9 +72,9 @@ export const CHEST = {
  * @order 2
  */
 export const LUCK = {
-	/** Chests come this much faster per Luck point (interval / (1 + n x Luck)), never faster than `chestIntervalFloor` x the base interval */
-	chestSpeedPerPoint: 0.004,
-	chestIntervalFloor: 0.6,
+	/** Every spawn timer (chests, rocks, monsters, bosses) is this much faster per Luck point (interval / (1 + n x Luck)), never faster than `spawnIntervalFloor` x the base interval */
+	spawnSpeedPerPoint: 0.006,
+	spawnIntervalFloor: 0.5,
 	/** Weights of rare-and-better gear grow by this much per point, capped at x`rarityCap` (the other weights stay, the roll is normalised) */
 	rarityPerPoint: 0.004,
 	rarityCap: 1.6,

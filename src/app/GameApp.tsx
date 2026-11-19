@@ -5,10 +5,10 @@
  * - Rates are per second and before modifiers unless stated; modifiers are fractions (0.25 = +25 %).
  * - Anything that moves resources is validated in the store action and covered in `tests/economy/economy.test.ts`; anything that is saved is validated in `src/lib/sanitizeSave.ts` ({@link sanitizeSave});
  *   anything that decides a reward or a fight lives on the server side (`src/lib/offline/`).
- * - **Documentation lives in the JSDoc next to the code** (this reference is generated from it, see the README of this folder). When the code changes, change its block in the same edit; a pre-commit hook regenerates `docs/reference`.
+ * - **Documentation lives in the JSDoc next to the code** (find a rule with `grep -rn "@category"`, e.g. `@category Economy/Tiles`). When the code changes, change its block in the same edit.
  *   `docs/plan/` holds the plans for what is not built; a built draft leaves `plan/` and is described here, in the JSDoc.
  * - Config is data, maths is pure functions. Tutorial, stat tooltips and cost lists are generated from config constants so they cannot drift from the rules.
- * - Reports measured from the game (`docs/generated/*`, written by `npm run docs:gen`) are never edited by hand; prefer a link to them over copying numbers into prose, and prefer `@table` over numbers typed into JSDoc.
+ * - Reports measured from the game (`docs/generated/*`, written by `npm run docs:gen`) are never edited by hand; prefer a link to them over copying numbers into prose, and prefer pointing at the config constant over numbers typed into JSDoc.
  *
  * @title Conventions
  * @category Overview/The game
@@ -27,11 +27,10 @@
  * 6. **Monsters** appear on owned land ({@link advanceBank}). You click one and the server runs the fight ({@link runCombat}); wins pay gold, XP, hide and gear ({@link killIncome}, {@link generateLoot}). Gear comes only from fights, chests and the merchant's shelf.
  * 7. **Rebirth** (castle 6 and 400+ tiles) restarts the map for Embers: a permanent income bonus and a shop ({@link REBIRTH}). Level, XP, Embers and shop levels stay; map, gear and merchant upgrades (except Pack Rat) do not.
  *
- * **Time scale.** Timers that set the pace: castle upgrades 30 min to 3.5 days per level; a monster every 15 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 10 minutes (`CHEST.intervalSec`); away time paid up to 8 hours at 50% (`LIMITS`).
+ * **Time scale.** Timers that set the pace: castle upgrades 30 min to 3.5 days per level; a monster every 10 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 12 minutes (`CHEST.intervalSec`); Luck shortens all of them (`spawnIntervalFactor`); away time paid up to 8 hours at 50% (`LIMITS`).
  * Measured pacing from the bot simulation is in `docs/generated/pace-milestones.md`; targets are on the Pacing page.
  *
- * **Where the numbers live.** Config is data (`src/config/*`, `src/catalog/*`), maths is pure functions next to it (`src/utils/game/*`, `src/lib/*`), the server engine is `src/lib/offline/*` + `src/app/api/*`. This reference points at all of them; the generated
- * [code-map.md](code-map.md) lists every file with its first comment.
+ * **Where the numbers live.** Config is data (`src/config/*`, `src/catalog/*`), maths is pure functions next to it (`src/utils/game/*`, `src/lib/*`), the server engine is `src/lib/offline/*` + `src/app/api/*`. The JSDoc points at all of them.
  *
  * **Not in the game yet**: hills, coast and lake monsters; jungle, fields, orchard, blight and battlefield biomes (dev-only entries); the Producer/Extractor/Idol building rework; quests; gambling; achievements, glossary and mastery;
  * paragon levels; rankings and the preview map; landing page and `/play` route; the guided tutorial (built, dark until the new chapter flips); gem sinks. Details: `docs/plan/ROADMAP.md`. Crafting (queue, recipes) exists but is still a first draft: `docs/plan/crafting-v0.md`.
@@ -39,7 +38,6 @@
  * @title The game at a glance
  * @category Overview/The game
  * @order 1
- * @table stack-versions
  */
 
 import React, { useEffect, useLayoutEffect, useRef } from 'react';

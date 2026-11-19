@@ -141,7 +141,6 @@ const LEVEL_STEPS = buildLevelSteps();
  * @order 3
  * @formula
  * totalStatPoints(level) = (level - 1) + (min(level, 30) - 1) x 2
- * @table stat-points-examples
  * @see reconcileCharacter
  */
 export const totalStatPoints = (level: number): number => {

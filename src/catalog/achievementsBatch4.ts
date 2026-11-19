@@ -348,6 +348,33 @@ secret(
 	'castle_skin',
 	15,
 );
+secret(
+	'window_shopper',
+	'Window shopper',
+	'Open every window in the dock in one visit.',
+	'Just browsing. Thank you.',
+	'Open Hero, Merchant, Farm, Bestiary, Gems, Deeds, Rankings, Rebirth and Boss without reloading the page.',
+	'dock_shuffle',
+	10,
+);
+secret(
+	'night_owl',
+	'Night owl',
+	'Play between 3 and 4 AM.',
+	'The monsters sleep. You, apparently, do not.',
+	'Have the game open any time from 3:00 to 3:59 AM on your own clock.',
+	'night_owl',
+	10,
+);
+secret(
+	'old_school',
+	'Old school',
+	'Enter a famous code.',
+	'Up, up, down, down, and you know the rest.',
+	'Type the classic cheat code on your keyboard while in the game: arrows, then B and A.',
+	'konami',
+	10,
+);
 
 // ---- Mining: rocks broken on the map (counted by the server when a rock's loot is paid)
 deed(

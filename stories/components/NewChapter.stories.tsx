@@ -7,7 +7,7 @@ import { deedViewsOf, milestoneViewsOf, DEED_CATEGORIES, TOTAL_DEED_POINTS, type
 import RebirthUnlockModal from '@/components/game/overlays/RebirthUnlockModal';
 import NewChapterScreen from '@/components/auth/NewChapterScreen';
 import HeroCreator from '@/components/auth/HeroCreator';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import { creatorAvatar } from '@/catalog/avatars';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { ACHIEVEMENTS } from '@/catalog/achievements';
@@ -128,7 +128,7 @@ const Creator = ({ initial = null, earned = [] }: { initial?: PlayerClassId | nu
 	const [pick, setPick] = useState<string | null>(null);
 	return (
 		<div style={{ minHeight: '100vh', background: '#14100c', padding: 40 }}>
-			<PixelModal title='Finish your hero' size='md' hideClose closeOnBackdrop={false} onClose={() => undefined}>
+			<GameModal title='Finish your hero' size='md' hideClose closeOnBackdrop={false} onClose={() => undefined}>
 				<HeroCreator
 					name={name}
 					onName={setName}
@@ -141,7 +141,7 @@ const Creator = ({ initial = null, earned = [] }: { initial?: PlayerClassId | nu
 					onAvatar={setPick}
 					earned={earned}
 				/>
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 };

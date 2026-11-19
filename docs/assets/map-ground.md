@@ -10,7 +10,7 @@ Ground textures, shape atlases and shores that TerrainLayer draws, the cracked-s
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `ground_bg_crack` | <img src="../../public/pixel/bg/crack.png" width="96" alt="ground_bg_crack"> | 96x96 | used | app/globals.css, styles/LoadingScreen.css | `pixel/bg/crack.png` |
+| `ground_bg_crack` | <img src="../../public/pixel/bg/crack.png" width="96" alt="ground_bg_crack"> | 96x96 | used | styles/LoadingScreen.css | `pixel/bg/crack.png` |
 | `ground_bg_farm_meadow` | <img src="../../public/pixel/bg/farm_meadow.png" width="96" alt="ground_bg_farm_meadow"> | 96x96 | used | catalog/achievementsBatch2.ts, styles/Farm.css | `pixel/bg/farm_meadow.png` |
 | `ground_bg_fog_a` | <img src="../../public/pixel/bg/fog_a.png" width="96" alt="ground_bg_fog_a"> | 48x48 | used | app/globals.css | `pixel/bg/fog_a.png` |
 | `ground_bg_fog_b` | <img src="../../public/pixel/bg/fog_b.png" width="96" alt="ground_bg_fog_b"> | 64x64 | used | app/globals.css | `pixel/bg/fog_b.png` |

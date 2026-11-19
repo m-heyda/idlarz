@@ -54,7 +54,6 @@ export const CASTLE_WARD = { fromLevel: 7 };
  *
  * @category Economy/Castle
  * @order 1
- * @table castle-levels
  * @see castleModifier, castleUpgradeDuration
  */
 export const CASTLE_UPGRADE = {

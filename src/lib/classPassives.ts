@@ -19,7 +19,6 @@ import type { CombatBonus } from '@/lib/combat';
  *
  * @category Progression/Class passives
  * @order 1
- * @table class-passives
  */
 export const classPassives = (playerClass: unknown): ClassPassives =>
 	typeof playerClass === 'string' && Object.hasOwn(CLASS_PASSIVES, playerClass) ? CLASS_PASSIVES[playerClass as PlayerClassId] : NO_CLASS_PASSIVES;

@@ -119,3 +119,13 @@ test('maxCraftable is the scarcest input, capped per request, and 0 while locked
 	assert.equal(maxCraftable(minor, { ...rich, stock: {} }), 0);
 	assert.equal(maxCraftable(RECIPE_BY_ID.potion_greater, { craftLevel: 4, resources: { food: 1e6, coal: 1e6 }, stock: { glass_vial: 9 } }), 0);
 });
+
+test('a recipe that eats dropped monster ingredients is priced at the junk sell value of those ingredients (Arcane Essence)', () => {
+	const recipe = RECIPE_BY_ID.arcane_essence;
+	assert.ok(recipe, 'Arcane Essence is a recipe');
+	const price = recipeCostGold(recipe);
+	// 1 Glass Vial (made from stone and coal) + 3 Glowberry + 2 Dried Herbs (dropped)
+	const junk = (id: string) => ITEM_CATALOG[id].sellValue ?? 0;
+	assert.ok(price > 3 * junk('junk_glowberry') + 2 * junk('junk_dried_herbs'));
+	assert.ok(Number.isFinite(price));
+});

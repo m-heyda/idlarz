@@ -6,7 +6,7 @@ import { archiveForNewGame, resetSave, type SavePeek } from '@/lib/saveStorage';
 import { newGameCloud } from '@/lib/cloudClient';
 import type { CloudInfo } from '@/lib/startPlan';
 import { countOwnedTiles } from '@/utils/game/tiles';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import AvatarArt from '@/components/game/AvatarArt';
 
 export type HubChoice = 'local' | 'cloud' | 'fresh';
@@ -115,7 +115,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 	if (mode === 'local' && local.kind === 'unreadable') {
 		return (
 			<div className='fixed inset-0 bg-[#14100c]'>
-				<PixelModal title='Save unreadable' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
+				<GameModal title='Save unreadable' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
 					<p className='text-sm text-center text-[#a89878] mb-4'>
 						A saved game is stored in this browser but could not be read. A copy of the damaged text is kept; you can copy it from the save tools (Ctrl x5 in
 						the game).
@@ -133,7 +133,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 							Log out
 						</button>
 					</div>
-				</PixelModal>
+				</GameModal>
 			</div>
 		);
 	}
@@ -142,7 +142,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 
 	return (
 		<div className='fixed inset-0 bg-[#14100c]'>
-			<PixelModal title={title} size={mode === 'choose' ? 'md' : 'sm'} hideClose closeOnBackdrop={false} onClose={NOOP}>
+			<GameModal title={title} size={mode === 'choose' ? 'md' : 'sm'} hideClose closeOnBackdrop={false} onClose={NOOP}>
 				{mode === 'choose' && (
 					<p className='text-sm text-center text-[#a89878] mb-4'>
 						This browser and your account hold different games. The one you do not pick is kept as a copy, nothing is deleted.
@@ -205,7 +205,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 						</div>
 					</div>
 				)}
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 };

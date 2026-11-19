@@ -13,7 +13,6 @@ import { resourceKeys, fromResources } from './resources';
  *
  * @category Economy/Merchant
  * @order 1
- * @table merchant-prices
  */
 export const MERCHANT_RESOURCE_PRICES = fromResources(
 	resourceKeys.filter((key) => 'merchant' in RESOURCES[key]),
@@ -38,7 +37,6 @@ export const MERCHANT_UPGRADE_GROUPS = {
  *
  * @category Economy/Merchant
  * @order 3
- * @table merchant-upgrades
  */
 export const MERCHANT_UPGRADES = {
 	haggler: {

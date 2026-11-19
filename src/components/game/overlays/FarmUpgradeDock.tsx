@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { canAffordBundle } from '@/utils/game/costs';
-import { farmUpgradeCost, farmUpgradeLevel } from '@/utils/game/farm';
+import { farmUpgradeCost, farmUpgradeLevel, farmUpgradeOpen } from '@/utils/game/farm';
 import { Button, SectionLabel } from '../../../../packages/design-system/src/components/primitives';
 import { UpgradeTile } from '../../../../packages/design-system/src/components/upgrade';
 import { compact } from '../../../../packages/design-system/src/logic';
@@ -20,6 +20,7 @@ interface FarmUpgradeDockProps {
 const UpgradeTiles: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
 	const upgrades = useGameStore((state) => state.farmUpgrades);
+	const farmLevels = useGameStore((state) => state.farmLevels);
 	const buy = useGameStore((state) => state.buyFarmUpgrade);
 
 	return (
@@ -29,7 +30,8 @@ const UpgradeTiles: React.FC = () => {
 				const level = farmUpgradeLevel(upgrades, id);
 				const maxed = level >= def.maxLevel;
 				const cost = farmUpgradeCost(id, level);
-				const affordable = !maxed && canAffordBundle(resources, cost);
+				const open = farmUpgradeOpen(id, farmLevels, upgrades);
+				const affordable = !maxed && open && canAffordBundle(resources, cost);
 				const entries = sortedCostEntries<keyof typeof resources>(cost);
 				return (
 					<UpgradeTile
@@ -43,7 +45,7 @@ const UpgradeTiles: React.FC = () => {
 						cost={0}
 						costText=''
 						have={0}
-						shortText='Not enough'
+						shortText={open ? 'Not enough' : 'Fill the chicken pen first'}
 						costNode={
 							<span className='farm-ups-cost'>
 								{entries.map(([key, amount]) => (

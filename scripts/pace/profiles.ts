@@ -100,7 +100,7 @@ export interface Profile {
 	emberPlan?: EmberPlan;
 	/** The Gem shop: `none` (no gems, one builder), `day0` (Builder #2 bought before the run starts), `daily` (the daily bonus pays gems, Builder #2 is bought at its price) */
 	gems?: 'none' | 'day0' | 'daily';
-	/** Mine the rocks that appear (one per 15 minutes, room for one per 50 tiles) with the clicks that would otherwise earn gold */
+	/** Mine the rocks that appear (one per 15 minutes, room for one per 100 tiles) with the clicks that would otherwise earn gold */
 	rocks?: boolean;
 	/** After the last rebirth keep playing the final run until the castle reaches its top level (the `max-*` probes) */
 	endAtCastle10?: boolean;
@@ -130,7 +130,7 @@ export const HUMAN_WINDOWS: [number, number][] = [
 	[18, 23],
 ];
 
-// PACE_DECISION / PACE_HOARD / PACE_TILES: calibration knobs (docs/reference/pacing.md: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus; calibrated to the owner)
+// PACE_DECISION / PACE_HOARD / PACE_TILES: calibration knobs (@category Pacing: a person who checks in hourly while playing, buys a few tiles per visit and never sells surplus; calibrated to the owner)
 const HUMAN = {
 	decisionSec: Number(process.env.PACE_DECISION ?? 3600),
 	hoard: Number(process.env.PACE_HOARD ?? 1e9),
@@ -151,7 +151,7 @@ export const PROFILES: Record<string, Profile> = {
 	'hardcore-rebirth10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 10, rebirths: 1 },
 	// the long game: ten rebirths, to see the character level (carried over each rebirth) reach the soft cap and the maximum
 	'hardcore-rebirth6-x10': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 10 },
-	// the owner's pace (docs/reference/pacing.md): a person who checks in a few times a day, fights with auto-battle, never optimises
+	// the owner's pace (@category Pacing): a person who checks in a few times a day, fights with auto-battle, never optimises
 	human: { ...HUMAN_PLAYER },
 	'human-rebirth6': { ...HUMAN_PLAYER, rebirthAtCastle: 6, rebirths: 5 },
 	'human-rebirth8': { ...HUMAN_PLAYER, rebirthAtCastle: 8, rebirths: 4 },

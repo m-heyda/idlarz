@@ -130,8 +130,6 @@ const isOpen = (facts: TutorialFacts, id: string) => facts.open.includes(id);
  * @title The guided tutorial
  * @category Progression/Guided tutorial
  * @order 0
- * @table tutorial-path
- * @table tutorial-lessons
  * @see applyTutorial, buildNumbers, guideVisibleFor
  */
 export const TUTORIAL_PATH: readonly PathStep[] = [

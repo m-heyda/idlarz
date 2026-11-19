@@ -12,7 +12,6 @@
  *
  * @category Saves & Server/Uploading
  * @order 1
- * @table sync-triggers
  */
 export const SYNC = {
 	firstMs: 4000,

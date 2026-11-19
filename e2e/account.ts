@@ -1,5 +1,5 @@
 /**
- * The one account every end-to-end test signs in with (docs/reference/ops.md). The password is never in the repo: the person running the test types it.
+ * The one account every end-to-end test signs in with (@category Ops). The password is never in the repo: the person running the test types it.
  *
  * **Every test that needs a real login uses one account: `lepryko@gmail.com`.** No other account is used for browser tests, manual checks of the server, or experiments with saves. The account lives in the Supabase project that `.env.local` points at.
  * Its password is never in the repo. Two ways to sign in: **by hand** (the default; the test opens Chrome and waits for the person to sign in) or from `.env.local` (`E2E_TEST_PASSWORD=...` in your git-ignored `.env.local`; `npm run e2e` then signs in through

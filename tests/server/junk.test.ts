@@ -6,7 +6,7 @@ import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkGold, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
 import { applyOp, parseOp, sellJunkRule } from '../../src/lib/offline/inventory';
-import { rollJunkDrops } from '../../src/lib/loot/junkDrops';
+import { rollJunkDrops, rollJunkLoot } from '../../src/lib/loot/junkDrops';
 import { mulberry32 } from '../../src/lib/rng';
 import { plainItem } from '../../src/lib/itemInstance';
 
@@ -45,8 +45,7 @@ test('every kill drops cheap junk, and how much follows the kill gold (monster l
 test('pricey junk is rare on an ordinary kill, locked behind monster level, and Luck helps', () => {
 	const found = (level: number, luck: number) => {
 		let n = 0;
-		for (let seed = 1; seed <= 4000; seed++)
-			if (rollJunkDrops({ ...ctx, level, luck }, seeded(seed)).some((d) => d.kind === 'consumable' && d.id === 'junk_amethyst')) n++;
+		for (let seed = 1; seed <= 4000; seed++) if (rollJunkLoot({ ...ctx, level, luck }, seeded(seed)).stash.ing_amethyst) n++;
 		return n;
 	};
 	assert.equal(found(19, 0), 0, 'below its level');
@@ -57,9 +56,10 @@ test('pricey junk is rare on an ordinary kill, locked behind monster level, and 
 
 test('a boss always drops the pricey stacks, in a number that grows with its level; a golden one drops triple', () => {
 	const at = (level: number, lucky = false) => {
-		const drops = rollJunkDrops({ ...ctx, level, boss: true, lucky }, seeded(7));
+		// claw and amethyst are crafting ingredients now (they go to the crafting bag), teal crystals stay junk
+		const { drops, stash } = rollJunkLoot({ ...ctx, level, boss: true, lucky }, seeded(7));
 		const qty = (id: string) => drops.reduce((sum, d) => sum + (d.kind === 'consumable' && d.id === id ? d.qty : 0), 0);
-		return { claw: qty('junk_claw'), teal: qty('junk_teal_crystals'), amethyst: qty('junk_amethyst') };
+		return { claw: stash.ing_claw ?? 0, teal: qty('junk_teal_crystals'), amethyst: stash.ing_amethyst ?? 0 };
 	};
 	const low = at(10);
 	assert.ok(low.claw >= 3 && low.teal >= 2 && low.amethyst >= 1);

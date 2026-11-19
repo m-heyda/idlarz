@@ -12,9 +12,9 @@ The one place to look when planning the next step. It lists only what is **still
 
 | Topic | Spec | Linear |
 | --- | --- | --- |
-| Magnitude targets (gold/s, income multiplier, Embers, stocks) | [pacing targets](../reference/pacing.md) | IDL-128 |
-| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | [loot](../reference/loot.md), [28](28-reuse-items-and-stats.md) section 6, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
-| Monster chests (no keys, 2 % per kill) | [loot](../reference/loot.md) | IDL-163 |
+| Magnitude targets (gold/s, income multiplier, Embers, stocks) | pacing targets | IDL-128 |
+| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | loot, [28](28-reuse-items-and-stats.md) section 6, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
+| Monster chests (no keys, 2 % per kill) | loot | IDL-163 |
 | Spawn tables per distance band, boss rules, rosters for hills, coast and lake | [20](20-monster-families-and-rewards.md), [12](12-rebirth-biomes.md) | IDL-53, 55, 201 |
 | Five rebirth biomes (names, rosters, tile output rule) | [12](12-rebirth-biomes.md) | IDL-105, 199 |
 | Set bonuses, palettes, accessory themes, new stats, affix tier labels | [28](28-reuse-items-and-stats.md), art README (removed 2026-11-16) | IDL-39, 23, 164, 176, 45 |
@@ -37,7 +37,7 @@ The same idea as the MVP art: first something that ships, then better. **Do not 
 
 Order of work: pass 1 (IDL-26..31 wiring) -> pass 2 -> the loot work of phase C of [26](26-next-updates-plan.md) -> pass 3 slot by slot in later releases. Pass 2 is cheap and unblocks C; pass 3 is polish and never blocks a release. Linear: IDL-217 (pass 2), IDL-218 (pass 3), IDL-219 (test benchmark).
 
-**Where the item art stands (2026-11-09).** Pass 1 and pass 2 are done and G1-G3 is live (PR 116, 125, 130): every grade has an icon, either real supplied art or an `art_ph_*` placeholder, and the legacy wood, cloth, steel and Obsidian pieces were mapped onto the ladder or retired (IDL-243). **The weapon art is the MVP art and the owner wants it replaced as soon as possible** (IDL-239, raised to High): the G1-G3 weapons of every type are Python placeholders, and the real supplied weapon icons are mostly **not used yet** (24 sit behind disabled reuse items: 10 swords, 4 maces, 2 mauls, 2 axes, 3 spears, 1 bow, 1 staff, 1 wand; plus 8 shields, 5 feet, 6 legs, 10 necklaces). They are wired grade by grade as G4+ goes live (IDL-238). **Not all of it goes to the four live biomes:** G4-G6 (and the Steel and Obsidian bases) go to forest, swamp and tundra; **G7-G9, the special sets S1-S3 and the legendary roster are kept for the five rebirth biomes** (jungle, fields, orchard, blight, battlefield; S1 Sunhoney pairs with Fields and Orchard, S2 with the Battlefield, S3 with the Blight) so each biome release brings new gear with its art. The exact split is decided with the owner when IDL-238 starts (IDL-244). The assets in `public/pixel/assets_to_assess_and_use/` (48 potions, buildings, map details) are not weapons; the potions can serve crafted potions (crafting v0.1).
+**Where the item art stands (2026-11-09).** Pass 1 and pass 2 are done and G1-G3 is live (PR 116, 125, 130): every grade has an icon, either real supplied art or an `art_ph_*` placeholder, and the legacy wood, cloth, steel and Obsidian pieces were mapped onto the ladder or retired (IDL-243). **The weapon art is the MVP art and the owner wants it replaced as soon as possible** (IDL-239, raised to High): the G1-G3 weapons of every type are Python placeholders, and the real supplied weapon icons are mostly **not used yet** (24 sit behind disabled reuse items: 10 swords, 4 maces, 2 mauls, 2 axes, 3 spears, 1 bow, 1 staff, 1 wand; plus 8 shields, 5 feet, 6 legs, 10 necklaces). They are wired grade by grade as G4+ goes live (IDL-238). **Not all of it goes to the four live biomes:** G4-G6 (and the Steel and Obsidian bases) go to forest, swamp and tundra; **G7-G9, the special sets S1-S3 and the legendary roster are kept for the five rebirth biomes** (jungle, fields, orchard, blight, battlefield; S1 Sunhoney pairs with Fields and Orchard, S2 with the Battlefield, S3 with the Blight) so each biome release brings new gear with its art. The exact split is decided with the owner when IDL-238 starts (IDL-244). The assets in `public/pixel/assets_to_assess_and_use/` (map details and the village buildings; the potions pack, the medieval buildings and the other packs were removed, see its README) are not weapons.
 
 **The test benchmark moves with the items.** Fight and loot tests use "a strong kit" as a fixture; since the Rattatui set was deleted (2026-11-08) that is the Obsidian set plus a legendary maul. Once the grade ladder (G1-G9), the new legendary pool and sets S1-S3 exist, Obsidian is no longer the top of the game, so the fixtures must be **one named kit per grade** from a single helper (not `fullSet('obsidian', ...)` scattered through the tests), and `fight-sim`, `monster-ladder` and `fightBalance` pin their numbers to those grades. Ticketed in Linear; until then do not add new tests that name Obsidian as "the best".
 
@@ -78,7 +78,7 @@ Release order as confirmed 2026-10-29 (**history: the first step, the New chapte
 - **Server-based achievements**: 12 at launch (decided, 600 gems and 4 avatars: [21](21-classes-avatars-achievements-offline-report.md) section 3), then **grind ladders** (lifetime gold 1M / 1B / 1T / 1Q ..., one ladder per resource, tiles placed, monsters killed in total and per type) fed by lifetime counters in a new ledger record; and a **Glossary** generated from the catalogs. **Monsters start unknown (the real sprite in black, no HP or level), unlock on the first fight, reveal a layer every 100 kills, and give permanent mastery bonuses (500 kills: +XP/loot; resources: 1 million unlocks the entry, 1 trillion gives +25 % income of that resource)** ([22](22-glossary-and-mastery.md)). The tutorial ships first, the glossary later ([21](21-classes-avatars-achievements-offline-report.md) sections 3-4).
 - **Offline report rework**: a bar of away time against the cap, a clear "capped, N h earned nothing" state with a Night Watch / Steward hint, also on the landing's Continue card.
 - **Landing**: name **IDLE REALM** (a big IDLE patch in hills tiles), Continue card for signed-in players, password reset on and email confirmation off for now ([16](16-landing-and-play-route.md)).
-  - **Paint the landing scene in the Map lab.** When the landing page is built, compose its background in `/map-lab` ([01 Map lab](../reference/architecture.md)): paint the big **IDLE** lettering with the hills biome and surround it with the other biomes (tundra, forest, swamp ...) so the page looks like a real corner of the realm. Export the lab file (JSON) as the source and keep it in the repo, so the strip can be re-baked when the name or the art changes (see the re-bake note in [16](16-landing-and-play-route.md)). The lab already has biome painting, brush size, undo and export; if the lettering needs a straight-line or stamp tool, it is one more function in `lib/mapEdit.ts`. Size S, part of the landing work (release step with [16](16-landing-and-play-route.md)).
+  - **Paint the landing scene in the Map lab.** When the landing page is built, compose its background in `/map-lab` (01 Map lab): paint the big **IDLE** lettering with the hills biome and surround it with the other biomes (tundra, forest, swamp ...) so the page looks like a real corner of the realm. Export the lab file (JSON) as the source and keep it in the repo, so the strip can be re-baked when the name or the art changes (see the re-bake note in [16](16-landing-and-play-route.md)). The lab already has biome painting, brush size, undo and export; if the lettering needs a straight-line or stamp tool, it is one more function in `lib/mapEdit.ts`. Size S, part of the landing work (release step with [16](16-landing-and-play-route.md)).
 
 Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` bump), nullable ledger columns applied before the code that reads them, no new per-click server calls, catalogs stay in TypeScript ([14](14-server-audit-and-data-plan.md)).
 
@@ -113,7 +113,7 @@ Notes from reading the code (not measured against the live project):
 
 ## Features and content (in suggested order)
 
-**Small polish and safety nets** (CI and the Playwright smoke test `e2e/smoke.spec.ts` are built: [ops/commands.md](../reference/ops.md))
+**Small polish and safety nets** (CI and the Playwright smoke test `e2e/smoke.spec.ts` are built: ops/commands.md)
 
 | Item | Size | Acceptance |
 |---|---|---|
@@ -174,7 +174,7 @@ Loose ideas, not scheduled and not sized; each needs a design pass before it ent
 
 > The rework itself is [18](18-biome-buildings-and-material-tiers.md): three buildings per biome (Producer, Extractor, Idol) with timed levels replace the 16 generic ones (`BUILDINGS`, one permanent building per tile). This section keeps only the rules the rework must not break.
 
-**What the first-run pacing fixed in place (do not undo)** - targets are in [pacing targets](../reference/pacing.md):
+**What the first-run pacing fixed in place (do not undo)** - targets are in pacing targets:
 
 - Rebirth is the first real goal and arrives around day 5-7 (castle 6 plus 400 tiles, +50 per rebirth).
 - **Gold is the tile limiter, never a material.** Any new building or resource that adds a tile cost must pass the sim's "minutes to cover what is missing" check.
@@ -199,19 +199,19 @@ The five T2 materials of the rebirth biomes (Hardwood, Cloth, Honey, Ichor, War 
 
 ## Balance backlog (each needs approval before changing)
 
-Measure with `npm run pace -- --seeds=3`, never from numbers copied into prose: [generated/pace-milestones.md](../generated/pace-milestones.md). Keep the targets of [pacing-targets](../reference/pacing.md). How the pacing guard works: [ops/commands.md](../reference/ops.md).
+Measure with `npm run pace -- --seeds=3`, never from numbers copied into prose: [generated/pace-milestones.md](../generated/pace-milestones.md). Keep the targets of pacing-targets. How the pacing guard works: ops/commands.md.
 
 | # | Topic | Observation | Idea |
 | --- | --- | --- | --- |
 | BL1 + BL3 | **Active vs idle gap, and chests and map clicks are small** (decided 2026-11-07, IDL-80) | gold is not the limiter (casual sits on 11-27M unspent gold; casual vs idle is only 4-20 % apart on pacing) | gold click ladder and chest gold stay; chest bundles get a bigger resource share and size (build task IDL-197); the click Idol and ranger passive give resources or chest speed, never gold; target casual 15-25 % faster than idle |
 | BL4 | **Meat/food is the strongest engine** (decided 2026-11-07, IDL-81) | farm is about 60 % of sellable income; `costScaling` +0.10 moves it only to 55 % (food piles up, the pen cap limits the count) | no cost change, no upkeep; the Harvest Scarecrow Idol adds inside the existing farm bracket, hard cap +25 % |
 
-The magnitude targets these rows are checked against are in [pacing targets](../reference/pacing.md) (IDL-128).
+The magnitude targets these rows are checked against are in pacing targets (IDL-128).
 
 ## Technical risks
 
 - **Performance on a big map** (`npm run perf`, and synthetic maps in the admin panel): at 50,000 tiles a purchase takes ~16 ms, the income pass ~11 ms, saving 12 ms (75 KB), loading and validating a save ~80 ms, the minimap ~4 ms; the screen mounts ~550 tile elements and ~20 terrain canvases. Panning stays at 60 fps with an occasional 33-60 ms frame while tiles enter the view. Follow-ups if it matters: one lightweight component (or event delegation) for plain explored tiles, incremental income on a purchase, chunk drawing off the main thread (OffscreenCanvas), minimap filters and "go to castle/workshop".
 - **No UI tests**: logic is covered by `npm test`; components are verified manually.
-- **Save compatibility**: an unreadable save falls back to the backup, then to a new game, and the damaged text is kept. A new field is optional (no bump); a renamed or removed one bumps `SAVE_SCHEMA` and older saves are refused (no migrations are kept, see [saves and server](../reference/saves-and-server.md)). Between seasons the server data is reset with `npm run reset-players` ([23](../reference/ops.md)).
+- **Save compatibility**: an unreadable save falls back to the backup, then to a new game, and the damaged text is kept. A new field is optional (no bump); a renamed or removed one bumps `SAVE_SCHEMA` and older saves are refused (no migrations are kept, see saves and server). Between seasons the server data is reset with `npm run reset-players` (23).
 - **Float drift**: resources are doubles capped at 1e21 (`RESOURCE_CAP`). With castle 10 and Ember bonuses the income grows by orders of magnitude, so watch the cap when adding multipliers.
 - **Per-tile store subscriptions**: a `Tile` reads only primitives and is `React.memo`'d; the 10 Hz `set()` that rebuilds `resources` is the remaining cost. Measure before optimising.

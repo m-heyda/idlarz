@@ -14,6 +14,7 @@ export const COMPONENT_ICONS: Record<string, PixelIconName> = {
 	glass_vial: 'comp_glass_vial',
 	cured_leather: 'comp_cured_leather',
 	plank_bundle: 'comp_plank_bundle',
+	arcane_essence: 'comp_arcane_essence',
 };
 
 /** A gear recipe is drawn with the first base of its grade and slot (the result is random, the sprite is the grade's look). */

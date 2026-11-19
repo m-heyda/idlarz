@@ -1,6 +1,6 @@
-# misc_map_details (81 files)
+# misc_map_details (40 files)
 
-Fantasy trees and mushrooms: beige-green and blue-green mushroom trees, Chanterelles (orange), Curved tree, Ent man and Ent woman, Light balls tree, Living gazebo (arched trees), Luminous tree, Mega tree (large, with a blue crystal), Swirling tree, Tree idols (deer, dragon, human, wolf), White-red mushrooms, White (dead) tree, Willow. `Assets` (soft grass shadow), `Assets_no_shadow` and `Assets_source.png`.
+Fantasy trees and mushrooms: beige-green and blue-green mushroom trees, Chanterelles (orange), Curved tree, Ent man and Ent woman, Light balls tree, Living gazebo (arched trees), Luminous tree, Mega tree (large, with a blue crystal), Swirling tree, Tree idols (deer, dragon, human, wolf), White-red mushrooms, White (dead) tree, Willow. Only `Assets_no_shadow` is kept; the soft-shadow `Assets` and `Assets_source.png` were removed on 2026-11-19.
 
 **Use for**
 

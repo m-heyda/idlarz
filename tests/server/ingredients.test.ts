@@ -12,7 +12,7 @@ import { mulberry32 } from '../../src/lib/rng';
 
 const ctx = { level: 20, gold: 1000, luck: 0, boss: true, lucky: false };
 
-test('every ingredient points at a real junk item and a crafting bag key, with a name and a tooltip, and no recipe uses it yet', () => {
+test('every ingredient points at a real junk item and a crafting bag key, with a name and a tooltip, and only the named recipe uses it', () => {
 	assert.equal(new Set(INGREDIENTS.map((i) => i.id)).size, INGREDIENTS.length);
 	for (const def of INGREDIENTS) {
 		assert.ok(
@@ -21,12 +21,12 @@ test('every ingredient points at a real junk item and a crafting bag key, with a
 		);
 		assert.equal(def.id, `ing_${def.junkId.replace('junk_', '')}`);
 		assert.ok(COMPONENTS[def.id]?.name && COMPONENTS[def.id].description.includes('Ingredient'), def.id);
-		assert.ok(ingredientDescription(def).includes('no recipe uses it yet'));
+		assert.ok(ingredientDescription(def).includes(def.usedBy ? `used in ${def.usedBy}` : 'no recipe uses it yet'));
 		assert.equal(
 			RECIPES.filter((r) => ('component' in r.output && r.output.component === def.id) || r.inputs.some((i) => 'component' in i && i.component === def.id))
 				.length,
-			0,
-			`${def.id}: no recipe yet`,
+			def.usedBy ? 1 : 0,
+			`${def.id}: ${def.usedBy ? 'one recipe (' + def.usedBy + ')' : 'no recipe yet'}`,
 		);
 	}
 	assert.equal(stashKeyOfJunk('junk_blood'), 'ing_blood');
@@ -67,7 +67,12 @@ test('the roll draws the same numbers as before: the cheap junk and the rest of 
 		assert.deepEqual(a.drops, b, 'the plain list is the same list');
 	}
 	const withoutType = rollJunkLoot(ctx, mulberry32(3));
-	assert.deepEqual(withoutType.stash, {}, 'no type, no ingredients');
+	// no type means no monster table; the pricey rolls (claw, amethyst) are crafting ingredients too and may still land in the crafting bag
+	assert.deepEqual(
+		Object.keys(withoutType.stash).filter((k) => k !== 'ing_claw' && k !== 'ing_amethyst'),
+		[],
+		'no type, no monster ingredients',
+	);
 });
 
 test('a golden monster triples the ingredients it drops', () => {

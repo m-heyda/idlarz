@@ -1,7 +1,7 @@
 import { COMBAT, FALLBACK_BOSS, FALLBACK_MONSTER, MONSTERS } from '@/config/combatConfig';
 import { SPAWN_LIMIT } from '@/config/spawns';
 import type { RockTier } from '@/config/rocks';
-import { chestIntervalSec, goldenMonsterChance } from '@/lib/luck';
+import { chestIntervalSec, goldenMonsterChance, spawnIntervalFactor } from '@/lib/luck';
 import { rockCap, rockIntervalSec, rollRockTier } from '@/lib/rocks';
 import type { Rng } from '@/lib/rng';
 import type { MonsterType } from '@/types/game';
@@ -146,7 +146,12 @@ export const ticketCap = (ctx: BankContext): number => {
 
 const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, ticketCap(ctx) - ticketCount(bank));
 
-const monsterThreshold = (bank: TicketBank): number => (bank.monstersMinted === 0 ? COMBAT.spawn.firstSec : COMBAT.spawn.intervalSec);
+/** Seconds between two monsters at this Luck (the base interval times the shared Luck factor). */
+export const monsterIntervalSec = (luck: number): number => COMBAT.spawn.intervalSec * spawnIntervalFactor(luck);
+/** Seconds a boss needs to appear after the last one left, at this Luck. */
+export const bossIntervalSec = (luck: number): number => COMBAT.spawn.bossIntervalSec * spawnIntervalFactor(luck);
+
+const monsterThreshold = (bank: TicketBank, luck: number): number => (bank.monstersMinted === 0 ? COMBAT.spawn.firstSec : monsterIntervalSec(luck));
 
 /** Monsters waiting (normal monsters and the boss), placed or not. */
 const monsterCount = (bank: TicketBank): number => bank.monsters.length;
@@ -162,8 +167,8 @@ export interface Minted {
 }
 
 /**
- * Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every ~10 minutes
- * (shorter with Luck), a normal monster every 15, the first after 2, a boss every 3 hours while none waits), as long as there is room.
+ * Runs the timers for `dtSec` seconds and mints the tickets that come due, in the order they come (a chest every 12 minutes, a normal monster every 10,
+ * the first after 2, a boss every 3 hours while none waits; Luck shortens every one of them, {@link spawnIntervalFactor}), as long as there is room.
  * With no room the chest and monster timers sit at 0, like the client's own timers. `rollFor(kind, n)` gives the random source of ticket
  * `n` (the server seals it with a secret; tests pass a seeded one) and decides whether a monster is golden.
  *
@@ -172,7 +177,7 @@ export interface Minted {
  *
  * Where and when monsters appear (server only).
  *
- * - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 900 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
+ * - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 600 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
  * - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets ({@link ticketCap}, `SPAWN_LIMIT`, `TICKET_CAP`).
  * - **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.goldenMonster`). Bosses are never golden.
  *
@@ -204,8 +209,8 @@ export const advanceBank = (
 			break;
 		}
 		const chestLeft = Math.max(0, chestEvery - next.chestAcc);
-		const monsterLeft = monstersAllowed ? Math.max(0, monsterThreshold(next) - next.monsterAcc) : Infinity;
-		const bossLeft = bossAllowed ? Math.max(0, COMBAT.spawn.bossIntervalSec - next.bossAcc) : Infinity;
+		const monsterLeft = monstersAllowed ? Math.max(0, monsterThreshold(next, ctx.luck) - next.monsterAcc) : Infinity;
+		const bossLeft = bossAllowed ? Math.max(0, bossIntervalSec(ctx.luck) - next.bossAcc) : Infinity;
 		const step = Math.min(chestLeft, monsterLeft, bossLeft, dt - used);
 		next.chestAcc += step;
 		if (monstersAllowed) next.monsterAcc += step;
@@ -220,7 +225,7 @@ export const advanceBank = (
 			next.chests.push(chest);
 			minted.chests.push(chest);
 		}
-		if (monstersAllowed && next.monsterAcc >= monsterThreshold(next) - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (monstersAllowed && next.monsterAcc >= monsterThreshold(next, ctx.luck) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const n = next.nextN++;
 			const lucky = rollFor('monster', n)() < goldenMonsterChance(ctx.luck);
 			const ticket: MonsterTicket = { n, at, kind: 'normal', lucky };
@@ -229,7 +234,7 @@ export const advanceBank = (
 			next.monsters.push(ticket);
 			minted.monsters.push(ticket);
 		}
-		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= COMBAT.spawn.bossIntervalSec - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= bossIntervalSec(ctx.luck) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const ticket: MonsterTicket = { n: next.nextN++, at, kind: 'boss', lucky: false };
 			next.bossAcc = 0;
 			next.monsters.push(ticket);
@@ -307,8 +312,8 @@ const rockLeft = (bank: TicketBank, ctx: BankContext): number[] =>
 export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null => {
 	if (ticketRoom(bank, ctx) <= 0) return rockLeft(bank, ctx)[0] ?? null;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck, ctx.chestSpeedPct) - bank.chestAcc)];
-	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank) - bank.monsterAcc));
-	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, COMBAT.spawn.bossIntervalSec - bank.bossAcc));
+	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank, ctx.luck) - bank.monsterAcc));
+	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, bossIntervalSec(ctx.luck) - bank.bossAcc));
 	return Math.min(...left, ...rockLeft(bank, ctx));
 };
 
