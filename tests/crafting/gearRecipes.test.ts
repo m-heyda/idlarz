@@ -356,7 +356,7 @@ test('a bag with room for one takes one; the rest waits in the batch for a later
 });
 
 test("cancel delivers what is finished, refunds the rest's components and the XP is paid once", () => {
-	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 30 } }));
+	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 30, copper_nails: 100 } }));
 	const half = T0 + q.r.timeSec! * 1000 + 1;
 	const out = applyCancel(q.inv, q.craft, 0, half, env);
 	assert.equal(out.ok, true);

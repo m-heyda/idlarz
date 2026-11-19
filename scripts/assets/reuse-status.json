@@ -39,6 +39,14 @@
 		"status": "used",
 		"usedBy": ["comp_iron_ingot (40 px copy)", "comp_steel_ingot and comp_silver_ingot (recolours)"]
 	},
+	"/pixel/__reuse/crafting/nail_iron.png": {
+		"status": "used",
+		"usedBy": ["comp_iron_nails (40 px copy)", "comp_steel_rivets, comp_silver_rivets, comp_gold_studs (recolours)"]
+	},
+	"/pixel/__reuse/crafting/nails_copper.png": {
+		"status": "used",
+		"usedBy": ["comp_copper_nails (40 px copy)"]
+	},
 	"/pixel/__reuse/crafting/ore_blue_vein.png": {
 		"status": "planned",
 		"usedBy": ["IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"]

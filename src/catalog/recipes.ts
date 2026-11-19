@@ -390,10 +390,11 @@ const GEAR_REFINED = {
 		G6: [refined('steel_ingot', 2), refined('obsidian_edge', 3)],
 	},
 	armour: {
-		G3: [refined('iron_ingot', 2)],
-		G4: [refined('steel_ingot', 2)],
-		G5: [refined('steel_ingot', 3)],
-		G6: [refined('obsidian_edge', 2), refined('gold_ingot', 1)],
+		G2: [refined('copper_nails', 12)],
+		G3: [refined('iron_ingot', 2), refined('iron_nails', 16)],
+		G4: [refined('steel_ingot', 2), refined('steel_rivets', 20)],
+		G5: [refined('steel_ingot', 3), refined('silver_rivets', 24)],
+		G6: [refined('obsidian_edge', 2), refined('gold_ingot', 1), refined('gold_studs', 30)],
 	},
 	cloak: {
 		G2: [refined('cloth_bolt', 2)],

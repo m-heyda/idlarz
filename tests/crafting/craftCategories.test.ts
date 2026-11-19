@@ -41,7 +41,7 @@ test('the categories are Components, Weapons, Off hands, Armor, Potions, Jewelry
 	assert.ok(potions?.sections.every((s) => s.recipes.every((r) => r.kind === 'potion')));
 	assert.deepEqual(
 		groups.find((g) => g.id === 'components')?.sections.map((s) => s.id),
-		['metals', 'gems', 'tools', 'extracts', 'materials'],
+		['metals', 'fasteners', 'gems', 'tools', 'extracts', 'materials'],
 	);
 });
 

@@ -11176,6 +11176,21 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_copper_nails",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_copper_nails.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_cured_leather",
 		"category": "resources",
 		"subcategory": "comp",
@@ -11446,6 +11461,21 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_gold_studs",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_gold_studs.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_herb_extract",
 		"category": "resources",
 		"subcategory": "comp",
@@ -11465,6 +11495,21 @@
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_iron_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_iron_nails",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_iron_nails.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -11536,10 +11581,40 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_silver_rivets",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_silver_rivets.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_steel_ingot",
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_steel_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_steel_rivets",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_steel_rivets.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -34743,6 +34818,37 @@
 		"category": "unsorted",
 		"subcategory": "crafting",
 		"src": "/pixel/__reuse/crafting/ingot_iron.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"comp_iron_nails (40 px copy)",
+			"comp_steel_rivets, comp_silver_rivets, comp_gold_studs (recolours)"
+		],
+		"name": "reuse_crafting_nail_iron",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/nail_iron.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"comp_copper_nails (40 px copy)"
+		],
+		"name": "reuse_crafting_nails_copper",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/nails_copper.png",
 		"status": "used",
 		"source": "public/pixel/__reuse",
 		"size": [

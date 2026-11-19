@@ -24,6 +24,11 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Silver Ingot | component | 14 | 2 Silver Ore + 60 Coal | 206 | - | - | - | 14 | 14.7 |
 | Gold Ingot | component | 30 | 2 Gold Ore + 1 Ember Coal + 120 Coal | 682 | - | - | - | 30 | 22.7 |
 | Obsidian Edge | component | 45 | 2 Obsidian Chip + 1 Steel Ingot + 150 Coal | 635 | - | - | - | 60 | 10.6 |
+| Copper Nails | component | 6 | 1 Copper Ingot + 10 Coal | 6.8 | - | - | - | 4 | 1.7 |
+| Iron Nails | component | 12 | 1 Iron Ingot + 20 Coal | 6.4 | - | - | - | 7 | 0.9 |
+| Steel Rivets | component | 20 | 1 Steel Ingot + 40 Coal | 20.1 | - | - | - | 12 | 1.7 |
+| Silver Rivets | component | 30 | 1 Silver Ingot + 30 Coal | 14.9 | - | - | - | 20 | 0.7 |
+| Gold Studs | component | 40 | 1 Gold Ingot + 60 Coal | 62.3 | - | - | - | 35 | 1.8 |
 | Gem Grit | component | 5 | 2 Flint + 30 Stone | 15 | - | - | - | 4 | 3.8 |
 | Polishing Cloth | component | 12 | 1 Cured Leather + 1 Gem Grit | 28.3 | - | - | - | 8 | 3.5 |
 | Stone Block | component | 6 | 100 Stone + 10 Coal | 101 | - | - | - | 4 | 25.3 |
@@ -95,6 +100,11 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Silver Ingot | 30 | 120 | 1,680 | 24,720 | 500000000 | 8333333.3 |
 | Gold Ingot | 45 | 80 | 2,400 | 54,560 | 750000000 | 12500000 |
 | Obsidian Edge | 60 | 60 | 3,600 | 38,100 | 1000000000 | 16666666.7 |
+| Copper Nails | 12 | 3,600 | 1,200 | 24,300 | 200000000 | 3333333.3 |
+| Iron Nails | 15 | 3,840 | 1,680 | 24,480 | 250000000 | 4166666.7 |
+| Steel Rivets | 20 | 2,880 | 2,160 | 57,960 | 333333333.3 | 5555555.6 |
+| Silver Rivets | 25 | 2,304 | 2,880 | 34,416 | 416666666.7 | 6944444.4 |
+| Gold Studs | 30 | 1,440 | 4,200 | 89,760 | 500000000 | 8333333.3 |
 | Gem Grit | 12 | 900 | 1,200 | 13,500 | 200000000 | 3333333.3 |
 | Polishing Cloth | 20 | 180 | 1,440 | 5,094 | 333333333.3 | 5555555.6 |
 | Stone Block | 15 | 240 | 960 | 24,240 | 250000000 | 4166666.7 |
@@ -149,11 +159,11 @@ Gate 1:
 | Grade | Unlock | Seconds each | Item level (unlock / top) | Cheapest cost | Mean sell at unlock | Mean sell at top | Worst mean sell (Int 105, Luck cap) | Cost / worst sell | XP (chest) | Pieces to the next unlock | Gate 1 |
 |---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|
 | G1 Starter | 1 | 20 | 1-2 / 7-8 | 2,395 | 357 | 1,732 | 1,891 | 1.27 | 78 | 26 | ok |
-| G2 Hide | 8 | 30 | 9-10 / 17-18 | 21,330 | 6,029 | 14,550 | 17,201 | 1.24 | 1040 | 28 | ok |
-| G3 Iron | 15 | 45 | 19-20 / 29-30 | 223,340 | 50,378 | 156,209 | 177,502 | 1.26 | 3250 | 27 | ok |
+| G2 Hide | 8 | 30 | 9-10 / 17-18 | 21,411 | 6,029 | 14,550 | 17,201 | 1.24 | 1040 | 28 | ok |
+| G3 Iron | 15 | 45 | 19-20 / 29-30 | 223,377 | 50,378 | 156,209 | 177,502 | 1.26 | 3250 | 27 | ok |
 | G4 Steel | 25 | 60 | 31-32 / 41-42 | 1,604,243 | 343,282 | 1,008,652 | 1,348,973 | 1.19 | 7800 | 27 | ok |
 | G5 Knight | 35 | 75 | 43-44 / 53-54 | 14,512,824 | 3,150,844 | 9,775,081 | 11,485,651 | 1.26 | 18200 | 73 | ok |
-| G6 Obsidian | 50 | 90 | 55-56 / 65-66 | 84,502,484 | 17,135,319 | 53,147,477 | 63,528,850 | 1.33 | 41600 | 159 | ok |
+| G6 Obsidian | 50 | 90 | 55-56 / 65-66 | 84,502,856 | 17,135,319 | 53,147,477 | 63,528,850 | 1.33 | 41600 | 159 | ok |
 
 Gate 2: mean sell value of one piece near the top item level of each grade (Luck 0, Intelligence 5), crafted against drops at the same item level.
 
@@ -182,7 +192,7 @@ Gate 4, what income can pay for: gold income per second at castle 10 (the two en
 |---|---|---:|---:|---:|
 | G1 | 0.0 / 0.0 | 180 | 180 | 180 |
 | G2 | 0.1 / 0.1 | 120 | 120 | 120 |
-| G3 | 1.2 / 0.6 | 80 | 48.4 | 80 |
+| G3 | 1.2 / 0.6 | 80 | 48.3 | 80 |
 | G4 | 8.9 / 4.5 | 60 | 6.7 | 13.5 |
 | G5 | 80.6 / 40.3 | 48 | 0.7 | 1.5 |
 | G6 | 469.5 / 234.7 | 40 | 0.1 | 0.3 |

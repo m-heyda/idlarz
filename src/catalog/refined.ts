@@ -3,6 +3,7 @@
  * potion recipes then eat. Pure data: one entry per component and one per recipe, built by the small helpers below, so adding an ore, a gem or an elixir is one line. Component ids are append-only (they name keys of the ledger's stock).
  *
  * - **Metals**: Copper Ingot (copper ore + coal), Iron Ingot (iron nodules + coal), Steel Ingot (2 iron ingots + Ember Coal + coal), Silver Ingot, Gold Ingot (with Ember Coal) and the Obsidian Edge (obsidian chips + a steel ingot). Weapons and armor from the Hide grade up eat them.
+ * - **Fasteners**: an ingot is hammered into Copper Nails, Iron Nails, Steel Rivets, Silver Rivets or Gold Studs, and every armor recipe from the Hide tier up is fastened with the ones of its metal.
  * - **Gems**: every rough gem has **its own polishing recipe**. Polishing needs tools that are crafted too: **Gem Grit** (flint and stone) for every gem, a **Polishing Cloth** (cured leather and grit) from the blue gems on, and a Glass Vial of polishing paste for the top tier. A cut gem sits in jewelry from the Hide grade up.
  * - **Extracts and parts**: Herb, Fungal and Vital Extract (the base of the elixirs), Stone Blocks and Cloth Bolts (cloaks, later buildings).
  *
@@ -13,7 +14,7 @@
  */
 import type { Recipe, RecipeInput } from './recipes';
 
-export type ComponentGroup = 'metal' | 'gem' | 'tool' | 'extract' | 'material' | 'part';
+export type ComponentGroup = 'metal' | 'fastener' | 'gem' | 'tool' | 'extract' | 'material' | 'part';
 
 export interface RefinedComponent {
 	id: string;
@@ -91,6 +92,22 @@ const METAL_RECIPES = [
 	recipe('obsidian_edge', 'Obsidian Edge', [ing('obsidian', 2), part('steel_ingot', 1), res('coal', 150)], 'obsidian_edge', 45, 60, 60),
 ];
 
+/** Nails and rivets, hammered from ingots (crafting rework, 2026-11-19): the small parts armor is fastened with. One ingot makes a handful, and every tier of armor from Hide up asks for the fasteners of its metal. */
+const FASTENER_COMPONENTS = [
+	comp('copper_nails', 'Copper Nails', 'fastener', 'Soft copper nails, hammered from a copper ingot. They hold the first leather and cloth armor together.'),
+	comp('iron_nails', 'Iron Nails', 'fastener', 'Plain iron nails. The studs and seams of the Iron grade.'),
+	comp('steel_rivets', 'Steel Rivets', 'fastener', 'Blued steel rivets, set hot and left to cool. They keep the plates of the Steel grade from rattling.'),
+	comp('silver_rivets', 'Silver Rivets', 'fastener', 'Bright silver rivets for the Knight grade. They shine, and they do not rust.'),
+	comp('gold_studs', 'Gold Studs', 'fastener', 'Heavy gold studs for the Obsidian grade. Armor this fine is meant to be seen.'),
+];
+const FASTENER_RECIPES = [
+	recipe('copper_nails', 'Copper Nails', [part('copper_ingot', 1), res('coal', 10)], 'copper_nails', 6, 4, 12, 12),
+	recipe('iron_nails', 'Iron Nails', [part('iron_ingot', 1), res('coal', 20)], 'iron_nails', 12, 7, 15, 16),
+	recipe('steel_rivets', 'Steel Rivets', [part('steel_ingot', 1), res('coal', 40)], 'steel_rivets', 20, 12, 20, 16),
+	recipe('silver_rivets', 'Silver Rivets', [part('silver_ingot', 1), res('coal', 30)], 'silver_rivets', 30, 20, 25, 16),
+	recipe('gold_studs', 'Gold Studs', [part('gold_ingot', 1), res('coal', 60)], 'gold_studs', 40, 35, 30, 12),
+];
+
 const PART_COMPONENTS = [
 	comp('gem_grit', 'Gem Grit', 'tool', 'Flint ground to a gritty powder. Every cut gem is polished with it, and the better the stone the more it takes.'),
 	comp('polish_cloth', 'Polishing Cloth', 'tool', 'Cured leather charged with grit. It gives a gem its final shine, so the blue and finer stones need one.'),
@@ -116,7 +133,7 @@ const PART_RECIPES = [
 ];
 
 /** The refined components (ingots, cut gems, tools, extracts), merged into `COMPONENTS` */
-export const REFINED_COMPONENTS: readonly RefinedComponent[] = [...METAL_COMPONENTS, ...PART_COMPONENTS, ...GEM_COMPONENTS];
+export const REFINED_COMPONENTS: readonly RefinedComponent[] = [...METAL_COMPONENTS, ...FASTENER_COMPONENTS, ...PART_COMPONENTS, ...GEM_COMPONENTS];
 
 /** The potion recipes made of them: healing and mana, the Vitality Tonic and six elixirs (one per buff family, `catalog/buffs.ts`). The items are in `catalog/items/consumables.ts`. */
 const POTION_RECIPES: Recipe[] = [
@@ -203,4 +220,4 @@ const POTION_RECIPES: Recipe[] = [
 ];
 
 /** Every refined recipe in the order the crafting list shows them (metals, parts and extracts, gems, potions) */
-export const REFINED_RECIPES: readonly Recipe[] = [...METAL_RECIPES, ...PART_RECIPES, ...GEM_RECIPES, ...POTION_RECIPES];
+export const REFINED_RECIPES: readonly Recipe[] = [...METAL_RECIPES, ...FASTENER_RECIPES, ...PART_RECIPES, ...GEM_RECIPES, ...POTION_RECIPES];

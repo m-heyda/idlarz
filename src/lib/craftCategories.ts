@@ -58,6 +58,7 @@ export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
 		label: 'Components',
 		children: [
 			{ id: 'metals', label: 'Metals', has: groupIs('metal') },
+			{ id: 'fasteners', label: 'Nails and rivets', has: groupIs('fastener') },
 			{ id: 'gems', label: 'Cut gems', has: groupIs('gem') },
 			{ id: 'tools', label: 'Polishing tools', has: groupIs('tool') },
 			{ id: 'extracts', label: 'Extracts', has: groupIs('extract') },

@@ -72,6 +72,11 @@ const BASE_ICON_SIZES = {
 	comp_arcane_essence: [40, 40], // the pink potion (reuse pool art, 40 px): the base of the magic potions
 	// refined crafting components (crafting rework 2026-11-19): ingots, cut gems, tools, extracts; recoloured or resampled from the supplied sprites
 	comp_copper_ingot: [40, 40],
+	comp_copper_nails: [40, 40],
+	comp_iron_nails: [40, 40],
+	comp_steel_rivets: [40, 40],
+	comp_silver_rivets: [40, 40],
+	comp_gold_studs: [40, 40],
 	comp_iron_ingot: [40, 40],
 	comp_steel_ingot: [40, 40],
 	comp_silver_ingot: [40, 40],

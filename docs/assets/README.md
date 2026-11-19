@@ -31,11 +31,11 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | [Accessories](accessories.md) | 53 | 41 | 12 | 0 |
 | [Monsters](monsters.md) | 53 | 53 | 0 | 0 |
 | [Buildings](buildings.md) | 108 | 25 | 31 | 52 |
-| [Resources](resources.md) | 121 | 84 | 12 | 25 |
+| [Resources](resources.md) | 126 | 89 | 12 | 25 |
 | [Map details](map-details.md) | 300 | 33 | 18 | 249 |
 | [UI](ui.md) | 105 | 94 | 5 | 6 |
 | [Portraits](portraits.md) | 22 | 16 | 6 | 0 |
 | [Biomes](biomes.md) | 5 | 5 | 0 | 0 |
 | [Equipment sets](sets.md) | 990 | 55 | 0 | 935 |
 | [Map ground and backdrops](map-ground.md) | 78 | 70 | 0 | 8 |
-| [Unsorted cuts](unsorted.md) | 234 | 31 | 11 | 192 |
+| [Unsorted cuts](unsorted.md) | 236 | 33 | 11 | 192 |
