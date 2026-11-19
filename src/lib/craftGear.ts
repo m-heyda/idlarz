@@ -1,7 +1,7 @@
 // Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 // Crafting window shows the odds from the very same request, so the panel can never disagree with the roll.
 import { RARITIES } from '@/catalog/rarity';
-import { GRADE_INFO, gradeLevels } from '@/catalog/items/grades';
+import { GRADE_INFO } from '@/catalog/items/grades';
 import { GEAR_UNLOCK, type CraftGrade, type GearTarget } from '@/catalog/recipes';
 import { CRAFT_GEAR } from '@/config/crafting';
 import { generateLoot, type LootRequest } from '@/lib/loot/generate';
@@ -38,7 +38,8 @@ const nextUnlockOf = (grade: CraftGrade): number => {
  * item level = centre - 1 .. centre + 1, held inside the grade's window
  */
 export const gearItemLevels = (grade: CraftGrade, craftLevel: number): { min: number; max: number; windowMin: number; windowMax: number } => {
-	const [lo, hi] = gradeLevels(grade);
+	// the grade's own window, not the open one of the top live grade (`gradeLevels` runs G6 up to 100 until G7 is live): a crafted piece never leaves its grade's range
+	const [lo, hi] = GRADE_INFO[grade].levels;
 	const unlock = GEAR_UNLOCK[grade];
 	const progress = Math.min(1, Math.max(0, (craftLevel - unlock) / Math.max(1, nextUnlockOf(grade) - unlock)));
 	const centre = Math.round(lo + (hi - lo) * progress);
@@ -90,6 +91,8 @@ export const gearRequest = (target: GearTarget, env: GearEnv, data: LootData = L
 		minItemLevel: levels.min,
 		maxItemLevel: levels.max,
 		slot: target.slot === 'ring' ? 'ring' : target.slot,
+		...(target.type ? { weaponType: target.type } : {}),
+		onlyRarities: GRADE_INFO[target.grade].rarities,
 		luck: env.luck,
 		maxRarity: rarityCeilingAt(env.craftLevel),
 		qualityBias: qualityBiasOf(env.intelligence),
@@ -166,6 +169,7 @@ export const gearBaseStats = (target: GearTarget, env: GearEnv, data: LootData =
 	for (const level of new Set([request.minItemLevel ?? 1, request.maxItemLevel ?? 1])) {
 		for (const { def } of eligibleCandidates(data, 'equipment_craft', level)) {
 			if (def.slot !== request.slot || def.generation !== 'base') continue;
+			if (request.weaponType && def.weaponType !== request.weaponType) continue;
 			const stats = baseStatsAt(def, level, 50, common);
 			for (const key of STAT_KEYS) {
 				const value = stats[key];

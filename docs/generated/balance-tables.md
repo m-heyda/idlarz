@@ -445,5 +445,6 @@ Shop (cost in points of the next level, by current level):
 | Idol Mastery | 1 | 10 | 100 | 250 | 625 | 1563 | 9766 | 381470 |
 | Imperial Decree | 1 | 1 | 150 | 150 | 150 | 150 | 150 | 150 |
 | Extra Builder | 1 | 1 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
+| Extra Craft Slot | 1 | 2 | 50 | 200 | 800 | 3200 | 51200 | 13107200 |
 | Quest Rarity | 2 | 10 | 5 | 7 | 10 | 14 | 27 | 104 |
 | Quest Slots | 1 | 5 | 25 | 50 | 100 | 200 | 800 | 12800 |

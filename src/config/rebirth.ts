@@ -290,6 +290,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 3,
 		effectPerLevel: 1, // one-time: +1 builder (base 1 + the gem shop's Builder #2 + this one = 3 at most)
 	},
+	craftslots: {
+		label: 'Extra Craft Slot',
+		maxLevel: 2,
+		baseCost: 50,
+		costGrowth: 4, // 50 / 200 Embers
+		effectPerLevel: 1, // +1 crafting queue slot per level (base `LIMITS.craftQueueSlots` 3, so 5 at most = `HARD_LIMITS.craftQueueSlots`)
+	},
 	questrarity: {
 		label: 'Quest Rarity',
 		maxLevel: 10,

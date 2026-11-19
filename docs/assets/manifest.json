@@ -14,6 +14,102 @@
 		]
 	},
 	{
+		"usedBy": [
+			"elixir_fortitude"
+		],
+		"name": "art_elixir_fortitude",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_fortitude.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elixir_haste"
+		],
+		"name": "art_elixir_haste",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_haste.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elixir_ironskin"
+		],
+		"name": "art_elixir_ironskin",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_ironskin.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elixir_keen_eye"
+		],
+		"name": "art_elixir_keen_eye",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_keen_eye.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elixir_might"
+		],
+		"name": "art_elixir_might",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_might.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elixir_warding"
+		],
+		"name": "art_elixir_warding",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/consumable/elixir_warding.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "art_glass_vial",
 		"category": "potions",
@@ -379,6 +475,38 @@
 	},
 	{
 		"usedBy": [
+			"junk_flint"
+		],
+		"name": "art_junk_flint",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_flint.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_garnet"
+		],
+		"name": "art_junk_garnet",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_garnet.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_geode"
 		],
 		"name": "art_junk_geode",
@@ -507,12 +635,76 @@
 	},
 	{
 		"usedBy": [
+			"junk_iron_ore"
+		],
+		"name": "art_junk_iron_ore",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_iron_ore.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_jasper"
+		],
+		"name": "art_junk_jasper",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_jasper.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_jug"
 		],
 		"name": "art_junk_jug",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_jug.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_lapis"
+		],
+		"name": "art_junk_lapis",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_lapis.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_malachite"
+		],
+		"name": "art_junk_malachite",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_malachite.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -603,12 +795,44 @@
 	},
 	{
 		"usedBy": [
+			"junk_ruby"
+		],
+		"name": "art_junk_ruby",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_ruby.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_sand"
 		],
 		"name": "art_junk_sand",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_sand.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_sapphire"
+		],
+		"name": "art_junk_sapphire",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_sapphire.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -689,6 +913,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_teal_crystals.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_turquoise"
+		],
+		"name": "art_junk_turquoise",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_turquoise.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -814,12 +1054,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"potion_regen"
+		],
 		"name": "art_vitality_heart",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/vitality_heart.png",
-		"status": "unused",
+		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
@@ -10904,10 +11146,265 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_cloth_bolt",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cloth_bolt.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_copper_ingot",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_copper_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_cured_leather",
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_cured_leather.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_amethyst",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_amethyst.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_crystal",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_crystal.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_emerald",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_emerald.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_garnet",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_garnet.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_geode",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_geode.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_heart",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_heart.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_jasper",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_jasper.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_lapis",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_lapis.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_malachite",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_malachite.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_moon",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_moon.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_ruby",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_ruby.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_sapphire",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_sapphire.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_cut_turquoise",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_cut_turquoise.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_fungal_extract",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_fungal_extract.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_gem_grit",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_gem_grit.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -10934,10 +11431,145 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_gold_ingot",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_gold_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_herb_extract",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_herb_extract.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_iron_ingot",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_iron_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_obsidian_edge",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_obsidian_edge.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_plank_bundle",
 		"category": "resources",
 		"subcategory": "comp",
 		"src": "/pixel/icons/comp_plank_bundle.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_polish_cloth",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_polish_cloth.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_silver_ingot",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_silver_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_steel_ingot",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_steel_ingot.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_stone_block",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_stone_block.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
+		"name": "comp_vital_extract",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_vital_extract.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -33968,6 +34600,1610 @@
 		]
 	},
 	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_amethyst_clust",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/amethyst_clust.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_crystal_gold",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/crystal_gold.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_crystal_green",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/crystal_green.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_crystal_ice",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/crystal_ice.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_gem_blue_hex",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/gem_blue_hex.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_gem_red_round",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/gem_red_round.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_geode_red",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/geode_red.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"comp_copper_ingot (40 px copy)"
+		],
+		"name": "reuse_crafting_ingot_copper",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ingot_copper.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"comp_gold_ingot (40 px copy)"
+		],
+		"name": "reuse_crafting_ingot_gold",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ingot_gold.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"comp_iron_ingot (40 px copy)",
+			"comp_steel_ingot and comp_silver_ingot (recolours)"
+		],
+		"name": "reuse_crafting_ingot_iron",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ingot_iron.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_ore_blue_vein",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ore_blue_vein.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_ore_dark_ember",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ore_dark_ember.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_ore_silver",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/ore_silver.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_warding (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_galaxy",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_galaxy.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			1024,
+			1024
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_might (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_gold_sta",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_gold_star.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			1024,
+			1024
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_fortitude (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_green_sw",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_green_swirl.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			1024,
+			1024
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_ironskin (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_grey_swi",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_grey_swirl.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			1024,
+			1024
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_keen_eye (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_purple",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_purple.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"art_elixir_haste (64 px copy)"
+		],
+		"name": "reuse_crafting_potion_winged_b",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/potion_winged_blue.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		],
+		"name": "reuse_crafting_rock_grey_pale",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/rock_grey_pale.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			512,
+			512
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_amber_clus_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/amber_clus_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_amber_cluster",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/amber_cluster.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_amethyst_bed",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/amethyst_bed.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_amethyst_geode",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/amethyst_geode.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_bismuth",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/bismuth.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_blue_vein_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/blue_vein_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_blue_vein_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/blue_vein_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_copper_green",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/copper_green.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_coral_tan_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/coral_tan_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_coral_tan_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/coral_tan_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_coral_white_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/coral_white_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_coral_white_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/coral_white_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_coral_white_c",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/coral_white_c.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_emerald_bed",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_bed.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_emerald_clus_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_clus_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_emerald_clus_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_clus_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_emerald_clus_c",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_clus_c.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_emerald",
+			"comp_cut_turquoise (recolour)"
+		],
+		"name": "reuse_crystals_32_emerald_cut",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_cut.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_malachite (recolour)"
+		],
+		"name": "reuse_crystals_32_emerald_oval",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_oval.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_geode (recolour)"
+		],
+		"name": "reuse_crystals_32_emerald_round",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_round.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_crystal (recolour)"
+		],
+		"name": "reuse_crystals_32_emerald_tear",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/emerald_tear.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_fungus_tan",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/fungus_tan.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_gold_nuggets",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/gold_nuggets.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_grass_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/grass_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_grass_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/grass_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_mossy_gold",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/mossy_gold.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_pyrite_cluster",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/pyrite_cluster.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_ruby_cluster_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_cluster_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_ruby_cluster_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_cluster_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_ruby_cluster_c",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_cluster_c.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_ruby",
+			"comp_cut_amethyst (recolour)"
+		],
+		"name": "reuse_crystals_32_ruby_cut",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_cut.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_jasper (recolour)",
+			"comp_cut_garnet (recolour)"
+		],
+		"name": "reuse_crystals_32_ruby_oval",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_oval.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_moon (recolour)",
+			"comp_cut_lapis (recolour)"
+		],
+		"name": "reuse_crystals_32_ruby_round",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_round.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cut_heart (recolour)",
+			"comp_cut_sapphire (recolour)"
+		],
+		"name": "reuse_crystals_32_ruby_tear",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/ruby_tear.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_sandstone_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/sandstone_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_sandstone_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/sandstone_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_slate_green_a",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/slate_green_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_slate_green_b",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/slate_green_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_amber",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_amber.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_blue",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_blue.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_green",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_green.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_opal",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_opal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_pink",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_pink.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_purple",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_purple.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_tourmal",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_tourmal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_spire_white",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/spire_white.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_stone_green",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/stone_green.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_crystals_32_turquoise_rock",
+		"category": "unsorted",
+		"subcategory": "crystals_32",
+		"src": "/pixel/__reuse/crystals_32/turquoise_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_agate_slice",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/agate_slice.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_amber_crystal",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/amber_crystal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_amber_fossil",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/amber_fossil.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_amethyst",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/amethyst.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_amethyst_geode",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/amethyst_geode.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_aquamarine",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/aquamarine.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_bloodstone",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/bloodstone.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_carnelian",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/carnelian.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_charoite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/charoite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_chrysocolla",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/chrysocolla.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_citrine",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/citrine.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_diamond_raw",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/diamond_raw.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_emerald",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/emerald.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_emerald_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/emerald_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_emerald_stone",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/emerald_stone.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_fire_amber",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/fire_amber.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_fire_opal",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/fire_opal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_fluorite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/fluorite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_garnet"
+		],
+		"name": "reuse_gems_32_garnet_dark",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/garnet_dark.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_garnet_red",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/garnet_red.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_geode_ice_a",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/geode_ice_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_geode_ice_b",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/geode_ice_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_gold_vein_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/gold_vein_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_kyanite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/kyanite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_labradorite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/labradorite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_labradorite_b",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/labradorite_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_lapis"
+		],
+		"name": "reuse_gems_32_lapis_cluster",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/lapis_cluster.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_larimar",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/larimar.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_malachite_teal",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/malachite_teal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_metal_cube",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/metal_cube.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_moonstone",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/moonstone.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_obsidian",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/obsidian.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_peridot_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/peridot_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_pink_crystal",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/pink_crystal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_pink_gem_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/pink_gem_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_quartz_clear",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/quartz_clear.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_rhodochrosite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/rhodochrosite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_rhodonite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/rhodonite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_rose_quartz",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/rose_quartz.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_rose_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/rose_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_ruby"
+		],
+		"name": "reuse_gems_32_ruby_cluster",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/ruby_cluster.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_ruby_on_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/ruby_on_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_sapphire_cryst",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/sapphire_cryst.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_sapphire"
+		],
+		"name": "reuse_gems_32_sapphire_rock",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/sapphire_rock.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_sugilite",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/sugilite.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_tiger_eye",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/tiger_eye.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_topaz",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/topaz.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_tourmaline_grn",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/tourmaline_grn.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_tourmaline_wm",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/tourmaline_wm.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_gems_32_yellow_crystal",
+		"category": "unsorted",
+		"subcategory": "gems_32",
+		"src": "/pixel/__reuse/gems_32/yellow_crystal.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "reuse_header_coin_bag",
 		"category": "unsorted",
@@ -34114,6 +36350,642 @@
 	},
 	{
 		"usedBy": [],
+		"name": "reuse_rocks_32_blue_grey_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/blue_grey_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_blue_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/blue_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_1",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_obsidian_edge (recolour)"
+		],
+		"name": "reuse_rocks_32_coal_2",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_2.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_3",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_4",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_5",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_6",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_6.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_7",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_7.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_coal_8",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/coal_8.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_1",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_2",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_3",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_4",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_5",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_6",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_6.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_7",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_7.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_rock_8",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_rock_8.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_copper_speck_a",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_speck_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_iron_ore"
+		],
+		"name": "reuse_rocks_32_copper_speck_b",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/copper_speck_b.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dark_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dark_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_1",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_2",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_3",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_4",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_5",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_6",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_6.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_7",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_7.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_dirt_rock_8",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/dirt_rock_8.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_green_grey_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/green_grey_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_1",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_2",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_3",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_4",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_5",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_flint"
+		],
+		"name": "reuse_rocks_32_grey_rock_6",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_6.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_7",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_7.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_grey_rock_8",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/grey_rock_8.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_malachite_a",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/malachite_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_malachite"
+		],
+		"name": "reuse_rocks_32_malachite_b",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/malachite_b.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_malachite_c",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/malachite_c.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_malachite_d",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/malachite_d.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_gem_grit"
+		],
+		"name": "reuse_rocks_32_sand_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/sand_rock.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_slate_a",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/slate_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_slate_b",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/slate_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_speckle_rock",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/speckle_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_rocks_32_turquoise_a",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/turquoise_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_turquoise"
+		],
+		"name": "reuse_rocks_32_turquoise_b",
+		"category": "unsorted",
+		"subcategory": "rocks_32",
+		"src": "/pixel/__reuse/rocks_32/turquoise_b.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "reuse_skills_chain_orbs",
 		"category": "unsorted",
 		"subcategory": "skills",
@@ -34222,6 +37094,636 @@
 		"category": "unsorted",
 		"subcategory": "skills",
 		"src": "/pixel/__reuse/skills/whirlwind.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_copper_chunk_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/copper_chunk_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_copper_chunk_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/copper_chunk_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_cloth_bolt"
+		],
+		"name": "reuse_stones_32_cotton_clump_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/cotton_clump_a.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_cotton_clump_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/cotton_clump_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_crystal_dome",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/crystal_dome.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_dome_stone_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/dome_stone_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_dome_stone_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/dome_stone_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_flower_stone_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/flower_stone_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_flower_stone_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/flower_stone_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_granite_grey",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/granite_grey.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_1",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_2",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"art_junk_jasper"
+		],
+		"name": "reuse_stones_32_jasper_3",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_3.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_4",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_5",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_6",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_6.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_7",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_7.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_jasper_8",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/jasper_8.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_lava_rock_1",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/lava_rock_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_lava_rock_2",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/lava_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_lava_rock_3",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/lava_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_lava_rock_4",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/lava_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_lava_rock_5",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/lava_rock_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"comp_stone_block"
+		],
+		"name": "reuse_stones_32_layer_rock_1",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/layer_rock_1.png",
+		"status": "used",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_layer_rock_2",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/layer_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_layer_rock_3",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/layer_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_layer_rock_4",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/layer_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_mushroom_rock_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/mushroom_rock_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_mushroom_rock_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/mushroom_rock_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_mushroom_rock_c",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/mushroom_rock_c.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_opal_black_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/opal_black_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_opal_black_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/opal_black_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_opal_rock",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/opal_rock.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_1",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_2",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_3",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_4",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_5",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_5.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pearl_cluster",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pearl_cluster.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pebble_grey",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pebble_grey.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pitted_rock_1",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pitted_rock_1.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pitted_rock_2",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pitted_rock_2.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pitted_rock_3",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pitted_rock_3.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pitted_rock_4",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pitted_rock_4.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pyrite_clump_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pyrite_clump_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_pyrite_clump_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/pyrite_clump_b.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_succulent_a",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/succulent_a.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [],
+		"name": "reuse_stones_32_succulent_b",
+		"category": "unsorted",
+		"subcategory": "stones_32",
+		"src": "/pixel/__reuse/stones_32/succulent_b.png",
 		"status": "unused",
 		"source": "public/pixel/__reuse",
 		"size": [

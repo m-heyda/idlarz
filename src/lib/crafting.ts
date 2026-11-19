@@ -124,7 +124,7 @@ export const stashKeyOf = (recipe: Recipe): string =>
 		? recipe.output.item
 		: 'component' in recipe.output
 			? recipe.output.component
-			: `gear:${recipe.output.gear.grade}:${recipe.output.gear.slot}`;
+			: `gear:${recipe.output.gear.grade}:${recipe.output.gear.slot}${recipe.output.gear.type ? `:${recipe.output.gear.type}` : ''}`;
 
 /** The recipe that makes a component (the first one, there is one per component). */
 const makerOf = (component: string): Recipe | undefined => RECIPES.find((r) => 'component' in r.output && r.output.component === component);

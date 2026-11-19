@@ -377,7 +377,7 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
 		id: 'craft',
 		rolls: { min: 1, max: 1, guaranteed: 1, chancePerRoll: 1 },
 		itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
-		rarityWeights: { common: 70, uncommon: 22, rare: 6 },
+		rarityWeights: { common: 70, uncommon: 22, rare: 6, epic: 1 },
 		generalPoolId: 'equipment_craft',
 		bonusTables: [],
 		enabled: true,
@@ -417,6 +417,6 @@ export const LOOT_SOURCES: Record<string, LootSource> = {
 	...BOSSES.sources,
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
 	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },
-	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-42 (41 and the variance of 1) are G1-G4.
-	craft: { id: 'craft', lootProfileId: 'craft', levels: { min: 1, max: 41 } },
+	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-67 (66 and the variance of 1) are G1-G6.
+	craft: { id: 'craft', lootProfileId: 'craft', levels: { min: 1, max: 66 } },
 };

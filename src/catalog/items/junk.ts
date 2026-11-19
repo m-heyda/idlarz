@@ -68,4 +68,15 @@ export const JUNK_ITEMS: ItemDef[] = [
 	junk('silver_ore', 'Silver Ore', 70, 'A pale, heavy lump with a bright vein. It rings when you drop it, which the neighbours dislike.', 'uncommon'),
 	junk('gold_ore', 'Gold Ore', 260, 'Stone with ambitions. A little of it glitters, and a lot of it is stone.', 'rare'),
 	junk('crystal', 'Raw Crystal', 520, 'A clear spike that hums faintly in a quiet room. Enchanters hear music in it.', 'rare'),
+
+	// Ores and rough gems for the refined chains (crafting rework, IDL-358): tiers follow the look (grey plain stones, green banded stones, blue gems, purple and red top gems); the higher the tier the rarer it drops and the fewer come at once (`config/rocks.ts`)
+	junk('flint', 'Flint', 9, 'A grey, sharp-edged stone that throws sparks. Every polisher keeps a pile of it, ground to grit.'),
+	junk('iron_ore', 'Iron Nodule', 18, 'A rust-speckled lump, heavier than it looks. The smith smelts it with coal into something useful.'),
+	junk('jasper', 'Striped Jasper', 55, 'Banded in brown, red and teal like a tiny cliff. Jewellers love the pattern.', 'uncommon'),
+	junk('malachite', 'Raw Malachite', 60, 'Green rings inside green rings. Polished, it looks like a pond that agreed to sit still.', 'uncommon'),
+	junk('turquoise', 'Raw Turquoise', 75, 'A sky-coloured stone veined with brown. Wearers say it keeps the weather off. It does not.', 'uncommon'),
+	junk('lapis', 'Lapis Lazuli', 300, 'Deep blue with a dusting of gold. Painters grind it, jewellers cut it.', 'rare'),
+	junk('garnet', 'Dark Garnet', 340, 'Red so dark it looks black until the light hits it. A good, serious stone.', 'rare'),
+	junk('ruby', 'Rough Ruby', 1800, 'A cluster of red crystals still rough from the rock. Whoever cuts it well will not need to work again.', 'epic'),
+	junk('sapphire', 'Rough Sapphire', 2100, 'Blue crystals on a grey bed. The rarest colour in the rock, and the rock knows it.', 'epic'),
 ];

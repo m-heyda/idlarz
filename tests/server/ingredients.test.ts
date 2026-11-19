@@ -22,12 +22,11 @@ test('every ingredient points at a real junk item and a crafting bag key, with a
 		assert.equal(def.id, `ing_${def.junkId.replace('junk_', '')}`);
 		assert.ok(COMPONENTS[def.id]?.name && COMPONENTS[def.id].description.includes('Ingredient'), def.id);
 		assert.ok(ingredientDescription(def).includes(def.usedBy ? `used in ${def.usedBy}` : 'no recipe uses it yet'));
-		assert.equal(
-			RECIPES.filter((r) => ('component' in r.output && r.output.component === def.id) || r.inputs.some((i) => 'component' in i && i.component === def.id))
-				.length,
-			def.usedBy ? 1 : 0,
-			`${def.id}: ${def.usedBy ? 'one recipe (' + def.usedBy + ')' : 'no recipe yet'}`,
-		);
+		// the recipes that eat it are exactly the ones its tooltip names ("Arcane Essence, Herb Extract")
+		const users = RECIPES.filter((r) => ('component' in r.output && r.output.component === def.id) || r.inputs.some((i) => 'component' in i && i.component === def.id))
+			.map((r) => r.name)
+			.sort();
+		assert.deepEqual(users, def.usedBy ? def.usedBy.split(', ').sort() : [], `${def.id}: the recipes that use it are the ones its tooltip names`);
 	}
 	assert.equal(stashKeyOfJunk('junk_blood'), 'ing_blood');
 	assert.equal(stashKeyOfJunk('junk_rubble'), undefined, 'plain junk stays junk');

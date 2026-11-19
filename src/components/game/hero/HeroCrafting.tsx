@@ -124,7 +124,9 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 					? `, bad luck bonus x${tidy(odds.pityMultiplier.toFixed(2))} on ${RARITIES[best.id as keyof typeof RARITIES]?.label ?? best.id}`
 					: ''}
 			</div>
-			<div className='ds-paper-note'>You choose the grade and the slot; the piece is random. It goes to your bag, marked Crafted.</div>
+			<div className='ds-paper-note'>
+				You choose the type and the tier; the piece (a base of that type) and its affixes are random. It goes to your bag, marked Crafted.
+			</div>
 		</div>
 	);
 };
@@ -133,7 +135,8 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const busy = useCraftStore((state) => state.busy);
 	const craftItem = useCraftStore((state) => state.craftItem);
-	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots') && !!recipe.timeSec;
+	const prestige = useGameStore((state) => state.prestige);
+	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots', { prestige }) && !!recipe.timeSec;
 	const showToast = useUiStore((state) => state.showToast);
 	const perCraft = craftTimeSec(recipe);
 	const max = maxCraftable(recipe, have);
@@ -276,6 +279,7 @@ const Queue: React.FC = () => {
 	const cancel = useCraftStore((state) => state.cancel);
 	const showToast = useUiStore((state) => state.showToast);
 	const now = useServerNow();
+	const prestige = useGameStore((state) => state.prestige);
 	const entries: CraftQueueEntry[] = queue.map((entry, slot) => {
 		const recipe = RECIPE_BY_ID[entry.recipeId];
 		const done = finishedOf(entry, now);
@@ -294,7 +298,7 @@ const Queue: React.FC = () => {
 	return (
 		<CraftQueue
 			entries={entries}
-			slots={craftLimit('craftQueueSlots')}
+			slots={craftLimit('craftQueueSlots', { prestige })}
 			onCollect={(id) => act(() => claim(Number(id)))}
 			onCancel={(id) => act(() => cancel(Number(id)))}
 			onCollectAll={() => act(() => claim('all'))}
@@ -359,8 +363,9 @@ const HeroCrafting: React.FC = () => {
 	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
 	const searching = query.trim() !== '';
 	const groups = useMemo(() => craftGroups(SHOWN, query), [query]);
-	const firstRecipes = ALL_GROUPS[0].sections[0].recipes;
-	const selected = SHOWN.find((r) => r.id === selectedId) ?? firstRecipes.find((r) => r.unlock <= level) ?? firstRecipes[0];
+	// nothing chosen yet: the first recipe the player can craft now, else the first in the list
+	const listed = ALL_GROUPS.flatMap((group) => group.sections.flatMap((section) => section.recipes));
+	const selected = SHOWN.find((r) => r.id === selectedId) ?? listed.find((r) => r.unlock <= level) ?? listed[0];
 	const toggleKind = (kind: string) =>
 		setClosed((before) => {
 			const out = new Set(before);

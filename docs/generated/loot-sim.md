@@ -196,5 +196,5 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **boss_blight**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_battlefield**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
-- **craft**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 71.4%, uncommon 22.4%, rare 6.1%; bonus: none
+- **craft**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 70.7%, uncommon 22.2%, rare 6.1%, epic 1.0%; bonus: none
 - **merchant_stock**: 12-12 roll(s), 12 guaranteed, 100% per roll; rarity weights common 57.7%, uncommon 38.5%, rare 3.8%; bonus: none

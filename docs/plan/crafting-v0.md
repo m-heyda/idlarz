@@ -2,6 +2,9 @@
 
 Status: v0.0 built in three PRs (data and pure logic, server, overlay). The long-term design is [17-crafting](17-crafting.md) (gear, tiers, Ichor); this file is the small first slice and wins where they differ for v0.
 
+## Built since v0 (crafting rework, 2026-11-19)
+The code is the reference (JSDoc `@category Economy/Crafting` in `catalog/recipes.ts` and `catalog/refined.ts`): gear recipes are grade G1-G6 x slot x item type (138 recipes, ids `gear_g3_mainhand_bow`; the old per-slot ids stay as hidden `legacy` recipes), ingots, cut gems (one polishing recipe per gem, with crafted Gem Grit and Polishing Cloth), extracts, Cloth Bolts and Stone Blocks are components that gear and potions eat, there are eight new potions (Mana, Vitality Tonic, six timed elixirs) and the Ember shop's Extra Craft Slot takes the queue from 3 to 5 slots. What is still planned stays in the Linear project R11 Crafting.
+
 ## Owner decision (2026-11-08)
 Crafting makes three things: **usable items**, **half-products** and **sellable goods**. v0 starts with **potions only**, then components and goods, then gear.
 

@@ -39,6 +39,7 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 		emberEffect(ctx.prestige, 'steward') +
 		(emberOwned(ctx.prestige, 'vigil') ? HARD_LIMITS.offlineEfficiency - LIMITS.offlineEfficiency : 0) +
 		((ctx.gear?.offlineEff ?? 0) + classPassives(ctx.playerClass).offlineEffPct) / 100,
+	craftQueueSlots: (ctx) => emberEffect(ctx.prestige, 'craftslots'),
 	builders: (ctx) => Math.min(1, Math.max(0, Math.floor(ctx.gemBuilders ?? 0))) + emberEffect(ctx.prestige, 'extrabuilder'),
 	// the three level caps of the Ember shop (the castle level still gates Producers, Extractors and the first five Idol levels)
 	idolMaxLevel: (ctx) => emberEffect(ctx.prestige, 'idolcap'),

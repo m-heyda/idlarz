@@ -38,8 +38,12 @@ export interface LootRequest {
 	extraGearRolls?: number;
 	/** Only items of this slot are eligible (a crafting recipe picks the slot, not the item) */
 	slot?: ItemDef['slot'];
+	/** Only weapons of this type are eligible (a crafting recipe for swords makes swords: a club never rolls a wand's spell power) */
+	weaponType?: ItemDef['weaponType'];
 	/** No item rolled for this request gets a lower item level than this (a crafting recipe stays inside its grade's window) */
 	minItemLevel?: number;
+	/** Only these rarities are rolled (a crafted piece takes the rarities of its grade, so the top live grade, which is open to every rarity for drops, still crafts as its own grade) */
+	onlyRarities?: readonly string[];
 	/** No rarity above this one is rolled (the crafting level's rarity ceiling) */
 	maxRarity?: string;
 	/** 0 and up: rolls toward the top of the quality and of every affix magnitude (Intelligence, crafting only). 0 changes nothing, not even the random numbers drawn. */
@@ -189,12 +193,14 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const rarity = data.rarities[id];
 		if (!rarity?.enabled || !(weight > 0)) continue;
 		if (itemLevel < (profile.rarityLevelGate?.[id] ?? 1)) continue;
+		if (ctx.req.onlyRarities && !ctx.req.onlyRarities.includes(id)) continue;
 		const ceiling = ctx.req.maxRarity ? data.rarities[ctx.req.maxRarity] : undefined;
 		if (ceiling && rarity.order > ceiling.order) continue;
 		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
 		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
 		const candidates = all.filter(
-			(c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) && (!ctx.req.slot || c.def.slot === ctx.req.slot),
+			(c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) && (!ctx.req.slot || c.def.slot === ctx.req.slot) &&
+				(!ctx.req.weaponType || c.def.weaponType === ctx.req.weaponType),
 		);
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;

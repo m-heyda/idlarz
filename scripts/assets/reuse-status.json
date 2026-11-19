@@ -1,0 +1,254 @@
+{
+	"/pixel/__reuse/crafting/amethyst_clust.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/crystal_gold.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/crystal_green.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/crystal_ice.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/gem_blue_hex.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/gem_red_round.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/geode_red.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/ingot_copper.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_copper_ingot (40 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/ingot_gold.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_gold_ingot (40 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/ingot_iron.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_iron_ingot (40 px copy)",
+			"comp_steel_ingot and comp_silver_ingot (recolours)"
+		]
+	},
+	"/pixel/__reuse/crafting/ore_blue_vein.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/ore_dark_ember.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/ore_silver.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_galaxy.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_warding (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_gold_star.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_might (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_green_swirl.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_fortitude (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_grey_swirl.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_ironskin (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_purple.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_keen_eye (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/potion_winged_blue.png": {
+		"status": "used",
+		"usedBy": [
+			"art_elixir_haste (64 px copy)"
+		]
+	},
+	"/pixel/__reuse/crafting/rock_grey_pale.png": {
+		"status": "planned",
+		"usedBy": [
+			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/emerald_cut.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_emerald",
+			"comp_cut_turquoise (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/emerald_oval.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_malachite (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/emerald_round.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_geode (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/emerald_tear.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_crystal (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/ruby_cut.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_ruby",
+			"comp_cut_amethyst (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/ruby_oval.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_jasper (recolour)",
+			"comp_cut_garnet (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/ruby_round.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_moon (recolour)",
+			"comp_cut_lapis (recolour)"
+		]
+	},
+	"/pixel/__reuse/crystals_32/ruby_tear.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cut_heart (recolour)",
+			"comp_cut_sapphire (recolour)"
+		]
+	},
+	"/pixel/__reuse/gems_32/garnet_dark.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_garnet"
+		]
+	},
+	"/pixel/__reuse/gems_32/lapis_cluster.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_lapis"
+		]
+	},
+	"/pixel/__reuse/gems_32/ruby_cluster.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_ruby"
+		]
+	},
+	"/pixel/__reuse/gems_32/sapphire_rock.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_sapphire"
+		]
+	},
+	"/pixel/__reuse/rocks_32/coal_2.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_obsidian_edge (recolour)"
+		]
+	},
+	"/pixel/__reuse/rocks_32/copper_speck_b.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_iron_ore"
+		]
+	},
+	"/pixel/__reuse/rocks_32/grey_rock_6.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_flint"
+		]
+	},
+	"/pixel/__reuse/rocks_32/malachite_b.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_malachite"
+		]
+	},
+	"/pixel/__reuse/rocks_32/sand_rock.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_gem_grit"
+		]
+	},
+	"/pixel/__reuse/rocks_32/turquoise_b.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_turquoise"
+		]
+	},
+	"/pixel/__reuse/stones_32/cotton_clump_a.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_cloth_bolt"
+		]
+	},
+	"/pixel/__reuse/stones_32/jasper_3.png": {
+		"status": "used",
+		"usedBy": [
+			"art_junk_jasper"
+		]
+	},
+	"/pixel/__reuse/stones_32/layer_rock_1.png": {
+		"status": "used",
+		"usedBy": [
+			"comp_stone_block"
+		]
+	}
+}

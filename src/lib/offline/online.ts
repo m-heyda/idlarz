@@ -42,6 +42,7 @@ import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, Invento
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { craftLimit } from '@/lib/crafting';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
 import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
@@ -394,7 +395,7 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 		};
 		const result =
 			'recipeId' in request
-				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct)
+				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct, craftLimit('craftQueueSlots', { prestige: prestigeOfCore(ctx.stored.core) }))
 				: request.action === 'claim'
 					? request.slot === 'all'
 						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)
