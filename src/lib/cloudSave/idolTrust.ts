@@ -11,15 +11,19 @@ import type { Tile } from '@/types/game';
  *
  * @category Saves & Server/Accepting a save
  * @order 8
+ * Several levels at once (`catchUp`, the same run as the previous save): an Idol that fell behind the record (the client keeps going while the server held a step back, or the browser was left open and two timers ended between saves) is accepted up to the level it stands at
+ * once the timer check raised no `timer_jump`; that check already needs the real time to cover every level above what the previous save held.
+ *
  * @formula
  * accepted[biome] = trusted                              when claimed <= trusted
- *                 = claimed                              when claimed = trusted + 1, the Idol stands at that level and no timer_jump was raised
+ *                 = claimed                              when claimed = trusted + 1 (or more with `catchUp`), the Idol stands at that level and no timer_jump was raised
  *                 = trusted                              otherwise
  */
 export const settleIdols = (
 	trusted: Record<string, number>,
 	state: Pick<PersistedGame, 'tiles' | 'idolLevels'>,
 	timerJumped: boolean,
+	catchUp = false,
 ): Record<string, number> => {
 	const placed = standingIdols(state.tiles);
 	const claimed = state.idolLevels ?? {};
@@ -27,7 +31,7 @@ export const settleIdols = (
 	for (const idol of IDOLS) {
 		const t = trusted[idol.biome] ?? 0;
 		const c = claimed[idol.biome] ?? 0;
-		const accepted = c > t && !timerJumped && c === t + 1 && (placed[idol.biome] ?? 0) >= c ? c : t;
+		const accepted = c > t && !timerJumped && (c === t + 1 || catchUp) && (placed[idol.biome] ?? 0) >= c ? c : t;
 		if (accepted > 0) out[idol.biome] = accepted;
 	}
 	return out;

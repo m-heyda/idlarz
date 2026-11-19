@@ -68,7 +68,7 @@ export type SaveFlag =
 
 /**
  * What the server does when a flag fires (IDL-167, IDL-112), recorded in one place instead of scattered through the pipeline:
- *  - `flag`: accepted as sent, the account loses its ranking (`POISON_FLAGS`); nothing the server pays out depends on the claim.
+ *  - `flag`: accepted as sent and recorded; the account loses its ranking only for a flag in `POISON_FLAGS` (`castle_jump`, `timer_jump` and `playtime_fast` are recorded only); nothing the server pays out depends on the claim being right.
  *  - `clamp`: accepted, but the server replaces the claimed number with the one it can explain (XP, Embers), or pays from the last trusted
  *    economy (`trustedEconomy.ts`: castle level, rates, merchant levels); the flag stays.
  *  - `reject`: the save is refused, but only while `ENFORCEMENT.enabled` is on (until then it behaves as `flag`).
@@ -85,10 +85,10 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  * - `xp_jump`: XP above what bought tiles, play time and server payouts explain ({@link XP_MODEL}).
  * - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
  * - `timer_jump`: a building level or timer faster than real time (the building system, off unless `BUILDINGS_FLAG` is on): the same rule as `castle_jump`, with the buildings sharing the castle's builder. A new building is level 1; every later level needs a running upgrade whose timer the real time between the saves covers.
- * - `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ({@link trustedEconomy}), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
+ * - `castle_jump`: castle level or timer faster than real time. It only records: a browser left open or asleep, an auto-clicker or a late save trips it in normal play, and a forged level's cost is what `networth_exceeds` clamps. A baseline frozen by the net-worth check keeps its timer running on the server clock ({@link trustedEconomy}) and is believed again once the real time covers the claim (`believableAfterFreeze`). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
  *
  * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
- * With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
+ * With it on, only `gold_jump` and `gems_increase` refuse a save (HTTP 422).
  *
  * @category Saves & Server/Accepting a save
  * @order 2
@@ -97,13 +97,13 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	baseline_rich: 'flag', // a first save holds a whole history (an imported or older game): nothing to compare with, so it cannot be refused
 	networth_exceeds: 'clamp', // land, buildings, castle and merchant levels are paid from the last trusted rates, not the claimed ones
 	playtime_regress: 'flag', // going back to an older save is the player's choice
-	playtime_fast: 'reject', // more play time than real time passed: the clock is forged
+	playtime_fast: 'flag', // more play time than real time passed: recorded only (a browser left open or put to sleep, an auto-clicker, a clock change are normal play); the XP check bounds what play time can pay
 	gold_jump: 'reject', // more gold than income, stock and the server's grants explain
 	xp_jump: 'clamp',
 	gems_increase: 'reject', // gems are the ledger's; a save that claims more is forged
 	prestige_regress: 'flag', // a New Game or an older save
-	castle_jump: 'clamp',
-	timer_jump: 'clamp', // building levels and rates are paid from the last trusted save, like the castle
+	castle_jump: 'flag', // recorded only: a castle or building level is paid as claimed, what it cost is judged by `networth_exceeds` (a browser left open or put to sleep, an auto-clicker or a save that came late are normal play)
+	timer_jump: 'flag',
 	ember_jump: 'clamp',
 };
 
@@ -139,7 +139,7 @@ export interface Enforcement {
  */
 export const ENFORCEMENT: Enforcement = {
 	enabled: false,
-	reject: new Set<SaveFlag>(['playtime_fast', 'gold_jump', 'gems_increase']),
+	reject: new Set<SaveFlag>(['gold_jump', 'gems_increase']),
 };
 
 /** The flags that make this save refused under the given enforcement (none while it is off). */
@@ -147,7 +147,8 @@ export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforceme
 	enforcement.enabled ? flags.filter((flag) => FLAG_POLICY[flag] === 'reject' && enforcement.reject.has(flag)) : [];
 
 /**
- * Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
+ * Flags that make an account ineligible for rankings for good (and stop its away pay while they stand on the stored save). Going back in time is a player choice (older save), not a cheat. `playtime_fast`, `castle_jump` and `timer_jump` are NOT in
+ * this set: leaving the browser open or asleep, an auto-clicker or a late save trips them in normal play, so they are recorded for reading (`check-live-saves`) and nothing more; what a forged level could gain is bounded by `networth_exceeds`.
  *
  * @category Saves & Server/Accepting a save
  * @order 9
@@ -155,13 +156,10 @@ export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforceme
 export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 	'baseline_rich',
 	'networth_exceeds',
-	'playtime_fast',
 	'gold_jump',
 	'xp_jump',
 	'gems_increase',
 	'prestige_regress',
-	'castle_jump',
-	'timer_jump',
 	'ember_jump',
 ]);
 

@@ -438,30 +438,21 @@ test('a running castle timer that lost more seconds than passed is a castle_jump
 	);
 });
 
-test('after one castle_jump the frozen timer runs on the server clock, so an honest account stops being flagged once the upgrade would have finished (IDL-250)', async () => {
+test('a castle level that came before its timer ran out raises castle_jump, which only records: the claimed castle is paid and the account stays rankable', async () => {
 	const { repo, rows } = memoryRepo();
 	const base = game();
 	const at = (secAfterStart: number, level: number, remaining: number | null) =>
 		castleAt({ ...base, playSeconds: base.playSeconds + secAfterStart }, level, remaining);
-	const accepted = await accept(repo, 'u1', at(0, 1, 1800), 0, T0);
-	assert.ok(accepted.kind === 'ok');
-	// the castle level arrives with 1,680 s still on the timer: nothing paid for it
+	assert.equal((await accept(repo, 'u1', at(0, 1, 1800), 0, T0)).kind, 'ok');
+	// the castle level arrives with 1,680 s still on the timer (a browser that was left open or asleep, a save that came late)
 	const first = await accept(repo, 'u1', at(120, 2, null), 1, T0 + 120_000);
-	assert.ok(first.kind === 'ok' && first.flags.includes('castle_jump'));
-	assert.equal(rows.get('u1')?.summary.castleLevel, 1, 'the server keeps paying from the trusted level');
-	assert.equal(Math.round(rows.get('u1')!.summary.derived.castleUpgrade!.remainingSec), 1680, 'the frozen timer ran for the 120 s between the saves');
-	// 780 s later the honest claim is still too early for the 1,680 s that were left
-	const second = await accept(repo, 'u1', at(900, 2, null), 2, T0 + 900_000);
-	assert.ok(second.kind === 'ok' && second.flags.includes('castle_jump'));
-	assert.equal(Math.round(rows.get('u1')!.summary.derived.castleUpgrade!.remainingSec), 900);
-	// 1,000 s later the real time since the last trusted save covers the 1,800 s the upgrade needed: the same claim is believed
-	const third = await accept(repo, 'u1', at(1900, 2, null), 3, T0 + 1900_000);
-	assert.ok(third.kind === 'ok' && !third.flags.includes('castle_jump'), third.kind === 'ok' ? third.flags.join() : '');
-	assert.equal(rows.get('u1')?.summary.castleLevel, 2, 'once believed, the claimed castle is the stored one');
+	assert.deepEqual(first.kind === 'ok' && first.flags.includes('castle_jump'), true, 'the flag is recorded');
+	assert.equal(rows.get('u1')?.summary.castleLevel, 2, 'the claimed castle is paid');
+	assert.equal(rows.get('u1')?.summary.derived.trustedAt, undefined, 'the account is not frozen');
+	assert.equal(rows.get('u1')?.everFlagged, false, 'and not taken out of the rankings');
 });
 
-test('a frozen account whose trusted castle had no upgrade running is believed once the real time since its last trusted save covers every level it claims', async () => {
-	const { repo, rows } = memoryRepo();
+test('a frozen baseline (the net-worth check froze it) is believed again once the real time since its last trusted save covers every castle level the claim holds', () => {
 	const base = game();
 	const at = (secAfterStart: number, level: number, remaining: number | null) =>
 		castleAt({ ...base, playSeconds: base.playSeconds + secAfterStart }, level, remaining);
@@ -469,22 +460,20 @@ test('a frozen account whose trusted castle had no upgrade running is believed o
 	const keep = 1 - (summarize(base).derived.buildTimeReduction ?? 0);
 	const levels = Math.round(9000 * keep);
 	const third = Math.round(21_600 * keep);
-	assert.equal((await accept(repo, 'u1', at(0, 1, null), 0, T0)).kind, 'ok');
-	// two levels claimed two minutes later, an upgrade to level 4 already running: nothing paid for them
-	const first = await accept(repo, 'u1', at(120, 3, third), 1, T0 + 120_000);
-	assert.deepEqual(first.kind === 'ok' && first.flags.includes('castle_jump'), true, 'two levels in two minutes');
-	assert.equal(rows.get('u1')?.summary.castleLevel, 1, 'the server keeps paying from the trusted level');
-	// half the time the claim needs: still a jump
-	const half = Math.round(levels / 2);
-	const early = await accept(repo, 'u1', at(half, 3, third), 2, T0 + half * 1000);
-	assert.deepEqual(early.kind === 'ok' && early.flags.includes('castle_jump'), true, 'half the needed time ');
-	assert.equal(rows.get('u1')?.summary.castleLevel, 1);
-	// once the real time covers the timers of both levels and the 1,000 s already run on the third (an overnight run is not a cheat): believed
+	const trustedSummary = summarize(at(0, 1, null));
+	const frozen = { summary: { ...trustedSummary, derived: { ...trustedSummary.derived, trustedAt: T0 } }, serverSavedAt: T0 + 120_000 };
+	const flagsAt = (sec: number, level: number, remaining: number | null) => verifyTransition(frozen, summarize(at(sec, level, remaining)), T0 + sec * 1000);
+	// the previous save was two minutes after the trusted one; the claim holds two levels and a third upgrade already running
+	assert.ok(flagsAt(Math.round(levels / 2), 3, third).includes('castle_jump'), 'half the time the claim needs: still a jump');
 	const long = levels + 1000 + 60;
-	const later = await accept(repo, 'u1', at(long, 3, third - 1000), 3, T0 + long * 1000);
-	assert.deepEqual(later.kind === 'ok' && later.flags.includes('castle_jump'), false, later.kind === 'ok' ? later.flags.join() : later.kind);
-	assert.equal(rows.get('u1')?.summary.castleLevel, 3, 'once believed, the claimed castle is the stored one');
-	assert.equal(rows.get('u1')?.summary.derived.trustedAt, undefined, 'a believed save is the trusted one again');
+	assert.ok(
+		!flagsAt(long, 3, third - 1000).includes('castle_jump'),
+		'the time covers both levels and the 1,000 s run on the third (an overnight run is not a cheat)',
+	);
+	// without the frozen baseline's clock the same claim is a jump however late the save comes (the previous save is two minutes older than the claim's levels need)
+	assert.ok(
+		verifyTransition({ summary: trustedSummary, serverSavedAt: T0 + 120_000 }, summarize(at(long, 3, third - 1000)), T0 + long * 1000).includes('castle_jump'),
+	);
 });
 
 test('a rebirth resets the castle without a flag', () => {
