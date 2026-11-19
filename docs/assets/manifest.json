@@ -34993,6 +34993,21 @@
 	},
 	{
 		"usedBy": [
+			"IDL-376: candidate extra sprite for the epic rock tier (an amethyst rock next to the white Crystal one)"
+		],
+		"name": "reuse_crafting_rock_amethyst",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/rock_amethyst.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"IDL-358: painted ore and gem tiers (full size, for the ore and gem windows to come)"
 		],
 		"name": "reuse_crafting_rock_grey_pale",
@@ -35004,6 +35019,21 @@
 		"size": [
 			512,
 			512
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-376: candidate extra sprite for the legendary rock tier (rocks/rock_legendary is the lava rock today)"
+		],
+		"name": "reuse_crafting_rock_lava_spher",
+		"category": "unsorted",
+		"subcategory": "crafting",
+		"src": "/pixel/__reuse/crafting/rock_lava_sphere.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
 		]
 	},
 	{

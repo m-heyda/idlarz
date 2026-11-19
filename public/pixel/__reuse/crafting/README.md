@@ -4,7 +4,7 @@ Supplied by the owner on 2026-11-19 for the crafting rework ([IDL-358](https://l
 
 | Folder | Count | What |
 | ------ | ----: | ---- |
-| `crafting/` | 20 | big pictures: 6 potions (1024 px or 512 px pixel art), 11 painted ores, gems and crystals (512 px), 3 ingots (64 px: copper, gold, iron) |
+| `crafting/` | 25 | big pictures: 6 potions (1024 px or 512 px pixel art), 11 painted ores, gems and crystals (512 px), 3 ingots (64 px: copper, gold, iron), the iron nail and the copper nails (64 px), and two rocks for the rock tiers (64 px: `rock_lava_sphere`, `rock_amethyst`, planned for IDL-376) |
 | `gems_32/` | 50 | 32 px sheet 1: crystals, cut and raw gems, geodes (10 x 5 cells) |
 | `crystals_32/` | 48 | 32 px sheet 2: cut gems (oval, round, cut, tear), crystal clusters, spires, coral, ores (8 x 6) |
 | `stones_32/` | 48 | 32 px sheet 3: jasper, opals, lava rock, pearls, mushroom stones, pitted and layered rock, copper and pyrite (8 x 6) |
