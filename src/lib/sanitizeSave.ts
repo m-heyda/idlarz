@@ -60,7 +60,6 @@ import type {
  *
  * @category Saves & Server/The save
  * @order 4
- * @table persisted-keys
  */
 export const PERSISTED_KEYS = [
 	'tiles',

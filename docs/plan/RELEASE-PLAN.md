@@ -1,6 +1,6 @@
 # Release plan: what is left on the way to the rebirth world
 
-Status: **cleaned on 2026-11-19 against the code, the closed Linear tickets and the git history: everything that is built was removed.** What is built is described in [docs/reference/](../reference/README.md) (generated from the JSDoc in the code) and, per version, in `content/changelog/`. Linear (team IDL, projects R0-R12) is the truth for status; this file keeps the **order and the product brief** of what is still open. The phase numbers (P3, P11 ...) and gem slices (G1-G5) stay as names other documents point to. Drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) and [26](26-next-updates-plan.md) hold the detail; [ROADMAP](ROADMAP.md) holds the long lists.
+Status: **cleaned on 2026-11-19 against the code, the closed Linear tickets and the git history: everything that is built was removed.** What is built is described by the JSDoc in the code (`grep -rn "@category" src scripts`) and, per version, in `content/changelog/`. Linear (team IDL, projects R0-R12) is the truth for status; this file keeps the **order and the product brief** of what is still open. The phase numbers (P3, P11 ...) and gem slices (G1-G5) stay as names other documents point to. Drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) and [26](26-next-updates-plan.md) hold the detail; [ROADMAP](ROADMAP.md) holds the long lists.
 
 Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 🧱 = ships with a placeholder asset first. Every step is its own pull request to `m-heyda/idlarz` and must leave `tsc`, `lint`, `npm test` and the pacing guard green. The game is desktop only (screens 1240 px and wider); mobile and phone layouts are dropped.
 
@@ -15,7 +15,7 @@ P0 foundation, **P1 front door** (landing, `/play`, offline bar, password reset)
 3. **Run `npm run check-live-saves`** against the real rows before every release that touches save or ledger rules.
 4. **Dark first, switch later**: server code and data shapes ship before the UI or the content that uses them, behind a constant, so the release moment is a one-line change.
 5. **Placeholder art never blocks mechanics**: new content ships with the nearest existing sprite (🧱); real art replaces it later without a code change (the sprite is a catalog key).
-6. **Sim and docs travel with the change**: the pacing sims, `npm run docs:code` (JSDoc is the source of truth) and a changelog line when players can see it.
+6. **Sim and docs travel with the change**: the pacing sims, the JSDoc block of any rule you change, and a changelog line when players can see it.
 7. One small behaviour change per release where possible, so a bad number is easy to attribute and roll back.
 
 ## 2. What is left, in order

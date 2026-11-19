@@ -17,6 +17,7 @@ import { Resources } from '@/types/game';
  * @category Progression/Rebirth
  * @order 1
  * @see rebirthStatus, emberGain
+ * @knownissue IDL-223 the gear wipe on rebirth is live without a crafting sink (RELEASE-PLAN P11); needs an owner decision.
  */
 export const REBIRTH = {
 	minCastleLevel: 6,
@@ -62,7 +63,6 @@ export const REBIRTH = {
  *
  * @category Progression/Ember shop
  * @order 1
- * @table ember-shop
  */
 export const EMBER_UPGRADES = {
 	thrift: {

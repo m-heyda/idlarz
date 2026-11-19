@@ -110,7 +110,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `ui_coin_pouch` | <img src="../../public/pixel/ui/coin_pouch.png" width="96" alt="ui_coin_pouch"> | 143x143 | used | code | `pixel/ui/coin_pouch.png` |
 | `ui_cursor_pickaxe` | <img src="../../public/pixel/ui/cursor_pickaxe.png" width="72" alt="ui_cursor_pickaxe"> | 36x36 | used | code | `pixel/ui/cursor_pickaxe.png` |
 | `ui_daily_gift` | <img src="../../public/pixel/ui/daily_gift.png" width="96" alt="ui_daily_gift"> | 384x48 | used |  | `pixel/ui/daily_gift.png` |
-| `ui_frame_modal` | <img src="../../public/pixel/ui/frame_modal.png" width="72" alt="ui_frame_modal"> | 36x36 | used | code | `pixel/ui/frame_modal.png` |
+| `ui_frame_modal` | <img src="../../public/pixel/ui/frame_modal.png" width="72" alt="ui_frame_modal"> | 36x36 | used |  | `pixel/ui/frame_modal.png` |
 | `ui_frame_panel` | <img src="../../public/pixel/ui/frame_panel.png" width="48" alt="ui_frame_panel"> | 12x12 | used | code | `pixel/ui/frame_panel.png` |
 | `ui_frame_tip` | <img src="../../public/pixel/ui/frame_tip.png" width="48" alt="ui_frame_tip"> | 12x12 | used | code | `pixel/ui/frame_tip.png` |
 | `ui_header_divider` | <img src="../../public/pixel/ui/header_divider.png" width="48" alt="ui_header_divider"> | 9x56 | used |  | `pixel/ui/header_divider.png` |

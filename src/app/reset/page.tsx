@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import AuthUnavailable from '@/components/auth/AuthUnavailable';
 import LoadingView from '@/components/game/overlays/LoadingView';
 import { fetchMe, setNewPassword, type UnavailableReason } from '@/lib/authClient';
@@ -61,7 +61,7 @@ export default function ResetPage() {
 		case 'expired':
 			return (
 				<div className='fixed inset-0 bg-[#14100c]'>
-					<PixelModal title='Reset password' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
+					<GameModal title='Reset password' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
 						<div className='flex flex-col gap-3'>
 							<p className='text-sm text-center text-[#a89878]'>This link is expired. Ask for a new one from the login window.</p>
 							<div className='flex justify-center'>
@@ -70,13 +70,13 @@ export default function ResetPage() {
 								</a>
 							</div>
 						</div>
-					</PixelModal>
+					</GameModal>
 				</div>
 			);
 		case 'form':
 			return (
 				<div className='fixed inset-0 bg-[#14100c]'>
-					<PixelModal title='Choose a new password' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
+					<GameModal title='Choose a new password' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
 						<form onSubmit={submit} className='flex flex-col gap-3'>
 							<input
 								type='password'
@@ -106,7 +106,7 @@ export default function ResetPage() {
 								</button>
 							</div>
 						</form>
-					</PixelModal>
+					</GameModal>
 				</div>
 			);
 	}

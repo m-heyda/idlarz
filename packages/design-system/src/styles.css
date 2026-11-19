@@ -1,34 +1,8 @@
-/* Idle Realm design system. Everything lives under .ds-root and uses the ds- prefix so it never touches the game's .px-* styles. */
+/* Idle Realm design system. Everything lives under .ds-root and uses the ds- prefix so it never touches the game's .px-* styles.
 
-.ds-root {
-	--ds-font: var(--font-pixel, system-ui, sans-serif);
-	--ds-slate: #1a1e29;
-	--ds-slate-2: #232836;
-	--ds-slate-3: #2e3446;
-	--ds-ink: #0a0b10;
-	--ds-text: #e9e4d6;
-	--ds-text-dim: #9aa0b2;
-	--ds-gold: #e0a93a;
-	--ds-gold-lt: #f4d57e;
-	--ds-gold-dk: #8a5f16;
-	--ds-wood: #6b4423;
-	--ds-wood-dk: #3d2614;
-	--ds-parch: #f1e6c8;
-	--ds-parch-ink: #4a3516;
-	--ds-good: #62d48a;
-	--ds-bad: #e5604f;
-	--ds-mana: #3d7cf0;
-	--ds-r-common: #cfd2d8;
-	--ds-r-uncommon: #55c264;
-	--ds-r-rare: #5f86ff;
-	--ds-r-epic: #b05cf5;
-	--ds-r-legendary: #f4a93c;
-	--ds-r-unique: #ef4444;
-	--ds-img: url('./assets/tex-slate.png');
-	font-family: var(--ds-font);
-	color: var(--ds-text);
-	-webkit-font-smoothing: antialiased;
-}
+   Order matters: the file is read top to bottom and a later rule of the same weight wins, so a window's section comes after the shared parts it adjusts.
+   Sections, in order: foundations (textures, frames, window shell, buttons, chips, slots, tooltips), the revamp look, HUD, Hero window (bag, stats, crafting), Merchant,
+   item tooltips by grade, Hall of Deeds and Bestiary, Gem shop and Deeds list, Checkbox, Rankings, Bestiary panel. Before changing the order, compare screenshots of every story. */
 
 .ds-root *,
 .ds-root *::before,
@@ -41,14 +15,11 @@
 .ds-iconbtn img,
 .ds-upgrade-icon,
 .ds-tip-head img,
-.ds-cost img,
-.ds-hero-sil {
+.ds-cost img {
 	image-rendering: pixelated;
 }
 
 .ds-topbar,
-.ds-slate,
-.ds-wood,
 .ds-parch {
 	image-rendering: pixelated;
 }
@@ -101,16 +72,6 @@
 
 /* ---------- textures ---------- */
 
-.ds-slate {
-	background: url('./assets/tex-slate.png') var(--ds-slate);
-	background-size: 64px 64px;
-}
-
-.ds-wood {
-	background: url('./assets/tex-wood-dark.png') var(--ds-wood-dk);
-	background-size: 96px 96px;
-}
-
 .ds-parch {
 	background: url('./assets/tex-parchment.png') var(--ds-parch);
 	background-size: 128px 128px;
@@ -122,10 +83,6 @@
 .ds-frame-b {
 	border-image-source: url('./assets/frame-stone-b.png');
 	border-image-slice: 15;
-}
-
-.ds-panel-b {
-	border-image-source: url('./assets/frame-panel-b.png');
 }
 
 /* ---------- window shell ---------- */
@@ -184,10 +141,6 @@
 .ds-btn-dark {
 	border-image-source: url('./assets/btn-dark.png');
 	background: #15171e;
-}
-
-.ds-tab:hover {
-	filter: brightness(1.2);
 }
 
 /* ---------- chips, bars, stats ---------- */
@@ -286,11 +239,6 @@
 	--ds-rarity: transparent;
 }
 
-.ds-slot img {
-	width: 36px;
-	height: 36px;
-}
-
 .ds-slot[data-rarity] {
 	box-shadow:
 		inset 0 0 0 2px #05060a,
@@ -318,20 +266,6 @@
 	color: #ffb4a6;
 	background: rgba(8, 4, 4, 0.85);
 	border: 1px solid #8a3a30;
-	pointer-events: none;
-}
-
-.ds-slot-cap {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
-	padding: 1px 0;
-	font-size: 10px;
-	line-height: 12px;
-	text-align: center;
-	color: #cfe0ff;
-	background: rgba(6, 8, 14, 0.8);
 	pointer-events: none;
 }
 
@@ -545,11 +479,6 @@
 		inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-.ds-tip[data-rarity='common'] {
-	--ds-rim: var(--ds-r-common);
-	--ds-glow: transparent;
-}
-
 .ds-tip[data-rarity='uncommon'] {
 	--ds-rim: var(--ds-r-uncommon);
 	--ds-glow: rgba(85, 194, 100, 0.25);
@@ -563,16 +492,6 @@
 .ds-tip[data-rarity='epic'] {
 	--ds-rim: var(--ds-r-epic);
 	--ds-glow: rgba(176, 92, 245, 0.42);
-}
-
-.ds-tip[data-rarity='legendary'] {
-	--ds-rim: var(--ds-r-legendary);
-	--ds-glow: rgba(244, 169, 60, 0.45);
-}
-
-.ds-tip[data-rarity='unique'] {
-	--ds-rim: var(--ds-r-unique);
-	--ds-glow: rgba(239, 68, 68, 0.5);
 }
 
 .ds-tip-head {
@@ -684,19 +603,36 @@
 
 /* ---------- map hud pieces ---------- */
 
-.ds-slots-sm .ds-slot {
-	width: 52px;
-	height: 52px;
-}
-
-.ds-slots-sm .ds-slot img {
-	width: 32px;
-	height: 32px;
-}
-
-/* ===== New Chapter look: warm-black flat panels, hairline borders, the game's simple stone+gold frame, flanked titles, flat segmented tabs ===== */
+/* ===== Look of the revamp (base override): warm-black flat panels, hairline borders, the game's simple stone+gold frame, flanked titles, flat segmented tabs ===== */
 
 .ds-root {
+	--ds-font: var(--font-pixel, system-ui, sans-serif);
+	--ds-slate: #1a1e29;
+	--ds-slate-2: #232836;
+	--ds-slate-3: #2e3446;
+	--ds-ink: #0a0b10;
+	--ds-text: #e9e4d6;
+	--ds-text-dim: #9aa0b2;
+	--ds-gold: #e0a93a;
+	--ds-gold-lt: #f4d57e;
+	--ds-gold-dk: #8a5f16;
+	--ds-wood: #6b4423;
+	--ds-wood-dk: #3d2614;
+	--ds-parch: #f1e6c8;
+	--ds-parch-ink: #4a3516;
+	--ds-good: #62d48a;
+	--ds-bad: #e5604f;
+	--ds-mana: #3d7cf0;
+	--ds-r-common: #cfd2d8;
+	--ds-r-uncommon: #55c264;
+	--ds-r-rare: #5f86ff;
+	--ds-r-epic: #b05cf5;
+	--ds-r-legendary: #f4a93c;
+	--ds-r-unique: #ef4444;
+	--ds-img: url('./assets/tex-slate.png');
+	font-family: var(--ds-font);
+	color: var(--ds-text);
+	-webkit-font-smoothing: antialiased;
 	--ds-line: #3a2c1c;
 	--ds-line-dk: #2a2118;
 	--ds-accent: #e0a040;
@@ -872,29 +808,10 @@
 	margin: -2px;
 }
 
-.ds-panel.ds-panel-b {
-	border: 10px solid transparent;
-	border-image: url('./assets/frame-panel-b.png') 11 / 10px round;
-}
-
-/* ===== HUD: compact grouped chips, wood buttons, orange glowing badges ===== */
+/* ===== HUD, part 1: compact grouped chips, wood buttons, orange glowing badges ===== */
 
 .ds-chipgroup .ds-chip + .ds-chip {
 	border-left: 1px solid rgba(224, 169, 58, 0.18);
-}
-
-.ds-glyphbtn::before {
-	content: '';
-	position: absolute;
-	inset: 0;
-	z-index: -1;
-	background: url('./assets/tex-wood.png') 0 0 / 96px 48px;
-	image-rendering: pixelated;
-	filter: brightness(0.8);
-}
-
-.ds-glyphbtn:hover {
-	filter: brightness(1.2);
 }
 
 .ds-badge-float {
@@ -903,9 +820,9 @@
 	right: calc(50% - 40px);
 }
 
-/* ===== HUD round 2: black cut-out resource trays, small brown glyph buttons, stone dock ===== */
+/* ===== HUD, part 2: black cut-out resource trays, small brown glyph buttons, stone dock ===== */
 
-/* ===== HUD round 3: smaller trays with air around them, gold glyph buttons, tighter stone dock ===== */
+/* ===== HUD, part 3 (final sizes): smaller trays with air around them, gold glyph buttons, tighter stone dock ===== */
 
 .ds-topbar {
 	display: flex;
@@ -933,16 +850,6 @@
 	border-width: 1px;
 }
 
-.ds-chipgroup .ds-chip {
-	background: none;
-	border: 0;
-	box-shadow: none;
-	height: 22px;
-	padding: 0 6px 0 4px;
-	gap: 4px;
-	font-size: 12px;
-}
-
 .ds-chipgroup .ds-chip img {
 	width: 16px;
 	height: 16px;
@@ -968,6 +875,13 @@
 }
 
 .ds-glyphbtn::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	z-index: -1;
+	background: url('./assets/tex-wood.png') 0 0 / 96px 48px;
+	image-rendering: pixelated;
+	filter: brightness(0.8);
 	display: none;
 }
 
@@ -1023,12 +937,6 @@
 	border-color: #171a22;
 	box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
 	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.6);
-}
-
-.ds-topbar-right {
-	margin-left: auto;
-	display: flex;
-	gap: 6px;
 }
 
 .ds-hovertip {
@@ -1129,7 +1037,7 @@
 	font-size: 10px;
 }
 
-/* ===== Hero window round: smaller frame, fluid layout, container queries, tabs, XP bar, paper ledger, identity, pickers ===== */
+/* ===== Hero window: smaller frame, fluid layout, container queries, tabs, XP bar, paper ledger, identity, pickers ===== */
 
 .ds-window-title[data-draggable='true'] {
 	cursor: grab;
@@ -1169,11 +1077,6 @@
 }
 
 /* slot size is one variable so windows can scale their slots */
-
-.ds-slot {
-	width: var(--ds-slot-size, 56px);
-	height: var(--ds-slot-size, 56px);
-}
 
 .ds-slot img {
 	width: calc(var(--ds-slot-size, 56px) * 0.62);
@@ -1315,15 +1218,6 @@
 	overflow: hidden;
 }
 
-.ds-xp-fill::after {
-	content: '';
-	position: absolute;
-	inset: 0;
-	background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
-	background-size: 200% 100%;
-	animation: ds-xp-shine 3.2s linear infinite;
-}
-
 @keyframes ds-xp-shine {
 	from {
 		background-position: 200% 0;
@@ -1432,11 +1326,6 @@
 	max-width: calc(100vw - 32px);
 	max-height: calc(100vh - 32px);
 	position: relative;
-}
-
-.ds-modal .ds-frame {
-	max-height: calc(100vh - 32px);
-	overflow: auto;
 }
 
 .ds-modal-title::before,
@@ -1548,44 +1437,6 @@
 	flex-direction: column;
 	gap: 8px;
 	overflow: hidden;
-}
-
-.ds-doll-col {
-	grid-row: 1;
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-	gap: 4px;
-	min-height: 0;
-}
-
-.ds-doll-center {
-	grid-column: 2;
-	grid-row: 1;
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	min-height: 0;
-}
-
-.ds-doll-hands {
-	grid-column: 2;
-	grid-row: 2;
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
-
-.ds-doll-hands .ds-section-label {
-	width: 100%;
-	justify-content: center;
-}
-
-.ds-doll-hands .ds-section-label::before {
-	content: '';
-	flex: 1;
-	height: 1px;
-	background: linear-gradient(270deg, var(--ds-gold-dk), transparent);
 }
 
 .ds-bag-foot {
@@ -1769,15 +1620,13 @@
 	gap: 12px;
 }
 
-/* ===== container queries: slots scale with the window; columns stack when narrow ===== */
+/* ===== Hero window: container queries, slots scale with the window; columns stack when narrow ===== */
 
 @container ds-win (max-width: 900px) or (max-height: 620px) {
 	.ds-baggrid {
 		--ds-slot-size: 44px;
 	}
-	.ds-doll {
-		--ds-slot-size: 40px;
-	}
+
 	.ds-paper-cols {
 		grid-template-columns: 1fr;
 	}
@@ -1787,9 +1636,7 @@
 	.ds-baggrid {
 		--ds-slot-size: 32px;
 	}
-	.ds-doll {
-		--ds-slot-size: 32px;
-	}
+
 	.ds-hero {
 		grid-template-columns: 1fr;
 		height: auto;
@@ -1841,49 +1688,16 @@
 	min-height: 0;
 }
 
-@container ds-win (max-width: 720px) or (max-height: 520px) {
-	.ds-doll {
-		flex: none;
-		height: 340px;
-	}
-}
-
 /* Slots are always square, never squeezed by a short column */
 
 .ds-slot {
+	width: var(--ds-slot-size, 56px);
+	height: var(--ds-slot-size, 56px);
 	flex: none;
 	aspect-ratio: 1;
 }
 
 /* Short or narrow window: drop the silhouette and lay the equipment slots out in its place, two rows of squares, with the bars and hands below */
-
-@container ds-win (max-height: 780px) or (max-width: 720px) {
-	.ds-doll {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		flex: none;
-		height: auto;
-		gap: 6px;
-	}
-	.ds-doll-col {
-		order: 1;
-		flex-direction: row;
-		flex-wrap: wrap;
-		justify-content: center;
-		gap: 6px;
-	}
-	.ds-doll-center {
-		order: 2;
-		width: 100%;
-	}
-	.ds-doll-figure {
-		display: none;
-	}
-	.ds-doll-hands {
-		order: 3;
-	}
-}
 
 /* compact window header, small close button, silhouette keeps its proportions */
 
@@ -2222,36 +2036,6 @@
 
 /* closer equipment columns around a narrower figure; level box and XP bar aligned; readable XP texture; coloured stats */
 
-.ds-doll {
-	--ds-slot-size: 46px;
-	flex: 1;
-	min-height: 0;
-	display: grid;
-	grid-template-rows: minmax(0, 1fr) auto;
-	gap: 6px;
-	grid-template-columns: auto minmax(0, 210px) auto;
-	justify-content: center;
-	column-gap: 4px;
-}
-
-.ds-doll-figure {
-	flex: 1;
-	min-height: 90px;
-	display: grid;
-	border: 1px solid var(--ds-line);
-	background: radial-gradient(ellipse at 50% 40%, #221e2b, #0b090d 78%);
-}
-
-.ds-doll-figure svg {
-	display: block;
-	width: auto;
-	height: 100%;
-	max-width: 100%;
-	justify-self: center;
-	align-self: center;
-	max-height: 400px;
-}
-
 .ds-xp-fill {
 	position: absolute;
 	inset: 0 auto 0 0;
@@ -2260,6 +2044,12 @@
 }
 
 .ds-xp-fill::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(100deg, transparent 30%, rgba(255, 255, 255, 0.35) 50%, transparent 70%);
+	background-size: 200% 100%;
+	animation: ds-xp-shine 3.2s linear infinite;
 	opacity: 0.5;
 }
 
@@ -2359,27 +2149,10 @@
 
 /* slider component */
 
-.ds-slider {
-	display: flex;
-	align-items: center;
-	gap: 12px;
-}
-
 .ds-slider-out {
 	min-width: 72px;
 	text-align: right;
 	font-size: 14px;
-}
-
-.ds-range {
-	accent-color: #c58d28;
-	--p: 0%;
-	appearance: none;
-	-webkit-appearance: none;
-	flex: 1;
-	height: 16px;
-	background: transparent;
-	cursor: pointer;
 }
 
 .ds-range:disabled {
@@ -2572,12 +2345,6 @@
 	min-width: 0;
 }
 
-.ds-queue .ds-btn {
-	min-height: 28px;
-	padding: 0 10px;
-	font-size: 11px;
-}
-
 .ds-collect-glow {
 	animation: ds-collect 1.6s ease-in-out infinite;
 }
@@ -2595,13 +2362,6 @@
 .ds-eq-bars {
 	display: grid;
 	gap: 4px;
-}
-
-.ds-eqgroup .ds-section-label::before {
-	content: '';
-	flex: 1;
-	height: 1px;
-	background: linear-gradient(270deg, var(--ds-gold-dk), transparent);
 }
 
 .ds-eqgrid {
@@ -2667,18 +2427,6 @@
 	line-height: 1;
 	padding: 1px 5px 0;
 	font-variant-numeric: tabular-nums;
-}
-
-.ds-tab .ds-badge {
-	height: 16px;
-	min-width: 16px;
-	font-size: 10px;
-	box-shadow:
-		0 0 0 1px #3a1b06,
-		0 0 6px 1px rgba(255, 150, 40, 0.7);
-	align-self: center;
-	padding: 1px 4px 0;
-	margin-top: 0;
 }
 
 /* compact crafting queue */
@@ -2899,6 +2647,10 @@
 }
 
 .ds-eqgroup .ds-section-label::before {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: linear-gradient(270deg, var(--ds-gold-dk), transparent);
 	display: none;
 }
 
@@ -2991,12 +2743,6 @@
 .ds-merch-res > .ds-panel {
 	min-height: 0;
 	overflow: auto;
-}
-
-.ds-ticket {
-	display: flex;
-	flex-direction: column;
-	gap: 10px;
 }
 
 .ds-stock .ds-capi {
@@ -3299,7 +3045,7 @@
 	}
 }
 
-/* ===== tooltips: grade-coloured radial wash from the top-left, animated shiny border for legendary ===== */
+/* ===== Item tooltips: grade-coloured radial wash from the top-left, animated shiny border for legendary ===== */
 
 @property --ds-ang {
 	syntax: '<angle>';
@@ -3314,10 +3060,14 @@
 }
 
 .ds-tip[data-rarity='common'] {
+	--ds-rim: var(--ds-r-common);
+	--ds-glow: transparent;
 	background: radial-gradient(circle at 0 0, rgba(255, 255, 255, 0.09), transparent 60%), linear-gradient(#10131c, #0a0c12);
 }
 
 .ds-tip[data-rarity='legendary'] {
+	--ds-rim: var(--ds-r-legendary);
+	--ds-glow: rgba(244, 169, 60, 0.45);
 	border-color: transparent;
 	overflow: hidden;
 	background: radial-gradient(circle at 0 0, rgba(244, 169, 60, 0.36), transparent 66%), linear-gradient(#14110d, #0a0907);
@@ -3410,6 +3160,8 @@
 /* ===== Unique: the rarest tier, red. The same shiny ring and sweep as legendary in red, and a flame wrap (see .ds-tip-flames) ===== */
 
 .ds-tip[data-rarity='unique'] {
+	--ds-rim: var(--ds-r-unique);
+	--ds-glow: rgba(239, 68, 68, 0.5);
 	border-color: transparent;
 	overflow: hidden;
 	background: radial-gradient(circle at 0 0, rgba(239, 68, 68, 0.34), transparent 66%), linear-gradient(#170d0d, #0a0707);
@@ -3891,16 +3643,6 @@
 	opacity: 0.6;
 }
 
-.ds-mon-lv {
-	position: absolute;
-	top: 0;
-	left: 0;
-	padding: 1px 6px;
-	font-size: 10px;
-	background: #5a22a8;
-	color: #fff;
-}
-
 .ds-mon-ready {
 	position: absolute;
 	top: 4px;
@@ -3910,15 +3652,6 @@
 	border-radius: 50%;
 	background: radial-gradient(circle at 35% 30%, #ffd27a, #ff9a2e 55%, #e0650f);
 	box-shadow: 0 0 6px 1px rgba(255, 150, 40, 0.8);
-}
-
-.ds-mon-art {
-	display: grid;
-	place-items: center;
-	width: 72px;
-	height: 72px;
-	background: radial-gradient(circle, #1a1c28, #0a0b10);
-	box-shadow: inset 0 0 0 1px var(--ds-line);
 }
 
 .ds-mon-art img {
@@ -4002,11 +3735,6 @@
 	filter: brightness(1.25);
 }
 
-.ds-chip > span:first-of-type:not(.ds-chip-rate) {
-	min-width: 3.4em;
-	font-variant-numeric: tabular-nums;
-}
-
 .ds-iconbtn[data-active='true'] img,
 .ds-iconbtn[data-active='true'] .ds-iconbtn-art {
 	filter: drop-shadow(0 0 6px rgba(244, 213, 126, 0.9));
@@ -4062,6 +3790,8 @@
 }
 
 .ds-topbar-right {
+	display: flex;
+	gap: 6px;
 	position: absolute;
 	right: 14px;
 	top: 0;
@@ -4415,12 +4145,6 @@ button.ds-income-head:hover {
 	width: 100%;
 }
 
-.ds-queue[data-stacked='true'] .ds-queue-head {
-	flex-direction: column;
-	align-items: stretch;
-	gap: 4px;
-}
-
 .ds-queue[data-stacked='true'] .ds-queue-row {
 	grid-template-columns: 18px 1fr 52px 70px;
 	grid-template-areas:
@@ -4456,12 +4180,10 @@ button.ds-income-head:hover {
 	background: #4a4e5a;
 }
 
-.ds-hero .ds-craft-list {
-	width: 360px;
-	--ds-slot-size: 48px;
-}
-
 .ds-queue[data-stacked='true'] .ds-queue-head {
+	flex-direction: column;
+	align-items: stretch;
+	gap: 4px;
 	margin-bottom: 8px;
 }
 
@@ -4529,7 +4251,7 @@ button.ds-income-head:hover {
 	margin: 30px 6px 6px;
 }
 
-/* ===== MVP refresh of the Gem shop and the Deeds list: rows on the dark inset, the same look as the new windows ===== */
+/* ===== Gem shop and Deeds list: rows on the dark inset, the same look as the new windows ===== */
 .ds-listrow {
 	display: flex;
 	flex-direction: column;
@@ -4581,11 +4303,17 @@ button.ds-income-head:hover {
 }
 
 .ds-chipgroup .ds-chip {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	height: 22px;
+	font-size: 12px;
 	padding: 0 5px 0 3px;
 	gap: 3px;
 }
 
 .ds-chip > span:first-of-type:not(.ds-chip-rate) {
+	font-variant-numeric: tabular-nums;
 	min-width: 2.6em;
 }
 
@@ -4893,11 +4621,19 @@ button.ds-income-head:hover {
 
 /* crafting list: slightly bigger icons */
 .ds-hero .ds-craft-list {
+	width: 360px;
 	--ds-slot-size: 52px;
 }
 
 /* the number in a tab badge sits in the middle of the circle */
 .ds-tab .ds-badge {
+	height: 16px;
+	font-size: 10px;
+	box-shadow:
+		0 0 0 1px #3a1b06,
+		0 0 6px 1px rgba(255, 150, 40, 0.7);
+	align-self: center;
+	margin-top: 0;
 	padding: 0;
 	min-width: 16px;
 	line-height: 16px;
@@ -4915,6 +4651,8 @@ button.ds-income-head:hover {
 
 /* the merchant trade ticket: more air between its blocks */
 .ds-ticket {
+	display: flex;
+	flex-direction: column;
 	gap: 20px;
 }
 
@@ -4940,29 +4678,32 @@ button.ds-income-head:hover {
 
 /* sliders never push their row wider than the window */
 .ds-slider {
+	display: flex;
+	align-items: center;
+	gap: 12px;
 	min-width: 0;
 }
 
 .ds-range {
+	accent-color: #c58d28;
+	--p: 0%;
+	appearance: none;
+	-webkit-appearance: none;
+	flex: 1;
+	height: 16px;
+	background: transparent;
+	cursor: pointer;
 	min-width: 0;
 	width: 100%;
 }
 
 .ds-modal .ds-frame {
+	max-height: calc(100vh - 32px);
+	overflow: auto;
 	overflow-x: hidden;
 }
 
 /* an action bar pinned to the bottom of a scrolling window body */
-.ds-sticky-foot {
-	position: sticky;
-	bottom: 0;
-	z-index: 2;
-	display: flex;
-	justify-content: flex-end;
-	margin: 8px -4px -4px;
-	padding: 10px 8px;
-	background: linear-gradient(transparent, #0a0c12 40%);
-}
 
 /* a slider whose value is shown elsewhere */
 .ds-slider-bare .ds-slider-out {
@@ -5386,11 +5127,6 @@ button.ds-income-head:hover {
 	text-overflow: ellipsis;
 }
 
-.ds-rank-nobadge {
-	width: 48px;
-	height: 48px;
-}
-
 /* the trophy column at the right end of the row (empty after the third place) */
 .ds-rank-podium {
 	display: flex;
@@ -5516,15 +5252,6 @@ button.ds-income-head:hover {
 	gap: 4px;
 }
 
-.ds-bst-family {
-	font: inherit;
-	font-size: 12px;
-	color: var(--ds-text);
-	background: rgba(0, 0, 0, 0.45);
-	border: 1px solid var(--ds-line-dk);
-	padding: 3px 6px;
-}
-
 .ds-bst-body {
 	flex: 1;
 	min-height: 0;
@@ -5538,40 +5265,6 @@ button.ds-income-head:hover {
 	overflow: auto;
 }
 
-.ds-bst-biomes {
-	flex: none;
-	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
-	gap: 6px;
-	max-height: 168px;
-	overflow: auto;
-}
-
-.ds-bst-biome {
-	display: flex;
-	flex-direction: column;
-	gap: 4px;
-	padding: 6px 8px;
-	background: rgba(0, 0, 0, 0.4);
-	border: 1px solid var(--ds-line-dk);
-}
-
-.ds-bst-biome[data-ready='true'] {
-	border-color: var(--ds-gold);
-}
-
-.ds-bst-biome-head {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 6px;
-}
-
-.ds-bst-biome-text {
-	font-size: 11px;
-	line-height: 1.3;
-}
-
 .ds-lv-row {
 	display: flex;
 	justify-content: space-between;
@@ -5582,17 +5275,6 @@ button.ds-income-head:hover {
 .ds-lv-ctl {
 	display: inline-flex;
 	gap: 3px;
-}
-
-.ds-lv-ctl button {
-	width: 22px;
-	height: 20px;
-	font: inherit;
-	line-height: 1;
-	cursor: pointer;
-	color: var(--ds-text);
-	background: rgba(0, 0, 0, 0.5);
-	border: 1px solid var(--ds-line-dk);
 }
 
 .ds-lv-ctl button:disabled {
@@ -5662,10 +5344,23 @@ button.ds-income-head:hover {
 }
 
 .ds-mon-lv {
+	position: absolute;
+	top: 0;
+	left: 0;
+	padding: 1px 6px;
+	font-size: 10px;
+	background: #5a22a8;
+	color: #fff;
 	z-index: 2;
 }
 
 .ds-mon-art {
+	display: grid;
+	place-items: center;
+	width: 72px;
+	height: 72px;
+	background: radial-gradient(circle, #1a1c28, #0a0b10);
+	box-shadow: inset 0 0 0 1px var(--ds-line);
 	position: relative;
 	z-index: 1;
 }
@@ -5688,6 +5383,12 @@ button.ds-income-head:hover {
 }
 
 .ds-lv-ctl button {
+	width: 22px;
+	height: 20px;
+	font: inherit;
+	line-height: 1;
+	cursor: pointer;
+	border: 1px solid var(--ds-line-dk);
 	color: #fff;
 	background: linear-gradient(#8a45e0, #5a22a8);
 	border-color: #3a1678;
@@ -5818,19 +5519,6 @@ button.ds-income-head:hover {
 	background: color-mix(in srgb, var(--ds-gold) 14%, transparent);
 }
 
-.ds-bst-overlay {
-	position: absolute;
-	inset: 0;
-	z-index: 20;
-	display: flex;
-	flex-direction: column;
-	gap: 8px;
-	padding: 10px;
-	overflow: auto;
-	background: #0a0705;
-	border: 1px solid #1f7a2a;
-}
-
 .ds-bst-goals-head {
 	display: flex;
 	flex-direction: column;
@@ -5840,13 +5528,6 @@ button.ds-income-head:hover {
 .ds-bst-goals-head b {
 	font-size: 16px;
 	color: #7ad07a;
-}
-
-.ds-bst-goals {
-	display: flex;
-	flex-direction: column;
-	gap: 6px;
-	min-width: max-content;
 }
 
 .ds-bst-goal-row {
@@ -5864,12 +5545,6 @@ button.ds-income-head:hover {
 	padding: 6px 10px;
 	background: rgba(0, 0, 0, 0.4);
 	border: 1px solid var(--ds-line-dk);
-}
-
-.ds-bst-goal-name {
-	flex-direction: column;
-	align-items: flex-start;
-	gap: 4px;
 }
 
 .ds-bst-goal-name b {
@@ -5924,10 +5599,23 @@ button.ds-income-head:hover {
 
 /* Biome goals: the list scrolls under a fixed heading, nothing wraps, each biome has its picture */
 .ds-bst-overlay {
+	position: absolute;
+	inset: 0;
+	z-index: 20;
+	display: flex;
+	flex-direction: column;
+	gap: 8px;
+	padding: 10px;
+	background: #0a0705;
+	border: 1px solid #1f7a2a;
 	overflow: hidden;
 }
 
 .ds-bst-goals {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: max-content;
 	flex: 1;
 	min-height: 0;
 	overflow: auto;
@@ -5939,23 +5627,6 @@ button.ds-income-head:hover {
 	align-items: center;
 	gap: 10px;
 	white-space: nowrap;
-}
-
-.ds-bst-biome-art {
-	flex: none;
-	display: grid;
-	place-items: center;
-	width: 44px;
-	height: 44px;
-	border: 1px solid var(--ds-line);
-	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.5);
-}
-
-.ds-bst-biome-art img {
-	width: 44px;
-	height: 44px;
-	image-rendering: pixelated;
-	object-fit: cover;
 }
 
 .ds-bst-goal-label {
@@ -6148,10 +5819,6 @@ button.ds-income-head:hover {
 .ds-dh-tier-main small {
 	font-size: 11px;
 	opacity: 0.85;
-}
-
-.ds-dh-unlock {
-	color: #2c5d9a;
 }
 
 .ds-dh-tier em,

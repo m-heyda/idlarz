@@ -12,7 +12,6 @@ export const FARM_PRODUCT_KEYS = FARM_KEYS.filter((key): key is Exclude<FarmKey,
  *
  * @category Economy/Farm
  * @order 1
- * @table farm-animals
  */
 export const ANIMALS: Animal[] = [
 	{
@@ -76,7 +75,6 @@ export const FARM_PEN = { outputPerLevel: 0.02, capPerLevel: 4 };
  *
  * @category Economy/Farm
  * @order 3
- * @table farm-upgrades
  */
 export const FARM_UPGRADES = {
 	feed: {

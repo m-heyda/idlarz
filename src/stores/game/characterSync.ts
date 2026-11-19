@@ -1,5 +1,5 @@
 // characterSync.ts
-// The attribute points are the server's (ledger `attrs`, docs/reference/saves-and-server.md): the browser previews a point at once (`addStatPoint`) and asks the server for it here.
+// The attribute points are the server's (ledger `attrs`, @category Saves & Server): the browser previews a point at once (`addStatPoint`) and asks the server for it here.
 
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { maxHp, maxMana } from '@/lib/combat';

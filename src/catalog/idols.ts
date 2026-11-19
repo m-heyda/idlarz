@@ -36,7 +36,6 @@ export interface IdolDef {
  *
  * @category Economy/Buildings
  * @order 6
- * @table idol-catalog
  */
 export const IDOLS: readonly IdolDef[] = [
 	{
