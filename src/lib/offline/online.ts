@@ -395,7 +395,15 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 		};
 		const result =
 			'recipeId' in request
-				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct, craftLimit('craftQueueSlots', { prestige: prestigeOfCore(ctx.stored.core) }))
+				? applyCraft(
+						ledger.inv!,
+						ledger.craft,
+						request.recipeId,
+						request.count,
+						nowMs,
+						env.xpPct,
+						craftLimit('craftQueueSlots', { prestige: prestigeOfCore(ctx.stored.core) }),
+					)
 				: request.action === 'claim'
 					? request.slot === 'all'
 						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)

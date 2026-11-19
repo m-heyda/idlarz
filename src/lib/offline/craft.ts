@@ -67,7 +67,15 @@ const takeComponents = (recipe: Recipe, count: number, stockIn: Record<string, n
  * Does or queues `count` crafts of `recipeId` at `nowMs`. Neither input is touched; the new ones are returned.
  * A timed recipe becomes a queue entry (needs a free slot); an instant one is done as in v0.0.
  */
-export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, count: number, nowMs: number, xpPct = 0, queueSlots = craftLimit('craftQueueSlots')): CraftResult => {
+export const applyCraft = (
+	inv: Inventory,
+	craft: CraftState,
+	recipeId: string,
+	count: number,
+	nowMs: number,
+	xpPct = 0,
+	queueSlots = craftLimit('craftQueueSlots'),
+): CraftResult => {
 	const recipe = recipeOf(recipeId);
 	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
 	if (!recipe) return refuse('unknown_recipe', inv, craft);
