@@ -61,5 +61,5 @@ __pycache__/
 # storybook
 /storybook-static
 
-# local sim results (npm run sim:local): never committed, never read by CI
+# local sim results (npm run pace:local): never committed, never read by CI
 /local-sims/

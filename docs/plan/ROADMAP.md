@@ -199,7 +199,7 @@ The five T2 materials of the rebirth biomes (Hardwood, Cloth, Honey, Ichor, War 
 
 ## Balance backlog (each needs approval before changing)
 
-Measure with `npm run sim -- --seeds=3`, never from numbers copied into prose: [generated/sim-milestones.md](../generated/sim-milestones.md). Keep the targets of [pacing-targets](../reference/pacing.md). How the pacing guard works: [ops/commands.md](../reference/ops.md).
+Measure with `npm run pace -- --seeds=3`, never from numbers copied into prose: [generated/pace-milestones.md](../generated/pace-milestones.md). Keep the targets of [pacing-targets](../reference/pacing.md). How the pacing guard works: [ops/commands.md](../reference/ops.md).
 
 | # | Topic | Observation | Idea |
 | --- | --- | --- | --- |

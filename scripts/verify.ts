@@ -3,7 +3,7 @@
  *
  * CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it skips it when the inputs hash says it was done (see `scripts/gen-inputs.ts`). This script does
  * it: formatting, types, lint, the unit tests and the reference docs check run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
- * `docs/generated` in parallel too (`sim:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
+ * `docs/generated` in parallel too (`pace:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
  * refused while something would fail in CI. When it regenerated files it stops with "commit them" (a hook cannot commit for you); commit and push again.
  *
  *   npm run verify                everything above; a tree that already passed (same HEAD tree, clean) is skipped
@@ -83,7 +83,7 @@ export const checkSteps = (withBuild: boolean): Step[] => [
 /** The regeneration of docs/generated: the full sim on all cores next to the three groups of report generators. */
 export const generateSteps = (): Step[] => [
 	// the sim takes the cores the three single-threaded report groups leave over (all of them at once made every step about twice as slow)
-	{ name: 'sim:parallel', command: `npm run sim:parallel -- --jobs=${Math.max(1, cpus().length - 4)}`, args: [], shell: true },
+	{ name: 'pace:parallel', command: `npm run pace:parallel -- --jobs=${Math.max(1, cpus().length - 4)}`, args: [], shell: true },
 	{ name: 'docs:gen:rest:quick', command: 'npm run docs:gen:rest:quick', args: [], shell: true },
 	{ name: 'docs:gen:rest:fights', command: 'npm run docs:gen:rest:fights', args: [], shell: true },
 	{ name: 'docs:gen:rest:loot', command: 'npm run docs:gen:rest:loot', args: [], shell: true },

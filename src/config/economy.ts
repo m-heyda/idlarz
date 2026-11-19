@@ -69,7 +69,7 @@ export const XP_TILE = {
 
 /**
  * Tile cost curve: exponential growth that is steepest early (cheap first tiles), gentler through the mid game and
- * gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/sim.ts
+ * gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/pace.ts
  * so the first ~100 tiles come within the first day, 200-300 within 2-3 days (docs/reference/pacing.md).
  */
 export const SCALING_CONFIG = {
