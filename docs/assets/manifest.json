@@ -37866,5 +37866,35 @@
 			32,
 			32
 		]
+	},
+	{
+		"usedBy": [
+			"IDL-345: world boss art (not built)"
+		],
+		"name": "reuse_world_boss_pyre_reapers",
+		"category": "unsorted",
+		"subcategory": "world_boss",
+		"src": "/pixel/__reuse/world_boss/pyre_reapers.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			234,
+			234
+		]
+	},
+	{
+		"usedBy": [
+			"IDL-345: world boss art (not built)"
+		],
+		"name": "reuse_world_boss_void_lord",
+		"category": "unsorted",
+		"subcategory": "world_boss",
+		"src": "/pixel/__reuse/world_boss/void_lord.png",
+		"status": "planned",
+		"source": "public/pixel/__reuse",
+		"size": [
+			248,
+			248
+		]
 	}
 ]

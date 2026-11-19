@@ -178,5 +178,13 @@
 	"/pixel/__reuse/stones_32/layer_rock_1.png": {
 		"status": "used",
 		"usedBy": ["comp_stone_block"]
+	},
+	"/pixel/__reuse/world_boss/pyre_reapers.png": {
+		"status": "planned",
+		"usedBy": ["IDL-345: world boss art (not built)"]
+	},
+	"/pixel/__reuse/world_boss/void_lord.png": {
+		"status": "planned",
+		"usedBy": ["IDL-345: world boss art (not built)"]
 	}
 }
