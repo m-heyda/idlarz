@@ -63,7 +63,6 @@ export const REBIRTH = {
  *
  * @category Progression/Ember shop
  * @order 1
- * @table ember-shop
  */
 export const EMBER_UPGRADES = {
 	thrift: {

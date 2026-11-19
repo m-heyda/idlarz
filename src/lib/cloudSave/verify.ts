@@ -92,7 +92,6 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  *
  * @category Saves & Server/Accepting a save
  * @order 2
- * @table flag-policy
  */
 export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	baseline_rich: 'flag', // a first save holds a whole history (an imported or older game): nothing to compare with, so it cannot be refused

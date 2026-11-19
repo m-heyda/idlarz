@@ -9,7 +9,7 @@ import { isPlaced } from '@/lib/offline/placement';
 import { bossOf, monsterTypeOf, normalsOf, type MonsterTicket } from '@/lib/offline/tickets';
 import type { MonsterType } from '@/types/game';
 
-// SERVER ONLY. Who the hero fights next: the monsters standing on the map, auto-battle's pick, the battle queue (docs/reference/combat.md) and
+// SERVER ONLY. Who the hero fights next: the monsters standing on the map, auto-battle's pick, the battle queue (@category Combat) and
 // the waiting between fights.
 
 type Target = { ticket: MonsterTicket; type: MonsterType };

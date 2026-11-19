@@ -336,7 +336,6 @@ const gearInputs = (grade: CraftGrade, slot: CraftSlot): RecipeInput[] => {
  *
  * @category Economy/Crafting
  * @order 2
- * @table craft-gear-recipes
  */
 export const GEAR_RECIPES: Recipe[] = CRAFT_GRADES.flatMap((grade) =>
 	CRAFT_SLOTS.map(

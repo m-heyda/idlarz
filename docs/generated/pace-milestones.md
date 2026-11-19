@@ -343,9 +343,9 @@ Minutes the income needs to cover what is still missing of each part of the next
 | hardcore-rebirth6-rocks | 300 | 13 | 13 | 16 | 23 | 0 | 5 |
 | hardcore-rebirth6-rocks | 400 | 31 | 26 | 27 | 33 | 0 | 3 |
 
-## Magnitude targets (docs/reference/pacing.md, IDL-128)
+## Magnitude targets (@category Pacing, IDL-128)
 
-Measured with the real store at the checkpoints of docs/reference/pacing.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.
+Measured with the real store at the checkpoints of @category Pacing; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.
 
 | profile | checkpoint | measured | band | status |
 | --- | --- | --- | --- | --- |

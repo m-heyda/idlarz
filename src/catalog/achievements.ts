@@ -116,7 +116,6 @@ export interface AchievementDef {
  * @title Achievements
  * @category Progression/Achievements
  * @order 0
- * @table achievement-list
  * @see settleAchievements, achievementsDue
  */
 export const ACHIEVEMENTS: readonly AchievementDef[] = [
