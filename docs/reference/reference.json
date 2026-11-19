@@ -3714,6 +3714,100 @@
   ]
  },
  {
+  "id": "the-bot-s-spending",
+  "name": "The bot's spending",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace/policies.ts",
+  "line": 1,
+  "summary": "What the bots buy, one function per spending decision (the pace sim, `scripts/pace/run.ts`). Each takes the `Bot` (the run's state and the real store) and calls the store's own actions, exactly as a button would: the Ember shop (`spendEmbers`, a plan per profile), the merchant's gold upgrades, the Gem shop (Builder #2), the castle, the buildings, click power, animals, farm upgrades, tiles and the sale of what is left over. Rocks and fights are in `run.ts` because they take the clicks and the clock.",
+  "see": []
+ },
+ {
+  "id": "the-pace-profiles",
+  "name": "The pace profiles",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace/profiles.ts",
+  "line": 1,
+  "summary": "The player profiles of the pace sim, as plain data. A profile says **who plays** (clicks per second, the hours of the day, how it spends) and **what it buys** (the Ember plan, the merchant's gold upgrades, the Gem shop); `scripts/pace/run.ts` turns it into a run of the real store. A profile with `localOnly` is not in the default run, `--list`, the CI shards, the merge or `docs/generated`.",
+  "see": []
+ },
+ {
+  "id": "pacing-targets",
+  "name": "Pacing targets",
+  "kind": "topic",
+  "category": "Pacing/Targets",
+  "file": "scripts/pace/report.ts",
+  "line": 1,
+  "summary": "What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/pace-milestones.md` (`npm run pace`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`. Open balance questions are in `docs/plan/ROADMAP.md`.",
+  "see": [
+   "MAGNITUDE_BANDS",
+   "CASTLE_UPGRADE"
+  ]
+ },
+ {
+  "id": "magnitude-bands",
+  "name": "MAGNITUDE_BANDS",
+  "symbol": "MAGNITUDE_BANDS",
+  "kind": "const",
+  "category": "Pacing/Magnitude targets",
+  "file": "scripts/pace/report.ts",
+  "line": 131,
+  "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
+  "see": []
+ },
+ {
+  "id": "the-pace-sim-engine",
+  "name": "The pace sim engine",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace/run.ts",
+  "line": 1,
+  "summary": "The pace sim's engine (`scripts/pace/run.ts`): a bot drives the **real store** (the same actions the buttons call) with a seeded RNG and a game clock it moves itself. What makes it fast:",
+  "see": []
+ },
+ {
+  "id": "the-class-picker-acceptance",
+  "name": "The class picker acceptance",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace-classes.ts",
+  "line": 1,
+  "summary": "`npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.",
+  "see": []
+ },
+ {
+  "id": "the-local-sim-runner",
+  "name": "The local sim runner",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace-local.ts",
+  "line": 1,
+  "summary": "`npm run pace:local`: the long and advanced sims, on your machine only (IDL-276). It runs the local-only profiles of `scripts/pace.ts` (`maximized`, `hardcore-rebirth6-x20`, `hardcore-rebirth8-x10` and the `max-*` optimisers), one child process per profile on all your cores (at most `--jobs=N`, default the cores minus one, at most 6; each needs about 1 GB), and puts their tables into **`local-sims/pace-local.md`**. That folder is git-ignored: nothing here is committed, read by CI, or compared by the pacing guard, and `docs/generated` is never touched (every child runs with `--no-write`). CI does not run these profiles at all, so a long sim never slows a pull request. A full run takes about three minutes on 8 cores (one seed).",
+  "see": []
+ },
+ {
+  "id": "the-parallel-sim-runner",
+  "name": "The parallel sim runner",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace-parallel.ts",
+  "line": 1,
+  "summary": "`npm run pace:parallel`: the full sim on all your cores. `scripts/pace.ts` plays one profile after another on one core; CI already runs the profiles as shards (`--dump`) and puts them together (`--merge`), whose result is byte-identical to one full run. This script does the same on one machine: one child process per profile (at most `--jobs=N`, default the number of cores minus one), then the merge. The wall time drops from the sum of all profiles to about the slowest one (`hardcore-rebirth6-x10`).",
+  "see": []
+ },
+ {
+  "id": "the-pace-sim",
+  "name": "The pace sim",
+  "kind": "topic",
+  "category": "Pacing/The sim",
+  "file": "scripts/pace.ts",
+  "line": 1,
+  "summary": "The pace sim (`npm run pace`): bots play the **real game store** with a seeded RNG and report when they reach each milestone (tiles, castle levels, click power, levels, the first possible rebirth, every rebirth and what it paid). The engine is `scripts/pace/run.ts`, the profiles `scripts/pace/profiles.ts`, what they buy `scripts/pace/policies.ts`, the tables `scripts/pace/report.ts`.",
+  "see": []
+ },
+ {
   "id": "the-pacing-guard-and-ci-sharding",
   "name": "The pacing guard and CI sharding",
   "kind": "topic",
@@ -3759,70 +3853,6 @@
    "applySeed",
    "judgeAccount"
   ]
- },
- {
-  "id": "the-class-picker-acceptance",
-  "name": "The class picker acceptance",
-  "kind": "topic",
-  "category": "Pacing/The sim",
-  "file": "scripts/sim-classes.ts",
-  "line": 1,
-  "summary": "`npm run sim:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.",
-  "see": []
- },
- {
-  "id": "the-local-sim-runner",
-  "name": "The local sim runner",
-  "kind": "topic",
-  "category": "Pacing/The sim",
-  "file": "scripts/sim-local.ts",
-  "line": 1,
-  "summary": "`npm run sim:local`: the long and advanced sims, on your machine only (IDL-276). It runs the local-only profiles of `scripts/sim.ts` (`hardcore-rebirth6-x20`, `hardcore-rebirth8-x10` and the `max-*` optimisers), one child process per profile on all your cores (at most `--jobs=N`, default the cores minus one, at most 6; each needs about 1 GB), and puts their tables into **`local-sims/sim-local.md`**. That folder is git-ignored: nothing here is committed, read by CI, or compared by the pacing guard, and `docs/generated` is never touched (every child runs with `--no-write`). CI does not run these profiles at all, so a long sim never slows a pull request. A full run takes about three minutes on 8 cores (one seed).",
-  "see": []
- },
- {
-  "id": "the-parallel-sim-runner",
-  "name": "The parallel sim runner",
-  "kind": "topic",
-  "category": "Pacing/The sim",
-  "file": "scripts/sim-parallel.ts",
-  "line": 1,
-  "summary": "`npm run sim:parallel`: the full sim on all your cores. `scripts/sim.ts` plays one profile after another on one core; CI already runs the profiles as shards (`--dump`) and puts them together (`--merge`), whose result is byte-identical to one full run. This script does the same on one machine: one child process per profile (at most `--jobs=N`, default the number of cores minus one), then the merge. The wall time drops from the sum of all profiles to about the slowest one (`hardcore-rebirth6-x10`).",
-  "see": []
- },
- {
-  "id": "the-bot-simulation",
-  "name": "The bot simulation",
-  "kind": "topic",
-  "category": "Pacing/The sim",
-  "file": "scripts/sim.ts",
-  "line": 1,
-  "summary": "The sim (`scripts/sim.ts`): a bot drives the **real store** with a seeded RNG and a mocked clock. Profiles: `idle`, `casual`, `hardcore`, `autoclicker` (24 h of perfect play, an upper bound), `human` (one click a second, plays 8-9, 12-13 and 18-23, a visit once an hour, at most 8 tiles per visit, never sells surplus; calibrated to about 185 tiles after 3.3 days like the owner's real run), `human-rebirth6` / `-rebirth8`, `hardcore-rebirth6` / `-rebirth10` and `hardcore-rebirth6-x10` (ten runs, used to fit the level anchors). \"finished\" in the milestone table = castle 6 + best click power + the Rebirth territory.",
-  "see": []
- },
- {
-  "id": "pacing-targets",
-  "name": "Pacing targets",
-  "kind": "topic",
-  "category": "Pacing/Targets",
-  "file": "scripts/sim.ts",
-  "line": 21,
-  "summary": "What pace the economy is tuned for, why, and how to check it. The measured numbers are **not** copied here: they live in `docs/generated/sim-milestones.md` (`npm run sim`, refreshed by `npm run docs:gen`) and `docs/generated/balance-tables.md`. Open balance questions are in `docs/plan/ROADMAP.md`.",
-  "see": [
-   "MAGNITUDE_BANDS",
-   "CASTLE_UPGRADE"
-  ]
- },
- {
-  "id": "magnitude-bands",
-  "name": "MAGNITUDE_BANDS",
-  "symbol": "MAGNITUDE_BANDS",
-  "kind": "const",
-  "category": "Pacing/Magnitude targets",
-  "file": "scripts/sim.ts",
-  "line": 986,
-  "summary": "The bands of the magnitude targets (IDL-128): the table below is their one copy, the sim prints them next to the measured value.",
-  "see": []
  },
  {
   "id": "the-local-verify-script-and-the-pre-push-hook",

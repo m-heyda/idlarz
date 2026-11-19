@@ -45,7 +45,7 @@ export const BUILDING_RULES = {
  * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
  * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).
  * - **Levels are the account's, the building is the run's**: an Idol's level is kept across rebirths (the server remembers it in the ledger, `legacy.idols`) and the map's building is gone; placing it again on any tile of its biome is free and it stands at its remembered level at once.
- *   An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs `t3PerLevel` x 2^(level - 3) of the biome's T3 extract (where the biome has one): 10,000 / 20,000 / 40,000 for levels 3 / 4 / 5 (an Extractor makes 0.3 a second at level 1, so the first one is hours of work, and the Extractors' material is for crafting too).
+ *   An upgrade is bought during a run: resources, a timer on a builder, and the castle gate (`min(5, castle level)`); from level 3 it also needs the biome's T3 extract (where the biome has one): `t3Costs` for levels 3 / 4 / 5 (10,000 / 100,000 / 500,000), then x`t3Growth` (5) per level above 5 (2.5 M, 12.5 M, 62.5 M, ...), so raising the cap past 5 means real Extractor investment (an Extractor makes 0.3 a second at level 1, and the Extractors' material is for crafting too).
  *   **Timers** (`durationsSec`, indexed by the level reached): 30 min, 1 h, 4 h, 12 h, 24 h for levels 1 to 5, then x1.35 per level up to 7 days. Even the **first** build of an Idol takes one (a builder works on it and the tile shows it under construction); placing an Idol the account has already learned stays instant, at the level it remembers.
  *   The base level cap is `idolMaxLevel` (5), raised later by the Ember shop's Idol Mastery; levels above it keep scaling without a limit (price, extract and timer all grow exponentially).
  * - `floorTiles`: the **price floor**. Buying Idol level `L` is priced as if the player owned at least `floorTiles[L - 1]` tiles (20, 40, 60, 80, 100), so a rebirth (9 tiles) does not make levels cheap again. Above the table the floor grows `floorStepTiles` (40) per level; the price tile count never exceeds `priceTileCap`.
@@ -59,7 +59,8 @@ export const IDOL_RULES = {
 	perLevel: 2,
 	luckPerLevel: 4,
 	buildTimeCap: 60,
-	t3PerLevel: 10000,
+	t3Costs: [10000, 100000, 500000],
+	t3Growth: 5,
 	floorTiles: [20, 40, 60, 80, 100],
 	floorStepTiles: 40,
 	durationsSec: [1800, 3600, 14400, 43200, 86400],

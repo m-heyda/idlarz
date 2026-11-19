@@ -31,7 +31,7 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
 
 // The character level curve (xpToNextLevel / calculateLevel in utils/game/character.ts). Level and XP carry over a rebirth, so the curve is
 // paced over rebirths, not days, and is written down as ANCHORS: the total XP at which a level is reached, measured with the sim bot
-// (npm run sim hardcore-rebirth6-x10 logs lifetime XP and level; with the cheaper castle the hardcore bot rebirths at ~day 4, 7, 10, 12.5, 15 ... 25):
+// (npm run pace hardcore-rebirth6-x10 logs lifetime XP and level; with the cheaper castle the hardcore bot rebirths at ~day 4, 7, 10, 12.5, 15 ... 25):
 //   level 10 after ~4-5 h (XP 1.4e5), level ~30 around day 2 (1e8), the soft cap (80) around the 3rd rebirth (3e9),
 //   level 90 around the 5th (6.5e9) and the maximum (100) around the 10th (1.85e10).
 // Between two anchors the step to the next level grows by a constant factor, chosen so the total hits the anchor and the steps never

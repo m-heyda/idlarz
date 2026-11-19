@@ -1,16 +1,16 @@
 /**
- * `npm run sim:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline
+ * `npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline
  * the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule
  * (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.
  *
- *   npm run sim:classes                       idle and casual, every class
- *   npm run sim:classes -- human --maxdays=60 other profiles and the other flags of sim.ts go through
+ *   npm run pace:classes                       idle and casual, every class
+ *   npm run pace:classes -- human --maxdays=60 other profiles and the other flags of pace.ts go through
  *
  * The sim bots play the real store, so they carry the XP, tile-discount and fight passives; offline efficiency and chest speed act on the server's grants and tickets, which the sim does not model.
  *
  * @title The class picker acceptance
  * @category Pacing/The sim
- * @order 3
+ * @order 7
  */
 import { spawn } from 'node:child_process';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -22,7 +22,7 @@ import { PACING_MAX_DRIFT_DAYS, PACING_TOLERANCE, comparePacing, formatSummary, 
 
 const require = createRequire(import.meta.url);
 const TSX = require.resolve('tsx/cli');
-const SIM = resolve(process.cwd(), 'scripts', 'sim.ts');
+const SIM = resolve(process.cwd(), 'scripts', 'pace.ts');
 
 /** Runs one sim (`--dump`: the raw results only) and resolves with its milestones. */
 const run = (cls: string, args: string[], dir: string): Promise<PacingBaseline> =>
@@ -44,7 +44,7 @@ const main = async () => {
 	const names = passed.filter((a) => !a.startsWith('--'));
 	const flags = passed.filter((a) => a.startsWith('--') && !a.startsWith('--class=') && !a.startsWith('--dump=') && !a.startsWith('--merge='));
 	const args = [...(names.length ? names : ['idle', 'casual']), ...flags];
-	const dir = mkdtempSync(join(tmpdir(), 'idlarz-sim-classes-'));
+	const dir = mkdtempSync(join(tmpdir(), 'idlarz-pace-classes-'));
 	try {
 		const classes = ['none', ...PLAYER_CLASS_ORDER];
 		const runs = await Promise.all(classes.map((cls) => run(cls, args, dir)));

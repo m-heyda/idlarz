@@ -1,5 +1,5 @@
 // The pure part of the pacing guard (scripts/pacing-guard.ts, tests/economy/pacingGuard.test.ts): compares two sim baselines
-// (docs/generated/sim-baseline.json, written by `npm run sim`) and lists the key milestones that moved by more than the tolerance.
+// (docs/generated/pace-baseline.json, written by `npm run pace`) and lists the key milestones that moved by more than the tolerance.
 
 /** One profile's milestones, as game days (null = never reached within the sim's horizon). */
 export type ProfileMilestones = Record<string, number | null>;
