@@ -1655,6 +1655,24 @@
 		]
 	},
 	{
+		"usedBy": [
+			"dawnsplitter"
+		],
+		"name": "art_dawnsplitter",
+		"category": "weapons",
+		"subcategory": "mainHand/axe G9",
+		"src": "/pixel/items/mainHand/axe/dawnsplitter.png",
+		"status": "planned",
+		"slot": "mainHand",
+		"weaponType": "axe",
+		"grade": "G9",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "art_ph_mainHand_axe_g9",
 		"category": "weapons",
@@ -12872,6 +12890,21 @@
 		"usedBy": [
 			"src/components/game/hero/recipeUi.ts"
 		],
+		"name": "comp_arcane_essence",
+		"category": "resources",
+		"subcategory": "comp",
+		"src": "/pixel/icons/comp_arcane_essence.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/components/game/hero/recipeUi.ts"
+		],
 		"name": "comp_cured_leather",
 		"category": "resources",
 		"subcategory": "comp",
@@ -13621,19 +13654,6 @@
 		"category": "resources",
 		"subcategory": "spare",
 		"src": "/pixel/resources/_sand.png",
-		"status": "unused",
-		"source": "public/pixel/resources",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "resource_spare_scallion",
-		"category": "resources",
-		"subcategory": "spare",
-		"src": "/pixel/resources/_scallion.png",
 		"status": "unused",
 		"source": "public/pixel/resources",
 		"size": [
@@ -37253,32 +37273,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_drops_fang",
-		"category": "unsorted",
-		"subcategory": "drops",
-		"src": "/pixel/__reuse/drops/fang.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			143,
-			143
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_food_honey_jar",
-		"category": "unsorted",
-		"subcategory": "food",
-		"src": "/pixel/__reuse/food/honey_jar.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "reuse_header_coin_bag",
 		"category": "unsorted",
 		"subcategory": "header",
@@ -37370,19 +37364,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_legendary_sf_b4884690_b36",
-		"category": "unsorted",
-		"subcategory": "legendary",
-		"src": "/pixel/__reuse/legendary/sprite-fusion-b4884690-b36e-4e90-a605-d65e49a32a54.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			65,
-			65
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "loose_pets_brown_cute_pet_cat",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
@@ -37446,19 +37427,6 @@
 		"size": [
 			84,
 			84
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_potions_pink_potion",
-		"category": "unsorted",
-		"subcategory": "potions",
-		"src": "/pixel/__reuse/potions/pink_potion.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			64,
-			64
 		]
 	},
 	{
@@ -37580,214 +37548,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_tools_arrows",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/arrows.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_bear_trap",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/bear_trap.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_bow",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/bow.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_crucible",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/crucible.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_hammer",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/hammer.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_hand_axe",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/hand_axe.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_hourglass",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/hourglass.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_iron_sword",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/iron_sword.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_shackles",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/shackles.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_tools_torch",
-		"category": "unsorted",
-		"subcategory": "tools",
-		"src": "/pixel/__reuse/tools/torch.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			143,
-			143
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_crystal_ball",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/crystal_ball.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_dagger",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/dagger.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_goblet",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/goblet.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_gold_amulet",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/gold_amulet.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			162,
-			162
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_gold_ring",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/gold_ring.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			132,
-			132
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_golden_egg",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/golden_egg.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			139,
-			139
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "reuse_valuables_phoenix_feather",
 		"category": "unsorted",
 		"subcategory": "valuables",
@@ -37797,71 +37557,6 @@
 		"size": [
 			99,
 			99
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_rune_stone",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/rune_stone.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			153,
-			153
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_sealed_scroll",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/sealed_scroll.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			144,
-			144
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_silver_key",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/silver_key.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			147,
-			147
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_silver_medal",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/silver_medal.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			148,
-			148
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_spellbook",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/spellbook.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			158,
-			158
 		]
 	}
 ]

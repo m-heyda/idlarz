@@ -29,6 +29,7 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
+| `comp_arcane_essence` | <img src="../../public/pixel/icons/comp_arcane_essence.png" width="80" alt="comp_arcane_essence"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_arcane_essence.png` |
 | `comp_cured_leather` | <img src="../../public/pixel/icons/comp_cured_leather.png" width="80" alt="comp_cured_leather"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_cured_leather.png` |
 | `comp_glass_vial` | <img src="../../public/pixel/icons/comp_glass_vial.png" width="80" alt="comp_glass_vial"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_glass_vial.png` |
 | `comp_plank_bundle` | <img src="../../public/pixel/icons/comp_plank_bundle.png" width="80" alt="comp_plank_bundle"> | 40x40 | used | src/components/game/hero/recipeUi.ts | `pixel/icons/comp_plank_bundle.png` |
@@ -138,7 +139,6 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 | `resource_spare_orange_mushrooms` | <img src="../../public/pixel/resources/_orange-mushrooms.png" width="64" alt="resource_spare_orange_mushrooms"> | 32x32 | unused |  | `pixel/resources/_orange-mushrooms.png` |
 | `resource_spare_rock_pile` | <img src="../../public/pixel/resources/_rock-pile.png" width="64" alt="resource_spare_rock_pile"> | 32x32 | unused |  | `pixel/resources/_rock-pile.png` |
 | `resource_spare_sand` | <img src="../../public/pixel/resources/_sand.png" width="64" alt="resource_spare_sand"> | 32x32 | unused |  | `pixel/resources/_sand.png` |
-| `resource_spare_scallion` | <img src="../../public/pixel/resources/_scallion.png" width="64" alt="resource_spare_scallion"> | 32x32 | unused |  | `pixel/resources/_scallion.png` |
 | `resource_spare_scrap` | <img src="../../public/pixel/resources/_scrap.png" width="64" alt="resource_spare_scrap"> | 32x32 | unused |  | `pixel/resources/_scrap.png` |
 | `resource_spare_sticks` | <img src="../../public/pixel/resources/_sticks.png" width="64" alt="resource_spare_sticks"> | 32x32 | unused |  | `pixel/resources/_sticks.png` |
 | `resource_spare_tar` | <img src="../../public/pixel/resources/_tar.png" width="64" alt="resource_spare_tar"> | 32x32 | unused |  | `pixel/resources/_tar.png` |

@@ -69,6 +69,7 @@ const BASE_ICON_SIZES = {
 	comp_glass_vial: [40, 40],
 	comp_cured_leather: [40, 40], // the leather roll (cut from the reuse pool, 40 px)
 	comp_plank_bundle: [40, 40], // the plank (cut from the reuse pool, 40 px)
+	comp_arcane_essence: [40, 40], // the pink potion (reuse pool art, 40 px): the base of the magic potions
 	skill_heal: [32, 32], // the green lotus of the Heal skill
 	skill_stun: [32, 32], // the golden fist of the Stun skill
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
