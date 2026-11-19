@@ -35,7 +35,6 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 | `cut_bow_toon_elegant_elven_longbow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_elegant_elven_longbow.png" width="96" alt="cut_bow_toon_elegant_elven_longbow"> | 227x225 | used | art_ph_mainHand_bow_g6 | `pixel/__reuse/equipment/bow/toon_elegant_elven_longbow.png` |
 | `cut_bow_toon_frost_encrusted_ice_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_frost_encrusted_ice_bow.png" width="96" alt="cut_bow_toon_frost_encrusted_ice_bow"> | 246x228 | used | art_ph_mainHand_bow_g9 | `pixel/__reuse/equipment/bow/toon_frost_encrusted_ice_bow.png` |
 | `cut_bow_toon_legendary_dark_obsidian_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_legendary_dark_obsidian_bow.png" width="96" alt="cut_bow_toon_legendary_dark_obsidian_bow"> | 240x225 | used | art_ph_mainHand_bow_s3 | `pixel/__reuse/equipment/bow/toon_legendary_dark_obsidian_bow.png` |
-| `cut_bow_toon_mechanical_steel_crossbow_fantasy_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_mechanical_steel_crossbow_fantasy_bow.png" width="96" alt="cut_bow_toon_mechanical_steel_crossbow_fantasy_bow"> | 209x183 | unused |  | `pixel/__reuse/equipment/bow/toon_mechanical_steel_crossbow_fantasy_bow.png` |
 | `cut_bow_toon_nature_druid_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_nature_druid_bow.png" width="96" alt="cut_bow_toon_nature_druid_bow"> | 243x241 | used | art_ph_mainHand_bow_g5 | `pixel/__reuse/equipment/bow/toon_nature_druid_bow.png` |
 | `cut_bow_toon_ornate_golden_paladin_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_ornate_golden_paladin_bow.png" width="96" alt="cut_bow_toon_ornate_golden_paladin_bow"> | 242x225 | used | art_ph_mainHand_bow_g7 | `pixel/__reuse/equipment/bow/toon_ornate_golden_paladin_bow.png` |
 | `cut_bow_toon_rustic_wooden_hunter_bow` | <img src="../../public/pixel/__reuse/equipment/bow/toon_rustic_wooden_hunter_bow.png" width="96" alt="cut_bow_toon_rustic_wooden_hunter_bow"> | 239x225 | used | art_wooden_bow | `pixel/__reuse/equipment/bow/toon_rustic_wooden_hunter_bow.png` |
@@ -117,6 +116,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
+| `art_dawnsplitter` | <img src="../../public/pixel/items/mainHand/axe/dawnsplitter.png" width="96" alt="art_dawnsplitter"> | 64x64 | planned | dawnsplitter | `pixel/items/mainHand/axe/dawnsplitter.png` |
 | `art_ph_mainHand_axe_g9` | <img src="../../public/pixel/items/mainHand/axe/ph_g9.png" width="96" alt="art_ph_mainHand_axe_g9"> | 64x64 | unused |  | `pixel/items/mainHand/axe/ph_g9.png` |
 
 ## mainHand/axe S1

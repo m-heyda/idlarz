@@ -1,6 +1,6 @@
-# map_details_ruins_buildings (164 files)
+# map_details_ruins_buildings (40 files)
 
-Ruins and landmark props in 8 colour themes, 5 pieces each: Blue-gray, Brown-gray, Brown, Sand, Snow, Water (lake ruins), White (marble columns), Yellow. They include ruined towers, arches, monoliths, standing stones, overgrown steps, a stone with glowing yellow cracks, a fountain and a tree growing out of a ruin. Same layout (`Assets`, `Assets_shadow`, `Assets_texture_shadow`, `Assets_texture_shadow_dark`, `*_source.png`).
+Ruins and landmark props in 8 colour themes, 5 pieces each: Blue-gray, Brown-gray, Brown, Sand, Snow, Water (lake ruins), White (marble columns), Yellow. They include ruined towers, arches, monoliths, standing stones, overgrown steps, a stone with glowing yellow cracks, a fountain and a tree growing out of a ruin. Only `Assets` (no shadow) is kept; the shadow variants and the source sheets were removed on 2026-11-19.
 
 **Use for**
 

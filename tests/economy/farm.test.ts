@@ -179,3 +179,44 @@ test('the Shearing Shed buys with wool and raises wool only', () => {
 	assert.ok(Math.abs(api().resourceRates.base.wool - wool0 * (1 + FARM_UPGRADES.shearing.effectPerLevel)) < 1e-12);
 	assert.equal(api().resourceRates.base.hide, hide0);
 });
+
+test('Rooster: a level turns one chicken into a rooster (5x a chicken) and every rooster lifts the flock by 10%', () => {
+	const flock = (rooster: number) => calculateFarmOutput({ chicken: 12 }, { rooster });
+	const base = flock(0);
+	const one = flock(1);
+	// 11 chickens + 1 rooster standing for 5, all x1.1
+	assert.ok(Math.abs(one.eggs / base.eggs - ((11 + 5) / 12) * 1.1) < 1e-9);
+	assert.ok(Math.abs(one.meat / base.meat - ((11 + 5) / 12) * 1.1) < 1e-9);
+	assert.ok(Math.abs(flock(5).eggs / base.eggs - ((7 + 25) / 12) * 1.5) < 1e-9);
+	// the other animals are untouched
+	assert.deepEqual(calculateFarmOutput({ cow: 4 }, { rooster: 5 }), calculateFarmOutput({ cow: 4 }));
+	// a rooster needs a chicken to stand for: 2 chickens cannot hold 5 roosters
+	assert.ok(Math.abs(calculateFarmOutput({ chicken: 2 }, { rooster: 5 }).eggs / calculateFarmOutput({ chicken: 2 }).eggs - ((0 + 10) / 2) * 1.2) < 1e-9);
+});
+
+test('Rooster upgrade: five levels from 5M food, closed until the chicken pen is full, bought like any farm upgrade', () => {
+	assert.equal(FARM_UPGRADES.rooster.maxLevel, 5);
+	assert.deepEqual(
+		[0, 1, 2, 3, 4].map((l) => farmUpgradeCost('rooster', l).food),
+		[5_000_000, 30_000_000, 180_000_000, 1_080_000_000, 6_480_000_000],
+	);
+	freshGame();
+	setResources({ food: 1e12 });
+	assert.equal(api().buyFarmUpgrade('rooster'), false, 'no chickens yet');
+	assert.equal(api().purchaseAnimal('chicken', FARM.baseCap - 1), FARM.baseCap - 1);
+	assert.equal(api().buyFarmUpgrade('rooster'), false, 'one slot is still free');
+	assert.equal(api().purchaseAnimal('chicken'), 1);
+	const before = api().resources.food;
+	assert.equal(api().buyFarmUpgrade('rooster'), true);
+	assert.equal(api().farmUpgrades.rooster, 1);
+	assert.equal(before - api().resources.food, 5_000_000);
+	assert.ok(api().resourceRates.base.eggs > 0);
+	// the pen grows: the rooster stays, the next one is closed until the new slots are full
+	setResources({ food: 1e12, wood: 1e9, stone: 1e9 });
+	assert.equal(api().buyFarmUpgrade('pen'), true);
+	assert.equal(api().buyFarmUpgrade('rooster'), false);
+	setResources({ food: 1e18 });
+	api().purchaseAnimal('chicken', 'max');
+	for (let i = 2; i <= 5; i++) assert.equal(api().buyFarmUpgrade('rooster'), true);
+	assert.equal(api().buyFarmUpgrade('rooster'), false, 'five roosters is the top');
+});

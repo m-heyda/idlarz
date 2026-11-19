@@ -24,6 +24,11 @@ const BASE_COMPONENTS: Record<string, ComponentDef> = {
 	glass_vial: { id: 'glass_vial', name: 'Glass Vial', description: 'A small flask of fire-blown glass. Every potion needs one.' },
 	cured_leather: { id: 'cured_leather', name: 'Cured Leather', description: 'Hide cured over coal until it is supple. The base of every leather good.' },
 	plank_bundle: { id: 'plank_bundle', name: 'Plank Bundle', description: 'Sawn, stone-planed boards tied in a bundle. Gear recipes will use them.' },
+	arcane_essence: {
+		id: 'arcane_essence',
+		name: 'Arcane Essence',
+		description: 'Glowberry and herbs steeped in a glass vial until it glows pink. The base of the magic potions to come; no recipe uses it yet.',
+	},
 };
 
 /** Every crafting bag stack that is not a potion or a trade good: the half-products recipes make, and the monster ingredients that drop into the bag (`catalog/ingredients.ts`, no recipe uses them yet). */
@@ -119,6 +124,20 @@ export const RECIPES: Recipe[] = [
 		unlock: 1,
 		xp: 2,
 		timeSec: 10,
+	},
+	{
+		id: 'arcane_essence',
+		kind: 'component',
+		name: 'Arcane Essence',
+		inputs: [
+			{ component: 'glass_vial', qty: 1 },
+			{ component: 'ing_glowberry', qty: 3 },
+			{ component: 'ing_dried_herbs', qty: 2 },
+		],
+		output: { component: 'arcane_essence', qty: 1 },
+		unlock: 3,
+		xp: 4,
+		timeSec: 20,
 	},
 	{
 		id: 'potion_minor',
@@ -357,6 +376,8 @@ RECIPES.push(...GEAR_RECIPES);
 export const LEGENDARY_UNLOCK = 99;
 
 /**
+ * TODO (owner, 2026-11-19): the legendaries get special abilities later; for now each is only a strong weapon (Dawnsplitter's numbers are in `SIGNATURE_STATS`, `catalog/items/ladder.ts`).
+ *
  * The legendary recipes: Dawnsplitter (axe), Stormstring (bow) and the Starlight Wand (mage), the strongest weapons in the catalog (grade G9, disabled data). They are **display only**: they are not in `RECIPES`, so the server cannot start them
  * (and the level they ask for is above the crafting cap), but the Crafting tab lists them under "Legendary" so the chase is visible. Opening them up later is moving them into `RECIPES` and lowering `LEGENDARY_UNLOCK`.
  */

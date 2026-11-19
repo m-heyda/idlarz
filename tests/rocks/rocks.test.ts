@@ -48,19 +48,19 @@ test('a rock is placed evenly on the free tiles, and none when the land is full'
 	assert.equal(pickRockSpot(world, new Set(['1,0', '2,0']), 1, mulberry32(1)), null);
 });
 
-test('the rocks that may wait are one per 50 owned tiles, at least one, with no other cap', () => {
+test('the rocks that may wait are one per 100 owned tiles, at least one, with no other cap', () => {
 	assert.equal(rockCap(0), 1);
-	assert.equal(rockCap(49), 1);
-	assert.equal(rockCap(50), 1);
-	assert.equal(rockCap(150), 3);
-	assert.equal(rockCap(503), 10);
-	assert.equal(rockCap(10_000), 200);
+	assert.equal(rockCap(99), 1);
+	assert.equal(rockCap(150), 1);
+	assert.equal(rockCap(200), 2);
+	assert.equal(rockCap(503), 5);
+	assert.equal(rockCap(10_000), 100);
 });
 
-test('rocks are rarer than chests (every 15 minutes), faster with Luck but never under 60% of it', () => {
+test('rocks are rarer than chests (every 15 minutes), faster with Luck but never under 50% of it', () => {
 	assert.equal(rockIntervalSec(0), 900);
 	assert.ok(rockIntervalSec(100) < 900);
-	assert.equal(rockIntervalSec(1_000_000), 900 * 0.6);
+	assert.equal(rockIntervalSec(1_000_000), 900 * 0.5);
 });
 
 test('the tiers need 50, 125, 250, 500 and 1,000 clicks, and a better rock is rarer', () => {

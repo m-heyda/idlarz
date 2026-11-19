@@ -66,12 +66,20 @@ export const FARM = {
 	unitsDrawn: 8, // most sprites drawn per kind in the pen (the animal panel shows the real count)
 };
 
+/**
+ * The Rooster upgrade: once the pen holds as many chickens as it can (`farmCap`), each level turns one more chicken into a rooster (5 levels, so 5 roosters). A rooster lays and feeds `outputMultiplier` times a chicken, and every rooster adds `chickenBoostPerRooster` to the output of all chickens (meat and eggs). Levels cost food, from millions to billions ({@link FARM_UPGRADES}).
+ *
+ * @category Economy/Farm
+ * @order 4
+ */
+export const FARM_ROOSTER = { animal: 'chicken', outputMultiplier: 5, chickenBoostPerRooster: 0.1 } as const;
+
 // Pen Expansion: per level, every animal kind may hold `capPerLevel` more animals and all farm output grows
 export const FARM_PEN = { outputPerLevel: 0.02, capPerLevel: 4 };
 
 /**
  * Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9);
- * the others have 10 levels and growth 1.6.
+ * the others have 10 levels and growth 1.6. The Rooster (5 levels, growth 6, from 5M food: {@link FARM_ROOSTER}) only opens once every chicken slot is filled.
  *
  * @category Economy/Farm
  * @order 3
@@ -132,6 +140,15 @@ export const FARM_UPGRADES = {
 		effectPerLevel: FARM_PEN.outputPerLevel,
 		cost: { food: 8000, wood: 3000, stone: 3000 } as Partial<Record<keyof Resources, number>>,
 		costGrowth: 1.9,
+	},
+	rooster: {
+		label: 'Rooster',
+		description: (n: number) =>
+			`${n} rooster${n === 1 ? '' : 's'}: each makes ${FARM_ROOSTER.outputMultiplier}x a chicken, +${Math.round(n * FARM_ROOSTER.chickenBoostPerRooster * 100)}% chicken output`,
+		maxLevel: 5,
+		effectPerLevel: FARM_ROOSTER.chickenBoostPerRooster, // chicken output, per rooster
+		cost: { food: 5_000_000 } as Partial<Record<keyof Resources, number>>, // 5M, 30M, 180M, 1.08B, 6.48B
+		costGrowth: 6,
 	},
 } as const;
 export type FarmUpgradeId = keyof typeof FARM_UPGRADES;

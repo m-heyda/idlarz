@@ -1,5 +1,5 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
-import { ANIMALS, FARM } from '@/config/farm';
+import { ANIMALS, FARM, FARM_ROOSTER } from '@/config/farm';
 import { PIXEL_ICON_SIZES, animalIcon, facesRight } from '@/config/pixelIcons';
 import { mulberry32 } from '@/lib/rng';
 import { Animal } from '@/types/game';
@@ -40,6 +40,8 @@ interface Instance {
 	key: string;
 	animal: Animal;
 	first: boolean;
+	/** Position among the animals of its kind (the first chickens are the roosters) */
+	index: number;
 }
 
 /** Animals drawn for a count: one per animal owned, up to FARM.unitsDrawn (the animal panel carries the real count) */
@@ -58,6 +60,8 @@ interface FarmSceneProps {
 	farmLevels: Record<string, number>;
 	/** Animal kind to light up (the card in the animal panel being hovered) */
 	highlightId: string | null;
+	/** Chickens that are roosters (the Rooster upgrade): the first ones drawn wear the rooster sprite */
+	roosters?: number;
 	/** animal id that was just bought (plays a little burst) */
 	celebrate: string | null;
 	/** Panels laid over the window (CSS px): animals keep clear of them */
@@ -70,7 +74,7 @@ interface FarmSceneProps {
  * The farm as a tiny game: an isometric pen (barn, trough, hay, gate) with your animals wandering about, on a meadow that
  * fills the whole window. The animals are scenery: buying happens in the panel beside the scene.
  */
-const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrate, insets, onPointerDown }) => {
+const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, roosters = 0, highlightId, celebrate, insets, onPointerDown }) => {
 	const stageRef = useRef<HTMLDivElement>(null);
 	const [zoom, setZoom] = useState(3);
 	const [stage, setStage] = useState({ w: 0, h: 0 });
@@ -79,6 +83,11 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 	const nodes = useRef(new Map<string, HTMLDivElement>());
 	const agents = useRef(new Map<string, Agent>());
 	const viewRef = useRef<WalkView | null>(null);
+	const roostersRef = useRef(roosters);
+	roostersRef.current = roosters;
+	/** The sprite of one drawn animal: a rooster for the first chickens while the Rooster upgrade has levels */
+	const iconOf = (inst: Instance) =>
+		inst.animal.id === FARM_ROOSTER.animal && inst.index < roostersRef.current ? ('animal_rooster' as const) : animalIcon(inst.animal.id, inst.key);
 
 	const instances = useMemo<Instance[]>(
 		() =>
@@ -87,10 +96,19 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 					key: `${animal.id}-${i}`,
 					animal,
 					first: i === 0,
+					index: i,
 				})),
 			),
 		[farmLevels],
 	);
+
+	// a chicken that becomes a rooster turns the way its new sprite looks
+	useLayoutEffect(() => {
+		for (const inst of instances) {
+			const agent = agents.current.get(inst.key);
+			if (agent && inst.animal.id === FARM_ROOSTER.animal) agent.faces = facesRight(iconOf(inst)) ? 'r' : 'l';
+		}
+	}, [roosters, instances]);
 
 	const place = (el: HTMLDivElement, a: Agent) => {
 		const p = project(a.x, a.y);
@@ -154,7 +172,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 					ty: spot.y,
 					wait: 0.5 + rnd() * 2.5,
 					flip: rnd() > 0.5,
-					faces: facesRight(animalIcon(inst.animal.id, inst.key)) ? 'r' : 'l',
+					faces: facesRight(iconOf(inst)) ? 'r' : 'l',
 					moving: false,
 				};
 				agents.current.set(inst.key, a);
@@ -244,7 +262,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, highlightId, celebrat
 
 				{instances.map((inst) => {
 					const a = inst.animal;
-					const icon = animalIcon(a.id, inst.key);
+					const icon = iconOf(inst);
 					const fit = spriteFit(PIXEL_ICON_SIZES[icon][0]);
 					return (
 						<div

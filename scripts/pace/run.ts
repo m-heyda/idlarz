@@ -7,7 +7,7 @@
  *   windows start and end on one), at the end of a castle or building timer, and at the next decision of a person who only checks in now and then.
  * - **Away time follows the server's rule** for the profiles with `away` (the `human*` ones): the kingdom pays `offlineEfficiency` of its income for at most `offlineCapHours` of a gap, the timers run at full speed, and the player buys nothing.
  *
- * What the bot also plays now: **Builder #2** and the daily gems (Gem shop), the Ember shop **plans** and the merchant's gold upgrades, and the **rocks** (one per 15 minutes, room for one per 50 tiles; their clicks are taken from the gold clicks).
+ * What the bot also plays now: **Builder #2** and the daily gems (Gem shop), the Ember shop **plans** and the merchant's gold upgrades, and the **rocks** (one per 15 minutes, room for one per 100 tiles; their clicks are taken from the gold clicks).
  * Rocks pay stone and coal (`rollRockLoot`); the ingredients are counted, not spent. The fights use the gear schedule below; Luck is 0.
  *
  * @title The pace sim engine

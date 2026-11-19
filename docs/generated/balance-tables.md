@@ -266,6 +266,7 @@ The pen holds 12 animals per kind (+4 per Pen Expansion level). Every animal als
 | Shearing Shed | +25% wool | 10 | 1500 food + 30.00 wool | 103.08K food + 2062 wool |
 | Pasture | +8% eggs, milk, hide and wool | 10 | 5000 food + 2500 wood | 343.60K food + 171.80K wood |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | 8000 food + 3000 wood + 3000 stone | 715.10K food + 268.16K wood + 268.16K stone |
+| Rooster | 1 rooster: each makes 5x a chicken, +10% chicken output | 5 | 5.00M food | 6.48B food |
 
 ## 5. Biomes
 

@@ -23,6 +23,17 @@ import { STEEL_ITEMS } from './steel';
 
 export { GRADES, GRADE_INFO, LIVE_GRADES, type Grade } from './grades';
 
+/**
+ * Hand-set numbers for the named legendaries of the G9 row: they replace the generated placeholder stats and are meant to be overpowered for now (owner, 2026-11-19). TODO: special abilities come later; until then the stats carry the fantasy.
+ * Dawnsplitter is the flaming axe: 300 damage a hit (the generated G9 axe had 192), 25% crit chance and +20% super crit.
+ */
+const SIGNATURE_STATS: Readonly<Record<string, { stats: ItemStats; description: string }>> = {
+	dawnsplitter: {
+		stats: { damage: 300, critChance: 25, superCrit: 20 },
+		description: 'Forged in magma, it splits the dawn and whatever stands under it. Its fire has not learned to speak yet.',
+	},
+};
+
 /** The set a special grade's pieces belong to (SetDef ids in catalog/sets.ts) */
 export const SPECIAL_SET: Record<'S1' | 'S2' | 'S3', string> = { S1: 'sunhoney', S2: 'ashen_warlord', S3: 'blightbound' };
 const isSpecial = (grade: Grade): grade is 'S1' | 'S2' | 'S3' => grade === 'S1' || grade === 'S2' || grade === 'S3';
@@ -261,7 +272,8 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	const set = isSpecial(grade) ? SPECIAL_SET[grade] : grade === 'G6' && key === 'belt' ? 'obsidian' : undefined;
 	// The icon comes from the registry (config/itemIcons): the line whose `item` is this id, real pass 1 art where there is a free one,
 	// else the art_ph_ placeholder of the cell. A grade with no such line yet shows the slot silhouette.
-	const def = gear(id, name, slot, info.rarities[0], stats, {
+	const signature = SIGNATURE_STATS[id];
+	const def = gear(id, name, slot, info.rarities[0], signature ? signature.stats : stats, {
 		tier: info.tier,
 		grade,
 		levelWindow: gradeOwnedLevels(grade),
@@ -270,7 +282,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
 		...(set ? { set } : {}),
 		...(weaponType ? { weaponType } : {}),
-		description: `${info.label} grade, placeholder numbers.`,
+		description: signature ? signature.description : `${info.label} grade, placeholder numbers.`,
 	});
 	generated.push({ ...def, allowedRarities: [...gradeOwnedRarities(grade)], dropLevels: gradeLevels(grade), dropRarities: gradeRarities(grade) });
 };

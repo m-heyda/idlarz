@@ -18,9 +18,17 @@ export interface IngredientDef {
 	tier: IngredientTier;
 	/** Where it is planned to go, as the tooltip says it ("potions", "ingots, with coal") */
 	planned: string;
+	/** The crafting recipe that already eats it (its name), when there is one: the tooltip then names it instead of saying no recipe uses it */
+	usedBy?: string;
 }
 
-const ing = (name: string, tier: IngredientTier, planned: string): IngredientDef => ({ junkId: `junk_${name}`, id: `ing_${name}`, tier, planned });
+const ing = (name: string, tier: IngredientTier, planned: string, usedBy?: string): IngredientDef => ({
+	junkId: `junk_${name}`,
+	id: `ing_${name}`,
+	tier,
+	planned,
+	...(usedBy ? { usedBy } : {}),
+});
 
 /**
  * The ingredients and what is planned for each (none of it is built yet). Append only.
@@ -31,14 +39,14 @@ const ing = (name: string, tier: IngredientTier, planned: string): IngredientDef
 export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('blood', 1, 'healing and vitality potions (the base)'),
 	ing('clay', 1, 'glass vials and pottery'),
-	ing('dried_herbs', 1, 'herb extracts for potions'),
+	ing('dried_herbs', 1, 'herb extracts for potions', 'Arcane Essence'),
 	ing('orange_mushrooms', 1, 'fungal extracts and night potions'),
 	ing('grapes', 1, 'wine and elixirs'),
 	ing('hollow_log', 1, 'planks'),
-	ing('glowberry', 2, 'night-vision and luck potions'),
+	ing('glowberry', 2, 'night-vision and luck potions', 'Arcane Essence'),
 	ing('horn_dark', 2, 'dark elixirs and enchanting powder'),
 	ing('copper_ore', 2, 'ingots (smelted with coal)'),
-	ing('ember_coal', 2, 'smelting fuel and fire potions'),
+	ing('ember_coal', 3, 'smelting fuel and fire potions'),
 	ing('obsidian', 2, 'blade edges for the Obsidian grade'),
 	ing('geode', 2, 'cut stones for jewelry'),
 	ing('dark_shard', 2, 'enchanting'),
@@ -50,6 +58,8 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('silver_ore', 2, 'silver ingots and fine jewelry'),
 	ing('gold_ore', 3, 'gold ingots and jewelry'),
 	ing('crystal', 3, 'enchanting and jewelry gems'),
+	ing('claw', 1, 'bone tools, charms and arrow tips'),
+	ing('amethyst', 1, 'cut stones for jewelry'),
 ];
 
 export const INGREDIENT_BY_JUNK = new Map(INGREDIENTS.map((i) => [i.junkId, i]));
@@ -75,7 +85,7 @@ const TIER_LABEL: Record<IngredientTier, string> = { 1: 'Tier 1', 2: 'Tier 2', 3
 export const ingredientDescription = (def: IngredientDef): string => {
 	const item = JUNK_ITEMS.find((i) => i.id === def.junkId);
 	const from = sourcesOf(def.junkId);
-	return `${item?.description ?? ''} Ingredient (${TIER_LABEL[def.tier]}): no recipe uses it yet, planned for ${def.planned}. Cannot be sold.${from.length ? ` Dropped by: ${from.join(', ')}.` : ''}`.trim();
+	return `${item?.description ?? ''} Ingredient (${TIER_LABEL[def.tier]}): ${def.usedBy ? `used in ${def.usedBy}` : 'no recipe uses it yet'}, planned for ${def.planned}. Cannot be sold.${from.length ? ` Dropped by: ${from.join(', ')}.` : ''}`.trim();
 };
 
 /** The ingredients as crafting components (name and tooltip), merged into `COMPONENTS` so the crafting bag shows them. */

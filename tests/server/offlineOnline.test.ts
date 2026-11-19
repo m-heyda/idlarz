@@ -73,8 +73,8 @@ const playing = async (minutes: number, id = 'u1', autoBattle = false, rebirths 
 test('a sync mints what the server clock says has appeared, and says when the next one is due', async () => {
 	const { m, now } = await playing(25);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
-	assert.equal(sync.tickets.chests.length, 2, 'a chest every ten minutes, each on a tile the server chose');
-	assert.equal(sync.tickets.monsters.length, 2, 'a rat after 2 minutes and the next 15 later');
+	assert.equal(sync.tickets.chests.length, 2, 'a chest every twelve minutes, each on a tile the server chose');
+	assert.equal(sync.tickets.monsters.length, 3, 'a rat after 2 minutes and the next ones every 10');
 	assert.ok(sync.nextInSec !== null && sync.nextInSec > 0 && sync.nextInSec <= 600);
 	// asking again changes nothing
 	const again = ok(await syncTickets(m.deps, 'u1', now + 1000));

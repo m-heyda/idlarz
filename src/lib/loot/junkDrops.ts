@@ -73,20 +73,29 @@ export const rollJunkLoot = (ctx: JunkRollContext, rng: Rng): JunkLoot => {
 	const stash: Record<string, number> = {};
 	const bonus = ctx.lucky ? 3 : 1;
 	const luck = 1 + Math.max(0, ctx.luck) * 0.005;
+	// an ingredient goes straight to the crafting bag, plain junk to the bag
+	const give = (id: string, n: number) => {
+		const key = stashKeyOfJunk(id);
+		if (key) {
+			stash[key] = (stash[key] ?? 0) + n;
+			return;
+		}
+		const merged = drops.find((x) => x.kind === 'consumable' && x.id === id);
+		if (merged && merged.kind === 'consumable') merged.qty += n;
+		else drops.push({ kind: 'consumable', id, qty: n });
+	};
 	const total = COMMON.reduce((sum, c) => sum + c.weight, 0);
 	let pick = rng() * total;
 	const common = COMMON.find((c) => (pick -= c.weight) < 0) ?? COMMON[0];
 	const qty = Math.max(1, Math.round(((ctx.gold * JUNK_GOLD_SHARE * (0.5 + rng())) / valueOf(common.id)) * bonus));
 	drops.push({ kind: 'consumable', id: common.id, qty });
 	for (const rare of RARE) {
-		if (ctx.level >= rare.minLevel && rng() < rare.chance * luck) drops.push({ kind: 'consumable', id: rare.id, qty: bonus });
+		if (ctx.level >= rare.minLevel && rng() < rare.chance * luck) give(rare.id, bonus);
 	}
 	if (ctx.boss)
 		for (const b of BOSS) {
 			const n = Math.max(1, Math.floor((b.base + ctx.level * b.perLevel) * luck)) * bonus;
-			const merged = drops.find((d) => d.kind === 'consumable' && d.id === b.id);
-			if (merged && merged.kind === 'consumable') merged.qty += n;
-			else drops.push({ kind: 'consumable', id: b.id, qty: n });
+			give(b.id, n);
 		}
 	// the monster's own ingredients come last of all: a monster without a type (or one with no table) draws nothing, so the rest of the kill's rolls are the same as before they existed
 	if (ctx.type) {
@@ -94,15 +103,7 @@ export const rollJunkLoot = (ctx: JunkRollContext, rng: Rng): JunkLoot => {
 			if (ctx.level < ing.minLevel) continue;
 			if (ing.chance < 1 && rng() >= ing.chance * luck) continue;
 			const n = ingredientQty(ing, ctx.level, rng()) * bonus;
-			// an ingredient goes straight to the crafting bag, plain junk to the bag
-			const key = stashKeyOfJunk(ing.id);
-			if (key) {
-				stash[key] = (stash[key] ?? 0) + n;
-				continue;
-			}
-			const merged = drops.find((x) => x.kind === 'consumable' && x.id === ing.id);
-			if (merged && merged.kind === 'consumable') merged.qty += n;
-			else drops.push({ kind: 'consumable', id: ing.id, qty: n });
+			give(ing.id, n);
 		}
 	}
 	return { drops, stash };

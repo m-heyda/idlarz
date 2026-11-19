@@ -77,7 +77,7 @@ test('rocks appear on their own clock, each on a tile of its own', async () => {
 	const { m, now } = await playing(125);
 	const sync = ok(await syncTickets(m.deps, 'u1', now));
 	const rocks = sync.tickets.rocks ?? [];
-	assert.ok(rocks.length === 1, `a rock every 15 minutes, room for one per 50 tiles (60 owned): ${rocks.length} after 125 minutes`);
+	assert.ok(rocks.length === 1, `a rock every 15 minutes, room for one per 100 tiles (60 owned, so one): ${rocks.length} after 125 minutes`);
 	const tiles = new Set(rocks.map((r) => `${r.x},${r.y}`));
 	assert.equal(tiles.size, rocks.length, 'no two rocks on one tile');
 	for (const rock of rocks) {
