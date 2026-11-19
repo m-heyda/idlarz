@@ -84,7 +84,7 @@ export const CATEGORIES: readonly { id: AssetCategory; title: string; blurb: str
 	{
 		id: 'map-details',
 		title: 'Map details',
-		blurb: 'Trees, bushes, rocks, minerals, ruins, props and creatures to dress the map. None is wired yet; use a variant that matches the ground.',
+		blurb: 'Bushes, rocks, ruins, fantasy trees, props and creatures to dress the map. None is wired yet; use a variant that matches the ground.',
 	},
 	{ id: 'ui', title: 'UI', blurb: 'Menu icons, equipment slot icons, banners, bars, frames, effects.' },
 	{
@@ -441,10 +441,8 @@ export const buildManifest = (): AssetEntry[] => {
 		return plain;
 	};
 	const PACKS: Record<string, { prefix: string; category: AssetCategory; sub: string; plain?: string }> = {
-		trees_mapp_details: { prefix: 'tree', category: 'map-details', sub: 'trees' },
 		bushes_map_details_mostly: { prefix: 'bush', category: 'map-details', sub: 'bushes' },
 		map_details_3: { prefix: 'rock', category: 'map-details', sub: 'rocks', plain: 'shadow' },
-		minerals_map_details_or_resources_crafting_etc: { prefix: 'mineral', category: 'map-details', sub: 'minerals' },
 		map_details_ruins_buildings: { prefix: 'ruin', category: 'map-details', sub: 'ruins' },
 		misc: { prefix: 'prop', category: 'map-details', sub: 'dark and bone props' },
 		misc_map_details: { prefix: 'fantasy', category: 'map-details', sub: 'fantasy trees and mushrooms', plain: 'shadow' },
@@ -490,15 +488,6 @@ export const buildManifest = (): AssetEntry[] => {
 			status: 'reuse',
 			source: 'assets_to_assess_and_use/potions',
 		});
-	for (const f of walk(join(POOL, 'buildings')))
-		add({
-			name: `building_medieval_${(/\((\d+)\)/.exec(basename(f))?.[1] ?? snake(basename(f))).padStart(3, '0')}`,
-			category: 'buildings',
-			subcategory: 'medieval pack 52px',
-			src: url(f),
-			status: 'reuse',
-			source: 'assets_to_assess_and_use/buildings',
-		});
 	// the village pictures the building catalog (src/catalog/buildings.ts) uses are in the game; the rest wait in the pool
 	const buildingOfArt = new Map(BUILDINGS.map((b) => [decodeURIComponent(b.art), b.id]));
 	for (const f of walk(join(POOL, 'more_buildings'))) {
@@ -514,15 +503,6 @@ export const buildManifest = (): AssetEntry[] => {
 			source: 'assets_to_assess_and_use/more_buildings',
 		});
 	}
-	for (const f of walk(join(POOL, 'monsters')))
-		add({
-			name: `monster_pack_${snake(basename(f))}`,
-			category: 'monsters',
-			subcategory: 'new biome monsters (not wired)',
-			src: url(f),
-			status: 'reuse',
-			source: 'assets_to_assess_and_use/monsters',
-		});
 	for (const f of walk(join(PUBLIC, 'pixel', 'ui', 'heroes')))
 		if (f.endsWith('.png'))
 			add({

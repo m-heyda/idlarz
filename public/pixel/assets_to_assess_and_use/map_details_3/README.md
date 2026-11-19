@@ -1,6 +1,6 @@
-# map_details_3 (164 files)
+# map_details_3 (160 files)
 
-Rocks, 8 kinds with 2 or 3 sizes: beige boulders (Rock1), tall beige pillars (Rock2), snow-capped rocks (Rock3), brown pine-cone stones (Rock4, Rock5), mossy dark boulders (Rock6), white quartz (Rock7, made for water) and sandy flat stones (Rock8, made for dry ground). Each exists without shadow and with a grass, snow, water or ground shadow, light and dark (`Rock7_water_shadow*`, `Rock8_ground_shadow*`, `Rokc3_snow_shadow*`; note the typo "Rokc3" in the file names). `Objects_separately` holds the singles, `Rocks_source*.png` the sheets.
+Rocks, 8 kinds with 2 or 3 sizes: beige boulders (Rock1), tall beige pillars (Rock2), snow-capped rocks (Rock3), brown pine-cone stones (Rock4, Rock5), mossy dark boulders (Rock6), white quartz (Rock7, made for water) and sandy flat stones (Rock8, made for dry ground). Each exists without shadow and with a grass, snow, water or ground shadow, light and dark (`Rock7_water_shadow*`, `Rock8_ground_shadow*`, `Rokc3_snow_shadow*`; note the typo "Rokc3" in the file names). `Objects_separately` holds the singles (the `Rocks_source*.png` sheets were removed on 2026-11-19).
 
 **Use for**
 
