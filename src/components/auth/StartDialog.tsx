@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import AuthForm, { authTitle, type AuthMode } from '@/components/auth/AuthForm';
 import type { Profile } from '@/lib/authClient';
 
@@ -20,9 +20,9 @@ const StartDialog: React.FC<Props> = ({ startMode, onSignedIn, onUnavailable }) 
 	const [mode, setMode] = useState<AuthMode>(initialMode);
 	return (
 		<div className='fixed inset-0 bg-[#14100c]'>
-			<PixelModal title={authTitle(mode)} size={mode === 'login' || mode === 'forgot' ? 'sm' : 'md'} hideClose closeOnBackdrop={false} onClose={NOOP}>
+			<GameModal title={authTitle(mode)} size={mode === 'login' || mode === 'forgot' ? 'sm' : 'md'} hideClose closeOnBackdrop={false} onClose={NOOP}>
 				<AuthForm initialMode={initialMode} onSignedIn={onSignedIn} onUnavailable={onUnavailable} onModeChange={setMode} />
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 };
