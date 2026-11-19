@@ -27,7 +27,6 @@ const ing = (name: string, tier: IngredientTier, planned: string): IngredientDef
  *
  * @category Economy/Crafting
  * @order 3
- * @table crafting-ingredients
  */
 export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('blood', 1, 'healing and vitality potions (the base)'),

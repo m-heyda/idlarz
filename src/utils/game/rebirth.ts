@@ -51,7 +51,6 @@ export const emberSpent = (upgrades: PrestigeState['upgrades']): number => {
  * @order 3
  * @formula
  * income bonus = 0.12 x (Embers ever earned)^0.6          multiplier = 1 + bonus
- * @table ember-income-examples
  */
 export const emberIncomeBonus = (earned: number): number => REBIRTH.incomePerPoint * Math.pow(Math.max(0, earned), REBIRTH.incomeExponent);
 
@@ -102,7 +101,6 @@ export const startingResources = (prestige: PrestigeState | undefined): Resource
  * @formula
  * base = floor(3 x (castle level - 5)^1.3 x ((tiles / 10)^0.65 + 0.03 x max(0, tiles - tilesNeeded)))
  * gain = floor(base x (1 + 0.05 x Ancestral Tithe level + 0.5 x Eternal Tithe level))
- * @table ember-gain-examples
  */
 export const emberGain = (castleLevel: number, tiles: number, merchant?: MerchantUpgrades, rebirths = 0, prestige?: PrestigeState): number =>
 	Math.floor(REBIRTH.gain(castleLevel, tiles, rebirths) * (1 + merchantEffect(merchant, 'tithe') + emberEffect(prestige, 'tithe')));

@@ -2,7 +2,7 @@
  * `npm run verify`: everything CI checks, run here on all your cores before you push.
  *
  * CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it skips it when the inputs hash says it was done (see `scripts/gen-inputs.ts`). This script does
- * it: formatting, types, lint, the unit tests and the reference docs check run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
+ * it: formatting, types, lint, the unit tests run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
  * `docs/generated` in parallel too (`pace:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
  * refused while something would fail in CI. When it regenerated files it stops with "commit them" (a hook cannot commit for you); commit and push again.
  *
@@ -76,7 +76,6 @@ export const checkSteps = (withBuild: boolean): Step[] => [
 	{ name: 'tsc', command: NODE, args: [bin('typescript/bin/tsc'), '--noEmit'] },
 	{ name: 'eslint', command: NODE, args: [bin('eslint/bin/eslint.js'), '.', '--max-warnings=0'] },
 	{ name: 'tests', command: NODE, args: [bin('tsx/cli'), '--test', 'tests/**/*.test.ts'] },
-	{ name: 'docs:code:check', command: NODE, args: [bin('tsx/cli'), 'scripts/docs-reference.ts', '--check'] },
 	...(withBuild ? [{ name: 'next build', command: 'npm run build', args: [], shell: true }] : []),
 ];
 

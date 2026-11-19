@@ -28,7 +28,6 @@ export const BUILDINGS_FLAG = { enabled: true };
  *
  * @category Economy/Buildings
  * @order 2
- * @table building-rules
  */
 export const BUILDING_RULES = {
 	maxLevel: 5,
@@ -52,8 +51,6 @@ export const BUILDING_RULES = {
  *
  * @category Economy/Buildings
  * @order 7
- * @table idol-effects
- * @table idol-price-floor
  */
 export const IDOL_RULES = {
 	perLevel: 2,

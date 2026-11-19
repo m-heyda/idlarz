@@ -59,7 +59,6 @@ export const DAY_SEC = 86_400;
  *
  * @category Economy/Gems
  * @order 1
- * @table gem-price-book
  */
 export const GEM_SHOP: readonly GemItem[] = [
 	{
@@ -179,7 +178,6 @@ export const GEM_CONFIRM_ABOVE = 300;
  *
  * @category Economy/Gems
  * @order 2
- * @table gem-daily-ladder
  */
 export const DAILY_BONUS_GEMS: readonly number[] = [20, 25, 30, 35, 40, 45, 50];
 

@@ -7,7 +7,6 @@
  * @title Endpoints (the API routes)
  * @category Saves & Server/Endpoints
  * @order 1
- * @table api-routes
  */
 import { classPassives } from '@/lib/classPassives';
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';

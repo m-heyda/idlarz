@@ -141,7 +141,7 @@ export const MAGNITUDE_BANDS = {
 
 type Magnitudes = Record<string, Record<string, number | string>>;
 
-/** The magnitude table of docs/reference/pacing.md, per profile, with a status per line; `warnings` lists the lines outside their band. */
+/** The magnitude table of @category Pacing, per profile, with a status per line; `warnings` lists the lines outside their band. */
 export const renderMagnitudes = (names: string[], magnitudes: Magnitudes): { lines: string[]; warnings: string[] } => {
 	const rows: string[] = [];
 	const warnings: string[] = [];
@@ -187,7 +187,7 @@ export const renderMagnitudes = (names: string[], magnitudes: Magnitudes): { lin
 			const band = castle == null ? undefined : byCastle[castle];
 			if (v != null && band) row(p, `after rebirth ${n} at castle ${castle}: lifetime Embers`, v, `${band[0]}-${band[1]}`, inBand(v, band));
 		}
-		// income multiplier: run N+1 against run 1 at the highest castle level both reached (docs/reference/pacing.md defines it at castle 10; the sim bot rebirths earlier)
+		// income multiplier: run N+1 against run 1 at the highest castle level both reached (@category Pacing defines it at castle 10; the sim bot rebirths earlier)
 		for (const [n, band] of Object.entries(MAGNITUDE_BANDS.incomeMultiplier)) {
 			const run = Number(n) + 1;
 			for (const c of [10, 8, 6]) {
@@ -206,13 +206,13 @@ export const renderMagnitudes = (names: string[], magnitudes: Magnitudes): { lin
 			}
 		}
 	}
-	const lines = ['', '## Magnitude targets (docs/reference/pacing.md, IDL-128)', ''];
+	const lines = ['', '## Magnitude targets (@category Pacing, IDL-128)', ''];
 	if (rows.length === 0) {
 		lines.push('No selected profile reached a checkpoint (castle 10 in run 1, a rebirth, lifetime Embers at rebirth 5 or 10).', '');
 		return { lines, warnings };
 	}
 	lines.push(
-		'Measured with the real store at the checkpoints of docs/reference/pacing.md; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
+		'Measured with the real store at the checkpoints of @category Pacing; the last seed of each profile. The income multiplier compares the same castle level in two runs (the bots rebirth before castle 10), so below castle 10 it is an indication with no status.',
 		'',
 	);
 	lines.push('| profile | checkpoint | measured | band | status |', '| --- | --- | --- | --- | --- |', ...rows, '');
@@ -347,7 +347,7 @@ export const renderMarkdown = (
 		lines.push(`| ${key} | ${names.map(cell).join(' | ')} |`);
 	});
 	lines.push('');
-	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, docs/reference/pacing.md; used to tune the Ember curve)
+	// How much faster each further run reaches "finished" than the first one (target band 60-70 %, @category Pacing; used to tune the Ember curve)
 	const ratioRows = names.flatMap((n) => {
 		const first = results[n].finished;
 		if (first == null) return [];

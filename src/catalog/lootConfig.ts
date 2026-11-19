@@ -3,7 +3,7 @@ import { CRAFT_GEAR } from '@/config/crafting';
 import { SET_DEFS } from './sets';
 
 // Loot configuration: which sources give what. Pure data; the pipeline in src/lib/loot reads it and nothing here is
-// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (docs/reference/loot.md).
+// code. All numbers are STARTING POINTS to be tuned with `npm run loot-sim` (@category Loot).
 //
 //   source (monster, boss, chest) --lootProfileId--> profile --generalPoolId / bonusTables--> pools --> item definitions
 //
@@ -210,7 +210,6 @@ export const bossSourceId = (biome: string): string => `boss_${biome}`;
  *
  * @category Loot/Config
  * @order 4
- * @table boss-loot
  */
 export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	plains: { uniques: [], setId: null, levels: { min: 15, max: 35 } },
@@ -344,7 +343,6 @@ const NORMAL_MONSTER: LootProfile = {
  *
  * @category Loot/Config
  * @order 2
- * @table loot-profiles
  */
 export const LOOT_PROFILES: Record<string, LootProfile> = {
 	normal_monster: NORMAL_MONSTER,
@@ -405,7 +403,6 @@ export const LOOT_PROFILES: Record<string, LootProfile> = {
  *
  * @category Loot/Config
  * @order 1
- * @table loot-sources
  */
 export const LOOT_SOURCES: Record<string, LootSource> = {
 	// A biome-less normal monster (the debug panel, tests): the whole general pool. The game's monsters use their biome's source below.

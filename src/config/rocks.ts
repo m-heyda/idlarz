@@ -20,7 +20,6 @@ export interface RockTierDef {
  *
  * @category Economy/Rocks and Mining
  * @order 1
- * @table rock-tiers
  */
 export const ROCK_TIERS: Record<RockTier, RockTierDef> = {
 	common: { label: 'Rock', clicks: 50, weight: 70, sprites: ['rock_stone'] },
@@ -46,7 +45,6 @@ export const rockSprite = (tier: RockTier, n: number): string => {
  *
  * @category Economy/Rocks and Mining
  * @order 2
- * @table rock-rules
  */
 export const ROCK = {
 	intervalSec: 900,
@@ -69,7 +67,6 @@ export type RockDrop =
  *
  * @category Economy/Rocks and Mining
  * @order 3
- * @table rock-drops
  */
 export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 	common: [

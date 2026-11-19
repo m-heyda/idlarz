@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useRef, useState } from 'react';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import type { UnavailableReason } from '@/lib/authClient';
 
 const NOOP = () => {};
@@ -46,7 +46,7 @@ const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Prom
 
 	return (
 		<div className='fixed inset-0 bg-[#14100c]'>
-			<PixelModal title='Accounts unavailable' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
+			<GameModal title='Accounts unavailable' size='sm' hideClose closeOnBackdrop={false} onClose={NOOP}>
 				<p className='text-sm text-center text-[#a89878] mb-2'>
 					{notConfigured
 						? 'Accounts are not set up on this server (the Supabase settings are missing), so there is nothing to retry.'
@@ -65,7 +65,7 @@ const AuthUnavailable: React.FC<{ reason: UnavailableReason; onRetry: () => Prom
 						</button>
 					)}
 				</div>
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 };

@@ -29,7 +29,6 @@ export interface SkillDef {
  * Nothing else is learned or levelled. Four classes (warrior, paladin, ranger, mage) give a portrait, a name (`PLAYER_CLASSES`) and two passives each (`CLASS_PASSIVES`, lib/classPassives.ts).
  *
  * @category Combat/Potions and skills
- * @table skills
  */
 export const SKILLS: Record<SkillId, SkillDef> = {
 	heal: { id: 'heal', name: 'Heal', unlockLevel: 5, manaCost: 20, cooldownSec: 12, fightOnly: false, healFraction: 0.25 },
