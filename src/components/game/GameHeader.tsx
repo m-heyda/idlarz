@@ -1,5 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { useClickIncome } from '@/hooks/useClickIncome';
+import { useSecretDeeds } from '@/hooks/useSecretDeeds';
 import HudDock from './hud/HudDock';
 import HudTopBar from './hud/HudTopBar';
 
@@ -9,6 +10,7 @@ import HudTopBar from './hud/HudTopBar';
  */
 const GameHeader: React.FC = () => {
 	useClickIncome();
+	useSecretDeeds();
 	const ref = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {

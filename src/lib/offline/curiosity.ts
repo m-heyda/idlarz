@@ -3,10 +3,20 @@ import type { Ledger } from '@/lib/offline/ledger';
 // SERVER ONLY. One-off events for the secret deeds (IDL-305): the browser reports that something happened (it opened the empty Gambling tab) and the server records it once, from a short allowlist, so a made-up id earns nothing.
 
 /**
- * The events the browser may report for a deed (`visit`): opening the empty Gambling tab, the smallest a window can be, the map at its largest and smallest zoom, a look into the World boss window, and putting a skin on the castle.
+ * The events the browser may report for a deed (`visit`): opening the empty Gambling tab, the smallest a window can be, the map at its largest and smallest zoom, a look into the World boss window, putting a skin on the castle, every dock window opened in one visit (`dock_shuffle`), the game open in the 3 AM hour (`night_owl`) and the Konami code (`konami`).
  * Cosmetic one-offs: a made-up report only earns the joke. Append only.
  */
-export const CURIOSITIES: readonly string[] = ['gambling_empty', 'window_min', 'map_zoom_max', 'map_zoom_min', 'boss_window', 'castle_skin'];
+export const CURIOSITIES: readonly string[] = [
+	'gambling_empty',
+	'window_min',
+	'map_zoom_max',
+	'map_zoom_min',
+	'boss_window',
+	'castle_skin',
+	'dock_shuffle',
+	'night_owl',
+	'konami',
+];
 
 /** The podium places (1st, 2nd, 3rd on any Ranking board). Only the server records these, from the Rankings it reads itself, so `visit` does not accept them. Append only. */
 export const RANK_CURIOSITIES: readonly string[] = ['rank_1', 'rank_2', 'rank_3'];

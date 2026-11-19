@@ -78,7 +78,7 @@ test('podium places are recorded by the server only: the visit allowlist refuses
 
 test('the browser may report the secret events, each once', () => {
 	const ledger = newLedger(1_700_000_000_000);
-	for (const id of ['window_min', 'map_zoom_max', 'map_zoom_min', 'boss_window', 'castle_skin', 'gambling_empty']) {
+	for (const id of ['window_min', 'map_zoom_max', 'map_zoom_min', 'boss_window', 'castle_skin', 'gambling_empty', 'dock_shuffle', 'night_owl', 'konami']) {
 		assert.ok(CURIOSITIES.includes(id), id);
 		const once = recordCuriosity(ledger, id);
 		assert.deepEqual(once.stats.curiosity, [id]);
