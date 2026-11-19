@@ -1,6 +1,6 @@
 import { ROCK, ROCK_DROPS, ROCK_TIERS, ROCK_TIER_ORDER, type RockTier } from '@/config/rocks';
 import { isInWard } from '@/lib/castleWard';
-import { rarityLuckMultiplier } from '@/lib/luck';
+import { rarityLuckMultiplier, spawnIntervalFactor } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import type { PrestigeState } from '@/types/game';
 import { emberEffect } from '@/utils/game/emberEffects';
@@ -36,17 +36,17 @@ export const pickRockSpot = (world: World, taken: ReadonlySet<string>, castleLev
  * @category Economy/Rocks and Mining
  * @order 5
  * @formula
- * interval = 900 s x max(0.6, 1 / (1 + 0.004 x Luck))
+ * interval = 900 s x max(0.5, 1 / (1 + 0.006 x Luck))
  */
-export const rockIntervalSec = (luck: number): number => ROCK.intervalSec * Math.max(0.6, 1 / (1 + Math.max(0, luck) * 0.004));
+export const rockIntervalSec = (luck: number): number => ROCK.intervalSec * spawnIntervalFactor(luck);
 
 /**
- * The most rocks that wait at once on a map of `tilesOwned` owned tiles: one per 50 tiles, at least one, no other cap.
+ * The most rocks that wait at once on a map of `tilesOwned` owned tiles: one per 100 tiles, at least one, no other cap.
  *
  * @category Economy/Rocks and Mining
  * @order 6
  * @formula
- * room = max(1, floor(tiles owned / 50))
+ * room = max(1, floor(tiles owned / 100))
  */
 export const rockCap = (tilesOwned: number): number => Math.max(ROCK.minAllowed, Math.floor(Math.max(0, tilesOwned) / ROCK.tilesPerRock));
 

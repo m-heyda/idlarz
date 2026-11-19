@@ -1200,21 +1200,6 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "cut_bow_toon_mechanical_steel_crossbow_fantasy_bow",
-		"category": "weapons",
-		"subcategory": "cut-outs: bow (toon)",
-		"slot": "mainHand",
-		"weaponType": "bow",
-		"src": "/pixel/__reuse/equipment/bow/toon_mechanical_steel_crossbow_fantasy_bow.png",
-		"status": "unused",
-		"source": "__reuse/equipment",
-		"size": [
-			209,
-			183
-		]
-	},
-	{
 		"usedBy": [
 			"art_ph_mainHand_bow_g5"
 		],
@@ -5779,36 +5764,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "cut_cape_toon_armored_knight_cape",
-		"category": "armor",
-		"subcategory": "cut-outs: cape (toon)",
-		"slot": "cape",
-		"src": "/pixel/__reuse/equipment/cape/toon_armored_knight_cape.png",
-		"status": "unused",
-		"source": "__reuse/equipment",
-		"size": [
-			194,
-			236
-		]
-	},
-	{
-		"usedBy": [
-			"art_ph_cape_s3"
-		],
-		"name": "cut_cape_toon_assassins_hooded_cloak",
-		"category": "armor",
-		"subcategory": "cut-outs: cape (toon)",
-		"slot": "cape",
-		"src": "/pixel/__reuse/equipment/cape/toon_assassins_hooded_cloak.png",
-		"status": "used",
-		"source": "__reuse/equipment",
-		"size": [
-			162,
-			244
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "cut_cape_toon_elemental_fire_cloak",
 		"category": "armor",
 		"subcategory": "cut-outs: cape (toon)",
@@ -10010,1965 +9965,9 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
 		"status": "planned",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins3.png"
-		},
 		"size": [
 			48,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_001",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (1).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_002",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (2).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_003",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (3).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_004",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (4).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_005",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (5).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_006",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (6).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_007",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (7).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_008",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (8).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_009",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (9).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_010",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (10).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_011",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (11).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_012",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (12).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_013",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (13).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_014",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (14).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_015",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (15).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_016",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (16).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_017",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (17).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_018",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (18).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_019",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (19).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_020",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (20).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_021",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (21).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_022",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (22).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_023",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (23).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_024",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (24).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_025",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (25).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_026",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (26).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_027",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (27).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_028",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (28).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_029",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (29).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_030",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (30).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_031",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (31).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_032",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (32).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_033",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (33).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_034",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (34).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_035",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (35).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_036",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (36).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_037",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (37).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_038",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (38).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_039",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (39).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_040",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (40).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_041",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (41).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_042",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (42).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_043",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (43).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_044",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (44).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_045",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (45).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_046",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (46).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_047",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (47).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_048",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (48).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_049",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (49).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_050",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (50).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_051",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (51).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_052",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (52).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_053",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (53).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_054",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (54).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_055",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (55).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_056",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (56).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_057",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (57).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_058",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (58).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_059",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (59).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_060",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (60).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_061",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (61).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_062",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (62).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_063",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (63).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_064",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (64).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_065",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (65).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_066",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (66).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_067",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (67).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_068",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (68).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_069",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (69).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_070",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (70).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_071",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (71).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_072",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (72).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_073",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (73).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_074",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (74).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_075",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (75).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_076",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (76).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_077",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (77).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_078",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (78).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_079",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (79).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_080",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (80).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_081",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (81).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_082",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (82).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_083",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (83).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_084",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (84).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_085",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (85).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_086",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (86).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_087",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (87).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_088",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (88).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_089",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (89).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_090",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (90).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_091",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (91).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_092",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (92).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_093",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (93).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_094",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (94).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_095",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (95).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_096",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (96).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_097",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (97).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_098",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (98).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_099",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (99).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_100",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (100).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_101",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (101).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_102",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (102).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_103",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (103).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_104",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (104).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_105",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (105).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_106",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (106).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_107",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (107).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_108",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (108).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_109",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (109).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_110",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (110).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_111",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (111).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_112",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (112).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_113",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (113).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_114",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (114).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_115",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (115).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_116",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (116).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_117",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (117).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_118",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (118).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_119",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (119).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_120",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (120).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_121",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (121).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_122",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (122).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_123",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (123).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_124",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (124).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_125",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (125).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_126",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (126).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_127",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (127).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_128",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (128).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_129",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (129).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_130",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (130).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_131",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (131).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_132",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (132).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_133",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (133).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_134",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (134).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_135",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (135).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_136",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (136).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_137",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (137).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_138",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (138).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_139",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (139).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_140",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (140).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_141",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (141).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_142",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (142).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_143",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (143).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_144",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (144).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_145",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (145).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_146",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (146).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_147",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (147).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_148",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (148).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_149",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (149).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "building_medieval_150",
-		"category": "buildings",
-		"subcategory": "medieval pack 52px",
-		"src": "/pixel/assets_to_assess_and_use/buildings/medieval-buildings-pixel-art-pack (150).png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/buildings",
-		"size": [
-			52,
-			52
 		]
 	},
 	{
@@ -15006,10 +13005,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom1.png"
-		},
 		"size": [
 			64,
 			64
@@ -15023,10 +13018,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom2.png"
-		},
 		"size": [
 			64,
 			64
@@ -15040,10 +13031,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Beige_green_mushroom3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Beige_green_mushroom3.png"
-		},
 		"size": [
 			32,
 			32
@@ -15057,10 +13044,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree1.png"
-		},
 		"size": [
 			64,
 			64
@@ -15074,10 +13057,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree2.png"
-		},
 		"size": [
 			64,
 			64
@@ -15091,10 +13070,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Blue-green_balls_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Blue-green_balls_tree3.png"
-		},
 		"size": [
 			32,
 			32
@@ -15108,10 +13083,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles1.png"
-		},
 		"size": [
 			32,
 			32
@@ -15125,10 +13096,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles2.png"
-		},
 		"size": [
 			32,
 			32
@@ -15142,10 +13109,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Chanterelles3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Chanterelles3.png"
-		},
 		"size": [
 			32,
 			32
@@ -15159,10 +13122,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15176,10 +13135,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15193,10 +13148,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Curved_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Curved_tree3.png"
-		},
 		"size": [
 			64,
 			64
@@ -15210,10 +13161,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_man.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_man.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Ent_man.png"
-		},
 		"size": [
 			128,
 			128
@@ -15227,10 +13174,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_woman.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Ent_woman.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Ent_woman.png"
-		},
 		"size": [
 			128,
 			128
@@ -15244,10 +13187,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15261,10 +13200,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15278,10 +13213,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Light_balls_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Light_balls_tree3.png"
-		},
 		"size": [
 			64,
 			64
@@ -15295,10 +13226,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Living gazebo1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15312,10 +13239,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Living gazebo2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Living gazebo2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15329,10 +13252,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15346,10 +13265,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15363,10 +13278,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree3.png"
-		},
 		"size": [
 			64,
 			64
@@ -15380,10 +13291,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Luminous_tree4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Luminous_tree4.png"
-		},
 		"size": [
 			64,
 			64
@@ -15397,10 +13304,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Mega_tree1.png"
-		},
 		"size": [
 			256,
 			256
@@ -15414,10 +13317,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Mega_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Mega_tree2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15431,10 +13330,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15448,10 +13343,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15465,10 +13356,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Swirling tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Swirling tree3.png"
-		},
 		"size": [
 			64,
 			64
@@ -15482,10 +13369,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_deer.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_deer.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_deer.png"
-		},
 		"size": [
 			128,
 			128
@@ -15499,10 +13382,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_dragon.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_dragon.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_dragon.png"
-		},
 		"size": [
 			256,
 			256
@@ -15516,10 +13395,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_human.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_human.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_human.png"
-		},
 		"size": [
 			128,
 			128
@@ -15533,10 +13408,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_wolf.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Tree_idol_wolf.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Tree_idol_wolf.png"
-		},
 		"size": [
 			128,
 			128
@@ -15550,10 +13421,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15567,10 +13434,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom2.png"
-		},
 		"size": [
 			64,
 			64
@@ -15584,10 +13447,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White-red_mushroom3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White-red_mushroom3.png"
-		},
 		"size": [
 			64,
 			64
@@ -15601,10 +13460,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White_tree1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15618,10 +13473,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/White_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/White_tree2.png"
-		},
 		"size": [
 			64,
 			64
@@ -15635,10 +13486,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow1.png"
-		},
 		"size": [
 			128,
 			128
@@ -15652,10 +13499,6 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow2.png"
-		},
 		"size": [
 			128,
 			128
@@ -15669,26 +13512,9 @@
 		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/misc_map_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_no_shadow/Willow3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/misc_map_details/Assets/Willow3.png"
-		},
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "fantasy_sheet_assets_source",
-		"category": "map-details",
-		"subcategory": "fantasy trees and mushrooms (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/misc_map_details/Assets_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/misc_map_details",
-		"size": [
-			688,
-			384
 		]
 	},
 	{
@@ -16467,37 +14293,6 @@
 		"size": [
 			64,
 			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "mineral_sheet_assets_shadow_source",
-		"category": "map-details",
-		"subcategory": "minerals (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_shadow_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc",
-		"size": [
-			640,
-			144
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "mineral_sheet_assets_source",
-		"category": "map-details",
-		"subcategory": "minerals (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_source.png",
-			"texture": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_source.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/minerals_map_details_or_resources_crafting_etc/Assets_texture_shadow_dark_source.png"
-		},
-		"size": [
-			640,
-			144
 		]
 	},
 	{
@@ -18222,37 +16017,12 @@
 	},
 	{
 		"usedBy": [],
-		"name": "rock_sheet_rocks_source",
-		"category": "map-details",
-		"subcategory": "rocks (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_no_shadow.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/map_details_3",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_no_shadow.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_3/Rocks_source_texture_shadow_dark.png"
-		},
-		"size": [
-			256,
-			304
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "ruin_blue_gray_ruins1",
 		"category": "map-details",
 		"subcategory": "ruins",
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins1.png"
-		},
 		"size": [
 			112,
 			128
@@ -18266,12 +16036,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins2.png"
-		},
 		"size": [
 			80,
 			80
@@ -18285,12 +16049,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18304,12 +16062,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Blue-gray_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Blue-gray_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Blue-gray_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Blue-gray_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18323,12 +16075,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown-gray_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown-gray_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown-gray_ruins1.png"
-		},
 		"size": [
 			112,
 			112
@@ -18342,12 +16088,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown-gray_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown-gray_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown-gray_ruins2.png"
-		},
 		"size": [
 			80,
 			80
@@ -18361,12 +16101,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown-gray_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown-gray_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown-gray_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18380,12 +16114,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown-gray_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown-gray_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown-gray_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18399,12 +16127,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown-gray_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown-gray_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown-gray_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown-gray_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18418,12 +16140,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown_ruins1.png"
-		},
 		"size": [
 			112,
 			112
@@ -18437,12 +16153,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown_ruins2.png"
-		},
 		"size": [
 			80,
 			80
@@ -18456,12 +16166,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18475,12 +16179,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18494,12 +16192,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Brown_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Brown_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Brown_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Brown_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18513,12 +16205,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Sand_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Sand_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Sand_ruins1.png"
-		},
 		"size": [
 			96,
 			96
@@ -18532,12 +16218,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Sand_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Sand_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Sand_ruins2.png"
-		},
 		"size": [
 			80,
 			64
@@ -18551,12 +16231,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Sand_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Sand_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Sand_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18570,12 +16244,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Sand_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Sand_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Sand_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18589,12 +16257,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Sand_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Sand_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Sand_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Sand_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18608,12 +16270,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Snow_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Snow_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Snow_ruins1.png"
-		},
 		"size": [
 			112,
 			96
@@ -18627,12 +16283,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Snow_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Snow_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Snow_ruins2.png"
-		},
 		"size": [
 			80,
 			80
@@ -18646,12 +16296,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Snow_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Snow_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Snow_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18665,12 +16309,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Snow_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Snow_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Snow_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18684,12 +16322,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Snow_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Snow_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Snow_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Snow_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18703,12 +16335,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Water_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Water_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Water_ruins1.png"
-		},
 		"size": [
 			80,
 			96
@@ -18722,12 +16348,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Water_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Water_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Water_ruins2.png"
-		},
 		"size": [
 			64,
 			80
@@ -18741,12 +16361,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Water_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Water_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Water_ruins3.png"
-		},
 		"size": [
 			48,
 			64
@@ -18760,12 +16374,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Water_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Water_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Water_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18779,12 +16387,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Water_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Water_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Water_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Water_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18798,12 +16400,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/White_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/White_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/White_ruins1.png"
-		},
 		"size": [
 			96,
 			96
@@ -18817,12 +16413,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/White_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/White_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/White_ruins2.png"
-		},
 		"size": [
 			80,
 			64
@@ -18836,12 +16426,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/White_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/White_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/White_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18855,12 +16439,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/White_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/White_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/White_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18874,12 +16452,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/White_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/White_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/White_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/White_ruins5.png"
-		},
 		"size": [
 			32,
 			32
@@ -18893,12 +16465,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins1.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Yellow_ruins1.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Yellow_ruins1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Yellow_ruins1.png"
-		},
 		"size": [
 			112,
 			112
@@ -18912,12 +16478,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins2.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Yellow_ruins2.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Yellow_ruins2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Yellow_ruins2.png"
-		},
 		"size": [
 			80,
 			80
@@ -18931,12 +16491,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins3.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Yellow_ruins3.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Yellow_ruins3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Yellow_ruins3.png"
-		},
 		"size": [
 			64,
 			64
@@ -18950,12 +16504,6 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins4.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Yellow_ruins4.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Yellow_ruins4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Yellow_ruins4.png"
-		},
 		"size": [
 			48,
 			48
@@ -18969,861 +16517,9 @@
 		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins5.png",
 		"status": "unused",
 		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets/Yellow_ruins5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadow/Yellow_ruins5.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow/Yellow_ruins5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark/Yellow_ruins5.png"
-		},
 		"size": [
 			32,
 			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ruin_sheet_assets_shadows_source",
-		"category": "map-details",
-		"subcategory": "ruins (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_shadows_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"size": [
-			496,
-			432
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "ruin_sheet_assets_source",
-		"category": "map-details",
-		"subcategory": "ruins (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/map_details_ruins_buildings",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_source.png",
-			"texture": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_source.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/map_details_ruins_buildings/Assets_texture_shadow_dark_source.png"
-		},
-		"size": [
-			496,
-			432
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_autumn_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Autumn_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Autumn_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Autumn_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_autumn_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Autumn_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Autumn_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Autumn_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_autumn_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Autumn_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Autumn_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Autumn_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Autumn_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree1.png"
-		},
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree2.png"
-		},
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree3.png"
-		},
-		"size": [
-			48,
-			48
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree4",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree4.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree4.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree4.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree4.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree4.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree5",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree5.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree5.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree5.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree5.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree5.png"
-		},
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree6",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree6.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree6.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree6.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree6.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree6.png"
-		},
-		"size": [
-			16,
-			16
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_broken_tree7",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree7.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Broken_tree7.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Broken_tree7.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Broken_tree7.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Broken_tree7.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_burned_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Burned_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Burned_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Burned_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_burned_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Burned_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Burned_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Burned_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_burned_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Burned_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Burned_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Burned_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Burned_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_christmas_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Christmas_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Christmas_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Christmas_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_christmas_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Christmas_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Christmas_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Christmas_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_christmas_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Christmas_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Christmas_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Christmas_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Christmas_tree3.png"
-		},
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_flower_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Flower_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Flower_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Flower_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_flower_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Flower_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Flower_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Flower_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_flower_tree2_1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Flower_tree2-1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_flower_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Flower_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Flower_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Flower_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_fruit_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Fruit_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Fruit_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Fruit_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_fruit_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Fruit_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Fruit_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Fruit_tree2.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_fruit_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Fruit_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Fruit_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Fruit_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Fruit_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_moss_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Moss_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Moss_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Moss_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_moss_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Moss_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Moss_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Moss_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_moss_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Moss_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Moss_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Moss_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Moss_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree1_1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree1_1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree1_1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree1_1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree1_2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree1_2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree1_2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree1_2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree1_3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree1_3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree1_3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree1_3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree1_3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree2_.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree2_1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree2_1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree2_1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree2_1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree2_2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree2_2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree2_2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Palm_tree2_2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_palm_tree2_3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Palm_tree2_3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Palm_tree2_3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Palm_tree2_3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_christmass_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_christmass_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_christmass_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_christmass_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_christmass_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_christmass_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_christmass_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_christmass_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_christmass_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_christmass_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_christmass_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_christmass_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_christmass_tree3.png"
-		},
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_snow_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Snow_tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Snow_tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Snow_tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Snow_tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_tree1",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree1.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree1.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Tree1.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Tree1.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Tree1.png"
-		},
-		"size": [
-			128,
-			128
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_tree2",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree2.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree2.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Tree2.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Tree2.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Tree2.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_tree3",
-		"category": "map-details",
-		"subcategory": "trees",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree3.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees/Tree3.png",
-			"shadow": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_shadow/Tree3.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow/Tree3.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Assets_separately/Trees_texture_shadow_dark/Tree3.png"
-		},
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_sheet_trees_shadow_source",
-		"category": "map-details",
-		"subcategory": "trees (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_shadow_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"size": [
-			800,
-			192
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "tree_sheet_trees_source",
-		"category": "map-details",
-		"subcategory": "trees (sheet)",
-		"src": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_source.png",
-		"status": "unused",
-		"source": "assets_to_assess_and_use/trees_mapp_details",
-		"variants": {
-			"none": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_source.png",
-			"texture": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadow_source.png",
-			"texture-dark": "/pixel/assets_to_assess_and_use/trees_mapp_details/Trees_texture_shadows_dark_source.png"
-		},
-		"size": [
-			800,
-			192
 		]
 	},
 	{
@@ -37286,19 +33982,6 @@
 	},
 	{
 		"usedBy": [],
-		"name": "reuse_header_crossed_swords",
-		"category": "unsorted",
-		"subcategory": "header",
-		"src": "/pixel/__reuse/header/crossed_swords.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			64,
-			64
-		]
-	},
-	{
-		"usedBy": [],
 		"name": "reuse_header_key",
 		"category": "unsorted",
 		"subcategory": "header",
@@ -37544,19 +34227,6 @@
 		"size": [
 			32,
 			32
-		]
-	},
-	{
-		"usedBy": [],
-		"name": "reuse_valuables_phoenix_feather",
-		"category": "unsorted",
-		"subcategory": "valuables",
-		"src": "/pixel/__reuse/valuables/phoenix_feather.png",
-		"status": "unused",
-		"source": "public/pixel/__reuse",
-		"size": [
-			99,
-			99
 		]
 	}
 ]

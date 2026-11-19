@@ -6,15 +6,25 @@ import type { Rng } from '@/lib/rng';
 const points = (luck: number): number => (Number.isFinite(luck) ? Math.max(0, luck) : 0);
 
 /**
- * Seconds between two chests: Luck shortens it, never below `LUCK.chestIntervalFloor` of the base.
+ * How much of its base time every spawn timer needs at this Luck (chests, rocks, monsters and bosses share it): Luck shortens it, never below `LUCK.spawnIntervalFloor`.
  *
  * @category Economy/Chests and Luck
  * @order 3
  * @formula
- * interval = 600 x max(0.6, 1 / (1 + 0.004 x Luck)) / (1 + class chest speed% / 100)
+ * factor = max(0.5, 1 / (1 + 0.006 x Luck))
+ */
+export const spawnIntervalFactor = (luck: number): number => Math.max(LUCK.spawnIntervalFloor, 1 / (1 + points(luck) * LUCK.spawnSpeedPerPoint));
+
+/**
+ * Seconds between two chests: the base interval times {@link spawnIntervalFactor}, then the class and idol chest speed.
+ *
+ * @category Economy/Chests and Luck
+ * @order 4
+ * @formula
+ * interval = 720 x max(0.5, 1 / (1 + 0.006 x Luck)) / (1 + class chest speed% / 100)
  */
 export const chestIntervalSec = (luck: number, classChestSpeedPct = 0): number =>
-	(CHEST.intervalSec * Math.max(LUCK.chestIntervalFloor, 1 / (1 + points(luck) * LUCK.chestSpeedPerPoint))) / (1 + Math.max(0, classChestSpeedPct) / 100);
+	(CHEST.intervalSec * spawnIntervalFactor(luck)) / (1 + Math.max(0, classChestSpeedPct) / 100);
 
 /** % more chests than at Luck 0 (what the Character window shows), the Ranger's chest speed included. */
 export const chestRateBonusPct = (luck: number, classChestSpeedPct = 0): number => (CHEST.intervalSec / chestIntervalSec(luck, classChestSpeedPct) - 1) * 100;

@@ -100,7 +100,7 @@ export interface Profile {
 	emberPlan?: EmberPlan;
 	/** The Gem shop: `none` (no gems, one builder), `day0` (Builder #2 bought before the run starts), `daily` (the daily bonus pays gems, Builder #2 is bought at its price) */
 	gems?: 'none' | 'day0' | 'daily';
-	/** Mine the rocks that appear (one per 15 minutes, room for one per 50 tiles) with the clicks that would otherwise earn gold */
+	/** Mine the rocks that appear (one per 15 minutes, room for one per 100 tiles) with the clicks that would otherwise earn gold */
 	rocks?: boolean;
 	/** After the last rebirth keep playing the final run until the castle reaches its top level (the `max-*` probes) */
 	endAtCastle10?: boolean;

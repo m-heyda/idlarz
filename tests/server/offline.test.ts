@@ -18,6 +18,8 @@ import {
 	rollGemAmount,
 } from '../../src/lib/luck';
 import { mulberry32 } from '../../src/lib/rng';
+import { bossIntervalSec, monsterIntervalSec } from '../../src/lib/offline/tickets';
+import { spawnIntervalFactor } from '../../src/lib/luck';
 import { applyOfflineGrant } from '../../src/lib/offline/apply';
 import { computeOfflineGrant, zeroGrant, type OfflineInput } from '../../src/lib/offline/grant';
 import { offlineCapHours, offlineCapSec, offlineEfficiency, offlineMinGapSec } from '../../src/lib/offline/limits';
@@ -75,7 +77,7 @@ test('the Character window lists the offline cap and efficiency, with the rebirt
 test('Luck shortens the chest interval (never below the floor) and raises gem, rarity, drop and lucky-rat odds', () => {
 	assert.equal(chestIntervalSec(0), CHEST.intervalSec);
 	assert.ok(chestIntervalSec(60) < chestIntervalSec(10));
-	assert.equal(chestIntervalSec(1e9), CHEST.intervalSec * LUCK.chestIntervalFloor);
+	assert.equal(chestIntervalSec(1e9), CHEST.intervalSec * LUCK.spawnIntervalFloor);
 	assert.ok(chestRateBonusPct(60) > chestRateBonusPct(0));
 	assert.equal(rarityLuckMultiplier(0), 1);
 	assert.equal(rarityLuckMultiplier(1e9), LUCK.rarityCap);
@@ -157,9 +159,9 @@ const ctx = (over: Partial<BankContext> = {}): BankContext => ({ luck: 0, tilesO
 const NO_LUCKY = () => () => 0.9999; // never under a lucky chance
 const ALL_LUCKY = () => () => 0;
 
-test('the first rat comes after 2 minutes, the next ones every 15, chests every 10', () => {
+test('the first rat comes after 2 minutes, the next ones every 10, chests every 12', () => {
 	const hour = advanceBank(openBank(), 3600, ctx(), NO_LUCKY);
-	assert.equal(hour.minted.chests.length, 6);
+	assert.equal(hour.minted.chests.length, 5);
 	assert.equal(hour.minted.monsters.length, 1 + Math.floor((3600 - COMBAT.spawn.firstSec) / COMBAT.spawn.intervalSec));
 	assert.equal(hour.minted.monsters[0].at, COMBAT.spawn.firstSec);
 	assert.equal(hour.minted.monsters[1].at, COMBAT.spawn.firstSec + COMBAT.spawn.intervalSec);
@@ -188,9 +190,22 @@ test('tickets are the same however the time is cut up', () => {
 	assert.equal(bank.monstersMinted, whole.monstersMinted);
 });
 
+test('Luck shortens the monster and boss timers too, on the same curve and floor as chests and rocks', () => {
+	assert.equal(monsterIntervalSec(0), COMBAT.spawn.intervalSec);
+	assert.equal(bossIntervalSec(0), COMBAT.spawn.bossIntervalSec);
+	assert.ok(monsterIntervalSec(50) < monsterIntervalSec(10));
+	assert.ok(bossIntervalSec(50) < bossIntervalSec(0));
+	assert.equal(monsterIntervalSec(1e9), COMBAT.spawn.intervalSec * LUCK.spawnIntervalFloor);
+	assert.equal(bossIntervalSec(1e9), COMBAT.spawn.bossIntervalSec * LUCK.spawnIntervalFloor);
+	assert.equal(spawnIntervalFactor(NaN), 1, 'a bad number counts as no Luck');
+	const slow = advanceBank(openBank(), 3600, ctx({ luck: 0 }), NO_LUCKY).minted.monsters.length;
+	const fast = advanceBank(openBank(), 3600, ctx({ luck: 100 }), NO_LUCKY).minted.monsters.length;
+	assert.ok(fast > slow, `${fast} > ${slow}`);
+});
+
 test('Luck makes chests come faster', () => {
-	const slow = advanceBank(openBank(), 4 * 3600, ctx({ luck: 0 }), NO_LUCKY).minted.chests.length;
-	const fast = advanceBank(openBank(), 4 * 3600, ctx({ luck: 100 }), NO_LUCKY).minted.chests.length;
+	const slow = advanceBank(openBank(), 3600, ctx({ luck: 0 }), NO_LUCKY).minted.chests.length;
+	const fast = advanceBank(openBank(), 3600, ctx({ luck: 100 }), NO_LUCKY).minted.chests.length;
 	assert.ok(fast > slow, `${fast} > ${slow}`);
 });
 

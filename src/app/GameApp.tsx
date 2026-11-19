@@ -27,7 +27,7 @@
  * 6. **Monsters** appear on owned land ({@link advanceBank}). You click one and the server runs the fight ({@link runCombat}); wins pay gold, XP, hide and gear ({@link killIncome}, {@link generateLoot}). Gear comes only from fights, chests and the merchant's shelf.
  * 7. **Rebirth** (castle 6 and 400+ tiles) restarts the map for Embers: a permanent income bonus and a shop ({@link REBIRTH}). Level, XP, Embers and shop levels stay; map, gear and merchant upgrades (except Pack Rat) do not.
  *
- * **Time scale.** Timers that set the pace: castle upgrades 30 min to 3.5 days per level; a monster every 15 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 10 minutes (`CHEST.intervalSec`); away time paid up to 8 hours at 50% (`LIMITS`).
+ * **Time scale.** Timers that set the pace: castle upgrades 30 min to 3.5 days per level; a monster every 10 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 12 minutes (`CHEST.intervalSec`); Luck shortens all of them (`spawnIntervalFactor`); away time paid up to 8 hours at 50% (`LIMITS`).
  * Measured pacing from the bot simulation is in `docs/generated/pace-milestones.md`; targets are on the Pacing page.
  *
  * **Where the numbers live.** Config is data (`src/config/*`, `src/catalog/*`), maths is pure functions next to it (`src/utils/game/*`, `src/lib/*`), the server engine is `src/lib/offline/*` + `src/app/api/*`. The JSDoc points at all of them.

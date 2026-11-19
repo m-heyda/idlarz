@@ -68,7 +68,7 @@ export const COMBAT = {
 	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
 	spawn: {
 		firstSec: 120, // first monster this long after the game starts (lib/offline/tickets.ts counts it on the server)
-		intervalSec: 900, // then one per this long (chests: 600 s)
+		intervalSec: 600, // then one per this long (chests: 720 s); Luck shortens it like every spawn timer (`spawnIntervalFactor`)
 		bossIntervalSec: 10800, // a boss (one at a time) appears this long after the last one left, or after the start
 		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
 	},
