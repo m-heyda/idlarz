@@ -11,7 +11,6 @@
 import { classPassives } from '@/lib/classPassives';
 import { PINNED_KEEP, type SaveRepo, type StoredSave } from '@/lib/cloudSave/pipeline';
 import { derivedJobs } from '@/lib/cloudSave/summary';
-import { POISON_FLAGS } from '@/lib/cloudSave/verify';
 import { UNCLAIMED_SEC, computeOfflineGrant } from '@/lib/offline/grant';
 import type { ClaimResult, PublicTickets } from '@/lib/offline/types';
 import { addTotals, resetLedger, seedLedger, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
@@ -259,23 +258,20 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 
 		const derived = stored.summary.derived;
 		const nowSec = nowMs / 1000;
-		const flagged = stored.flags.some((flag) => POISON_FLAGS.has(flag));
 		const anchorMs = Math.max(ledger.anchorAt, stored.serverSavedAt);
 		const gapSec = Math.max(0, (nowMs - anchorMs) / 1000);
-		const grant = flagged
-			? null
-			: computeOfflineGrant({
-					rates: stored.summary.rates,
-					ratesAfterCastle: derived.ratesAfterCastle,
-					castleUpgrade: derived.castleUpgrade,
-					buildingUpgrades: derivedJobs(derived).jobs,
-					ratesAfterBuildings: derivedJobs(derived).ratesAfter,
-					xpGainPct: stored.summary.xpGainPct,
-					gapSec,
-					capSec: derived.offlineCapSec,
-					efficiency: derived.offlineEfficiency,
-					minGapSec: offlineMinGapSec(),
-				});
+		const grant = computeOfflineGrant({
+			rates: stored.summary.rates,
+			ratesAfterCastle: derived.ratesAfterCastle,
+			castleUpgrade: derived.castleUpgrade,
+			buildingUpgrades: derivedJobs(derived).jobs,
+			ratesAfterBuildings: derivedJobs(derived).ratesAfter,
+			xpGainPct: stored.summary.xpGainPct,
+			gapSec,
+			capSec: derived.offlineCapSec,
+			efficiency: derived.offlineEfficiency,
+			minGapSec: offlineMinGapSec(),
+		});
 
 		const ctx = bankContext(stored);
 		const rollFor = (kind: string, n: number) => sealedRng(deps.secret, userId, ledger.runId, kind, n);
@@ -293,7 +289,7 @@ export const claimOffline = async (deps: ServiceDeps, userId: string, claimId: s
 
 		const result: ClaimResult = {
 			grant,
-			reason: flagged ? 'flagged' : grant ? 'paid' : 'short',
+			reason: grant ? 'paid' : 'short',
 			tickets: publicTickets(bank, ledger.ordChest),
 			serverNowSec: nowSec,
 			gems: ledger.gems,
