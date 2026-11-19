@@ -786,8 +786,8 @@
       "foundInOres": false,
       "inChest": false,
       "delete": false,
-      "reviewed": false,
-      "purpose": "LTR (look to replace): picture to be replaced; same purpose as now. Candidate from the pool: __reuse/glassware/empty_flask.png."
+      "reviewed": true,
+      "purpose": "Crafting component used by the recipe UI. Replaced 2026-11-19 with the supplied empty flask (same as items/consumable/glass_vial.png)."
     },
     "comp_plank_bundle": {
       "file": "public/pixel/icons/comp_plank_bundle.png",
@@ -1101,8 +1101,8 @@
       "foundInOres": false,
       "inChest": false,
       "delete": false,
-      "reviewed": false,
-      "purpose": "LTR (look to replace): shine strip for the planned mystery resource."
+      "reviewed": true,
+      "purpose": "Rune stone art (from __reuse/valuables/rune_stone.png) since 2026-11-19; icons/res_mystery.png matches. Crystal, mana and sapphire strips still LTR."
     },
     "res_pearls": {
       "file": "public/pixel/icons/res_pearls.png",

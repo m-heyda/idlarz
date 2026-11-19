@@ -39382,6 +39382,19 @@
 	},
 	{
 		"usedBy": [],
+		"name": "reuse_potions_red_jar",
+		"category": "unsorted",
+		"subcategory": "potions",
+		"src": "/pixel/__reuse/potions/red_jar.png",
+		"status": "unused",
+		"source": "public/pixel/__reuse",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "reuse_potions_red_potion",
 		"category": "unsorted",
 		"subcategory": "potions",
