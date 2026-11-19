@@ -21,6 +21,7 @@ export type SaveEventReason =
 	| 'refreshMerchantStock'
 	| 'buyClickUpgrade'
 	| 'levelUp'
+	| 'goldTier'
 	| 'offlineClaimed';
 
 type Listener = (reason: SaveEventReason) => void;

@@ -64,7 +64,18 @@ import { gemBuildersOf } from '@/config/gemShop';
 import type { PrestigeState } from '@/types/game';
 import { calculateLevel, reconcileCharacter } from '@/utils/game/character';
 import { restoreMerchantLevels, sameRunAs, trustedEconomy } from './trustedEconomy';
-import { ENFORCEMENT, POISON_FLAGS, VERIFY, rejectedFlags, verifyTransition, type Enforcement, type SaveFlag, type Snapshot } from './verify';
+import {
+	ENFORCEMENT,
+	FORGED_GOLD_FLAGS,
+	FORGED_LAND_FLAGS,
+	POISON_FLAGS,
+	VERIFY,
+	rejectedFlags,
+	verifyTransition,
+	type Enforcement,
+	type SaveFlag,
+	type Snapshot,
+} from './verify';
 
 /** Accepted saves are copied into the history when this long passed since the last copy (not every N revisions: event saves make the revision count race ahead of the clock), and when a flag appears that the previous save did not have. */
 export const HISTORY_EVERY_MS = 30 * 60_000;
@@ -375,8 +386,9 @@ export const acceptSave = async (
 			baseline?.serverSavedAt,
 		);
 	}
-	// the deeds read the land and farm facts of the stored summary: a flagged save does not get to raise them (the save before it keeps its facts)
-	if (flags.length > 0) summary.derived.deedWorld = current?.summary.derived.deedWorld;
+	// the deeds read the land and farm facts of the stored summary: a save whose land could not have been paid for does not get to raise them (the save before it keeps its facts).
+	// Any other flag (a castle timer, XP, an older save) leaves the facts alone, or one such flag would freeze the land deeds for good
+	if (flags.some((flag) => FORGED_LAND_FLAGS.has(flag))) summary.derived.deedWorld = current?.summary.derived.deedWorld;
 	const newRun = !!(ledger && current && (summary.rebirths > current.summary.rebirths || flags.includes('playtime_regress')));
 
 	// Starting over (New Game), or a browser re-basing its game over an account save that is further along (client `resolveConflict`) must not
@@ -454,8 +466,8 @@ export const acceptSave = async (
 				tilesOwned: summary.tilesOwned,
 				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
 				newRun: newRun || !current,
-				// only a clean save's gold counts towards Hoarder: a flagged save (shadow mode) may claim gold nothing paid for
-				gold: flags.length === 0 ? summary.gold : undefined,
+				// only believable gold counts towards Hoarder: a save flagged for forged gold or land (shadow mode) may claim gold nothing paid for
+				gold: flags.some((flag) => FORGED_GOLD_FLAGS.has(flag)) ? undefined : summary.gold,
 			});
 			// trades the server made since the last save stay on the record until this save's stock accounts for them (an older browser's picture does not)
 			counted.tradeSince = ledger ? settleTrades(ledger, current, split.core, nowMs / 1000, newRun || !current) : counted.tradeSince;

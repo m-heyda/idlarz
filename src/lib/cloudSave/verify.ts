@@ -68,7 +68,7 @@ export type SaveFlag =
 
 /**
  * What the server does when a flag fires (IDL-167, IDL-112), recorded in one place instead of scattered through the pipeline:
- *  - `flag`: accepted as sent, the account loses its ranking (`POISON_FLAGS`); nothing the server pays out depends on the claim.
+ *  - `flag`: accepted as sent, the account loses its ranking (`POISON_FLAGS`); nothing the server pays out depends on it (away pay included: a flag never stops a claim).
  *  - `clamp`: accepted, but the server replaces the claimed number with the one it can explain (XP, Embers), or pays from the last trusted
  *    economy (`trustedEconomy.ts`: castle level, rates, merchant levels); the flag stays.
  *  - `reject`: the save is refused, but only while `ENFORCEMENT.enabled` is on (until then it behaves as `flag`).
@@ -164,6 +164,16 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 	'timer_jump',
 	'ember_jump',
 ]);
+
+/**
+ * The flags that say the land or the gold a save claims cannot be explained (a forged map or purse). Only these keep a save's land facts and gold out of the deeds ({@link FORGED_LAND_FLAGS}, {@link FORGED_GOLD_FLAGS}):
+ * a save that tripped some other check (a castle timer, XP, a rebirth count, going back to an older save) says nothing against its tiles or its gold, so an honest player is not locked out of the deeds by it.
+ *
+ * @category Progression/Achievements
+ * @order 6
+ */
+export const FORGED_LAND_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast']);
+export const FORGED_GOLD_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast', 'gold_jump']);
 
 /**
  * `grants`: what the server itself handed out since the previous save (income while away, chest and kill rewards): a save may

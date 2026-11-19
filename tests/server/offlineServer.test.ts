@@ -144,7 +144,7 @@ test('an account with no cloud save has nothing to claim', async () => {
 	assert.equal((await claimOffline(m.deps, 'nobody', 'claim-0001', T0)).kind, 'no_save');
 });
 
-test('an account under review (a poison flag on its latest save) is not paid', async () => {
+test('a poison flag on its latest save does not stop the away pay (flags only cost the ranking)', async () => {
 	const m = memory();
 	const state = game();
 	// a first save with far more gold than the income could ever explain is flagged baseline_rich
@@ -152,8 +152,8 @@ test('an account under review (a poison flag on its latest save) is not paid', a
 	const out = await save(m, 'u1', rich, 0, T0);
 	assert.ok(out.kind === 'ok' && out.flags.includes('baseline_rich'));
 	const result = await claim(m, 'u1', 'claim-0001', T0 + 3 * HOUR);
-	assert.equal(result.grant, null);
-	assert.equal(result.reason, 'flagged');
+	assert.ok(result.grant);
+	assert.equal(result.reason, 'paid');
 });
 
 test('a claim made before the ledger exists seeds it from the save: the gems start at the gift, and a save from before server-placed monsters brings its rats as unplaced tickets', async () => {
