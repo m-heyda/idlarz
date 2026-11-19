@@ -1,5 +1,5 @@
 // The farm: animal costs and output, pen and upgrades (part of the former utils/gameUtils.ts, split in IDL-15).
-import { ANIMALS, FARM, FARM_PEN, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
+import { ANIMALS, FARM, FARM_PEN, FARM_ROOSTER, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import type { Animal, Resources } from '@/types/game';
 
 /**
@@ -22,6 +22,24 @@ export const farmUpgradeLevel = (upgrades: FarmUpgrades | undefined, id: FarmUpg
 
 /** Animals of one kind the pen holds (the base cap plus Pen Expansion). A save with more is never trimmed. */
 export const farmCap = (upgrades: FarmUpgrades | undefined): number => FARM.baseCap + farmUpgradeLevel(upgrades, 'pen') * FARM_PEN.capPerLevel;
+
+/** Roosters on the farm: the Rooster level, never more than the chickens owned. */
+export const roosterCount = (upgrades: FarmUpgrades | undefined, farmLevels?: Record<string, number>): number => {
+	const level = farmUpgradeLevel(upgrades, 'rooster');
+	return farmLevels ? Math.min(level, Math.max(0, farmLevels[FARM_ROOSTER.animal] ?? 0)) : level;
+};
+
+/**
+ * Whether the next level of a farm upgrade may be bought at all (price aside). The Rooster needs every chicken slot filled: as many chickens as the pen holds (`farmCap`) and one chicken left to turn.
+ *
+ * @category Economy/Farm
+ * @order 7
+ */
+export const farmUpgradeOpen = (id: FarmUpgradeId, farmLevels: Record<string, number>, upgrades: FarmUpgrades | undefined): boolean => {
+	if (id !== 'rooster') return true;
+	const chickens = farmLevels[FARM_ROOSTER.animal] ?? 0;
+	return chickens >= farmCap(upgrades) && farmUpgradeLevel(upgrades, 'rooster') < chickens;
+};
 
 /**
  * Cost of the next level of a farm upgrade, given its current level (one entry per resource).
@@ -55,15 +73,20 @@ const emptyOutput = (): FarmOutput => ({ meat: 0, eggs: 0, milk: 0, hide: 0, woo
  * @formula
  * meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
  * product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery | shearing effect) x (1 + 0.08 x pasture level)
+ * chickens: N is replaced by N + 4 x R (a rooster counts as 5 chickens) and meat and eggs are multiplied by (1 + 0.1 x R), R = min(rooster level, chickens)
  */
 export const animalOutput = (animal: Animal, count: number, upgrades?: FarmUpgrades): FarmOutput => {
 	const out = emptyOutput();
 	if (count <= 0) return out;
 	const pen = 1 + farmUpgradeLevel(upgrades, 'pen') * FARM_PEN.outputPerLevel;
 	const up = (id: FarmUpgradeId) => 1 + farmUpgradeLevel(upgrades, id) * FARM_UPGRADES[id].effectPerLevel;
-	out.meat = animal.baseProduction * count * pen * up('feed');
+	// the roosters of the chicken pen: each stands for several chickens and lifts the whole flock
+	const roosters = animal.id === FARM_ROOSTER.animal ? Math.min(farmUpgradeLevel(upgrades, 'rooster'), count) : 0;
+	const units = count + roosters * (FARM_ROOSTER.outputMultiplier - 1);
+	const flock = 1 + roosters * FARM_ROOSTER.chickenBoostPerRooster;
+	out.meat = animal.baseProduction * units * flock * pen * up('feed');
 	const productUpgrade: Record<Animal['product']['resource'], FarmUpgradeId> = { eggs: 'coop', milk: 'dairy', hide: 'tannery', wool: 'shearing' };
-	out[animal.product.resource] = animal.product.perSec * count * pen * up(productUpgrade[animal.product.resource]) * up('pasture');
+	out[animal.product.resource] = animal.product.perSec * units * flock * pen * up(productUpgrade[animal.product.resource]) * up('pasture');
 	return out;
 };
 
@@ -115,7 +138,7 @@ export const farmHasPurchase = (
 	if (ANIMALS.some((a) => affordableAnimals(a, farmLevels[a.id] || 0, resources.food, cap, 1) > 0)) return true;
 	return (Object.keys(FARM_UPGRADES) as FarmUpgradeId[]).some((id) => {
 		const level = farmUpgradeLevel(farmUpgrades, id);
-		if (level >= FARM_UPGRADES[id].maxLevel) return false;
+		if (level >= FARM_UPGRADES[id].maxLevel || !farmUpgradeOpen(id, farmLevels, farmUpgrades)) return false;
 		return Object.entries(farmUpgradeCost(id, level)).every(([resource, price]) => (resources[resource as keyof typeof resources] ?? 0) >= (price ?? 0));
 	});
 };

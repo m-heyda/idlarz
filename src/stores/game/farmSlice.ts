@@ -2,7 +2,7 @@
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
-import { affordableAnimals, animalBatchCost, farmCap, farmUpgradeCost, farmUpgradeLevel } from '@/utils/game/farm';
+import { affordableAnimals, animalBatchCost, farmCap, farmUpgradeCost, farmUpgradeLevel, farmUpgradeOpen } from '@/utils/game/farm';
 import { calculateResourceRates } from '@/utils/game/income';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { gearIncomePct } from '@/lib/gearEconomy';
@@ -43,13 +43,13 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 		return n;
 	},
 
-	// One level of a farm upgrade (feed, hen house, dairy, tannery, pen), paid in resources
+	// One level of a farm upgrade (feed, hen house, dairy, tannery, pen, rooster), paid in resources
 	buyFarmUpgrade: (id: FarmUpgradeId) => {
 		const state = get();
 		const def = FARM_UPGRADES[id];
 		if (!def) return false;
 		const level = farmUpgradeLevel(state.farmUpgrades, id);
-		if (level >= def.maxLevel) return false;
+		if (level >= def.maxLevel || !farmUpgradeOpen(id, state.farmLevels, state.farmUpgrades)) return false;
 		const cost = farmUpgradeCost(id, level);
 		if (!canAffordBundle(state.resources, cost)) return false;
 

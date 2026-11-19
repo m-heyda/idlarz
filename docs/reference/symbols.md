@@ -15,7 +15,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `allocatePoints` | Progression / Levels | [`src/lib/offline/attrs.ts:107`](../../src/lib/offline/attrs.ts) | Puts points into attributes: |
 | `ANIMAL_PIXEL_ICONS` | Architecture / Art | [`src/config/pixelIcons.ts:255`](../../src/config/pixelIcons.ts) | Farm animal id -> its sprites. |
 | `animalIcon` | Architecture / Art | [`src/config/pixelIcons.ts:270`](../../src/config/pixelIcons.ts) | The sprite one animal wears: |
-| `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
+| `animalOutput` | Economy / Farm | [`src/utils/game/farm.ts:78`](../../src/utils/game/farm.ts) | Output of `count` animals of one kind (every purchase adds one more animal). |
 | `ANIMALS` | Economy / Farm | [`src/config/farm.ts:17`](../../src/config/farm.ts) | The farm: |
 | `applyPets` | Progression / Pets | [`src/lib/offline/pets.ts:28`](../../src/lib/offline/pets.ts) | Applies one pets request to the ledger. |
 | `applySpend` | Economy / Gems | [`src/lib/offline/gems.ts:96`](../../src/lib/offline/gems.ts) | One purchase from the gem shop, decided on the ledger: |
@@ -62,7 +62,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `buyResource` | Economy / Merchant | [`src/lib/offline/trade.ts:128`](../../src/lib/offline/trade.ts) | Buys `qty` whole units of a resource the merchant sells (`MERCHANT_BUYABLE`) for `buyCost`, rounded up in the merchant's favour. |
 | `calculateAnimalCost` | Economy / Farm | [`src/utils/game/farm.ts:14`](../../src/utils/game/farm.ts) | Food cost of the next animal of a kind when `level` of them are owned: |
 | `calculateCombatStats` | Progression / Attributes | [`src/utils/game/character.ts:252`](../../src/utils/game/character.ts) | The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says. |
-| `calculateFarmOutput` | Economy / Farm | [`src/utils/game/farm.ts:79`](../../src/utils/game/farm.ts) | The whole farm's output per second: |
+| `calculateFarmOutput` | Economy / Farm | [`src/utils/game/farm.ts:102`](../../src/utils/game/farm.ts) | The whole farm's output per second: |
 | `calculateLevel` | Progression / Levels | [`src/utils/game/character.ts:206`](../../src/utils/game/character.ts) | Level from total XP: |
 | `calculateResourceBreakdown` | Economy / Income | [`src/utils/game/income.ts:129`](../../src/utils/game/income.ts) | Income per second of every resource, split into its sources and modifiers (the one place the income formula lives). |
 | `calculateStatResourceModifiers` | Progression / Attributes | [`src/utils/game/character.ts:230`](../../src/utils/game/character.ts) | What the five attributes add to the income modifier of each resource (all points count, not only those above 5). |
@@ -139,8 +139,10 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `estimateWin` | Combat / Win chance | [`src/lib/offline/winChance.ts:72`](../../src/lib/offline/winChance.ts) | The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. |
 | `extractorOutput` | Economy / Buildings | [`src/lib/buildingOutput.ts:42`](../../src/lib/buildingOutput.ts) | What an Extractor of level `level` makes per second, before the global modifiers: |
 | `FAMILY_DROPS` | Monsters / Bestiary | [`src/catalog/monsterDrops.ts:35`](../../src/catalog/monsterDrops.ts) | What each family leaves (two or three ingredients), so a bear and a boar share a theme and the Bestiary can explain it. |
-| `FARM_UPGRADES` | Economy / Farm | [`src/config/farm.ts:81`](../../src/config/farm.ts) | Farm upgrades: |
-| `farmUpgradeCost` | Economy / Farm | [`src/utils/game/farm.ts:34`](../../src/utils/game/farm.ts) | Cost of the next level of a farm upgrade, given its current level (one entry per resource). |
+| `FARM_ROOSTER` | Economy / Farm | [`src/config/farm.ts:76`](../../src/config/farm.ts) | The Rooster upgrade: |
+| `FARM_UPGRADES` | Economy / Farm | [`src/config/farm.ts:89`](../../src/config/farm.ts) | Farm upgrades: |
+| `farmUpgradeCost` | Economy / Farm | [`src/utils/game/farm.ts:52`](../../src/utils/game/farm.ts) | Cost of the next level of a farm upgrade, given its current level (one entry per resource). |
+| `farmUpgradeOpen` | Economy / Farm | [`src/utils/game/farm.ts:38`](../../src/utils/game/farm.ts) | Whether the next level of a farm upgrade may be bought at all (price aside). |
 | `fightStep` | Combat / A fight | [`src/lib/offline/fightSteps.ts:165`](../../src/lib/offline/fightSteps.ts) | One tick of the open fight. |
 | `finite` | Saves & Server / The ledger | [`src/lib/offline/ledgerRead.ts:19`](../../src/lib/offline/ledgerRead.ts) | Tolerant readers for the two ledger columns that hold catalog ids (`inv`: |
 | `FLAG_POLICY` | Saves & Server / Accepting a save | [`src/lib/cloudSave/verify.ts:97`](../../src/lib/cloudSave/verify.ts) | The flags and what the server does with each. |

@@ -145,6 +145,7 @@ const bySlug={};for(const x of ents)(bySlug[x.slug]=bySlug[x.slug]||[]).push(x);
 for(const x of ents){if(x.group==='minerals')continue;const o=(bySlug[x.slug]||[]).filter(y=>y!==x&&y.group!=='minerals');if(o.length)x.also=o.map(y=>y.src);}
 // the used pictures are reviewed (decisions.json); the page lists planned and unused ones. INCLUDE_USED=1 adds them back.
 if(!process.env.INCLUDE_USED)for(let i=ents.length-1;i>=0;i--)if(ents[i].def.status==='used')ents.splice(i,1);
+for(const e of ents)if(e.def.status==='planned')e.def.status='unused'; // no planned tab: planned art is reviewed with the unused
 const tpl=fs.readFileSync(path.join(__dirname,'template.html'),'utf8');
 const html=tpl.replace('/*DATA*/',()=>'const ITEMS='+JSON.stringify(ents)+';const IMGS='+JSON.stringify(Object.fromEntries([...imgs].filter(([k])=>ents.some(e=>e.img===k))))+';');
 fs.writeFileSync(OUT,html);

@@ -798,7 +798,6 @@ export const buildManifest = (): AssetEntry[] => {
 	for (const e of entries) {
 		if (e.status === 'reuse' && e.name.startsWith('avatar_horned_'))
 			Object.assign(e, { status: 'planned', usedBy: ['unlockable avatar (gems, achievements), IDL-266'] });
-		if (e.name === 'animal_rooster') Object.assign(e, { status: 'planned', usedBy: ['golden-egg chicken upgrade (late gem purchase), IDL-260'] });
 	}
 	// The three tags. Art that code names by path or quoted file name is `used` whatever it was filed as; `planned` stays only while nothing names the picture; everything else (pool art, spares, alternatives, retired) is `unused`.
 	// A placeholder is drawn in the game, so it is `used`.

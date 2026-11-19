@@ -11,7 +11,7 @@ Income, tiles, castle, farm, merchant, clicks, chests and Luck.
 - Tiles: [`tilePrice`](#tileprice), [`TILE_RESOURCE_COST`](#tile-resource-cost), [`calculateTileCost`](#calculatetilecost), [`effectiveTileDiscount`](#effectivetilediscount), [`calculateXpGain`](#calculatexpgain), [`economyTiles`](#economytiles)
 - Biomes: [`rollBiome`](#rollbiome), [`BIOMES`](#biomes), [`REBIRTH_BIOME_OUTPUT`](#rebirth-biome-output), [`generateStartRing`](#generatestartring)
 - Castle: [`CASTLE_UPGRADE`](#castle-upgrade), [`castleModifier`](#castlemodifier), [`castleUpgradeDuration`](#castleupgradeduration), [`CASTLE_RANGE`](#castle-range), [`CASTLE_AREA_BONUS`](#castle-area-bonus), [`CASTLE_WARD`](#castle-ward), [`isInWard`](#isinward), [`castleRangeRadius`](#castlerangeradius), [`castleAreaBonus`](#castleareabonus)
-- Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput)
+- Farm: [`ANIMALS`](#animals), [`animalOutput`](#animaloutput), [`FARM_UPGRADES`](#farm-upgrades), [`FARM_ROOSTER`](#farm-rooster), [`calculateAnimalCost`](#calculateanimalcost), [`farmUpgradeCost`](#farmupgradecost), [`calculateFarmOutput`](#calculatefarmoutput), [`farmUpgradeOpen`](#farmupgradeopen)
 - Merchant: [`MERCHANT_RESOURCE_PRICES`](#merchant-resource-prices), [`MERCHANT_GOODS`](#merchant-goods), [`MERCHANT_UPGRADES`](#merchant-upgrades), [`sellPayout`](#sellpayout), [`buyCost`](#buycost), [`MERCHANT_BUY_MULTIPLIER`](#merchant-buy-multiplier), [`merchantUpgradeCost`](#merchantupgradecost), [`generateMerchantStock`](#generatemerchantstock), [`shopPriceOf`](#shoppriceof), [`paidRefreshesNow`](#paidrefreshesnow), [`refreshCost`](#refreshcost), [`sellResource`](#sellresource), [`bestWornGrade`](#bestworngrade), [`buyResource`](#buyresource)
 - Clicks: [`CLICK_LADDER`](#click-ladder), [`CLICK_LIMIT`](#click-limit), [`clickGold`](#clickgold), [`createClickLimiter`](#createclicklimiter)
 - Chests and Luck: [`CHEST`](#chest), [`LUCK`](#luck), [`chestIntervalSec`](#chestintervalsec), [`chestSpots`](#chestspots), [`rewardWeights`](#rewardweights), [`rollChestLoot`](#rollchestloot), [`gemChance`](#gemchance), [`rarityLuckMultiplier`](#rarityluckmultiplier), [`dropChanceMultiplier`](#dropchancemultiplier), [`goldenMonsterChance`](#goldenmonsterchance)
@@ -499,7 +499,7 @@ The farm: animals are bought with food. The N-th animal of a kind costs `floor(b
 
 ### `animalOutput` <small>function</small>
 
-Source: [`src/utils/game/farm.ts:59`](../../src/utils/game/farm.ts)
+Source: [`src/utils/game/farm.ts:78`](../../src/utils/game/farm.ts)
 
 Output of `count` animals of one kind (every purchase adds one more animal).
 
@@ -510,16 +510,17 @@ Output of N animals of one kind. Meat uses Feed Trough, the products use their o
 ```text
 meat    = baseProduction x N x (1 + 0.02 x pen level) x (1 + 0.05 x feed trough level)
 product = perSec x N x (1 + 0.02 x pen level) x (1 + coop | dairy | tannery | shearing effect) x (1 + 0.08 x pasture level)
+chickens: N is replaced by N + 4 x R (a rooster counts as 5 chickens) and meat and eggs are multiplied by (1 + 0.1 x R), R = min(rooster level, chickens)
 ```
 
 <a id="farm-upgrades"></a>
 
 ### `FARM_UPGRADES` <small>const</small>
 
-Source: [`src/config/farm.ts:81`](../../src/config/farm.ts)
+Source: [`src/config/farm.ts:89`](../../src/config/farm.ts)
 
 Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ([`farmUpgradeCost`](economy.md#farmupgradecost)). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9);
-the others have 10 levels and growth 1.6.
+the others have 10 levels and growth 1.6. The Rooster (5 levels, growth 6, from 5M food: [`FARM_ROOSTER`](economy.md#farm-rooster)) only opens once every chicken slot is filled.
 
 **Farm upgrades** _(computed from the code)_
 
@@ -532,6 +533,15 @@ the others have 10 levels and growth 1.6.
 | Shearing Shed | +25% wool | 10 | food 1,500, wool 30 | 1.6 |
 | Pasture | +8% eggs, milk, hide and wool | 10 | food 5,000, wood 2,500 | 1.6 |
 | Pen Expansion | +2% farm output, +4 animals per kind | 8 | food 8,000, wood 3,000, stone 3,000 | 1.9 |
+| Rooster | 1 rooster: each makes 5x a chicken, +10% chicken output | 5 | food 5 M | 6 |
+
+<a id="farm-rooster"></a>
+
+### `FARM_ROOSTER` <small>const</small>
+
+Source: [`src/config/farm.ts:76`](../../src/config/farm.ts)
+
+The Rooster upgrade: once the pen holds as many chickens as it can (`farmCap`), each level turns one more chicken into a rooster (5 levels, so 5 roosters). A rooster lays and feeds `outputMultiplier` times a chicken, and every rooster adds `chickenBoostPerRooster` to the output of all chickens (meat and eggs). Levels cost food, from millions to billions ([`FARM_UPGRADES`](economy.md#farm-upgrades)).
 
 <a id="calculateanimalcost"></a>
 
@@ -551,7 +561,7 @@ cost = floor(baseCost x costScaling^owned)
 
 ### `farmUpgradeCost` <small>function</small>
 
-Source: [`src/utils/game/farm.ts:34`](../../src/utils/game/farm.ts)
+Source: [`src/utils/game/farm.ts:52`](../../src/utils/game/farm.ts)
 
 Cost of the next level of a farm upgrade, given its current level (one entry per resource).
 
@@ -565,9 +575,17 @@ cost[r] = ceil(base[r] x growth^level)          per resource of the upgrade
 
 ### `calculateFarmOutput` <small>function</small>
 
-Source: [`src/utils/game/farm.ts:79`](../../src/utils/game/farm.ts)
+Source: [`src/utils/game/farm.ts:102`](../../src/utils/game/farm.ts)
 
 The whole farm's output per second: the sum of [`animalOutput`](economy.md#animaloutput) over the animal kinds. The merchant's Skinner multiplies meat and hide afterwards ([`calculateResourceBreakdown`](economy.md#calculateresourcebreakdown)).
+
+<a id="farmupgradeopen"></a>
+
+### `farmUpgradeOpen` <small>function</small>
+
+Source: [`src/utils/game/farm.ts:38`](../../src/utils/game/farm.ts)
+
+Whether the next level of a farm upgrade may be bought at all (price aside). The Rooster needs every chicken slot filled: as many chickens as the pen holds (`farmCap`) and one chicken left to turn.
 
 ## Merchant
 

@@ -12825,13 +12825,13 @@
 	},
 	{
 		"usedBy": [
-			"golden-egg chicken upgrade (late gem purchase), IDL-260"
+			"src/components/game/overlays/FarmScene.tsx"
 		],
 		"name": "animal_rooster",
 		"category": "resources",
 		"subcategory": "animal",
 		"src": "/pixel/icons/animal_rooster.png",
-		"status": "planned",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			96,

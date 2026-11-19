@@ -980,14 +980,25 @@
   "see": []
  },
  {
+  "id": "farm-rooster",
+  "name": "FARM_ROOSTER",
+  "symbol": "FARM_ROOSTER",
+  "kind": "const",
+  "category": "Economy/Farm",
+  "file": "src/config/farm.ts",
+  "line": 76,
+  "summary": "The Rooster upgrade: once the pen holds as many chickens as it can (`farmCap`), each level turns one more chicken into a rooster (5 levels, so 5 roosters). A rooster lays and feeds `outputMultiplier` times a chicken, and every rooster adds `chickenBoostPerRooster` to the output of all chickens (meat and eggs). Levels cost food, from millions to billions ({@link FARM_UPGRADES}).",
+  "see": []
+ },
+ {
   "id": "farm-upgrades",
   "name": "FARM_UPGRADES",
   "symbol": "FARM_UPGRADES",
   "kind": "const",
   "category": "Economy/Farm",
   "file": "src/config/farm.ts",
-  "line": 81,
-  "summary": "Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9); the others have 10 levels and growth 1.6.",
+  "line": 89,
+  "summary": "Farm upgrades: the cost of level N+1 is `ceil(base x growth^N)` per resource ({@link farmUpgradeCost}). Pen Expansion adds +2% farm output and +4 animals per kind (8 levels, growth 1.9); the others have 10 levels and growth 1.6. The Rooster (5 levels, growth 6, from 5M food: {@link FARM_ROOSTER}) only opens once every chicken slot is filled.",
   "see": []
  },
  {
@@ -3467,13 +3478,24 @@
   "see": []
  },
  {
+  "id": "farmupgradeopen",
+  "name": "farmUpgradeOpen",
+  "symbol": "farmUpgradeOpen",
+  "kind": "function",
+  "category": "Economy/Farm",
+  "file": "src/utils/game/farm.ts",
+  "line": 38,
+  "summary": "Whether the next level of a farm upgrade may be bought at all (price aside). The Rooster needs every chicken slot filled: as many chickens as the pen holds (`farmCap`) and one chicken left to turn.",
+  "see": []
+ },
+ {
   "id": "farmupgradecost",
   "name": "farmUpgradeCost",
   "symbol": "farmUpgradeCost",
   "kind": "function",
   "category": "Economy/Farm",
   "file": "src/utils/game/farm.ts",
-  "line": 34,
+  "line": 52,
   "summary": "Cost of the next level of a farm upgrade, given its current level (one entry per resource).",
   "see": []
  },
@@ -3484,7 +3506,7 @@
   "kind": "function",
   "category": "Economy/Farm",
   "file": "src/utils/game/farm.ts",
-  "line": 59,
+  "line": 78,
   "summary": "Output of `count` animals of one kind (every purchase adds one more animal).",
   "see": []
  },
@@ -3495,7 +3517,7 @@
   "kind": "function",
   "category": "Economy/Farm",
   "file": "src/utils/game/farm.ts",
-  "line": 79,
+  "line": 102,
   "summary": "The whole farm's output per second: the sum of {@link animalOutput} over the animal kinds. The merchant's Skinner multiplies meat and hide afterwards ({@link calculateResourceBreakdown}).",
   "see": []
  },

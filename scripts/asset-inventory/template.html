@@ -130,7 +130,7 @@ const KEY='pixel-inv-v1';
 const $=s=>document.querySelector(s);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const clone=o=>JSON.parse(JSON.stringify(o));
-const state={};let tab='planned',sel=new Set();
+const state={};let tab='unused',sel=new Set();
 for(const it of ITEMS){it.def.foundOres=it.def.ores.length>0;it.def.ok=!!it.def.ok;state[it.id]=clone(it.def)}
 try{const s=JSON.parse(localStorage.getItem(KEY)||'{}');for(const id in s)if(state[id])Object.assign(state[id],s[id])}catch(e){}
 const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(state))}catch(e){}};
@@ -175,7 +175,7 @@ function visible(){
     if(q&&!(it.label+' '+it.src+' '+it.id+' '+s.purpose).toLowerCase().includes(q))return false;return true}).sort((a,b)=>a.group.localeCompare(b.group)||a.label.localeCompare(b.label));
 }
 function counts(){const c={used:0,planned:0,unused:0,del:0,all:ITEMS.length,edited:0,ok:0};for(const it of ITEMS){const s=state[it.id];c[it.def.status]++;if(s.del)c.del++;if(changed(it))c.edited++;if(s.ok)c.ok++}return c}
-function renderTabs(){const c=counts();$('#tabs').innerHTML=[['planned','Planned'],['unused','Unused']].map(t=>`<button class="tab" data-tab="${t[0]}" aria-pressed="${tab===t[0]}">${t[1]}<b>${c[t[0]]}</b></button>`).join('');$('#stat').textContent=`${c.ok} reviewed · ${c.edited} edited · ${c.del} marked for delete (all tabs). Copy buttons use the open tab only.`}
+function renderTabs(){const c=counts();$('#tabs').innerHTML=[['unused','Unused']].map(t=>`<button class="tab" data-tab="${t[0]}" aria-pressed="${tab===t[0]}">${t[1]}<b>${c[t[0]]}</b></button>`).join('');$('#stat').textContent=`${c.ok} reviewed · ${c.edited} edited · ${c.del} marked for delete (all tabs). Copy buttons use the open tab only.`}
 function render(){renderTabs();const v=visible();$('#grid').innerHTML=v.map(card).join('');$('#empty').hidden=v.length>0;renderBatch()}
 function renderBatch(){const n=sel.size;$('#batch').classList.toggle('on',n>0);$('#bn').textContent=n+' selected'}
 function refreshCard(id){const it=ITEMS.find(i=>i.id===id),el=document.querySelector(`.card[data-id="${CSS.escape(id)}"]`);if(el){const t=document.createElement('div');t.innerHTML=card(it);el.replaceWith(t.firstElementChild)}renderTabs()}

@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import '@/styles/Farm.css';
+import { roosterCount } from '@/utils/game/farm';
 import FarmScene from './FarmScene';
 import FarmUpgradeDock from './FarmUpgradeDock';
 import FarmAnimalDock, { ANIMAL_DOCK_WIDTH } from './FarmAnimalDock';
@@ -13,6 +14,7 @@ import FarmAnimalDock, { ANIMAL_DOCK_WIDTH } from './FarmAnimalDock';
 const FarmOverlay: React.FC = () => {
 	const purchaseAnimal = useGameStore((state) => state.purchaseAnimal);
 	const farmLevels = useGameStore((state) => state.farmLevels);
+	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
 	const [highlightId, setHighlightId] = useState<string | null>(null);
 	const [celebrate, setCelebrate] = useState<string | null>(null);
 	// which panels are folded is remembered between visits (lib/uiPrefs)
@@ -33,7 +35,13 @@ const FarmOverlay: React.FC = () => {
 
 	return (
 		<div className='farm-root'>
-			<FarmScene farmLevels={farmLevels} highlightId={highlightId} celebrate={celebrate} insets={{ right: animalsOpen ? ANIMAL_DOCK_WIDTH : 0 }} />
+			<FarmScene
+				farmLevels={farmLevels}
+				roosters={roosterCount(farmUpgrades, farmLevels)}
+				highlightId={highlightId}
+				celebrate={celebrate}
+				insets={{ right: animalsOpen ? ANIMAL_DOCK_WIDTH : 0 }}
+			/>
 			<FarmAnimalDock open={animalsOpen} onToggle={() => setPref('farmAnimalsOpen', !animalsOpen)} onBuy={buy} onHover={setHighlightId} />
 			<FarmUpgradeDock open={upgradesOpen} onOpenChange={setUpgradesOpen} />
 		</div>
