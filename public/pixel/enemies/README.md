@@ -24,3 +24,7 @@ The hills sheet was cut into the nine hills sprites (`hill-ogre`, `highland-gnol
 ## Hills and blight art swap (2026-11-18)
 
 `hills/magma-knight.png` was a byte-for-byte copy of `battlefield/boss-cinder-warlord.png` and `blight/blighted-husk.png` of `swamp/toxic-zombie.png`; both, and `hills/magma-crab.png`, were removed (the Magma Knight, Magma Crab and Blighted Husk are retired ids now, `RETIRED_MONSTERS`). New: `hills/quarry-rat-knight.png` and `blight/sporeback-ogre.png` (supplied by the owner in chat), `battlefield/frost-flame-knight.png` and `orchard/mushroom-wizard.png` (from the `monsters` pack, since removed from the repository, `). No two monsters share a picture.
+
+## Four stand-ins replaced (2026-11-19)
+
+Supplied by the owner in chat, each with a 1 px clear margin added: `forest/pinecone-warden.png` (a blue spiked, fanged plant), `hills/cairn-sentinel.png` (a stone watchtower with a blue brazier), `fields/millstone-golem.png` (a grey stone creature) and `swamp/bogfire-wisp.png`, which is now a sludge cyclops: the id `bogfireWisp` stays (ids are append-only) but the monster is called **Sludge Cyclops**, with new lore and tags (`catalog/monsterMeta.ts`). Its stats and loot are unchanged.

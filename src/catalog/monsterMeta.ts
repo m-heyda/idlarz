@@ -28,7 +28,7 @@ export const META: Readonly<Record<string, { family: MonsterFamily; tags: readon
 	magmaCrab: { family: 'Vermin', tags: ['Fire', 'Armored'] },
 	mawhornBrute: { family: 'Demon', tags: ['Poison'] },
 	quarryDrake: { family: 'Dragon', tags: ['Fast', 'Fire'] },
-	cairnSentinel: { family: 'Construct', tags: ['Armored'] },
+	cairnSentinel: { family: 'Construct', tags: ['Armored', 'Magic'] },
 	quarryRatKnight: { family: 'Humanoid', tags: ['Pack', 'Armored'] },
 	highlandGnoll: { family: 'Humanoid', tags: ['Pack', 'Fast'] },
 	bossIronhorn: { family: 'Construct', tags: ['Boss', 'Armored', 'Fire'] },
@@ -41,7 +41,7 @@ export const META: Readonly<Record<string, { family: MonsterFamily; tags: readon
 	dumpback: { family: 'Beast', tags: ['Poison', 'Armored'] },
 	rotHeron: { family: 'Bird', tags: ['Poison', 'Fast'] },
 	scrapGolem: { family: 'Construct', tags: ['Armored'] },
-	bogfireWisp: { family: 'Elemental', tags: ['Fire', 'Magic', 'Night'] },
+	bogfireWisp: { family: 'Elemental', tags: ['Poison', 'Night'] },
 	bossMireMatriarch: { family: 'Aquatic', tags: ['Boss', 'Poison'] },
 	garbageOgre: { family: 'Humanoid', tags: ['Poison'] },
 	// tundra
@@ -122,14 +122,15 @@ export const MORE_LORE: Readonly<Record<string, string>> = {
 	bossElderStag: 'Older than the road, older than the toll, and rather tired of both. The forest turns to look when it lowers its head.',
 	// hills
 	quarryDrake: 'A young drake that decided the quarry is its nest.',
-	cairnSentinel: 'A heap of stones that remembers being a wall.',
+	cairnSentinel:
+		'A watchtower the old border wars left standing. The brazier on top burns blue with nothing to feed it, and it fires on whatever walks the road.',
 	quarryRatKnight:
 		'The old Rat King lost his crown and his kingdom, but not his guard. They took the quarry, they drill every dawn, and they still salute an empty throne.',
 	highlandGnoll: 'Laughs at everything, mostly his own jokes, and steals the rest. The miners say the laugh means he has already found your lunch.',
 	// swamp
 	dumpback: 'Wears a rubbish heap as a shell and keeps the best bits at the bottom. It is surprisingly proud of its collection.',
 	rotHeron: 'It stands in the shallows for hours and looks wise. Then it eats a frog and ruins the effect.',
-	bogfireWisp: 'A light that wants travellers to stand very still.',
+	bogfireWisp: 'A heap of swamp sludge with one red eye and far too many teeth. It pops easily and hits hard, and it has not eaten since the last traveller.',
 	bossMireMatriarch: 'Every drain, pond and puddle in the swamp is a room in her house, and you are tracking mud through all of them.',
 	// tundra
 	frostHare: 'Fast enough to outrun a blizzard, and it does, daily, mostly to show off.',

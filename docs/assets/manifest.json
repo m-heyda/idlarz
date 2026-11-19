@@ -8986,6 +8986,21 @@
 	},
 	{
 		"usedBy": [
+			"millstoneGolem"
+		],
+		"name": "monster_millstone_golem",
+		"category": "monsters",
+		"subcategory": "fields normal",
+		"src": "/pixel/enemies/fields/millstone-golem.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			66,
+			66
+		]
+	},
+	{
+		"usedBy": [
 			"bossElderStag"
 		],
 		"name": "monster_boss_elder_stag",
@@ -9031,6 +9046,21 @@
 	},
 	{
 		"usedBy": [
+			"pineconeWarden"
+		],
+		"name": "monster_pinecone_warden",
+		"category": "monsters",
+		"subcategory": "forest normal",
+		"src": "/pixel/enemies/forest/pinecone-warden.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			66,
+			66
+		]
+	},
+	{
+		"usedBy": [
 			"rotcapStag"
 		],
 		"name": "monster_rotcap_stag",
@@ -9057,6 +9087,21 @@
 		"size": [
 			70,
 			70
+		]
+	},
+	{
+		"usedBy": [
+			"cairnSentinel"
+		],
+		"name": "monster_cairn_sentinel",
+		"category": "monsters",
+		"subcategory": "hills normal",
+		"src": "/pixel/enemies/hills/cairn-sentinel.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			66,
+			66
 		]
 	},
 	{
@@ -9289,7 +9334,6 @@
 			"gravelQuail",
 			"stonehornBison",
 			"emberSquirrel",
-			"pineconeWarden",
 			"graniteRam",
 			"caveGoblinMiner",
 			"boulderBeetle",
@@ -9297,10 +9341,8 @@
 			"magmaKnight",
 			"magmaCrab",
 			"quarryDrake",
-			"cairnSentinel",
 			"highlandGnoll",
 			"garbageOgre",
-			"bogfireWisp",
 			"glacierYeti",
 			"tideglassJelly",
 			"barnacleBrute",
@@ -9311,7 +9353,6 @@
 			"mossbackIdol",
 			"bossHardwoodColossus",
 			"crowMarshal",
-			"millstoneGolem",
 			"rootboundGardener",
 			"blightedHusk",
 			"sporeHound",
@@ -9401,6 +9442,21 @@
 		"size": [
 			68,
 			68
+		]
+	},
+	{
+		"usedBy": [
+			"bogfireWisp"
+		],
+		"name": "monster_bogfire_wisp",
+		"category": "monsters",
+		"subcategory": "swamp normal",
+		"src": "/pixel/enemies/swamp/bogfire-wisp.png",
+		"status": "used",
+		"source": "monster roster",
+		"size": [
+			70,
+			70
 		]
 	},
 	{
