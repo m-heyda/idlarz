@@ -40,7 +40,7 @@ export async function GET(request: Request) {
 		const [stats, game, away, identity] = await Promise.all([
 			profile ? loadStats(supabase, data.user.id) : null,
 			wantsGame ? loadBootSnapshot(createSupabaseAdmin(), data.user.id, nowMs) : null,
-			profile && !needsReset ? loadAway(supabase, data.user.id, nowMs) : null,
+			profile && !needsReset ? loadAway(supabase, data.user.id, nowMs, adminConfigured() ? createSupabaseAdmin() : supabase) : null,
 			profile && !needsReset ? loadShownIdentity(supabase, data.user.id) : null,
 		]);
 		// `epoch`: the data epoch the server is on; `needsReset`: this account's game is on an older one and has to go through the new chapter screen (both dark while the epoch is the baseline)

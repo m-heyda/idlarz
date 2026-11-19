@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { awayBlockOf } from '../../src/lib/offline/away';
+import type { SupabaseClient } from '@supabase/supabase-js';
+import { awayBlockOf, loadAway } from '../../src/lib/offline/away';
 
 const NOW = Date.UTC(2026, 10, 11, 12, 0, 0);
 const H = 3600_000;
@@ -26,4 +27,25 @@ test('an older row without the stored cap falls back to the base limits, and a g
 	assert.equal(block?.efficiency, 0.5);
 	assert.equal(block?.gapSec, 20 * 3600);
 	assert.notEqual(awayBlockOf({ serverSavedAt: NOW - H, derived: 'junk' }, null, NOW), null);
+});
+
+/** A stand-in for the Supabase client: `table.select().eq().maybeSingle()` answers with `rows[table]`, or with the permission error the browser's token gets on `player_ledger`. */
+const fakeDb = (rows: Record<string, unknown>, denied: string[] = []) =>
+	({
+		from: (table: string) => ({
+			select: () => ({
+				eq: () => ({
+					maybeSingle: async () => (denied.includes(table) ? { data: null, error: { code: '42501' } } : { data: rows[table] ?? null, error: null }),
+				}),
+			}),
+		}),
+	}) as unknown as SupabaseClient;
+
+test('the ledger anchor is read with the client given for it: the player token may not read that column, so the away gap used to ignore the anchor', async () => {
+	const saved = { server_saved_at: new Date(NOW - 5 * H).toISOString(), derived };
+	const ledger = { anchor_at: new Date(NOW - 2 * H).toISOString() };
+	const user = fakeDb({ player_saves: saved }, ['player_ledger']);
+	const server = fakeDb({ player_ledger: ledger });
+	assert.equal((await loadAway(user, 'u1', NOW))?.gapSec, 5 * 3600, 'with only the player token the ledger read is refused and the save time counts');
+	assert.equal((await loadAway(user, 'u1', NOW, server))?.gapSec, 2 * 3600, 'read with the server client, the later anchor counts');
 });

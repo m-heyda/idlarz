@@ -367,7 +367,13 @@ export const acceptSave = async (
 			};
 		const restored = summarize(state);
 		restored.derived.xpBase = summary.derived.xpBase;
-		summary = trustedEconomy(baseline?.summary ?? null, restored, worth.ratio, baseline ? Math.max(0, nowMs - baseline.serverSavedAt) / 1000 : 0);
+		summary = trustedEconomy(
+			baseline?.summary ?? null,
+			restored,
+			worth.ratio,
+			baseline ? Math.max(0, nowMs - baseline.serverSavedAt) / 1000 : 0,
+			baseline?.serverSavedAt,
+		);
 	}
 	// the deeds read the land and farm facts of the stored summary: a flagged save does not get to raise them (the save before it keeps its facts)
 	if (flags.length > 0) summary.derived.deedWorld = current?.summary.derived.deedWorld;

@@ -41,14 +41,17 @@ const scaled = (rates: Resources | null, factor: number): Resources | null => {
  * @category Saves & Server/Accepting a save
  * @order 3
  */
-export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, ratio: number, elapsedSec = 0): SaveSummary => {
+export const trustedEconomy = (prev: SaveSummary | null, claimed: SaveSummary, ratio: number, elapsedSec = 0, baselineSavedAtMs?: number): SaveSummary => {
 	if (sameRunAs(prev, claimed)) {
+		// when the baseline was last believed: kept while it stays frozen, so the real time since then can be weighed against the claim (verify.ts: believableAfterFreeze)
+		const trustedAt = prev.derived.trustedAt ?? baselineSavedAtMs;
 		return {
 			...claimed,
 			rates: { ...prev.rates },
 			castleLevel: prev.castleLevel,
 			derived: {
 				...claimed.derived,
+				...(trustedAt !== undefined ? { trustedAt } : {}),
 				castleUpgrade: prev.derived.castleUpgrade
 					? { ...prev.derived.castleUpgrade, remainingSec: Math.max(0, prev.derived.castleUpgrade.remainingSec - Math.max(0, elapsedSec)) }
 					: null,
