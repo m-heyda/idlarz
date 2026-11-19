@@ -796,7 +796,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 **scripts/lib/**
 
-- [`loadGame.ts`](../../scripts/lib/loadGame.ts) — The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/sim.ts).
+- [`loadGame.ts`](../../scripts/lib/loadGame.ts) — The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/pace.ts).
 - [`rehearsalSeed.ts`](../../scripts/lib/rehearsalSeed.ts) — ~ The numbers of the seeded state:
 - [`savedIds.ts`](../../scripts/lib/savedIds.ts) — ~ Everything a stored save or ledger can name by id or position, as the running code has it.
 
@@ -807,6 +807,21 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`migrate-saves.ts`](../../scripts/migrate-saves.ts) — The tool for a release that cannot be additive:
 - [`migrateSaves.ts`](../../scripts/migrateSaves.ts) — The pure part of `scripts/migrate-saves.ts`:
 - [`monster-ladder.ts`](../../scripts/monster-ladder.ts) — Monster ladder: win rate of each gear tier against every monster at the levels it spawns at (docs/plan/ROADMAP.md, enemy rework).
+
+**scripts/pace/**
+
+- [`env.ts`](../../scripts/pace/env.ts) — Import this first: the sim plays the real store, which needs a `localStorage` and a `fetch` before it loads.
+- [`policies.ts`](../../scripts/pace/policies.ts) — ~ What the bots build, in this order.
+- [`profiles.ts`](../../scripts/pace/profiles.ts) — ~ How a bot spends its Embers.
+- [`report.ts`](../../scripts/pace/report.ts) — ~ What one CI shard saves for `--merge`:
+- [`run.ts`](../../scripts/pace/run.ts) — ~ What one run measured:
+
+**scripts/**
+
+- [`pace-classes.ts`](../../scripts/pace-classes.ts) — ~ Runs one sim (`--dump`:
+- [`pace-local.ts`](../../scripts/pace-local.ts) — ~ Runs `node tsx scripts/pace.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
+- [`pace-parallel.ts`](../../scripts/pace-parallel.ts) — ~ Runs `node tsx scripts/pace.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
+- [`pace.ts`](../../scripts/pace.ts)
 - [`pacing-guard.ts`](../../scripts/pacing-guard.ts) — The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 - [`pacingCompare.ts`](../../scripts/pacingCompare.ts) — The pure part of the pacing guard (scripts/pacing-guard.ts, tests/economy/pacingGuard.test.ts): compares two sim baselines
 - [`perf-world.ts`](../../scripts/perf-world.ts) — How the game copes with a big map:
@@ -816,10 +831,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`restore-trust.ts`](../../scripts/restore-trust.ts)
 - [`seed-dev-world.ts`](../../scripts/seed-dev-world.ts) — Gives ONE throwaway development account a fresh mid-game world (land, a castle upgrade, a few producer and extractor buildings, a little progress), so the windows can be tried by hand.
 - [`seed-rehearsal-account.ts`](../../scripts/seed-rehearsal-account.ts) — ~ Stops the run with a reason made of words only (a database error text could name a row or an address).
-- [`sim-classes.ts`](../../scripts/sim-classes.ts) — ~ Runs one sim (`--dump`:
-- [`sim-local.ts`](../../scripts/sim-local.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
-- [`sim-parallel.ts`](../../scripts/sim-parallel.ts) — ~ Runs `node tsx scripts/sim.ts ...args` and resolves with its stdout (stderr is passed on with a prefix); rejects on a non-zero exit.
-- [`sim.ts`](../../scripts/sim.ts) — Headless balance simulation.
 - [`spawnMix.ts`](../../scripts/spawnMix.ts) — What a hero of a given level meets on a castle level 1 map that owns all four biomes: the share of new spawns by the hero's chance to beat them,
 - [`stat-audit.ts`](../../scripts/stat-audit.ts) — Writes docs/generated/stat-audit.md:
 - [`verify.ts`](../../scripts/verify.ts) — ~ The marker file that says "this exact tree passed":
@@ -975,8 +986,8 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 
 - [`genInputs.test.ts`](../../tests/ops/genInputs.test.ts)
 - [`migrateSaves.test.ts`](../../tests/ops/migrateSaves.test.ts) — The pure part of `npm run migrate-saves` (scripts/migrateSaves.ts), run on the frozen fixtures. No network: the script feeds the same functions with database rows.
+- [`paceLocal.test.ts`](../../tests/ops/paceLocal.test.ts)
 - [`rehearsalSeed.test.ts`](../../tests/ops/rehearsalSeed.test.ts)
-- [`simLocal.test.ts`](../../tests/ops/simLocal.test.ts)
 
 **tests/rocks/**
 

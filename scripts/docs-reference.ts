@@ -4,7 +4,7 @@
  * - `npm run docs:code` regenerates `docs/reference` from the JSDoc (seconds). The git pre-commit hook runs it for every commit and stages the result; `npm run docs:code:check` and `tests/docs/reference.test.ts` fail when it is stale.
  * - `npm run docs:gen` regenerates everything in `docs/generated` (report, sim, catalog-report, fight-sim, monster-ladder, loot-sim, kill-sim, craft-sim). Run it and commit the diff whenever balance values change; CI (job `generated`) fails a PR whose
  *   `docs/generated` differs from a fresh run. `npm run docs:check` is that gate in one local command (about 9 minutes, the sim is most of it).
- * - `npm run sim` is the bot simulation (see the Pacing page); `npm run perf` prints timings of the map at 5k / 50k / 250k tiles; `npm run lint`, `npm test` (node:test over every `*.test.ts` under tests/).
+ * - `npm run pace` is the bot simulation (see the Pacing page); `npm run perf` prints timings of the map at 5k / 50k / 250k tiles; `npm run lint`, `npm test` (node:test over every `*.test.ts` under tests/).
  * - Every npm script, computed from `package.json`:
  *
  * @title Commands and documentation generation

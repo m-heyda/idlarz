@@ -8,14 +8,14 @@ test('the generator entries follow the docs:gen scripts and always include the s
 		'docs:gen:rest': 'npm run docs:gen:rest:a && npm run docs:gen:rest:b',
 		'docs:gen:rest:a': 'npm run report && npm run extra -- --md',
 		'docs:gen:rest:b': 'npm run other',
-		'docs:gen:sim': 'npm run sim:parallel',
+		'docs:gen:sim': 'npm run pace:parallel',
 		report: 'tsx scripts/balance-report.ts',
 		extra: 'tsx scripts/extra-sim.ts',
 		other: 'tsx scripts/other.ts',
-		'sim:parallel': 'tsx scripts/sim-parallel.ts',
+		'pace:parallel': 'tsx scripts/pace-parallel.ts',
 		lint: 'eslint .',
 	});
-	assert.deepEqual(entries, ['scripts/balance-report.ts', 'scripts/extra-sim.ts', 'scripts/other.ts', 'scripts/sim-parallel.ts', 'scripts/sim.ts']);
+	assert.deepEqual(entries, ['scripts/balance-report.ts', 'scripts/extra-sim.ts', 'scripts/other.ts', 'scripts/pace-parallel.ts', 'scripts/pace.ts']);
 });
 
 test('the hash ignores line endings and a BOM, and changes with a path or a content change', () => {
@@ -34,7 +34,7 @@ test('the hash ignores line endings and a BOM, and changes with a path or a cont
 
 test('the real inputs are the game logic and the generators, not the UI', async () => {
 	const files = await inputFiles();
-	for (const must of ['scripts/sim.ts', 'src/config/combatConfig.ts', 'src/stores/gameStore.ts', 'package-lock.json'])
+	for (const must of ['scripts/pace.ts', 'src/config/combatConfig.ts', 'src/stores/gameStore.ts', 'package-lock.json'])
 		assert.ok(files.includes(must), `${must} must count`);
 	assert.ok(
 		!files.some((f) => f.startsWith('src/components/') || f.startsWith('src/app/') || f.startsWith('src/styles/')),

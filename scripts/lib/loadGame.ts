@@ -1,4 +1,4 @@
-// The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/sim.ts).
+// The game's config and maths as one merged object each, for the scripts that read and override them by name (scripts/pace.ts).
 // Loaded late (dynamic import): the store needs a localStorage mock first, which the caller installs before calling these.
 
 /** The config and the game maths as one object each (the sim reads and overrides them by name; they are loaded late because the store needs a localStorage mock first). */

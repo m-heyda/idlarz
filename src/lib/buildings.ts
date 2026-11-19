@@ -124,6 +124,13 @@ export const buildingMinGold = (level: number): number => {
 	return gold;
 };
 
+/** The T3 extract an Idol level asks for (level 3 and up): the `t3Costs` table for levels 3 to 5, then x`t3Growth` per level. */
+export const idolT3Cost = (level: number): number => {
+	const { t3Costs, t3Growth } = IDOL_RULES;
+	const i = Math.floor(level) - 3;
+	return t3Costs[i] ?? (t3Costs[t3Costs.length - 1] ?? 0) * Math.pow(t3Growth, i - t3Costs.length + 1);
+};
+
 const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> => {
 	const { tilePrices, priceTileCap, levelGrowth } = BUILDING_RULES.cost;
 	const tile = tileCostAsResources(calculateTileCost(Math.min(Math.max(1, ownedTiles), priceTileCap)));
@@ -133,7 +140,7 @@ const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partia
 	// an Idol level from 3 also needs the T3 extract of its biome (where the biome has an Extractor): the Extractors feed the economy as well as crafting
 	if (def?.kind === 'idol' && level >= 3) {
 		const t3 = BUILDINGS.find((b) => b.kind === 'extractor' && b.biome === def.biome)?.produces[0];
-		if (t3) out[t3] = IDOL_RULES.t3PerLevel * Math.pow(2, level - 3);
+		if (t3) out[t3] = idolT3Cost(level);
 	}
 	return out;
 };

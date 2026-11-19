@@ -23,7 +23,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 - `npm run docs:code` regenerates `docs/reference` from the JSDoc (seconds). The git pre-commit hook runs it for every commit and stages the result; `npm run docs:code:check` and `tests/docs/reference.test.ts` fail when it is stale.
 - `npm run docs:gen` regenerates everything in `docs/generated` (report, sim, catalog-report, fight-sim, monster-ladder, loot-sim, kill-sim, craft-sim). Run it and commit the diff whenever balance values change; CI (job `generated`) fails a PR whose
   `docs/generated` differs from a fresh run. `npm run docs:check` is that gate in one local command (about 9 minutes, the sim is most of it).
-- `npm run sim` is the bot simulation (see the Pacing page); `npm run perf` prints timings of the map at 5k / 50k / 250k tiles; `npm run lint`, `npm test` (node:test over every `*.test.ts` under tests/).
+- `npm run pace` is the bot simulation (see the Pacing page); `npm run perf` prints timings of the map at 5k / 50k / 250k tiles; `npm run lint`, `npm test` (node:test over every `*.test.ts` under tests/).
 - Every npm script, computed from `package.json`:
 
 **npm scripts (from package.json)** _(computed from the code)_
@@ -34,10 +34,10 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run build` | `next build` |
 | `npm run start` | `next start` |
 | `npm run lint` | `eslint . --max-warnings=0` |
-| `npm run sim` | `tsx scripts/sim.ts` |
-| `npm run sim:parallel` | `tsx scripts/sim-parallel.ts` |
-| `npm run sim:local` | `tsx scripts/sim-local.ts` |
-| `npm run sim:classes` | `tsx scripts/sim-classes.ts` |
+| `npm run pace` | `tsx scripts/pace.ts` |
+| `npm run pace:parallel` | `tsx scripts/pace-parallel.ts` |
+| `npm run pace:local` | `tsx scripts/pace-local.ts` |
+| `npm run pace:classes` | `tsx scripts/pace-classes.ts` |
 | `npm run perf` | `tsx scripts/perf-world.ts` |
 | `npm run test` | `tsx --test "tests/**/*.test.ts"` |
 | `npm run report` | `tsx scripts/balance-report.ts` |
@@ -68,7 +68,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run docs:gen:rest:quick` | `npm run report && npm run stat-audit && npm run catalog-report && npm run kill-sim -- --md && npm run craft-sim -- --md` |
 | `npm run docs:gen:rest:fights` | `npm run fight-sim -- --md && npm run monster-ladder -- --md` |
 | `npm run docs:gen:rest:loot` | `npm run loot-sim -- --md` |
-| `npm run docs:gen:sim` | `npm run sim:parallel` |
+| `npm run docs:gen:sim` | `npm run pace:parallel` |
 | `npm run docs:gen:hash` | `tsx scripts/gen-inputs.ts --write` |
 | `npm run docs:gen:fast` | `tsx scripts/verify.ts --gen-only` |
 | `npm run verify` | `tsx scripts/verify.ts` |
@@ -91,7 +91,7 @@ Source: [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts)
 
 The pacing guard, and how CI generates the docs.
 
-`npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
+`npm run pace` writes `docs/generated/pace-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
 (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days).
 Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label is read when a run starts,
 so after adding it **push a commit or close and reopen the PR** ("Re-run jobs" keeps the labels of the old run).
@@ -128,7 +128,7 @@ Source: [`scripts/verify.ts:1`](../../scripts/verify.ts)
 
 CI used to repeat the slow work (the sims behind `docs/generated`) on every pull request; now it skips it when the inputs hash says it was done (see `scripts/gen-inputs.ts`). This script does
 it: formatting, types, lint, the unit tests and the reference docs check run **at the same time**, and when a file the generators read has changed (the hash is stale) it regenerates
-`docs/generated` in parallel too (`sim:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
+`docs/generated` in parallel too (`pace:parallel` on all cores next to the three report groups) and writes the new hash. The `pre-push` hook (`.githooks/pre-push`) runs it, so a push is
 refused while something would fail in CI. When it regenerated files it stops with "commit them" (a hook cannot commit for you); commit and push again.
 
   npm run verify                everything above; a tree that already passed (same HEAD tree, clean) is skipped
