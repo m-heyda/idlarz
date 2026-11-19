@@ -1041,8 +1041,8 @@
       "foundInOres": false,
       "inChest": false,
       "delete": false,
-      "reviewed": false,
-      "purpose": "LTR (look to replace): shine strip for the planned crystal resource."
+      "reviewed": true,
+      "purpose": "Amethyst cluster art (from __reuse/gems/amethyst.png) since 2026-11-19; icons/res_crystal.png matches."
     },
     "res_frostshard": {
       "file": "public/pixel/icons/res_frostshard.png",
@@ -1086,8 +1086,8 @@
       "foundInOres": false,
       "inChest": false,
       "delete": false,
-      "reviewed": false,
-      "purpose": "LTR (look to replace): shine strip for the planned mana resource."
+      "reviewed": true,
+      "purpose": "Blue powder art (from __reuse/materials/blue_powder.png) since 2026-11-19; icons/res_mana.png matches."
     },
     "res_mystery_shine": {
       "file": "public/pixel/icons/res_mystery_shine.png",
@@ -1102,7 +1102,7 @@
       "inChest": false,
       "delete": false,
       "reviewed": true,
-      "purpose": "Rune stone art (from __reuse/valuables/rune_stone.png) since 2026-11-19; icons/res_mystery.png matches. Crystal, mana and sapphire strips still LTR."
+      "purpose": "Rune stone art (from __reuse/valuables/rune_stone.png) since 2026-11-19; icons/res_mystery.png matches."
     },
     "res_pearls": {
       "file": "public/pixel/icons/res_pearls.png",
@@ -1161,8 +1161,8 @@
       "foundInOres": false,
       "inChest": false,
       "delete": false,
-      "reviewed": false,
-      "purpose": "LTR (look to replace): shine strip for the planned sapphire resource."
+      "reviewed": true,
+      "purpose": "Sapphire art (from __reuse/gems/sapphire.png) since 2026-11-19; icons/res_sapphire.png matches."
     },
     "res_spores": {
       "file": "public/pixel/icons/res_spores.png",
