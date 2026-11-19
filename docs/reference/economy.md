@@ -1028,7 +1028,7 @@ Source: [`src/catalog/ingredients.ts:32`](../../src/catalog/ingredients.ts)
 
 The ingredients and what is planned for each (none of it is built yet). Append only.
 
-**Crafting ingredients (21, no recipe uses them yet)** _(computed from the code)_
+**Crafting ingredients (23, no recipe uses them yet)** _(computed from the code)_
 
 | Ingredient | Tier | Planned for | Dropped by |
 | --- | --- | --- | --- |
@@ -1041,18 +1041,20 @@ The ingredients and what is planned for each (none of it is built yet). Append o
 | Glowberry | 2 | night-vision and luck potions | Fungus |
 | Dark Horn | 2 | dark elixirs and enchanting powder | Demon |
 | Copper Ore | 2 | ingots (smelted with coal) | Construct, mining rocks |
-| Ember Coal | 2 | smelting fuel and fire potions | Elemental, Dragon, mining rocks |
-| Obsidian Chip | 2 | blade edges for the Obsidian grade | Elemental |
-| Geode | 2 | cut stones for jewelry | Aquatic, Construct |
-| Dark Shard | 2 | enchanting | Demon |
+| Ember Coal | 3 | smelting fuel and fire potions | Elemental, Dragon, mining rocks |
+| Obsidian Chip | 2 | blade edges for the Obsidian grade | Elemental, mining rocks |
+| Geode | 2 | cut stones for jewelry | Aquatic, Construct, mining rocks |
+| Dark Shard | 2 | enchanting | Demon, mining rocks |
 | Murky Phial | 2 | cursed brews | Undead |
 | Moonstone Sliver | 3 | jewelry and enchanting | Undead |
 | Fire Drop | 3 | fire-ward jewelry | Elemental, Dragon |
-| Emerald Star | 3 | jewelry gems | a few monsters |
-| Heart Gem | 4 | the finest jewelry | a few monsters |
+| Emerald Star | 3 | jewelry gems | a few monsters, mining rocks |
+| Heart Gem | 4 | the finest jewelry | a few monsters, mining rocks |
 | Silver Ore | 2 | silver ingots and fine jewelry | mining rocks |
 | Gold Ore | 3 | gold ingots and jewelry | mining rocks |
 | Raw Crystal | 3 | enchanting and jewelry gems | mining rocks |
+| Cracked Beast Claw | 1 | bone tools, charms and arrow tips | Vermin, Dragon |
+| Void Amethyst Shard | 1 | cut stones for jewelry | - |
 
 ## Buildings
 
@@ -1485,18 +1487,22 @@ Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.
 | uncommon | ing_silver_ore | 1 | 12% |
 | uncommon | ing_copper_ore | 1 | 10% |
 | uncommon | ing_ember_coal | 1 | 4% |
+| uncommon | ing_geode | 1 | 5% |
 | rare | stone | 10-15 min of income (at least 120) | always |
 | rare | coal | 6-10 min of income (at least 70) | always |
 | rare | ing_gold_ore | 1 | 12% |
 | rare | ing_silver_ore | 1 | 20% |
 | rare | ing_copper_ore | 1-2 | 15% |
 | rare | ing_ember_coal | 1-2 | 8% |
+| rare | ing_geode | 1 | 8% |
 | epic | stone | 20-30 min of income (at least 250) | always |
 | epic | coal | 12-20 min of income (at least 150) | always |
 | epic | ing_crystal | 1 | 25% |
 | epic | ing_gold_ore | 1 | 25% |
 | epic | ing_silver_ore | 1-2 | 30% |
 | epic | ing_ember_coal | 1-3 | 15% |
+| epic | ing_obsidian | 1 | 12% |
+| epic | ing_dark_shard | 1 | 8% |
 | legendary | stone | 40-60 min of income (at least 500) | always |
 | legendary | coal | 25-40 min of income (at least 300) | always |
 | legendary | ing_crystal | 1-2 | 40% |
@@ -1504,6 +1510,10 @@ Ingredient ids are the crafting bag ids (`ing_<name>`, see `catalog/ingredients.
 | legendary | ing_silver_ore | 1-3 | 50% |
 | legendary | ing_copper_ore | 1-2 | 30% |
 | legendary | ing_ember_coal | 1-3 | 10% |
+| legendary | ing_obsidian | 1 | 25% |
+| legendary | ing_dark_shard | 1 | 20% |
+| legendary | ing_emerald_star | 1 | 10% |
+| legendary | ing_heart_gem | 1 | 3% |
 
 <a id="rockspots"></a>
 

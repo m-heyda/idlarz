@@ -39,7 +39,7 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('glowberry', 2, 'night-vision and luck potions'),
 	ing('horn_dark', 2, 'dark elixirs and enchanting powder'),
 	ing('copper_ore', 2, 'ingots (smelted with coal)'),
-	ing('ember_coal', 2, 'smelting fuel and fire potions'),
+	ing('ember_coal', 3, 'smelting fuel and fire potions'),
 	ing('obsidian', 2, 'blade edges for the Obsidian grade'),
 	ing('geode', 2, 'cut stones for jewelry'),
 	ing('dark_shard', 2, 'enchanting'),
@@ -51,6 +51,8 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('silver_ore', 2, 'silver ingots and fine jewelry'),
 	ing('gold_ore', 3, 'gold ingots and jewelry'),
 	ing('crystal', 3, 'enchanting and jewelry gems'),
+	ing('claw', 1, 'bone tools, charms and arrow tips'),
+	ing('amethyst', 1, 'cut stones for jewelry'),
 ];
 
 export const INGREDIENT_BY_JUNK = new Map(INGREDIENTS.map((i) => [i.junkId, i]));

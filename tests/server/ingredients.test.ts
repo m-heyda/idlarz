@@ -67,7 +67,12 @@ test('the roll draws the same numbers as before: the cheap junk and the rest of 
 		assert.deepEqual(a.drops, b, 'the plain list is the same list');
 	}
 	const withoutType = rollJunkLoot(ctx, mulberry32(3));
-	assert.deepEqual(withoutType.stash, {}, 'no type, no ingredients');
+	// no type means no monster table; the pricey rolls (claw, amethyst) are crafting ingredients too and may still land in the crafting bag
+	assert.deepEqual(
+		Object.keys(withoutType.stash).filter((k) => k !== 'ing_claw' && k !== 'ing_amethyst'),
+		[],
+		'no type, no monster ingredients',
+	);
 });
 
 test('a golden monster triples the ingredients it drops', () => {

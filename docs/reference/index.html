@@ -1383,7 +1383,7 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <h3><code>INGREDIENTS</code> <small>const</small></h3>
 <p>Source: <a href="../../src/catalog/ingredients.ts"><code>src/catalog/ingredients.ts:32</code></a></p>
 <p>The ingredients and what is planned for each (none of it is built yet). Append only.</p>
-<p><strong>Crafting ingredients (21, no recipe uses them yet)</strong> <em>(computed from the code)</em></p>
+<p><strong>Crafting ingredients (23, no recipe uses them yet)</strong> <em>(computed from the code)</em></p>
 <table>
 <thead>
 <tr>
@@ -1449,7 +1449,7 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 </tr>
 <tr>
 <td>Ember Coal</td>
-<td>2</td>
+<td>3</td>
 <td>smelting fuel and fire potions</td>
 <td>Elemental, Dragon, mining rocks</td>
 </tr>
@@ -1457,19 +1457,19 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <td>Obsidian Chip</td>
 <td>2</td>
 <td>blade edges for the Obsidian grade</td>
-<td>Elemental</td>
+<td>Elemental, mining rocks</td>
 </tr>
 <tr>
 <td>Geode</td>
 <td>2</td>
 <td>cut stones for jewelry</td>
-<td>Aquatic, Construct</td>
+<td>Aquatic, Construct, mining rocks</td>
 </tr>
 <tr>
 <td>Dark Shard</td>
 <td>2</td>
 <td>enchanting</td>
-<td>Demon</td>
+<td>Demon, mining rocks</td>
 </tr>
 <tr>
 <td>Murky Phial</td>
@@ -1493,13 +1493,13 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <td>Emerald Star</td>
 <td>3</td>
 <td>jewelry gems</td>
-<td>a few monsters</td>
+<td>a few monsters, mining rocks</td>
 </tr>
 <tr>
 <td>Heart Gem</td>
 <td>4</td>
 <td>the finest jewelry</td>
-<td>a few monsters</td>
+<td>a few monsters, mining rocks</td>
 </tr>
 <tr>
 <td>Silver Ore</td>
@@ -1518,6 +1518,18 @@ Adding a grade is one entry in <code>GEAR_UNLOCK</code>, <code>GEAR_GRADE_COST</
 <td>3</td>
 <td>enchanting and jewelry gems</td>
 <td>mining rocks</td>
+</tr>
+<tr>
+<td>Cracked Beast Claw</td>
+<td>1</td>
+<td>bone tools, charms and arrow tips</td>
+<td>Vermin, Dragon</td>
+</tr>
+<tr>
+<td>Void Amethyst Shard</td>
+<td>1</td>
+<td>cut stones for jewelry</td>
+<td>-</td>
 </tr>
 </tbody></table>
 </article><h2>Buildings</h2><article><p><a id="buildings-flag"></a></p>
@@ -2507,6 +2519,12 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>4%</td>
 </tr>
 <tr>
+<td>uncommon</td>
+<td>ing_geode</td>
+<td>1</td>
+<td>5%</td>
+</tr>
+<tr>
 <td>rare</td>
 <td>stone</td>
 <td>10-15 min of income (at least 120)</td>
@@ -2540,6 +2558,12 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>rare</td>
 <td>ing_ember_coal</td>
 <td>1-2</td>
+<td>8%</td>
+</tr>
+<tr>
+<td>rare</td>
+<td>ing_geode</td>
+<td>1</td>
 <td>8%</td>
 </tr>
 <tr>
@@ -2577,6 +2601,18 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>ing_ember_coal</td>
 <td>1-3</td>
 <td>15%</td>
+</tr>
+<tr>
+<td>epic</td>
+<td>ing_obsidian</td>
+<td>1</td>
+<td>12%</td>
+</tr>
+<tr>
+<td>epic</td>
+<td>ing_dark_shard</td>
+<td>1</td>
+<td>8%</td>
 </tr>
 <tr>
 <td>legendary</td>
@@ -2619,6 +2655,30 @@ Ingredient ids are the crafting bag ids (<code>ing_&lt;name&gt;</code>, see <cod
 <td>ing_ember_coal</td>
 <td>1-3</td>
 <td>10%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_obsidian</td>
+<td>1</td>
+<td>25%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_dark_shard</td>
+<td>1</td>
+<td>20%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_emerald_star</td>
+<td>1</td>
+<td>10%</td>
+</tr>
+<tr>
+<td>legendary</td>
+<td>ing_heart_gem</td>
+<td>1</td>
+<td>3%</td>
 </tr>
 </tbody></table>
 </article><article><p><a id="rockspots"></a></p>
@@ -10727,6 +10787,10 @@ three minutes on 8 cores (one seed).</p>
 <tr>
 <td><code>npm run assets:catalog:check</code></td>
 <td><code>tsx scripts/assets-catalog.ts --check</code></td>
+</tr>
+<tr>
+<td><code>npm run assets:inventory</code></td>
+<td><code>node scripts/asset-inventory/build.cjs</code></td>
 </tr>
 <tr>
 <td><code>npm run storybook</code></td>

@@ -78,6 +78,7 @@ Commands. Generated reports go to `docs/generated` and are never edited by hand;
 | `npm run prepare` | `git config core.hooksPath .githooks && chmod +x .githooks/pre-commit .githooks/pre-push || exit 0` |
 | `npm run assets:catalog` | `tsx scripts/assets-catalog.ts` |
 | `npm run assets:catalog:check` | `tsx scripts/assets-catalog.ts --check` |
+| `npm run assets:inventory` | `node scripts/asset-inventory/build.cjs` |
 | `npm run storybook` | `storybook dev -p 6007` |
 | `npm run build-storybook` | `storybook build` |
 

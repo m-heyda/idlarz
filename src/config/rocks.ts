@@ -84,6 +84,7 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.12, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.1, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.04, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_geode', chance: 0.05, qty: [1, 1] },
 	],
 	rare: [
 		{ kind: 'resource', id: 'stone', minutes: [10, 15], floor: 120 },
@@ -92,6 +93,7 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.2, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.15, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.08, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_geode', chance: 0.08, qty: [1, 1] },
 	],
 	epic: [
 		{ kind: 'resource', id: 'stone', minutes: [20, 30], floor: 250 },
@@ -100,6 +102,8 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_gold_ore', chance: 0.25, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.3, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.15, qty: [1, 3] },
+		{ kind: 'ingredient', id: 'ing_obsidian', chance: 0.12, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_dark_shard', chance: 0.08, qty: [1, 1] },
 	],
 	// MVP (the pool is adjusted later): much more stone and coal than an epic rock, the better ores often, and Ember Coal now and then (1 to 3)
 	legendary: [
@@ -110,5 +114,9 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_silver_ore', chance: 0.5, qty: [1, 3] },
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.3, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.1, qty: [1, 3] },
+		{ kind: 'ingredient', id: 'ing_obsidian', chance: 0.25, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_dark_shard', chance: 0.2, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_emerald_star', chance: 0.1, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_heart_gem', chance: 0.03, qty: [1, 1] },
 	],
 };
