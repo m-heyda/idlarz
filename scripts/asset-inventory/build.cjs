@@ -143,8 +143,13 @@ for(const e of list){
 }
 const bySlug={};for(const x of ents)(bySlug[x.slug]=bySlug[x.slug]||[]).push(x);
 for(const x of ents){if(x.group==='minerals')continue;const o=(bySlug[x.slug]||[]).filter(y=>y!==x&&y.group!=='minerals');if(o.length)x.also=o.map(y=>y.src);}
+const usedSlugs=new Set(ents.filter(x=>x.def.status==='used'&&x.group!=='minerals').map(x=>x.slug));
 // the used pictures are reviewed (decisions.json); the page lists planned and unused ones. INCLUDE_USED=1 adds them back.
 if(!process.env.INCLUDE_USED)for(let i=ents.length-1;i>=0;i--)if(ents[i].def.status==='used')ents.splice(i,1);
+// a spare resources/_name.png is a pixel copy (2x) of the used items/junk icon of the same name, already reviewed: it is left out (INCLUDE_DUPES=1 keeps it)
+const dupes=[];
+if(!process.env.INCLUDE_DUPES)for(let i=ents.length-1;i>=0;i--){const x=ents[i];if(x.def.status!=='used'&&x.src.startsWith('resources/_')&&usedSlugs.has(x.slug)){dupes.push(x.src);ents.splice(i,1)}}
+if(dupes.length)console.log('left out as duplicates of used art:',dupes.length,dupes.join(' | '));
 for(const e of ents)if(e.def.status==='planned')e.def.status='unused'; // no planned tab: planned art is reviewed with the unused
 const tpl=fs.readFileSync(path.join(__dirname,'template.html'),'utf8');
 const html=tpl.replace('/*DATA*/',()=>'const ITEMS='+JSON.stringify(ents)+';const IMGS='+JSON.stringify(Object.fromEntries([...imgs].filter(([k])=>ents.some(e=>e.img===k))))+';');
