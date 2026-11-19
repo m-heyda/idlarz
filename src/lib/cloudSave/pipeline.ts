@@ -27,7 +27,7 @@
  * | XP and level | save floor (XP the owned tiles must have produced) | `xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain; the browser takes the lower number (`applyServerXp`) |
  * | Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls, the ledger holds the gem balance, a save can never raise it |
  * | Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
- * | Gold jumps / forged land | none | the flags of {@link FLAG_POLICY}, in **shadow mode**: stored, the save is accepted; flagged accounts are never ranked |
+ * | Gold jumps / forged land | none | the flags of {@link FLAG_POLICY}, in **shadow mode**: stored, the save is accepted; accounts with a poison flag ({@link POISON_FLAGS}) are never ranked (castle, timer and play-time flags only record) |
  * | Rebirth | needs castle >= 6 and 400 tiles (+50 per rebirth); points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
  * | Settings in `localStorage` | cosmetic only | not stored |
  *
@@ -313,7 +313,9 @@ export const acceptSave = async (
 	if (BUILDINGS_FLAG.enabled && ledgerUsable) {
 		// the timer check only needs the buildings on the map, which the settling does not change
 		const jumped = verifyTransition(previous, sent!, nowMs, grants, trustedIdols, gemBuildersOf(ledger?.gemShop.bought)).includes('timer_jump');
-		settledIdols = settleIdols(trustedIdols, state, jumped);
+		// the same run as the previous save (a rebirth or a New Game starts the record again): an Idol that fell behind the record may catch up several levels at once, once the timer check above passed
+		const sameRunSave = !!previous && !newGame && previous.summary.rebirths === state.prestige.rebirths;
+		settledIdols = settleIdols(trustedIdols, state, jumped, sameRunSave);
 		state = { ...state, idolLevels: settledIdols, tiles: clampIdolTiles(state.tiles, settledIdols) };
 	} else if (BUILDINGS_FLAG.enabled) {
 		state = { ...state, idolLevels: {} };
@@ -364,11 +366,11 @@ export const acceptSave = async (
 	const legacyChanged = !!ledger && !sameIdols(legacyIdols, ledger.legacy.idols);
 
 	/**
-	 * Trusted economy (IDL-167, IDL-168): a castle level its timer never paid for, or land, buildings and merchant levels worth more than the game
-	 * could have paid, are stored as claimed (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates
-	 * and the castle the server pays from are that save's too
+	 * Trusted economy (IDL-167, IDL-168): land, buildings, castle and merchant levels worth more than the game could have paid are stored as claimed
+	 * (the flag stays) but never paid: the merchant levels go back to the last trusted save's, and the rates and the castle the server pays from are that save's too.
+	 * A castle or building timer that looks too fast (`castle_jump`, `timer_jump`) only leaves its flag: a browser left open or asleep, an auto-clicker or a late save trips it in normal play, and the cost of the levels is what `networth_exceeds` bounds.
 	 */
-	const trusted = flags.includes('castle_jump') || flags.includes('timer_jump') || worth.exceeds;
+	const trusted = worth.exceeds;
 	if (trusted) {
 		const baseline = sameRunAs(previous?.summary ?? null, summary) ? current : null;
 		if (worth.exceeds && baseline)

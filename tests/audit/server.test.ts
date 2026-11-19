@@ -40,8 +40,9 @@ test('FLAGGED ONLY (shadow mode): the flag costs the account its ranking; enforc
 	for (const [id, flag] of Object.entries(expected)) {
 		assert.equal(get(id).verdict, 'flagged', id);
 		assert.ok(get(id).flags.includes(flag), `${id} should raise ${flag}, raised ${get(id).flags}`);
-		assert.equal(FLAG_POLICY[flag], 'reject', `${flag} refuses the save once enforcement is on`);
-		assert.ok(ENFORCEMENT.reject.has(flag), `${flag} is on the enforcement list`);
+		// play time is recorded only (a browser left open or asleep is normal play); gold is the one that refuses the save once enforcement is on
+		assert.equal(FLAG_POLICY[flag], flag === 'gold_jump' ? 'reject' : 'flag', `${flag}: what the server does with it`);
+		assert.equal(ENFORCEMENT.reject.has(flag), flag === 'gold_jump', `${flag} is on the enforcement list only when it refuses`);
 	}
 	assert.equal(ENFORCEMENT.enabled, false, 'shadow mode is the default until the live flags have been reviewed');
 });
@@ -57,8 +58,10 @@ test('CLOSED (IDL-167): a save whose economy cannot be believed is stored flagge
 		assert.equal(get(id).verdict, 'clamped', id);
 		assert.ok(get(id).flags.includes(flag), `${id} should raise ${flag}, raised ${get(id).flags}`);
 		assert.ok(get(id).rateFactor < 1.05, `${id} pays ${get(id).rateFactor.toFixed(2)}x the income on the server`);
-		assert.equal(FLAG_POLICY[flag], 'clamp', `${flag} is a clamp flag`);
+		// castle_jump alone only records (an unfinished timer is normal play when a browser is left open); the cost of the forged level is what the net-worth check clamps
+		assert.equal(FLAG_POLICY[flag], flag === 'castle_jump' ? 'flag' : 'clamp', `${flag}: what the server does with it`);
 	}
+	assert.ok(get('castle-skip').flags.includes('networth_exceeds'), 'a forged castle level is still clamped, by the net-worth check');
 });
 
 test('the gold check has no flat 10,000 blind spot any more: a 1,000 floor + 2 % of the balance + income, and a burst that follows the time that really passed', () => {
