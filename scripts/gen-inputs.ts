@@ -37,8 +37,8 @@ export const generatorEntries = (scripts: Record<string, string>): string[] => {
 		}
 	};
 	for (const [name, command] of Object.entries(scripts)) if (name === 'docs:gen' || name.startsWith('docs:gen:')) visit(command, 0);
-	// `docs:gen:sim` runs `sim:parallel`, which only spawns the sim: the sim itself is the real input
-	entries.add('scripts/sim.ts');
+	// `docs:gen:sim` runs `pace:parallel`, which only spawns the sim: the sim itself is the real input
+	entries.add('scripts/pace.ts');
 	return [...entries].sort();
 };
 

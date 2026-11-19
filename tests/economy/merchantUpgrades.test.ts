@@ -32,7 +32,7 @@ const fx = (merchantUpgrades: Record<string, number>, equipment: Equipment = STA
 
 // ---------------------------------------------------------------------------------------------------- the gold sink
 
-// By the first rebirth (castle 6, about day 5-6 in docs/generated/sim-milestones.md) the player has paid the castle and the tiles and has
+// By the first rebirth (castle 6, about day 5-6 in docs/generated/pace-milestones.md) the player has paid the castle and the tiles and has
 // roughly this much gold to spare. The upgrades are the late gold sink: all of them together are bought over several runs, never in the first.
 const SPARE_GOLD_FIRST_REBIRTH = 100e6;
 

@@ -193,7 +193,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `LOOT_SOURCES` | Loot / Config | [`src/catalog/lootConfig.ts:410`](../../src/catalog/lootConfig.ts) | Keyed by the `DropSource` (a monster type, `chest` or the merchant's `merchant` shelf). |
 | `losesProgress` | Saves & Server / Accepting a save | [`src/lib/cloudSave/pipeline.ts:84`](../../src/lib/cloudSave/pipeline.ts) | True when a new save holds less than the one it replaces: |
 | `LUCK` | Economy / Chests and Luck | [`src/config/spawns.ts:74`](../../src/config/spawns.ts) | Luck = Charisma + Lucky Charm + gear Luck. |
-| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/sim.ts:986`](../../scripts/sim.ts) | The bands of the magnitude targets (IDL-128): |
+| `MAGNITUDE_BANDS` | Pacing / Magnitude targets | [`scripts/pace/report.ts:131`](../../scripts/pace/report.ts) | The bands of the magnitude targets (IDL-128): |
 | `MANUAL_CLOUD_COOLDOWN_MS` | Saves & Server / Uploading | [`src/lib/manualCloudSave.ts:15`](../../src/lib/manualCloudSave.ts) | "Save game" in the menu: |
 | Map lab | Architecture / Art | [`src/app/map-lab/page.tsx:2`](../../src/app/map-lab/page.tsx) | Map lab (`/map-lab`): |
 | `MASTERY_CAPS` | Progression / Mastery | [`src/catalog/mastery.ts:159`](../../src/catalog/mastery.ts) | The most each stat may add against one monster, monster tiers and biome goal together, in percent. |
@@ -217,7 +217,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `NICK_COLORS` | Progression / Badges | [`src/config/nickColors.ts:17`](../../src/config/nickColors.ts) | The fourteen plain colours of the picker, in the order the swatches are drawn (by hue). |
 | `NICK_EFFECTS` | Progression / Badges | [`src/config/nickColors.ts:59`](../../src/config/nickColors.ts) | The animated nickname effects, each a separate one-time purchase of 500 gems in the Gem shop (or straight from the name window): |
 | `NPC_PORTRAITS` | Architecture / Art | [`src/config/npcPortraits.ts:10`](../../src/config/npcPortraits.ts) | The NPC portraits: |
-| Pacing targets | Pacing / Targets | [`scripts/sim.ts:21`](../../scripts/sim.ts) | What pace the economy is tuned for, why, and how to check it. |
+| Pacing targets | Pacing / Targets | [`scripts/pace/report.ts:1`](../../scripts/pace/report.ts) | What pace the economy is tuned for, why, and how to check it. |
 | `paidRefreshesNow` | Economy / Merchant | [`src/lib/merchant.ts:33`](../../src/lib/merchant.ts) | The paid refreshes that still count towards the price: |
 | `payKill` | Combat / A fight | [`src/lib/offline/reward.ts:58`](../../src/lib/offline/reward.ts) | Pays the kill of ticket `n`: |
 | `PERK_CAPS` | Economy / Perk caps | [`src/catalog/perkCaps.ts:15`](../../src/catalog/perkCaps.ts) | The cap on the gear bucket of each perk family, in percent. |
@@ -304,19 +304,22 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `takeClicks` | Economy / Rocks and Mining | [`src/lib/rocks.ts:86`](../../src/lib/rocks.ts) | How many of `clicks` the server lets in for a rock at `nowSec`: |
 | The /play route and its redirects | Architecture / Routes | [`src/lib/playRoute.ts:1`](../../src/lib/playRoute.ts) | The front door's routes (IDL-61). |
 | The boards | Progression / Rankings | [`src/lib/rankings.ts:41`](../../src/lib/rankings.ts) | The tabs of the Rankings window, in order. |
-| The bot simulation | Pacing / The sim | [`scripts/sim.ts:1`](../../scripts/sim.ts) | The sim (`scripts/sim.ts`): |
+| The bot's spending | Pacing / The sim | [`scripts/pace/policies.ts:1`](../../scripts/pace/policies.ts) | What the bots buy, one function per spending decision (the pace sim, `scripts/pace/run.ts`). |
 | The browser's half of the data epoch | Saves & Server / Browser state | [`src/lib/epochGuard.ts:10`](../../src/lib/epochGuard.ts) | The browser's half of the data epoch. |
-| The class picker acceptance | Pacing / The sim | [`scripts/sim-classes.ts:1`](../../scripts/sim-classes.ts) | `npm run sim:classes`: |
+| The class picker acceptance | Pacing / The sim | [`scripts/pace-classes.ts:1`](../../scripts/pace-classes.ts) | `npm run pace:classes`: |
 | The end-to-end test account | Ops / Operator guides | [`e2e/account.ts:23`](../../e2e/account.ts) | The one account every end-to-end test signs in with (docs/reference/ops.md). |
 | The game at a glance | Overview / The game | [`src/app/GameApp.tsx:17`](../../src/app/GameApp.tsx) | Idle Realm (code name idlarz) is an idle/incremental map game for signed-in players. |
 | The generated-docs inputs hash | Ops / CI | [`scripts/gen-inputs.ts:1`](../../scripts/gen-inputs.ts) | The inputs hash of the generated docs: |
 | The guided tutorial | Progression / Guided tutorial | [`src/catalog/tutorial.ts:137`](../../src/catalog/tutorial.ts) | The guided tutorial (IDL-74): |
 | The landing world | Architecture / Art | [`src/lib/landingWorld.ts:4`](../../src/lib/landingWorld.ts) | The world behind the landing page: |
-| The local sim runner | Pacing / The sim | [`scripts/sim-local.ts:1`](../../scripts/sim-local.ts) | `npm run sim:local`: |
+| The local sim runner | Pacing / The sim | [`scripts/pace-local.ts:1`](../../scripts/pace-local.ts) | `npm run pace:local`: |
 | The local verify script and the pre-push hook | Ops / CI | [`scripts/verify.ts:1`](../../scripts/verify.ts) | `npm run verify`: |
 | The map (World) | Architecture / State | [`src/utils/world.ts:32`](../../src/utils/world.ts) | The map has no edge. |
+| The pace profiles | Pacing / The sim | [`scripts/pace/profiles.ts:1`](../../scripts/pace/profiles.ts) | The player profiles of the pace sim, as plain data. |
+| The pace sim | Pacing / The sim | [`scripts/pace.ts:1`](../../scripts/pace.ts) | The pace sim (`npm run pace`): |
+| The pace sim engine | Pacing / The sim | [`scripts/pace/run.ts:1`](../../scripts/pace/run.ts) | The pace sim's engine (`scripts/pace/run.ts`): |
 | The pacing guard and CI sharding | Ops / CI | [`scripts/pacing-guard.ts:1`](../../scripts/pacing-guard.ts) | The pacing guard, and how CI generates the docs. |
-| The parallel sim runner | Pacing / The sim | [`scripts/sim-parallel.ts:1`](../../scripts/sim-parallel.ts) | `npm run sim:parallel`: |
+| The parallel sim runner | Pacing / The sim | [`scripts/pace-parallel.ts:1`](../../scripts/pace-parallel.ts) | `npm run pace:parallel`: |
 | The server's rule and the threat model | Saves & Server / Threat model | [`src/lib/cloudSave/pipeline.ts:1`](../../src/lib/cloudSave/pipeline.ts) | What the browser keeps, what the server keeps, and what the server decides. |
 | The tick loop and persistence | Architecture / The loop | [`src/app/GameApp.tsx:126`](../../src/app/GameApp.tsx) | The tick loop. |
 | `ticketCap` | Monsters / Spawning | [`src/lib/offline/tickets.ts:142`](../../src/lib/offline/tickets.ts) | How many more tickets may wait: |

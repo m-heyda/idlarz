@@ -1,7 +1,7 @@
 /**
  * The pacing guard, and how CI generates the docs.
  *
- * `npm run sim` writes `docs/generated/sim-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
+ * `npm run pace` writes `docs/generated/pace-baseline.json`; CI (job `generated`) runs this script, which compares it with the copy on the base branch and fails the PR when a guarded milestone moves by more than +-15 % **or by more than 5 game days**
  * (`PACING_MAX_DRIFT_DAYS` in `scripts/pacingCompare.ts`; without it a milestone at day 220 could drift for a month inside 15 %). The job log starts with a table per profile (guarded milestones, how many moved, the largest move in percent and days).
  * Regenerating the baseline cannot hide a change, because the comparison is against the base branch. An intended pacing change carries the `pacing-change` label: the guard then prints the report and passes. The label is read when a run starts,
  * so after adding it **push a commit or close and reopen the PR** ("Re-run jobs" keeps the labels of the old run).
@@ -14,10 +14,10 @@
  */
 // The pacing guard: fails (exit 1) when a key milestone of the sim moved by more than 15 % or more than 5 game days against a base. Prints a summary table first.
 //
-//   npx tsx scripts/pacing-guard.ts --base=<baseline.json> [--current=docs/generated/sim-baseline.json] [--allow-violations]
+//   npx tsx scripts/pacing-guard.ts --base=<baseline.json> [--current=docs/generated/pace-baseline.json] [--allow-violations]
 //
-// `--current` is what `npm run sim` just wrote; `--base` is the same file as it is on the branch the PR targets. CI extracts it with
-// `git show origin/<base>:docs/generated/sim-baseline.json`, so a PR cannot pass by regenerating the baseline with its own numbers.
+// `--current` is what `npm run pace` just wrote; `--base` is the same file as it is on the branch the PR targets. CI extracts it with
+// `git show origin/<base>:docs/generated/pace-baseline.json`, so a PR cannot pass by regenerating the baseline with its own numbers.
 // An intended pacing change carries the `pacing-change` label: CI then passes `--allow-violations`, so the guard prints the report but exits 0.
 // Only violations are excused: a missing or malformed file still exits non-zero (2), and so does a crash.
 import { readFileSync } from 'node:fs';
@@ -41,8 +41,8 @@ const load = (path: string): PacingBaseline => {
 };
 
 const basePath = arg('base');
-if (!basePath) fail('usage: pacing-guard.ts --base=<baseline.json> [--current=docs/generated/sim-baseline.json] [--allow-violations]');
-const currentPath = arg('current') ?? 'docs/generated/sim-baseline.json';
+if (!basePath) fail('usage: pacing-guard.ts --base=<baseline.json> [--current=docs/generated/pace-baseline.json] [--allow-violations]');
+const currentPath = arg('current') ?? 'docs/generated/pace-baseline.json';
 
 const baseData = load(basePath as string);
 const currentData = load(currentPath);
@@ -57,10 +57,10 @@ if (violations.length === 0) {
 	);
 	console.error(formatViolations(violations));
 	if (allowed) {
-		console.error('Allowed by the `pacing-change` label; the numbers are in docs/generated/sim-milestones.md.');
+		console.error('Allowed by the `pacing-change` label; the numbers are in docs/generated/pace-milestones.md.');
 	} else {
 		console.error(
-			'If this change is intended, add the `pacing-change` label to the PR (then push a commit or reopen the PR: re-running keeps the old labels); the numbers are in docs/generated/sim-milestones.md.',
+			'If this change is intended, add the `pacing-change` label to the PR (then push a commit or reopen the PR: re-running keeps the old labels); the numbers are in docs/generated/pace-milestones.md.',
 		);
 		process.exit(1);
 	}

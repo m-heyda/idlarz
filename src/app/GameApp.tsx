@@ -28,7 +28,7 @@
  * 7. **Rebirth** (castle 6 and 400+ tiles) restarts the map for Embers: a permanent income bonus and a shop ({@link REBIRTH}). Level, XP, Embers and shop levels stay; map, gear and merchant upgrades (except Pack Rat) do not.
  *
  * **Time scale.** Timers that set the pace: castle upgrades 30 min to 3.5 days per level; a monster every 15 minutes and a boss every 3 hours (`COMBAT.spawn`); a chest every 10 minutes (`CHEST.intervalSec`); away time paid up to 8 hours at 50% (`LIMITS`).
- * Measured pacing from the bot simulation is in `docs/generated/sim-milestones.md`; targets are on the Pacing page.
+ * Measured pacing from the bot simulation is in `docs/generated/pace-milestones.md`; targets are on the Pacing page.
  *
  * **Where the numbers live.** Config is data (`src/config/*`, `src/catalog/*`), maths is pure functions next to it (`src/utils/game/*`, `src/lib/*`), the server engine is `src/lib/offline/*` + `src/app/api/*`. This reference points at all of them; the generated
  * [code-map.md](code-map.md) lists every file with its first comment.

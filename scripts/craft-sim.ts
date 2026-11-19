@@ -91,7 +91,7 @@ out();
 out('## Trade goods income');
 out();
 out(
-	'Gold from selling crafted trade goods (IDL-227) against the gold per second of the sim profiles. A good sells for at most 1.4x its inputs, and a queue only makes so many per hour, so goods stay a small side income: the gate is at most `GOODS_SHARE_MAX` of income. Income is the lowest gold per second a profile is expected to have at castle 10 (`MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts), which is the most favourable case for the goods; gold from selling the goods is counted gross (the raw inputs would also have sold).',
+	'Gold from selling crafted trade goods (IDL-227) against the gold per second of the sim profiles. A good sells for at most 1.4x its inputs, and a queue only makes so many per hour, so goods stay a small side income: the gate is at most `GOODS_SHARE_MAX` of income. Income is the lowest gold per second a profile is expected to have at castle 10 (`MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/pace.ts), which is the most favourable case for the goods; gold from selling the goods is counted gross (the raw inputs would also have sold).',
 );
 out();
 const goods = RECIPES.filter((r) => r.kind === 'good');
@@ -232,7 +232,7 @@ out(
 );
 out();
 out(
-	"Gate 4, what income can pay for: gold income per second at castle 10 (the two ends of `MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/sim.ts) counted as if it were all spent on the grade's cheapest recipe, against the pieces a queue makes nonstop at base limits. An unpaid queue is idle, so the pieces per hour is the smaller of the two; by gate 1 the gold value of what is crafted never exceeds what it cost.",
+	"Gate 4, what income can pay for: gold income per second at castle 10 (the two ends of `MAGNITUDE_BANDS.gpsRun1Castle10` in scripts/pace.ts) counted as if it were all spent on the grade's cheapest recipe, against the pieces a queue makes nonstop at base limits. An unpaid queue is idle, so the pieces per hour is the smaller of the two; by gate 1 the gold value of what is crafted never exceeds what it cost.",
 );
 out();
 out('| Grade | Cost in minutes of income (3,000 / 6,000 gold/s) | Pieces / hour one queue makes | Pieces / hour paid at 3,000 gold/s | at 6,000 gold/s |');
