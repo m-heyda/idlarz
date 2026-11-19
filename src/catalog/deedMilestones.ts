@@ -24,7 +24,6 @@ export const DEED_BONUS_CAP_PCT = 5;
  * @title Deed milestones
  * @category Progression/Deeds
  * @order 4
- * @table deed-milestones
  */
 export const DEED_MILESTONES: readonly DeedMilestone[] = [
 	{ id: 'dm_50', points: 50, gems: 25, bonus: { stat: 'gold', pct: 1 } },

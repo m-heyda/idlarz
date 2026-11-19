@@ -140,7 +140,6 @@ export interface MonsterReward {
  *
  * @category Monsters/Boss modifiers
  * @order 1
- * @table boss-modifiers
  */
 export interface BossModifiers {
 	/** **Venom**: every hit that lands adds a poison stack (up to `maxStacks`, the clock refreshed to `durationSec`). Each stack costs `pctPerSec` % of the hero's max HP per second, and the hero's regeneration works at `100 - regenCutPct` % while poisoned. */
@@ -587,7 +586,6 @@ export const FALLBACK_BOSS = 'bossGreatAuroch' as const;
  *
  * @category Monsters/Roster
  * @order 1
- * @table monster-roster
  */
 export const MONSTERS = {
 	// plains

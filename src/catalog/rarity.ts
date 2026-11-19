@@ -29,7 +29,6 @@ export interface RarityDef {
  *
  * @category Loot/Items
  * @order 1
- * @table rarities
  */
 export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 	common: {

@@ -46,7 +46,6 @@ export const bonusText = (b: MasteryBonus): string => `${b.stat === 'defense' ? 
  * @title Bestiary mastery
  * @category Progression/Mastery
  * @order 0
- * @table bestiary-tiers
  * @see masteryState, claimMastery, BOSS_MASTERY_TIERS, BIOME_GOALS
  */
 export const MASTERY_TIERS: readonly MasteryTier[] = [

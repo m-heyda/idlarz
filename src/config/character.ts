@@ -49,7 +49,6 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
  *
  * @category Progression/Levels
  * @order 1
- * @table level-curve-examples
  * @see xpToNextLevel, totalStatPoints
  */
 export const LEVELING = {

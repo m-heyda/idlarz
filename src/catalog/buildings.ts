@@ -55,7 +55,6 @@ export const BUILDING_LORE: Readonly<Record<string, string>> = {
  *
  * @category Economy/Buildings
  * @order 3
- * @table building-catalog
  */
 export const BUILDINGS: readonly BuildingDef[] = [
 	{

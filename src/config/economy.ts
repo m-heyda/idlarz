@@ -16,7 +16,6 @@ import { amounts } from '@/catalog/resourceKeys';
  * @title Basics: tick, caps, start
  * @category Economy/Basics
  * @order 1
- * @table economy-basics
  * @see MAX_CATCHUP_SEC, RESOURCE_CAP, BASE_GENERATION_RATES, INITIAL_RESOURCES
  */
 export const TICK_RATE = 100; // 10 times per second
@@ -70,7 +69,7 @@ export const XP_TILE = {
 /**
  * Tile cost curve: exponential growth that is steepest early (cheap first tiles), gentler through the mid game and
  * gentler again past `lateTiles`, so a big territory stays a goal instead of an unreachable number. Tuned with scripts/pace.ts
- * so the first ~100 tiles come within the first day, 200-300 within 2-3 days (docs/reference/pacing.md).
+ * so the first ~100 tiles come within the first day, 200-300 within 2-3 days (@category Pacing).
  */
 export const SCALING_CONFIG = {
 	growthEarly: 1.13, // cost multiplier per owned tile up to `earlyTiles`
@@ -100,7 +99,6 @@ export const SCALING_CONFIG = {
  * m        = min(n, 300)
  * price(n) = floor(min(55 x 1.13^min(m,15) x 1.07^max(min(m,100)-15, 0) x 1.007^max(m-100, 0) x (n/300)^3.5 [only if n > 300], ceiling))
  * ceiling  = RESOURCE_CAP / 100
- * @table tile-price-examples
  * @see calculateTileCost, TILE_RESOURCE_COST, economyTiles
  */
 function tilePrice(ownedTiles: number): number {
@@ -121,7 +119,6 @@ function tilePrice(ownedTiles: number): number {
  *
  * @category Economy/Tiles
  * @order 2
- * @table tile-extra-resources
  */
 export const TILE_RESOURCE_COST: { from: number; resource: 'wood' | 'stone' | 'coal' | 'food' | 'hide'; share: number }[] = [
 	{ from: 15, resource: 'wood', share: 0.3 },
@@ -165,7 +162,6 @@ export const BASE_GENERATION_RATES = amounts({ gold: 0.1, xp: 0.25 });
  *
  * @category Economy/Clicks
  * @order 1
- * @table click-ladder
  */
 export const CLICK_LADDER = [
 	{ power: 2, floor: 2, price: 0 },

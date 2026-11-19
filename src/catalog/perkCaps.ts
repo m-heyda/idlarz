@@ -10,7 +10,6 @@ export type PerkFamily = 'incomePct' | 'xpPct' | 'killRewardPct' | 'clickPct' | 
  * @category Economy/Perk caps
  * @formula
  * bucket = min(cap, sum of gear + set bonus + legendary perks)       multiplier = 1 + bucket / 100
- * @table perk-caps
  */
 export const PERK_CAPS: Record<PerkFamily, number> = {
 	incomePct: 50,
@@ -25,7 +24,6 @@ export const PERK_CAPS: Record<PerkFamily, number> = {
  * roster (IDL-144): no item carries these yet, so nothing reads them in the game today.
  *
  * @category Economy/Perk caps
- * @table perk-tiers
  */
 export const LEGENDARY_PERK_TIERS: Record<PerkFamily, { common: number; rare: number; top: number }> = {
 	incomePct: { common: 8, rare: 15, top: 25 },

@@ -47,7 +47,6 @@ export const CRAFTING = {
  *
  * @category Progression/Crafting
  * @order 2
- * @table craft-gear
  */
 export const CRAFT_GEAR = {
 	ceilingGrade: 'G4',

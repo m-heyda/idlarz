@@ -30,7 +30,6 @@ const d = (id: string, chance: number, qty: readonly [number, number] = [1, 2], 
  *
  * @category Monsters/Bestiary
  * @order 2
- * @table bestiary-ingredients
  */
 export const FAMILY_DROPS: Readonly<Record<MonsterFamily, readonly IngredientDrop[]>> = {
 	Beast: [d('bacon', 0.12), d('blood', 0.09), d('horn', 0.04, [1, 1], 0.05, 3)],

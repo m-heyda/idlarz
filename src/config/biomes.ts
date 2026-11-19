@@ -27,7 +27,6 @@ export const BIOME_SPAWN = {
  *
  * @category Economy/Biomes
  * @order 3
- * @table rebirth-biome-output
  */
 export const REBIRTH_BIOME_OUTPUT: Record<string, { rebirth: number; multiplier: number; base: Record<string, number>; measuredAgainst: string }> = {
 	jungle: { rebirth: 1, multiplier: 1.5, base: { gold: 0.1, wood: 0.3 }, measuredAgainst: 'forest' },
@@ -48,7 +47,6 @@ function rebirthBiomeOutput(biome: string): Record<string, number> {
  *
  * @category Economy/Biomes
  * @order 2
- * @table biome-output
  */
 export const BIOMES: Record<string, BiomeInfo> = {
 	empty: {

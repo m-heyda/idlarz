@@ -134,7 +134,7 @@ export interface CombatState {
 	ord: number;
 	/** Monsters that beat the player (or ran out the clock) by ticket number: not tried again before this (epoch seconds) */
 	retryAt: Record<string, number>;
-	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (docs/reference/combat.md). Rows from before have none: read it as empty. */
+	/** Ticket numbers of the monsters waiting to be fought after the open fight, in the order clicked (@category Combat). Rows from before have none: read it as empty. */
 	queue: number[];
 	/** Defeats in a row since the last win (absent: none); at `COMBAT.auto.pauseAfterDefeats` auto-battle switches itself off and this goes back to 0. Rows from before have none. */
 	defeatStreak?: number;
