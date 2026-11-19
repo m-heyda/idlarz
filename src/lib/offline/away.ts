@@ -36,12 +36,16 @@ export const awayBlockOf = (
 	return { gapSec: Math.floor(gapSec), capSec, efficiency: Math.min(1, efficiency) };
 };
 
-/** Reads the two rows (the player's own, through RLS) and builds the block; any failed read is simply no block. */
-export const loadAway = async (supabase: SupabaseClient, userId: string, nowMs: number): Promise<AwayBlock | null> => {
+/**
+ * Reads the two rows and builds the block; any failed read is simply no block. The save is the player's own row (`supabase`, through RLS). The ledger is the server's record: a player's token may read only `user_id` and `gems` from it
+ * (`supabase/schema.sql`), so asking for `anchor_at` with it is refused (42501, a 403 in the log) and the gap silently fell back to the save time. `ledgerDb` is the server's own client for that one read (the route passes the service client);
+ * it is always filtered by the signed-in `userId`, and without it the player's client is used as before.
+ */
+export const loadAway = async (supabase: SupabaseClient, userId: string, nowMs: number, ledgerDb: SupabaseClient = supabase): Promise<AwayBlock | null> => {
 	try {
 		const [saved, ledger] = await Promise.all([
 			supabase.from('player_saves').select('server_saved_at, derived').eq('user_id', userId).maybeSingle(),
-			supabase.from('player_ledger').select('anchor_at').eq('user_id', userId).maybeSingle(),
+			ledgerDb.from('player_ledger').select('anchor_at').eq('user_id', userId).maybeSingle(),
 		]);
 		if (saved.error || !saved.data) return null;
 		const savedAt = Date.parse(String((saved.data as { server_saved_at?: unknown }).server_saved_at));
