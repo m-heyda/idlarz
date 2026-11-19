@@ -460,6 +460,33 @@ test('after one castle_jump the frozen timer runs on the server clock, so an hon
 	assert.equal(rows.get('u1')?.summary.castleLevel, 2, 'once believed, the claimed castle is the stored one');
 });
 
+test('a frozen account whose trusted castle had no upgrade running is believed once the real time since its last trusted save covers every level it claims', async () => {
+	const { repo, rows } = memoryRepo();
+	const base = game();
+	const at = (secAfterStart: number, level: number, remaining: number | null) =>
+		castleAt({ ...base, playSeconds: base.playSeconds + secAfterStart }, level, remaining);
+	// the shortest the timers can be with the account's build-time cuts: levels 1 to 3 need 30 min + 2 h, the third upgrade (to level 4) takes 6 h
+	const keep = 1 - (summarize(base).derived.buildTimeReduction ?? 0);
+	const levels = Math.round(9000 * keep);
+	const third = Math.round(21_600 * keep);
+	assert.equal((await accept(repo, 'u1', at(0, 1, null), 0, T0)).kind, 'ok');
+	// two levels claimed two minutes later, an upgrade to level 4 already running: nothing paid for them
+	const first = await accept(repo, 'u1', at(120, 3, third), 1, T0 + 120_000);
+	assert.deepEqual(first.kind === 'ok' && first.flags.includes('castle_jump'), true, 'two levels in two minutes');
+	assert.equal(rows.get('u1')?.summary.castleLevel, 1, 'the server keeps paying from the trusted level');
+	// half the time the claim needs: still a jump
+	const half = Math.round(levels / 2);
+	const early = await accept(repo, 'u1', at(half, 3, third), 2, T0 + half * 1000);
+	assert.deepEqual(early.kind === 'ok' && early.flags.includes('castle_jump'), true, 'half the needed time ');
+	assert.equal(rows.get('u1')?.summary.castleLevel, 1);
+	// once the real time covers the timers of both levels and the 1,000 s already run on the third (an overnight run is not a cheat): believed
+	const long = levels + 1000 + 60;
+	const later = await accept(repo, 'u1', at(long, 3, third - 1000), 3, T0 + long * 1000);
+	assert.deepEqual(later.kind === 'ok' && later.flags.includes('castle_jump'), false, later.kind === 'ok' ? later.flags.join() : later.kind);
+	assert.equal(rows.get('u1')?.summary.castleLevel, 3, 'once believed, the claimed castle is the stored one');
+	assert.equal(rows.get('u1')?.summary.derived.trustedAt, undefined, 'a believed save is the trusted one again');
+});
+
 test('a rebirth resets the castle without a flag', () => {
 	const prev = castleAt(game(), 6, null);
 	const reborn = castleAt(

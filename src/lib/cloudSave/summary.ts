@@ -66,6 +66,8 @@ export interface SaveDerived {
 	idol?: { chestSpeedPct: number; craftXpPct: number; damagePct: number; hpArmorPct: number; merchantSellPct?: number };
 	/** The share of a castle or building timer the player's cuts take off (Master Builders plus the Dwarf Statue, at most 0.6): `verify.ts` refuses a new upgrade shorter than that allows. Absent with none. */
 	buildTimeReduction?: number;
+	/** Set only while the server pays this save from an older one (`trustedEconomy`): the server time (ms) of the last save it believed. `verify.ts` judges a claim against the real time since then (the self-heal rule), so a frozen account whose claim the clock has caught up with is believed again. Absent on every believed save. */
+	trustedAt?: number;
 	/** The set bonuses' Kill Rewards %: extra gold and XP from a kill */
 	killRewardPct: number;
 	/** Chests standing on the map: the ledger is seeded from them the first time it is created (monsters are the ledger's own) */

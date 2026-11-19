@@ -174,12 +174,74 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 const maxBuildTimeCut = (before: SaveSummary, next: SaveSummary): number =>
 	Math.min(IDOL_RULES.buildTimeCap / 100, Math.max(before.derived.buildTimeReduction ?? 0, next.derived.buildTimeReduction ?? 0));
 
+/** What the healing rule needs when the previous save is a frozen baseline: the real seconds since the last save the server believed, and the builders and remembered Idol levels the timers are judged with. */
+interface FrozenCheck {
+	sinceTrustedSec: number;
+	trustedIdols: Record<string, number>;
+	gemBuilders: number;
+}
+
+/**
+ * The way out of a frozen account whose trusted save had no upgrade running (the self-heal rule; with one running, the frozen timer that keeps counting down on the server clock is the way out, IDL-250). After a `castle_jump` / `timer_jump` the server pays from the last trusted save, and a claim many levels ahead of it can never pass the one-level-per-save rule, so every later save of an honest
+ * account (one that was left running for a night, say) raised the flag again and the freeze never ended. The frozen summary now remembers when it was last believed (`derived.trustedAt`), and a claim is believed once the real time since then covers all the
+ * timers it needs: every castle level above the trusted one, every building level above the trusted one (a building not in the trusted save is born at level 1), and the part of each running upgrade that is already done, each at the shortest timer the
+ * player's build-time cuts allow, against `builders` upgrades running side by side. A claim that needs more time than has passed stays flagged, so a forged jump is still refused and only ever pays once the clock has caught up with it.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 8
+ * @formula
+ * work     = (sum of the timers of every claimed level above the trusted one + the done part of each running upgrade) x (1 - build-time cut)
+ * believed = castle work <= seconds since the last trusted save x 1.05 + 30 s (the castle's levels follow one another), all work <= seconds x builders x 1.05 + 30 s, and the builders in use are within what the account has
+ */
+const believableAfterFreeze = (before: SaveSummary, next: SaveSummary, frozen: FrozenCheck): boolean => {
+	// a baseline with an upgrade running has a timer that carries on by itself on the server clock (IDL-250): that is the way out then
+	if (before.derived.castleUpgrade || derivedJobs(before.derived).jobs.length > 0) return false;
+	const cut = maxBuildTimeCut(before, next);
+	const keep = 1 - cut;
+	let work = 0;
+	if (next.castleLevel < before.castleLevel) return false;
+	for (let level = before.castleLevel; level < next.castleLevel; level++) {
+		const duration = CASTLE_UPGRADE.durationsSec[level - 1];
+		if (duration === undefined) return false;
+		work += duration * keep;
+	}
+	const castle = next.derived.castleUpgrade;
+	if (castle) {
+		const duration = CASTLE_UPGRADE.durationsSec[castle.toLevel - 2];
+		if (castle.toLevel !== next.castleLevel + 1 || duration === undefined) return false;
+		work += Math.max(0, duration * keep - castle.remainingSec);
+	}
+	// the castle's levels follow one another (one castle upgrade at a time): they cannot be spread over the builders
+	const allowedSec = frozen.sinceTrustedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
+	if (work > allowedSec) return false;
+	const trusted = before.derived.buildings ?? {};
+	for (const [id, level] of Object.entries(next.derived.buildings ?? {})) {
+		const idol = idolDef(id);
+		const old = trusted[id];
+		if (old !== undefined && level < old) return false;
+		const from = old ?? (idol && level <= (frozen.trustedIdols[idol.biome] ?? 0) ? level : 1);
+		for (let to = from + 1; to <= level; to++) work += shortestUpgradeSec(to, !!idol) * keep;
+	}
+	const jobs = derivedJobs(next.derived).jobs;
+	for (const job of jobs) {
+		if (job.remainingSec <= 0) return false;
+		work += Math.max(0, shortestUpgradeSec(job.toLevel, !!idolDef(job.building)) * keep - job.remainingSec);
+	}
+	const builders = Math.min(HARD_LIMITS.builders, 1 + frozen.gemBuilders + Math.max(0, (next.derived.builders ?? 1) - 1));
+	const running = (s: SaveSummary) => derivedJobs(s.derived).jobs.length + (s.derived.castleUpgrade ? 1 : 0);
+	if (running(next) > Math.max(builders, running(before))) return false;
+	return work <= frozen.sinceTrustedSec * builders * VERIFY.castleSlack + VERIFY.castleGraceSec;
+};
+
 /**
  * The castle upgrade is a timer the server can check from two summaries: it runs at most as fast as real time. So a new castle level is
  * only believable when an upgrade was running and the real time between the saves covers what was left of its timer, and a running timer
  * cannot have lost more seconds than passed. (Setting `remainingSec` to 0 in a save, or a level the timer never paid for, is a jump.)
  */
-const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
+const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, frozen: FrozenCheck | null): boolean =>
+	castleStepJumped(before, next, elapsedSec) && !(frozen && believableAfterFreeze(before, next, frozen));
+
+const castleStepJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = before.derived.castleUpgrade;
 	const now = next.derived.castleUpgrade;
@@ -201,7 +263,16 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
  * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Several can run at once, but never more than the account has builders (`builders`: the Gem shop's, from the ledger,
  * plus the save's own, with the castle's upgrade counted too). Always false while the building system is off.
  */
-const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number> = {}, gemBuilders = 0): boolean => {
+const timerJumped = (
+	before: SaveSummary,
+	next: SaveSummary,
+	elapsedSec: number,
+	trustedIdols: Record<string, number> = {},
+	gemBuilders = 0,
+	frozen: FrozenCheck | null = null,
+): boolean => timerStepJumped(before, next, elapsedSec, trustedIdols, gemBuilders) && !(frozen && believableAfterFreeze(before, next, frozen));
+
+const timerStepJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number>, gemBuilders: number): boolean => {
 	if (!BUILDINGS_FLAG.enabled) return false;
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = derivedJobs(before.derived).jobs;
@@ -284,8 +355,12 @@ export const verifyTransition = (
 	if (next.rebirths < before.rebirths || next.legacyEarned < before.legacyEarned) flags.add('prestige_regress');
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
-	if (sameRun && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols, gemBuilders)) flags.add('timer_jump');
+	// a frozen baseline (the server pays from an older save than the previous one) remembers when it was last believed
+	const trustedAt = before.derived.trustedAt;
+	const frozen: FrozenCheck | null =
+		trustedAt === undefined ? null : { sinceTrustedSec: Math.max(0, (nowMs - trustedAt) / 1000), trustedIdols: trustedIdols ?? {}, gemBuilders };
+	if (sameRun && castleJumped(before, next, elapsedSec, frozen)) flags.add('castle_jump');
+	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols, gemBuilders, frozen)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);
