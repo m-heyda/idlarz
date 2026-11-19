@@ -1152,7 +1152,7 @@
   "kind": "const",
   "category": "Progression/Rebirth",
   "file": "src/config/rebirth.ts",
-  "line": 22,
+  "line": 21,
   "summary": "Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIRTH` and are checked by {@link rebirthStatus}, the one function the button, the dialog, the store and the server share.",
   "see": [
    "rebirthStatus",
@@ -1166,7 +1166,7 @@
   "kind": "const",
   "category": "Progression/Ember shop",
   "file": "src/config/rebirth.ts",
-  "line": 68,
+  "line": 67,
   "summary": "The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ({@link emberUpgradeCost}). Shop levels are permanent: nothing refunds Embers on a rebirth. The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).",
   "see": []
  },
@@ -3774,7 +3774,7 @@
   "category": "Pacing/The sim",
   "file": "scripts/pace-classes.ts",
   "line": 1,
-  "summary": "`npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.",
+  "summary": "`npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.",
   "see": []
  },
  {

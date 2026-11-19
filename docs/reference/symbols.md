@@ -127,7 +127,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `effectiveTileDiscount` | Economy / Tiles | [`src/utils/game/rebirth.ts:71`](../../src/utils/game/rebirth.ts) | Percent off tile cost: |
 | `eligibleCandidates` | Loot / Pipeline | [`src/lib/loot/pools.ts:37`](../../src/lib/loot/pools.ts) | Members that exist at this item level (item window and the pool's own minimum), with their weights. |
 | `EMBER_MODEL` | Saves & Server / Accepting a save | [`src/lib/cloudSave/emberModel.ts:29`](../../src/lib/cloudSave/emberModel.ts) | The server's model of how many Embers (and rebirths) an account can hold. |
-| `EMBER_UPGRADES` | Progression / Ember shop | [`src/config/rebirth.ts:68`](../../src/config/rebirth.ts) | The Ember shop: |
+| `EMBER_UPGRADES` | Progression / Ember shop | [`src/config/rebirth.ts:67`](../../src/config/rebirth.ts) | The Ember shop: |
 | `emberGain` | Progression / Rebirth | [`src/utils/game/rebirth.ts:107`](../../src/utils/game/rebirth.ts) | Embers a rebirth gives: |
 | `emberIncomeBonus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:56`](../../src/utils/game/rebirth.ts) | The income bonus (0.5 = +50 %) that `earned` Embers ever earned give: |
 | `emberUpgradeCost` | Progression / Ember shop | [`src/utils/game/rebirth.ts:33`](../../src/utils/game/rebirth.ts) | Cost in Embers of buying the next level of an upgrade, given its current level. |
@@ -241,7 +241,7 @@ Every documented function, constant and topic, with the file to open. Search thi
 | `rarityLuckMultiplier` | Economy / Chests and Luck | [`src/lib/luck.ts:30`](../../src/lib/luck.ts) | What the weight of every rarity above Common/Uncommon is multiplied by (the roll is normalised afterwards, so it moves odds toward rare gear). |
 | `readBuffs` | Combat / Consumables | [`src/lib/buffs.ts:30`](../../src/lib/buffs.ts) | Cleans a stored buff list: |
 | `readProgress` | Progression / Guided tutorial | [`src/lib/tutorial/progress.ts:18`](../../src/lib/tutorial/progress.ts) | Reads the stored `stats.tutorial` (or an answer from the server) back: |
-| `REBIRTH` | Progression / Rebirth | [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts) | Rebirth: |
+| `REBIRTH` | Progression / Rebirth | [`src/config/rebirth.ts:21`](../../src/config/rebirth.ts) | Rebirth: |
 | `REBIRTH_BIOME_OUTPUT` | Economy / Biomes | [`src/config/biomes.ts:32`](../../src/config/biomes.ts) | Output of the five rebirth biomes (unlocked one per rebirth, `BIOME_RULES.unlockAfterRebirths`): |
 | `rebirthRunSummary` | Progression / Rebirth | [`src/utils/game/rebirthUnlocks.ts:125`](../../src/utils/game/rebirthUnlocks.ts) | The numbers of the rebirth result screen, from what the run had reached and the prestige before and after. |
 | `rebirthStatus` | Progression / Rebirth | [`src/utils/game/rebirth.ts:138`](../../src/utils/game/rebirth.ts) | Can the player rebirth, and if not what is missing. |

@@ -5656,7 +5656,7 @@ point the level has earned is left to spend again. A character that is within it
 <p>The combat numbers the attributes give (max HP and mana pools, crit chance, ...), from all points or the points above 5 as each rule says.</p>
 </article><h2>Rebirth</h2><article><p><a id="rebirth"></a></p>
 <h3><code>REBIRTH</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:22</code></a></p>
+<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:21</code></a></p>
 <p>Rebirth: restart with a permanent bonus paid in Embers. The rules live in <code>REBIRTH</code> and are checked by <a href="#rebirthstatus"><code>rebirthStatus</code></a>, the one function the button, the dialog, the store and the server share.</p>
 <ul>
 <li><strong>Requirements</strong>: castle level &gt;= 6 (<code>minCastleLevel</code>), economy tile count &gt;= <code>400 + 50 x rebirths already done</code> (<code>minTiles</code>, <code>tilesPerRebirth</code>), no castle upgrade running, and at least 1 Ember of gain.</li>
@@ -5666,10 +5666,6 @@ the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) e
 <li><strong>What is kept</strong>: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant&#39;s shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).</li>
 <li>The server runs the rebirth first (<code>POST /api/rebirth</code>): it checks the stored save, wipes the ledger&#39;s inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.</li>
 <li>Auto-battle unlocks after the first rebirth (<code>COMBAT.auto.minRebirths</code>).</li>
-</ul>
-<p><strong>Known issues</strong></p>
-<ul>
-<li>IDL-223 the gear wipe on rebirth is live without a crafting sink (RELEASE-PLAN P11); needs an owner decision.</li>
 </ul>
 <p>See also: <a href="#rebirthstatus"><code>rebirthStatus</code></a>, <a href="#embergain"><code>emberGain</code></a></p>
 </article><article><p><a id="embergain"></a></p>
@@ -5802,7 +5798,7 @@ and the browser (which builds the same new bag from the same picks).</p>
 (what the player really got, whether the server or the browser named the amount), never recomputed here.</p>
 </article><h2>Ember shop</h2><article><p><a id="ember-upgrades"></a></p>
 <h3><code>EMBER_UPGRADES</code> <small>const</small></h3>
-<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:68</code></a></p>
+<p>Source: <a href="../../src/config/rebirth.ts"><code>src/config/rebirth.ts:67</code></a></p>
 <p>The Ember shop: level N+1 costs <code>ceil(baseCost x costGrowth^N)</code> Embers (<a href="#emberupgradecost"><code>emberUpgradeCost</code></a>). Shop levels are permanent: nothing refunds Embers on a rebirth.
 The save is valid only if <code>unspent + spent = earned</code> and <code>rebirths = 0</code> implies <code>earned = 0</code> (checked in <code>src/lib/sanitizeSave.ts</code>).</p>
 <ul>
@@ -10577,7 +10573,7 @@ three minutes on 8 cores (one seed).</p>
 </article><article><p><a id="the-class-picker-acceptance"></a></p>
 <h3>The class picker acceptance</h3>
 <p>Source: <a href="../../scripts/pace-classes.ts"><code>scripts/pace-classes.ts:1</code></a></p>
-<p><code>npm run pace:classes</code>: the class picker&#39;s pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays <code>idle</code> and <code>casual</code> (or the profiles named on the command line) once with no class (the neutral baseline
+<p><code>npm run pace:classes</code>: the class picker&#39;s pacing acceptance (IDL-70, IDL-78). Plays <code>idle</code> and <code>casual</code> (or the profiles named on the command line) once with no class (the neutral baseline
 the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard&#39;s own rule
 (<code>comparePacing</code>: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.</p>
 <p>  npm run pace:classes                       idle and casual, every class

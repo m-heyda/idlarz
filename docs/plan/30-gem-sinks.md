@@ -71,7 +71,7 @@ A rebirth-payout bonus ("a small, capped extra of Embers") was floated in the sa
 | Group | In v1 / v2 | Why |
 | --- | --- | --- |
 | Merchant economy: Haggler, Lucky Charm, Foreman, Skinner, Ancestral Tithe | **v1** (IDL-231) | pure economy ladders |
-| Farm: Feed Trough, Hen House, Dairy, Tannery, Pasture | **v2** (IDL-232) | Pen Expansion waits for the farm cost scaling decision (RELEASE-PLAN D3) |
+| Farm: Feed Trough, Hen House, Dairy, Tannery, Pasture | **v2** (IDL-232) | Pen Expansion waits for the farm cost scaling (decided: tune `costScaling`, no upkeep; IDL-81) |
 | Ember shop: Click Mastery, Provisions, Master Builders, Night Watch | **v2** (IDL-232) | Night Watch stays under `HARD_LIMITS.offlineCapHours` 72 |
 | Merchant combat ladders | **out** until IDL-228 | permanent combat power |
 | Pack Rat | **out** | bag growth is sold directly (row 5) |

@@ -202,7 +202,7 @@ The combat numbers the attributes give (max HP and mana pools, crit chance, ...)
 
 ### `REBIRTH` <small>const</small>
 
-Source: [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts)
+Source: [`src/config/rebirth.ts:21`](../../src/config/rebirth.ts)
 
 Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIRTH` and are checked by [`rebirthStatus`](progression.md#rebirthstatus), the one function the button, the dialog, the store and the server share.
 
@@ -213,10 +213,6 @@ Rebirth: restart with a permanent bonus paid in Embers. The rules live in `REBIR
 - **What is kept**: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant's shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).
 - The server runs the rebirth first (`POST /api/rebirth`): it checks the stored save, wipes the ledger's inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.
 - Auto-battle unlocks after the first rebirth (`COMBAT.auto.minRebirths`).
-
-**Known issues**
-
-- IDL-223 the gear wipe on rebirth is live without a crafting sink (RELEASE-PLAN P11); needs an owner decision.
 
 See also: [`rebirthStatus`](progression.md#rebirthstatus), [`emberGain`](progression.md#embergain)
 
@@ -333,7 +329,7 @@ The numbers of the rebirth result screen, from what the run had reached and the 
 
 ### `EMBER_UPGRADES` <small>const</small>
 
-Source: [`src/config/rebirth.ts:68`](../../src/config/rebirth.ts)
+Source: [`src/config/rebirth.ts:67`](../../src/config/rebirth.ts)
 
 The Ember shop: level N+1 costs `ceil(baseCost x costGrowth^N)` Embers ([`emberUpgradeCost`](progression.md#emberupgradecost)). Shop levels are permanent: nothing refunds Embers on a rebirth.
 The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).

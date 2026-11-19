@@ -186,7 +186,7 @@ What the profiles are: `scripts/pace/profiles.ts`. Open them in a spreadsheet or
 
 Source: [`scripts/pace-classes.ts:1`](../../scripts/pace-classes.ts)
 
-`npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78, RELEASE-PLAN B7). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline
+`npm run pace:classes`: the class picker's pacing acceptance (IDL-70, IDL-78). Plays `idle` and `casual` (or the profiles named on the command line) once with no class (the neutral baseline
 the committed numbers are measured with) and once with each hero class, all at the same time in separate processes, then compares every guarded milestone of each class run with the baseline using the pacing guard's own rule
 (`comparePacing`: +-15 % and 5 game days). The last line is the acceptance line, and the exit code is 1 when a class moves a milestone out of the band. Writes nothing under docs/.
 

@@ -4,6 +4,4 @@
 
 Open code-side findings, each written as `@knownissue` on the code it is about. Fix the code, then delete the tag.
 
-### [`REBIRTH`](progression.md#rebirth) — [`src/config/rebirth.ts:22`](../../src/config/rebirth.ts)
-
-- IDL-223 the gear wipe on rebirth is live without a crafting sink (RELEASE-PLAN P11); needs an owner decision.
+_None._
