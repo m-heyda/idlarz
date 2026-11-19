@@ -313,7 +313,7 @@ export const renderMarkdown = (
 	);
 	lines.push('');
 	lines.push(
-		'> Class picker (IDL-78, RELEASE-PLAN B7): these profiles play with no class, the neutral baseline. `npm run pace:classes` plays `idle` and `casual` with each class and fails when a guarded milestone moves more than ±15 % (or 5 game days) from this baseline; the sim models the XP, tile-discount and fight passives, not offline efficiency or chest speed (both are server-side only).',
+		'> Class picker (IDL-78): these profiles play with no class, the neutral baseline. `npm run pace:classes` plays `idle` and `casual` with each class and fails when a guarded milestone moves more than ±15 % (or 5 game days) from this baseline; the sim models the XP, tile-discount and fight passives, not offline efficiency or chest speed (both are server-side only).',
 	);
 	lines.push('');
 	lines.push(`| milestone | ${names.join(' | ')} |`);
