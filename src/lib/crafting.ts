@@ -1,5 +1,7 @@
 // Crafting maths, pure (no store, no server): the crafting level curve and what a recipe costs. The server (/api/craft) and the
 // overlay both use these, so a level and a price are the same on both sides.
+import { INGREDIENT_BY_ID } from '@/catalog/ingredients';
+import { JUNK_ITEMS } from '@/catalog/items/junk';
 import { RESOURCES, type MerchantResourceKey } from '@/catalog/resources';
 import { RECIPES, type Recipe } from '@/catalog/recipes';
 import { CRAFTING } from '@/config/crafting';
@@ -131,7 +133,7 @@ const makerOf = (component: string): Recipe | undefined => RECIPES.find((r) => '
 export const recipeResourceGold = (recipe: Recipe): number =>
 	recipe.inputs.reduce((sum, input) => ('resource' in input ? sum + input.qty * RESOURCES[input.resource].merchant.price : sum), 0);
 
-/** The gold value of a recipe's inputs at merchant prices; a component counts at what its own recipe costs per piece made. */
+/** The gold value of a recipe's inputs at merchant prices; a component counts at what its own recipe costs per piece made, a dropped monster ingredient at the sell value of its junk. */
 export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): number => {
 	let sum = 0;
 	for (const input of recipe.inputs) {
@@ -140,6 +142,12 @@ export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): nu
 			continue;
 		}
 		const maker = makerOf(input.component);
+		// a monster ingredient is dropped, not made: it counts at the sell value of the junk it came from
+		const dropped = !maker ? INGREDIENT_BY_ID.get(input.component) : undefined;
+		if (dropped) {
+			sum += input.qty * (JUNK_ITEMS.find((j) => j.id === dropped.junkId)?.sellValue ?? 0);
+			continue;
+		}
 		if (!maker || seen.includes(maker.id)) throw new Error(`recipe ${recipe.id}: no way to make component ${input.component}`);
 		sum += (input.qty * recipeCostGold(maker, [...seen, recipe.id])) / maker.output.qty;
 	}

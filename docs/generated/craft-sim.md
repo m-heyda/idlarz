@@ -9,6 +9,7 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Recipe | Kind | Unlock | Inputs | Cost (gold value) | Sell value | Shop price | Cost / shop | Crafting XP | Cost per XP |
 |---|---|---:|---|---:|---:|---:|---:|---:|---:|
 | Glass Vial | component | 1 | 10 Stone + 5 Coal | 14.5 | - | - | - | 2 | 7.3 |
+| Arcane Essence | component | 3 | 1 Glass Vial + 3 Glowberry + 2 Dried Herb Bundle | 82.5 | - | - | - | 4 | 20.6 |
 | Minor Healing Potion | potion | 1 | 40 Food + 1 Glass Vial | 30.5 | 20 | 80 | 38% | 6 | 5.1 |
 | Greater Healing Potion | potion | 5 | 150 Food + 60 Coal + 1 Glass Vial | 140.5 | 90 | 360 | 39% | 25 | 5.6 |
 | Cured Leather | component | 3 | 5 Hide + 3 Coal | 13.3 | - | - | - | 3 | 4.4 |
@@ -45,6 +46,7 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |
 |---|---:|---:|---:|---:|---:|---:|
 | Glass Vial | 10 | 360 | 720 | 5,220 | 166666666.7 | 2777777.8 |
+| Arcane Essence | 20 | 180 | 720 | 14,850 | 333333333.3 | 5555555.6 |
 | Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 233333333.3 | 3888888.9 |
 | Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 500000000 | 8333333.3 |
 | Cured Leather | 12 | 300 | 900 | 3,990 | 200000000 | 3333333.3 |
