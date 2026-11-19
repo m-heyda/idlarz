@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import dynamic from 'next/dynamic';
 import LoadingView from '@/components/game/overlays/LoadingView';
-import PixelModal from '@/components/game/PixelModal';
+import GameModal from '@/components/game/GameModal';
 import HeroCreator from '@/components/auth/HeroCreator';
 import QueryProvider from '@/components/QueryProvider';
 import { Button } from '../../../packages/design-system/src/components/primitives';
@@ -71,7 +71,7 @@ export default function GuestPage() {
 		);
 	return (
 		<div className='guest-start'>
-			<PixelModal title='Play as guest' size='md' hideClose closeOnBackdrop={false} onClose={() => undefined}>
+			<GameModal title='Play as guest' size='md' hideClose closeOnBackdrop={false} onClose={() => undefined}>
 				<div className='guest-start-body'>
 					<p className='guest-start-note'>
 						Pick a hero and play right away. Your game is saved in this browser only; register any time to start a real account.
@@ -82,7 +82,7 @@ export default function GuestPage() {
 						Start playing
 					</Button>
 				</div>
-			</PixelModal>
+			</GameModal>
 		</div>
 	);
 }

@@ -3,7 +3,7 @@ import { WindowShell } from '../../../packages/design-system/src/components/prim
 import { clampWindowPosition, clampWindowSize } from '../../../packages/design-system/src/logic';
 import { reportCuriosity } from '@/lib/curiosityClient';
 import { useWindowStore, type WinId } from '@/stores/windowStore';
-import { hasOpenModal } from './PixelModal';
+import { hasOpenModal } from './GameModal';
 
 /** Below this screen width windows are laid out one at a time (no room to drag them side by side) */
 const NARROW_PX = 900;

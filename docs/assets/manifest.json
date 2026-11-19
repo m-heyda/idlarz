@@ -21629,9 +21629,7 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
+		"usedBy": [],
 		"name": "ui_frame_modal",
 		"category": "ui",
 		"subcategory": "frames and bars",
@@ -36968,7 +36966,6 @@
 	},
 	{
 		"usedBy": [
-			"app/globals.css",
 			"styles/LoadingScreen.css"
 		],
 		"name": "ground_bg_crack",

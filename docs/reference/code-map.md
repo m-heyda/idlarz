@@ -263,7 +263,7 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`EmberIcon.tsx`](../../src/components/game/EmberIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`FloatingText.tsx`](../../src/components/game/FloatingText.tsx) — ~ Renders "+N <icon>" popups where the player clicked.
 - [`GameHeader.tsx`](../../src/components/game/GameHeader.tsx) — ~ The game's HUD, drawn with the design system (IDL-325):
-- [`GameModal.tsx`](../../src/components/game/GameModal.tsx) — ~ A game dialog drawn with the design system's `Modal` (stone frame, flanked title, close button).
+- [`GameModal.tsx`](../../src/components/game/GameModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
 - [`GameWindow.tsx`](../../src/components/game/GameWindow.tsx) — ~ Below this screen width windows are laid out one at a time (no room to drag them side by side)
 - [`GemIcon.tsx`](../../src/components/game/GemIcon.tsx) — ~ 0.5 = 20px inline icon (default), 1 = the full 40px sprite
 - [`Grid.tsx`](../../src/components/game/Grid.tsx) — ~ Wheel zoom.
@@ -285,7 +285,6 @@ Every source file with the first sentence of its leading comment. A leading `~` 
 - [`NotifyDot.tsx`](../../src/components/game/NotifyDot.tsx) — ~ Render nothing when false, so callers can pass the condition straight through
 - [`PickaxeCursor.tsx`](../../src/components/game/PickaxeCursor.tsx) — ~ Where the tip of the pick is in the 36 px picture:
 - [`PixelIcon.tsx`](../../src/components/game/PixelIcon.tsx) — ~ A one-row sprite sheet from the icon set (its size is the whole sheet)
-- [`PixelModal.tsx`](../../src/components/game/PixelModal.tsx) — ~ True while a real modal (a confirmation, settings ...) is open:
 - [`RankingsWindow.tsx`](../../src/components/game/RankingsWindow.tsx) — ~ The number of a row:
 - [`ResourceIcon.tsx`](../../src/components/game/ResourceIcon.tsx) — ~ 0.6 = 24px inline icon (default), 1 = full 40px sprite
 - [`RockLayer.tsx`](../../src/components/game/RockLayer.tsx) — ~ How long the whole effect lives:
