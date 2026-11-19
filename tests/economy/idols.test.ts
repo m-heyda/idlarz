@@ -194,15 +194,13 @@ const ctxOf = () => {
 	return { tiles: s.tiles, monsters: s.monsters, castleLevel: 5, castleUpgrade: s.castleUpgrade, buildingUpgrades: s.buildingUpgrades, ownedTiles: 20 };
 };
 
-test('an Idol level from 3 also costs the T3 extract of its biome (where it has one), doubling each level', () => {
+test('an Idol level from 3 also costs the T3 extract of its biome (where it has one), growing steeply each level', () => {
 	const def = buildingDef('idol_forest');
 	assert.equal(buildingLevelCost(2, 20, def).sap, undefined);
-	assert.equal(buildingLevelCost(3, 20, def).sap, IDOL_RULES.t3PerLevel);
-	assert.equal(buildingLevelCost(4, 20, def).sap, IDOL_RULES.t3PerLevel * 2);
 	assert.deepEqual(
-		[3, 4, 5].map((l) => buildingLevelCost(l, 20, def).sap),
-		[10000, 20000, 40000],
-		'x5 since the slower Idols',
+		[3, 4, 5, 6, 7, 8].map((l) => buildingLevelCost(l, 20, def).sap),
+		[10000, 100000, 500000, 2500000, 12500000, 62500000],
+		'levels past the base cap grow x5 a level',
 	);
 	assert.equal(buildingLevelCost(3, 20, buildingDef('idol_jungle')).sap, undefined, 'a biome without an Extractor asks for none');
 	assert.equal(buildingLevelCost(3, 20, buildingDef('lumberyard')).sap, undefined, 'only Idols');
@@ -214,7 +212,7 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 	assert.equal(api().upgradeBuilding(a.x, a.y), false, 'not enough sap');
 	setResources({ sap: 100000 });
 	assert.equal(api().upgradeBuilding(a.x, a.y), true);
-	assert.equal(api().resources.sap, 100000 - IDOL_RULES.t3PerLevel);
+	assert.equal(api().resources.sap, 100000 - IDOL_RULES.t3Costs[0]);
 });
 
 test('Dwarf Statue shortens castle and building timers, capped at 60 % together with Master Builders', () => {
