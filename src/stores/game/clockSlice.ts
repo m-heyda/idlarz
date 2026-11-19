@@ -10,6 +10,7 @@ import { withClassBonus } from '@/lib/classPassives';
 import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
 import { bestWornGrade, generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
+import { crossedGoldTier } from '@/lib/goldTiers';
 import { gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { castleLevelOf } from '@/lib/castleWard';
@@ -187,5 +188,6 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		if (castleFinished) emitSaveEvent('castleUpgraded');
 		if (buildingFinished) emitSaveEvent('buildingUpgraded');
 		if (level > state.level.level) emitSaveEvent('levelUp');
+		if (crossedGoldTier(state.resources.gold, newResources.gold)) emitSaveEvent('goldTier');
 	},
 });

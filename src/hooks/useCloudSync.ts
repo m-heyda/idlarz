@@ -9,6 +9,7 @@ import { onSaveEvent } from '@/lib/saveEvents';
 import { createSyncScheduler, type PushOutcome, type PushReason } from '@/lib/syncPolicy';
 import { registerCloudSaver } from '@/lib/manualCloudSave';
 import { writeEntered } from '@/lib/authClient';
+import { signalSyncNow } from '@/lib/serverSession';
 import { cloudSaveGone } from '@/lib/startPlan';
 import { countOwnedTiles } from '@/utils/game/tiles';
 
@@ -74,6 +75,7 @@ export const useCloudSync = (userId: string, active: boolean) => {
 					}
 					writeLink({ userId, rev: result.rev });
 					writeAttempts([]);
+					if (!hiding) signalSyncNow(); // the server judges the deeds from the save it just stored: ask now, so an earned deed shows up within seconds, not at the next poll
 					return 'ok';
 				case 'conflict':
 					if (cloudSaveGone(result.rev)) {
