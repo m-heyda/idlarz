@@ -42,6 +42,7 @@ import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, Invento
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { mergeJunkStacks } from '@/lib/offline/junkMerge';
 import { craftLimit } from '@/lib/crafting';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
@@ -120,7 +121,7 @@ const onlineStep = async <T>(
 		const bank = await place(advanced);
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
 		// ingredient stacks the player held before the Crafting bag existed move over (a pass that finds nothing once it has run)
-		const out = await body({ ledger: moveIngredientStacks({ ...ledger, bank }), stored, bank, nowSec, env, place });
+		const out = await body({ ledger: mergeJunkStacks(moveIngredientStacks({ ...ledger, bank })), stored, bank, nowSec, env, place });
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;

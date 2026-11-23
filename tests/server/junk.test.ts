@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ITEM_CATALOG } from '../../src/catalog';
-import { JUNK_ITEMS } from '../../src/catalog/items/junk';
+import { JUNK_ITEMS, JUNK_STACK } from '../../src/catalog/items/junk';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkGold, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
@@ -15,10 +15,10 @@ import { plainItem } from '../../src/lib/itemInstance';
 const seeded = (n: number) => mulberry32(n);
 const ctx = { level: 10, gold: 400, luck: 0, boss: false, lucky: false };
 
-test('every junk material is a consumable that stacks by rarity with art, lore and a price, and the ladder runs cheap to very pricey', () => {
+test('every junk material is a consumable that stacks without limit with art, lore and a price, and the ladder runs cheap to very pricey', () => {
 	assert.equal(JUNK_ITEMS.length, 49);
 	for (const item of JUNK_ITEMS) {
-		assert.equal(item.stackMax, { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 }[item.rarity as string], item.id);
+		assert.equal(item.stackMax, JUNK_STACK, item.id);
 		assert.equal(ITEM_CATALOG[item.id], item, `${item.id} is in the catalog`);
 		assert.ok(item.junk && item.description && item.sellValue > 0, item.id);
 		assert.ok(

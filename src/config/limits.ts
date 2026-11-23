@@ -13,8 +13,8 @@
 export const LIMITS = {
 	/** Levels a monster may grow above the level it spawned at */
 	monsterGrowthLevels: 10,
-	/** Seconds of map time per level of growth */
-	monsterGrowthIntervalSec: 1800,
+	/** Seconds of map time per level of growth (900: twice as fast as the first 1,800, owner 2026-11-24, so a monster reaches its growth cap in 2.5 hours) */
+	monsterGrowthIntervalSec: 900,
 	/** Monsters that can wait in the battle queue while a fight is open (@category Combat) */
 	battleQueue: 10,
 	/** Pieces of gear on the merchant's shelf */

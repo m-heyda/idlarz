@@ -92,6 +92,30 @@ export const addToBag = (bag: BagSlot[], id: string, qty = 1): { bag: BagSlot[];
 	return { bag: next, added: qty - left, overflow: left };
 };
 
+/**
+ * Merges every kind of junk that sits in more than one bag slot into its first slot (the owner's "one slot per junk" rule): a save from the time junk stacked to 100,000 holds several stacks of one kind. The other slots become empty,
+ * the bag keeps its length, and a total above the stack size (never for junk today) leaves the rest in the second slot. Returns the same bag when nothing needs merging, so it can run on every request.
+ */
+export const mergeJunk = (bag: BagSlot[]): BagSlot[] => {
+	const where = new Map<string, number[]>();
+	bag.forEach((slot, index) => {
+		const stack = stackOf(slot);
+		if (stack && ITEM_CATALOG[stack.id]?.junk) where.set(stack.id, [...(where.get(stack.id) ?? []), index]);
+	});
+	let next: BagSlot[] | null = null;
+	for (const [id, indexes] of where) {
+		if (indexes.length < 2) continue;
+		next ??= bag.map(copySlot);
+		const total = indexes.reduce((sum, i) => sum + slotQty(bag[i]), 0);
+		const max = stackMax(id);
+		const first = Math.min(total, max);
+		next[indexes[0]] = { id, qty: first };
+		next[indexes[1]] = total > first ? { id, qty: total - first } : null;
+		for (const i of indexes.slice(2)) next[i] = null;
+	}
+	return next ?? bag;
+};
+
 /** Puts a piece of gear in the first empty slot; `added` is false when the bag is full. */
 export const addGear = (bag: BagSlot[], item: ItemInstance): { bag: BagSlot[]; added: boolean } => {
 	const next = bag.map(copySlot);

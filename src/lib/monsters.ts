@@ -94,13 +94,13 @@ export const maxLevelOf = (spawnLevel: number, ctx: LimitContext = {}, growCap?:
 /**
  * The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.
  *
- * Growth: +1 level per 1,800 s on the map (`LIMITS.monsterGrowthIntervalSec`), at most +10 above the spawn level (`LIMITS.monsterGrowthLevels`, hard 40). The level is a function of age.
+ * Growth: +1 level per 900 s on the map (`LIMITS.monsterGrowthIntervalSec`), at most +10 above the spawn level (`LIMITS.monsterGrowthLevels`, hard 40). The level is a function of age.
  * A monster whose spawn was capped for a weak player has a smaller `growCap`.
  *
  * @category Monsters/Level scaling
  * @order 4
  * @formula
- * level = spawnLevel + min(growthLevels, floor(ageSec / 1800))
+ * level = spawnLevel + min(growthLevels, floor(ageSec / 900))
  */
 export const levelAtAge = (spawnLevel: number, ageSec: number, ctx: LimitContext = {}, growCap?: number): number =>
 	spawnLevel + Math.min(growthLevels(ctx, growCap), Math.floor(Math.max(0, ageSec) / limitOf('monsterGrowthIntervalSec', ctx)));

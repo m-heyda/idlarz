@@ -58,7 +58,7 @@ test('placed tickets become monsters exactly where the server put them, aged as 
 		],
 	);
 	assert.equal(out.monsters[0].ageSec, 3600);
-	assert.equal(out.monsters[0].level, out.monsters[0].spawnLevel + 2, 'an hour old: two growth intervals');
+	assert.equal(out.monsters[0].level, out.monsters[0].spawnLevel + 4, 'an hour old: four growth intervals of a quarter hour');
 	assert.equal(out.monsters[1].lucky, true);
 	assert.equal(out.monsters[0].lucky, undefined);
 	assert.equal(out.placed.monsters, 2);

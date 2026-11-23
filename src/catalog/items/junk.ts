@@ -1,10 +1,16 @@
 import type { ItemDef } from '@/types/game';
 
-// Junk materials (IDL-312): trade goods with no use but the merchant. They stack by rarity (`JUNK_STACK_MAX`: 100,000 common, 50,000 uncommon, 25,000 rare, 10,000 epic), drop from monsters (config in `lib/loot/junkDrops.ts`) and are what the Bag's Sell junk button sells (`lib/loot/junk.ts`). The cheap ones are plentiful,
+// Junk materials (IDL-312): trade goods with no use but the merchant. They stack without a practical limit (`JUNK_STACK`: one bag slot holds up to a trillion of one kind, so a junk material is one slot however much you carry), drop from monsters (config in `lib/loot/junkDrops.ts`) and are what the Bag's Sell junk button sells (`lib/loot/junk.ts`). The cheap ones are plentiful,
 // the pricey ones are rare finds and the boss guarantees. Prices are placeholders for the balance pass.
 
-/** How many of a junk material fit in one bag slot, by rarity: the cheap ones drop by the thousand, the pricey ones are rare finds */
-export const JUNK_STACK_MAX: Partial<Record<ItemDef['rarity'], number>> = { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 };
+/**
+ * How many of a junk material fit in one bag slot (owner request 2026-11-24): effectively unlimited, so one kind of junk takes exactly one slot. A finite number on purpose (never `Infinity`: it must survive JSON and the sell maths):
+ * a trillion of the priciest junk (2,400 gold each) is 2.4e15 gold, still exact in a double. Saves hold such a stack through `MAX_STACK_QTY` (sanitizeSave), old split stacks are merged on the next request (`mergeJunk`).
+ *
+ * @category Loot/Junk
+ * @order 1
+ */
+export const JUNK_STACK = 1_000_000_000_000;
 
 const junk = (id: string, name: string, sellValue: number, description: string, rarity: ItemDef['rarity'] = 'common'): ItemDef => ({
 	id: `junk_${id}`,
@@ -12,7 +18,7 @@ const junk = (id: string, name: string, sellValue: number, description: string, 
 	kind: 'consumable',
 	rarity,
 	tier: 0,
-	stackMax: JUNK_STACK_MAX[rarity] ?? 10_000,
+	stackMax: JUNK_STACK,
 	sellValue,
 	icon: `art_junk_${id}` as ItemDef['icon'],
 	junk: true,

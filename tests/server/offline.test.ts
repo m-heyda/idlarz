@@ -341,5 +341,5 @@ test('monsters grow by the whole absence, not by the efficiency', () => {
 	const state = { ...api(), monsters: [monster] };
 	const { patch } = applyOfflineGrant(state, computeOfflineGrant(input({ gapSec: 3 * 3600 + 10 }))!);
 	assert.equal(patch.monsters![0].ageSec, 3 * 3600 + 10);
-	assert.equal(patch.monsters![0].level, 2 + 6, 'six growth intervals of half an hour');
+	assert.equal(patch.monsters![0].level, 2 + 10, 'twelve growth intervals of a quarter hour, capped at the growth limit of ten');
 });

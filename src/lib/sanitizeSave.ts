@@ -18,7 +18,7 @@ import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES } from '@/catal
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
-import { starterBag } from '@/lib/inventory';
+import { mergeJunk, starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
 import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
 import { refundOldShop } from '@/lib/emberShopMigration';
@@ -42,6 +42,9 @@ import type {
 	Resources,
 	Tile,
 } from '@/types/game';
+
+/** The most one bag stack may hold in a save: a junk stack is unlimited in practice (`JUNK_STACK`, a trillion), so the cap sits just above it; every stack is still cut to its item's own `stackMax` */
+const MAX_STACK_QTY = 1e12;
 
 /**
  * The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
@@ -405,13 +408,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			}
 			for (const key of Object.keys(entry)) if (!STACK_KEYS.has(key)) return fail('bag entry key');
 			const def = typeof entry.id === 'string' ? ITEM_CATALOG[entry.id] : undefined;
-			const qty = int(entry.qty, 1, 1e9);
+			const qty = int(entry.qty, 1, MAX_STACK_QTY);
 			if (!def || def.kind !== 'consumable' || qty === null) {
 				bag.push(null); // an id this version does not know (or a broken count): an empty slot
 				continue;
 			}
 			bag.push({ id: def.id, qty: Math.min(qty, def.stackMax ?? 1) }); // a stack above a lowered stack size is cut to it
 		}
+		bag = mergeJunk(bag); // junk that an older version split over several slots is one stack now
 	}
 
 	// Loot bookkeeping (optional: a save from before it has no pity and keeps everything)
