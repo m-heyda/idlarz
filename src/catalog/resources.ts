@@ -39,6 +39,8 @@ export interface ResourceDef {
 	color: string;
 	/** Present when the merchant buys it: gold per unit, plus his pitch */
 	merchant?: { price: number; description: string; pitch: string };
+	/** What a unit counts for in the cost of a recipe (`recipeCostGold`, the no-gold-printer gates) when that is more than the merchant pays: the T3 extracts sell for 5 gold but are worth 50 as crafting inputs, because their real sink is crafting and the buildings, not the shop (docs/plan/18) */
+	craftValue?: number;
 }
 
 export const RESOURCES = {
@@ -189,9 +191,11 @@ export const RESOURCES = {
 		emoji: '🌿',
 		label: 'Herbs',
 		description: 'A crafting extract of the plains.',
-		usedFor: 'Crafting (potions and enchants) and, later, building upgrades.',
+		usedFor:
+			'Crafting (potions and enchants), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Herb Garden on a plains tile. Sells to the merchant (he does not sell it back).',
 		color: '#8fd16a',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Fresh-cut herbs from the plains.', pitch: 'Apothecaries pay for good herbs.' },
 	},
 	sap: {
@@ -201,9 +205,11 @@ export const RESOURCES = {
 		emoji: '🍯',
 		label: 'Sap',
 		description: 'A crafting extract of the forest.',
-		usedFor: 'Crafting (arrow and blade coatings) and, later, building upgrades.',
+		usedFor:
+			'Crafting (arrow and blade coatings), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Sap Tapper on a forest tile. Sells to the merchant (he does not sell it back).',
 		color: '#e0a64a',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Thick sap from the forest.', pitch: 'Used for coatings and glues.' },
 	},
 	ironOre: {
@@ -213,9 +219,11 @@ export const RESOURCES = {
 		emoji: '⛏️',
 		label: 'Iron Ore',
 		description: 'A crafting extract of the hills.',
-		usedFor: 'Crafting (steel weapons and armor) and, later, building upgrades.',
+		usedFor:
+			'Crafting (steel weapons and armor), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Deep Mine on a hills tile. Sells to the merchant (he does not sell it back).',
 		color: '#b8c0d0',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Raw ore from the deep mines.', pitch: 'Smiths always need more ore.' },
 	},
 	spores: {
@@ -225,9 +233,11 @@ export const RESOURCES = {
 		emoji: '🍄',
 		label: 'Spores',
 		description: 'A crafting extract of the swamp.',
-		usedFor: 'Crafting (potions and enchants) and, later, building upgrades.',
+		usedFor:
+			'Crafting (potions and enchants), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Spore Cellar on a swamp tile. Sells to the merchant (he does not sell it back).',
 		color: '#b88ad8',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Cellar-grown spores from the swamp.', pitch: 'Alchemists buy them by the sack.' },
 	},
 	frostshard: {
@@ -237,9 +247,11 @@ export const RESOURCES = {
 		emoji: '❄️',
 		label: 'Frostshard',
 		description: 'A crafting extract of the tundra.',
-		usedFor: 'Crafting (rings and trinkets) and, later, building upgrades.',
+		usedFor:
+			'Crafting (rings and trinkets), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Ice Cutter on a tundra tile. Sells to the merchant (he does not sell it back).',
 		color: '#8fdcff',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Glittering shards cut from the ice.', pitch: 'Enchanters like the cold glow.' },
 	},
 	pearls: {
@@ -249,9 +261,11 @@ export const RESOURCES = {
 		emoji: '🦪',
 		label: 'Pearls',
 		description: 'A crafting extract of the lakes.',
-		usedFor: 'Crafting (rings and trinkets) and, later, building upgrades.',
+		usedFor:
+			'Crafting (rings and trinkets), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back).',
 		color: '#f0e8f8',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Pearls from the lake bed.', pitch: 'Jewellers pay a fair price.' },
 	},
 	salt: {
@@ -261,9 +275,11 @@ export const RESOURCES = {
 		emoji: '🧂',
 		label: 'Salt',
 		description: 'A crafting extract of the coast.',
-		usedFor: 'Crafting (leather armor) and, later, building upgrades.',
+		usedFor:
+			'Crafting (leather armor), Producer, Extractor and Idol upgrades from level 3, and the castle from level 7 (sells to the merchant for just 5 gold).',
 		source: 'The Salt Works on a coast tile. Sells to the merchant (he does not sell it back).',
 		color: '#f4f0e4',
+		craftValue: 50,
 		merchant: { price: 5, description: 'Coarse salt from the coast.', pitch: 'Every kitchen and tannery needs it.' },
 	},
 	wool: {
@@ -302,3 +318,9 @@ export const sortedCostEntries = <K extends string>(cost: Partial<Record<K, numb
 /** The resources of one tier, in catalog order (the header lists them left to right) */
 export const resourcesInTier = (tier: ResourceTier): ResourceKey[] =>
 	(Object.keys(RESOURCES) as ResourceKey[]).filter((key) => (RESOURCES[key] as ResourceDef).tier === tier);
+
+/** What a unit of a resource counts for in a recipe's cost: its `craftValue`, else what the merchant pays. */
+export const craftValueOf = (key: MerchantResourceKey): number => {
+	const def: { craftValue?: number; merchant: { price: number } } = RESOURCES[key];
+	return def.craftValue ?? def.merchant.price;
+};

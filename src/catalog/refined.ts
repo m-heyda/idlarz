@@ -27,7 +27,10 @@ const comp = (id: string, name: string, group: ComponentGroup, description: stri
 
 const ing = (id: string, qty: number): RecipeInput => ({ component: `ing_${id}`, qty });
 const part = (id: string, qty: number): RecipeInput => ({ component: id, qty });
-const res = (resource: 'stone' | 'coal' | 'food' | 'wool' | 'wood' | 'hide', qty: number): RecipeInput => ({ resource, qty });
+const res = (
+	resource: 'stone' | 'coal' | 'food' | 'wool' | 'wood' | 'hide' | 'herbs' | 'sap' | 'ironOre' | 'spores' | 'frostshard' | 'pearls' | 'salt',
+	qty: number,
+): RecipeInput => ({ resource, qty });
 
 const recipe = (id: string, name: string, inputs: RecipeInput[], component: string, unlock: number, xp: number, timeSec: number, qty = 1): Recipe => ({
 	id,
@@ -60,8 +63,9 @@ const GEMS: { id: string; name: string; tier: 1 | 2 | 3 | 4; unlock: number; raw
 /** What polishing a gem of this tier takes besides the rough stone: the tools are crafted too (Gem Grit, then a Polishing Cloth, then a vial of paste) */
 const polishInputs = (tier: 1 | 2 | 3 | 4, raw: string): RecipeInput[] => {
 	if (tier <= 2) return [ing(raw, 2), part('gem_grit', 1)];
-	if (tier === 3) return [ing(raw, 2), part('gem_grit', 2), part('polish_cloth', 1)];
-	return [ing(raw, 1), part('gem_grit', 3), part('polish_cloth', 2), part('glass_vial', 1)];
+	// the blue gems are polished with pearl dust (Pearls from the lake Extractor), the top gems with pearls and frostshard
+	if (tier === 3) return [ing(raw, 2), part('gem_grit', 2), part('polish_cloth', 1), res('pearls', 100)];
+	return [ing(raw, 1), part('gem_grit', 3), part('polish_cloth', 2), part('glass_vial', 1), res('pearls', 300), res('frostshard', 300)];
 };
 
 export const cutGemId = (gem: string): string => `cut_${gem}`;
@@ -85,10 +89,10 @@ const METAL_COMPONENTS = [
 ];
 const METAL_RECIPES = [
 	recipe('copper_ingot', 'Copper Ingot', [ing('copper_ore', 2), res('coal', 20)], 'copper_ingot', 4, 5, 15),
-	recipe('iron_ingot', 'Iron Ingot', [ing('iron_ore', 2), res('coal', 40)], 'iron_ingot', 8, 8, 20),
-	recipe('steel_ingot', 'Steel Ingot', [part('iron_ingot', 2), ing('ember_coal', 1), res('coal', 80)], 'steel_ingot', 14, 14, 30),
-	recipe('silver_ingot', 'Silver Ingot', [ing('silver_ore', 2), res('coal', 60)], 'silver_ingot', 14, 14, 30),
-	recipe('gold_ingot', 'Gold Ingot', [ing('gold_ore', 2), ing('ember_coal', 1), res('coal', 120)], 'gold_ingot', 30, 30, 45),
+	recipe('iron_ingot', 'Iron Ingot', [ing('iron_ore', 2), res('ironOre', 50), res('coal', 40)], 'iron_ingot', 8, 8, 20),
+	recipe('steel_ingot', 'Steel Ingot', [part('iron_ingot', 2), ing('ember_coal', 1), res('ironOre', 200), res('coal', 80)], 'steel_ingot', 14, 14, 30),
+	recipe('silver_ingot', 'Silver Ingot', [ing('silver_ore', 2), res('salt', 100), res('coal', 60)], 'silver_ingot', 14, 14, 30),
+	recipe('gold_ingot', 'Gold Ingot', [ing('gold_ore', 2), ing('ember_coal', 1), res('salt', 300), res('coal', 120)], 'gold_ingot', 30, 30, 45),
 	recipe('obsidian_edge', 'Obsidian Edge', [ing('obsidian', 2), part('steel_ingot', 1), res('coal', 150)], 'obsidian_edge', 45, 60, 60),
 ];
 
@@ -127,9 +131,9 @@ const PART_RECIPES = [
 	recipe('polish_cloth', 'Polishing Cloth', [part('cured_leather', 1), part('gem_grit', 1)], 'polish_cloth', 12, 8, 20),
 	recipe('stone_block', 'Stone Block', [res('stone', 100), res('coal', 10)], 'stone_block', 6, 4, 15),
 	recipe('cloth_bolt', 'Cloth Bolt', [res('wool', 60)], 'cloth_bolt', 7, 5, 15),
-	recipe('herb_extract', 'Herb Extract', [ing('dried_herbs', 3), part('glass_vial', 1), res('coal', 10)], 'herb_extract', 4, 6, 18),
-	recipe('fungal_extract', 'Fungal Extract', [ing('orange_mushrooms', 3), part('glass_vial', 1)], 'fungal_extract', 8, 8, 20),
-	recipe('vital_extract', 'Vital Extract', [ing('blood', 2), part('glass_vial', 1), res('food', 20)], 'vital_extract', 6, 7, 18),
+	recipe('herb_extract', 'Herb Extract', [ing('dried_herbs', 3), part('glass_vial', 1), res('herbs', 60), res('coal', 10)], 'herb_extract', 4, 6, 18),
+	recipe('fungal_extract', 'Fungal Extract', [ing('orange_mushrooms', 3), part('glass_vial', 1), res('spores', 60)], 'fungal_extract', 8, 8, 20),
+	recipe('vital_extract', 'Vital Extract', [ing('blood', 2), part('glass_vial', 1), res('herbs', 30), res('food', 20)], 'vital_extract', 6, 7, 18),
 ];
 
 /** The refined components (ingots, cut gems, tools, extracts), merged into `COMPONENTS` */
@@ -151,7 +155,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'potion_regen',
 		kind: 'potion',
 		name: 'Vitality Tonic',
-		inputs: [part('vital_extract', 1), res('food', 120), res('coal', 40)],
+		inputs: [part('vital_extract', 1), res('herbs', 100), res('food', 120), res('coal', 40)],
 		output: { item: 'potion_regen', qty: 1 },
 		unlock: 10,
 		xp: 30,
@@ -161,7 +165,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_might',
 		kind: 'potion',
 		name: 'Elixir of Might',
-		inputs: [part('herb_extract', 2), ing('claw', 3), part('glass_vial', 1)],
+		inputs: [part('herb_extract', 2), ing('claw', 3), part('glass_vial', 1), res('herbs', 100)],
 		output: { item: 'elixir_might', qty: 1 },
 		unlock: 16,
 		xp: 60,
@@ -171,7 +175,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_haste',
 		kind: 'potion',
 		name: 'Elixir of Haste',
-		inputs: [part('fungal_extract', 1), ing('glowberry', 3), part('glass_vial', 1)],
+		inputs: [part('fungal_extract', 1), ing('glowberry', 3), part('glass_vial', 1), res('spores', 100)],
 		output: { item: 'elixir_haste', qty: 1 },
 		unlock: 18,
 		xp: 70,
@@ -181,7 +185,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_ironskin',
 		kind: 'potion',
 		name: 'Elixir of Ironskin',
-		inputs: [part('herb_extract', 1), part('iron_ingot', 1), ing('clay', 3), part('glass_vial', 1)],
+		inputs: [part('herb_extract', 1), part('iron_ingot', 1), ing('clay', 3), part('glass_vial', 1), res('ironOre', 100)],
 		output: { item: 'elixir_ironskin', qty: 1 },
 		unlock: 20,
 		xp: 80,
@@ -191,7 +195,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_fortitude',
 		kind: 'potion',
 		name: 'Elixir of Fortitude',
-		inputs: [part('vital_extract', 2), ing('grapes', 4), part('glass_vial', 1)],
+		inputs: [part('vital_extract', 2), ing('grapes', 4), part('glass_vial', 1), res('herbs', 100)],
 		output: { item: 'elixir_fortitude', qty: 1 },
 		unlock: 22,
 		xp: 90,
@@ -201,7 +205,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_keen_eye',
 		kind: 'potion',
 		name: 'Elixir of the Keen Eye',
-		inputs: [part('fungal_extract', 1), part('cut_jasper', 1), ing('glowberry', 2), part('glass_vial', 1)],
+		inputs: [part('fungal_extract', 1), part('cut_jasper', 1), ing('glowberry', 2), part('glass_vial', 1), res('sap', 100)],
 		output: { item: 'elixir_keen_eye', qty: 1 },
 		unlock: 24,
 		xp: 100,
@@ -211,7 +215,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_warding',
 		kind: 'potion',
 		name: 'Elixir of Warding',
-		inputs: [part('arcane_essence', 1), part('cut_moon', 1), part('vital_extract', 1), part('glass_vial', 1)],
+		inputs: [part('arcane_essence', 1), part('cut_moon', 1), part('vital_extract', 1), part('glass_vial', 1), res('frostshard', 100)],
 		output: { item: 'elixir_warding', qty: 1 },
 		unlock: 30,
 		xp: 140,

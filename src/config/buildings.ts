@@ -35,6 +35,9 @@ export const BUILDING_RULES = {
 	producer: { tileEquivalents: 15, levelStep: 0.5, perOwnedTile: 0.02, bonusCap: 1 },
 	extractor: { baseRate: 0.3, levelStep: 0.4 },
 	cost: { tilePrices: 14, priceTileCap: 300, levelGrowth: 2 },
+	/** From level 3 a Producer or an Extractor upgrade also eats the biome's T3 extract (the same one the Idol takes, owner 2026-11-24, docs/plan/18): levels 3 / 4 / 5 cost 1,000 / 5,000 / 25,000, then x`t3Growth` per level above 5 */
+	t3Costs: [1000, 5000, 25000],
+	t3Growth: 5,
 	relocateShare: 0.5,
 };
 

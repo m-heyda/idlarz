@@ -2,7 +2,7 @@
 // overlay both use these, so a level and a price are the same on both sides.
 import { INGREDIENT_BY_ID } from '@/catalog/ingredients';
 import { JUNK_ITEMS } from '@/catalog/items/junk';
-import { RESOURCES, type MerchantResourceKey } from '@/catalog/resources';
+import { RESOURCES, craftValueOf, type MerchantResourceKey } from '@/catalog/resources';
 import { RECIPES, type Recipe } from '@/catalog/recipes';
 import { CRAFTING, CRAFT_DISCOUNT_MAX } from '@/config/crafting';
 import { emberEffect } from '@/utils/game/emberEffects';
@@ -139,7 +139,7 @@ export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): nu
 	let sum = 0;
 	for (const input of recipe.inputs) {
 		if ('resource' in input) {
-			sum += input.qty * RESOURCES[input.resource].merchant.price;
+			sum += input.qty * craftValueOf(input.resource);
 			continue;
 		}
 		const maker = makerOf(input.component);

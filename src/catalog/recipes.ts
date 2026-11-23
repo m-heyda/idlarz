@@ -11,7 +11,7 @@ import { GRADE_INFO, type Grade } from '@/catalog/items/grades';
 import type { ItemDef } from '@/types/game';
 import { INGREDIENT_COMPONENTS } from './ingredients';
 import { REFINED_COMPONENTS, REFINED_RECIPES, type ComponentGroup } from './refined';
-import { RESOURCES, type MerchantResourceKey } from './resources';
+import { RESOURCES, craftValueOf, type MerchantResourceKey } from './resources';
 
 export type RecipeKind = 'potion' | 'component' | 'good' | 'gear' | 'legendary';
 
@@ -380,6 +380,19 @@ const FAMILY_PART: Record<Family, string> = { weapon: 'plank_bundle', armour: 'c
 const refined = (component: string, qty: number): RecipeInput => ({ component, qty });
 
 /**
+ * The biome extracts a gear recipe takes from the Gear tier Iron up (crafting rework 2026-11-24: the extracts of the Extractor buildings finally matter): weapons Iron Ore and Sap, armor Salt and Spores, cloaks Herbs and Salt, jewelry Pearls and Frostshard.
+ * `GEAR_EXTRACT_QTY` is the amount of each of the two for a weight-1 piece of the grade (a heavier slot takes more): about an hour of a level 3 to 5 Extractor at the Hide tier's end up to eight hours at Ancient, so the Extractors, not only gold, set the pace of the high tiers.
+ * G1 and G2 take none, because a new player may not own the biomes yet.
+ */
+const GEAR_EXTRACTS: Record<'weapon' | 'armour' | 'cloak' | 'trinket', readonly [MerchantResourceKey, MerchantResourceKey]> = {
+	weapon: ['ironOre', 'sap'],
+	armour: ['salt', 'spores'],
+	cloak: ['herbs', 'salt'],
+	trinket: ['pearls', 'frostshard'],
+};
+const GEAR_EXTRACT_QTY: Partial<Record<CraftGrade, number>> = { G3: 100, G4: 400, G5: 1_500, G6: 5_000, G7: 15_000, G8: 40_000 };
+
+/**
  * The refined components a gear recipe adds to its cost, by grade (crafting rework 2026-11-19). Weapons and armor climb copper, iron, steel, silver and the Obsidian Edge; cloaks take Cloth Bolts; every jewelry slot takes the cut gem of its own
  * stone and a precious ingot. Every component is unlocked at or below the crafting level of the grade that asks for it (tests/crafting/gearRecipes.test.ts), so a recipe never waits on a later level.
  */
@@ -437,7 +450,7 @@ const nice = (n: number): number => {
 /** The gold value of the resources a component's own recipe takes (a component is made once and counted at what it cost) */
 const componentValue = (id: string): number => {
 	const maker = RECIPES.find((r) => 'component' in r.output && r.output.component === id);
-	return (maker?.inputs ?? []).reduce((sum, i) => ('resource' in i ? sum + i.qty * RESOURCES[i.resource].merchant.price : sum), 0);
+	return (maker?.inputs ?? []).reduce((sum, i) => ('resource' in i ? sum + i.qty * craftValueOf(i.resource) : sum), 0);
 };
 
 /** The refined components a gear recipe of this grade and slot adds (see {@link GEAR_REFINED}) */
@@ -462,7 +475,14 @@ const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): Recip
 		qty: nice((raw * share) / RESOURCES[resource].merchant.price),
 	}));
 	if (count > 0) inputs.push({ component: FAMILY_PART[family], qty: count });
-	return [...inputs, ...gearRefined(grade, slot)];
+	const extractQty = GEAR_EXTRACT_QTY[grade];
+	const extracts: RecipeInput[] = extractQty
+		? GEAR_EXTRACTS[slot === 'cape' ? 'cloak' : family === 'weapon' ? 'weapon' : family === 'armour' ? 'armour' : 'trinket'].map((resource) => ({
+				resource,
+				qty: nice(extractQty * weight),
+			}))
+		: [];
+	return [...inputs, ...extracts, ...gearRefined(grade, slot)];
 };
 
 const gearRecipe = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): Recipe => {

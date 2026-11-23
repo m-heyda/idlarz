@@ -131,6 +131,19 @@ export const idolT3Cost = (level: number): number => {
 	return t3Costs[i] ?? (t3Costs[t3Costs.length - 1] ?? 0) * Math.pow(t3Growth, i - t3Costs.length + 1);
 };
 
+/**
+ * The T3 extract a Producer or an Extractor upgrade asks for (level 3 and up, `BUILDING_RULES.t3Costs`): 1,000 / 5,000 / 25,000 for levels 3 to 5, then x5 per level (the Ember shop's building cap lifts it past 5). The biome's own extract: a Producer
+ * needs its biome's Extractor to be built and working before it goes past level 2, and an Extractor eats a little of what it makes.
+ *
+ * @category Economy/Buildings
+ * @order 8
+ */
+export const buildingT3Cost = (level: number): number => {
+	const { t3Costs, t3Growth } = BUILDING_RULES;
+	const i = Math.floor(level) - 3;
+	return i < 0 ? 0 : (t3Costs[i] ?? (t3Costs[t3Costs.length - 1] ?? 0) * Math.pow(t3Growth, i - t3Costs.length + 1));
+};
+
 const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> => {
 	const { tilePrices, priceTileCap, levelGrowth } = BUILDING_RULES.cost;
 	const tile = tileCostAsResources(calculateTileCost(Math.min(Math.max(1, ownedTiles), priceTileCap)));
@@ -141,6 +154,11 @@ const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partia
 	if (def?.kind === 'idol' && level >= 3) {
 		const t3 = BUILDINGS.find((b) => b.kind === 'extractor' && b.biome === def.biome)?.produces[0];
 		if (t3) out[t3] = idolT3Cost(level);
+	}
+	// a Producer or an Extractor level from 3 needs the extract of its biome as well (where the biome has an Extractor)
+	if ((def?.kind === 'producer' || def?.kind === 'extractor') && level >= 3) {
+		const t3 = BUILDINGS.find((b) => b.kind === 'extractor' && b.biome === def.biome)?.produces[0];
+		if (t3) out[t3] = buildingT3Cost(level);
 	}
 	return out;
 };
