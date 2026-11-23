@@ -3,7 +3,8 @@ import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
 import { rollGear } from '@/lib/craftGear';
 import { sealedRng } from '@/lib/offline/seal';
-import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import { craftCostFactor, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import type { LimitContext } from '@/lib/limits';
 import type { GearTarget } from '@/catalog/recipes';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory } from '@/lib/offline/types';
 
@@ -27,6 +28,8 @@ export interface CraftEnv {
 	intelligence: number;
 	/** % more crafting XP from the Blossom Shrine (the Idol of the orchard), from the last accepted save */
 	xpPct?: number;
+	/** What raises the crafting limits and discounts (Ember shop from the last accepted save, Gem shop from the ledger): the batch run time and, at queue time, the speed, slots and cost */
+	limits?: LimitContext;
 }
 
 export interface CraftResult {
@@ -74,7 +77,7 @@ export const applyCraft = (
 	count: number,
 	nowMs: number,
 	xpPct = 0,
-	queueSlots = craftLimit('craftQueueSlots'),
+	limits: LimitContext = {},
 ): CraftResult => {
 	const recipe = recipeOf(recipeId);
 	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
@@ -85,11 +88,12 @@ export const applyCraft = (
 
 	const stock = takeComponents(recipe, count, craft.stock);
 	if (!stock) return refuse('no_components', inv, craft);
-	const spent = craft.spent + recipeResourceGold(recipe) * count;
+	const factor = craftCostFactor(limits);
+	const spent = craft.spent + recipeResourceGold(recipe) * factor * count;
 
 	if (recipe.timeSec) {
-		if (craft.queue.length >= queueSlots) return refuse('queue_full', inv, craft);
-		const entry: CraftQueueEntry = { recipeId, count, startedAt: nowMs, timeSec: craftTimeSec(recipe) };
+		if (craft.queue.length >= craftLimit('craftQueueSlots', limits)) return refuse('queue_full', inv, craft);
+		const entry: CraftQueueEntry = { recipeId, count, startedAt: nowMs, timeSec: craftTimeSec(recipe, limits), ...(factor < 1 ? { costFactor: factor } : {}) };
 		return { ok: true, inv, queued: count, craft: { ...craft, stock: dropEmpty(stock), spent, last: nowMs, queue: [...craft.queue, entry] } };
 	}
 
@@ -144,7 +148,7 @@ const deliverGear = (inv: Inventory, craft: CraftState, index: number, nowMs: nu
 	let bag = inv.bag;
 	let pity = craft.pity[target.grade] ?? 0;
 	let n = 0;
-	for (const want = finishedOf(entry, nowMs); n < want; n++) {
+	for (const want = finishedOf(entry, nowMs, env.limits); n < want; n++) {
 		const rng = sealedRng(env.secret, env.userId, 0, 'craft', craft.ord + n + 1);
 		const rolled = rollGear(target, { craftLevel, luck: env.luck, intelligence: env.intelligence, pity }, rng);
 		if (!rolled) break;
@@ -181,7 +185,7 @@ const deliverItems = (
 	env?: CraftEnv,
 ) => {
 	const entry = craft.queue[index];
-	const want = finishedOf(entry, nowMs);
+	const want = finishedOf(entry, nowMs, env?.limits);
 	const tried = addDrop(inv.bag, { kind: 'consumable', id: output.item, qty: want * output.qty });
 	const n = Math.floor((want * output.qty - tried.overflow) / output.qty);
 	// the bag takes exactly `n` crafts' worth (a partial craft is not delivered)
@@ -205,7 +209,7 @@ const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number
 	if ('gear' in recipe.output) return deliverGear(inv, craft, index, nowMs, recipe, recipe.output.gear, env);
 	if ('item' in recipe.output) return deliverItems(inv, craft, index, nowMs, recipe, recipe.output, env);
 	const stock = { ...craft.stock };
-	const n = fitting(recipe, finishedOf(entry, nowMs), stock);
+	const n = fitting(recipe, finishedOf(entry, nowMs, env?.limits), stock);
 	if (n > 0) stock[stashKeyOf(recipe)] = (stock[stashKeyOf(recipe)] ?? 0) + recipe.output.qty * n;
 	const left = entry.count - n;
 	const queue = craft.queue.slice();
@@ -234,7 +238,7 @@ export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowM
 	const entry = Number.isInteger(slot) ? craft.queue[slot] : undefined;
 	if (!entry || !recipeOf(entry.recipeId)) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
-	if (finishedOf(entry, nowMs) < 1) return refuse('nothing_ready', inv, craft);
+	if (finishedOf(entry, nowMs, env?.limits) < 1) return refuse('nothing_ready', inv, craft);
 	const done = deliver(inv, craft, slot, nowMs, env);
 	if (!done) return refuse('no_batch', inv, craft);
 	if (done.n < 1) return refuse(isGear(entry) || isItem(entry) ? 'bag_full' : 'stock_full', inv, craft);
@@ -252,11 +256,11 @@ export const applyClaimAll = (inv: Inventory, craft: CraftState, nowMs: number, 
 	// last to first, so removing a used-up batch never shifts one still to do
 	for (let index = craft.queue.length - 1; index >= 0; index--) {
 		const entry = state.queue[index];
-		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs) < 1) continue;
+		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs, env?.limits) < 1) continue;
 		ready = true;
 		const done = deliver(inventory, state, index, nowMs, env);
 		if (!done) continue;
-		if (done.n < finishedOf(entry, nowMs) && (isGear(entry) || isItem(entry))) gearWaiting = true;
+		if (done.n < finishedOf(entry, nowMs, env?.limits) && (isGear(entry) || isItem(entry))) gearWaiting = true;
 		crafted += done.n;
 		state = done.craft;
 		inventory = done.inv;
@@ -276,13 +280,13 @@ export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, now
 	if (!entry || !recipe) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 
-	const delivered = finishedOf(entry, nowMs) > 0 ? deliver(inv, craft, slot, nowMs, env) : null;
+	const delivered = finishedOf(entry, nowMs, env?.limits) > 0 ? deliver(inv, craft, slot, nowMs, env) : null;
 	const after = delivered?.craft ?? craft;
 	const outInv = delivered?.inv ?? inv;
 	const index = delivered && delivered.craft.queue.length < craft.queue.length ? -1 : slot; // -1: the delivery used the entry up
 	const rest = index < 0 ? null : after.queue[index];
 	// unfinished = crafts that are not done yet (what is done but did not fit stays as the smaller batch)
-	const waiting = rest ? finishedOf(rest, nowMs) : 0;
+	const waiting = rest ? finishedOf(rest, nowMs, env?.limits) : 0;
 	const cancelled = rest ? rest.count - waiting : 0;
 
 	const stock = { ...after.stock };
@@ -290,10 +294,11 @@ export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, now
 	let spent = after.spent;
 	const refund: NonNullable<CraftReply['refund']> = [];
 	if (rest && cancelled > 0) {
-		const needs = craftNeeds(recipe, cancelled);
+		const factor = rest.costFactor ?? 1; // the discount the batch was paid with
+		const needs = craftNeeds(recipe, cancelled, factor);
 		for (const c of needs.components) stock[c.id] = (stock[c.id] ?? 0) + c.qty;
 		for (const r of needs.resources) refund.push({ key: r.key, qty: r.qty });
-		spent = Math.max(0, spent - recipeResourceGold(recipe) * cancelled);
+		spent = Math.max(0, spent - recipeResourceGold(recipe) * factor * cancelled);
 		if (waiting > 0) queue[index] = { ...rest, count: waiting };
 		else queue.splice(index, 1);
 	}

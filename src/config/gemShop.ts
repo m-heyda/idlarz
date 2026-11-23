@@ -19,6 +19,9 @@ export type GemItemId =
 	| 'name_void'
 	| 'name_galaxy'
 	| 'builder_2'
+	| 'master_workbench'
+	| 'overnight_orders'
+	| 'bulk_discount'
 	| `castle_skin_${number}`;
 
 export interface GemItem {
@@ -162,6 +165,33 @@ export const GEM_SHOP: readonly GemItem[] = [
 		price: 1000,
 		cooldownSec: 0,
 	},
+	{
+		id: 'master_workbench',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Master Workbench',
+		blurb: 'Crafting batches finish 50% faster. Permanent, it survives a rebirth.',
+		price: 1500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'overnight_orders',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Overnight Orders',
+		blurb: 'A crafting batch may run 24 hours longer without a claim. Permanent, it survives a rebirth.',
+		price: 1000,
+		cooldownSec: 0,
+	},
+	{
+		id: 'bulk_discount',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Bulk Discount',
+		blurb: 'Every craft takes 10% fewer resources. Permanent, it survives a rebirth.',
+		price: 1500,
+		cooldownSec: 0,
+	},
 ];
 
 /** The id of the Builder #2 purchase (`ledger.gemShop.bought`). */
@@ -169,6 +199,26 @@ export const BUILDER_ITEM: GemItemId = 'builder_2';
 
 /** Builders the Gem shop gave an account: 1 once Builder #2 is in `bought`, else 0 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
 export const gemBuildersOf = (bought: Record<string, number> | undefined): number => ((bought?.[BUILDER_ITEM] ?? 0) > 0 ? 1 : 0);
+
+/** What the Gem shop's crafting items give an account (the ledger's `bought` record is the truth; the game mirrors it as `gemCraft`): extra craft speed, extra hours a batch may run, and the share of the resources a craft saves. */
+export interface GemCraft {
+	speed: number;
+	hours: number;
+	discount: number;
+}
+export const NO_GEM_CRAFT: GemCraft = { speed: 0, hours: 0, discount: 0 };
+
+/**
+ * The crafting bonuses of the Gem shop's one-time items: Master Workbench +0.5 craft speed, Overnight Orders +24 hours of batch run, Bulk Discount -10% resources (read by `limitOf` and `craftCostFactor`).
+ *
+ * @category Economy/Gems
+ * @order 3
+ */
+export const gemCraftOf = (bought: Record<string, number> | undefined): GemCraft => ({
+	speed: (bought?.master_workbench ?? 0) > 0 ? 0.5 : 0,
+	hours: (bought?.overnight_orders ?? 0) > 0 ? 24 : 0,
+	discount: (bought?.bulk_discount ?? 0) > 0 ? 0.1 : 0,
+});
 
 /** A purchase above this many gems asks for a confirmation in the shop window. */
 export const GEM_CONFIRM_ABOVE = 300;

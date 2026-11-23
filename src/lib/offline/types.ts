@@ -205,6 +205,8 @@ export interface CraftQueueEntry {
 	startedAt: number;
 	/** Seconds one craft takes, speed multiplier included, fixed when the batch was queued */
 	timeSec: number;
+	/** The share of the resources the batch paid (`craftCostFactor`, left out = 1: no discount), so a cancel refunds what was charged whatever the player owns later */
+	costFactor?: number;
 }
 
 /** Why a craft was refused (nothing is charged and nothing is changed) */

@@ -65,6 +65,9 @@ const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 	idolcap: (n) => `Idols go up to level ${5 + n * EMBER_UPGRADES.idolcap.effectPerLevel}`,
 	decree: () => 'The castle bonus counts double (one-time)',
 	extrabuilder: (n) => `+${n * EMBER_UPGRADES.extrabuilder.effectPerLevel} builder`,
+	workbench: (n) => `+${n * EMBER_UPGRADES.workbench.effectPerLevel} crafting speed: batches finish faster`,
+	nightshift: (n) => `+${n * EMBER_UPGRADES.nightshift.effectPerLevel} hours a crafting batch runs without you (8 at the start)`,
+	thrifty: (n) => `-${n * EMBER_UPGRADES.thrifty.effectPerLevel}% of the resources every craft takes`,
 	craftslots: (n) => `+${n * EMBER_UPGRADES.craftslots.effectPerLevel} crafting queue slot (3 at the start, 5 at most)`,
 	questrarity: () => 'A better chance of a higher quest rarity (comes with quests)',
 	questslots: () => 'More active quests at once (comes with quests)',
@@ -85,7 +88,7 @@ const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly Embe
 	{ id: 'time', label: 'Build and away time', ids: ['builders', 'buildtime', 'idoltime', 'nightwatch', 'steward', 'vigil'] },
 	{ id: 'caps', label: 'Caps and builders', ids: ['castlecap', 'buildcap', 'idolcap', 'extrabuilder', 'craftslots', 'decree'] },
 	{ id: 'battle', label: 'Battle', ids: ['tempo', 'precision', 'execution', 'brawn', 'sorcery', 'bloodthirst', 'vigor', 'potion'] },
-	{ id: 'utility', label: 'Utility', ids: ['deeppockets'] },
+	{ id: 'utility', label: 'Utility', ids: ['deeppockets', 'workbench', 'nightshift', 'thrifty'] },
 	{ id: 'quests', label: 'Quests (coming soon)', ids: ['questrarity', 'questslots'] },
 ];
 

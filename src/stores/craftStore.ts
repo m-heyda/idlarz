@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { ITEM_CATALOG } from '@/catalog';
 import { RECIPE_BY_ID } from '@/catalog/recipes';
-import { craftBlock, craftLevelOf, craftLimit, craftNeeds, emptyCraft } from '@/lib/crafting';
+import { craftBlock, craftCostFactor, craftLevelOf, craftLimit, craftNeeds, emptyCraft } from '@/lib/crafting';
 import type { BootSnapshot, CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
 import { onAccountCleared } from '@/lib/bootSnapshot';
 import { newClaimId } from '@/lib/offlineClient';
@@ -89,13 +89,14 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 		if (!recipe || state.busy || !Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return 'Cannot craft that.';
 		const craft = state.craft ?? emptyCraft();
 		const game = useGameStore.getState();
-		const blocked = craftBlock(recipe, count, { craftLevel: craftLevelOf(craft.xp).level, resources: game.resources, stock: craft.stock });
+		const costFactor = craftCostFactor({ prestige: game.prestige, gemCraft: game.gemCraft }); // Thrifty Hands and Bulk Discount
+		const blocked = craftBlock(recipe, count, { craftLevel: craftLevelOf(craft.xp).level, resources: game.resources, stock: craft.stock, costFactor });
 		if (blocked === 'locked') return REFUSAL.locked;
 		if (blocked === 'components') return REFUSAL.no_components;
 		if (blocked === 'resources') return 'Not enough resources.';
 
 		// pay at once (like the shop); the server's refusal gives it back
-		const needs = craftNeeds(recipe, count);
+		const needs = craftNeeds(recipe, count, costFactor);
 		const pay = (sign: 1 | -1) =>
 			useGameStore.setState((s) => {
 				const resources = { ...s.resources };

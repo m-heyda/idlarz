@@ -6,7 +6,7 @@
  *   good       trade goods: a bag stack with no use, sold to the merchant like any item (v0.1, IDL-227)
  *   gear       equipment: one recipe per grade (G1-G4) and slot, rolled by the server through the loot pipeline's `craft` source when a batch is claimed (docs/plan/17-crafting.md)
  */
-import { CRAFT_GEAR } from '@/config/crafting';
+import { CRAFT_COST_HEADROOM, CRAFT_GEAR } from '@/config/crafting';
 import { GRADE_INFO, type Grade } from '@/catalog/items/grades';
 import type { ItemDef } from '@/types/game';
 import { INGREDIENT_COMPONENTS } from './ingredients';
@@ -363,7 +363,7 @@ const GEAR_GRADE_COST: Record<CraftGrade, { value: number; parts: number; xp: nu
 	G1: { value: 2_400, parts: 0, xp: 60 },
 	G2: { value: 21_500, parts: 3, xp: 800 },
 	G3: { value: 222_000, parts: 6, xp: 2_500 },
-	G4: { value: 1_600_000, parts: 12, xp: 6_000 },
+	G4: { value: 1_700_000, parts: 12, xp: 6_000 },
 	G5: { value: 14_500_000, parts: 24, xp: 14_000 },
 	G6: { value: 85_000_000, parts: 40, xp: 32_000 },
 };
@@ -445,7 +445,8 @@ const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): Recip
 	const weight = SLOT_WEIGHT[slot] * (type ? (TYPE_WEIGHT[type] ?? 1) : 1);
 	const family = FAMILY[slot];
 	const count = parts > 0 ? Math.max(1, Math.round(parts * weight)) : 0;
-	const raw = Math.max(0, value * weight - count * componentValue(FAMILY_PART[family]));
+	// the headroom keeps a craft above the sell value even with every crafting discount (CRAFT_COST_HEADROOM)
+	const raw = Math.max(0, value * weight * CRAFT_COST_HEADROOM - count * componentValue(FAMILY_PART[family]));
 	const inputs: RecipeInput[] = (Object.entries(FAMILY_SPLIT[family]) as [MerchantResourceKey, number][]).map(([resource, share]) => ({
 		resource,
 		qty: nice((raw * share) / RESOURCES[resource].merchant.price),

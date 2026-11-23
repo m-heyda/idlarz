@@ -9,6 +9,7 @@ import type { PixelIconName } from '@/config/pixelIcons';
 import type { ItemStats } from '@/catalog/stats';
 import type { SkillId } from '@/catalog/skills';
 import type { ConsumableEffect } from '@/catalog/buffs';
+import type { GemCraft } from '@/config/gemShop';
 import type { World } from '@/utils/world';
 import type { ChestLoot } from '@/lib/chests';
 import type { OfflineReport } from '@/lib/offline/apply';
@@ -411,6 +412,8 @@ export interface GameState {
 	buildingUpgrades: BuildingUpgradeState[];
 	/** Builders the Gem shop's "Builder #2" gave this account (0 or 1; transient: the server's ledger is the record, the gem store sets it from its answers) */
 	gemBuilders: number;
+	/** What the Gem shop's crafting items give this account (transient like `gemBuilders`: the ledger's record, set by the gem store) */
+	gemCraft: GemCraft;
 	/** The level of each Idol the account has reached, by biome (kept across rebirths; the server's ledger holds the trusted copy, `legacy.idols`). A standing Idol works at the lower of this and its tile's level; placing a learned Idol again is free at this level. */
 	idolLevels: Record<string, number>;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks

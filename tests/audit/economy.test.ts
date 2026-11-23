@@ -269,6 +269,7 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 		'idoltime',
 		'mastery',
 		'miningpower',
+		'nightshift',
 		'nightwatch',
 		'overseer',
 		'potion',
@@ -282,9 +283,11 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 		'steward',
 		'tempo',
 		'thrift',
+		'thrifty',
 		'tithe',
 		'vigil',
 		'vigor',
+		'workbench',
 	]);
 	for (const id of ids) {
 		const def = EMBER_UPGRADES[id];

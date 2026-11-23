@@ -43,7 +43,7 @@ import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { mergeJunkStacks } from '@/lib/offline/junkMerge';
-import { craftLimit } from '@/lib/crafting';
+import { gemCraftOf } from '@/config/gemShop';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
 import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
@@ -393,18 +393,11 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			luck: ctx.stored.summary.derived.luck + craftLuckBonus(prestigeOfCore(ctx.stored.core)), // Artisan's Eye (Ember shop): crafted gear only
 			intelligence: ctx.stored.summary.derived.intelligence ?? 0,
 			xpPct: ctx.stored.summary.derived.idol?.craftXpPct ?? 0,
+			limits: { prestige: prestigeOfCore(ctx.stored.core), gemCraft: gemCraftOf(ledger.gemShop.bought) }, // Ember shop from the last accepted save, Gem shop from the ledger
 		};
 		const result =
 			'recipeId' in request
-				? applyCraft(
-						ledger.inv!,
-						ledger.craft,
-						request.recipeId,
-						request.count,
-						nowMs,
-						env.xpPct,
-						craftLimit('craftQueueSlots', { prestige: prestigeOfCore(ctx.stored.core) }),
-					)
+				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct, env.limits)
 				: request.action === 'claim'
 					? request.slot === 'all'
 						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)

@@ -4,6 +4,7 @@
 import { LIMITS } from '@/config/limits';
 import { DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import { STARTING_GEMS } from '@/config/economy';
+import { NO_GEM_CRAFT } from '@/config/gemShop';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
 import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { calculateCombatStats, calculateLevel } from '@/utils/game/character';
@@ -40,10 +41,11 @@ export const ratesWithGear = (
 	);
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
-export const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'> & Partial<Pick<GameState, 'gemBuilders'>>): LimitContext => ({
+export const limitCtx = (state: Pick<GameState, 'merchantUpgrades' | 'prestige'> & Partial<Pick<GameState, 'gemBuilders' | 'gemCraft'>>): LimitContext => ({
 	merchantUpgrades: state.merchantUpgrades,
 	prestige: state.prestige,
 	gemBuilders: state.gemBuilders,
+	gemCraft: state.gemCraft,
 });
 
 // Shared by the gold click and the tile tap: one token per physical click
@@ -112,6 +114,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		castleUpgrade: null,
 		buildingUpgrades: [] as BuildingUpgradeState[],
 		gemBuilders: 0,
+		gemCraft: NO_GEM_CRAFT,
 		idolLevels: {} as Record<string, number>,
 		playSeconds: 0,
 		activeChests: 0,

@@ -135,7 +135,13 @@ export const craftFromJson = (raw: unknown): CraftState => {
 			const q = e as Record<string, unknown>;
 			const count = Math.floor(n(q.count));
 			if (typeof q.recipeId === 'string' && q.recipeId.length <= 40 && count > 0 && n(q.startedAt) > 0 && n(q.timeSec) > 0)
-				queue.push({ recipeId: q.recipeId, count, startedAt: n(q.startedAt), timeSec: n(q.timeSec) });
+				queue.push({
+					recipeId: q.recipeId,
+					count,
+					startedAt: n(q.startedAt),
+					timeSec: n(q.timeSec),
+					...(n(q.costFactor) > 0 && n(q.costFactor) < 1 ? { costFactor: n(q.costFactor) } : {}),
+				});
 		}
 	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last), queue };
 };

@@ -81,6 +81,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			lootPity: kit.lootPity,
 			gems: state.gems, // the premium currency survives a rebirth
 			gemBuilders: state.gemBuilders, // so does the Gem shop's Builder #2
+			gemCraft: state.gemCraft, // and its crafting items
 			idolLevels: state.idolLevels, // the Idols' levels are the account's: only the buildings go with the map, they are placed again for free
 			autoSellUpTo: state.autoSellUpTo, // a setting, not gear
 			merchantUpgrades,

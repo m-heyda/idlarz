@@ -15,7 +15,7 @@ import {
 import { ITEMS } from '../../src/catalog';
 import { GRADE_INFO, gradeOfItem } from '../../src/catalog/items/grades';
 import { RARITIES } from '../../src/catalog/rarity';
-import { CRAFT_GEAR } from '../../src/config/crafting';
+import { CRAFT_DISCOUNT_MAX, CRAFT_GEAR } from '../../src/config/crafting';
 import { gearItemLevels, gearOdds, gearRequest, pityMultiplier, pityRarityOf, qualityBiasOf, rarityCeilingAt, rollGear } from '../../src/lib/craftGear';
 import { craftCumulativeXp, craftLimit, craftXpOf, emptyCraft, recipeCostGold } from '../../src/lib/crafting';
 import { generateLoot, rollLeaning } from '../../src/lib/loot/generate';
@@ -259,7 +259,7 @@ test("even with the pity counter working, the long-run share of rare at G4 stays
 	assert.ok(rare / N <= chest, `crafted rare share ${rare / N} vs chest ${chest}`);
 });
 
-test('no gold printer: every gear recipe (every grade, slot and type) costs more than the mean sell value of its piece, at the top of the item level window, with Intelligence and Luck', () => {
+test('no gold printer: every gear recipe (every grade, slot and type) costs more than the mean sell value of its piece even with every crafting discount, at the top of the item level window, with Intelligence and Luck', () => {
 	const N = 80;
 	for (const recipe of GEAR_RECIPES) {
 		const target = (recipe.output as { gear: GearTarget }).gear;
@@ -270,7 +270,7 @@ test('no gold printer: every gear recipe (every grade, slot and type) costs more
 			for (let i = 0; i < N; i++) sum += sellValueOf(rollGear(target, { craftLevel: 80, luck, intelligence: 105 }, rng(`v${luck}`, i))!.item);
 			worst = Math.max(worst, sum / N);
 		}
-		assert.ok(cost > worst * 1.05, `${recipe.id}: costs ${Math.round(cost)} vs mean sell ${Math.round(worst)}`);
+		assert.ok(cost * (1 - CRAFT_DISCOUNT_MAX) > worst * 1.05, `${recipe.id}: costs ${Math.round(cost)} vs mean sell ${Math.round(worst)}`);
 	}
 });
 

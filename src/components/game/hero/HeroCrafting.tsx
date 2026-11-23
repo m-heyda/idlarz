@@ -7,9 +7,22 @@ import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type
 import { gearBaseStats, gearItemLevels, gearOdds } from '@/lib/craftGear';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { craftGroups } from '@/lib/craftCategories';
-import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
+import {
+	craftBlock,
+	craftCostFactor,
+	craftLevelOf,
+	craftLimit,
+	craftNeeds,
+	craftTimeSec,
+	craftXpOf,
+	craftXpToNext,
+	finishedOf,
+	maxCraftable,
+	stashKeyOf,
+} from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { attributesWithGear } from '@/lib/gearAttributes';
+import type { LimitContext } from '@/lib/limits';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -25,6 +38,10 @@ interface Have {
 	craftLevel: number;
 	resources: Partial<Record<string, number>>;
 	stock: Record<string, number>;
+	/** What raises the crafting limits (Ember and Gem shop): craft speed and the batch run time */
+	limits: LimitContext;
+	/** The share of the resources a craft pays now (`craftCostFactor`) */
+	costFactor: number;
 }
 
 /** What a recipe's kind is called in a tooltip (one thing, capitalised). */
@@ -138,7 +155,7 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 	const prestige = useGameStore((state) => state.prestige);
 	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots', { prestige }) && !!recipe.timeSec;
 	const showToast = useUiStore((state) => state.showToast);
-	const perCraft = craftTimeSec(recipe);
+	const perCraft = craftTimeSec(recipe, have.limits);
 	const max = maxCraftable(recipe, have);
 	const [wanted, setWanted] = useState(1);
 	const [draft, setDraft] = useState<string | null>(null);
@@ -149,7 +166,7 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 	const description = 'component' in recipe.output ? COMPONENTS[recipe.output.component].description : null;
 	const isGear = 'gear' in recipe.output;
 	const block = count > 0 ? craftBlock(recipe, count, have) : 'resources';
-	const needs = craftNeeds(recipe, Math.max(1, count));
+	const needs = craftNeeds(recipe, Math.max(1, count), have.costFactor);
 
 	return (
 		<Panel parchment className='ds-ledger ds-craft-ticket'>
@@ -280,11 +297,13 @@ const Queue: React.FC = () => {
 	const showToast = useUiStore((state) => state.showToast);
 	const now = useServerNow();
 	const prestige = useGameStore((state) => state.prestige);
+	const gemCraft = useGameStore((state) => state.gemCraft);
+	const limits = { prestige, gemCraft };
 	const entries: CraftQueueEntry[] = queue.map((entry, slot) => {
 		const recipe = RECIPE_BY_ID[entry.recipeId];
-		const done = finishedOf(entry, now);
+		const done = finishedOf(entry, now, limits);
 		const left = Math.max(0, (entry.count - done) * entry.timeSec - (now - entry.startedAt) / 1000 + done * entry.timeSec);
-		const stalled = done < entry.count && now - entry.startedAt >= craftLimit('craftOfflineHours') * 3_600_000;
+		const stalled = done < entry.count && now - entry.startedAt >= craftLimit('craftOfflineHours', limits) * 3_600_000;
 		return {
 			id: slot,
 			name: recipe ? outputName(recipe) : entry.recipeId,
@@ -298,7 +317,7 @@ const Queue: React.FC = () => {
 	return (
 		<CraftQueue
 			entries={entries}
-			slots={craftLimit('craftQueueSlots', { prestige })}
+			slots={craftLimit('craftQueueSlots', limits)}
 			onCollect={(id) => act(() => claim(Number(id)))}
 			onCancel={(id) => act(() => cancel(Number(id)))}
 			onCollectAll={() => act(() => claim('all'))}
@@ -360,7 +379,12 @@ const HeroCrafting: React.FC = () => {
 	useEffect(() => void refresh(), [refresh]);
 
 	const { level } = craftLevelOf(craft?.xp ?? 0);
-	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
+	const prestige = useGameStore((state) => state.prestige);
+	const gemCraft = useGameStore((state) => state.gemCraft);
+	const have: Have = useMemo(() => {
+		const limits = { prestige, gemCraft };
+		return { craftLevel: level, resources, stock: craft?.stock ?? {}, limits, costFactor: craftCostFactor(limits) };
+	}, [level, resources, craft?.stock, prestige, gemCraft]);
 	const searching = query.trim() !== '';
 	const groups = useMemo(() => craftGroups(SHOWN, query), [query]);
 	// nothing chosen yet: the first recipe the player can craft now, else the first in the list

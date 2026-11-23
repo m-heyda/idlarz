@@ -36,6 +36,16 @@ export const CRAFTING = {
 };
 
 /**
+ * The most the crafting discounts can take off the resources of a recipe together (Ember shop Thrifty Hands up to 15% and the Gem shop's Bulk Discount 10%, `craftCostFactor`), and the headroom the gear recipe values carry for it: a gear recipe is priced
+ * 1 / (1 - `CRAFT_DISCOUNT_MAX`) higher than the sell-value gate needs, so even with every discount a craft still costs more than the piece sells for (tests/crafting/gearRecipes.test.ts, "no gold printer").
+ *
+ * @category Economy/Crafting
+ * @order 5
+ */
+export const CRAFT_DISCOUNT_MAX = 0.25;
+export const CRAFT_COST_HEADROOM = 1 / (1 - CRAFT_DISCOUNT_MAX);
+
+/**
  * Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
  * the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
  *
