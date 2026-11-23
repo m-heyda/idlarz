@@ -1,4 +1,5 @@
 import type { BuffFamily, BuffStat } from '@/catalog/buffs';
+import { TIME_SHIFT } from '@/config/crafting';
 import type { ItemDef } from '@/types/game';
 
 /** A timed-buff elixir: one effect of one buff family, a bag stack, drunk by hand */
@@ -130,6 +131,19 @@ export const CONSUMABLES: ItemDef[] = [
 		'art_elixir_keen_eye',
 		'A violet drop in each eye. Weak spots glow.',
 	),
+	{
+		id: 'elixir_time_shift',
+		name: 'Elixir of Time Shift',
+		kind: 'consumable',
+		rarity: 'epic',
+		tier: 0,
+		effects: [{ kind: 'timeShift', seconds: TIME_SHIFT.seconds }],
+		stackMax: 100,
+		sellValue: 1000,
+		icon: 'art_hourglass_draught',
+		description:
+			'An hourglass in a bottle. Drink it and an hour passes for the castle, the builders and the mines: an hour of income (at your away efficiency) and an hour off every building timer. Up to 3 a day.',
+	},
 	elixir(
 		'elixir_warding',
 		'Elixir of Warding',

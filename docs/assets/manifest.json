@@ -156,12 +156,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"elixir_time_shift"
+		],
 		"name": "art_hourglass_draught",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/hourglass_draught.png",
-		"status": "unused",
+		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
@@ -625,6 +627,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_horn_dark.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_hourglass_sand"
+		],
+		"name": "art_junk_hourglass_sand",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_hourglass_sand.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",

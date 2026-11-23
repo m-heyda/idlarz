@@ -352,7 +352,18 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 		if (op.action === 'use') {
 			const used = applyUse(ledger, ctx.env, op.index);
 			if (!used.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: used.message } };
-			return { ledger: used.ledger, value: { ok: true, gold: 0, count: 0, inv: used.ledger.inv!, serverNowSec: ctx.nowSec, buffs: used.buffs } };
+			return {
+				ledger: used.ledger,
+				value: {
+					ok: true,
+					gold: 0,
+					count: 0,
+					inv: used.ledger.inv!,
+					serverNowSec: ctx.nowSec,
+					buffs: used.buffs,
+					...(used.shifted ? { shifted: used.shifted } : {}),
+				},
+			};
 		}
 		if (op.action === 'sellResource' || op.action === 'buyResource') {
 			// the merchant's resource trades (IDL-319): priced here, judged against what the last save and the rates can explain; allowed in a fight like the shop purchases

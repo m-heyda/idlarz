@@ -84,5 +84,12 @@ export const JUNK_ITEMS: ItemDef[] = [
 	junk('lapis', 'Lapis Lazuli', 300, 'Deep blue with a dusting of gold. Painters grind it, jewellers cut it.', 'rare'),
 	junk('garnet', 'Dark Garnet', 340, 'Red so dark it looks black until the light hits it. A good, serious stone.', 'rare'),
 	junk('ruby', 'Rough Ruby', 1800, 'A cluster of red crystals still rough from the rock. Whoever cuts it well will not need to work again.', 'epic'),
+	junk(
+		'hourglass_sand',
+		'Hourglass Sand',
+		4000,
+		'Fine gold grains that fall upward when nobody is looking. Where they come from is a secret nobody has found out yet; the clockmakers want it badly.',
+		'epic',
+	),
 	junk('sapphire', 'Rough Sapphire', 2100, 'Blue crystals on a grey bed. The rarest colour in the rock, and the rock knows it.', 'epic'),
 ];

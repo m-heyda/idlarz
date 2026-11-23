@@ -289,8 +289,8 @@ test('builders: 1 for everyone, +1 with the Gem shop Builder #2; the castle take
 		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 2);
 		assert.equal(tileAt(api().tiles, b.x, b.y).buildingLevel, 2);
 
-		// a castle upgrade and a building upgrade at once
-		setResources(RICH);
+		// a castle upgrade and a building upgrade at once (a Producer's third level also eats a little sap, BUILDING_RULES.t3Costs)
+		setResources({ ...RICH, sap: 10_000 });
 		assert.equal(api().upgradeCastle(), true);
 		assert.equal(api().upgradeBuilding(a.x, a.y), true);
 		assert.equal(api().upgradeBuilding(b.x, b.y), false, 'the castle holds the other builder');

@@ -93,7 +93,11 @@ export const readGemShop = (raw: unknown): GemShop => {
 };
 
 /** Everything the server ever granted (income while away, chest and kill rewards): the save checks allow gains up to this much more. */
-export type GrantTotals = Resources & { gems: number };
+export type GrantTotals = Resources & {
+	gems: number;
+	/** Seconds of time the server shifted forward with time-shift potions: the save check lets the castle and building timers run that much ahead (read as 0 when absent) */
+	shiftSec?: number;
+};
 
 export const zeroTotals = (): GrantTotals => ({ ...zeroResources(), gems: 0 });
 
@@ -115,7 +119,7 @@ export const subtractTotals = (a: GrantTotals, b: GrantTotals): GrantTotals => {
 
 /** True for the state of a player who never crafted (stored as null, so the column stays empty for most rows). */
 export const isEmptyCraft = (c: CraftState): boolean =>
-	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0 && c.queue.length === 0;
+	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0 && c.queue.length === 0 && !c.shift;
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
 export const craftFromJson = (raw: unknown): CraftState => {
@@ -143,7 +147,18 @@ export const craftFromJson = (raw: unknown): CraftState => {
 					...(n(q.costFactor) > 0 && n(q.costFactor) < 1 ? { costFactor: n(q.costFactor) } : {}),
 				});
 		}
-	return { xp: n(r.xp), ord: Math.floor(n(r.ord)), stock: counts(r.stock), pity: counts(r.pity), spent: n(r.spent), last: n(r.last), queue };
+	const sh = r.shift as Record<string, unknown> | undefined;
+	const shift = sh && typeof sh === 'object' && n(sh.day) > 0 && n(sh.used) > 0 ? { day: Math.floor(n(sh.day)), used: Math.floor(n(sh.used)) } : undefined;
+	return {
+		xp: n(r.xp),
+		ord: Math.floor(n(r.ord)),
+		stock: counts(r.stock),
+		pity: counts(r.pity),
+		spent: n(r.spent),
+		last: n(r.last),
+		queue,
+		...(shift ? { shift } : {}),
+	};
 };
 
 /**

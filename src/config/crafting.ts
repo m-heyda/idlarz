@@ -36,6 +36,14 @@ export const CRAFTING = {
 };
 
 /**
+ * The time-shift potion (IDL-355): each moves the clock `seconds` forward (an hour of income at the away efficiency, building and castle timers an hour shorter) and at most `perDay` can be drunk a day (UTC day), so a stack is no way to skip the game.
+ *
+ * @category Economy/Crafting
+ * @order 7
+ */
+export const TIME_SHIFT = { seconds: 3600, perDay: 3 } as const;
+
+/**
  * The most the crafting discounts can take off the resources of a recipe together (Ember shop Thrifty Hands up to 15% and the Gem shop's Bulk Discount 10%, `craftCostFactor`), and the headroom the gear recipe values carry for it: a gear recipe is priced
  * 1 / (1 - `CRAFT_DISCOUNT_MAX`) higher than the sell-value gate needs, so even with every discount a craft still costs more than the piece sells for (tests/crafting/gearRecipes.test.ts, "no gold printer").
  *

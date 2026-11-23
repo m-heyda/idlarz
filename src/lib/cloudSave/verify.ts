@@ -284,8 +284,10 @@ export const verifyTransition = (
 	if (next.rebirths < before.rebirths || next.legacyEarned < before.legacyEarned) flags.add('prestige_regress');
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
-	if (sameRun && castleJumped(before, next, elapsedSec)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols, gemBuilders)) flags.add('timer_jump');
+	// the time-shift potions the server paid since the last save (`granted.shiftSec`) let the timers run that many seconds ahead
+	const timerSec = elapsedSec + Math.max(0, grants?.shiftSec ?? 0);
+	if (sameRun && castleJumped(before, next, timerSec)) flags.add('castle_jump');
+	if (sameRun && timerJumped(before, next, timerSec, trustedIdols, gemBuilders)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

@@ -212,6 +212,26 @@ const POTION_RECIPES: Recipe[] = [
 		timeSec: 55,
 	},
 	{
+		id: 'elixir_time_shift',
+		kind: 'potion',
+		name: 'Elixir of Time Shift',
+		// the most expensive brew of the game: the resources alone are worth more than the hour it pays (tests/crafting/timeShift.test.ts), and the Hourglass Sand has no source yet (IDL-355)
+		inputs: [
+			ing('hourglass_sand', 5),
+			part('gold_ingot', 5),
+			part('cut_crystal', 3),
+			part('glass_vial', 1),
+			res('wood', 8_000_000),
+			res('stone', 6_000_000),
+			res('coal', 6_000_000),
+			res('food', 10_000_000),
+		],
+		output: { item: 'elixir_time_shift', qty: 1 },
+		unlock: 70,
+		xp: 500,
+		timeSec: 600,
+	},
+	{
 		id: 'elixir_warding',
 		kind: 'potion',
 		name: 'Elixir of Warding',

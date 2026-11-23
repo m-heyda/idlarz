@@ -70,6 +70,8 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('garnet', 3, 'cut stones for rings', 'Cut Garnet'),
 	ing('ruby', 4, 'the finest cut stones for rings', 'Cut Ruby'),
 	ing('sapphire', 4, 'the finest cut stones for necklaces', 'Cut Sapphire'),
+	// no source yet (IDL-355: what drops it is still to be decided): the time-shift potion cannot be finished until it does
+	ing('hourglass_sand', 4, 'the time-shift potion', 'Elixir of Time Shift'),
 ];
 
 export const INGREDIENT_BY_JUNK = new Map(INGREDIENTS.map((i) => [i.junkId, i]));

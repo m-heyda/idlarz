@@ -170,6 +170,8 @@ export interface InventoryReply {
 	message?: string;
 	/** The running buffs after a `use` (only on that operation) */
 	buffs?: ActiveBuff[];
+	/** A time-shift potion's payment (only on a `use` of one): the income of the hour and the timers it ran ahead; the browser applies it like an absence (`applyOfflineGrant`) without the rest */
+	shifted?: OfflineGrant;
 }
 
 /**
@@ -191,6 +193,8 @@ export interface CraftState {
 	last: number;
 	/** The timed batches that are running (docs/plan/crafting-v0.md, Timed batch queue); at most `craftQueueSlots` of them. Empty for most players. */
 	queue: CraftQueueEntry[];
+	/** Time-shift potions drunk on `day` (the UTC day number): the daily cap (`TIME_SHIFT.perDay`). Absent for most players. */
+	shift?: { day: number; used: number };
 }
 
 /**
