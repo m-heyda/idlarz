@@ -1,6 +1,6 @@
 import type { BonusTable, ItemLevelDef, LootProfile, RollsDef, SourceLevelDef } from '@/catalog/lootConfig';
 import type { RarityDef } from '@/catalog/rarity';
-import type { Grade } from '@/catalog/items/grades';
+import { gradeOfItem, type Grade } from '@/catalog/items/grades';
 import { MAX_ITEM_LEVEL, clampItemLevel } from '@/catalog/stats';
 import { affixFits } from '@/lib/itemInstance';
 import { LUCK } from '@/config/spawns';
@@ -40,6 +40,8 @@ export interface LootRequest {
 	slot?: ItemDef['slot'];
 	/** Only weapons of this type are eligible (a crafting recipe for swords makes swords: a club never rolls a wand's spell power) */
 	weaponType?: ItemDef['weaponType'];
+	/** Only items of exactly this grade are eligible (a crafting recipe makes its own grade: the open window of the top live grade would otherwise let G6 pieces into a G7 craft) */
+	grade?: Grade;
 	/** No item rolled for this request gets a lower item level than this (a crafting recipe stays inside its grade's window) */
 	minItemLevel?: number;
 	/** Only these rarities are rolled (a crafted piece takes the rarities of its grade, so the top live grade, which is open to every rarity for drops, still crafts as its own grade) */
@@ -203,7 +205,8 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 				c.def.generation === 'base' &&
 				(c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) &&
 				(!ctx.req.slot || c.def.slot === ctx.req.slot) &&
-				(!ctx.req.weaponType || c.def.weaponType === ctx.req.weaponType),
+				(!ctx.req.weaponType || c.def.weaponType === ctx.req.weaponType) &&
+				(!ctx.req.grade || gradeOfItem(c.def) === ctx.req.grade),
 		);
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;

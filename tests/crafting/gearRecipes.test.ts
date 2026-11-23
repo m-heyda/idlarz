@@ -49,10 +49,10 @@ const bagItems = (i: Inventory) => i.bag.flatMap((s) => (s && 'item' in s ? [s.i
 /** A state that has crafting level `level` */
 const atLevel = (level: number, over: Partial<CraftState> = {}): CraftState => ({ ...emptyCraft(), xp: craftCumulativeXp(level), ...over });
 
-test('six tiers (G1-G6) of 12 weapon and off-hand types and 11 other slots = 138 timed gear recipes, unlocked at G1 1, G2 8, G3 15, G4 25, G5 35, G6 50', () => {
+test('eight tiers (G1-G8) of 12 weapon and off-hand types and 11 other slots = 184 timed gear recipes, unlocked at G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, G7 65, G8 80', () => {
 	assert.equal(GEAR_RECIPES.length, CRAFT_GRADES.length * (CRAFT_TYPES.mainHand.length + CRAFT_TYPES.offHand.length + 11));
-	assert.equal(GEAR_RECIPES.length, 138);
-	assert.deepEqual(GEAR_UNLOCK, { G1: 1, G2: 8, G3: 15, G4: 25, G5: 35, G6: 50 });
+	assert.equal(GEAR_RECIPES.length, 184);
+	assert.deepEqual(GEAR_UNLOCK, { G1: 1, G2: 8, G3: 15, G4: 25, G5: 35, G6: 50, G7: 65, G8: 80 });
 	assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length, 'recipe ids stay unique');
 	for (const r of GEAR_RECIPES) {
 		assert.equal(r.kind, 'gear');
@@ -102,7 +102,9 @@ test('the item level climbs the grade window from its unlock to the next grade, 
 		const start = gearItemLevels(grade, GEAR_UNLOCK[grade]);
 		const end = gearItemLevels(grade, 80);
 		assert.equal(start.min, lo, `${grade} starts at the bottom of its window`);
-		assert.equal(end.max, hi, `${grade} ends at the top of its window`);
+		// the crafting cap is 80: a grade whose next one unlocks above it (G8, next 95) is only at the bottom of its window then
+		if (CRAFT_GEAR.nextUnlock <= 80 || grade !== 'G8') assert.equal(end.max, hi, `${grade} ends at the top of its window`);
+		else assert.equal(end.min, lo, `${grade} is at the start of its window at the crafting cap`);
 		for (let level = 1; level <= 80; level++) {
 			const r = gearItemLevels(grade, level);
 			assert.ok(r.min >= lo && r.max <= hi && r.min <= r.max, `${grade} at ${level}`);

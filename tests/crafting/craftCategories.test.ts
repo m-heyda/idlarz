@@ -45,7 +45,7 @@ test('the categories are Components, Weapons, Off hands, Armor, Potions, Jewelry
 	);
 });
 
-test('weapons and off hands are split by item type, each with one recipe per tier (G1-G6) and only that type', () => {
+test('weapons and off hands are split by item type, each with one recipe per tier (G1-G8) and only that type', () => {
 	const groups = craftGroups(SHOWN);
 	const weapons = groups.find((g) => g.id === 'weapons');
 	assert.deepEqual(
@@ -58,16 +58,16 @@ test('weapons and off hands are split by item type, each with one recipe per tie
 		['shield', 'tome'],
 	);
 	for (const section of [...(weapons?.sections ?? []), ...(offhands?.sections ?? [])]) {
-		assert.equal(section.recipes.length, 6, `${section.id} has six tiers`);
+		assert.equal(section.recipes.length, 8, `${section.id} has eight tiers`);
 		assert.ok(section.recipes.every((r) => 'gear' in r.output && r.output.gear.type === section.id));
 		assert.deepEqual(
 			section.recipes.map((r) => ('gear' in r.output ? r.output.gear.grade : '')),
-			['G1', 'G2', 'G3', 'G4', 'G5', 'G6'],
+			['G1', 'G2', 'G3', 'G4', 'G5', 'G6', 'G7', 'G8'],
 		);
 	}
-	// armor and jewelry: six tiers of every slot too
+	// armor and jewelry: eight tiers of every slot too
 	for (const id of ['armor', 'jewelry'])
-		for (const section of groups.find((g) => g.id === id)?.sections ?? []) assert.equal(section.recipes.length, 6, `${id}/${section.id} has six tiers`);
+		for (const section of groups.find((g) => g.id === id)?.sections ?? []) assert.equal(section.recipes.length, 8, `${id}/${section.id} has eight tiers`);
 });
 
 test('a section lists its recipes from the lowest crafting level up', () => {

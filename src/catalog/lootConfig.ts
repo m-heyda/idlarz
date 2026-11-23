@@ -417,6 +417,6 @@ export const LOOT_SOURCES: Record<string, LootSource> = {
 	...BOSSES.sources,
 	chest: { id: 'chest', lootProfileId: 'basic_chest', level: { base: 4, perCastleLevel: 3 } },
 	merchant: { id: 'merchant', lootProfileId: 'merchant_stock', level: { base: 4, perCastleLevel: 3 } },
-	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-67 (66 and the variance of 1) are G1-G6.
-	craft: { id: 'craft', lootProfileId: 'craft', levels: { min: 1, max: 66 } },
+	// Crafted gear: the caller passes the item level (a recipe's grade window), see CRAFT_GEAR. Levels 1-100 are G1-G8 (G7 and G8 are craft-only, `CRAFT_ONLY_GRADES`).
+	craft: { id: 'craft', lootProfileId: 'craft', levels: { min: 1, max: 100 } },
 };

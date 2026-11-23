@@ -49,7 +49,7 @@ export const CRAFT_COST_HEADROOM = 1 / (1 - CRAFT_DISCOUNT_MAX);
  * Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
  * the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
  *
- * - **Grades**: G1-G6 (`ceilingGrade`, the live grades): six tiers of every item type; a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, owner 2026-11-07). G7 and up join when they go live (`LIVE_GRADES`).
+ * - **Grades**: G1-G8 (`ceilingGrade`): eight tiers of every item type; a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, G7 65, G8 80, owner 2026-11-07). G1-G6 are live grades (they drop); G7 and G8 are craft-only (`CRAFT_ONLY_GRADES`: nothing drops them). G9 comes through the legendary recipes.
  * - **Type**: a weapon or off-hand recipe also names the weapon type (sword, mace, bow, shield, tome ...), so only bases of that type roll; the other slots have one type each.
  * - **Item level**: inside the grade's window, rising with the crafting level from the grade's unlock to the next grade's (`gradeLevel`), +-1 around the centre. Never above the window, so a Hide recipe always makes Hide gear.
  * - **Rarity**: the profile's weights among the rarities the grade carries (`GRADE_INFO`), Luck multiplying rare and better (`rarityLuckMultiplier`); the crafting level caps it (`rarityCeiling`: up to rare, epic from 50, never legendary).
@@ -60,9 +60,9 @@ export const CRAFT_COST_HEADROOM = 1 / (1 - CRAFT_DISCOUNT_MAX);
  * @order 2
  */
 export const CRAFT_GEAR = {
-	ceilingGrade: 'G6',
-	/** The crafting level a grade after the last recipe grade unlocks at (G7, 65): the item level window of G6 is climbed until then */
-	nextUnlock: 65,
+	ceilingGrade: 'G8',
+	/** The crafting level a grade after the last recipe grade unlocks at (G9, 95): the item level window of G8 is climbed until then (the crafting cap is 80, so G8 starts at its bottom) */
+	nextUnlock: 95,
 	/** Best rarity by crafting level: the highest `from` that is at or below the level applies */
 	rarityCeiling: [
 		{ from: 1, rarity: 'rare' },
@@ -74,5 +74,5 @@ export const CRAFT_GEAR = {
 	/** Intelligence of a new character: the points above it count */
 	baseIntelligence: 5,
 	/** Seconds one craft takes, by grade */
-	timeSec: { G1: 20, G2: 30, G3: 45, G4: 60, G5: 75, G6: 90 },
+	timeSec: { G1: 20, G2: 30, G3: 45, G4: 60, G5: 75, G6: 90, G7: 105, G8: 120 },
 } as const;

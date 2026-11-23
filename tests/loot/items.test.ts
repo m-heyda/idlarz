@@ -61,8 +61,8 @@ test('the Obsidian set covers every slot but the weapon (the ring item covers ri
 test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 6', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
 		if (def.slot === 'mainHand') {
-			// the disabled grade ladder is authored at its own, higher item levels (catalog/items/ladder.ts)
-			assert.ok((def.stats?.damage ?? 0) >= 1 && (def.enabled === false || def.stats!.damage! <= COMBAT.maxItemDamage), def.id);
+			// the disabled grade ladder and the craft-only grades (G7, G8) are authored at their own, higher item levels (catalog/items/ladder.ts)
+			assert.ok((def.stats?.damage ?? 0) >= 1 && (def.enabled === false || def.craftOnly || def.stats!.damage! <= COMBAT.maxItemDamage), def.id);
 		} else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
 	}
 	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!.base].stats?.damage, 6);

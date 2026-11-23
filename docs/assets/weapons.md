@@ -431,8 +431,8 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostcrystal_mace` | <img src="../../public/pixel/items/mainHand/mace/frostcrystal_mace.png" width="96" alt="art_frostcrystal_mace"> | 64x64 | planned | frostcrystal_mace | `pixel/items/mainHand/mace/frostcrystal_mace.png` |
-| `art_magma_flail` | <img src="../../public/pixel/items/mainHand/mace/magma_flail.png" width="96" alt="art_magma_flail"> | 64x64 | planned | magma_flail | `pixel/items/mainHand/mace/magma_flail.png` |
+| `art_frostcrystal_mace` | <img src="../../public/pixel/items/mainHand/mace/frostcrystal_mace.png" width="96" alt="art_frostcrystal_mace"> | 64x64 | used | frostcrystal_mace | `pixel/items/mainHand/mace/frostcrystal_mace.png` |
+| `art_magma_flail` | <img src="../../public/pixel/items/mainHand/mace/magma_flail.png" width="96" alt="art_magma_flail"> | 64x64 | used | magma_flail | `pixel/items/mainHand/mace/magma_flail.png` |
 | `art_ph_mainHand_mace_g7` | <img src="../../public/pixel/items/mainHand/mace/ph_g7.png" width="96" alt="art_ph_mainHand_mace_g7"> | 64x64 | used |  | `pixel/items/mainHand/mace/ph_g7.png` |
 
 ## mainHand/mace G8
@@ -766,15 +766,15 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_cinderfang_sword` | <img src="../../public/pixel/items/mainHand/sword/cinderfang_sword.png" width="96" alt="art_cinderfang_sword"> | 64x64 | planned | cinderfang_sword | `pixel/items/mainHand/sword/cinderfang_sword.png` |
-| `art_frostbrand` | <img src="../../public/pixel/items/mainHand/sword/frostbrand.png" width="96" alt="art_frostbrand"> | 64x64 | planned | frostbrand | `pixel/items/mainHand/sword/frostbrand.png` |
-| `art_runed_jade_blade` | <img src="../../public/pixel/items/mainHand/sword/runed_jade_blade.png" width="96" alt="art_runed_jade_blade"> | 64x64 | planned | runed_jade_blade | `pixel/items/mainHand/sword/runed_jade_blade.png` |
+| `art_cinderfang_sword` | <img src="../../public/pixel/items/mainHand/sword/cinderfang_sword.png" width="96" alt="art_cinderfang_sword"> | 64x64 | used | cinderfang_sword | `pixel/items/mainHand/sword/cinderfang_sword.png` |
+| `art_frostbrand` | <img src="../../public/pixel/items/mainHand/sword/frostbrand.png" width="96" alt="art_frostbrand"> | 64x64 | used | frostbrand | `pixel/items/mainHand/sword/frostbrand.png` |
+| `art_runed_jade_blade` | <img src="../../public/pixel/items/mainHand/sword/runed_jade_blade.png" width="96" alt="art_runed_jade_blade"> | 64x64 | used | runed_jade_blade | `pixel/items/mainHand/sword/runed_jade_blade.png` |
 
 ## mainHand/sword G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_seraph_blade` | <img src="../../public/pixel/items/mainHand/sword/seraph_blade.png" width="96" alt="art_seraph_blade"> | 64x64 | planned | seraph_blade | `pixel/items/mainHand/sword/seraph_blade.png` |
+| `art_seraph_blade` | <img src="../../public/pixel/items/mainHand/sword/seraph_blade.png" width="96" alt="art_seraph_blade"> | 64x64 | used | seraph_blade | `pixel/items/mainHand/sword/seraph_blade.png` |
 
 ## mainHand/wand
 
@@ -908,15 +908,15 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runeward_roundel` | <img src="../../public/pixel/items/offHand/runeward_roundel.png" width="96" alt="art_runeward_roundel"> | 64x64 | planned | runeward_roundel | `pixel/items/offHand/runeward_roundel.png` |
+| `art_runeward_roundel` | <img src="../../public/pixel/items/offHand/runeward_roundel.png" width="96" alt="art_runeward_roundel"> | 64x64 | used | runeward_roundel | `pixel/items/offHand/runeward_roundel.png` |
 
 ## offHand/shield G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostcrystal_aegis` | <img src="../../public/pixel/items/offHand/frostcrystal_aegis.png" width="96" alt="art_frostcrystal_aegis"> | 64x64 | planned | frostcrystal_aegis | `pixel/items/offHand/frostcrystal_aegis.png` |
-| `art_royal_lion_crest` | <img src="../../public/pixel/items/offHand/royal_lion_crest.png" width="96" alt="art_royal_lion_crest"> | 64x64 | planned | royal_lion_crest | `pixel/items/offHand/royal_lion_crest.png` |
-| `art_verdant_kite_shield` | <img src="../../public/pixel/items/offHand/verdant_kite_shield.png" width="96" alt="art_verdant_kite_shield"> | 64x64 | planned | verdant_kite_shield | `pixel/items/offHand/verdant_kite_shield.png` |
+| `art_frostcrystal_aegis` | <img src="../../public/pixel/items/offHand/frostcrystal_aegis.png" width="96" alt="art_frostcrystal_aegis"> | 64x64 | used | frostcrystal_aegis | `pixel/items/offHand/frostcrystal_aegis.png` |
+| `art_royal_lion_crest` | <img src="../../public/pixel/items/offHand/royal_lion_crest.png" width="96" alt="art_royal_lion_crest"> | 64x64 | used | royal_lion_crest | `pixel/items/offHand/royal_lion_crest.png` |
+| `art_verdant_kite_shield` | <img src="../../public/pixel/items/offHand/verdant_kite_shield.png" width="96" alt="art_verdant_kite_shield"> | 64x64 | used | verdant_kite_shield | `pixel/items/offHand/verdant_kite_shield.png` |
 
 ## offHand/tome
 

@@ -5,7 +5,7 @@ import { test } from 'node:test';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { ITEM_ART_SIZE, PIXEL_ICON_SIZES, isItemArt, pixelIconSrc, type PixelIconName } from '../../src/config/pixelIcons';
 import { ITEM_CATALOG } from '../../src/catalog';
-import { LIVE_GRADES } from '../../src/catalog/items/grades';
+import { CRAFT_ONLY_GRADES, LIVE_GRADES } from '../../src/catalog/items/grades';
 import { RESERVE_ITEMS } from '../../src/catalog/items/reuse';
 import type { ItemDef } from '../../src/types/game';
 import { shopItems } from '../../src/catalog/loot';
@@ -25,7 +25,11 @@ test('reserve items are all in the catalog, enabled only at the live grades (G1-
 	assert.ok(RESERVE_ITEMS.length >= 90, 'the reuse art pass is in the catalog');
 	for (const def of RESERVE_ITEMS) {
 		assert.equal(ITEM_CATALOG[def.id], def, `${def.id} resolves`);
-		assert.equal(def.enabled !== false, isLive(def), `${def.id} is enabled only if graded G1-G3`);
+		assert.equal(
+			def.enabled !== false,
+			isLive(def) || CRAFT_ONLY_GRADES.includes(gradeOf(def) as never),
+			`${def.id} is enabled only if graded G1-G6 (or craft-only G7, G8)`,
+		);
 		assert.equal(def.icon, `art_${def.id}`, `${def.id} uses its own art`);
 		assert.ok(isItemArt(def.icon!), `${def.id} icon is item art`);
 		assert.ok(def.icon! in PIXEL_ICON_SIZES, `${def.id} icon is registered`);

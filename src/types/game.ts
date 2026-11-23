@@ -128,6 +128,8 @@ export interface ItemDef {
 	// ---- loot generation (see src/lib/loot and @category Loot); gear only ----
 	/** false takes the item out of every loot pool (and stops saves from holding it); default true */
 	enabled?: boolean;
+	/** true: only the Crafting tab makes it (the `equipment_craft` pool): no drop, no shelf, no other pool (grades G7 and G8, `CRAFT_ONLY_GRADES`) */
+	craftOnly?: true;
 	/** true: the item no longer drops, is not in any pool or the shop, but pieces already owned keep loading, equipping and selling (until its definition is deleted at the epoch reset, IDL-76) */
 	retired?: boolean;
 	/** `base`: a generic item that drops at any level inside its window with a rolled rarity. `named`: a fixed-identity item. */

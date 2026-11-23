@@ -5,7 +5,7 @@ import { STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
-import { GRADES, GRADE_INFO, LIVE_GRADES, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
+import { GRADES, GRADE_INFO, gradeAvailability, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
@@ -278,7 +278,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 		grade,
 		levelWindow: gradeOwnedLevels(grade),
 		// G1-G3 are live (IDL-220); the rest stay disabled data
-		enabled: LIVE_GRADES.includes(grade),
+		...gradeAvailability(grade),
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
 		...(set ? { set } : {}),
 		...(weaponType ? { weaponType } : {}),
@@ -338,7 +338,7 @@ export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
 			// what it is generated at is the grade's; what a piece already owned may be (minItemLevel .. maxItemLevel, allowedRarities) stays, so no save breaks
 			dropLevels: gradeLevels(grade),
 			dropRarities: gradeRarities(grade),
-			enabled: LIVE_GRADES.includes(grade),
+			...gradeAvailability(grade),
 		};
 	});
 

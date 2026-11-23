@@ -313,7 +313,7 @@ export const CRAFT_TYPE_LABEL: Record<CraftType, { one: string; many: string }> 
 };
 
 /** The grades with a gear recipe, lowest first, and the crafting level each unlocks at (owner 2026-11-07: G1 1, G2 8, G3 15, G4 25, G5 35, G6 50; G7 65 and G8 80 when those grades go live) */
-export const GEAR_UNLOCK = { G1: 1, G2: 8, G3: 15, G4: 25, G5: 35, G6: 50 } as const satisfies Partial<Record<Grade, number>>;
+export const GEAR_UNLOCK = { G1: 1, G2: 8, G3: 15, G4: 25, G5: 35, G6: 50, G7: 65, G8: 80 } as const satisfies Partial<Record<Grade, number>>;
 export type CraftGrade = keyof typeof GEAR_UNLOCK;
 export const CRAFT_GRADES = Object.keys(GEAR_UNLOCK) as CraftGrade[];
 
@@ -366,6 +366,8 @@ const GEAR_GRADE_COST: Record<CraftGrade, { value: number; parts: number; xp: nu
 	G4: { value: 1_700_000, parts: 12, xp: 6_000 },
 	G5: { value: 14_500_000, parts: 24, xp: 14_000 },
 	G6: { value: 85_000_000, parts: 40, xp: 32_000 },
+	G7: { value: 850_000_000, parts: 64, xp: 70_000 },
+	G8: { value: 1_200_000_000, parts: 96, xp: 150_000 },
 };
 /** How the resource part of the value splits over the resources of a family (shares add up to 1) */
 const FAMILY_SPLIT: Record<Family, Partial<Record<MerchantResourceKey, number>>> = {
@@ -388,6 +390,8 @@ const GEAR_REFINED = {
 		G4: [refined('steel_ingot', 2)],
 		G5: [refined('steel_ingot', 3), refined('silver_ingot', 1)],
 		G6: [refined('steel_ingot', 2), refined('obsidian_edge', 3)],
+		G7: [refined('obsidian_edge', 4), refined('gold_ingot', 1)],
+		G8: [refined('obsidian_edge', 6), refined('gold_ingot', 2), refined('silver_ingot', 4)],
 	},
 	armour: {
 		G2: [refined('copper_nails', 12)],
@@ -395,6 +399,8 @@ const GEAR_REFINED = {
 		G4: [refined('steel_ingot', 2), refined('steel_rivets', 20)],
 		G5: [refined('steel_ingot', 3), refined('silver_rivets', 24)],
 		G6: [refined('obsidian_edge', 2), refined('gold_ingot', 1), refined('gold_studs', 30)],
+		G7: [refined('obsidian_edge', 3), refined('gold_ingot', 2), refined('gold_studs', 36)],
+		G8: [refined('obsidian_edge', 4), refined('gold_ingot', 3), refined('gold_studs', 48)],
 	},
 	cloak: {
 		G2: [refined('cloth_bolt', 2)],
@@ -402,6 +408,8 @@ const GEAR_REFINED = {
 		G4: [refined('cloth_bolt', 4), refined('silver_ingot', 1)],
 		G5: [refined('cloth_bolt', 6), refined('silver_ingot', 2)],
 		G6: [refined('cloth_bolt', 8), refined('gold_ingot', 2)],
+		G7: [refined('cloth_bolt', 10), refined('gold_ingot', 3)],
+		G8: [refined('cloth_bolt', 12), refined('gold_ingot', 4)],
 	},
 	/** The metal of a trinket, by grade (the gem is in `TRINKET_GEM`) */
 	trinket: {
@@ -409,13 +417,15 @@ const GEAR_REFINED = {
 		G4: [refined('silver_ingot', 2)],
 		G5: [refined('gold_ingot', 1)],
 		G6: [refined('gold_ingot', 2)],
+		G7: [refined('gold_ingot', 3)],
+		G8: [refined('gold_ingot', 4)],
 	},
 } as const satisfies Record<string, Partial<Record<CraftGrade, readonly RecipeInput[]>>>;
 /** The cut gem of each jewelry slot by grade: rings take reds and teals, amulets blues and greens, charms the odd stones; the G5 and G6 pieces take two */
 const TRINKET_GEM: Record<'ring' | 'neck' | 'charm', Record<Exclude<CraftGrade, 'G1'>, string>> = {
-	ring: { G2: 'cut_jasper', G3: 'cut_turquoise', G4: 'cut_garnet', G5: 'cut_crystal', G6: 'cut_ruby' },
-	neck: { G2: 'cut_jasper', G3: 'cut_malachite', G4: 'cut_lapis', G5: 'cut_emerald', G6: 'cut_sapphire' },
-	charm: { G2: 'cut_jasper', G3: 'cut_geode', G4: 'cut_amethyst', G5: 'cut_moon', G6: 'cut_heart' },
+	ring: { G2: 'cut_jasper', G3: 'cut_turquoise', G4: 'cut_garnet', G5: 'cut_crystal', G6: 'cut_ruby', G7: 'cut_ruby', G8: 'cut_heart' },
+	neck: { G2: 'cut_jasper', G3: 'cut_malachite', G4: 'cut_lapis', G5: 'cut_emerald', G6: 'cut_sapphire', G7: 'cut_sapphire', G8: 'cut_heart' },
+	charm: { G2: 'cut_jasper', G3: 'cut_geode', G4: 'cut_amethyst', G5: 'cut_moon', G6: 'cut_heart', G7: 'cut_heart', G8: 'cut_heart' },
 };
 
 /** Two significant digits, so a cost reads as a round number */
@@ -437,7 +447,7 @@ export const gearRefined = (grade: CraftGrade, slot: CraftSlot): RecipeInput[] =
 	const metals = (GEAR_REFINED[family] as Partial<Record<CraftGrade, readonly RecipeInput[]>>)[grade] ?? [];
 	if (family !== 'trinket' || grade === 'G1') return [...metals];
 	const gem = TRINKET_GEM[slot as 'ring' | 'neck' | 'charm'][grade as Exclude<CraftGrade, 'G1'>];
-	return [...metals, refined(gem, grade === 'G5' || grade === 'G6' ? 2 : 1)];
+	return [...metals, refined(gem, grade === 'G7' || grade === 'G8' ? 3 : grade === 'G5' || grade === 'G6' ? 2 : 1)];
 };
 
 const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): RecipeInput[] => {

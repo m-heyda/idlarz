@@ -1,7 +1,7 @@
 // Gear crafting maths, pure (IDL-241): the item level window, the rarity ceiling, the pity multiplier and the roll itself. The server (src/lib/offline/craft.ts) rolls with a sealed rng and the
 // Crafting window shows the odds from the very same request, so the panel can never disagree with the roll.
 import { RARITIES } from '@/catalog/rarity';
-import { GRADE_INFO } from '@/catalog/items/grades';
+import { GRADE_INFO, gradeOfItem } from '@/catalog/items/grades';
 import { GEAR_UNLOCK, type CraftGrade, type GearTarget } from '@/catalog/recipes';
 import { CRAFT_GEAR } from '@/config/crafting';
 import { generateLoot, type LootRequest } from '@/lib/loot/generate';
@@ -92,6 +92,7 @@ export const gearRequest = (target: GearTarget, env: GearEnv, data: LootData = L
 		maxItemLevel: levels.max,
 		slot: target.slot === 'ring' ? 'ring' : target.slot,
 		...(target.type ? { weaponType: target.type } : {}),
+		grade: target.grade,
 		onlyRarities: GRADE_INFO[target.grade].rarities,
 		luck: env.luck,
 		maxRarity: rarityCeilingAt(env.craftLevel),
@@ -170,6 +171,7 @@ export const gearBaseStats = (target: GearTarget, env: GearEnv, data: LootData =
 		for (const { def } of eligibleCandidates(data, 'equipment_craft', level)) {
 			if (def.slot !== request.slot || def.generation !== 'base') continue;
 			if (request.weaponType && def.weaponType !== request.weaponType) continue;
+			if (request.grade && gradeOfItem(def) !== request.grade) continue;
 			const stats = baseStatsAt(def, level, 50, common);
 			for (const key of STAT_KEYS) {
 				const value = stats[key];
