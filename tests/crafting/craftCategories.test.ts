@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { LEGENDARY_RECIPES, RECIPES } from '../../src/catalog/recipes';
+import { RECIPES } from '../../src/catalog/recipes';
 import { CRAFT_CATEGORIES, craftGroups, recipeMatches } from '../../src/lib/craftCategories';
 
-const SHOWN = [...RECIPES, ...LEGENDARY_RECIPES];
+const SHOWN = RECIPES;
 
 test('every shown recipe sits in exactly one section; trade goods and legacy recipes are the only ones left out', () => {
 	const groups = craftGroups(SHOWN);

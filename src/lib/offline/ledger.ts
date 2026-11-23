@@ -119,7 +119,14 @@ export const subtractTotals = (a: GrantTotals, b: GrantTotals): GrantTotals => {
 
 /** True for the state of a player who never crafted (stored as null, so the column stays empty for most rows). */
 export const isEmptyCraft = (c: CraftState): boolean =>
-	c.xp === 0 && c.ord === 0 && c.spent === 0 && Object.keys(c.stock).length === 0 && Object.keys(c.pity).length === 0 && c.queue.length === 0 && !c.shift;
+	c.xp === 0 &&
+	c.ord === 0 &&
+	c.spent === 0 &&
+	Object.keys(c.stock).length === 0 &&
+	Object.keys(c.pity).length === 0 &&
+	c.queue.length === 0 &&
+	!c.shift &&
+	!c.ordEnchant;
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
 export const craftFromJson = (raw: unknown): CraftState => {
@@ -158,6 +165,7 @@ export const craftFromJson = (raw: unknown): CraftState => {
 		last: n(r.last),
 		queue,
 		...(shift ? { shift } : {}),
+		...(n(r.ordEnchant) > 0 ? { ordEnchant: Math.floor(n(r.ordEnchant)) } : {}),
 	};
 };
 

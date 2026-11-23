@@ -25,7 +25,7 @@ test('recipe ids are unique and every input and output exists', () => {
 });
 
 test('potion, component and good recipes: potions are stackable consumables, goods are stacks with no effect, components stay in the stock (gear is in gearRecipes.test.ts)', () => {
-	for (const r of RECIPES.filter((x) => x.kind !== 'gear')) {
+	for (const r of RECIPES.filter((x) => x.kind !== 'gear' && x.kind !== 'legendary')) {
 		assert.ok(r.kind === 'potion' || r.kind === 'component' || r.kind === 'good', r.id);
 		if (r.kind === 'component') {
 			assert.ok('component' in r.output);

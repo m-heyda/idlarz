@@ -37,7 +37,17 @@ import { ROCK_TIERS } from '@/config/rocks';
 import { miningPower, rollRockLoot, takeClicks } from '@/lib/rocks';
 import { stashIn } from '@/lib/offline/reward';
 import { moveIngredientStacks } from '@/lib/offline/ingredientMove';
-import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
+import {
+	applyCancel,
+	applyClaim,
+	applyClaimAll,
+	applyCraft,
+	applyWithdraw,
+	craftedGearAdded,
+	type CraftEnv,
+	applyEnchant,
+	type EnchantMode,
+} from '@/lib/offline/craft';
 import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
@@ -383,7 +393,8 @@ export type CraftRequest =
 	| { action?: 'craft'; recipeId: string; count: number }
 	| { action: 'claim'; slot: number | 'all' }
 	| { action: 'cancel'; slot: number }
-	| { action: 'withdraw'; id: string; qty: number };
+	| { action: 'withdraw'; id: string; qty: number }
+	| { action: 'enchant'; index: number; mode: EnchantMode; affix: number };
 
 /**
  * One crafting request (docs/plan/crafting-v0.md): `count` crafts of a recipe are queued as a timed batch (a recipe without a time is done at
@@ -415,7 +426,9 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 						: applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs, env)
 					: request.action === 'withdraw'
 						? applyWithdraw(ledger.inv!, ledger.craft, request.id, request.qty, nowMs)
-						: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs, env);
+						: request.action === 'enchant'
+							? applyEnchant(ledger.inv!, ledger.craft, request.index, request.mode, request.affix, nowMs, env)
+							: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs, env);
 		const value: CraftReply = {
 			ok: result.ok,
 			...(result.reason ? { reason: result.reason } : {}),

@@ -136,6 +136,24 @@ const countSuccesses = (rolls: RollsDef, level: number, rng: Rng, chanceMultipli
 	return hits;
 };
 
+/**
+ * Picks one affix for an item (the roll of one slot of {@link rollAffixes}, also the enchant craft's): a weighted pick among the affixes that fit and whose group is not in `used`, with a roll leaning by `bias`. Null when none fits.
+ * The random numbers it draws (the pick, then the roll) are the ones the loot rolls have always drawn, so no sealed roll changes.
+ */
+export const pickAffix = (
+	def: ItemDef,
+	level: number,
+	rarity: RarityDef,
+	used: ReadonlySet<string>,
+	data: LootData,
+	rng: Rng,
+	bias = 0,
+): { id: string; roll: number; group: string } | null => {
+	const options = Object.values(data.affixes).filter((affix) => !used.has(affix.group) && affixFits(affix, def, level, rarity));
+	const affix = weightedPick(options, (a) => a.weight, rng);
+	return affix ? { id: affix.id, roll: rollLeaning(rng, bias), group: affix.group } : null;
+};
+
 /** Rolls the affixes of an item: a count from the rarity, picked without replacement, one per group, respecting item level and tags. */
 const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootData, rng: Rng, bias = 0): { id: string; roll: number }[] => {
 	if (def.generation === 'named') return [];
@@ -143,11 +161,10 @@ const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootD
 	const picked: { id: string; roll: number }[] = [];
 	const groups = new Set<string>();
 	for (let i = 0; i < want; i++) {
-		const options = Object.values(data.affixes).filter((affix) => !groups.has(affix.group) && affixFits(affix, def, level, rarity));
-		const affix = weightedPick(options, (a) => a.weight, rng);
+		const affix = pickAffix(def, level, rarity, groups, data, rng, bias);
 		if (!affix) break; // fewer compatible affixes than the rarity wants: take what exists (the validator reports it)
 		groups.add(affix.group);
-		picked.push({ id: affix.id, roll: rollLeaning(rng, bias) });
+		picked.push({ id: affix.id, roll: affix.roll });
 	}
 	return picked;
 };

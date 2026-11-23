@@ -653,6 +653,22 @@
 	},
 	{
 		"usedBy": [
+			"junk_ichor"
+		],
+		"name": "art_junk_ichor",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_ichor.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"junk_iron_ore"
 		],
 		"name": "art_junk_iron_ore",
@@ -947,6 +963,22 @@
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/junk/junk_turquoise.png",
+		"status": "used",
+		"slot": "consumable",
+		"source": "itemIcons registry",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"junk_war_medals"
+		],
+		"name": "art_junk_war_medals",
+		"category": "potions",
+		"subcategory": "consumable",
+		"src": "/pixel/items/junk/junk_war_medals.png",
 		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
@@ -1907,7 +1939,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe G9",
 		"src": "/pixel/items/mainHand/axe/dawnsplitter.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "axe",
 		"grade": "G9",

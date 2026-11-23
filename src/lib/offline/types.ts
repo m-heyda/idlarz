@@ -195,6 +195,8 @@ export interface CraftState {
 	queue: CraftQueueEntry[];
 	/** Time-shift potions drunk on `day` (the UTC day number): the daily cap (`TIME_SHIFT.perDay`). Absent for most players. */
 	shift?: { day: number; used: number };
+	/** Enchants done, lifetime: the seal counter of the enchant rolls (kept apart from `ord` so an enchant never shifts a gear craft). Absent until the first one. */
+	ordEnchant?: number;
 }
 
 /**
@@ -226,7 +228,12 @@ export type CraftRefusal =
 	| 'queue_full'
 	| 'no_batch'
 	| 'nothing_ready'
-	| 'not_in_stash';
+	| 'not_in_stash'
+	| 'bad_item'
+	| 'bad_affix'
+	| 'affix_cap'
+	| 'needs_ichor'
+	| 'already_have';
 
 /** What /api/craft answers: whether it was done, why not, how many were made, and the bag and crafting state as they stand now. */
 export interface CraftReply {

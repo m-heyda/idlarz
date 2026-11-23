@@ -231,6 +231,9 @@ const OBSIDIAN_CELLS: Partial<Record<string, string>> = {
 	staff: 'obsidian_staff',
 };
 
+/** The three legendary weapons the Crafting tab makes (IDL-120, the `legendary_*` recipes of `catalog/recipes.ts`): G9 pieces that are enabled and `craftOnly`, so a save can hold one and nothing else ever gives one out. */
+export const CRAFTED_LEGENDARIES: readonly string[] = ['dawnsplitter', 'stormstring', 'starlight_wand'];
+
 // ---- building ----------------------------------------------------------------------------------------------------------
 const slug = (name: string): string =>
 	name
@@ -278,7 +281,7 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 		grade,
 		levelWindow: gradeOwnedLevels(grade),
 		// G1-G3 are live (IDL-220); the rest stay disabled data
-		...gradeAvailability(grade),
+		...(CRAFTED_LEGENDARIES.includes(id) ? { enabled: true, craftOnly: true as const } : gradeAvailability(grade)),
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
 		...(set ? { set } : {}),
 		...(weaponType ? { weaponType } : {}),

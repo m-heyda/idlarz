@@ -116,7 +116,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_dawnsplitter` | <img src="../../public/pixel/items/mainHand/axe/dawnsplitter.png" width="96" alt="art_dawnsplitter"> | 64x64 | planned | dawnsplitter | `pixel/items/mainHand/axe/dawnsplitter.png` |
+| `art_dawnsplitter` | <img src="../../public/pixel/items/mainHand/axe/dawnsplitter.png" width="96" alt="art_dawnsplitter"> | 64x64 | used | dawnsplitter | `pixel/items/mainHand/axe/dawnsplitter.png` |
 | `art_ph_mainHand_axe_g9` | <img src="../../public/pixel/items/mainHand/axe/ph_g9.png" width="96" alt="art_ph_mainHand_axe_g9"> | 64x64 | unused |  | `pixel/items/mainHand/axe/ph_g9.png` |
 
 ## mainHand/axe S1

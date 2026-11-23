@@ -532,15 +532,16 @@ export const LEGACY_GEAR_RECIPES: Recipe[] = (['G1', 'G2', 'G3', 'G4'] as const)
 );
 RECIPES.push(...GEAR_RECIPES, ...LEGACY_GEAR_RECIPES);
 
-/** A crafting level no player reaches (`CRAFTING.maxLevel` is 80): the legendary recipes below are shown but cannot be crafted yet. */
-export const LEGENDARY_UNLOCK = 99;
+/** The crafting level the legendary recipes unlock at: the cap (`CRAFTING.maxLevel`, 80), the top of the ladder. */
+export const LEGENDARY_UNLOCK = 80;
 
 /**
  * TODO (owner, 2026-11-19): the legendaries get special abilities later; for now each is only a strong weapon (Dawnsplitter's numbers are in `SIGNATURE_STATS`, `catalog/items/ladder.ts`).
  *
- * The legendary recipes: Dawnsplitter (axe), Stormstring (bow) and the Starlight Wand (mage), the strongest weapons in the catalog (grade G9, disabled data). They are **display only**: they are not in `RECIPES`, so the server cannot start them
- * (and the level they ask for is above the crafting cap), but the Crafting tab lists them under "Legendary" so the chase is visible. Opening them up later is moving them into `RECIPES` and lowering `LEGENDARY_UNLOCK`.
- */
+ * The legendary recipes (IDL-120): Dawnsplitter (axe), Stormstring (bow) and the Starlight Wand (mage), the strongest weapons in the catalog (grade G9, craft-only items). They are real recipes now, from crafting level 80, but each takes **50 War Medals**
+ * from the crafting stash, a Battlefield reagent that nothing gives out yet, so none can be started until the medals have a source. One copy at a time: the server refuses the craft (nothing charged) when the bag, the gear or the queue already holds
+ * that weapon, and when the bag has no free slot (checked at queue time, before the components are taken: a finished legendary is never turned into gold). One craft per request. A craft takes 8 hours, the most a batch runs without a claim at the start (`craftOfflineHours`), so it finishes on a plain account.
+ * */
 export const LEGENDARY_RECIPES: Recipe[] = [
 	{
 		id: 'legendary_dawnsplitter',
@@ -550,11 +551,12 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'wood', qty: 2_000_000_000 },
 			{ resource: 'stone', qty: 1_500_000_000 },
 			{ component: 'plank_bundle', qty: 500 },
+			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'dawnsplitter', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 86_400,
+		timeSec: 28_800,
 	},
 	{
 		id: 'legendary_stormstring',
@@ -564,11 +566,12 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'wood', qty: 2_000_000_000 },
 			{ resource: 'hide', qty: 1_000_000_000 },
 			{ component: 'cured_leather', qty: 500 },
+			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'stormstring', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 86_400,
+		timeSec: 28_800,
 	},
 	{
 		id: 'legendary_starlight_wand',
@@ -578,12 +581,15 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'stone', qty: 2_000_000_000 },
 			{ resource: 'coal', qty: 1_500_000_000 },
 			{ component: 'plank_bundle', qty: 500 },
+			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'starlight_wand', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 86_400,
+		timeSec: 28_800,
 	},
 ];
+
+RECIPES.push(...LEGENDARY_RECIPES);
 
 export const RECIPE_BY_ID: Record<string, Recipe> = Object.fromEntries(RECIPES.map((r) => [r.id, r]));

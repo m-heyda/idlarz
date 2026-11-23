@@ -91,5 +91,7 @@ export const JUNK_ITEMS: ItemDef[] = [
 		'Fine gold grains that fall upward when nobody is looking. Where they come from is a secret nobody has found out yet; the clockmakers want it badly.',
 		'epic',
 	),
+	junk('ichor', 'Ichor', 5000, 'Black-violet blood of the Blight that still moves a little. Enchanters say it remembers what an item could have been.', 'epic'),
+	junk('war_medals', 'War Medal', 6000, 'Struck for the last battle and never handed out. Whoever holds fifty of them is owed a legend.', 'epic'),
 	junk('sapphire', 'Rough Sapphire', 2100, 'Blue crystals on a grey bed. The rarest colour in the rock, and the rock knows it.', 'epic'),
 ];

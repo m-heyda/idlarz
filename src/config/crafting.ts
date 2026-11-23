@@ -36,6 +36,16 @@ export const CRAFTING = {
 };
 
 /**
+ * The enchant craft (IDL-120): at the workbench a piece of gear in the bag gets one affix **rerolled** (a new affix of another group, a fresh roll) or **added** (up to the most its rarity carries). It takes Ichor from the crafting stash
+ * (a Blight reagent that nothing gives out yet, so the button is locked: "Needs Ichor from the Blight"). Intelligence leans the new roll up like a gear craft does, and the roll is sealed on its own counter (`craft.ordEnchant`), so it never shifts the pieces
+ * the gear crafts roll. Named legendaries cannot be enchanted.
+ *
+ * @category Economy/Crafting
+ * @order 9
+ */
+export const ENCHANT = { ichor: { reroll: 3, add: 10 } } as const;
+
+/**
  * The time-shift potion (IDL-355): each moves the clock `seconds` forward (an hour of income at the away efficiency, building and castle timers an hour shorter) and at most `perDay` can be drunk a day (UTC day), so a stack is no way to skip the game.
  *
  * @category Economy/Crafting

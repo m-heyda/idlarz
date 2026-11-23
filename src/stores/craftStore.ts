@@ -5,7 +5,7 @@ import { craftBlock, craftCostFactor, craftLevelOf, craftLimit, craftNeeds, empt
 import type { BootSnapshot, CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
 import { onAccountCleared } from '@/lib/bootSnapshot';
 import { newClaimId } from '@/lib/offlineClient';
-import { requestCraft, requestCraftCancel, requestCraftClaim, requestCraftWithdraw } from '@/lib/rewardsClient';
+import { requestCraft, requestCraftCancel, requestCraftClaim, requestCraftEnchant, requestCraftWithdraw } from '@/lib/rewardsClient';
 import { useGameStore } from '@/stores/gameStore';
 
 // The browser's picture of the player's crafting. The server's ledger owns it (level XP, component stock); this store only holds the last
@@ -24,6 +24,11 @@ const REFUSAL: Record<CraftRefusal, string> = {
 	queue_full: 'The crafting queue is full.',
 	no_batch: 'That batch is gone.',
 	nothing_ready: 'Nothing is ready yet.',
+	bad_item: 'That piece cannot be enchanted.',
+	bad_affix: 'That affix cannot be changed.',
+	affix_cap: 'That piece already has all the affixes its rarity allows.',
+	needs_ichor: 'Needs Ichor from the Blight.',
+	already_have: 'You already have that legendary (in the bag, worn or being made).',
 };
 
 /** One shared empty stock: a selector must hand back the same reference every time, or Zustand re-renders forever (the Crafting window crashed on it). */
@@ -56,6 +61,8 @@ interface CraftStore {
 	claim: (slot?: number | 'all') => Promise<string>;
 	/** Moves crafted potions or goods from the stash into the bag. Returns the toast text. */
 	withdraw: (id: string, qty: number) => Promise<string>;
+	/** Rerolls or adds one affix of the gear in a bag slot (the enchant craft); the answer is the toast text */
+	enchant: (index: number, mode: 'reroll' | 'add', affix?: number) => Promise<string>;
 	/** Ends a batch and takes the refund. Returns the toast text. */
 	cancel: (slot?: number) => Promise<string>;
 }
@@ -147,6 +154,21 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 		useGameStore.getState().applyServerInventory(answer.inv);
 		if (!answer.ok) return REFUSAL[answer.reason ?? 'bad_request'];
 		return `Moved ${answer.moved ?? 0} x ${ITEM_CATALOG[id]?.name ?? id} to the bag`;
+	},
+
+	enchant: async (index, mode, affix = 0) => {
+		if (get().busy) return 'Wait a moment.';
+		set({ busy: true });
+		const key = newClaimId();
+		let reply = await requestCraftEnchant(key, index, mode, affix);
+		if (reply.status === 'unavailable') reply = await requestCraftEnchant(key, index, mode, affix);
+		set({ busy: false });
+		if (reply.status !== 'ok') return 'Could not reach the server.';
+		const answer = reply.value;
+		set({ craft: answer.craft, clockOffsetMs: answer.serverNowSec * 1000 - Date.now() });
+		useGameStore.getState().applyServerInventory(answer.inv);
+		if (!answer.ok) return REFUSAL[answer.reason ?? 'bad_request'];
+		return mode === 'reroll' ? 'Affix rerolled.' : 'An affix was added.';
 	},
 
 	cancel: async (slot = 0) => {

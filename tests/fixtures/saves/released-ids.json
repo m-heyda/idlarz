@@ -474,7 +474,9 @@
 		"junk_ruby",
 		"junk_sapphire",
 		"elixir_time_shift",
-		"junk_hourglass_sand"
+		"junk_hourglass_sand",
+		"junk_ichor",
+		"junk_war_medals"
 	],
 	"affixIds": [
 		"damage_prefix",
@@ -840,7 +842,10 @@
 		"gear_g8_ring",
 		"gear_g8_charm",
 		"gear_g8_cape",
-		"gear_g8_belt"
+		"gear_g8_belt",
+		"legendary_dawnsplitter",
+		"legendary_stormstring",
+		"legendary_starlight_wand"
 	],
 	"componentIds": [
 		"glass_vial",
@@ -910,7 +915,9 @@
 		"ing_garnet",
 		"ing_ruby",
 		"ing_sapphire",
-		"ing_hourglass_sand"
+		"ing_hourglass_sand",
+		"ing_ichor",
+		"ing_war_medals"
 	],
 	"buildingIds": [
 		"granary",

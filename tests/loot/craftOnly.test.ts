@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ITEMS } from '../../src/catalog';
 import { CRAFT_ONLY_GRADES, LIVE_GRADES, gradeOfItem } from '../../src/catalog/items/grades';
+import { CRAFTED_LEGENDARIES } from '../../src/catalog/items/ladder';
 import { LOOT_DATA } from '../../src/lib/loot/data';
 import { eligibleCandidates, poolMembers } from '../../src/lib/loot/pools';
 import { generateLoot } from '../../src/lib/loot/generate';
@@ -11,14 +12,15 @@ import { mulberry32 } from '../../src/lib/rng';
 
 const craftOnly = ITEMS.filter((d) => d.craftOnly);
 
-test('exactly the G7 and G8 ladder items are craft-only, enabled, and none of them is a live or a named item', () => {
+test('exactly the G7 and G8 ladder items and the three crafted legendaries are craft-only, enabled, and none of them is a live or a named item', () => {
 	assert.ok(craftOnly.length > 40);
 	for (const def of craftOnly) {
-		assert.ok(CRAFT_ONLY_GRADES.includes(gradeOfItem(def)!), def.id);
+		assert.ok(CRAFT_ONLY_GRADES.includes(gradeOfItem(def)!) || CRAFTED_LEGENDARIES.includes(def.id), def.id);
 		assert.notEqual(def.enabled, false, def.id);
 		assert.ok(!LIVE_GRADES.includes(gradeOfItem(def)!), def.id);
 	}
 	for (const def of ITEMS.filter((d) => d.enabled !== false && CRAFT_ONLY_GRADES.includes(gradeOfItem(d) as never))) assert.equal(def.craftOnly, true, def.id);
+	assert.equal(craftOnly.filter((d) => CRAFTED_LEGENDARIES.includes(d.id)).length, 3);
 });
 
 test('no loot pool but the craft pool ever holds a craft-only item', () => {
