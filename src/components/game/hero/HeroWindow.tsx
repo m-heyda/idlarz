@@ -16,11 +16,12 @@ import {
 	Tabs,
 } from '../../../../packages/design-system/src/components/primitives';
 import { ComingSoon, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
-import { HintTooltip, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
+import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
 import { badgePicSrc, shownBadge, shownTitle } from '@/catalog/badges';
+import { INGREDIENT_BY_ID } from '@/catalog/ingredients';
 import { COMPONENTS } from '@/catalog/recipes';
 import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
@@ -34,6 +35,7 @@ import { effectiveStats } from '@/lib/effectiveStats';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { aggregateStats, averageItemLevel, gearOf } from '@/lib/inventory';
 import { setDrag } from '@/lib/inventoryDrag';
+import { openMenuAt } from '@/lib/globalMenu';
 import { resolveItem } from '@/lib/itemInstance';
 import { countJunk, isJunk, junkFor, junkGold, wornLevelOf } from '@/lib/loot/junk';
 import { healAmount } from '@/lib/skills';
@@ -391,15 +393,17 @@ const KIND_LABEL = { component: 'Component', potion: 'Potion', good: 'Trade good
 
 /**
  * The crafting bag: what crafting made and the components, kept on the server. It looks like the bag (a grid of slots, one per kind of thing, with the count in the corner) but has no slot limit: past the empty cells it just gets another row.
- * Things only move one way, out: a click takes a stack of a potion or trade good into the bag, Shift+click takes all that fits; nothing can be put back, and components stay for recipes.
+ * Things only move one way, out. A click opens the stack's actions (take a stack or all of a potion or trade good into the bag, or "Craft with it" for a component, which opens the Crafting tab searched by its name); Shift+click takes all that fits at once.
+ * Nothing can be put back, and ingredients and components stay for recipes: they are tooltip-only and can never be sold or withdrawn (the server refuses, `applyWithdraw`). An ingredient's slot wears its tier colour (grey, green, blue, purple) and its tooltip says what uses it and where it drops.
  */
-const CraftingBag: React.FC = () => {
+const TIER_RARITY = { 1: 'common', 2: 'uncommon', 3: 'rare', 4: 'epic' } as const;
+const CraftingBag: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWith }) => {
 	const stock = useCraftStore(selectStock);
 	const withdraw = useCraftStore((state) => state.withdraw);
 	const refresh = useCraftStore((state) => state.refresh);
 	const showToast = useUiStore((state) => state.showToast);
 	useEffect(() => void refresh(), [refresh]);
-	const entries: StashEntry[] = useMemo(
+	const entries: (StashEntry & { tier?: 1 | 2 | 3 | 4; about?: string })[] = useMemo(
 		() =>
 			Object.entries(stock)
 				.filter(([, qty]) => qty > 0)
@@ -412,6 +416,8 @@ const CraftingBag: React.FC = () => {
 						icon: item ? pixelIconSrc(itemIconName(item)) : componentIconUrl(id),
 						kind: item ? (item.kind === 'consumable' || item.effects?.length ? ('potion' as const) : ('good' as const)) : ('component' as const),
 						stack: item?.stackMax ?? 1,
+						tier: INGREDIENT_BY_ID.get(id)?.tier,
+						about: item?.description ?? COMPONENTS[id]?.description,
 					};
 				}),
 		[stock],
@@ -423,11 +429,25 @@ const CraftingBag: React.FC = () => {
 			{entries.map((entry) => {
 				const takeable = entry.kind !== 'component';
 				const take = (n: number) => void withdraw(entry.id, Math.min(entry.qty, n)).then(showToast);
+				const openActions = (e: React.MouseEvent) => {
+					const items = takeable
+						? [
+								{
+									id: 'take',
+									label: `Take a stack${(entry.stack ?? 1) > 1 ? ` (${Math.min(entry.qty, entry.stack ?? 1)})` : ''}`,
+									onSelect: () => take(entry.stack ?? 1),
+								},
+								{ id: 'takeAll', label: 'Take all that fits', onSelect: () => take(entry.qty) },
+							]
+						: [{ id: 'craft', label: 'Craft with it...', hint: 'opens Crafting', onSelect: () => onCraftWith(entry.name) }];
+					openMenuAt(e.clientX, e.clientY, entry.name, items);
+				};
 				return (
 					<HoverTip
 						key={entry.id}
 						tip={
 							<Tooltip className='ds-tip-wide' title={entry.name} icon={entry.icon} subtitle={KIND_LABEL[entry.kind]}>
+								{entry.about ? <TipLine>{entry.about}</TipLine> : null}
 								<TipRows rows={[{ label: 'You hold', value: formatNumber(entry.qty) }]} />
 								<div className='ds-tip-keys'>
 									{takeable ? (
@@ -440,7 +460,12 @@ const CraftingBag: React.FC = () => {
 											</span>
 										</>
 									) : (
-										<span>Kept here for recipes</span>
+										<>
+											<span>
+												<span className='ds-kbd'>Click</span>craft with it
+											</span>
+											<span>Kept here for recipes: it cannot be sold or taken out</span>
+										</>
 									)}
 								</div>
 							</Tooltip>
@@ -448,10 +473,10 @@ const CraftingBag: React.FC = () => {
 					>
 						<Slot
 							icon={entry.icon}
-							rarity='common'
+							rarity={entry.tier ? TIER_RARITY[entry.tier] : 'common'}
 							count={entry.qty > 1 ? compact(entry.qty) : undefined}
 							aria-label={entry.name}
-							onClick={(e) => takeable && take(e.shiftKey ? entry.qty : (entry.stack ?? 1))}
+							onClick={(e) => (takeable && e.shiftKey ? take(entry.qty) : openActions(e))}
 						/>
 					</HoverTip>
 				);
@@ -464,7 +489,7 @@ const CraftingBag: React.FC = () => {
 };
 
 /** The Bag tab: the bag and the crafting bag as sub-tabs, the slot grid with buffs above it, the used count, Organise, Sell junk and the hint line. */
-const BagTab: React.FC = () => {
+const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWith }) => {
 	const bag = useGameStore((state) => state.bag);
 	const equipment = useGameStore((state) => state.equipment);
 	const sellCtx = useGameStore(
@@ -492,7 +517,7 @@ const BagTab: React.FC = () => {
 				</button>
 			</div>
 			{view === 'craft' ? (
-				<CraftingBag />
+				<CraftingBag onCraftWith={onCraftWith} />
 			) : (
 				<>
 					<BuffRow />
@@ -567,6 +592,7 @@ const PetsSoon: React.FC = () => (
  */
 const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
+	const [craftQuery, setCraftQuery] = useState('');
 	const points = useGameStore((state) => state.characterStats.availablePoints);
 	return (
 		<GameWindow
@@ -591,7 +617,22 @@ const HeroWindow: React.FC = () => {
 			<div className='ds-hero' data-tab={tab}>
 				{tab === 'craft' ? <CraftingSidebar /> : <HeroLeft />}
 				<Panel className='ds-hero-right'>
-					{tab === 'bag' ? <BagTab /> : tab === 'stats' ? <HeroStats /> : tab === 'pets' ? <PetsSoon /> : tab === 'skills' ? <SkillsSoon /> : <HeroCrafting />}
+					{tab === 'bag' ? (
+						<BagTab
+							onCraftWith={(query) => {
+								setCraftQuery(query);
+								setTab('craft');
+							}}
+						/>
+					) : tab === 'stats' ? (
+						<HeroStats />
+					) : tab === 'pets' ? (
+						<PetsSoon />
+					) : tab === 'skills' ? (
+						<SkillsSoon />
+					) : (
+						<HeroCrafting key={craftQuery} initialQuery={craftQuery} />
+					)}
 				</Panel>
 			</div>
 		</GameWindow>

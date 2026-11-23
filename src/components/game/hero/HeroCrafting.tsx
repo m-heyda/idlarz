@@ -369,13 +369,13 @@ export const CraftingSidebar: React.FC = () => {
  * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), a search box and the recipe list in folding categories (Weapons, Armor by slot, Potions, Jewelry by kind, Components, Legendary; see `lib/craftCategories.ts`; each by required level, a locked recipe is dimmed and tagged with the level it needs, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
  * Everything the old Crafting window did: amount by slider or typed text, cost colours, XP and time, gear odds, queue slots, Collect, Cancel.
  */
-const HeroCrafting: React.FC = () => {
+const HeroCrafting: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
 	const craft = useCraftStore((state) => state.craft);
 	const refresh = useCraftStore((state) => state.refresh);
 	const resources = useGameStore((state) => state.resources);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
-	const [query, setQuery] = useState('');
+	const [query, setQuery] = useState(initialQuery);
 	useEffect(() => void refresh(), [refresh]);
 
 	const { level } = craftLevelOf(craft?.xp ?? 0);
