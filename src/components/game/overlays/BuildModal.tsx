@@ -139,7 +139,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		const text = buildingEffectText(def, ownedOfBiome(tiles, def.biome));
 		if (!text) return null;
 		return (
-			<div className='bh-key'>
+			<div className='bh-key' title={text.produces}>
 				<span style={{ color: '#5ee07a' }}>{text.produces.replace(/\.$/, '')}</span>
 				<span className='bh-key-more'> · {text.perLevel.replace(/\.$/, '')}</span>
 			</div>
@@ -153,6 +153,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 			<Tooltip title={def.label} subtitle={buildingKindLabel(def)} className='ds-tip-compact'>
 				{text && (
 					<>
+						<TipLine>{text.perLevel}</TipLine>
 						<TipLine>{text.scale}</TipLine>
 						<TipLine>{text.levels}</TipLine>
 					</>
@@ -179,7 +180,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						</div>
 						<div className='bh-side'>
 							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
-								Build
+								Buy
 							</Button>
 						</div>
 					</div>
@@ -204,7 +205,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						</div>
 						<div className='bh-side'>
 							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
-								Move here
+								Move
 							</Button>
 						</div>
 					</div>
