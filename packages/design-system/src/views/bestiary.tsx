@@ -68,6 +68,8 @@ export interface BestiaryPanelProps {
 	biomes: readonly BestiaryBiomeGoal[];
 	/** "Mastery bonuses active" line, already worded by the caller */
 	activeText: string;
+	/** One line about golden (lucky) monsters under the mastery line, already worded by the caller (IDL-56); absent: nothing shown */
+	goldenText?: string;
 	/** A claim is in flight: the buttons wait */
 	busy?: boolean;
 	onClaim?: (id: string, tier: number) => void;
@@ -379,7 +381,7 @@ const BiomeGoals: React.FC<{ goals: readonly BestiaryBiomeGoal[]; busy?: boolean
 /**
  * The whole Bestiary body. Wrap it in a window (`GameWindow` in the game, `WindowShell` in Storybook); it fills the height it is given and re-flows by its own width: wide = grid and detail side by side, medium = a narrower grid, narrow = one column.
  */
-export const BestiaryPanel: React.FC<BestiaryPanelProps> = ({ entries, biomes, activeText, busy, onClaim, onClaimBiome, onClaimAll, initial }) => {
+export const BestiaryPanel: React.FC<BestiaryPanelProps> = ({ entries, biomes, activeText, goldenText, busy, onClaim, onClaimBiome, onClaimAll, initial }) => {
 	const [filter, setFilter] = useState('all');
 	const [family, setFamily] = useState('all');
 	const [showBiomes, setShowBiomes] = useState(false);
@@ -407,6 +409,7 @@ export const BestiaryPanel: React.FC<BestiaryPanelProps> = ({ entries, biomes, a
 				<div className='ds-sum-cell ds-bst-active'>
 					<span className='ds-dim'>Mastery bonuses active</span>
 					<b className='ds-good'>{activeText}</b>
+					{goldenText ? <span className='ds-dim'>{goldenText}</span> : null}
 				</div>
 				{ready > 0 ? (
 					<div className='ds-sum-claim'>

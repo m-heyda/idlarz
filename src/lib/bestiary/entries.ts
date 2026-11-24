@@ -6,6 +6,7 @@ import { LOOT_PROFILES, LOOT_SOURCES } from '@/catalog/lootConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { BOSS_MIN_DISTANCE, MONSTERS } from '@/config/combatConfig';
 import { BIOMES } from '@/config/biomes';
+import { LUCK } from '@/config/spawns';
 import { biomeState, masteryBonusesFor, masteryStateOf, noBonuses } from '@/lib/mastery';
 import { maxLevelOf, monsterStats, rewardLevelMult } from '@/lib/monsters';
 import { formatCompact } from '@/utils/formatters';
@@ -192,4 +193,13 @@ export const readyCountOf = (input: BestiaryInput): number => {
 	for (const m of MONSTER_CATALOG.filter((x) => x.enabled)) n += masteryStateOf(m.id, input.kills[m.id] ?? 0, input.claimed[m.id] ?? 0).claimable;
 	for (const biome of MASTERY_BIOMES) n += biomeState(biome, input.kills, input.biomeClaimed[biome] ?? 0).claimable;
 	return n;
+};
+
+/**
+ * The line about golden monsters under the mastery summary (IDL-56): how often one turns up (the base chance, more with Luck up to the cap) and what it pays. Worded from `LUCK.goldenMonster`, so it follows the numbers. Golden kills count for the
+ * monster's mastery like any other kill.
+ */
+export const goldenTextOf = (): string => {
+	const g = LUCK.goldenMonster;
+	return `Golden monsters: ${Math.round(g.base * 100)}% of new monsters (up to ${Math.round(g.cap * 100)}% with Luck) pay x${g.rewardMultiplier} gold and XP and an extra gear roll, and count as a normal kill here.`;
 };
