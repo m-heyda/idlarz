@@ -4594,6 +4594,24 @@ button.ds-income-head:hover {
 		0 6px 14px rgba(0, 0, 0, 0.55);
 }
 
+.ds-toast[data-tone='epic'] {
+	border-color: #c084fc;
+	color: #e9d5ff;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 18px rgba(192, 132, 252, 0.55),
+		0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
+.ds-toast[data-tone='legendary'] {
+	border-color: #fb923c;
+	color: #ffedd5;
+	box-shadow:
+		0 0 0 1px #05060a,
+		0 0 22px rgba(251, 146, 60, 0.65),
+		0 6px 14px rgba(0, 0, 0, 0.55);
+}
+
 .ds-toast-line {
 	display: inline-flex;
 	align-items: center;

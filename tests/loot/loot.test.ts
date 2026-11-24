@@ -210,3 +210,18 @@ test('epic and better gear is never junk and never auto-sold by default (IDL-382
 		"only the player's own mark overrides",
 	);
 });
+
+test('epic and better pieces get a drop notice, everything else does not (IDL-382)', async () => {
+	const { announceDrops } = await import('@/lib/loot/announce');
+	const gear = (rarity: string) => ({ kind: 'gear' as const, item: { base: 'iron_sword', level: 20, rarity, quality: 50, affixes: [] } });
+	const found = announceDrops([gear('common'), gear('rare'), gear('epic'), gear('legendary'), { kind: 'consumable', id: 'potion_minor', qty: 2 }]);
+	assert.deepEqual(
+		found.map((f) => [f.rarity, f.text.startsWith(f.rarity === 'epic' ? 'Epic drop: ' : 'Legendary drop: ')]),
+		[
+			['legendary', true],
+			['epic', true],
+		],
+		'the strongest first; common, rare and potions stay quiet',
+	);
+	assert.deepEqual(announceDrops([]), []);
+});
