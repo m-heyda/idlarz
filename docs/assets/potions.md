@@ -10,7 +10,7 @@ Consumables in the game and the 48 raw potion icons waiting in the reuse pool.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_arcane_swirl` | <img src="../../public/pixel/items/consumable/arcane_swirl.png" width="96" alt="art_arcane_swirl"> | 64x64 | unused |  | `pixel/items/consumable/arcane_swirl.png` |
+| `art_arcane_swirl` | <img src="../../public/pixel/items/consumable/arcane_swirl.png" width="96" alt="art_arcane_swirl"> | 64x64 | used | elixir_arcana | `pixel/items/consumable/arcane_swirl.png` |
 | `art_elixir_fortitude` | <img src="../../public/pixel/items/consumable/elixir_fortitude.png" width="96" alt="art_elixir_fortitude"> | 64x64 | used | elixir_fortitude | `pixel/items/consumable/elixir_fortitude.png` |
 | `art_elixir_haste` | <img src="../../public/pixel/items/consumable/elixir_haste.png" width="96" alt="art_elixir_haste"> | 64x64 | used | elixir_haste | `pixel/items/consumable/elixir_haste.png` |
 | `art_elixir_ironskin` | <img src="../../public/pixel/items/consumable/elixir_ironskin.png" width="96" alt="art_elixir_ironskin"> | 64x64 | used | elixir_ironskin | `pixel/items/consumable/elixir_ironskin.png` |

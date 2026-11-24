@@ -43,7 +43,7 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('orange_mushrooms', 1, 'fungal extracts and night potions', 'Fungal Extract'),
 	ing('grapes', 1, 'wine and elixirs', 'Elixir of Fortitude'),
 	ing('hollow_log', 1, 'planks'),
-	ing('glowberry', 2, 'night-vision and luck potions', 'Arcane Essence, Elixir of Haste, Elixir of the Keen Eye'),
+	ing('glowberry', 2, 'night-vision and luck potions', 'Arcane Essence, Elixir of Arcana, Elixir of Haste, Elixir of the Keen Eye'),
 	ing('horn_dark', 2, 'dark elixirs and enchanting powder'),
 	ing('copper_ore', 2, 'ingots (smelted with coal)', 'Copper Ingot'),
 	ing('ember_coal', 3, 'smelting fuel and fire potions', 'Steel Ingot, Gold Ingot'),

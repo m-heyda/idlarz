@@ -1,11 +1,13 @@
 [
 	{
-		"usedBy": [],
+		"usedBy": [
+			"elixir_arcana"
+		],
 		"name": "art_arcane_swirl",
 		"category": "potions",
 		"subcategory": "consumable",
 		"src": "/pixel/items/consumable/arcane_swirl.png",
-		"status": "unused",
+		"status": "used",
 		"slot": "consumable",
 		"source": "itemIcons registry",
 		"size": [
