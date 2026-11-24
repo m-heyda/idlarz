@@ -10362,12 +10362,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:guildhall"
+		],
 		"name": "building_village_adventurers_guild",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Adventurers Guild.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10582,12 +10584,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:marketplace"
+		],
 		"name": "building_village_general_store",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/General Store.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10806,12 +10810,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:watchtower"
+		],
 		"name": "building_village_observatory",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Observatory.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10901,12 +10907,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:trainingyard"
+		],
 		"name": "building_village_school_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/School House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10914,12 +10922,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:scriptorium"
+		],
 		"name": "building_village_scribes_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Scribes House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10955,12 +10965,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:garrison"
+		],
 		"name": "building_village_stone_village_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Stone Village House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,

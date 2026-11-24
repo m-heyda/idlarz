@@ -4,7 +4,8 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { api, freshGame, growTo, patchTileAt, setResources, tileAt, store } from '../helpers';
 import { BUILDING_RULES, BUILDINGS_FLAG } from '../../src/config/buildings';
-import { BUILDINGS, buildingDef, buildingsOfBiome } from '../../src/catalog/buildings';
+import { BUILDINGS, buildingDef, buildingsOfBiome, fitsBiome } from '../../src/catalog/buildings';
+import { idolEconomy } from '../../src/lib/idolEconomy';
 import { BIOMES } from '../../src/config/biomes';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -76,7 +77,7 @@ test('the flag ships on (owner decision: live on merge)', () => {
 
 test('the catalog: a Producer and an Extractor for each of the twelve biomes, with real art', () => {
 	const homes = ['battlefield', 'blight', 'coast', 'fields', 'forest', 'hills', 'jungle', 'lake', 'orchard', 'plains', 'swamp', 'tundra'];
-	assert.equal(BUILDINGS.length, 24 + 12, 'twelve Producers, twelve Extractors and the twelve Idols');
+	assert.equal(BUILDINGS.length, 24 + 12 + 6, 'twelve Producers, twelve Extractors, the twelve Idols and six general buildings');
 	assert.equal(new Set(BUILDINGS.map((b) => b.id)).size, BUILDINGS.length);
 	for (const kind of ['producer', 'extractor'] as const)
 		assert.deepEqual(
@@ -86,8 +87,8 @@ test('the catalog: a Producer and an Extractor for each of the twelve biomes, wi
 			homes,
 		);
 	for (const b of BUILDINGS) {
-		assert.ok(BIOMES[b.biome], b.id);
-		if (b.kind === 'idol') assert.equal(b.produces.length, 0, `${b.id} makes nothing`);
+		assert.ok(b.kind === 'general' || BIOMES[b.biome], b.id);
+		if (b.kind === 'idol' || b.kind === 'general') assert.equal(b.produces.length, 0, `${b.id} makes nothing`);
 		else if (b.kind === 'producer')
 			for (const key of b.produces)
 				assert.ok((BIOMES[b.biome].resourceGeneration as Record<string, number>)[key] > 0, `${b.id} makes ${key}, which its biome does not`);
@@ -106,7 +107,8 @@ test('the catalog: a Producer and an Extractor for each of the twelve biomes, wi
 			.sort(),
 		['corruptedCore', 'dye', 'frostshard', 'herbs', 'ironOre', 'pearls', 'royalJelly', 'salt', 'sap', 'scrapSteel', 'spores', 'venom'],
 	);
-	assert.equal(buildingsOfBiome('forest').length, 3, 'Producer, Extractor and Idol');
+	assert.equal(buildingsOfBiome('forest').length, 9, 'Producer, Extractor, Idol and the six general buildings');
+	assert.equal(buildingsOfBiome('lake').length, 3, 'no general building on water');
 	assert.equal(buildingsOfBiome('castle').length, 0);
 });
 
@@ -662,5 +664,22 @@ test('building copies: 1 of each Producer and Extractor at the start, 2 / 3 with
 		assert.match(buildProblem({ ...base, buildingCopies: 1 }, b.x, b.y, 'lumberyard') ?? '', /already built/);
 		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, b.x, b.y, 'lumberyard'), null, 'a second copy with a Building Slot');
 		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, c.x, c.y, 'saptapper'), null, 'other types are not affected');
+	});
+});
+
+test('general buildings: stand on any land except the lake, each level of each copy adds 1 % of its effect through the Idol economy, with their own copy caps', () => {
+	withBuildings(() => {
+		for (const id of ['watchtower', 'marketplace', 'trainingyard', 'scriptorium', 'guildhall', 'garrison']) {
+			const def = buildingDef(id)!;
+			assert.equal(def.kind, 'general');
+			assert.ok(fitsBiome(def, 'forest') && fitsBiome(def, 'swamp') && !fitsBiome(def, 'lake') && !fitsBiome(def, 'castle'), id);
+			assert.ok([2, 3].includes(copiesAllowed(def, 1)), `${id} has its own cap`);
+		}
+		const [a, b] = gameWith('forest', 2, 5);
+		assert.equal(api().buildBuilding(a.x, a.y, 'watchtower'), true);
+		assert.equal(api().buildBuilding(b.x, b.y, 'watchtower'), true, 'a second Watchtower, no Building Slot needed');
+		assert.equal(idolEconomy(api().tiles).damagePct, 2, 'two level-1 Watchtowers: 1 % each');
+		store.setState({ tiles: patchTile(api().tiles, a.x, a.y, { buildingLevel: 4 }) });
+		assert.equal(idolEconomy(api().tiles).damagePct, 5, 'level 4 + level 1');
 	});
 });

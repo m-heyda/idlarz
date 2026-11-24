@@ -42,6 +42,16 @@ export const BUILDING_RULES = {
 };
 
 /**
+ * The general buildings (Watchtower, Marketplace, Training Yard, Scriptorium, Guild Hall, Garrison): they stand on any land biome except the lake, each has its own copy cap (`BuildingDef.copies`, 2 or 3, separate from the Producer and Extractor Building Slots), and
+ * make nothing: every level of every copy adds `perLevel` (1 %) of its effect, the same effects the Idols have and through the same server-derived economy (`idolEconomy`), so level 5 of a Watchtower is +5 % damage and three of them +15 %. Levels, timers, builders and the castle gate are
+ * the Producer's; the price is the Producer's too (resources only: no extract).
+ *
+ * @category Economy/Buildings
+ * @order 6
+ */
+export const GENERAL_RULES = { perLevel: 1 };
+
+/**
  * The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
  *
  * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).

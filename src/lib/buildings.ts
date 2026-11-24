@@ -3,7 +3,7 @@ import { BUILDING_RULES, BUILDINGS_FLAG, IDOL_RULES } from '@/config/buildings';
 import { HARD_LIMITS } from '@/config/limits';
 import { busyBuilders } from '@/lib/builders';
 import { limitOf, type LimitContext } from '@/lib/limits';
-import { BUILDINGS, buildingDef, type BuildingDef } from '@/catalog/buildings';
+import { BUILDINGS, buildingDef, fitsBiome, type BuildingDef } from '@/catalog/buildings';
 import { calculateTileCost, tileCostAsResources } from '@/utils/game/costs';
 import { emberEffect } from '@/utils/game/rebirth';
 import { biomeCount, forEachOwned, getTile, setTile, type World } from '@/utils/world';
@@ -221,8 +221,12 @@ export interface BuildingContext {
 }
 
 /** How many copies of this building the map may hold: an Idol is always one, a Producer or an Extractor `buildingCopies` (1 at the start, up to 4 with the Ember shop's Building Slots and the Gem shop's Building Slot). */
-export const copiesAllowed = (def: Pick<BuildingDef, 'kind'> | undefined, buildingCopies = 1): number =>
-	def?.kind === 'idol' ? 1 : Math.max(1, Math.min(HARD_LIMITS.buildingCopies, Math.floor(buildingCopies)));
+export const copiesAllowed = (def: Pick<BuildingDef, 'kind' | 'copies'> | undefined, buildingCopies = 1): number =>
+	def?.kind === 'idol'
+		? 1
+		: def?.kind === 'general'
+			? Math.max(1, Math.min(HARD_LIMITS.buildingCopies, def.copies ?? 1))
+			: Math.max(1, Math.min(HARD_LIMITS.buildingCopies, Math.floor(buildingCopies)));
 
 /** How many of building `id` stand on the map or are waiting to be built (a first Idol build is a running upgrade without a tile level yet). */
 export const copiesOf = (ctx: Pick<BuildingContext, 'tiles' | 'buildingUpgrades'>, id: string): number =>
@@ -237,7 +241,7 @@ const tileProblem = (ctx: BuildingContext, x: number, y: number, def: BuildingDe
 	if (upgradeAt(ctx, x, y)) return 'Under construction';
 	if (tile.hasChest) return 'A chest is here';
 	if (monsterAt(ctx.monsters as Monster[], x, y)) return 'A monster is here';
-	if (tile.biome !== def.biome) return `Needs ${BIOMES[def.biome]?.label ?? def.biome}`;
+	if (!fitsBiome(def, tile.biome)) return def.kind === 'general' ? 'Not on water' : `Needs ${BIOMES[def.biome]?.label ?? def.biome}`;
 	return null;
 };
 

@@ -4,7 +4,7 @@ import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
 import { BUILDINGS_FLAG } from '@/config/buildings';
-import { buildingDef } from '@/catalog/buildings';
+import { buildingDef, fitsBiome } from '@/catalog/buildings';
 import { IDOLS } from '@/catalog/idols';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { HARD_LIMITS } from '@/config/limits';
@@ -264,7 +264,13 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
 			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : HARD_LIMITS.buildingMaxLevel);
-			if (def && def.biome === t.biome && !tile.hasChest && (buildingCopies.get(def.id) ?? 0) < copiesAllowed(def, HARD_LIMITS.buildingCopies) && bl !== null) {
+			if (
+				def &&
+				fitsBiome(def, String(t.biome)) &&
+				!tile.hasChest &&
+				(buildingCopies.get(def.id) ?? 0) < copiesAllowed(def, HARD_LIMITS.buildingCopies) &&
+				bl !== null
+			) {
 				buildingCopies.set(def.id, (buildingCopies.get(def.id) ?? 0) + 1);
 				tile.building = def.id;
 				if (bl > 1) tile.buildingLevel = bl;

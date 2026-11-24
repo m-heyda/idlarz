@@ -962,7 +962,13 @@
 		"rotworks",
 		"coresiphon",
 		"warcamp",
-		"scrapforge"
+		"scrapforge",
+		"watchtower",
+		"marketplace",
+		"trainingyard",
+		"scriptorium",
+		"guildhall",
+		"garrison"
 	],
 	"avatarIds": [
 		"knight",

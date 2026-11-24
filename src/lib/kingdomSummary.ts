@@ -15,7 +15,7 @@ export interface KingdomBuildingRow {
 	id: string;
 	label: string;
 	biome: string;
-	kind: 'producer' | 'extractor' | 'idol';
+	kind: 'producer' | 'extractor' | 'idol' | 'general';
 	/** 0 = not built */
 	level: number;
 	/** The highest level it can be taken to with what the account owns (the Ember caps; the castle level only gates when a level can be bought) */

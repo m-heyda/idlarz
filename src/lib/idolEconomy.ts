@@ -1,5 +1,6 @@
+import { buildingDef } from '@/catalog/buildings';
 import { idolDef, type IdolDef } from '@/catalog/idols';
-import { IDOL_RULES } from '@/config/buildings';
+import { GENERAL_RULES, IDOL_RULES } from '@/config/buildings';
 import { HARD_LIMITS } from '@/config/limits';
 import { forEachOwned, type World } from '@/utils/world';
 
@@ -124,6 +125,32 @@ export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>): 
 				break;
 		}
 	}
+	// the general buildings: every level of every copy adds a little of its effect
+	forEachOwned(tiles, (tile) => {
+		const def = buildingDef(tile.building);
+		if (def?.kind !== 'general') return;
+		const pct = Math.max(1, Math.min(HARD_LIMITS.buildingMaxLevel, Math.floor(tile.buildingLevel ?? 1))) * GENERAL_RULES.perLevel;
+		switch (def.effect) {
+			case 'damage':
+				out.damagePct += pct;
+				break;
+			case 'merchantSell':
+				out.merchantSellPct += pct;
+				break;
+			case 'xpGain':
+				out.xpPct += pct;
+				break;
+			case 'craftXp':
+				out.craftXpPct += pct;
+				break;
+			case 'killRewards':
+				out.killRewardPct += pct;
+				break;
+			case 'hpArmor':
+				out.hpArmorPct += pct;
+				break;
+		}
+	});
 	return out;
 };
 
