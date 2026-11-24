@@ -376,3 +376,32 @@ test('compareDetailed: armor pieces headline armor, jewellery has no headline, a
 	assert.equal(compareDetailed(p('steel_ring'), {})?.primary, null);
 	assert.equal(compareDetailed(p('steel_helm'), {})?.swing, null);
 });
+
+test('IDL-343: a ring is compared with the ring the player picks, and only that ring is replaced in the calculation', () => {
+	const low: ItemInstance = { ...p('obsidian_ring'), level: 5 };
+	const high: ItemInstance = { ...p('obsidian_ring'), level: 40 };
+	const candidate: ItemInstance = { ...p('obsidian_ring'), level: 20 };
+	const worn = { ring1: low, ring2: high };
+	const def = compareToEquipped(candidate, worn)!;
+	assert.equal(def.slot, 'ring1', 'the default is the first ring');
+	const one = compareToEquipped(candidate, worn, 'ring1')!;
+	const two = compareToEquipped(candidate, worn, 'ring2')!;
+	assert.equal(one.slot, 'ring1');
+	assert.equal(two.slot, 'ring2');
+	assert.deepEqual(one.deltas, def.deltas);
+	assert.deepEqual(one.equipped, low);
+	assert.deepEqual(two.equipped, high);
+	// each scenario is exactly the stat change of really swapping that ring
+	for (const [pick, slot] of [
+		[one, 'ring1'],
+		[two, 'ring2'],
+	] as const) {
+		const before = aggregateStats(worn);
+		const after = aggregateStats({ ...worn, [slot]: candidate });
+		for (const key of Object.keys(pick.deltas) as (keyof typeof pick.deltas)[])
+			assert.equal(pick.deltas[key], Math.round(((after[key] ?? 0) - (before[key] ?? 0)) * 100) / 100);
+	}
+	assert.notDeepEqual(one.deltas, two.deltas, 'replacing the stronger ring is a different result');
+	assert.equal(compareDetailed(candidate, worn, 'ring2')!.slot, 'ring2');
+	assert.equal(compareToEquipped(p('obsidian_blade'), STARTER_EQUIPMENT, 'ring2')!.slot, 'mainHand', 'the pick only matters for rings');
+});
