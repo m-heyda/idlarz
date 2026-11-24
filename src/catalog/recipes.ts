@@ -297,7 +297,7 @@ export const RECIPES: Recipe[] = [
 		output: { item: 'herb_crate', qty: 1 },
 		unlock: 20,
 		xp: 40,
-		timeSec: 60,
+		timeSec: 900, // slow on purpose: goods stay a small side income (craft-sim goods gate)
 	},
 	{
 		id: 'trade_pack',
@@ -311,7 +311,7 @@ export const RECIPES: Recipe[] = [
 		output: { item: 'trade_pack', qty: 1 },
 		unlock: 32,
 		xp: 60,
-		timeSec: 90,
+		timeSec: 1200,
 	},
 ];
 RECIPES.push(...REFINED_RECIPES);

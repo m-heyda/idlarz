@@ -18,6 +18,8 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Honey Cake | good | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | - | - | 7 | 5.1 |
 | Leather Satchel | good | 6 | 3 Cured Leather | 39.9 | 52 | - | - | 12 | 3.3 |
 | Carved Trinket | good | 8 | 40 Wood + 20 Stone | 48 | 62 | - | - | 18 | 2.7 |
+| Herb Crate | good | 20 | 100 Herbs + 50 Sap | 7500 | 9800 | - | - | 40 | 187.5 |
+| Trade Pack | good | 32 | 60 Iron Ore + 60 Salt + 60 Pearls | 9000 | 11800 | - | - | 60 | 150 |
 | Copper Ingot | component | 4 | 2 Copper Ore + 20 Coal | 70 | - | - | - | 5 | 14 |
 | Iron Ingot | component | 8 | 2 Iron Nodule + 50 Iron Ore + 40 Coal | 2580 | - | - | - | 8 | 322.5 |
 | Steel Ingot | component | 14 | 2 Iron Ingot + 1 Ember Coal + 200 Iron Ore + 80 Coal | 15278 | - | - | - | 14 | 1091.3 |
@@ -36,6 +38,8 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Herb Extract | component | 4 | 3 Dried Herb Bundle + 1 Glass Vial + 60 Herbs + 10 Coal | 3046.5 | - | - | - | 6 | 507.8 |
 | Fungal Extract | component | 8 | 3 Orange Caps + 1 Glass Vial + 60 Spores | 3053.5 | - | - | - | 8 | 381.7 |
 | Vital Extract | component | 6 | 2 Vial of Blood + 1 Glass Vial + 30 Herbs + 20 Food | 1550.5 | - | - | - | 7 | 221.5 |
+| Distilled Ichor | component | 60 | 1 Glass Vial + 1000 Corrupted Core | 50014.5 | - | - | - | 40 | 1250.4 |
+| Forged War Medal | component | 70 | 1 Gold Ingot + 1500 Scrap Steel | 90682 | - | - | - | 50 | 1813.6 |
 | Cut Jasper | component | 8 | 2 Striped Jasper + 1 Gem Grit | 125 | - | - | - | 18 | 6.9 |
 | Cut Malachite | component | 9 | 2 Raw Malachite + 1 Gem Grit | 135 | - | - | - | 18 | 7.5 |
 | Cut Turquoise | component | 10 | 2 Raw Turquoise + 1 Gem Grit | 165 | - | - | - | 18 | 9.2 |
@@ -58,9 +62,9 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Elixir of the Keen Eye | potion | 24 | 1 Fungal Extract + 1 Cut Jasper + 2 Glowberry + 1 Glass Vial + 100 Sap | 8229 | 145 | - | - | 100 | 82.3 |
 | Elixir of Time Shift | potion | 70 | 5 Hourglass Sand + 5 Gold Ingot + 3 Cut Crystal + 1 Glass Vial + 8000000 Wood + 6000000 Stone + 6000000 Coal + 10000000 Food | 22116719.4 | 1000 | - | - | 500 | 44233.4 |
 | Elixir of Warding | potion | 30 | 1 Arcane Essence + 1 Cut Moonstone + 1 Vital Extract + 1 Glass Vial + 100 Frostshard | 12545.8 | 650 | - | - | 140 | 89.6 |
-| Dawnsplitter | legendary | 80 | 2000000000 Wood + 1500000000 Stone + 500 Plank Bundle + 50 War Medal | 2850307200 | 45000 | - | - | 100000 | 28503.1 |
-| Stormstring | legendary | 80 | 2000000000 Wood + 1000000000 Hide + 500 Cured Leather + 50 War Medal | 3500306650 | 45000 | - | - | 100000 | 35003.1 |
-| Starlight Wand | legendary | 80 | 2000000000 Stone + 1500000000 Coal + 500 Plank Bundle + 50 War Medal | 3450307200 | 45000 | - | - | 100000 | 34503.1 |
+| Dawnsplitter | legendary | 80 | 2000000000 Wood + 1500000000 Stone + 500 Plank Bundle + 50 War Medal | 2854541300 | 45000 | - | - | 100000 | 28545.4 |
+| Stormstring | legendary | 80 | 2000000000 Wood + 1000000000 Hide + 500 Cured Leather + 50 War Medal | 3504540750 | 45000 | - | - | 100000 | 35045.4 |
+| Starlight Wand | legendary | 80 | 2000000000 Stone + 1500000000 Coal + 500 Plank Bundle + 50 War Medal | 3454541300 | 45000 | - | - | 100000 | 34545.4 |
 
 ## Crafting level
 
@@ -98,6 +102,8 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Honey Cake | 20 | 180 | 1,260 | 6,480 | 333333333.3 | 5555555.6 |
 | Leather Satchel | 30 | 120 | 1,440 | 4,788 | 500000000 | 8333333.3 |
 | Carved Trinket | 30 | 120 | 2,160 | 5,760 | 500000000 | 8333333.3 |
+| Herb Crate | 900 | 4 | 160 | 30,000 | 15000000000 | 250000000 |
+| Trade Pack | 1200 | 3 | 180 | 27,000 | 20000000000 | 333333333.3 |
 | Copper Ingot | 15 | 240 | 1,200 | 16,800 | 250000000 | 4166666.7 |
 | Iron Ingot | 20 | 180 | 1,440 | 464,400 | 333333333.3 | 5555555.6 |
 | Steel Ingot | 30 | 120 | 1,680 | 1,833,360 | 500000000 | 8333333.3 |
@@ -116,6 +122,8 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Herb Extract | 18 | 200 | 1,200 | 609,300 | 300000000 | 5000000 |
 | Fungal Extract | 20 | 180 | 1,440 | 549,630 | 333333333.3 | 5555555.6 |
 | Vital Extract | 18 | 200 | 1,400 | 310,100 | 300000000 | 5000000 |
+| Distilled Ichor | 60 | 60 | 2,400 | 3,000,870 | 1000000000 | 16666666.7 |
+| Forged War Medal | 90 | 40 | 2,000 | 3,627,280 | 1500000000 | 25000000 |
 | Cut Jasper | 40 | 90 | 1,620 | 11,250 | 666666666.7 | 11111111.1 |
 | Cut Malachite | 40 | 90 | 1,620 | 12,150 | 666666666.7 | 11111111.1 |
 | Cut Turquoise | 40 | 90 | 1,620 | 14,850 | 666666666.7 | 11111111.1 |
@@ -138,9 +146,9 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Elixir of the Keen Eye | 55 | 65 | 6,545 | 538,625 | 916666666.7 | 15277777.8 |
 | Elixir of Time Shift | 600 | 6 | 3,000 | 132,700,316 | 10000000000 | 166666666.7 |
 | Elixir of Warding | 60 | 60 | 8,400 | 752,748 | 1000000000 | 16666666.7 |
-| Dawnsplitter | 28800 | 0 | 12,500 | 356,288,400 | 480000000000 | 8000000000 |
-| Stormstring | 28800 | 0 | 12,500 | 437,538,331 | 480000000000 | 8000000000 |
-| Starlight Wand | 28800 | 0 | 12,500 | 431,288,400 | 480000000000 | 8000000000 |
+| Dawnsplitter | 28800 | 0 | 12,500 | 356,817,663 | 480000000000 | 8000000000 |
+| Stormstring | 28800 | 0 | 12,500 | 438,067,594 | 480000000000 | 8000000000 |
+| Starlight Wand | 28800 | 0 | 12,500 | 431,817,663 | 480000000000 | 8000000000 |
 
 ## Trade goods income
 
@@ -152,11 +160,13 @@ Gold from selling crafted trade goods (IDL-227) against the gold per second of t
 | Honey Cake | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | 1.28 | 8,280 |
 | Leather Satchel | 6 | 3 Cured Leather | 39.9 | 52 | 1.30 | 6,240 |
 | Carved Trinket | 8 | 40 Wood + 20 Stone | 48 | 62 | 1.29 | 7,440 |
+| Herb Crate | 20 | 100 Herbs + 50 Sap | 7500 | 9800 | 1.31 | 39,200 |
+| Trade Pack | 32 | 60 Iron Ore + 60 Salt + 60 Pearls | 9000 | 11800 | 1.31 | 35,400 |
 
 | Queues | Best good, gold / hour | Gold / second | Share of income (castle 10, 3,000 gold/s) | Gate |
 |---|---:|---:|---:|---|
-| base limits (1 queue, speed 1) | 33,120 | 9.2 | 0.3% | ok |
-| hard ceilings (5 queues, speed 4) | 220,800 | 61.3 | 2.0% | ok |
+| base limits (1 queue, speed 1) | 117,600 | 32.7 | 1.1% | ok |
+| hard ceilings (5 queues, speed 4) | 784,000 | 217.8 | 7.3% | ok |
 
 ## Gear recipes (IDL-241)
 

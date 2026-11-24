@@ -39,9 +39,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Pinecone Warden | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Pinecone Warden | 13 (castle 8) | 0% | 0% | 3% | 100% | 100% | 100% |
 | Pinecone Warden | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
-| The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
-| The Elder Stag | 38 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Elder Stag | 20 (castle 1) | 0% | 0% | 0% | 75% | 100% | 100% |
+| The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 48% | 100% | 100% |
+| The Elder Stag | 38 (grown) | 0% | 0% | 0% | 15% | 100% | 100% |
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 10% | 100% |
 | Garbage Ogre | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -63,7 +63,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 63% | 98% |
 | The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 45% | 100% |
 | The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 33% | 100% |
-| Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
 | Frost Hare | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Hare | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Icetusk Calf | 12 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
@@ -72,7 +72,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Rime Wraith | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rime Wraith | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rime Wraith | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 38% | 100% | 100% |
 | Frost Moth | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Moth | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Glacier Yeti | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
@@ -88,33 +88,33 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Cave Goblin Miner | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Cave Goblin Miner | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Boulder Beetle | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Boulder Beetle | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Boulder Beetle | 15 (castle 8) | 0% | 0% | 0% | 10% | 100% | 100% |
 | Boulder Beetle | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Hill Giant | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Hill Giant | 22 (castle 1) | 0% | 0% | 0% | 5% | 100% | 100% |
 | The Hill Giant | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Magma Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Magma Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 88% | 100% |
 | Magma Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Magma Crab | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Magma Crab | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Magma Crab | 15 (castle 8) | 0% | 0% | 0% | 10% | 100% | 100% |
 | Magma Crab | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Mawhorn Brute | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Mawhorn Brute | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Mawhorn Brute | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Quarry Drake | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Quarry Drake | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Drake | 15 (castle 8) | 0% | 0% | 0% | 3% | 100% | 100% |
 | Quarry Drake | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Cairn Sentinel | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Cairn Sentinel | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Cairn Sentinel | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Quarry Rat Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Quarry Rat Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
+| Quarry Rat Knight | 15 (castle 8) | 0% | 0% | 0% | 15% | 100% | 100% |
 | Quarry Rat Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Highland Gnoll | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Highland Gnoll | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Highland Gnoll | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 0% | 100% | 100% |
+| The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
 | The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
@@ -133,8 +133,8 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
-| The Reef Leviathan | 25 (castle 8) | 0% | 0% | 70% | 98% | 100% | 100% |
-| The Reef Leviathan | 35 (grown) | 0% | 0% | 23% | 80% | 100% | 100% |
+| The Reef Leviathan | 25 (castle 8) | 0% | 0% | 70% | 100% | 100% | 100% |
+| The Reef Leviathan | 35 (grown) | 0% | 0% | 23% | 100% | 100% | 100% |
 | Moss Snapper | 10 (castle 1) | 0% | 85% | 100% | 100% | 100% | 100% |
 | Moss Snapper | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Moss Snapper | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |

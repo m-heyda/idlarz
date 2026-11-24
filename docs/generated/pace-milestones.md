@@ -96,7 +96,6 @@
 | r3.finished | — | — | — | — | — | — | — | — | 7.0 d | — | 1.1 d | 7.0 d | 7.0 d | 7.2 d | 7.4 d | — |
 | r3.rebirthPossible | — | — | — | — | 1.4 d | — | 1.4 d | — | 9.0 d | — | 1.1 d | 9.0 d | 9.0 d | 9.0 d | 9.0 d | 1.4 d |
 | r3.tiles100 | — | — | — | — | 1.7 h | — | 1.7 h | — | 2.0 d | — | 1.0 h | 2.0 d | 2.0 d | 1.6 d | 1.6 d | 0.6 h |
-| r4.builder2 | — | — | — | — | — | — | — | — | — | — | — | — | 3.9 d | — | — | — |
 | r4.castle6 | — | — | — | — | 1.2 d | — | 1.2 d | — | 2.5 d | — | 23.8 h | 2.5 d | 2.5 d | 3.0 d | 3.0 d | 1.2 d |
 | r4.finished | — | — | — | — | 1.2 d | — | 1.2 d | — | 7.0 d | — | 23.8 h | 7.0 d | 7.0 d | 7.4 d | 7.2 d | 1.2 d |
 | r4.rebirthPossible | — | — | — | — | — | — | 1.2 d | — | 10.0 d | — | 23.8 h | 10.0 d | 10.0 d | 9.6 d | 9.6 d | — |
@@ -385,7 +384,7 @@ Measured with the real store at the checkpoints of @category Pacing; the last se
 | human-rebirth6-gems | rebirth 4 at castle 6: Embers gained | 40 | 18-28 | **outside** |
 | human-rebirth6-gems | rebirth 5 at castle 6: Embers gained | 43 | 18-28 | **outside** |
 | human-rebirth6-gems | after rebirth 5 at castle 6: lifetime Embers | 189 | 90-140 | **outside** |
-| human-rebirth6-gems | after rebirth 5: income multiplier at castle 6 (run 6 over run 1) | 3 | (x3-6 is for castle 10) | n/a |
+| human-rebirth6-gems | after rebirth 5: income multiplier at castle 6 (run 6 over run 1) | 2.4 | (x3-6 is for castle 10) | n/a |
 | human-rebirth6-economy | rebirth 1 at castle 6: Embers gained | 33 | 18-28 | **outside** |
 | human-rebirth6-economy | rebirth 2 at castle 6: Embers gained | 36 | 18-28 | **outside** |
 | human-rebirth6-economy | rebirth 3 at castle 6: Embers gained | 38 | 18-28 | **outside** |

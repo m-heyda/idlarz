@@ -163,8 +163,8 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 |---|---|---|---|---|---|
 | Wooden Sword (damage) | 6 | 10 | (20) 14 | (20) 14 | (20) 14 |
 | Iron Sword (damage) | (4) 12 | 16 | 27 | 44 | (50) 44 |
-| Obsidian Blade (damage) | (8) 18 | 20 | 32 | 54 | 96 |
-| Emberbrand (damage) | (3) 33 | 47 | 78 | 128 | 230 |
+| Obsidian Blade (damage) | (8) 18 | 20 | 32 | 54 | 2012 |
+| Emberbrand (damage) | (3) 33 | 47 | 78 | 128 | 4821 |
 | Steel Cuirass (armor) | (4) 7 | 9 | 16 | 26 | (50) 26 |
 
 ## Profiles
