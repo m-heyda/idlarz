@@ -89,11 +89,11 @@ Level factor: `1 + 0.07 x (level - 1)` relative to the base's authored level; ca
 
 | Pieces | Adds | Total so far |
 | --- | --- | --- |
-| 2 pieces | incomePct 6, maxHp 20 | incomePct 6, maxHp 20 |
-| 4 pieces | xpPct 10, goldFind 10, armor 6 | incomePct 6, maxHp 20, xpPct 10, goldFind 10, armor 6 |
-| 6 pieces | killRewardPct 12, damage 5, luck 3 | incomePct 6, maxHp 20, xpPct 10, goldFind 10, armor 6, killRewardPct 12, damage 5, luck 3 |
-| 9 pieces | offlineEff 15, clickPct 10, incomePct 8, maxHp 40 | incomePct 14, maxHp 60, xpPct 10, goldFind 10, armor 6, killRewardPct 12, damage 5, luck 3, offlineEff 15, clickPct 10 |
-| 12 pieces | incomePct 12, xpPct 15, killRewardPct 25, offlineCapHours 3, goldFind 20, armor 10, superCrit 6 | incomePct 26, maxHp 60, xpPct 25, goldFind 30, armor 16, killRewardPct 37, damage 5, luck 3, offlineEff 15, clickPct 10, offlineCapHours 3, superCrit 6 |
+| 2 pieces | incomePct 6, maxHp 24 | incomePct 6, maxHp 24 |
+| 4 pieces | xpPct 10, goldFind 10, armor 7 | incomePct 6, maxHp 24, xpPct 10, goldFind 10, armor 7 |
+| 6 pieces | killRewardPct 12, damage 6, luck 3 | incomePct 6, maxHp 24, xpPct 10, goldFind 10, armor 7, killRewardPct 12, damage 6, luck 3 |
+| 9 pieces | offlineEff 15, clickPct 10, incomePct 8, maxHp 48 | incomePct 14, maxHp 72, xpPct 10, goldFind 10, armor 7, killRewardPct 12, damage 6, luck 3, offlineEff 15, clickPct 10 |
+| 12 pieces | incomePct 12, xpPct 15, killRewardPct 25, offlineCapHours 3, goldFind 20, armor 12, superCrit 6 | incomePct 26, maxHp 72, xpPct 25, goldFind 30, armor 19, killRewardPct 37, damage 6, luck 3, offlineEff 15, clickPct 10, offlineCapHours 3, superCrit 6 |
 
 **Sunhoney Raiment** (14 slots)
 

@@ -34,11 +34,11 @@ The prospector's set: it pays the kingdom (income, XP, kill rewards, away time) 
 
 | Pieces worn | Bonus | Total so far |
 |---|---|---|
-| 2 | +6% Income, +20 Max HP | +20 Max HP, +6% Income |
-| 4 | +10% XP Gain, +10% Gold Find, +6 Armor | +6 Armor, +20 Max HP, +10% Gold Find, +6% Income, +10% XP Gain |
-| 6 | +12% Kill Rewards, +5 Damage, +3 Luck | +5 Damage, +6 Armor, +20 Max HP, +3 Luck, +10% Gold Find, +6% Income, +10% XP Gain, +12% Kill Rewards |
-| 9 | +15% Away Income, +10% Click Gold, +8% Income, +40 Max HP | +5 Damage, +6 Armor, +60 Max HP, +3 Luck, +10% Gold Find, +14% Income, +10% XP Gain, +12% Kill Rewards, +15% Away Income, +10% Click Gold |
-| 12 | +12% Income, +15% XP Gain, +25% Kill Rewards, +3h Away Time, +20% Gold Find, +10 Armor, +6% Super Crit | +5 Damage, +16 Armor, +60 Max HP, +6% Super Crit, +3 Luck, +30% Gold Find, +26% Income, +25% XP Gain, +37% Kill Rewards, +15% Away Income, +3h Away Time, +10% Click Gold |
+| 2 | +6% Income, +24 Max HP | +24 Max HP, +6% Income |
+| 4 | +10% XP Gain, +10% Gold Find, +7 Armor | +7 Armor, +24 Max HP, +10% Gold Find, +6% Income, +10% XP Gain |
+| 6 | +12% Kill Rewards, +6 Damage, +3 Luck | +6 Damage, +7 Armor, +24 Max HP, +3 Luck, +10% Gold Find, +6% Income, +10% XP Gain, +12% Kill Rewards |
+| 9 | +15% Away Income, +10% Click Gold, +8% Income, +48 Max HP | +6 Damage, +7 Armor, +72 Max HP, +3 Luck, +10% Gold Find, +14% Income, +10% XP Gain, +12% Kill Rewards, +15% Away Income, +10% Click Gold |
+| 12 | +12% Income, +15% XP Gain, +25% Kill Rewards, +3h Away Time, +20% Gold Find, +12 Armor, +6% Super Crit | +6 Damage, +19 Armor, +72 Max HP, +6% Super Crit, +3 Luck, +30% Gold Find, +26% Income, +25% XP Gain, +37% Kill Rewards, +15% Away Income, +3h Away Time, +10% Click Gold |
 
 Pieces: obsidian_aegis, obsidian_helm, obsidian_pauldrons, obsidian_cuirass, obsidian_gauntlets, obsidian_greaves, obsidian_sabatons, obsidian_pendant, obsidian_cloak, obsidian_ring, obsidian_charm, obsidian_belt
 

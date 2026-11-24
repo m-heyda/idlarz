@@ -182,12 +182,12 @@ test("MISMATCH 5 (design question): affixes grow with the ABSOLUTE item level, b
 const SET_TOTALS: Record<string, Partial<Record<StatKey, number>>> = {
 	obsidian: {
 		incomePct: 26,
-		maxHp: 60,
+		maxHp: 72,
 		xpPct: 25,
 		goldFind: 30,
-		armor: 16,
+		armor: 19,
 		killRewardPct: 37,
-		damage: 5,
+		damage: 6,
 		luck: 3,
 		offlineEff: 15,
 		clickPct: 10,

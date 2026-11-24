@@ -15,8 +15,8 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | G4 kit + mace | 50 | 0.8 | 40 | 93 | 221 | 9.1 | 7 |
 | G4 kit + bow | 36 | 1 | 36 | 93 | 221 | 14.3 | 7 |
 | G5 kit + mace | 73 | 0.8 | 58.4 | 124 | 284 | 13.1 | 7 |
-| G6 kit + mace | 93 | 0.8 | 74.4 | 189 | 436 | 13.7 | 13 |
-| G6 kit + bow | 66 | 1 | 66 | 189 | 436 | 38.7 | 18 |
+| G6 kit + mace | 94 | 0.8 | 75.2 | 192 | 448 | 13.7 | 13 |
+| G6 kit + bow | 67 | 1 | 67 | 192 | 448 | 38.7 | 18 |
 
 # No potions, no skills
 
@@ -39,16 +39,16 @@ The same fight with 25 spare attribute points spent as shown (bonuses count poin
 
 | Build + gear | Damage/hit | Swings/s | Armor | Boar level 9 | Great Auroch |
 |---|---|---|---|---|---|
-| no points spent, G6 kit + mace (physical) | 93 | 0.8 | 189 | 100% (6s) | 100% (16s) |
-| warrior: +25 Strength, G6 kit + mace (physical) | 139.5 | 0.8 | 195.3 | 100% (4s) | 100% (10s) |
-| mage: +25 Intelligence, G6 kit + mace (physical) | 93 | 0.8 | 189 | 100% (6s) | 100% (16s) |
-| tank: +15 Vitality, +10 Dexterity, G6 kit + mace (physical) | 93 | 0.82 | 201.5 | 100% (6s) | 100% (15s) |
-| balanced: +5 each, G6 kit + mace (physical) | 102.3 | 0.81 | 195.3 | 100% (6s) | 100% (14s) |
-| no points spent, G6 kit + staff (magic) | 60 | 0.9 | 189 | 100% (10s) | 100% (21s) |
-| warrior: +25 Strength, G6 kit + staff (magic) | 60 | 0.9 | 195.3 | 100% (9s) | 100% (21s) |
-| mage: +25 Intelligence, G6 kit + staff (magic) | 96 | 0.9 | 189 | 100% (6s) | 100% (14s) |
-| tank: +15 Vitality, +10 Dexterity, G6 kit + staff (magic) | 60 | 0.92 | 201.5 | 100% (9s) | 100% (20s) |
-| balanced: +5 each, G6 kit + staff (magic) | 67.2 | 0.91 | 195.3 | 100% (8s) | 100% (18s) |
+| no points spent, G6 kit + mace (physical) | 94 | 0.8 | 192 | 100% (6s) | 100% (16s) |
+| warrior: +25 Strength, G6 kit + mace (physical) | 141 | 0.8 | 198.3 | 100% (4s) | 100% (10s) |
+| mage: +25 Intelligence, G6 kit + mace (physical) | 94 | 0.8 | 192 | 100% (6s) | 100% (16s) |
+| tank: +15 Vitality, +10 Dexterity, G6 kit + mace (physical) | 94 | 0.82 | 204.5 | 100% (6s) | 100% (15s) |
+| balanced: +5 each, G6 kit + mace (physical) | 103.4 | 0.81 | 198.3 | 100% (6s) | 100% (14s) |
+| no points spent, G6 kit + staff (magic) | 61 | 0.9 | 192 | 100% (10s) | 100% (21s) |
+| warrior: +25 Strength, G6 kit + staff (magic) | 61 | 0.9 | 198.3 | 100% (9s) | 100% (21s) |
+| mage: +25 Intelligence, G6 kit + staff (magic) | 97.6 | 0.9 | 192 | 100% (6s) | 100% (14s) |
+| tank: +15 Vitality, +10 Dexterity, G6 kit + staff (magic) | 61 | 0.92 | 204.5 | 100% (9s) | 100% (20s) |
+| balanced: +5 each, G6 kit + staff (magic) | 68.3 | 0.91 | 198.3 | 100% (8s) | 100% (18s) |
 
 # Auto-use (level 30)
 
