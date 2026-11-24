@@ -276,7 +276,7 @@ export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: 
 export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): OpResult => {
 	switch (op.action) {
 		case 'equip': {
-			const result = Number.isInteger(op.index) ? equipFromBag(inv.bag, inv.equipment, op.index) : null;
+			const result = Number.isInteger(op.index) ? equipFromBag(inv.bag, inv.equipment, op.index, op.slot) : null;
 			if (!result) return refused(inv);
 			// a belt with bag slots grows the bag at once (and the slots stay when it comes off again)
 			const beltSlots = beltSlotsFor(inv, result.equipment);
@@ -374,7 +374,7 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 	const int = (v: unknown): v is number => typeof v === 'number' && Number.isInteger(v);
 	switch (raw.action) {
 		case 'equip':
-			return int(raw.index) ? { action: 'equip', index: raw.index } : null;
+			return int(raw.index) ? { action: 'equip', index: raw.index, ...(raw.slot === 'ring1' || raw.slot === 'ring2' ? { slot: raw.slot } : {}) } : null;
 		case 'unequip':
 			return typeof raw.slot === 'string' && EQUIPMENT_SLOTS.includes(raw.slot) ? { action: 'unequip', slot: raw.slot as EquipmentSlot } : null;
 		case 'move':

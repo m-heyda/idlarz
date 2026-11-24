@@ -489,7 +489,7 @@ export interface GameState {
 	applyServerPrestige: (prestige: PrestigeState) => void;
 	applyFightReply: (reply: FightReply) => void;
 	clearCombatNotice: () => void;
-	equipItem: (bagIndex: number) => boolean;
+	equipItem: (bagIndex: number, slot?: 'ring1' | 'ring2') => boolean;
 	unequipItem: (slot: EquipmentSlot) => boolean;
 	moveBagItem: (from: number, to: number) => boolean;
 	organizeBag: () => boolean;

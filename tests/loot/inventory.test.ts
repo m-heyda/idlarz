@@ -9,6 +9,7 @@ import {
 	compareToEquipped,
 	emptyBag,
 	equipFromBag,
+	otherRingSlot,
 	gearOf,
 	moveSlot,
 	removeFromBag,
@@ -22,6 +23,7 @@ import { ITEM_CATALOG, emptyStats, setCounts, sumStats } from '../../src/catalog
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { SETS } from '../../src/catalog';
 import { plainItem as p, resolveItem } from '../../src/lib/itemInstance';
+import { parseOp } from '../../src/lib/offline/inventory';
 import type { BagSlot, Equipment, ItemInstance } from '../../src/types/game';
 
 const deepFreeze = <T>(o: T): T => {
@@ -404,4 +406,26 @@ test('IDL-343: a ring is compared with the ring the player picks, and only that 
 	assert.notDeepEqual(one.deltas, two.deltas, 'replacing the stronger ring is a different result');
 	assert.equal(compareDetailed(candidate, worn, 'ring2')!.slot, 'ring2');
 	assert.equal(compareToEquipped(p('obsidian_blade'), STARTER_EQUIPMENT, 'ring2')!.slot, 'mainHand', 'the pick only matters for rings');
+});
+
+test('IDL-343: a ring can be equipped into the picked ring slot, the old ring goes back to the bag, and the op carries the pick', () => {
+	const a: ItemInstance = { ...p('obsidian_ring'), level: 5 };
+	const b: ItemInstance = { ...p('obsidian_ring'), level: 40 };
+	const incoming: ItemInstance = { ...p('obsidian_ring'), level: 20 };
+	const bag = addGear(emptyBag(), incoming).bag;
+	const worn: Equipment = { ring1: a, ring2: b };
+	assert.equal(otherRingSlot(worn), 'ring2', 'both worn: the default is ring1, the other is ring2');
+	assert.equal(otherRingSlot({ ring1: a }), 'ring1', 'ring2 free: the default is ring2, the other is the worn ring1');
+	const def = equipFromBag(bag, worn, 0)!;
+	assert.deepEqual(def.equipment.ring1, incoming);
+	assert.deepEqual(def.equipment.ring2, b);
+	const picked = equipFromBag(bag, worn, 0, 'ring2')!;
+	assert.deepEqual(picked.equipment.ring2, incoming);
+	assert.deepEqual(picked.equipment.ring1, a, 'the other ring is untouched');
+	assert.deepEqual(picked.bag[0], { item: b }, 'the replaced ring goes back into the freed bag slot');
+	assert.deepEqual(equipFromBag(emptyBag(), worn, 0, 'ring2'), null);
+	// the server reads the same pick, and an older client simply leaves it out
+	assert.deepEqual(parseOp({ action: 'equip', index: 3, slot: 'ring2' }), { action: 'equip', index: 3, slot: 'ring2' });
+	assert.deepEqual(parseOp({ action: 'equip', index: 3 }), { action: 'equip', index: 3 });
+	assert.deepEqual(parseOp({ action: 'equip', index: 3, slot: 'head' }), { action: 'equip', index: 3 }, 'a pick that is not a ring slot is ignored');
 });

@@ -172,7 +172,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					]
 				: [];
 
-	if (ringHint) hintText.push({ key: 'Ctrl', text: 'compare with your other ring' });
+	if (ringHint) hintText.push({ key: 'Ctrl', text: 'compare with other slot' });
 	const showHints = buyPrice === undefined && !wornLabel;
 
 	return (

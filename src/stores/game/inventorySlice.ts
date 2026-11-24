@@ -40,12 +40,12 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 		},
 
 		// Gear actions: refused while a fight is open; max HP can drop when gear comes off, so playerHp follows it down
-		equipItem: (bagIndex: number) => {
+		equipItem: (bagIndex: number, slot?: 'ring1' | 'ring2') => {
 			const state = get();
 			if (state.combat.fight) return false;
-			const result = equipFromBag(state.bag, state.equipment, bagIndex);
+			const result = equipFromBag(state.bag, state.equipment, bagIndex, slot);
 			if (!result) return false;
-			sendInventoryOp({ action: 'equip', index: bagIndex });
+			sendInventoryOp({ action: 'equip', index: bagIndex, ...(slot ? { slot } : {}) });
 			set({
 				bag: result.bag,
 				equipment: result.equipment,

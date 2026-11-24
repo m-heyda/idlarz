@@ -226,12 +226,15 @@ const targetSlot = (def: ItemDef, equipment: Equipment, prefer?: EquipmentSlot):
 	return def.slot;
 };
 
-/** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. */
-export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number): { bag: BagSlot[]; equipment: Equipment } | null => {
+/** The ring slot a ring does NOT take by default (the first free one, else the first): the one Ctrl compares with and equips into (IDL-343). */
+export const otherRingSlot = (equipment: Equipment): 'ring1' | 'ring2' => (!equipment.ring1 ? 'ring2' : !equipment.ring2 ? 'ring1' : 'ring2');
+
+/** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. `prefer` (a ring slot) puts a ring into that one instead of the default. */
+export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number, prefer?: EquipmentSlot): { bag: BagSlot[]; equipment: Equipment } | null => {
 	if (!validIndex(bag, index)) return null;
 	const item = gearOf(bag[index]);
 	const def = item ? ITEM_CATALOG[item.base] : undefined;
-	const target = def ? targetSlot(def, equipment) : null;
+	const target = def ? targetSlot(def, equipment, prefer) : null;
 	if (!item || !def || !target) return null;
 
 	const displaced = equipment[target];
