@@ -70,9 +70,9 @@ test('the flag ships on (owner decision: live on merge)', () => {
 	assert.equal(BUILDINGS_FLAG.enabled, true);
 });
 
-test('the catalog: a Producer and an Extractor for each of the seven home biomes, with real art', () => {
-	const homes = ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra'];
-	assert.equal(BUILDINGS.length, 14 + 12, 'seven Producers, seven Extractors and the twelve Idols');
+test('the catalog: a Producer and an Extractor for each of the twelve biomes, with real art', () => {
+	const homes = ['battlefield', 'blight', 'coast', 'fields', 'forest', 'hills', 'jungle', 'lake', 'orchard', 'plains', 'swamp', 'tundra'];
+	assert.equal(BUILDINGS.length, 24 + 12, 'twelve Producers, twelve Extractors and the twelve Idols');
 	assert.equal(new Set(BUILDINGS.map((b) => b.id)).size, BUILDINGS.length);
 	for (const kind of ['producer', 'extractor'] as const)
 		assert.deepEqual(
@@ -95,12 +95,12 @@ test('the catalog: a Producer and an Extractor for each of the seven home biomes
 		assert.ok(existsSync(join(process.cwd(), 'public', file)), `${b.id}: ${file}`);
 		assert.equal(buildingDef(b.id), b);
 	}
-	// the seven extracts are the seven T3 materials of the home biomes, each made by one Extractor
+	// the twelve extracts are the T3 materials of the twelve biomes, each made by one Extractor
 	assert.deepEqual(
 		BUILDINGS.filter((b) => b.kind === 'extractor')
 			.map((b) => b.produces[0])
 			.sort(),
-		['frostshard', 'herbs', 'ironOre', 'pearls', 'salt', 'sap', 'spores'],
+		['corruptedCore', 'dye', 'frostshard', 'herbs', 'ironOre', 'pearls', 'royalJelly', 'salt', 'sap', 'scrapSteel', 'spores', 'venom'],
 	);
 	assert.equal(buildingsOfBiome('forest').length, 3, 'Producer, Extractor and Idol');
 	assert.equal(buildingsOfBiome('castle').length, 0);

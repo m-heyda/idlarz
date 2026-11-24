@@ -387,7 +387,7 @@ export type EnchantMode = 'reroll' | 'add';
  *
  * - `reroll`: the affix at `affix` is replaced by another affix (a group the piece does not already carry, a fresh roll); `add`: one more affix, up to the most the rarity carries.
  * - Refused, with nothing taken, for a slot that holds no gear or a named legendary (`bad_item`), an affix index outside the piece (`bad_affix`), a piece that already has every affix its rarity allows or no affix left that fits (`affix_cap`),
- *   too little Ichor (`needs_ichor`: nothing gives Ichor out yet, the button says so), a missing roll environment or a request within a second of the last (`too_fast`).
+ *   too little Ichor (`needs_ichor`: distil it from Corrupted Core first), a missing roll environment or a request within a second of the last (`too_fast`).
  * - The roll is sealed on its own lifetime counter (`craft.ordEnchant`, kind `'enchant'`), leaned up by Intelligence like a gear craft; the same request replayed (a lost answer) is the same result because the idempotency key replays the stored answer.
  *
  * @category Economy/Crafting

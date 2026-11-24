@@ -28,7 +28,25 @@ const comp = (id: string, name: string, group: ComponentGroup, description: stri
 const ing = (id: string, qty: number): RecipeInput => ({ component: `ing_${id}`, qty });
 const part = (id: string, qty: number): RecipeInput => ({ component: id, qty });
 const res = (
-	resource: 'stone' | 'coal' | 'food' | 'wool' | 'wood' | 'hide' | 'herbs' | 'sap' | 'ironOre' | 'spores' | 'frostshard' | 'pearls' | 'salt',
+	resource:
+		| 'stone'
+		| 'coal'
+		| 'food'
+		| 'wool'
+		| 'wood'
+		| 'hide'
+		| 'herbs'
+		| 'sap'
+		| 'ironOre'
+		| 'spores'
+		| 'frostshard'
+		| 'pearls'
+		| 'salt'
+		| 'venom'
+		| 'dye'
+		| 'royalJelly'
+		| 'corruptedCore'
+		| 'scrapSteel',
 	qty: number,
 ): RecipeInput => ({ resource, qty });
 
@@ -134,6 +152,9 @@ const PART_RECIPES = [
 	recipe('herb_extract', 'Herb Extract', [ing('dried_herbs', 3), part('glass_vial', 1), res('herbs', 60), res('coal', 10)], 'herb_extract', 4, 6, 18),
 	recipe('fungal_extract', 'Fungal Extract', [ing('orange_mushrooms', 3), part('glass_vial', 1), res('spores', 60)], 'fungal_extract', 8, 8, 20),
 	recipe('vital_extract', 'Vital Extract', [ing('blood', 2), part('glass_vial', 1), res('herbs', 30), res('food', 20)], 'vital_extract', 6, 7, 18),
+	// the two reagents of the late crafts come from the Blight and Battlefield Extractors (IDL-120): their extracts are distilled and forged into them
+	recipe('ichor', 'Distilled Ichor', [part('glass_vial', 1), res('corruptedCore', 1000)], 'ing_ichor', 60, 40, 60),
+	recipe('war_medals', 'Forged War Medal', [part('gold_ingot', 1), res('scrapSteel', 1500)], 'ing_war_medals', 70, 50, 90),
 ];
 
 /** The refined components (ingots, cut gems, tools, extracts), merged into `COMPONENTS` */

@@ -308,3 +308,8 @@ Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_s
 | `pearls` | Pearls | 5 | The Pearl Diver on a lake tile. Sells to the merchant (he does not sell it back). |
 | `salt` | Salt | 5 | The Salt Works on a coast tile. Sells to the merchant (he does not sell it back). |
 | `wool` | Wool | 2 | Sheep on the farm. Cannot be bought. |
+| `venom` | Venom | 5 | The Venom Press on a jungle tile. Sells to the merchant (he does not sell it back). |
+| `dye` | Dye | 5 | The Dye Works on a fields tile. Sells to the merchant (he does not sell it back). |
+| `royalJelly` | Royal Jelly | 5 | The Royal Apiary on a orchard tile. Sells to the merchant (he does not sell it back). |
+| `corruptedCore` | Corrupted Core | 5 | The Core Siphon on a blight tile. Sells to the merchant (he does not sell it back). |
+| `scrapSteel` | Scrap Steel | 5 | The Scrap Forge on a battlefield tile. Sells to the merchant (he does not sell it back). |

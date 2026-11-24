@@ -151,8 +151,8 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 };
 
 /**
- * The enchant craft (IDL-120), under the gear recipes: pick a piece of gear in the bag, then reroll one of its affixes or add one (up to what its rarity carries) for Ichor from the Crafting bag. Nothing gives Ichor out yet, so the button says
- * "Needs Ichor from the Blight" and stays off; the server judges everything again (`applyEnchant`).
+ * The enchant craft (IDL-120), under the gear recipes: pick a piece of gear in the bag, then reroll one of its affixes or add one (up to what its rarity carries) for Ichor from the Crafting bag (distilled at the workbench from the Corrupted Core of a Blight Core Siphon). Without Ichor the button says
+ * "Needs Ichor: distil it from Corrupted Core" and stays off; the server judges everything again (`applyEnchant`).
  */
 const EnchantPanel: React.FC = () => {
 	const bag = useGameStore((state) => state.bag);
@@ -170,7 +170,7 @@ const EnchantPanel: React.FC = () => {
 	const chosen = pieces.find((p) => p.index === slot) ?? null;
 	const rarity = chosen?.resolved.rarity;
 	const canAdd = !!chosen && !!rarity && chosen.resolved.instance.affixes.length < rarity.maxAffixes;
-	const note = ichor < ENCHANT.ichor.reroll ? 'Needs Ichor from the Blight' : null;
+	const note = ichor < ENCHANT.ichor.reroll ? 'Needs Ichor: distil it from Corrupted Core' : null;
 	const run = (mode: 'reroll' | 'add') => chosen && void enchant(chosen.index, mode, affix).then(showToast);
 	return (
 		<div data-slot='enchant'>

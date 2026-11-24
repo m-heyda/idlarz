@@ -539,7 +539,7 @@ export const LEGENDARY_UNLOCK = 80;
  * TODO (owner, 2026-11-19): the legendaries get special abilities later; for now each is only a strong weapon (Dawnsplitter's numbers are in `SIGNATURE_STATS`, `catalog/items/ladder.ts`).
  *
  * The legendary recipes (IDL-120): Dawnsplitter (axe), Stormstring (bow) and the Starlight Wand (mage), the strongest weapons in the catalog (grade G9, craft-only items). They are real recipes now, from crafting level 80, but each takes **50 War Medals**
- * from the crafting stash, a Battlefield reagent that nothing gives out yet, so none can be started until the medals have a source. One copy at a time: the server refuses the craft (nothing charged) when the bag, the gear or the queue already holds
+ * from the crafting stash, a Battlefield reagent forged at the workbench from the Scrap Steel of a Scrap Forge (Battlefield Extractor), so none can be started before the Battlefield is reached. One copy at a time: the server refuses the craft (nothing charged) when the bag, the gear or the queue already holds
  * that weapon, and when the bag has no free slot (checked at queue time, before the components are taken: a finished legendary is never turned into gold). One craft per request. A craft takes 8 hours, the most a batch runs without a claim at the start (`craftOfflineHours`), so it finishes on a plain account.
  * */
 export const LEGENDARY_RECIPES: Recipe[] = [

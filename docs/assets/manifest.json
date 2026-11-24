@@ -10319,12 +10319,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:rotworks"
+		],
 		"name": "building_village_abandoned_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Abandoned House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10345,12 +10347,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:coresiphon"
+		],
 		"name": "building_village_abandoned_tower",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Abandoned Tower.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10384,12 +10388,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:apiary"
+		],
 		"name": "building_village_beekeepers_hut",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Beekeepers Hut.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10398,7 +10404,7 @@
 	},
 	{
 		"usedBy": [
-			"building:coalpit"
+			"building:scrapforge"
 		],
 		"name": "building_village_blacksmith_house",
 		"category": "buildings",
@@ -10518,12 +10524,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:farmstead"
+		],
 		"name": "building_village_farmers_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Farmers House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10546,12 +10554,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:blossomyard"
+		],
 		"name": "building_village_florists_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Florists House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10598,12 +10608,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:warcamp"
+		],
 		"name": "building_village_guard_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Guard House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10820,12 +10832,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:dyeworks"
+		],
 		"name": "building_village_painters_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Painters House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10833,12 +10847,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"building:venompress"
+		],
 		"name": "building_village_perfumers_house",
 		"category": "buildings",
 		"subcategory": "village pack 80px (named)",
 		"src": "/pixel/assets_to_assess_and_use/more_buildings/Perfumers House.png",
-		"status": "unused",
+		"status": "used",
 		"source": "assets_to_assess_and_use/more_buildings",
 		"size": [
 			80,
@@ -10912,7 +10928,7 @@
 	},
 	{
 		"usedBy": [
-			"building:peatworks"
+			"building:junglecamp"
 		],
 		"name": "building_village_small_wooden_cottage",
 		"category": "buildings",
@@ -11984,6 +12000,21 @@
 		]
 	},
 	{
+		"usedBy": [
+			"resource:corruptedCore"
+		],
+		"name": "res_corrupted_core",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_corrupted_core.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
 		"usedBy": [],
 		"name": "res_crystal",
 		"category": "resources",
@@ -12008,6 +12039,21 @@
 		"source": "public/pixel/icons",
 		"size": [
 			240,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:dye"
+		],
+		"name": "res_dye",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_dye.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
 			40
 		]
 	},
@@ -12142,6 +12188,21 @@
 	},
 	{
 		"usedBy": [
+			"resource:royalJelly"
+		],
+		"name": "res_royal_jelly",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_royal_jelly.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"resource:salt"
 		],
 		"name": "res_salt",
@@ -12200,12 +12261,42 @@
 	},
 	{
 		"usedBy": [
+			"resource:scrapSteel"
+		],
+		"name": "res_scrap_steel",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_scrap_steel.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
 			"resource:spores"
 		],
 		"name": "res_spores",
 		"category": "resources",
 		"subcategory": "res",
 		"src": "/pixel/icons/res_spores.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			40,
+			40
+		]
+	},
+	{
+		"usedBy": [
+			"resource:venom"
+		],
+		"name": "res_venom",
+		"category": "resources",
+		"subcategory": "res",
+		"src": "/pixel/icons/res_venom.png",
 		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
@@ -12750,6 +12841,36 @@
 	},
 	{
 		"usedBy": [
+			"corruptedCore"
+		],
+		"name": "resource_corrupted_core",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/corrupted-core.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"dye"
+		],
+		"name": "resource_dye",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/dye.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
 			"frostshard"
 		],
 		"name": "resource_frostshard",
@@ -12810,6 +12931,21 @@
 	},
 	{
 		"usedBy": [
+			"royalJelly"
+		],
+		"name": "resource_royal_jelly",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/royal-jelly.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
 			"salt"
 		],
 		"name": "resource_salt",
@@ -12840,6 +12976,21 @@
 	},
 	{
 		"usedBy": [
+			"scrapSteel"
+		],
+		"name": "resource_scrap_steel",
+		"category": "resources",
+		"subcategory": "t3",
+		"src": "/pixel/resources/scrap-steel.png",
+		"status": "used",
+		"source": "resource roster",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
 			"spores"
 		],
 		"name": "resource_spores",
@@ -12855,43 +13006,13 @@
 	},
 	{
 		"usedBy": [
-			"scrapSteel"
+			"venom"
 		],
-		"name": "resource_scrap_steel",
+		"name": "resource_venom",
 		"category": "resources",
-		"subcategory": "t3 battlefield",
-		"src": "/pixel/resources/scrap-steel.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"corruptedCore"
-		],
-		"name": "resource_corrupted_core",
-		"category": "resources",
-		"subcategory": "t3 blight",
-		"src": "/pixel/resources/corrupted-core.png",
-		"status": "planned",
-		"source": "resource roster",
-		"size": [
-			32,
-			32
-		]
-	},
-	{
-		"usedBy": [
-			"dye"
-		],
-		"name": "resource_dye",
-		"category": "resources",
-		"subcategory": "t3 fields",
-		"src": "/pixel/resources/dye.png",
-		"status": "planned",
+		"subcategory": "t3",
+		"src": "/pixel/resources/venom.png",
+		"status": "used",
 		"source": "resource roster",
 		"size": [
 			32,

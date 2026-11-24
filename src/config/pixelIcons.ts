@@ -132,6 +132,11 @@ const BASE_ICON_SIZES = {
 	res_frostshard: [40, 40],
 	res_pearls: [40, 40],
 	res_salt: [40, 40],
+	res_venom: [40, 40],
+	res_dye: [40, 40],
+	res_royal_jelly: [40, 40],
+	res_corrupted_core: [40, 40],
+	res_scrap_steel: [40, 40],
 	res_fish: [40, 40],
 	res_mana: [40, 40],
 	res_crystal: [40, 40],
@@ -248,6 +253,11 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	frostshard: 'res_frostshard',
 	pearls: 'res_pearls',
 	salt: 'res_salt',
+	venom: 'res_venom',
+	dye: 'res_dye',
+	royalJelly: 'res_royal_jelly',
+	corruptedCore: 'res_corrupted_core',
+	scrapSteel: 'res_scrap_steel',
 };
 
 // Sprites that twinkle: name -> its 6-frame strip (see the .px-shine class)

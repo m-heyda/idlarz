@@ -37,7 +37,7 @@ export const CRAFTING = {
 
 /**
  * The enchant craft (IDL-120): at the workbench a piece of gear in the bag gets one affix **rerolled** (a new affix of another group, a fresh roll) or **added** (up to the most its rarity carries). It takes Ichor from the crafting stash
- * (a Blight reagent that nothing gives out yet, so the button is locked: "Needs Ichor from the Blight"). Intelligence leans the new roll up like a gear craft does, and the roll is sealed on its own counter (`craft.ordEnchant`), so it never shifts the pieces
+ * (distilled at the workbench from the Corrupted Core of the Blight's Core Siphon; without it the button says "Needs Ichor: distil it from Corrupted Core"). Intelligence leans the new roll up like a gear craft does, and the roll is sealed on its own counter (`craft.ordEnchant`), so it never shifts the pieces
  * the gear crafts roll. Named legendaries cannot be enchanted.
  *
  * @category Economy/Crafting

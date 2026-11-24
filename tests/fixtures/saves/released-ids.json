@@ -17,7 +17,12 @@
 		"frostshard",
 		"pearls",
 		"salt",
-		"wool"
+		"wool",
+		"venom",
+		"dye",
+		"royalJelly",
+		"corruptedCore",
+		"scrapSteel"
 	],
 	"biomeCodes": {
 		"castle": "K",
@@ -845,7 +850,9 @@
 		"gear_g8_belt",
 		"legendary_dawnsplitter",
 		"legendary_stormstring",
-		"legendary_starlight_wand"
+		"legendary_starlight_wand",
+		"ichor",
+		"war_medals"
 	],
 	"componentIds": [
 		"glass_vial",
@@ -945,7 +952,17 @@
 		"idol_fields",
 		"idol_orchard",
 		"idol_blight",
-		"idol_battlefield"
+		"idol_battlefield",
+		"junglecamp",
+		"venompress",
+		"farmstead",
+		"dyeworks",
+		"blossomyard",
+		"apiary",
+		"rotworks",
+		"coresiphon",
+		"warcamp",
+		"scrapforge"
 	],
 	"avatarIds": [
 		"knight",

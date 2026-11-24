@@ -62,7 +62,11 @@ export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
 			{ id: 'gems', label: 'Cut gems', has: groupIs('gem') },
 			{ id: 'tools', label: 'Polishing tools', has: groupIs('tool') },
 			{ id: 'extracts', label: 'Extracts', has: groupIs('extract') },
-			{ id: 'materials', label: 'Materials', has: groupIs('material', 'part') },
+			{
+				id: 'materials',
+				label: 'Materials',
+				has: (recipe) => groupIs('material', 'part')(recipe) || ('component' in recipe.output && recipe.output.component.startsWith('ing_')),
+			}, // an ingredient made at the workbench (Ichor, War Medals) sits here too
 		],
 	},
 	{

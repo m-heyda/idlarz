@@ -27,7 +27,7 @@ const REFUSAL: Record<CraftRefusal, string> = {
 	bad_item: 'That piece cannot be enchanted.',
 	bad_affix: 'That affix cannot be changed.',
 	affix_cap: 'That piece already has all the affixes its rarity allows.',
-	needs_ichor: 'Needs Ichor from the Blight.',
+	needs_ichor: 'Needs Ichor: distil it from Corrupted Core.',
 	already_have: 'You already have that legendary (in the bag, worn or being made).',
 };
 
