@@ -13528,8 +13528,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			32,
-			35
+			22,
+			24
 		]
 	},
 	{
@@ -13543,8 +13543,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			30,
-			39
+			21,
+			26
 		]
 	},
 	{
@@ -13558,8 +13558,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			30,
-			34
+			21,
+			24
 		]
 	},
 	{
@@ -13573,8 +13573,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			41,
-			41
+			28,
+			28
 		]
 	},
 	{
@@ -13590,21 +13590,6 @@
 		"size": [
 			10,
 			10
-		]
-	},
-	{
-		"usedBy": [
-			"farm window"
-		],
-		"name": "farm_cobble_path",
-		"category": "map-details",
-		"subcategory": "farm part",
-		"src": "/pixel/farm/cobble_path.png",
-		"status": "used",
-		"source": "public/pixel/farm",
-		"size": [
-			40,
-			39
 		]
 	},
 	{
@@ -13783,8 +13768,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			35,
-			38
+			24,
+			26
 		]
 	},
 	{
@@ -13798,8 +13783,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			37,
-			37
+			25,
+			25
 		]
 	},
 	{
@@ -13813,8 +13798,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			47,
-			41
+			34,
+			29
 		]
 	},
 	{
@@ -13828,8 +13813,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			39,
-			35
+			27,
+			25
 		]
 	},
 	{
@@ -13843,8 +13828,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			41,
-			40
+			28,
+			27
 		]
 	},
 	{
@@ -13903,8 +13888,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			64,
-			62
+			48,
+			46
 		]
 	},
 	{
@@ -13918,8 +13903,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			85,
-			82
+			71,
+			69
 		]
 	},
 	{
@@ -13933,8 +13918,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			31,
-			28
+			22,
+			20
 		]
 	},
 	{
@@ -13948,8 +13933,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			32,
-			44
+			22,
+			30
 		]
 	},
 	{
@@ -13963,8 +13948,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			45,
-			54
+			32,
+			38
 		]
 	},
 	{
@@ -13978,8 +13963,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			50,
-			41
+			33,
+			28
 		]
 	},
 	{
@@ -13993,8 +13978,8 @@
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			32,
-			29
+			22,
+			20
 		]
 	},
 	{

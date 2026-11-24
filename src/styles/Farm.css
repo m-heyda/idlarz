@@ -96,10 +96,10 @@
 
 .farm-shadow {
 	position: absolute;
-	left: calc(12px * var(--z, 2));
-	top: calc(40px * var(--z, 2));
-	width: calc(24px * var(--z, 2));
-	height: calc(6px * var(--z, 2));
+	left: calc((24px - 12px * var(--s, 1)) * var(--z, 2));
+	top: calc((46px - 6px * var(--s, 1)) * var(--z, 2));
+	width: calc(24px * var(--s, 1) * var(--z, 2));
+	height: calc(6px * var(--s, 1) * var(--z, 2));
 	border-radius: 50%;
 	background: rgba(0, 0, 0, 0.32);
 	pointer-events: none;

@@ -29,7 +29,7 @@ export const TUBS: [number, number][] = [
 export const WELLS: [number, number][] = [[-9, 9]];
 export const HAY: [number, number][] = [
 	[-6, 7],
-	[10, 2],
+	[11.5, 1.2],
 	[2, -6],
 	[-11, -1],
 	[14.5, 13],
@@ -64,12 +64,12 @@ const box = (x: number, y: number, hx: number, hy: number): [number, number, num
 // Rectangles animals keep out of (x0, x1, y0, y1): every prop plus about a body's width round it, so an animal never stands in
 // or on a building, a trough, a hay stack and so on (its feet stay a whole sprite away from the prop's footprint)
 const BLOCKED: [number, number, number, number][] = [
-	box(BARN.x, BARN.y, 3.7, 3.2),
+	box(BARN.x, BARN.y, 3.4, 2.9),
 	box(COOP.x, COOP.y, 2.2, 2.0),
 	box(STALL.x, STALL.y, 2.6, 2.2),
 	box(POND.x, POND.y, 3.3, 3.0),
-	...TUBS.map(([x, y]) => box(x, y, 1.95, 1.95)),
-	...WELLS.map(([x, y]) => box(x, y, 1.9, 1.9)),
+	...TUBS.map(([x, y]) => box(x, y, 1.7, 1.7)),
+	...WELLS.map(([x, y]) => box(x, y, 1.6, 1.6)),
 	...HAY.map(([x, y]) => box(x, y, 2.3, 2.3)),
 	...BARRELS.map(([x, y]) => box(x, y, 1.35, 1.35)),
 	...CRATES.map(([x, y]) => box(x, y, 1.6, 1.6)),
@@ -158,8 +158,22 @@ export const ANIMAL_MOTION: Record<string, { speed: number }> = {
  */
 export const ANCHOR = { x: 24, y: 42 };
 
-/** How big an animal is drawn inside its 48 x 48 box (the art used to fill it: too big against the pen) */
-export const ANIMAL_SIZE = 0.75;
+/**
+ * How big each animal is drawn inside its 48 x 48 box, so the herd is in true proportion: a cow's body is about 29 native px wide, a pig's 23, a sheep's 21,
+ * a chicken's 13 (the art is 96 px with a different margin per animal, so the factors differ more than the sizes do).
+ */
+export const ANIMAL_SIZES: Record<string, number> = {
+	animal_cow_1: 0.66,
+	animal_cow_2: 0.66,
+	animal_pig: 0.52,
+	animal_sheep: 0.5,
+	animal_chicken_1: 0.4,
+	animal_chicken_2: 0.36,
+	animal_rooster: 0.38,
+	animal_duck: 0.32,
+};
+const DEFAULT_ANIMAL_SIZE = 0.5;
+export const animalSize = (icon: string): number => ANIMAL_SIZES[icon] ?? DEFAULT_ANIMAL_SIZE;
 
-/** How an animal icon sits in the 48 x 48 box: its scale (96 px art: 36 px) and its offset (native px): centred sideways, standing on the bottom edge so the feet stay where they were */
-export const spriteFit = (iconWidth: number) => ({ scale: (48 * ANIMAL_SIZE) / iconWidth, dx: (48 - 48 * ANIMAL_SIZE) / 2, dy: 48 - 48 * ANIMAL_SIZE });
+/** How an animal icon sits in the 48 x 48 box: its scale and its offset (native px): centred sideways, standing on the bottom edge so the feet stay about where they were */
+export const spriteFit = (iconWidth: number, size: number) => ({ scale: (48 * size) / iconWidth, dx: (48 - 48 * size) / 2, dy: 48 - 48 * size });

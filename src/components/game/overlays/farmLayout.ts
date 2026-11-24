@@ -1,6 +1,6 @@
 // Lays out the farm's loose parts (public/pixel/farm/*.png: the fence, gate, coop, pine, pond and dirt from scripts/pixel/farm_parts.py, everything else the
 // farm_rework Sprite Fusion set baked down to the pen's pixel grid) as a list of props on the ground plane: the fence round the pen with its gate, the barn,
-// coop, well, produce stall, water tubs, hay, barrels and log piles, the cobble path from the gate to the barn door, and an endless apron of trees, grass
+// coop, well, produce stall, water tubs, hay, barrels and log piles, the dirt road from the gate to the barn door, and an endless apron of trees, grass
 // tufts, rocks and flowers outside the fence. Pure: the same call gives the same props, and the apron is built from cells that do not depend on how far the window reaches, so a
 // bigger window only adds props at its edge. FarmProps.tsx draws them.
 import parts from '../../../../public/pixel/farm/index.json';
@@ -16,7 +16,7 @@ export interface FarmProp {
 	x: number;
 	y: number;
 	ground?: boolean;
-	/** drawn mirrored left to right (the other iso axis for the cobble path, a second look for hay) */
+	/** drawn mirrored left to right (a second look for hay, rocks and tufts) */
 	flip?: boolean;
 }
 
@@ -57,20 +57,25 @@ export const penProps = (): FarmProp[] => {
 		{ key: 'sheaf-0', part: 'wheat_sheaf', x: BARN.x - 4.4, y: BARN.y - 4.4 },
 		{ key: 'sheaf-1', part: 'wheat_sheaf', x: BARN.x - 5.4, y: BARN.y - 3.6, flip: true },
 	];
-	// the cobble path from the gate to the barn door: down from the gate, across, then up to the door (one tile is about 4.3 world units long, laid with a slight overlap)
+	// the dirt road from the gate to the barn door: down from the gate, across, then up to the door, a chain of overlapping worn patches
 	const gx = (GATE[0] + GATE[1]) / 2;
 	const PATH_Y = -8;
-	const cobble = (key: string, from: [number, number], to: [number, number], flip: boolean) => {
-		const len = Math.hypot(to[0] - from[0], to[1] - from[1]);
-		const n = Math.max(1, Math.ceil(len / 3.7));
-		for (let i = 0; i < n; i++) {
-			const t = (i + 0.5) / n;
-			props.push({ key: `${key}-${i}`, part: 'cobble_path', x: from[0] + (to[0] - from[0]) * t, y: from[1] + (to[1] - from[1]) * t, ground: true, flip });
+	const road = (key: string, from: [number, number], to: [number, number]) => {
+		const n = Math.ceil(Math.hypot(to[0] - from[0], to[1] - from[1]) / 1.6);
+		for (let i = 0; i <= n; i++) {
+			const t = i / n;
+			props.push({
+				key: `${key}-${i}`,
+				part: i % 2 ? 'dirt_0' : 'dirt_1',
+				x: from[0] + (to[0] - from[0]) * t,
+				y: from[1] + (to[1] - from[1]) * t,
+				ground: true,
+			});
 		}
 	};
-	cobble('path-a', [gx, -HY + 0.6], [gx, PATH_Y], true);
-	cobble('path-b', [gx, PATH_Y], [BARN.x, PATH_Y], false);
-	cobble('path-c', [BARN.x, PATH_Y], [BARN.x, BARN.y - 4.2], true);
+	road('road-a', [gx, -HY + 0.6], [gx, PATH_Y]);
+	road('road-b', [gx, PATH_Y], [BARN.x, PATH_Y]);
+	road('road-c', [BARN.x, PATH_Y], [BARN.x, BARN.y - 3.4]);
 	TUBS.forEach(([x, y], i) => props.push({ key: `tub-${i}`, part: 'water_tub', x, y }));
 	WELLS.forEach(([x, y], i) => props.push({ key: `well-${i}`, part: 'stone_well', x, y }));
 	const HAY_PARTS: FarmPart[] = ['hay_roll_iso', 'hay_stack_block', 'hay_roll_front'];
@@ -85,6 +90,7 @@ export const penProps = (): FarmProp[] => {
 		[COOP.x, COOP.y, 2.2],
 		[POND.x, POND.y, 3],
 		[STALL.x, STALL.y, 2.6],
+		...props.filter((p) => p.key.startsWith('road-')).map((p): [number, number, number] => [p.x, p.y, 1.4]),
 		...[...TUBS, ...WELLS, ...HAY, ...BARRELS, ...CRATES].map(([x, y]): [number, number, number] => [x, y, 1.6]),
 	];
 	const free = (x: number, y: number, pad = 0) => taken.every(([tx, ty, r]) => Math.hypot(x - tx, y - ty) > r + pad);
