@@ -24,7 +24,11 @@ import {
 	extractorOutput,
 	buildingOutput,
 	relocationCost,
+	buildProblem,
+	copiesAllowed,
 } from '../../src/lib/buildings';
+import { limitOf } from '../../src/lib/limits';
+import { gemCraftOf } from '../../src/config/gemShop';
 import { buildingMenuItems } from '../../src/lib/buildingMenu';
 import { calculateResourceRates } from '../../src/utils/game/income';
 import { decodeSave, encodeSave, packBody, unpackBody } from '../../src/lib/saveFormat';
@@ -408,7 +412,7 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.equal(back.state.buildingUpgrades?.[0]?.toLevel, 2);
 		assert.equal(Math.round(back.state.buildingUpgrades![0].remainingSec), 540);
 
-		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a second of its type, a level the castle does not allow
+		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a fifth of its type, a level the castle does not allow
 		const loads = (tiles: typeof wrongBiome) => {
 			const r = decodeSave(encodeSave({ ...pickPersisted(api()), tiles }));
 			assert.ok(r.ok, r.ok ? '' : r.reason);
@@ -418,7 +422,11 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.equal(tileAt(loads(wrongBiome)!.tiles, b.x, b.y).building, undefined);
 		const twice = patchTile(api().tiles, b.x, b.y, { building: 'lumberyard' });
 		const twiceState = loads(twice)!;
-		assert.equal(builtBuildings(twiceState.tiles).length, 1, 'only one of a type survives');
+		assert.equal(
+			builtBuildings(twiceState.tiles).length,
+			2,
+			'two of a type survive (a save may hold up to HARD_LIMITS.buildingCopies; the build rule enforces what the account owns)',
+		);
 		const tooHigh = patchTile(api().tiles, a.x, a.y, { buildingLevel: 5 });
 		const high = loads(tooHigh)!;
 		assert.equal(tileAt(high.tiles, a.x, a.y).building, undefined, 'castle level 3 does not allow level 5');
@@ -625,5 +633,34 @@ test('Extra Builder (Ember shop): one level adds one builder (5 with all three G
 		// without the Ember level the same two timers are refused
 		const none = { ...two, derived: { ...two.derived, builders: 1 } };
 		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, none, T0 + 5000, undefined, {}, 0).includes('timer_jump'), true);
+	});
+});
+
+test('building copies: 1 of each Producer and Extractor at the start, 2 / 3 with the Ember Building Slots, 4 with the Gem shop slot too; an Idol stays one', () => {
+	withBuildings(() => {
+		const copies = (ctx: Parameters<typeof limitOf>[1]) => limitOf('buildingCopies', ctx);
+		assert.equal(copies({}), 1);
+		const prestige = (level: number) => ({ ...api().prestige, upgrades: { buildslots: level } });
+		assert.equal(copies({ prestige: prestige(1) }), 2);
+		assert.equal(copies({ prestige: prestige(2) }), 3);
+		assert.equal(copies({ prestige: prestige(2), gemCraft: gemCraftOf({ building_slot: 1 }) }), 4);
+		assert.equal(copies({ prestige: prestige(9), gemCraft: gemCraftOf({ building_slot: 1 }) }), 4, 'never past the hard limit');
+		assert.equal(copiesAllowed(buildingDef('lumberyard'), 4), 4);
+		assert.equal(copiesAllowed(buildingDef('idol_forest'), 4), 1);
+
+		const tiles = gameWith('forest', 3, 5);
+		const [a, b, c] = tiles;
+		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
+		const base = {
+			tiles: api().tiles,
+			monsters: api().monsters,
+			castleLevel: 3,
+			castleUpgrade: null,
+			buildingUpgrades: [],
+			ownedTiles: 20,
+		};
+		assert.match(buildProblem({ ...base, buildingCopies: 1 }, b.x, b.y, 'lumberyard') ?? '', /already built/);
+		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, b.x, b.y, 'lumberyard'), null, 'a second copy with a Building Slot');
+		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, c.x, c.y, 'saptapper'), null, 'other types are not affected');
 	});
 });

@@ -8,7 +8,7 @@ import { buildingDef } from '@/catalog/buildings';
 import { IDOLS } from '@/catalog/idols';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { HARD_LIMITS } from '@/config/limits';
-import { buildingLevelCap, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
+import { buildingLevelCap, copiesAllowed, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
@@ -230,7 +230,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	let castleTile: Tile | null = null;
 	let owned = 0;
 	let chests = 0;
-	const buildingIds = new Set<string>();
+	const buildingCopies = new Map<string, number>(); // how many of each building type stand (a Producer or an Extractor up to HARD_LIMITS.buildingCopies, an Idol one)
 	for (const { x, y, t } of land) {
 		const key = tileKey(x, y);
 		if (at.has(key)) return fail('two tiles share a position');
@@ -264,8 +264,8 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
 			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : HARD_LIMITS.buildingMaxLevel);
-			if (def && def.biome === t.biome && !tile.hasChest && !buildingIds.has(def.id) && bl !== null) {
-				buildingIds.add(def.id);
+			if (def && def.biome === t.biome && !tile.hasChest && (buildingCopies.get(def.id) ?? 0) < copiesAllowed(def, HARD_LIMITS.buildingCopies) && bl !== null) {
+				buildingCopies.set(def.id, (buildingCopies.get(def.id) ?? 0) + 1);
 				tile.building = def.id;
 				if (bl > 1) tile.buildingLevel = bl;
 			}

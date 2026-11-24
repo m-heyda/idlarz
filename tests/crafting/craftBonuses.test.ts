@@ -23,8 +23,8 @@ test('the Gem shop items are one-time upgrades with the documented bonuses', () 
 		assert.ok(item && item.kind === 'once' && item.tab === 'upgrades' && item.price > 0, id);
 	}
 	assert.deepEqual(gemCraftOf(undefined), NO_GEM_CRAFT);
-	assert.deepEqual(gemCraftOf({ master_workbench: 1 }), { speed: 0.5, hours: 0, discount: 0 });
-	assert.deepEqual(gemCraftOf({ master_workbench: 1, overnight_orders: 1, bulk_discount: 1 }), { speed: 0.5, hours: 24, discount: 0.1 });
+	assert.deepEqual(gemCraftOf({ master_workbench: 1 }), { speed: 0.5, hours: 0, discount: 0, slots: 0 });
+	assert.deepEqual(gemCraftOf({ master_workbench: 1, overnight_orders: 1, bulk_discount: 1 }), { speed: 0.5, hours: 24, discount: 0.1, slots: 0 });
 });
 
 test('Workbench and Night Shift raise the craft speed and the batch run, the Gem shop adds on top, all under the hard ceiling', () => {
@@ -51,7 +51,7 @@ test('the discount: Thrifty Hands 3% a level and Bulk Discount 10%, never more t
 	assert.ok(Math.abs(craftCostFactor(ember({ thrifty: 5 })) - 0.85) < 1e-9);
 	assert.ok(Math.abs(craftCostFactor({ ...ember({ thrifty: 5 }), gemCraft: gemCraftOf({ bulk_discount: 1 }) }) - (1 - CRAFT_DISCOUNT_MAX)) < 1e-9);
 	assert.ok(
-		craftCostFactor({ ...ember({ thrifty: 99 }), gemCraft: { speed: 0, hours: 0, discount: 5 } }) >= 1 - CRAFT_DISCOUNT_MAX - 1e-9,
+		craftCostFactor({ ...ember({ thrifty: 99 }), gemCraft: { speed: 0, hours: 0, discount: 5, slots: 0 } }) >= 1 - CRAFT_DISCOUNT_MAX - 1e-9,
 		'the cap holds even for absurd inputs',
 	);
 	const minor = RECIPE_BY_ID.potion_minor; // 40 food and one Glass Vial

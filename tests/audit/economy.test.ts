@@ -255,6 +255,7 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 		'brawn',
 		'buildcap',
 		'builders',
+		'buildslots',
 		'buildtime',
 		'castlecap',
 		'charter',

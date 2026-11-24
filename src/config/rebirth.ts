@@ -290,6 +290,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 3,
 		effectPerLevel: 1, // one-time: +1 builder (base 1 + the Gem shop's three Additional builder levels + this one = 5 at most)
 	},
+	buildslots: {
+		label: 'Building Slots',
+		maxLevel: 2,
+		baseCost: 80,
+		costGrowth: 3, // 80 / 240 Embers
+		effectPerLevel: 1, // +1 copy of each Producer and Extractor per level (1 at the start; with the Gem shop's Building Slot 4 at most = `HARD_LIMITS.buildingCopies`)
+	},
 	craftslots: {
 		label: 'Extra Craft Slot',
 		maxLevel: 2,

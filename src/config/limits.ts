@@ -47,6 +47,8 @@ export const LIMITS = {
 	castleMaxLevel: 10,
 	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Additional builder (up to 3) and the Ember shop's Extra Builder add to it, see `builderCount`) */
 	builders: 1,
+	/** Copies of one Producer or Extractor on the map (1 for everyone; the Ember shop's Building Slots, two levels, and the Gem shop's Building Slot add one each, 4 at most). Idols stay one per map. */
+	buildingCopies: 1,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -75,4 +77,6 @@ export const HARD_LIMITS = {
 	castleMaxLevel: 15,
 	/** Builders a save may hold timers for: 1 + the Gem shop's one + the Ember shop's, with room to grow */
 	builders: 8,
+	/** Copies of one Producer or Extractor a save may hold: 1 + two Ember levels + the Gem shop's slot */
+	buildingCopies: 4,
 } as const;

@@ -22,6 +22,7 @@ export type GemItemId =
 	| 'master_workbench'
 	| 'overnight_orders'
 	| 'bulk_discount'
+	| 'building_slot'
 	| `castle_skin_${number}`;
 
 export interface GemItem {
@@ -187,6 +188,15 @@ export const GEM_SHOP: readonly GemItem[] = [
 		cooldownSec: 0,
 	},
 	{
+		id: 'building_slot',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Building Slot',
+		blurb: 'Build one more copy of every Producer and Extractor on the map. Permanent, it survives a rebirth.',
+		price: 6000,
+		cooldownSec: 0,
+	},
+	{
 		id: 'bulk_discount',
 		tab: 'upgrades',
 		kind: 'once',
@@ -223,8 +233,10 @@ export interface GemCraft {
 	speed: number;
 	hours: number;
 	discount: number;
+	/** The Building Slot item: one more copy of every Producer and Extractor (0 or 1). It lives here with the other Gem shop items the game mirrors from the ledger. */
+	slots: number;
 }
-export const NO_GEM_CRAFT: GemCraft = { speed: 0, hours: 0, discount: 0 };
+export const NO_GEM_CRAFT: GemCraft = { speed: 0, hours: 0, discount: 0, slots: 0 };
 
 /**
  * The crafting bonuses of the Gem shop's one-time items: Master Workbench +0.5 craft speed, Overnight Orders +24 hours of batch run, Bulk Discount -10% resources (read by `limitOf` and `craftCostFactor`).
@@ -236,6 +248,7 @@ export const gemCraftOf = (bought: Record<string, number> | undefined): GemCraft
 	speed: (bought?.master_workbench ?? 0) > 0 ? 0.5 : 0,
 	hours: (bought?.overnight_orders ?? 0) > 0 ? 24 : 0,
 	discount: (bought?.bulk_discount ?? 0) > 0 ? 0.1 : 0,
+	slots: (bought?.building_slot ?? 0) > 0 ? 1 : 0,
 });
 
 /** A purchase above this many gems asks for a confirmation in the shop window. */

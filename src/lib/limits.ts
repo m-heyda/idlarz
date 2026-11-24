@@ -50,10 +50,11 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 	idolMaxLevel: (ctx) => emberEffect(ctx.prestige, 'idolcap'),
 	buildingMaxLevel: (ctx) => emberEffect(ctx.prestige, 'buildcap'),
 	castleMaxLevel: (ctx) => emberEffect(ctx.prestige, 'castlecap'),
+	buildingCopies: (ctx) => emberEffect(ctx.prestige, 'buildslots') + (ctx.gemCraft?.slots ?? 0),
 };
 
 /** The limits `limitOf` cuts at the hard ceiling (the others are cut where they are read, e.g. `craftLimit`, `offlineCapHours`) */
-const CLAMPED: ReadonlySet<string> = new Set(['bagSize', 'idolMaxLevel', 'buildingMaxLevel', 'castleMaxLevel']);
+const CLAMPED: ReadonlySet<string> = new Set(['bagSize', 'idolMaxLevel', 'buildingMaxLevel', 'castleMaxLevel', 'buildingCopies']);
 
 /**
  * The current value of a limit: its base plus the registered bonuses.

@@ -216,7 +216,17 @@ export interface BuildingContext {
 	idolMax?: number;
 	/** The Producer and Extractor level cap in force ({@link limitOf} `buildingMaxLevel`); absent = the base */
 	buildingMax?: number;
+	/** How many copies of one Producer or Extractor may stand ({@link limitOf} `buildingCopies`); absent = 1 */
+	buildingCopies?: number;
 }
+
+/** How many copies of this building the map may hold: an Idol is always one, a Producer or an Extractor `buildingCopies` (1 at the start, up to 4 with the Ember shop's Building Slots and the Gem shop's Building Slot). */
+export const copiesAllowed = (def: Pick<BuildingDef, 'kind'> | undefined, buildingCopies = 1): number =>
+	def?.kind === 'idol' ? 1 : Math.max(1, Math.min(HARD_LIMITS.buildingCopies, Math.floor(buildingCopies)));
+
+/** How many of building `id` stand on the map or are waiting to be built (a first Idol build is a running upgrade without a tile level yet). */
+export const copiesOf = (ctx: Pick<BuildingContext, 'tiles' | 'buildingUpgrades'>, id: string): number =>
+	builtBuildings(ctx.tiles).filter((b) => b.id === id).length + ctx.buildingUpgrades.filter((u) => u.building === id).length;
 
 /** Why a tile cannot take this building, or null when it can: owned, not the castle, no building, chest or monster on it, and of the building's biome. */
 const tileProblem = (ctx: BuildingContext, x: number, y: number, def: BuildingDef): string | null => {
@@ -248,14 +258,15 @@ export const needsConstruction = (def: BuildingDef | undefined, idolLevels: Reco
 	def?.kind === 'idol' && rememberedIdolLevel(idolLevels, def.biome) === 0;
 
 /**
- * Why `id` cannot be built on tile (x, y) now, or null when it can: the system is on, the type exists, **one of each type per map**, and the tile fits.
+ * Why `id` cannot be built on tile (x, y) now, or null when it can: the system is on, the type exists, **at most `copiesAllowed` of each type per map** (one at the start, one Idol always), and the tile fits.
  * Paying is the caller's check, so the menu can show the price next to the reason.
  */
 export const buildProblem = (ctx: BuildingContext, x: number, y: number, id: string): string | null => {
 	if (!buildingsEnabled()) return 'Buildings are not available yet';
 	const def = buildingDef(id);
 	if (!def) return 'Unknown building';
-	if (builtBuildings(ctx.tiles).some((b) => b.id === id) || ctx.buildingUpgrades.some((u) => u.building === id)) return `The ${def.label} is already built`;
+	const allowed = copiesAllowed(def, ctx.buildingCopies);
+	if (copiesOf(ctx, id) >= allowed) return allowed > 1 ? `All ${allowed} ${def.label}s are built` : `The ${def.label} is already built`;
 	return tileProblem(ctx, x, y, def);
 };
 
