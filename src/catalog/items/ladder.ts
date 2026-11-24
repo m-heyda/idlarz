@@ -60,7 +60,8 @@ const SLOT_STATS: Record<ArmourSlot | 'offHand', PerIndex> = {
 	feet: { armor: 0.57, maxHp: 0.57 },
 	neck: { armor: 0.29, maxHp: 1.14, critChance: 0.21, goldFind: 0.86 },
 	cape: { armor: 0.43, maxHp: 0.71, dodge: 0.29 },
-	ring: { maxHp: 0.86, critChance: 0.21 },
+	// a ring is an offence slot: flat damage and crit (two rings are about a third of a weapon's damage); item attack speed is not a gear stat, so it comes from weapons only
+	ring: { damage: 0.3, maxHp: 0.5, critChance: 0.35, superCrit: 0.07 },
 	charm: { armor: 0.14, maxHp: 1, superCrit: 0.14 },
 	// The belt's own stats (potion cooldown and power, potion slots, bag slots; IDL-138) are not in the stats pipeline yet, so a belt
 	// carries the plain defence of an accessory until they land (IDL-139 follow-up).
@@ -127,7 +128,11 @@ const weaponStats = (type: LadderWeapon, index: number, tier: number): ItemStats
 };
 
 /** Blightbound is the fragile set: no armor and no max HP on its pieces, Luck instead */
+/** The first two grades keep the old defensive ring (a flat point of damage per ring is a third of a starter weapon: the early bosses are tuned without it) */
+const EARLY_RING: PerIndex = { maxHp: 0.86, critChance: 0.21 };
+
 const forGrade = (grade: Grade, perIndex: PerIndex): PerIndex => {
+	if (perIndex === SLOT_STATS.ring && (grade === 'G1' || grade === 'G2')) return EARLY_RING;
 	if (grade !== 'S3') return perIndex;
 	const { armor, maxHp, ...rest } = perIndex;
 	return armor || maxHp ? { ...rest, luck: 0.15 } : rest;

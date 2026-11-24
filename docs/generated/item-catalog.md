@@ -110,7 +110,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Sunhoney Slippers | `sunhoney_slippers` | armor | 5 | base | 100-100 | +40 Armor, +40 Max HP |  | general pool |
 | Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +20 Armor, +80 Max HP, +7.68% CRIT CH, +12% Gold Find |  | general pool |
 | Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +30 Armor, +50 Max HP, +4.0% Dodge |  | general pool |
-| Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +61 Max HP, +7.68% CRIT CH |  | general pool |
+| Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +21 Damage, +35 Max HP, +12.8% CRIT CH, +2.56% Super Crit |  | general pool |
 | Hive Charm | `hive_charm` | accessory | 5 | base | 100-100 | +10 Armor, +71 Max HP, +5.12% Super Crit |  | general pool |
 | Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +20 Armor, +40 Max HP |  | general pool |
 | Honeycomb Scepter | `honeycomb_scepter` | weapon (mace) | 5 | base | 100-100 | +278 Damage |  | general pool |
@@ -123,7 +123,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Warlord's Sabatons | `warlords_sabatons` | armor | 5 | base | 100-100 | +51 Armor, +51 Max HP |  | general pool |
 | Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +26 Armor, +102 Max HP, +9.78% CRIT CH, +12% Gold Find |  | general pool |
 | Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +39 Armor, +64 Max HP, +4.0% Dodge |  | general pool |
-| Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +77 Max HP, +9.78% CRIT CH |  | general pool |
+| Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +27 Damage, +45 Max HP, +16.29% CRIT CH, +3.26% Super Crit |  | general pool |
 | War Medal Charm | `war_medal_charm` | accessory | 5 | base | 100-100 | +13 Armor, +90 Max HP, +6.52% Super Crit |  | general pool |
 | Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +26 Armor, +51 Max HP |  | general pool |
 | Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +269 Damage, +9.31% CRIT CH |  | general pool |
@@ -136,7 +136,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Shroud Treads | `shroud_treads` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% CRIT CH, +12% Gold Find, +10 Luck |  | general pool |
 | Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck |  | general pool |
-| Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +11.17% CRIT CH, +10 Luck |  | general pool |
+| Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +31 Damage, +18.62% CRIT CH, +3.72% Super Crit, +10 Luck |  | general pool |
 | Core Charm | `core_charm` | accessory | 5 | base | 100-100 | +7.45% Super Crit, +10 Luck |  | general pool |
 | Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Blight Staff | `blight_staff` | weapon (staff) | 5 | base | 100-100 | +291 Damage, +11.2/s HP REG, +33 Max Mana, +30.13% SPELL PWR |  | general pool |
@@ -146,8 +146,8 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 
 | Affix | Position | Stat | Needs item level | Fits |
 |---|---|---|---|---|
-| Sharp | prefix | damage | 1 | weapon |
-| of Power | suffix | damage | 1 | weapon |
+| Sharp | prefix | damage | 1 | weapon, ring |
+| of Power | suffix | damage | 1 | weapon, ring |
 | Sturdy | prefix | armor | 1 | head, shoulder, chest, hands, legs, feet, offhand, cape, belt |
 | of the Bulwark | suffix | armor | 1 | head, shoulder, chest, hands, legs, feet, offhand, cape, belt |
 | Hearty | prefix | maxHp | 1 | any gear |

@@ -60,7 +60,7 @@ const pair = ({ stat, prefix, suffix, power, tags, minItemLevel = 1, weight = 10
 	}));
 
 export const AFFIXES: AffixDef[] = [
-	...pair({ stat: 'damage', prefix: 'Sharp', suffix: 'of Power', power: 0.5, tags: WEAPON }),
+	...pair({ stat: 'damage', prefix: 'Sharp', suffix: 'of Power', power: 0.5, tags: [...WEAPON, 'ring'] }),
 	...pair({ stat: 'armor', prefix: 'Sturdy', suffix: 'of the Bulwark', power: 1.5, tags: DEFENCE }),
 	...pair({ stat: 'maxHp', prefix: 'Hearty', suffix: 'of Vitality', power: 1.5, tags: [] }),
 	...pair({ stat: 'critChance', prefix: 'Keen', suffix: 'of Precision', power: 1.5, tags: [...WEAPON, 'hands', ...TRINKET] }),

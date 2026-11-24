@@ -58,12 +58,12 @@ test('the Obsidian set covers every slot but the weapon (the ring item covers ri
 	assert.equal(SETS.obsidian.pieces.length, 12);
 });
 
-test('only weapons carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 6', () => {
+test('only weapons and rings carry damage, none exceeds COMBAT.maxItemDamage, and the starter weapon deals 6', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
 		if (def.slot === 'mainHand') {
 			// the disabled grade ladder and the craft-only grades (G7, G8) are authored at their own, higher item levels (catalog/items/ladder.ts)
 			assert.ok((def.stats?.damage ?? 0) >= 1 && (def.enabled === false || def.craftOnly || def.stats!.damage! <= COMBAT.maxItemDamage), def.id);
-		} else assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`);
+		} else if (def.slot !== 'ring') assert.equal(def.stats?.damage, undefined, `${def.id} is not a weapon`); // rings carry a little flat damage from G3 up (catalog/items/ladder.ts)
 	}
 	assert.equal(ITEM_CATALOG[STARTER_EQUIPMENT.mainHand!.base].stats?.damage, 6);
 });
