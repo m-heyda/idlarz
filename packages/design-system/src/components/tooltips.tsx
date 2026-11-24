@@ -314,14 +314,16 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 export const TooltipStack: React.FC<{ children: React.ReactNode }> = ({ children }) => <div className='ds-tip-stack'>{children}</div>;
 
 /** A resource in the top bar: stock, income, where it comes from. */
-export const ResourceTooltip: React.FC<{ icon: string; name: string; rows: TipRow[]; sources?: TipRow[]; footer?: Footer }> = ({
-	icon,
-	name,
-	rows,
-	sources,
-	footer,
-}) => (
-	<Tooltip rarity='common' className='ds-tip-compact' icon={icon} title={name} subtitle='Base material' footer={footer}>
+export const ResourceTooltip: React.FC<{
+	icon: string;
+	name: string;
+	rows: TipRow[];
+	sources?: TipRow[];
+	footer?: Footer;
+	rarity?: Rarity;
+	subtitle?: string;
+}> = ({ icon, name, rows, sources, footer, rarity = 'common', subtitle = 'Base material' }) => (
+	<Tooltip rarity={rarity} className='ds-tip-compact' icon={icon} title={name} subtitle={subtitle} footer={footer}>
 		<TipRows rows={rows} />
 		{sources ? (
 			<>
@@ -537,8 +539,11 @@ export const ResourceStat: React.FC<{
 	sources?: TipRow[];
 	footer?: Footer;
 	chip?: { onClick?: () => void; title?: string } & Record<`data-${string}`, string | undefined>;
-}> = ({ icon, name, value, rows, sources, footer, chip }) => (
-	<HoverTip tip={<ResourceTooltip icon={icon} name={name} rows={rows} sources={sources} footer={footer} />}>
+	/** The tier colour and label of the tooltip (default: a common base material) */
+	rarity?: Rarity;
+	subtitle?: string;
+}> = ({ icon, name, value, rows, sources, footer, chip, rarity, subtitle }) => (
+	<HoverTip tip={<ResourceTooltip icon={icon} name={name} rows={rows} sources={sources} footer={footer} rarity={rarity} subtitle={subtitle} />}>
 		<ResourceChip icon={icon} value={value} {...chip} />
 	</HoverTip>
 );
