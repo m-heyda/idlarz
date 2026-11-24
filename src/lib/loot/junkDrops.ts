@@ -52,6 +52,9 @@ const BOSS: readonly { id: string; base: number; perLevel: number }[] = [
 	{ id: 'junk_amethyst', base: 1, perLevel: 1 / 12 },
 ];
 
+/** The junk ids a chest or the junk roll of a kill can give (chest finds, rare junk and the boss stack): read by tests/crafting/sources.test.ts to prove every crafting ingredient has a source. */
+export const JUNK_ROLL_IDS: ReadonlySet<string> = new Set([...CHEST_FINDS, ...RARE, ...BOSS].map((row) => row.id));
+
 /** What a kill's junk roll gives: stacks for the bag, and ingredients for the crafting bag (crafting bag key -> amount). */
 export interface JunkLoot {
 	drops: Drop[];

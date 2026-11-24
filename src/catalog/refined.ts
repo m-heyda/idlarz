@@ -236,7 +236,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_time_shift',
 		kind: 'potion',
 		name: 'Elixir of Time Shift',
-		// the most expensive brew of the game: the resources alone are worth more than the hour it pays (tests/crafting/timeShift.test.ts), and the Hourglass Sand has no source yet (IDL-355)
+		// the most expensive brew of the game: the resources alone are worth more than the hour it pays (tests/crafting/timeShift.test.ts), and the Hourglass Sand is a rare drop of the Banner Wraith and the Cinder Warlord (IDL-381)
 		inputs: [
 			ing('hourglass_sand', 5),
 			part('gold_ingot', 5),

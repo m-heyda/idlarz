@@ -73,7 +73,7 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	// the reagents of the enchant craft and the legendary craft (IDL-120): made at the workbench from the extracts of the Blight and Battlefield Extractors
 	ing('ichor', 3, 'the enchant craft: reroll or add one affix of a piece of gear', 'Distilled Ichor'),
 	ing('war_medals', 4, 'the legendary recipes', 'Dawnsplitter, Forged War Medal, Starlight Wand, Stormstring'),
-	// no source yet (IDL-355: what drops it is still to be decided): the time-shift potion cannot be finished until it does
+	// drops from the Banner Wraith and the Cinder Warlord (`catalog/monsterDrops.ts`, IDL-381); the time-shift potion's rare ingredient
 	ing('hourglass_sand', 4, 'the time-shift potion', 'Elixir of Time Shift'),
 ];
 
