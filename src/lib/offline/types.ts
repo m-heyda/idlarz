@@ -25,7 +25,11 @@ export interface Inventory {
 
 /** One of the player's own changes to what they carry: what the browser previews at once and asks the server (`/api/inventory`) to do. */
 export type InventoryOp =
-	| { action: 'equip'; index: number }
+	| {
+			action: 'equip';
+			index: number;
+			/** A ring goes into this ring slot instead of the default (additive: older clients leave it out) */ slot?: 'ring1' | 'ring2';
+	  }
 	| { action: 'unequip'; slot: EquipmentSlot }
 	| { action: 'move'; from: number; to: number }
 	| { action: 'organize' }

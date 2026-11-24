@@ -105,3 +105,16 @@ test('a stronger character is let loose on what a weaker one is kept away from',
 	const profile = playerProfile(trained.stored.core);
 	assert.ok(estimateWin(profile, profile.maxHp, 'thistleBoar', 9).chance > weak);
 });
+
+test('IDL-372: the estimate counts the Bestiary mastery edge: more damage kills sooner, more defense lasts longer, no edge is the old number', () => {
+	const s = simSetup({ equipment: STARTER_EQUIPMENT, monsters: [{ type: 'thistleBoar', level: 9 }], seed: 'mastery-estimate' });
+	const profile = playerProfile(s.stored.core);
+	const plain = estimateWin(profile, profile.maxHp, 'thistleBoar', 9);
+	assert.deepEqual(estimateWin(profile, profile.maxHp, 'thistleBoar', 9, [], { damage: 0, defense: 0 }), plain, 'no edge changes nothing');
+	const hits = estimateWin(profile, profile.maxHp, 'thistleBoar', 9, [], { damage: 20, defense: 0 });
+	assert.ok(Math.abs(hits.killSec - plain.killSec / 1.2) < 1e-9, 'a 20% damage edge kills in 1/1.2 of the time');
+	assert.ok(hits.chance >= plain.chance);
+	const tough = estimateWin(profile, profile.maxHp, 'thistleBoar', 9, [], { damage: 0, defense: 20 });
+	assert.ok(tough.surviveSec > plain.surviveSec, 'a defense edge lasts longer');
+	assert.ok(tough.chance >= plain.chance);
+});

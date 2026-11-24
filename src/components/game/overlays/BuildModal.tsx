@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
-import { buildingKindLabel } from '@/catalog/buildings';
+import { buildingKindLabel, buildingsOfBiome } from '@/catalog/buildings';
 import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import type { PrestigeState } from '@/types/game';
 import { limitOf } from '@/lib/limits';
@@ -102,6 +102,10 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	}, [free, blocked, builds.length, moves.length, close]);
 	if (!free || blocked) return null;
 
+	// one fixed place per building type (Producer, Extractor, Idol, then the general buildings): "Move here" keeps the place its "Build" card would have had, so nothing jumps when a building is built
+	const position = new Map(buildingsOfBiome(tile?.biome ?? '').map((d, i) => [d.id, i]));
+	const at = (id: string) => position.get(id) ?? position.size;
+
 	const build = (o: BuildOption) => {
 		if (o.problem) return;
 		audioManager.playSound('click');
@@ -135,7 +139,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		const text = buildingEffectText(def, ownedOfBiome(tiles, def.biome));
 		if (!text) return null;
 		return (
-			<div className='bh-key'>
+			<div className='bh-key' title={text.produces}>
 				<span style={{ color: '#5ee07a' }}>{text.produces.replace(/\.$/, '')}</span>
 				<span className='bh-key-more'> · {text.perLevel.replace(/\.$/, '')}</span>
 			</div>
@@ -149,6 +153,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 			<Tooltip title={def.label} subtitle={buildingKindLabel(def)} className='ds-tip-compact'>
 				{text && (
 					<>
+						<TipLine>{text.perLevel}</TipLine>
 						<TipLine>{text.scale}</TipLine>
 						<TipLine>{text.levels}</TipLine>
 					</>
@@ -159,10 +164,10 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	};
 
 	return (
-		<GameModal title='Build here' width={780} onClose={close}>
-			<div className='build-list' style={{ gap: 12 }}>
+		<GameModal title='Build here' width={1080} onClose={close}>
+			<div className='build-list bh-grid'>
 				{builds.map((o) => (
-					<div key={o.def.id} className={`bh-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={o.def.id} className={`bh-row${o.problem ? ' build-row-off' : ''}`} style={{ order: at(o.def.id) * 2 }}>
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} details={details(o.def, o.remembered)} />
@@ -175,13 +180,13 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						</div>
 						<div className='bh-side'>
 							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
-								Build
+								Buy
 							</Button>
 						</div>
 					</div>
 				))}
 				{moves.map((o) => (
-					<div key={`move-${o.def.id}`} className={`bh-row${o.problem ? ' build-row-off' : ''}`}>
+					<div key={`move-${o.def.id}`} className={`bh-row${o.problem ? ' build-row-off' : ''}`} style={{ order: at(o.def.id) * 2 + 1 }}>
 						<Art def={o.def} />
 						<div className='bh-info'>
 							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
@@ -200,7 +205,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						</div>
 						<div className='bh-side'>
 							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
-								Move here
+								Move
 							</Button>
 						</div>
 					</div>

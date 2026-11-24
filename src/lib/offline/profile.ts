@@ -103,6 +103,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
  * hit' = hit x (1 + damagePct/100)         attacksPerSec' = attacksPerSec x (1 + atkSpeedPct/100)
  * armor' = armor x (1 + armorPct/100)       maxHp' = maxHp x (1 + maxHpPct/100)
  * crit' = min(maxCritChance, crit + critChance/100)       dodge' = min(maxDodge, dodge + dodge/100)
+ * mpRegen' = mpRegen x (1 + manaRegenPct/100)
  * @order 8
  */
 export const withBuffs = (profile: PlayerProfile, totals: Partial<Record<BuffStat, number>>): PlayerProfile => {
@@ -114,6 +115,7 @@ export const withBuffs = (profile: PlayerProfile, totals: Partial<Record<BuffSta
 		attacksPerSec: profile.attacksPerSec * pct('atkSpeedPct'),
 		armor: profile.armor * pct('armorPct'),
 		maxHp: Math.round(profile.maxHp * pct('maxHpPct')),
+		mpRegen: profile.mpRegen * pct('manaRegenPct'),
 		crit: Math.min(COMBAT.crit.maxCritChance / 100, profile.crit + (totals.critChance ?? 0) / 100),
 		dodge: Math.min(COMBAT.maxDodge / 100, profile.dodge + (totals.dodge ?? 0) / 100),
 	};

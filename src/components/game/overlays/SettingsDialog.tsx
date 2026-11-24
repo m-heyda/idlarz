@@ -31,7 +31,8 @@ const SettingsDialog: React.FC = () => {
 	const open = useUiStore((state) => state.settingsOpen);
 	const close = useUiStore((state) => state.closeSettings);
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
-	const { soundEnabled, volume, ambientLife, guideEnabled, setSoundEnabled, setVolume, setAmbientLife, setGuideEnabled } = useSettingsStore();
+	const { soundEnabled, volume, ambientLife, guideEnabled, numberNotation, setSoundEnabled, setVolume, setAmbientLife, setGuideEnabled, setNumberNotation } =
+		useSettingsStore();
 
 	if (!open) return null;
 
@@ -56,6 +57,16 @@ const SettingsDialog: React.FC = () => {
 
 				<Row label='Life on the map' hint='Critters wander over your land and ripples play on the water'>
 					<Toggle on={ambientLife} onChange={setAmbientLife} />
+				</Row>
+
+				<Row label='Number notation' hint='How big numbers are written: 1.23M, 1.23e6 (scientific) or 12.3e6 (engineering)'>
+					<div style={{ display: 'flex', gap: 6 }}>
+						{(['suffix', 'scientific', 'engineering'] as const).map((mode) => (
+							<Button key={mode} tone={numberNotation === mode ? 'gold' : undefined} onClick={() => setNumberNotation(mode)}>
+								{mode === 'suffix' ? 'Suffix' : mode === 'scientific' ? 'Scientific' : 'Engineering'}
+							</Button>
+						))}
+					</div>
 				</Row>
 
 				<Row label='Brother Alder' hint='The guide who explains the game as you play'>

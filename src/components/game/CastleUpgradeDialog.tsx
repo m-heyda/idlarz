@@ -173,25 +173,52 @@ const CastleUpgradeDialog: FC = () => {
 
 					{!isMaxLevel && nextLevelCosts ? (
 						<>
-							<div className='bw-card bw-card-main'>
-								<div className='bw-sechead'>
-									<span className='bw-label'>Upgrade to level {castleLevel + 1}</span>
-									<DiamondLevel level={castleLevel} max={castleCap} />
-								</div>
-								<div className='bw-gets'>
-									You get: <b>+{formatPercent(nextMultiplier * 100)}</b> to all resources, <b>+{formatCompact(nextXpBonus)}</b> castle XP / s
-								</div>
-								<CostGrid cost={nextLevelCosts} />
-							</div>
-
-							{!isNextToMaxLevel && afterNextLevelCosts && (
+							{castleUpgrade && (
 								<div className='bw-card bw-card-dim'>
-									<div className='bw-label'>Then: level {castleLevel + 2}</div>
-									<div className='bw-gets'>
-										+{formatPercent(afterNextMultiplier * 100)} to all resources, +{formatCompact(afterNextXpBonus)} castle XP / s
+									<div className='bw-label'>
+										Current upgrade, already paid: level {castleLevel} → {castleUpgrade.toLevel}
 									</div>
-									<CostGrid cost={afterNextLevelCosts} muted />
+									<CostGrid cost={nextLevelCosts} muted />
 								</div>
+							)}
+							{castleUpgrade ? (
+								afterNextLevelCosts && castleUpgrade.toLevel < castleCap ? (
+									<div className='bw-card bw-card-main'>
+										<div className='bw-sechead'>
+											<span className='bw-label'>
+												Next upgrade: level {castleUpgrade.toLevel} → {castleUpgrade.toLevel + 1}
+											</span>
+											<DiamondLevel level={castleUpgrade.toLevel} max={castleCap} />
+										</div>
+										<div className='bw-gets'>
+											You get: <b>+{formatPercent(afterNextMultiplier * 100)}</b> to all resources, <b>+{formatCompact(afterNextXpBonus)}</b> castle XP / s
+										</div>
+										<CostGrid cost={afterNextLevelCosts} />
+									</div>
+								) : null
+							) : (
+								<>
+									<div className='bw-card bw-card-main'>
+										<div className='bw-sechead'>
+											<span className='bw-label'>Upgrade to level {castleLevel + 1}</span>
+											<DiamondLevel level={castleLevel} max={castleCap} />
+										</div>
+										<div className='bw-gets'>
+											You get: <b>+{formatPercent(nextMultiplier * 100)}</b> to all resources, <b>+{formatCompact(nextXpBonus)}</b> castle XP / s
+										</div>
+										<CostGrid cost={nextLevelCosts} />
+									</div>
+
+									{!isNextToMaxLevel && afterNextLevelCosts && (
+										<div className='bw-card bw-card-dim'>
+											<div className='bw-label'>Then: level {castleLevel + 2}</div>
+											<div className='bw-gets'>
+												+{formatPercent(afterNextMultiplier * 100)} to all resources, +{formatCompact(afterNextXpBonus)} castle XP / s
+											</div>
+											<CostGrid cost={afterNextLevelCosts} muted />
+										</div>
+									)}
+								</>
 							)}
 
 							<div className='bw-foot' style={{ marginTop: 4 }}>

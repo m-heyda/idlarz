@@ -160,7 +160,7 @@ const PART_RECIPES = [
 /** The refined components (ingots, cut gems, tools, extracts), merged into `COMPONENTS` */
 export const REFINED_COMPONENTS: readonly RefinedComponent[] = [...METAL_COMPONENTS, ...FASTENER_COMPONENTS, ...PART_COMPONENTS, ...GEM_COMPONENTS];
 
-/** The potion recipes made of them: healing and mana, the Vitality Tonic and six elixirs (one per buff family, `catalog/buffs.ts`). The items are in `catalog/items/consumables.ts`. */
+/** The potion recipes made of them: healing and mana, the Vitality Tonic and seven elixirs (one per buff family, `catalog/buffs.ts`). The items are in `catalog/items/consumables.ts`. */
 const POTION_RECIPES: Recipe[] = [
 	{
 		id: 'potion_mana',
@@ -233,10 +233,20 @@ const POTION_RECIPES: Recipe[] = [
 		timeSec: 55,
 	},
 	{
+		id: 'elixir_arcana',
+		kind: 'potion',
+		name: 'Elixir of Arcana',
+		inputs: [part('arcane_essence', 2), ing('glowberry', 3), part('glass_vial', 1), res('herbs', 100)],
+		output: { item: 'elixir_arcana', qty: 1 },
+		unlock: 26,
+		xp: 110,
+		timeSec: 55,
+	},
+	{
 		id: 'elixir_time_shift',
 		kind: 'potion',
 		name: 'Elixir of Time Shift',
-		// the most expensive brew of the game: the resources alone are worth more than the hour it pays (tests/crafting/timeShift.test.ts), and the Hourglass Sand has no source yet (IDL-355)
+		// the most expensive brew of the game: the resources alone are worth more than the hour it pays (tests/crafting/timeShift.test.ts), and the Hourglass Sand is a rare drop of the Banner Wraith and the Cinder Warlord (IDL-381)
 		inputs: [
 			ing('hourglass_sand', 5),
 			part('gold_ingot', 5),

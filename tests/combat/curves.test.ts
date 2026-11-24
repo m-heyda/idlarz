@@ -82,14 +82,15 @@ test('levels: terminate for any XP, including absurd and non-finite values', () 
 	}
 });
 
-test('big numbers are shown with suffixes up to Sx, then scientific, and never as Infinity text by accident', () => {
+test('big numbers are shown with suffixes up to Dc, then scientific, and never as Infinity text by accident', () => {
 	assert.equal(formatNumber(1_500_000), '1.5M');
 	assert.equal(formatNumber(2.5e9), '2.5B');
 	assert.equal(formatNumber(3e12), '3T');
 	assert.equal(formatNumber(4e15), '4Qa');
 	assert.equal(formatNumber(5e18), '5Qi');
 	assert.equal(formatNumber(6e21), '6Sx');
-	assert.equal(formatNumber(7e24), '7e24');
+	assert.equal(formatNumber(7e24), '7Sp');
+	assert.equal(formatNumber(7e36), '7e36');
 	assert.equal(formatNumber(12_345), '12.35K');
 	assert.equal(formatRate(2e15), '+2Qa/s');
 	assert.equal(formatRate(-3e6), '-3M/s');

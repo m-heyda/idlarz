@@ -145,7 +145,9 @@ const MerchantResourcesTab: React.FC = () => {
 												{MERCHANT_RESOURCE_INFO[key].label}
 											</span>
 											<span>{compact(Math.floor(resources[key]))}</span>
-											<span style={{ color: r ? GREEN : '#8a7a5a' }}>{r ? `+${Math.round(r)}/s` : '—'}</span>
+											<span style={{ color: r ? GREEN : '#8a7a5a' }}>
+												{r ? `${r < 0.01 ? '<0.01' : `+${r >= 100 ? Math.round(r) : r.toFixed(2)}`}/s` : '—'}
+											</span>
 											<span>{tidy((MERCHANT_RESOURCE_PRICES[key] * haggle).toFixed(2))}</span>
 											<span style={{ color: rowBuyable ? BLUE : '#8a7a5a' }}>
 												{rowBuyable ? tidy((MERCHANT_RESOURCE_PRICES[key] * MERCHANT_BUY_MULTIPLIER).toFixed(2)) : 'not sold'}

@@ -69,7 +69,7 @@ export const MERCHANT_UPGRADES = {
 	packrat: {
 		label: 'Pack Rat (old)',
 		group: 'economy',
-		description: (n: number) => `+${n * 8} bag slots`,
+		description: (n: number) => `+${n * 8} bag slots, kept through rebirth`,
 		maxLevel: 6,
 		effectPerLevel: 8, // bag slots; RETIRED: no longer for sale, the levels a player already bought keep this value (the id stays, saves are append-only)
 		baseCost: 500000,
@@ -78,7 +78,7 @@ export const MERCHANT_UPGRADES = {
 	packrat2: {
 		label: 'Pack Rat',
 		group: 'economy',
-		description: (n: number) => `+${n * 4} bag slots`,
+		description: (n: number) => `+${n * 4} bag slots, kept through rebirth`,
 		maxLevel: 10,
 		effectPerLevel: 4, // bag slots (the Deep Pockets Ember upgrade gives +8 per level)
 		baseCost: 500000,

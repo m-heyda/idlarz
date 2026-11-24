@@ -145,6 +145,18 @@ export const CONSUMABLES: ItemDef[] = [
 			'An hourglass in a bottle. Drink it and an hour passes for the castle, the builders and the mines: an hour of income (at your away efficiency) and an hour off every building timer. Up to 3 a day.',
 	},
 	elixir(
+		'elixir_arcana',
+		'Elixir of Arcana',
+		'arcana',
+		'manaRegenPct',
+		50,
+		180,
+		'uncommon',
+		110,
+		'art_arcane_swirl',
+		'A pink swirl that keeps the well of mana from running dry.',
+	),
+	elixir(
 		'elixir_warding',
 		'Elixir of Warding',
 		'warding',

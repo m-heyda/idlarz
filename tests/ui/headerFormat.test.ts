@@ -31,8 +31,9 @@ test('header amounts carry into the next suffix instead of printing 1000', () =>
 });
 
 test('header amounts stay short past the suffix table, and survive odd input', () => {
-	assert.equal(formatHeaderAmount(1e24), '1e24');
-	assert.equal(formatHeaderAmount(1.23e30), '1.2e30');
+	assert.equal(formatHeaderAmount(1e24), '1Sp');
+	assert.equal(formatHeaderAmount(1.23e30), '1.23No');
+	assert.equal(formatHeaderAmount(1.23e36), '1.2e36');
 	assert.equal(formatHeaderAmount(Infinity), '∞');
 	assert.equal(formatHeaderAmount(NaN), '0');
 	assert.equal(formatHeaderAmount(undefined), '0');

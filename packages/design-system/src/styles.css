@@ -4289,13 +4289,22 @@ button.ds-income-head:hover {
 /* the key hints of an item tooltip: key caps with what they do, pushed to the two ends */
 .ds-tip-keys {
 	display: flex;
+	flex-wrap: wrap;
 	justify-content: space-between;
-	gap: 10px;
+	gap: 4px 10px;
 	margin-top: 8px;
 	padding-top: 6px;
 	border-top: 1px solid rgba(255, 255, 255, 0.1);
 	font-size: 11px;
 	color: var(--ds-text-dim);
+}
+
+/* a hint never breaks inside itself (key cap and its words stay on one line); a long list wraps between hints */
+.ds-tip-keys > span {
+	white-space: nowrap;
+}
+.ds-kbd {
+	white-space: nowrap;
 }
 
 /* the top bar, tightened: narrower chips, less air between the trays */

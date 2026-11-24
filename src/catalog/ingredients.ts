@@ -43,7 +43,7 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	ing('orange_mushrooms', 1, 'fungal extracts and night potions', 'Fungal Extract'),
 	ing('grapes', 1, 'wine and elixirs', 'Elixir of Fortitude'),
 	ing('hollow_log', 1, 'planks'),
-	ing('glowberry', 2, 'night-vision and luck potions', 'Arcane Essence, Elixir of Haste, Elixir of the Keen Eye'),
+	ing('glowberry', 2, 'night-vision and luck potions', 'Arcane Essence, Elixir of Arcana, Elixir of Haste, Elixir of the Keen Eye'),
 	ing('horn_dark', 2, 'dark elixirs and enchanting powder'),
 	ing('copper_ore', 2, 'ingots (smelted with coal)', 'Copper Ingot'),
 	ing('ember_coal', 3, 'smelting fuel and fire potions', 'Steel Ingot, Gold Ingot'),
@@ -73,7 +73,7 @@ export const INGREDIENTS: readonly IngredientDef[] = [
 	// the reagents of the enchant craft and the legendary craft (IDL-120): made at the workbench from the extracts of the Blight and Battlefield Extractors
 	ing('ichor', 3, 'the enchant craft: reroll or add one affix of a piece of gear', 'Distilled Ichor'),
 	ing('war_medals', 4, 'the legendary recipes', 'Dawnsplitter, Forged War Medal, Starlight Wand, Stormstring'),
-	// no source yet (IDL-355: what drops it is still to be decided): the time-shift potion cannot be finished until it does
+	// drops from the Banner Wraith and the Cinder Warlord (`catalog/monsterDrops.ts`, IDL-381); the time-shift potion's rare ingredient
 	ing('hourglass_sand', 4, 'the time-shift potion', 'Elixir of Time Shift'),
 ];
 
