@@ -265,11 +265,12 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 	});
 });
 
-test('builders: 1 for everyone, +1 with the Gem shop Builder #2; the castle takes a builder like a building does', () => {
+test('builders: 1 for everyone, +1 per level of the Gem shop Additional builder (up to 3); the castle takes a builder like a building does', () => {
 	withBuildings(() => {
 		assert.equal(builderCount(), 1);
 		assert.equal(builderCount({ gemBuilders: 1 }), 2);
-		assert.equal(builderCount({ gemBuilders: 9 }), 2, 'the Gem shop gives one, whatever a forged number says');
+		assert.equal(builderCount({ gemBuilders: 3 }), 4);
+		assert.equal(builderCount({ gemBuilders: 9 }), 4, 'the Gem shop gives three at most, whatever a forged number says');
 		const [a, b] = gameWith('forest', 2, 5);
 		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
 		assert.equal(api().buildBuilding(b.x, b.y, 'saptapper'), true);
@@ -602,13 +603,13 @@ test('timer_jump: a completion is bound to its own building, an Idol floor is th
 	});
 });
 
-test('Extra Builder (Ember shop): one level adds one builder (3 with the Gem shop one), and two parallel timers pass verify without the Gem shop one', () => {
+test('Extra Builder (Ember shop): one level adds one builder (5 with all three Gem shop levels), and two parallel timers pass verify without the Gem shop one', () => {
 	withBuildings(() => {
 		const prestige = (level: number) => ({ ...api().prestige, upgrades: { extrabuilder: level } });
 		assert.equal(builderCount({ prestige: prestige(1) }), 2);
 		assert.equal(builderCount({ prestige: prestige(2) }), 2, 'the shop sells one level; a stored higher one is cut to it');
-		assert.equal(builderCount({ prestige: prestige(1), gemBuilders: 1 }), 3, 'with Builder #2 from the Gem shop: the most there is');
-		assert.equal(builderCount({ prestige: prestige(5), gemBuilders: 9 }), 3);
+		assert.equal(builderCount({ prestige: prestige(1), gemBuilders: 1 }), 3, 'with a Gem shop builder level it adds one');
+		assert.equal(builderCount({ prestige: prestige(5), gemBuilders: 9 }), 5, 'the most there is: 1 + 1 Ember + 3 Gem shop');
 
 		const [a, b] = gameWith('forest', 2, 5);
 		api().buildBuilding(a.x, a.y, 'lumberyard');

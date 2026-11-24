@@ -288,7 +288,7 @@ export const EMBER_UPGRADES = {
 		maxLevel: 1,
 		baseCost: 40,
 		costGrowth: 3,
-		effectPerLevel: 1, // one-time: +1 builder (base 1 + the gem shop's Builder #2 + this one = 3 at most)
+		effectPerLevel: 1, // one-time: +1 builder (base 1 + the Gem shop's three Additional builder levels + this one = 5 at most)
 	},
 	craftslots: {
 		label: 'Extra Craft Slot',

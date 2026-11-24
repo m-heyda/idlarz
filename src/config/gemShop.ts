@@ -34,8 +34,10 @@ export interface GemItem {
 	name: string;
 	/** One line: what the player gets. */
 	blurb: string;
-	/** Gems charged per purchase. */
+	/** Gems charged per purchase (for an item with `tiers`: the price of the first level). */
 	price: number;
+	/** A `once` item bought in levels (Additional builder): the price of each level, in order; the purchase count in `bought` is the level. Absent: one purchase. */
+	tiers?: readonly number[];
 	/** Seconds that must pass between two purchases of this item (0 = none). */
 	cooldownSec: number;
 }
@@ -54,7 +56,7 @@ export const DAY_SEC = 86_400;
  *
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
- * - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
+ * - **Additional builder** (id `builder_2`, three levels of 2,000 / 6,000 / 12,000 = 20,000 gems; Upgrades tab): each level is one more builder, so up to three more castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; the purchase count in the ledger is the level and the server's save check allows that many timers. An account that bought the old one-time Builder #2 owns level 1.
  *
  * - **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
  *
@@ -160,9 +162,10 @@ export const GEM_SHOP: readonly GemItem[] = [
 		id: 'builder_2',
 		tab: 'upgrades',
 		kind: 'once',
-		name: 'Builder #2',
-		blurb: 'A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth.',
-		price: 1000,
+		name: 'Additional builder',
+		blurb: 'One more builder: another castle or building upgrade can run at the same time. Three levels, each dearer. Permanent, it survives a rebirth.',
+		price: 2000,
+		tiers: [2000, 6000, 12000],
 		cooldownSec: 0,
 	},
 	{
@@ -197,8 +200,23 @@ export const GEM_SHOP: readonly GemItem[] = [
 /** The id of the Builder #2 purchase (`ledger.gemShop.bought`). */
 export const BUILDER_ITEM: GemItemId = 'builder_2';
 
-/** Builders the Gem shop gave an account: 1 once Builder #2 is in `bought`, else 0 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
-export const gemBuildersOf = (bought: Record<string, number> | undefined): number => ((bought?.[BUILDER_ITEM] ?? 0) > 0 ? 1 : 0);
+/** The most builders the Gem shop adds: one per level of the Additional builder. */
+export const GEM_BUILDERS_MAX = 3;
+
+/** Builders the Gem shop gave an account: the level of the Additional builder in `bought`, 0 to 3 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
+export const gemBuildersOf = (bought: Record<string, number> | undefined): number =>
+	Math.min(GEM_BUILDERS_MAX, Math.max(0, Math.floor(bought?.[BUILDER_ITEM] ?? 0)));
+
+/** How many times an item has been bought (its level, for one with `tiers`). */
+export const gemLevelOf = (item: GemItem, bought: Record<string, number> | undefined): number => Math.max(0, Math.floor(bought?.[item.id] ?? 0));
+
+/** True when nothing more of a `once` item can be bought: owned, or every level of a tiered one. */
+export const gemMaxedOf = (item: GemItem, bought: Record<string, number> | undefined): boolean =>
+	item.kind === 'once' && gemLevelOf(item, bought) >= (item.tiers?.length ?? 1);
+
+/** What the next purchase of an item costs: the price of its next level for a tiered item, else its price. */
+export const gemNextPrice = (item: GemItem, bought: Record<string, number> | undefined): number =>
+	item.tiers ? item.tiers[Math.min(gemLevelOf(item, bought), item.tiers.length - 1)] : item.price;
 
 /** What the Gem shop's crafting items give an account (the ledger's `bought` record is the truth; the game mirrors it as `gemCraft`): extra craft speed, extra hours a batch may run, and the share of the resources a craft saves. */
 export interface GemCraft {

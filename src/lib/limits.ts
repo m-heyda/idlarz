@@ -15,7 +15,7 @@ export interface LimitContext {
 	beltSlots?: number;
 	/** The hero class: the Paladin adds offline efficiency (lib/classPassives.ts) */
 	playerClass?: unknown;
-	/** Builders the Gem shop's "Builder #2" gave (0 or 1; the server's ledger holds the record, the game state mirrors it as `gemBuilders`) */
+	/** Builders the Gem shop's "Builder #2" gave (0 to 3, the level of the Additional builder; the server's ledger holds the record, the game state mirrors it as `gemBuilders`) */
 	gemBuilders?: number;
 	/** What the Gem shop's crafting items gave (Master Workbench, Overnight Orders, Bulk Discount; see `gemCraftOf`) */
 	gemCraft?: GemCraft;
@@ -45,7 +45,7 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 	craftQueueSlots: (ctx) => emberEffect(ctx.prestige, 'craftslots'),
 	craftSpeed: (ctx) => emberEffect(ctx.prestige, 'workbench') + (ctx.gemCraft?.speed ?? 0),
 	craftOfflineHours: (ctx) => emberEffect(ctx.prestige, 'nightshift') + (ctx.gemCraft?.hours ?? 0),
-	builders: (ctx) => Math.min(1, Math.max(0, Math.floor(ctx.gemBuilders ?? 0))) + emberEffect(ctx.prestige, 'extrabuilder'),
+	builders: (ctx) => Math.min(3, Math.max(0, Math.floor(ctx.gemBuilders ?? 0))) + emberEffect(ctx.prestige, 'extrabuilder'),
 	// the three level caps of the Ember shop (the castle level still gates Producers, Extractors and the first five Idol levels)
 	idolMaxLevel: (ctx) => emberEffect(ctx.prestige, 'idolcap'),
 	buildingMaxLevel: (ctx) => emberEffect(ctx.prestige, 'buildcap'),

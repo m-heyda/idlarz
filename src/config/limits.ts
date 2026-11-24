@@ -45,7 +45,7 @@ export const LIMITS = {
 	buildingMaxLevel: 5,
 	/** The highest castle level (the Castle Expansion Ember upgrade raises it, one level per upgrade level) */
 	castleMaxLevel: 10,
-	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Builder #2 and the Ember shop's Extra Builder add to it, see `builderCount`) */
+	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Additional builder (up to 3) and the Ember shop's Extra Builder add to it, see `builderCount`) */
 	builders: 1,
 } as const;
 

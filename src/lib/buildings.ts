@@ -68,12 +68,12 @@ export const shortestUpgradeSec = (toLevel: number, idol = false): number =>
 	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, 'idol') : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol ? 'idol' : 'building');
 
 /**
- * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
+ * How many castle or building upgrades can run at once: 1 for everyone, +1 per level of the Gem shop's Additional builder (three levels, 20,000 gems in all, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 5 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
  *
  * @category Economy/Buildings
  * @order 8
  * @formula
- * builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
+ * builders = 1 + (Additional builder level, 0 to 3) + (Extra Builder bought ? 1 : 0)
  */
 export const builderCount = (ctx: LimitContext = {}): number => Math.min(HARD_LIMITS.builders, limitOf('builders', ctx));
 
