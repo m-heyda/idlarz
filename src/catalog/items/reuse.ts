@@ -314,6 +314,12 @@ const RESERVE_BASE: ItemDef[] = [
 	}),
 ];
 
+/**
+ * The top-tier legendaries (income, building time, kill reward: 25 %): they come only from a boss's own table, never from a chest or a monster (`legendary_top`, IDL-146). Runeforged Titanhammer is on the list but stays
+ * disabled with the rest of the perkless roster until its building-time perk has a stat to run on (IDL-145).
+ */
+export const LEGENDARY_TOP: readonly string[] = ['dawnbringer_trident', 'reapers_crescent', 'runeforged_titanhammer'];
+
 /** The mid tier of a legendary perk, in the units of its stat (percent, percentage points or Gold Find): 15, the `rare` step of {@link LEGENDARY_PERK_TIERS} */
 const MID_PERK = LEGENDARY_PERK_TIERS.xpPct.rare;
 
@@ -345,7 +351,10 @@ const gradeOfIcon = new Map(ITEM_ICONS.flatMap((e) => (e.grade ? [[e.icon, e.gra
  * folder), stay disabled. Ids and icons never change.
  */
 export const RESERVE_ITEMS: ItemDef[] = RESERVE_BASE.map((base) => {
-	const def: ItemDef = LEGENDARY_PERKS[base.id] ? { ...base, perks: LEGENDARY_PERKS[base.id] } : base;
+	// a legendary whose perk is wired is live (IDL-146): the top tier only from bosses (`legendary_top`, one boss each in `BOSS_LOOT`), the rest from chests and rare monster drops (`legendary_weapons`, `MONSTER_LEGENDARY_IDS`)
+	const def: ItemDef = LEGENDARY_PERKS[base.id]
+		? { ...base, perks: LEGENDARY_PERKS[base.id], enabled: true, ...(LEGENDARY_TOP.includes(base.id) ? { pools: ['legendary_top'] } : {}) }
+		: base;
 	const grade = def.generation === 'named' ? undefined : gradeOfIcon.get(def.icon as string);
 	if (!grade) return def;
 	return {

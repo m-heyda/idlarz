@@ -7,7 +7,7 @@ import { LEGENDARY_LORE } from '../../src/catalog/items/lore';
 // IDL-317: every legendary weapon (the 3 live and the 11 in reserve) has a story, and nothing else does.
 
 test('every legendary weapon has lore, and only they do', () => {
-	const legendaries = ITEMS.filter((i) => i.pools?.includes('legendary_weapons'));
+	const legendaries = ITEMS.filter((i) => i.pools?.some((p) => p === 'legendary_weapons' || p === 'legendary_top'));
 	assert.equal(legendaries.length, 14);
 	for (const item of legendaries) assert.ok((ITEM_CATALOG[item.id].lore ?? '').length > 40, `${item.id} has lore`);
 	for (const id of Object.keys(LEGENDARY_LORE))

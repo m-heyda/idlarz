@@ -29,8 +29,8 @@ test('rng 0 drops a piece of plain gear and a potion from a rat, rng 0.999 drops
 	assert.deepEqual(noJunk(rollKillLoot(T1, ctx, () => 0.999).items), []);
 });
 
-test('rats never drop the legendary weapons, whatever the rng', () => {
-	for (const level of [1, 5, 9, 20] as const) {
+test('low-level monsters never drop the legendary weapons, whatever the rng (the rare monster legendary starts at level 15)', () => {
+	for (const level of [1, 5, 9] as const) {
 		for (let i = 0; i < 200; i++) {
 			const r = rollKillLoot({ type: 'thistleBoar', level }, ctx, () => i / 200);
 			for (const item of r.items) {
@@ -224,4 +224,18 @@ test('epic and better pieces get a drop notice, everything else does not (IDL-38
 		'the strongest first; common, rare and potions stay quiet',
 	);
 	assert.deepEqual(announceDrops([]), []);
+});
+
+test('a monster of level 15 or more can drop a mid-tier legendary on a low roll, never a top-tier one, and never below level 15 (IDL-146)', async () => {
+	const { generateLoot } = await import('@/lib/loot/generate');
+	const { MONSTER_LEGENDARY_IDS, MONSTER_LEGENDARY_MIN_LEVEL } = await import('@/catalog/lootConfig');
+	const named = (level: number, roll: number) =>
+		generateLoot({ sourceId: 'monster', level }, () => roll)
+			.drops.flatMap((d) => (d.kind === 'gear' ? [d.item.base] : []))
+			.filter((id) => ITEM_CATALOG[id].generation === 'named');
+	assert.deepEqual(named(MONSTER_LEGENDARY_MIN_LEVEL - 1, 0), [], 'nothing named below the gate');
+	const found = named(MONSTER_LEGENDARY_MIN_LEVEL + 5, 0);
+	assert.ok(found.length > 0 && found.every((id) => MONSTER_LEGENDARY_IDS.includes(id)), `a low roll gives a mid-tier legendary (${found})`);
+	for (const id of MONSTER_LEGENDARY_IDS) assert.ok(!ITEM_CATALOG[id].pools?.includes('legendary_top'), `${id} is not top tier`);
+	assert.deepEqual(named(40, 0.5), [], 'a normal roll gives none');
 });

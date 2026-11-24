@@ -101,7 +101,22 @@ test('rarity follows the family: wood and cloth common, steel uncommon, obsidian
 	assert.deepEqual([...rarityOf('knight')], ['uncommon']);
 	assert.deepEqual([...rarityOf('obsidian')], ['rare']);
 	// Only the enabled items count: the disabled reserve legendaries (catalog/items/reuse.ts) are not part of the game yet.
-	assert.equal(Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary' && d.enabled !== false && !d.craftOnly).length, 3);
+	// the three classics plus the roster legendaries whose perk is live (IDL-143, IDL-146); the ones still waiting for a perk stay disabled
+	const live = Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary' && d.enabled !== false && !d.craftOnly);
+	assert.deepEqual(live.map((d) => d.id).sort(), [
+		'cindercrescent_glaive',
+		'cinderflight_bow',
+		'dawnbringer_trident',
+		'emberbrand',
+		'frostbloom_fan',
+		'nightfall_edge',
+		'reapers_crescent',
+		'starfall_bow',
+		'stormtrident',
+		'titan_maul',
+		'voidrune_blade',
+	]);
+	for (const d of live) assert.ok(['emberbrand', 'starfall_bow', 'titan_maul'].includes(d.id) || d.perks, `${d.id} is a classic or carries a live perk`);
 });
 
 test('every weapon type has a steel or obsidian version and every weapon comes with its stats', () => {

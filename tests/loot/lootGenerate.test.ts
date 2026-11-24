@@ -6,6 +6,8 @@ import { instanceProblem, resolveItem } from '@/lib/itemInstance';
 import { mulberry32, randomInt, weightedPick } from '@/lib/rng';
 
 const gear = (drops: LootDrop[]) => drops.flatMap((d) => (d.kind === 'gear' ? [d.item] : []));
+/** The pieces of the general roll: a rare named legendary (IDL-146) comes from its own table and has its own fixed rarity */
+const generalGear = (drops: LootDrop[]) => gear(drops).filter((item) => LOOT_DATA.items[item.base].generation !== 'named');
 
 // A deep copy of the real data to modify (plain objects are fine: no test looks up 'constructor')
 const copy = (): LootData => JSON.parse(JSON.stringify(LOOT_DATA)) as LootData;
@@ -104,7 +106,7 @@ test('higher monster levels raise the item level, and rarer rarities unlock with
 		const seen = new Set<string>();
 		let maxLevel = 0;
 		for (let i = 0; i < 40000; i++) {
-			for (const item of gear(generateLoot({ sourceId: 'monster', level }, rng).drops)) {
+			for (const item of generalGear(generateLoot({ sourceId: 'monster', level }, rng).drops)) {
 				seen.add(item.rarity);
 				maxLevel = Math.max(maxLevel, item.level);
 				assert.equal(instanceProblem(item), null);
@@ -132,7 +134,7 @@ test('every rolled instance is valid and resolves', () => {
 test('rarity sets the affix count', () => {
 	const rng = mulberry32(6);
 	for (let i = 0; i < 20000; i++) {
-		for (const item of gear(generateLoot({ sourceId: 'monster', level: 20 }, rng).drops)) {
+		for (const item of generalGear(generateLoot({ sourceId: 'monster', level: 20 }, rng).drops)) {
 			const rarity = LOOT_DATA.rarities[item.rarity];
 			assert.ok(item.affixes.length >= rarity.minAffixes && item.affixes.length <= rarity.maxAffixes, `${item.rarity}: ${item.affixes.length}`);
 			assert.equal(new Set(item.affixes.map((a) => LOOT_DATA.affixes[a.id].group)).size, item.affixes.length);

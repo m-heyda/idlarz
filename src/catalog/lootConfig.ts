@@ -211,7 +211,7 @@ export const bossSourceId = (biome: string): string => `boss_${biome}`;
  *
  * **Adding a biome's boss (post release):** add the biome to {@link BIOME_LOOT}, its boss to `MONSTERS` with `lootSourceId: bossSourceId(biome)`, and one entry here. **Wiring a set:** fill in `setId`; its pieces must be enabled and have item levels the boss reaches (the validator reports an empty set pool).
  * The sets S1-S3 and Obsidian have no boss yet (their pieces are disabled or out of item level reach), so `setId` is `null` for all four bosses; `PENDING_SETS` in the test lists them so a set cannot be forgotten.
- * The uniques are the three legendary weapons, one per boss from the hardest down (Titan Maul from the Winter Wyrm, Emberbrand from the Mire Matriarch, Starfall Bow from the Elder Stag); the Great Auroch has none yet. Chests still drop them too (`basic_chest`, 1.9 %).
+ * The uniques are the three classic legendary weapons, one per boss from the hardest down (Titan Maul from the Winter Wyrm, Emberbrand from the Mire Matriarch, Starfall Bow from the Elder Stag); the Great Auroch has none yet. Chests still drop them too (`basic_chest`, 1.9 %), and so do rare monsters ({@link MONSTER_LEGENDARY_IDS}). The two top-tier legendaries with a live perk each have a boss of their own and no other source (IDL-146): the Dawnbringer Trident from the Jungle's, Reaper's Crescent from the Fields'.
  *
  * @category Loot/Config
  * @order 4
@@ -225,12 +225,34 @@ export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	coast: { uniques: [], setId: null, levels: { min: 17, max: 37 } },
 	hills: { uniques: [], setId: null, levels: { min: 22, max: 42 } },
 	lake: { uniques: [], setId: null, levels: { min: 27, max: 47 } },
-	jungle: { uniques: [], setId: null, levels: { min: 38, max: 68 } },
-	fields: { uniques: [], setId: null, levels: { min: 46, max: 76 } },
+	// IDL-146: the top-tier legendaries with a live perk, one boss each: the Dawnbringer Trident (+25 % income) from the Jungle's boss, Reaper's Crescent (+25 % kill rewards) from the Fields'
+	jungle: { uniques: ['dawnbringer_trident'], setId: null, levels: { min: 38, max: 68 } },
+	fields: { uniques: ['reapers_crescent'], setId: null, levels: { min: 46, max: 76 } },
 	orchard: { uniques: [], setId: null, levels: { min: 54, max: 84 } },
 	blight: { uniques: [], setId: null, levels: { min: 60, max: 92 } },
 	battlefield: { uniques: [], setId: null, levels: { min: 68, max: 100 } },
 };
+
+/**
+ * What a normal monster very rarely drops (IDL-146, owner 2026-11-07): the mid-tier legendaries whose perk is live, plus the three classics, at {@link MONSTER_LEGENDARY_CHANCE} per kill from monster level
+ * {@link MONSTER_LEGENDARY_MIN_LEVEL}. A chest's 1.9 % replace roll draws from the same ids (`legendary_weapons`). The mid-tier items still waiting for a perk (Tidecaller Axe, Amethyst Spire) join when it exists.
+ *
+ * @category Loot/Config
+ * @order 5
+ */
+export const MONSTER_LEGENDARY_IDS: readonly string[] = [
+	'emberbrand',
+	'starfall_bow',
+	'titan_maul',
+	'frostbloom_fan',
+	'voidrune_blade',
+	'nightfall_edge',
+	'stormtrident',
+	'cinderflight_bow',
+	'cindercrescent_glaive',
+];
+export const MONSTER_LEGENDARY_CHANCE = 0.002;
+export const MONSTER_LEGENDARY_MIN_LEVEL = 15;
 
 /** A boss's chance per kill of its unique, and the bad-luck protection on it (the numbers of the old single boss table: 5 %, +1 % per miss up to +10 %) */
 export const BOSS_UNIQUE_CHANCE = 0.05;
@@ -317,6 +339,15 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 	/** The craft source's pool (IDL-241): ladder gear up to the highest crafted grade; the request names the slot and the item level window, so the grade follows. */
 	equipment_craft: { id: 'equipment_craft', requireTags: ['gear'], excludeTags: [...GENERAL_EXCLUDED_TAGS], maxGrade: CRAFT_GEAR.ceilingGrade, enabled: true },
 	legendary_weapons: { id: 'legendary_weapons', enabled: true },
+	/** The top-tier legendaries (IDL-146): reachable only through a boss's own unique table (`BOSS_LOOT`), so the pool has no table of its own and nothing else points at it */
+	legendary_top: { id: 'legendary_top', enabled: true },
+	/** What a normal monster can very rarely give (IDL-146): the mid-tier legendaries and the three classics, from monster level 15 */
+	monster_legendary: {
+		id: 'monster_legendary',
+		includeIds: [...MONSTER_LEGENDARY_IDS],
+		minLevels: Object.fromEntries(MONSTER_LEGENDARY_IDS.map((id) => [id, MONSTER_LEGENDARY_MIN_LEVEL])),
+		enabled: true,
+	},
 	...bossPools(),
 	...BOSSES.pools,
 	potions_rat: {
@@ -339,7 +370,11 @@ const NORMAL_MONSTER: LootProfile = {
 	rarityWeights: { common: 62, uncommon: 24, rare: 9, epic: 1.1, legendary: 0.4 },
 	rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
 	generalPoolId: 'general_equipment',
-	bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
+	bonusTables: [
+		{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } },
+		// IDL-146: a rare named legendary on top of the gear roll (the mid tier and the classics; never the top tier, which only bosses give)
+		{ id: 'monster_legendary', poolId: 'monster_legendary', chance: MONSTER_LEGENDARY_CHANCE, mode: 'fixed' },
+	],
 	// bad-luck protection for the first epic: +5 % epic weight per eligible roll without one, up to x3 (about 40 rolls, a bit over 100 kills); a hit starts over
 	rarityPity: { rarity: 'epic', group: 'monster', perMiss: 0.05, maxMultiplier: 3 },
 	enabled: true,

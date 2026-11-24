@@ -33,11 +33,11 @@ Config validation: 0 errors, 25 warnings.
 
 | Source | Source level | Gear / kill | Common | Uncommon | Rare | Epic | Legendary | Unique | Item level p50 / p90 / max | P(epic+ per kill) | Named / kill | Empty-pool warnings |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---:|
-| Monster level 1 | 1 | 0.119 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 0 |
-| Monster level 5 | 5 | 0.160 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 0 |
-| Monster level 9 | 9 | 0.200 | 77.0% | 16.7% | 6.3% | 0.0% | 0.0% | 0.0% | 9 / 10 / 10 | 0.0% | 0.0000 | 0 |
-| Monster level 15 | 15 | 0.260 | 65.4% | 25.3% | 9.3% | 0.0% | 0.0% | 0.0% | 15 / 16 / 16 | 0.0% | 0.0000 | 0 |
-| Monster level 20 | 20 | 0.310 | 0.0% | 70.6% | 26.0% | 3.4% | 0.0% | 0.0% | 20 / 21 / 21 | 1.0% | 0.0000 | 0 |
+| Monster level 1 | 1 | 0.119 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 1 / 2 / 2 | 0.0% | 0.0000 | 192 |
+| Monster level 5 | 5 | 0.160 | 100.0% | 0.0% | 0.0% | 0.0% | 0.0% | 0.0% | 5 / 6 / 6 | 0.0% | 0.0000 | 215 |
+| Monster level 9 | 9 | 0.200 | 76.8% | 16.9% | 6.3% | 0.0% | 0.0% | 0.0% | 9 / 10 / 10 | 0.0% | 0.0000 | 196 |
+| Monster level 15 | 15 | 0.259 | 64.7% | 25.4% | 9.3% | 0.0% | 0.5% | 0.0% | 15 / 16 / 16 | 0.1% | 0.0014 | 58 |
+| Monster level 20 | 20 | 0.312 | 0.0% | 70.1% | 26.1% | 3.3% | 0.6% | 0.0% | 20 / 21 / 21 | 1.2% | 0.0019 | 0 |
 | Boss (plains) level 15 | 15 | 1.000 | 25.1% | 37.4% | 37.5% | 0.0% | 0.0% | 0.0% | 15 / 15 / 15 | 0.0% | 0.0000 | 0 |
 | Boss (forest) level 25 | 25 | 1.050 | 0.0% | 38.1% | 38.3% | 18.9% | 4.7% | 0.0% | 25 / 25 / 25 | 23.8% | 0.0496 | 0 |
 | Boss (swamp) level 35 | 35 | 1.050 | 0.0% | 38.1% | 38.3% | 18.9% | 4.7% | 0.0% | 35 / 35 / 35 | 23.8% | 0.0496 | 0 |
@@ -59,8 +59,8 @@ Each biome's boss drops from a source of its own (`boss_<biome>`, IDL-44): a gua
 | boss_coast | 27 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_hills | 32 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_lake | 37 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_jungle | 58 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_fields | 66 | nothing yet | 1.00 | - | - | - | - | - |
+| boss_jungle | 58 | Dawnbringer Trident | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
+| boss_fields | 66 | Reaper's Crescent | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
 | boss_orchard | 74 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_blight | 82 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_battlefield | 90 | nothing yet | 1.00 | - | - | - | - | - |
@@ -79,43 +79,43 @@ Normal monsters drop from the source of their biome (`monster_<biome>`, pool `eq
 
 | Source | Level | Gear / kill | Grades | Weapon | Off hand | Armor | Accessory |
 |---|---:|---:|---|---:|---:|---:|---:|
-| monster_plains | 1 | 0.119 | G1 100.0% | 25.6% | 16.8% | 36.7% | 20.9% |
-| monster_plains | 11 | 0.222 | G2 100.0% | 16.3% | 11.7% | 38.0% | 34.0% |
-| monster_plains | 20 | 0.310 | G3 100.0% | 24.8% | 12.7% | 37.5% | 25.0% |
-| monster_forest | 4 | 0.150 | G1 100.0% | 25.0% | 16.6% | 37.3% | 21.1% |
-| monster_forest | 14 | 0.251 | G2 100.0% | 16.4% | 11.3% | 38.3% | 34.0% |
-| monster_forest | 24 | 0.350 | G3 100.0% | 24.9% | 12.4% | 37.9% | 24.9% |
-| monster_swamp | 8 | 0.192 | G1 67.1%, G2 32.9% | 22.0% | 15.2% | 37.3% | 25.5% |
-| monster_swamp | 18 | 0.290 | G2 66.9%, G3 33.1% | 19.2% | 11.9% | 37.9% | 31.0% |
-| monster_swamp | 28 | 0.387 | G3 100.0% | 24.9% | 12.4% | 37.8% | 24.8% |
-| monster_tundra | 12 | 0.231 | G2 100.0% | 16.4% | 11.5% | 38.2% | 33.9% |
-| monster_tundra | 21 | 0.321 | G3 100.0% | 24.9% | 12.7% | 37.5% | 24.9% |
-| monster_tundra | 30 | 0.409 | G3 66.6%, G4 33.4% | 22.9% | 12.3% | 35.9% | 28.8% |
-| monster_coast | 2 | 0.129 | G1 100.0% | 25.6% | 16.7% | 36.5% | 21.3% |
-| monster_coast | 12 | 0.231 | G2 100.0% | 16.4% | 11.5% | 38.2% | 33.9% |
-| monster_coast | 22 | 0.331 | G3 100.0% | 24.9% | 12.4% | 37.6% | 25.0% |
-| monster_hills | 6 | 0.170 | G1 100.0% | 25.3% | 16.2% | 37.4% | 21.1% |
-| monster_hills | 16 | 0.270 | G2 100.0% | 16.5% | 11.2% | 38.1% | 34.2% |
-| monster_hills | 26 | 0.368 | G3 100.0% | 24.7% | 12.4% | 37.8% | 25.0% |
-| monster_lake | 10 | 0.212 | G2 100.0% | 16.6% | 11.6% | 37.9% | 33.9% |
-| monster_lake | 20 | 0.310 | G3 100.0% | 24.8% | 12.7% | 37.5% | 25.0% |
-| monster_lake | 29 | 0.399 | G3 100.0% | 24.9% | 12.4% | 37.7% | 24.9% |
-| monster_jungle | 16 | 0.270 | G2 100.0% | 16.5% | 11.2% | 38.1% | 34.2% |
-| monster_jungle | 32 | 0.430 | G4 100.0% | 19.1% | 12.0% | 32.4% | 36.5% |
-| monster_jungle | 47 | 0.580 | G5 100.0% | 18.4% | 14.2% | 24.8% | 42.6% |
-| monster_fields | 20 | 0.310 | G3 100.0% | 24.8% | 12.7% | 37.5% | 25.0% |
-| monster_fields | 36 | 0.470 | G4 100.0% | 19.2% | 11.9% | 32.2% | 36.7% |
-| monster_fields | 52 | 0.632 | G5 100.0% | 18.5% | 14.1% | 24.9% | 42.4% |
-| monster_orchard | 24 | 0.350 | G3 100.0% | 24.9% | 12.4% | 37.9% | 24.9% |
-| monster_orchard | 40 | 0.512 | G4 100.0% | 19.1% | 12.0% | 32.6% | 36.3% |
-| monster_orchard | 56 | 0.670 | G6 100.0% | 20.0% | 12.7% | 33.6% | 33.6% |
-| monster_blight | 28 | 0.387 | G3 100.0% | 24.9% | 12.4% | 37.8% | 24.8% |
-| monster_blight | 44 | 0.550 | G5 100.0% | 18.5% | 14.1% | 24.8% | 42.6% |
-| monster_blight | 60 | 0.711 | G6 100.0% | 20.0% | 12.8% | 33.6% | 33.6% |
-| monster_battlefield | 32 | 0.430 | G4 100.0% | 19.1% | 12.0% | 32.4% | 36.5% |
-| monster_battlefield | 48 | 0.588 | G5 100.0% | 18.4% | 14.1% | 24.9% | 42.6% |
-| monster_battlefield | 64 | 0.752 | G6 100.0% | 20.2% | 12.6% | 33.5% | 33.7% |
-| monster | 9 | 0.200 | G1 33.2%, G2 66.8% | 19.4% | 13.2% | 37.9% | 29.4% |
+| monster_plains | 1 | 0.119 | G1 100.0% | 25.7% | 17.4% | 35.6% | 21.3% |
+| monster_plains | 11 | 0.217 | G2 100.0% | 16.9% | 11.6% | 37.6% | 34.0% |
+| monster_plains | 20 | 0.312 | - 0.6%, G3 99.4% | 25.6% | 12.4% | 37.0% | 25.0% |
+| monster_forest | 4 | 0.150 | G1 100.0% | 25.4% | 16.6% | 36.9% | 21.1% |
+| monster_forest | 14 | 0.248 | - 0.3%, G2 99.7% | 16.9% | 11.4% | 37.8% | 33.8% |
+| monster_forest | 24 | 0.352 | - 0.6%, G3 99.4% | 25.6% | 12.7% | 36.8% | 24.9% |
+| monster_swamp | 8 | 0.191 | G1 66.6%, G2 33.4% | 22.3% | 15.1% | 37.7% | 24.9% |
+| monster_swamp | 18 | 0.290 | - 0.7%, G2 66.4%, G3 32.9% | 20.1% | 11.9% | 37.3% | 30.8% |
+| monster_swamp | 28 | 0.391 | - 0.5%, G3 99.5% | 25.3% | 12.7% | 37.5% | 24.5% |
+| monster_tundra | 12 | 0.228 | G2 100.0% | 16.7% | 11.5% | 37.5% | 34.3% |
+| monster_tundra | 21 | 0.323 | - 0.6%, G3 99.4% | 25.6% | 12.6% | 36.9% | 24.9% |
+| monster_tundra | 30 | 0.410 | - 0.5%, G3 66.3%, G4 33.2% | 23.4% | 12.6% | 35.3% | 28.6% |
+| monster_coast | 2 | 0.129 | G1 100.0% | 25.5% | 17.0% | 36.1% | 21.4% |
+| monster_coast | 12 | 0.228 | G2 100.0% | 16.7% | 11.5% | 37.5% | 34.3% |
+| monster_coast | 22 | 0.332 | - 0.6%, G3 99.4% | 25.5% | 12.6% | 37.0% | 24.8% |
+| monster_hills | 6 | 0.170 | G1 100.0% | 25.3% | 16.6% | 37.2% | 21.0% |
+| monster_hills | 16 | 0.269 | - 0.7%, G2 99.3% | 17.4% | 11.4% | 37.5% | 33.6% |
+| monster_hills | 26 | 0.372 | - 0.6%, G3 99.4% | 25.5% | 12.7% | 37.1% | 24.7% |
+| monster_lake | 10 | 0.209 | G2 100.0% | 16.8% | 11.6% | 37.8% | 33.8% |
+| monster_lake | 20 | 0.312 | - 0.6%, G3 99.4% | 25.6% | 12.4% | 37.0% | 25.0% |
+| monster_lake | 29 | 0.401 | - 0.5%, G3 99.5% | 25.3% | 12.8% | 37.3% | 24.7% |
+| monster_jungle | 16 | 0.269 | - 0.7%, G2 99.3% | 17.4% | 11.4% | 37.5% | 33.6% |
+| monster_jungle | 32 | 0.429 | - 0.5%, G4 99.5% | 19.9% | 12.1% | 31.9% | 36.0% |
+| monster_jungle | 47 | 0.578 | - 0.3%, G5 99.7% | 18.9% | 14.1% | 24.6% | 42.5% |
+| monster_fields | 20 | 0.312 | - 0.6%, G3 99.4% | 25.6% | 12.4% | 37.0% | 25.0% |
+| monster_fields | 36 | 0.471 | - 0.4%, G4 99.6% | 19.7% | 11.8% | 32.2% | 36.3% |
+| monster_fields | 52 | 0.632 | - 0.4%, G5 99.6% | 18.8% | 14.1% | 24.7% | 42.5% |
+| monster_orchard | 24 | 0.352 | - 0.6%, G3 99.4% | 25.6% | 12.7% | 36.8% | 24.9% |
+| monster_orchard | 40 | 0.512 | - 0.3%, G4 99.7% | 19.7% | 12.1% | 32.0% | 36.3% |
+| monster_orchard | 56 | 0.671 | - 0.3%, G6 99.7% | 20.1% | 12.8% | 33.9% | 33.3% |
+| monster_blight | 28 | 0.391 | - 0.5%, G3 99.5% | 25.3% | 12.7% | 37.5% | 24.5% |
+| monster_blight | 44 | 0.549 | - 0.4%, G5 99.6% | 19.0% | 14.2% | 24.3% | 42.5% |
+| monster_blight | 60 | 0.711 | - 0.3%, G6 99.7% | 20.3% | 12.7% | 33.7% | 33.4% |
+| monster_battlefield | 32 | 0.429 | - 0.5%, G4 99.5% | 19.9% | 12.1% | 31.9% | 36.0% |
+| monster_battlefield | 48 | 0.590 | - 0.3%, G5 99.7% | 18.8% | 14.2% | 24.6% | 42.4% |
+| monster_battlefield | 64 | 0.751 | - 0.3%, G6 99.7% | 20.3% | 12.6% | 33.6% | 33.5% |
+| monster | 9 | 0.200 | G1 33.7%, G2 66.3% | 19.3% | 13.1% | 37.7% | 29.9% |
 
 ## First epic (IDL-382)
 
@@ -123,11 +123,11 @@ How many kills (normal monsters) or fights (bosses) until the first epic or bett
 
 | Source | Level | Kills until an epic: mean | p10 | p50 | p90 |
 |---|---:|---:|---:|---:|---:|
-| monster | 20 | 61.2 | 10 | 51 | 125 |
-| monster | 30 | 46.1 | 8 | 39 | 94 |
-| monster | 40 | 36.9 | 6 | 31 | 75 |
-| monster | 50 | 12.1 | 2 | 9 | 26 |
-| monster | 70 | 43.9 | 8 | 36 | 90 |
+| monster | 20 | 56.2 | 9 | 47 | 116 |
+| monster | 30 | 43.7 | 7 | 36 | 90 |
+| monster | 40 | 34.9 | 6 | 29 | 72 |
+| monster | 50 | 11.9 | 2 | 9 | 25 |
+| monster | 70 | 41.3 | 7 | 34 | 85 |
 | boss | 25 | 5.1 | 1 | 4 | 11 |
 | boss | 45 | 3.0 | 1 | 2 | 6 |
 | boss | 70 | 5.0 | 1 | 4 | 11 |
@@ -139,11 +139,11 @@ A level 9 monster and a castle 5 chest at several Luck totals (Charisma + Lucky 
 | Luck | Chest every | Monster gear / kill | Rare+ share of monster gear | Rare+ share of chest gear | Gem find / chest | Gems / chest | Golden monster |
 |---:|---:|---:|---:|---:|---:|---:|---:|
 | 0 | 12.0 min | 0.200 | 6.3% | 11.5% | 3.0% | 0.59 | 2.0% |
-| 10 | 11.3 min | 0.205 | 6.6% | 11.8% | 3.6% | 0.71 | 2.5% |
-| 30 | 10.2 min | 0.213 | 6.8% | 12.3% | 4.8% | 0.95 | 3.5% |
-| 60 | 8.8 min | 0.224 | 7.4% | 13.3% | 6.6% | 1.32 | 5.0% |
-| 100 | 7.5 min | 0.240 | 8.3% | 14.5% | 9.0% | 1.79 | 7.0% |
-| 200 | 6.0 min | 0.280 | 9.8% | 15.8% | 15.0% | 2.99 | 10.0% |
+| 10 | 11.3 min | 0.203 | 6.6% | 11.8% | 3.6% | 0.71 | 2.5% |
+| 30 | 10.2 min | 0.211 | 7.0% | 12.3% | 4.8% | 0.95 | 3.5% |
+| 60 | 8.8 min | 0.223 | 7.6% | 13.3% | 6.6% | 1.32 | 5.0% |
+| 100 | 7.5 min | 0.239 | 8.5% | 14.5% | 9.0% | 1.79 | 7.0% |
+| 200 | 6.0 min | 0.279 | 9.4% | 15.8% | 15.0% | 2.99 | 10.0% |
 
 ## Item power over the level range
 
@@ -159,19 +159,19 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 
 ## Profiles
 
-- **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_plains**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_forest**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_swamp**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_tundra**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_coast**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_hills**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_lake**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_jungle**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_fields**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_orchard**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_blight**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
-- **normal_monster_battlefield**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion
+- **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_plains**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_forest**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_swamp**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_tundra**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_coast**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_hills**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_lake**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_jungle**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_fields**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_orchard**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_blight**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
+- **normal_monster_battlefield**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary
 - **boss**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_plains**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_forest**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
@@ -180,8 +180,8 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **boss_coast**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_hills**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_lake**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
-- **boss_jungle**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
-- **boss_fields**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
+- **boss_jungle**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
+- **boss_fields**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
 - **boss_orchard**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_blight**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **boss_battlefield**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
