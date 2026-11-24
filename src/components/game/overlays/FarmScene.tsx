@@ -12,6 +12,7 @@ import {
 	penZoom,
 	project,
 	randomSpot,
+	animalSize,
 	spriteFit,
 	PERSONAL_SPACE,
 	roomySpot,
@@ -263,7 +264,8 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, roosters = 0, highlig
 				{instances.map((inst) => {
 					const a = inst.animal;
 					const icon = iconOf(inst);
-					const fit = spriteFit(PIXEL_ICON_SIZES[icon][0]);
+					const size = animalSize(icon);
+					const fit = spriteFit(PIXEL_ICON_SIZES[icon][0], size);
 					return (
 						<div
 							key={inst.key}
@@ -272,6 +274,7 @@ const FarmScene: React.FC<FarmSceneProps> = ({ farmLevels, roosters = 0, highlig
 								else nodes.current.delete(inst.key);
 							}}
 							className='farm-animal'
+							style={{ '--s': size / 0.75 } as React.CSSProperties}
 							data-selected={highlightId === a.id}
 							data-celebrate={celebrate === a.id}
 						>

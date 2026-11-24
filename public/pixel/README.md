@@ -17,7 +17,7 @@ Everything the game draws lives here, in folders by what the picture **is** (not
 | `castles/` | castle levels 1..10, premium skins, loading strip ([README](castles/README.md)) | levels yes, skins planned |
 | `enemies/` | monsters and bosses, `enemies/<biome>/<id>.png` ([README](enemies/README.md)) | yes (`enabled` monsters) |
 | `farm/`, `bg/`, `terrain/` | farm props; `bg/` crack tile, fog and the farm meadow; `terrain/` the ground textures (`tex_<biome>.png`, also used as the dialog swatches) and shape atlases | yes |
-| `farm_rework/` | 18 isometric 200 px farm props for the later farm rework ([README](farm_rework/README.md)) | no, planned (IDL-346) |
+| `farm_rework/` | 18 isometric 200 px farm props for the later farm rework ([README](farm_rework/README.md)) | yes, baked down into `farm/` (all but `fence_section`) |
 | `pets/` | Yuki (`kaczkawu_dog.png`, in the game) and new pet sprite sheets not sorted yet ([README](pets/README.md)) | Yuki only |
 | `wireframe/` | the green hologram "early tester" set: sources of the Beta tester avatar and the Early tester badge, plus three pets ([README](wireframe/README.md)) | partly (copies are wired, see README) |
 | `__reuse/` | loose cut-outs (15), 75 equipment cut-outs in `__reuse/equipment/` ([README](__reuse/equipment/README.md)) and 63 prepared equipment sets in `__reuse/sets/` ([README](__reuse/sets/README.md)) that nothing in the game uses yet, grouped by kind (the 9 skill icons for the later Skills tab are in `__reuse/skills/`); found by name in Storybook *Unsorted cuts*. The `__` puts it at the top and marks it as a pool to organise later | no |
