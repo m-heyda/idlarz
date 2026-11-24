@@ -68,7 +68,7 @@ export type SaveFlag =
 
 /**
  * What the server does when a flag fires (IDL-167, IDL-112), recorded in one place instead of scattered through the pipeline:
- *  - `flag`: accepted as sent, the account loses its ranking (`POISON_FLAGS`); nothing the server pays out depends on the claim.
+ *  - `flag`: accepted as sent and recorded; the account loses its ranking only for a flag in `POISON_FLAGS` (`castle_jump`, `timer_jump` and `playtime_fast` are recorded only); nothing the server pays out depends on the claim being right (away pay included: a flag never stops a claim).
  *  - `clamp`: accepted, but the server replaces the claimed number with the one it can explain (XP, Embers), or pays from the last trusted
  *    economy (`trustedEconomy.ts`: castle level, rates, merchant levels); the flag stays.
  *  - `reject`: the save is refused, but only while `ENFORCEMENT.enabled` is on (until then it behaves as `flag`).
@@ -85,10 +85,10 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  * - `xp_jump`: XP above what bought tiles, play time and server payouts explain ({@link XP_MODEL}).
  * - `gems_increase`: gems above the server's balance. `prestige_regress`: rebirths or Embers earned went down.
  * - `timer_jump`: a building level or timer faster than real time (the building system, off unless `BUILDINGS_FLAG` is on): the same rule as `castle_jump`, with the buildings sharing the castle's builder. A new building is level 1; every later level needs a running upgrade whose timer the real time between the saves covers.
- * - `castle_jump`: castle level or timer faster than real time. After a flag the timer it is judged against keeps running on the server clock ({@link trustedEconomy}), so one flag does not repeat on every later honest save (IDL-250). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
+ * - `castle_jump`: castle level or timer faster than real time. It only records: a browser left open or asleep, an auto-clicker or a late save trips it in normal play, and a forged level's cost is what `networth_exceeds` clamps. A baseline frozen by the net-worth check keeps its timer running on the server clock ({@link trustedEconomy}) and is believed again once the real time covers the claim (`believableAfterFreeze`). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
  *
  * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
- * With it on, only `playtime_fast`, `gold_jump` and `gems_increase` refuse a save (HTTP 422).
+ * With it on, only `gold_jump` and `gems_increase` refuse a save (HTTP 422).
  *
  * @category Saves & Server/Accepting a save
  * @order 2
@@ -97,13 +97,13 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	baseline_rich: 'flag', // a first save holds a whole history (an imported or older game): nothing to compare with, so it cannot be refused
 	networth_exceeds: 'clamp', // land, buildings, castle and merchant levels are paid from the last trusted rates, not the claimed ones
 	playtime_regress: 'flag', // going back to an older save is the player's choice
-	playtime_fast: 'reject', // more play time than real time passed: the clock is forged
+	playtime_fast: 'flag', // more play time than real time passed: recorded only (a browser left open or put to sleep, an auto-clicker, a clock change are normal play); the XP check bounds what play time can pay
 	gold_jump: 'reject', // more gold than income, stock and the server's grants explain
 	xp_jump: 'clamp',
 	gems_increase: 'reject', // gems are the ledger's; a save that claims more is forged
 	prestige_regress: 'flag', // a New Game or an older save
-	castle_jump: 'clamp',
-	timer_jump: 'clamp', // building levels and rates are paid from the last trusted save, like the castle
+	castle_jump: 'flag', // recorded only: a castle or building level is paid as claimed, what it cost is judged by `networth_exceeds` (a browser left open or put to sleep, an auto-clicker or a save that came late are normal play)
+	timer_jump: 'flag',
 	ember_jump: 'clamp',
 };
 
@@ -139,7 +139,7 @@ export interface Enforcement {
  */
 export const ENFORCEMENT: Enforcement = {
 	enabled: false,
-	reject: new Set<SaveFlag>(['playtime_fast', 'gold_jump', 'gems_increase']),
+	reject: new Set<SaveFlag>(['gold_jump', 'gems_increase']),
 };
 
 /** The flags that make this save refused under the given enforcement (none while it is off). */
@@ -147,7 +147,8 @@ export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforceme
 	enforcement.enabled ? flags.filter((flag) => FLAG_POLICY[flag] === 'reject' && enforcement.reject.has(flag)) : [];
 
 /**
- * Flags that make an account ineligible for rankings for good. Going back in time is a player choice (older save), not a cheat.
+ * Flags that make an account ineligible for rankings for good (and stop its away pay while they stand on the stored save). Going back in time is a player choice (older save), not a cheat. `playtime_fast`, `castle_jump` and `timer_jump` are NOT in
+ * this set: leaving the browser open or asleep, an auto-clicker or a late save trips them in normal play, so they are recorded for reading (`check-live-saves`) and nothing more; what a forged level could gain is bounded by `networth_exceeds`.
  *
  * @category Saves & Server/Accepting a save
  * @order 9
@@ -155,15 +156,22 @@ export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforceme
 export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 	'baseline_rich',
 	'networth_exceeds',
-	'playtime_fast',
 	'gold_jump',
 	'xp_jump',
 	'gems_increase',
 	'prestige_regress',
-	'castle_jump',
-	'timer_jump',
 	'ember_jump',
 ]);
+
+/**
+ * The flags that say the land or the gold a save claims cannot be explained (a forged map or purse). Only these keep a save's land facts and gold out of the deeds ({@link FORGED_LAND_FLAGS}, {@link FORGED_GOLD_FLAGS}):
+ * a save that tripped some other check (a castle timer, XP, a rebirth count, going back to an older save) says nothing against its tiles or its gold, so an honest player is not locked out of the deeds by it.
+ *
+ * @category Progression/Achievements
+ * @order 6
+ */
+export const FORGED_LAND_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast']);
+export const FORGED_GOLD_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['baseline_rich', 'networth_exceeds', 'playtime_fast', 'gold_jump']);
 
 /**
  * `grants`: what the server itself handed out since the previous save (income while away, chest and kill rewards): a save may
@@ -174,12 +182,74 @@ export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
 const maxBuildTimeCut = (before: SaveSummary, next: SaveSummary): number =>
 	Math.min(IDOL_RULES.buildTimeCap / 100, Math.max(before.derived.buildTimeReduction ?? 0, next.derived.buildTimeReduction ?? 0));
 
+/** What the healing rule needs when the previous save is a frozen baseline: the real seconds since the last save the server believed, and the builders and remembered Idol levels the timers are judged with. */
+interface FrozenCheck {
+	sinceTrustedSec: number;
+	trustedIdols: Record<string, number>;
+	gemBuilders: number;
+}
+
+/**
+ * The way out of a frozen account whose trusted save had no upgrade running (the self-heal rule; with one running, the frozen timer that keeps counting down on the server clock is the way out, IDL-250). After a `castle_jump` / `timer_jump` the server pays from the last trusted save, and a claim many levels ahead of it can never pass the one-level-per-save rule, so every later save of an honest
+ * account (one that was left running for a night, say) raised the flag again and the freeze never ended. The frozen summary now remembers when it was last believed (`derived.trustedAt`), and a claim is believed once the real time since then covers all the
+ * timers it needs: every castle level above the trusted one, every building level above the trusted one (a building not in the trusted save is born at level 1), and the part of each running upgrade that is already done, each at the shortest timer the
+ * player's build-time cuts allow, against `builders` upgrades running side by side. A claim that needs more time than has passed stays flagged, so a forged jump is still refused and only ever pays once the clock has caught up with it.
+ *
+ * @category Saves & Server/Accepting a save
+ * @order 8
+ * @formula
+ * work     = (sum of the timers of every claimed level above the trusted one + the done part of each running upgrade) x (1 - build-time cut)
+ * believed = castle work <= seconds since the last trusted save x 1.05 + 30 s (the castle's levels follow one another), all work <= seconds x builders x 1.05 + 30 s, and the builders in use are within what the account has
+ */
+const believableAfterFreeze = (before: SaveSummary, next: SaveSummary, frozen: FrozenCheck): boolean => {
+	// a baseline with an upgrade running has a timer that carries on by itself on the server clock (IDL-250): that is the way out then
+	if (before.derived.castleUpgrade || derivedJobs(before.derived).jobs.length > 0) return false;
+	const cut = maxBuildTimeCut(before, next);
+	const keep = 1 - cut;
+	let work = 0;
+	if (next.castleLevel < before.castleLevel) return false;
+	for (let level = before.castleLevel; level < next.castleLevel; level++) {
+		const duration = CASTLE_UPGRADE.durationsSec[level - 1];
+		if (duration === undefined) return false;
+		work += duration * keep;
+	}
+	const castle = next.derived.castleUpgrade;
+	if (castle) {
+		const duration = CASTLE_UPGRADE.durationsSec[castle.toLevel - 2];
+		if (castle.toLevel !== next.castleLevel + 1 || duration === undefined) return false;
+		work += Math.max(0, duration * keep - castle.remainingSec);
+	}
+	// the castle's levels follow one another (one castle upgrade at a time): they cannot be spread over the builders
+	const allowedSec = frozen.sinceTrustedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
+	if (work > allowedSec) return false;
+	const trusted = before.derived.buildings ?? {};
+	for (const [id, level] of Object.entries(next.derived.buildings ?? {})) {
+		const idol = idolDef(id);
+		const old = trusted[id];
+		if (old !== undefined && level < old) return false;
+		const from = old ?? (idol && level <= (frozen.trustedIdols[idol.biome] ?? 0) ? level : 1);
+		for (let to = from + 1; to <= level; to++) work += shortestUpgradeSec(to, !!idol) * keep;
+	}
+	const jobs = derivedJobs(next.derived).jobs;
+	for (const job of jobs) {
+		if (job.remainingSec <= 0) return false;
+		work += Math.max(0, shortestUpgradeSec(job.toLevel, !!idolDef(job.building)) * keep - job.remainingSec);
+	}
+	const builders = Math.min(HARD_LIMITS.builders, 1 + frozen.gemBuilders + Math.max(0, (next.derived.builders ?? 1) - 1));
+	const running = (s: SaveSummary) => derivedJobs(s.derived).jobs.length + (s.derived.castleUpgrade ? 1 : 0);
+	if (running(next) > Math.max(builders, running(before))) return false;
+	return work <= frozen.sinceTrustedSec * builders * VERIFY.castleSlack + VERIFY.castleGraceSec;
+};
+
 /**
  * The castle upgrade is a timer the server can check from two summaries: it runs at most as fast as real time. So a new castle level is
  * only believable when an upgrade was running and the real time between the saves covers what was left of its timer, and a running timer
  * cannot have lost more seconds than passed. (Setting `remainingSec` to 0 in a save, or a level the timer never paid for, is a jump.)
  */
-const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
+const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, frozen: FrozenCheck | null): boolean =>
+	castleStepJumped(before, next, elapsedSec) && !(frozen && believableAfterFreeze(before, next, frozen));
+
+const castleStepJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number): boolean => {
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = before.derived.castleUpgrade;
 	const now = next.derived.castleUpgrade;
@@ -201,7 +271,16 @@ const castleJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number
  * and whose remaining time the real seconds between the saves cover, and a running timer cannot have lost more seconds than passed. Several can run at once, but never more than the account has builders (`builders`: the Gem shop's, from the ledger,
  * plus the save's own, with the castle's upgrade counted too). Always false while the building system is off.
  */
-const timerJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number> = {}, gemBuilders = 0): boolean => {
+const timerJumped = (
+	before: SaveSummary,
+	next: SaveSummary,
+	elapsedSec: number,
+	trustedIdols: Record<string, number> = {},
+	gemBuilders = 0,
+	frozen: FrozenCheck | null = null,
+): boolean => timerStepJumped(before, next, elapsedSec, trustedIdols, gemBuilders) && !(frozen && believableAfterFreeze(before, next, frozen));
+
+const timerStepJumped = (before: SaveSummary, next: SaveSummary, elapsedSec: number, trustedIdols: Record<string, number>, gemBuilders: number): boolean => {
 	if (!BUILDINGS_FLAG.enabled) return false;
 	const allowed = elapsedSec * VERIFY.castleSlack + VERIFY.castleGraceSec;
 	const was = derivedJobs(before.derived).jobs;
@@ -286,8 +365,12 @@ export const verifyTransition = (
 
 	// the time-shift potions the server paid since the last save (`granted.shiftSec`) let the timers run that many seconds ahead
 	const timerSec = elapsedSec + Math.max(0, grants?.shiftSec ?? 0);
-	if (sameRun && castleJumped(before, next, timerSec)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, timerSec, trustedIdols, gemBuilders)) flags.add('timer_jump');
+	// a frozen baseline (the server pays from an older save than the previous one) remembers when it was last believed
+	const trustedAt = before.derived.trustedAt;
+	const frozen: FrozenCheck | null =
+		trustedAt === undefined ? null : { sinceTrustedSec: Math.max(0, (nowMs - trustedAt) / 1000), trustedIdols: trustedIdols ?? {}, gemBuilders };
+	if (sameRun && castleJumped(before, next, timerSec, frozen)) flags.add('castle_jump');
+	if (sameRun && timerJumped(before, next, timerSec, trustedIdols, gemBuilders, frozen)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

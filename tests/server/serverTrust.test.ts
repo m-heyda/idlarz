@@ -7,7 +7,7 @@ import { acceptSave } from '../../src/lib/cloudSave/pipeline';
 import { summarize } from '../../src/lib/cloudSave/summary';
 import { merchantGoldSpent } from '../../src/lib/cloudSave/netWorth';
 import { restoreMerchantLevels } from '../../src/lib/cloudSave/trustedEconomy';
-import { ENFORCEMENT, FLAG_POLICY, rejectedFlags, verifyTransition, type SaveFlag } from '../../src/lib/cloudSave/verify';
+import { ENFORCEMENT, FLAG_POLICY, POISON_FLAGS, rejectedFlags, verifyTransition, type SaveFlag } from '../../src/lib/cloudSave/verify';
 import { MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { merchantUpgradeCost } from '../../src/utils/game/merchant';
 import type { PersistedGame } from '../../src/lib/sanitizeSave';
@@ -33,13 +33,22 @@ test('every flag has a decision, and the ones enforcement can refuse are exactly
 		'gems_increase',
 		'prestige_regress',
 		'castle_jump',
+		'timer_jump',
 		'ember_jump',
 	];
 	for (const flag of flags) assert.ok(['flag', 'clamp', 'reject'].includes(FLAG_POLICY[flag]), flag);
-	assert.deepEqual(rejectedFlags(flags, ON).sort(), ['gems_increase', 'gold_jump', 'playtime_fast']);
+	assert.deepEqual(rejectedFlags(flags, ON).sort(), ['gems_increase', 'gold_jump']);
 	assert.deepEqual(rejectedFlags(flags, { enabled: false, reject: ENFORCEMENT.reject }), [], 'the kill switch turns every refusal off');
 	assert.deepEqual(rejectedFlags(flags, { enabled: true, reject: new Set<SaveFlag>(['gold_jump']) }), ['gold_jump'], 'a flag off the list is not enforced');
 	assert.deepEqual(rejectedFlags(['castle_jump', 'xp_jump'], ON), [], 'clamp and flag decisions never refuse a save');
+});
+
+test('normal play never costs an account its ranking or its away pay: a browser left open, an auto-clicker or a late save only leave a recorded flag', () => {
+	for (const flag of ['playtime_fast', 'castle_jump', 'timer_jump'] as SaveFlag[]) {
+		assert.equal(POISON_FLAGS.has(flag), false, `${flag} is not a poison flag`);
+		assert.equal(FLAG_POLICY[flag], 'flag', `${flag} only records`);
+	}
+	assert.equal(POISON_FLAGS.has('networth_exceeds'), true, 'what the game could not have paid still does');
 });
 
 test('shadow mode stores a gold jump flagged; enforcement refuses it and the account keeps its last accepted save', async () => {

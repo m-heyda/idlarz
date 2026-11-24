@@ -737,15 +737,15 @@ export const buildManifest = (): AssetEntry[] => {
 			});
 		}
 
-	// 6c. The second farm art set (200 px, isometric), waiting for the farm rework (IDL-346)
+	// 6c. The second farm art set (200 px, isometric): the originals. Most of it is baked down to the pen's pixel grid into public/pixel/farm/ (listed above as "farm part"); fence_section and the rest stay here as source
 	for (const f of walk(join(PUBLIC, 'pixel', 'farm_rework')))
 		add({
 			name: `farm_rework_${snake(basename(f, '.png'))}`,
 			category: 'map-details',
-			subcategory: 'farm rework (planned)',
+			subcategory: 'farm rework (source)',
 			src: url(f),
-			status: 'planned',
-			usedBy: ['Farm rework 2, IDL-346'],
+			status: f.endsWith('fence_section.png') ? 'planned' : 'used',
+			usedBy: f.endsWith('fence_section.png') ? ['Farm rework 2, IDL-346 (new fence)'] : ['farm window (baked into public/pixel/farm)'],
 			source: 'farm_rework',
 		});
 

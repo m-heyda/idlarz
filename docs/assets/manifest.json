@@ -14467,30 +14467,60 @@
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_barn",
+		"name": "farm_barrel_lid",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/barn.png",
+		"src": "/pixel/farm/barrel_lid.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			75,
-			68
+			22,
+			24
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_barrel",
+		"name": "farm_barrel_upright",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/barrel.png",
+		"src": "/pixel/farm/barrel_upright.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			14,
-			15
+			21,
+			26
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_beanstalk_sprout",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/beanstalk_sprout.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			21,
+			24
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_boulder_flat",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/boulder_flat.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			28
 		]
 	},
 	{
@@ -14512,51 +14542,6 @@
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_bush_0",
-		"category": "map-details",
-		"subcategory": "farm part",
-		"src": "/pixel/farm/bush_0.png",
-		"status": "used",
-		"source": "public/pixel/farm",
-		"size": [
-			19,
-			15
-		]
-	},
-	{
-		"usedBy": [
-			"farm window"
-		],
-		"name": "farm_bush_1",
-		"category": "map-details",
-		"subcategory": "farm part",
-		"src": "/pixel/farm/bush_1.png",
-		"status": "used",
-		"source": "public/pixel/farm",
-		"size": [
-			24,
-			19
-		]
-	},
-	{
-		"usedBy": [
-			"farm window"
-		],
-		"name": "farm_bush_2",
-		"category": "map-details",
-		"subcategory": "farm part",
-		"src": "/pixel/farm/bush_2.png",
-		"status": "used",
-		"source": "public/pixel/farm",
-		"size": [
-			29,
-			23
-		]
-	},
-	{
-		"usedBy": [
-			"farm window"
-		],
 		"name": "farm_coop",
 		"category": "map-details",
 		"subcategory": "farm part",
@@ -14566,21 +14551,6 @@
 		"size": [
 			40,
 			38
-		]
-	},
-	{
-		"usedBy": [
-			"farm window"
-		],
-		"name": "farm_crate",
-		"category": "map-details",
-		"subcategory": "farm part",
-		"src": "/pixel/farm/crate.png",
-		"status": "used",
-		"source": "public/pixel/farm",
-		"size": [
-			20,
-			17
 		]
 	},
 	{
@@ -14737,15 +14707,75 @@
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_hay",
+		"name": "farm_grass_tuft",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/hay.png",
+		"src": "/pixel/farm/grass_tuft.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			24,
+			26
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_hay_roll_front",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/hay_roll_front.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			25,
+			25
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_hay_roll_iso",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/hay_roll_iso.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
 			34,
-			26
+			29
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_hay_stack_block",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/hay_stack_block.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			27,
+			25
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_log_pile",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/log_pile.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			28,
+			27
 		]
 	},
 	{
@@ -14797,90 +14827,105 @@
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_stone_0",
+		"name": "farm_produce_stall",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/stone_0.png",
+		"src": "/pixel/farm/produce_stall.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			8,
-			7
+			48,
+			46
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_stone_1",
+		"name": "farm_red_barn",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/stone_1.png",
+		"src": "/pixel/farm/red_barn.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			10,
-			8
+			71,
+			69
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_stone_2",
+		"name": "farm_rock_cluster",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/stone_2.png",
+		"src": "/pixel/farm/rock_cluster.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			13,
-			11
+			22,
+			20
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_tank",
+		"name": "farm_signpost_blank",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/tank.png",
+		"src": "/pixel/farm/signpost_blank.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			28,
-			22
+			22,
+			30
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_trough_x",
+		"name": "farm_stone_well",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/trough_x.png",
+		"src": "/pixel/farm/stone_well.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			29,
-			21
+			32,
+			38
 		]
 	},
 	{
 		"usedBy": [
 			"farm window"
 		],
-		"name": "farm_trough_y",
+		"name": "farm_water_tub",
 		"category": "map-details",
 		"subcategory": "farm part",
-		"src": "/pixel/farm/trough_y.png",
+		"src": "/pixel/farm/water_tub.png",
 		"status": "used",
 		"source": "public/pixel/farm",
 		"size": [
-			28,
-			21
+			33,
+			28
+		]
+	},
+	{
+		"usedBy": [
+			"farm window"
+		],
+		"name": "farm_wheat_sheaf",
+		"category": "map-details",
+		"subcategory": "farm part",
+		"src": "/pixel/farm/wheat_sheaf.png",
+		"status": "used",
+		"source": "public/pixel/farm",
+		"size": [
+			22,
+			20
 		]
 	},
 	{
@@ -14898,13 +14943,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_barrel_lid",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/barrel_lid.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -14913,13 +14958,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_barrel_upright",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/barrel_upright.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -14928,13 +14973,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_beanstalk_sprout",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/beanstalk_sprout.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -14943,13 +14988,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_boulder_flat",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/boulder_flat.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -14958,13 +15003,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_cobble_path",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/cobble_path.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -14973,11 +15018,11 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"Farm rework 2, IDL-346 (new fence)"
 		],
 		"name": "farm_rework_fence_section",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/fence_section.png",
 		"status": "planned",
 		"source": "farm_rework",
@@ -14988,13 +15033,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_grass_tuft",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/grass_tuft.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15003,13 +15048,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_hay_roll_front",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/hay_roll_front.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15018,13 +15063,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_hay_roll_iso",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/hay_roll_iso.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15033,13 +15078,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_hay_stack_block",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/hay_stack_block.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15048,13 +15093,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_log_pile",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/log_pile.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15063,13 +15108,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_produce_stall",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/produce_stall.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15078,13 +15123,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_red_barn",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/red_barn.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15093,13 +15138,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_rock_cluster",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/rock_cluster.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15108,13 +15153,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_signpost_blank",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/signpost_blank.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15123,13 +15168,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_stone_well",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/stone_well.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15138,13 +15183,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_water_tub",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/water_tub.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,
@@ -15153,13 +15198,13 @@
 	},
 	{
 		"usedBy": [
-			"Farm rework 2, IDL-346"
+			"farm window (baked into public/pixel/farm)"
 		],
 		"name": "farm_rework_wheat_sheaf",
 		"category": "map-details",
-		"subcategory": "farm rework (planned)",
+		"subcategory": "farm rework (source)",
 		"src": "/pixel/farm_rework/wheat_sheaf.png",
-		"status": "planned",
+		"status": "used",
 		"source": "farm_rework",
 		"size": [
 			200,

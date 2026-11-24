@@ -465,6 +465,18 @@ test('settleIdols: the claim is cut to the trusted record plus one verified step
 	assert.deepEqual(claim({ hills: 1 }, {}), {}, 'a record for an Idol that does not stand');
 });
 
+test('settleIdols: an Idol that fell behind the record catches up several levels in the same run, never after a timer_jump and never without standing', () => {
+	const [a] = gameWith('forest', 1, 5);
+	patchTileAt(a.x, a.y, { building: 'idol_forest', buildingLevel: 4 });
+	const claim = (idolLevels: Record<string, number>, trusted: Record<string, number>, jumped: boolean, catchUp: boolean) =>
+		settleIdols(trusted, { tiles: api().tiles, idolLevels }, jumped, catchUp);
+	assert.deepEqual(claim({ forest: 4 }, { forest: 1 }, false, true), { forest: 4 }, 'three levels behind: caught up');
+	assert.deepEqual(claim({ forest: 4 }, {}, false, true), { forest: 4 }, 'an Idol the record never had');
+	assert.deepEqual(claim({ forest: 4 }, { forest: 1 }, false, false), { forest: 1 }, 'a rebirth, a New Game or a first save: one step only');
+	assert.deepEqual(claim({ forest: 4 }, { forest: 1 }, true, true), { forest: 1 }, 'a timer_jump: refused');
+	assert.deepEqual(claim({ forest: 5 }, { forest: 1 }, false, true), { forest: 1 }, 'a level the Idol does not stand at');
+});
+
 test('timer_jump: placing a learned Idol at its remembered level is fine, above it is a jump', () => {
 	const before = summarize(plain());
 	const placedAt = (level: number) => {
