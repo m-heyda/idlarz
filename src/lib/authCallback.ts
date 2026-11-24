@@ -7,6 +7,20 @@ export const CALLBACK_PATH = '/auth/callback';
 /** Where the callback sends a link that could not be used (expired, used twice, wrong browser). */
 export const RESET_EXPIRED_PATH = '/?reset=expired';
 
+/** What the landing page says when the emailed link could not be used (IDL-301) */
+export const RESET_EXPIRED_MESSAGE = 'That reset link has expired or was already used. Ask for a new one with "Forgot password".';
+
+/**
+ * The notice the landing page owes its address (`?reset=expired`, set by {@link RESET_EXPIRED_PATH}), or null. `rest` is the query string without that parameter, for the address bar, so a reload does not repeat the notice and `next` / `register` survive.
+ */
+export const landingNoticeOf = (search: string): { message: string; rest: string } | null => {
+	const params = new URLSearchParams(search);
+	if (params.get('reset') !== 'expired') return null;
+	params.delete('reset');
+	const rest = params.toString();
+	return { message: RESET_EXPIRED_MESSAGE, rest: rest ? `?${rest}` : '' };
+};
+
 /**
  * The `next` of the auth callback: a path on this site only (single leading `/`, no `//`, no backslash, no control characters), else `/play`.
  * It comes from the address bar, so an open redirect through it would turn a real reset email into a phishing link.

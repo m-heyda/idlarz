@@ -4,7 +4,7 @@ import { api, growTo, store } from '../helpers';
 import { pickPersisted, type PersistedGame } from '../../src/lib/sanitizeSave';
 import { SAVE_PREFIX, encodeSave } from '../../src/lib/saveFormat';
 import { createSaveStorage, type KeyValue } from '../../src/lib/saveStorage';
-import { checkCredentials, checkProfile, CHARACTER_NAME_MAX } from '../../src/lib/authValidation';
+import { checkCharacterName, checkCredentials, checkProfile, CHARACTER_NAME_MAX } from '../../src/lib/authValidation';
 import { DEFAULT_PLAYER_NAME } from '../../src/config/character';
 import { epochScoped } from '../../src/lib/storageScope';
 
@@ -142,4 +142,38 @@ test('the profile only ever lands on a brand-new game', () => {
 	api().resetGame();
 	assert.equal(api().applyProfileToFreshGame('Aria', 'dragon' as never), false);
 	assert.equal(api().applyProfileToFreshGame('   ', 'mage'), false);
+});
+
+test('the hero list has one source: the order the pickers use is exactly the classes the game defines, and every id fits the database shape check (IDL-280)', async () => {
+	const { PLAYER_CLASSES, PLAYER_CLASS_ORDER } = await import('../../src/config/playerClasses');
+	assert.deepEqual([...PLAYER_CLASS_ORDER].sort(), Object.keys(PLAYER_CLASSES).sort());
+	// supabase/migrations/player_class_open.sql: player_class ~ '^[a-z][a-z_]{0,31}$'
+	for (const id of PLAYER_CLASS_ORDER) assert.match(id, /^[a-z][a-z_]{0,31}$/, id);
+});
+
+test('blocked names (IDL-301): profanity and look-alikes are refused, impersonation names only as a whole, ordinary names pass', async () => {
+	const { isBlockedName, normalizeName } = await import('../../src/config/blockedNames');
+	for (const bad of ['fuck', 'F u c k', 'sh1t', 'B!tch', 'kurwa', 'Chuuuj', 'Pierdol', 'cwel', 'Hitler', 'Admin', '4dm1n', 'Idlarz', 'MOD'])
+		assert.equal(isBlockedName(bad), true, bad);
+	for (const fine of [
+		'Bob',
+		'Weronika',
+		'KaczkaWu',
+		'Warrior',
+		'Paladin',
+		'Ranger',
+		'Mage',
+		'Class',
+		'Assassin',
+		'Adminton',
+		'Modest',
+		'Hello',
+		'Łukasz',
+		'Zażółć',
+	])
+		assert.equal(isBlockedName(fine), false, fine);
+	assert.equal(normalizeName('Zażółć'), 'zazolc');
+	assert.equal(checkCharacterName('fuck').ok, false);
+	assert.equal(checkCharacterName('Bob').ok, true);
+	assert.equal(checkProfile({ characterName: 'sh1t', playerClass: 'mage' }).ok, false, 'the register and profile routes use the same check');
 });

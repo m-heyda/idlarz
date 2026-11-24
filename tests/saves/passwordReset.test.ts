@@ -136,3 +136,14 @@ test('reset route: a bad email is a 400, an outage is a 503, and limits answer 4
 	const body = await (await handleResetRequest(request('u0@example.com', '2.2.2.2'), d2)).json();
 	assert.ok(!JSON.stringify(body).includes('u0@example.com'), 'the limit answer never echoes the email');
 });
+
+test('the landing page owes a notice for an expired link and takes the parameter out of the address, keeping the others (IDL-301)', async () => {
+	const { landingNoticeOf, RESET_EXPIRED_MESSAGE, RESET_EXPIRED_PATH } = await import('../../src/lib/authCallback');
+	const fromPath = landingNoticeOf(RESET_EXPIRED_PATH.slice(1));
+	assert.equal(fromPath?.message, RESET_EXPIRED_MESSAGE);
+	assert.equal(fromPath?.rest, '');
+	assert.deepEqual(landingNoticeOf('?reset=expired&next=%2Fplay'), { message: RESET_EXPIRED_MESSAGE, rest: '?next=%2Fplay' });
+	assert.equal(landingNoticeOf('?next=%2Fplay'), null);
+	assert.equal(landingNoticeOf('?reset=ok'), null);
+	assert.equal(landingNoticeOf(''), null);
+});

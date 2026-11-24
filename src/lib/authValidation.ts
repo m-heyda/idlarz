@@ -1,3 +1,4 @@
+import { isBlockedName } from '@/config/blockedNames';
 import { PLAYER_CLASSES, PLAYER_CLASS_ORDER, type PlayerClassId } from '@/config/playerClasses';
 import { avatarById, avatarFitsClass, unlockedAvatarIds } from '@/catalog/avatars';
 
@@ -39,6 +40,7 @@ const checkPassword = (raw: unknown): Checked<string> => {
 export const checkCharacterName = (raw: unknown): Checked<string> => {
 	const name = typeof raw === 'string' ? raw.trim() : '';
 	if (!name || name.length > CHARACTER_NAME_MAX) return { ok: false, error: `Character name needs 1 to ${CHARACTER_NAME_MAX} characters.` };
+	if (isBlockedName(name)) return { ok: false, error: 'That name is not allowed. Pick another.' };
 	return { ok: true, value: name };
 };
 
