@@ -25,17 +25,17 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 
 | Category | Assets | Used | Planned | Unused |
 | --- | --- | --- | --- | --- |
-| [Potions](potions.md) | 55 | 45 | 0 | 10 |
-| [Weapons](weapons.md) | 235 | 173 | 35 | 27 |
-| [Armor](armor.md) | 174 | 83 | 39 | 52 |
-| [Accessories](accessories.md) | 53 | 41 | 12 | 0 |
-| [Monsters](monsters.md) | 53 | 53 | 0 | 0 |
-| [Buildings](buildings.md) | 108 | 25 | 31 | 52 |
-| [Resources](resources.md) | 95 | 58 | 12 | 25 |
+| [Potions](potions.md) | 73 | 65 | 0 | 8 |
+| [Weapons](weapons.md) | 235 | 184 | 24 | 27 |
+| [Armor](armor.md) | 174 | 95 | 27 | 52 |
+| [Accessories](accessories.md) | 53 | 45 | 8 | 0 |
+| [Monsters](monsters.md) | 57 | 57 | 0 | 0 |
+| [Buildings](buildings.md) | 108 | 39 | 31 | 38 |
+| [Resources](resources.md) | 133 | 99 | 9 | 25 |
 | [Map details](map-details.md) | 303 | 53 | 1 | 249 |
 | [UI](ui.md) | 105 | 94 | 5 | 6 |
 | [Portraits](portraits.md) | 22 | 16 | 6 | 0 |
 | [Biomes](biomes.md) | 5 | 5 | 0 | 0 |
 | [Equipment sets](sets.md) | 990 | 55 | 0 | 935 |
 | [Map ground and backdrops](map-ground.md) | 78 | 70 | 0 | 8 |
-| [Unsorted cuts](unsorted.md) | 20 | 1 | 0 | 19 |
+| [Unsorted cuts](unsorted.md) | 240 | 33 | 15 | 192 |

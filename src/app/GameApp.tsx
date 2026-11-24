@@ -182,7 +182,7 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 		void usePetStore.getState().sync();
 	}, [isHydrated, tabStatus, claim]);
 
-	// the Gem shop's record is read once per start: it holds Builder #2, which decides how many upgrades the game lets run at once (`gemBuilders`)
+	// the Gem shop's record is read once per start: it holds the Additional builder levels, which decide how many upgrades the game lets run at once (`gemBuilders`)
 	const gemsAsked = useRef(false);
 	useEffect(() => {
 		if (!isHydrated || tabStatus !== 'owner' || claim !== 'done' || gemsAsked.current) return;

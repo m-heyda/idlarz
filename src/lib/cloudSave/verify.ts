@@ -64,6 +64,7 @@ export type SaveFlag =
 	| 'prestige_regress'
 	| 'castle_jump'
 	| 'timer_jump'
+	| 'building_copies'
 	| 'ember_jump';
 
 /**
@@ -104,6 +105,7 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	prestige_regress: 'flag', // a New Game or an older save
 	castle_jump: 'flag', // recorded only: a castle or building level is paid as claimed, what it cost is judged by `networth_exceeds` (a browser left open or put to sleep, an auto-clicker or a save that came late are normal play)
 	timer_jump: 'flag',
+	building_copies: 'flag', // more copies of a Producer or Extractor than the account can own: recorded only
 	ember_jump: 'clamp',
 };
 
@@ -340,6 +342,7 @@ export const verifyTransition = (
 	grants?: GrantTotals,
 	trustedIdols?: Record<string, number>,
 	gemBuilders = 0,
+	gemSlots = 0,
 ): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
@@ -363,12 +366,16 @@ export const verifyTransition = (
 	if (next.rebirths < before.rebirths || next.legacyEarned < before.legacyEarned) flags.add('prestige_regress');
 	if (!grants && next.gems > before.gems) flags.add('gems_increase'); // without a ledger gems have no source in the game
 
+	// the time-shift potions the server paid since the last save (`granted.shiftSec`) let the timers run that many seconds ahead
+	const timerSec = elapsedSec + Math.max(0, grants?.shiftSec ?? 0);
 	// a frozen baseline (the server pays from an older save than the previous one) remembers when it was last believed
 	const trustedAt = before.derived.trustedAt;
 	const frozen: FrozenCheck | null =
 		trustedAt === undefined ? null : { sinceTrustedSec: Math.max(0, (nowMs - trustedAt) / 1000), trustedIdols: trustedIdols ?? {}, gemBuilders };
-	if (sameRun && castleJumped(before, next, elapsedSec, frozen)) flags.add('castle_jump');
-	if (sameRun && timerJumped(before, next, elapsedSec, trustedIdols, gemBuilders, frozen)) flags.add('timer_jump');
+	// the Ember shop's two Building Slot levels are the save's own claim, the Gem shop's slot is the ledger's: without it a save may hold three copies at most
+	if ((next.derived.maxCopies ?? 0) > 3 + Math.max(0, Math.min(1, gemSlots))) flags.add('building_copies');
+	if (sameRun && castleJumped(before, next, timerSec, frozen)) flags.add('castle_jump');
+	if (sameRun && timerJumped(before, next, timerSec, trustedIdols, gemBuilders, frozen)) flags.add('timer_jump');
 
 	if (sameRun) {
 		const played = Math.max(0, playedSec);

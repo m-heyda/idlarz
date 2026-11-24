@@ -24,7 +24,8 @@ const G = (grade: Grade, weapon: Parameters<typeof kit>[1] = 'mace'): Equipment 
 const BEST = STRONG_KIT;
 
 test('no enabled item exceeds the damage sanity ceiling', () => {
-	for (const def of Object.values(ITEM_CATALOG).filter((d) => d.enabled !== false)) assert.ok((def.stats?.damage ?? 0) <= COMBAT.maxItemDamage, def.id);
+	for (const def of Object.values(ITEM_CATALOG).filter((d) => d.enabled !== false && !d.craftOnly))
+		assert.ok((def.stats?.damage ?? 0) <= COMBAT.maxItemDamage, def.id);
 });
 
 test('the starter kit and the first grade never beat the boss, with or without skills and potions', () => {

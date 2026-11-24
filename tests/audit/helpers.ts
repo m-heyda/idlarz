@@ -152,6 +152,8 @@ export const combatOracle = {
 	attrMana: (int: number) => 20 + int * 4,
 	attrManaRegen: (int: number) => 0.5 + int * 0.05,
 	levelScale: (level: number) => 1 + 0.07 * (clamp(level, 1, 100) - 1),
+	/** The late-game tail on flat gear stats: 1.07 per item level above 55 (written out again here on purpose, an independent check of catalog/stats levelTail) */
+	levelTail: (level: number) => 1.07 ** Math.max(0, clamp(level, 1, 100) - 55),
 	quality: (q: number) => 1 + ((clamp(q, 0, 100) - 50) / 50) * 0.08,
 	/** Armor to damage reduction: a/(a+40), halved above 50 % (asymptote 75 %) */
 	armorReduction: (armor: number) => {

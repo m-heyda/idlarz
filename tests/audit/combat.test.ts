@@ -90,6 +90,8 @@ const TIER1: Record<string, number> = {
 };
 const roundStat = (key: string, v: number) => (!v ? 0 : INTEGER_STATS.has(key) ? Math.max(1, Math.round(v)) : round2(v));
 const factor = (key: string, ratio: number) => 1 + (ratio - 1) * (LEVEL_SHARE[key] ?? 1);
+/** The late-game tail (stats.levelTail) only multiplies the flat stats, the ones that follow the whole level curve */
+const tail = (key: string, ratio: number) => ((LEVEL_SHARE[key] ?? 1) >= 1 ? ratio : 1);
 
 const gearItems = ITEMS.filter((i) => i.slot);
 const levelsFor = (min: number, max: number) => [...new Set([min, 1, 10, 50, 100].map((l) => clamp(l, min, max)))];
@@ -105,7 +107,7 @@ test('item stats: every gear base at several levels and qualities matches 1 + 0.
 				const got = resolveItem(inst)!.stats;
 				const ratio = o.levelScale(level) / o.levelScale(min);
 				for (const [key, authored] of Object.entries(def.stats ?? {})) {
-					const want = roundStat(key, (authored as number) * factor(key, ratio) * o.quality(quality));
+					const want = roundStat(key, (authored as number) * factor(key, ratio) * tail(key, o.levelTail(level) / o.levelTail(min)) * o.quality(quality));
 					assert.equal((got as Record<string, number>)[key], want, `${def.id} L${level} q${quality} ${key}`);
 					checked++;
 				}
@@ -137,7 +139,10 @@ test('affixes: each affix at levels 1..100 and rolls 0..100 = tier-1 base x leve
 				const resolved = resolveItem(inst)!;
 				const lo = affix.roll[0];
 				const hi = affix.roll[1];
-				const want = roundStat(affix.stat, TIER1[affix.stat] * factor(affix.stat, o.levelScale(level)) * affix.power * (lo + (hi - lo) * (roll / 100)));
+				const want = roundStat(
+					affix.stat,
+					TIER1[affix.stat] * factor(affix.stat, o.levelScale(level)) * tail(affix.stat, o.levelTail(level)) * affix.power * (lo + (hi - lo) * (roll / 100)),
+				);
 				assert.equal(resolved.affixes[0].value, want, `${affix.id} L${level} roll ${roll}`);
 				// the stat on the item is the base's own plus the affix, rounded to 2 places
 				const base = baseStatsAt(ITEM_CATALOG.wooden_sword, level, 50, RARITIES.rare);

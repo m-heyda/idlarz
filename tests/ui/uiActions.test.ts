@@ -188,12 +188,12 @@ test('with the building system on the placeholder gives way to the real build me
 	const { builds } = buildOptions(useGameStore as never, at.x, at.y);
 	assert.deepEqual(
 		builds.map((o) => o.def.id),
-		['lumberyard', 'saptapper', 'idol_forest'],
-		'the Producer, the Extractor and the Idol of a forest',
+		['lumberyard', 'saptapper', 'idol_forest', 'watchtower', 'marketplace', 'trainingyard', 'scriptorium', 'guildhall', 'garrison'],
+		'the Producer, the Extractor, the Idol of a forest and the general buildings',
 	);
 	assert.deepEqual(
 		builds.map((o) => o.def.kind),
-		['producer', 'extractor', 'idol'],
+		['producer', 'extractor', 'idol', 'general', 'general', 'general', 'general', 'general', 'general'],
 	);
 	here.onSelect();
 	assert.deepEqual(useUiStore.getState().buildModal, { x: at.x, y: at.y }, 'selecting it opens the window for this tile');
@@ -205,7 +205,7 @@ test('with the building system on the placeholder gives way to the real build me
 	const second = buildOptions(useGameStore as never, other.x, other.y);
 	assert.deepEqual(
 		second.builds.map((o) => o.def.id),
-		['saptapper', 'idol_forest'],
+		['saptapper', 'idol_forest', 'watchtower', 'marketplace', 'trainingyard', 'scriptorium', 'guildhall', 'garrison'],
 		'the Extractor and the Idol are not built yet',
 	);
 	assert.deepEqual(

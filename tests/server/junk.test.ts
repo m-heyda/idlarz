@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { ITEM_CATALOG } from '../../src/catalog';
-import { JUNK_ITEMS } from '../../src/catalog/items/junk';
+import { JUNK_ITEMS, JUNK_STACK } from '../../src/catalog/items/junk';
 import { ITEM_ICONS } from '../../src/config/itemIcons';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { countJunk, isJunk, isJunkStack, JUNK_LEVEL_MARGIN, junkFor, junkGold, junkSale, wornLevelOf } from '../../src/lib/loot/junk';
@@ -15,10 +15,10 @@ import { plainItem } from '../../src/lib/itemInstance';
 const seeded = (n: number) => mulberry32(n);
 const ctx = { level: 10, gold: 400, luck: 0, boss: false, lucky: false };
 
-test('every junk material is a consumable that stacks by rarity with art, lore and a price, and the ladder runs cheap to very pricey', () => {
-	assert.equal(JUNK_ITEMS.length, 40);
+test('every junk material is a consumable that stacks without limit with art, lore and a price, and the ladder runs cheap to very pricey', () => {
+	assert.equal(JUNK_ITEMS.length, 52);
 	for (const item of JUNK_ITEMS) {
-		assert.equal(item.stackMax, { common: 100_000, uncommon: 50_000, rare: 25_000, epic: 10_000 }[item.rarity as string], item.id);
+		assert.equal(item.stackMax, JUNK_STACK, item.id);
 		assert.equal(ITEM_CATALOG[item.id], item, `${item.id} is in the catalog`);
 		assert.ok(item.junk && item.description && item.sellValue > 0, item.id);
 		assert.ok(
@@ -134,4 +134,23 @@ test('markJunk sets and clears the flag on a bag piece, refuses anything else, a
 	const cleared = applyOp(marked.inv, { action: 'markJunk', index: 0, junk: false }, ctx);
 	assert.ok(cleared.ok);
 	assert.equal(sellJunkRule(cleared.inv, ctx).ok, false);
+});
+
+test('a chest also holds gems and ore for the crafting bag (IDL-358): none under their minimum level, and a plain kill never drops them', async () => {
+	const { rollJunkLoot } = await import('../../src/lib/loot/junkDrops');
+	const roll = (level: number, chest: boolean) => {
+		const found = new Set<string>();
+		for (let n = 0; n < 4000; n++) {
+			let i = 0;
+			const rng = () => ((n * 7919 + i++ * 104729) % 10007) / 10007;
+			for (const key of Object.keys(rollJunkLoot({ level, gold: 100, luck: 100, boss: false, lucky: false, chest }, rng).stash)) found.add(key);
+		}
+		return found;
+	};
+	const high = roll(60, true);
+	assert.ok(high.has('ing_copper_ore') && high.has('ing_jasper'), 'the common stones come');
+	assert.ok(high.has('ing_ruby') || high.has('ing_sapphire'), 'and the finest gems are possible at the top');
+	const low = roll(2, true);
+	assert.ok(!['ing_copper_ore', 'ing_flint', 'ing_iron_ore', 'ing_jasper', 'ing_ruby'].some((id) => low.has(id)), 'a level 2 chest holds none of them');
+	assert.equal(roll(60, false).has('ing_jasper'), false, 'a plain kill without a type never drops them');
 });

@@ -10,11 +10,11 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | starter kit | 6 | 1.2 | 7.2 | 2 | 101 | 3.8 | 5 |
 | G1 kit + mace | 9 | 0.8 | 7.2 | 24 | 140 | 5.2 | 5 |
 | G2 kit + mace | 20 | 0.8 | 16 | 38 | 164 | 6.0 | 5 |
-| G3 kit + mace | 30 | 0.8 | 24 | 58 | 195 | 7.1 | 6 |
-| G3 kit + bow | 21 | 1 | 21 | 58 | 195 | 10.7 | 6 |
-| G4 kit + mace | 44 | 0.8 | 35.2 | 93 | 229 | 7.4 | 6 |
-| G4 kit + bow | 30 | 1 | 30 | 93 | 229 | 12.7 | 6 |
-| G5 kit + mace | 63 | 0.8 | 50.4 | 124 | 296 | 10.8 | 6 |
+| G3 kit + mace | 34 | 0.8 | 27.2 | 58 | 189 | 8.2 | 6 |
+| G3 kit + bow | 25 | 1 | 25 | 58 | 189 | 11.8 | 6 |
+| G4 kit + mace | 50 | 0.8 | 40 | 93 | 221 | 9.1 | 7 |
+| G4 kit + bow | 36 | 1 | 36 | 93 | 221 | 14.3 | 7 |
+| G5 kit + mace | 73 | 0.8 | 58.4 | 124 | 284 | 13.1 | 7 |
 | G6 kit + mace | 93 | 0.8 | 74.4 | 189 | 436 | 13.7 | 13 |
 | G6 kit + bow | 66 | 1 | 66 | 189 | 436 | 38.7 | 18 |
 
@@ -25,11 +25,11 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | starter kit | 100% (14s) | 100% (32s) | 0% | 0% |
 | G1 kit + mace | 100% (14s) | 100% (32s) | 0% | 0% |
 | G2 kit + mace | 100% (6s) | 100% (14s) | 100% (33s) | 7% (73s) |
-| G3 kit + mace | 100% (5s) | 100% (10s) | 100% (22s) | 100% (53s) |
-| G3 kit + bow | 100% (5s) | 100% (11s) | 100% (24s) | 100% (59s) |
-| G4 kit + mace | 100% (4s) | 100% (7s) | 100% (15s) | 100% (37s) |
-| G4 kit + bow | 100% (4s) | 100% (7s) | 100% (16s) | 100% (40s) |
-| G5 kit + mace | 100% (2s) | 100% (5s) | 100% (10s) | 100% (24s) |
+| G3 kit + mace | 100% (4s) | 100% (8s) | 100% (20s) | 100% (47s) |
+| G3 kit + bow | 100% (4s) | 100% (9s) | 100% (20s) | 100% (48s) |
+| G4 kit + mace | 100% (2s) | 100% (6s) | 100% (14s) | 100% (32s) |
+| G4 kit + bow | 100% (3s) | 100% (6s) | 100% (14s) | 100% (34s) |
+| G5 kit + mace | 100% (2s) | 100% (4s) | 100% (9s) | 100% (20s) |
 | G6 kit + mace | 100% (2s) | 100% (3s) | 100% (7s) | 100% (16s) |
 | G6 kit + bow | 100% (2s) | 100% (3s) | 100% (6s) | 100% (14s) |
 
@@ -62,9 +62,9 @@ Auto-use drinks a potion below 40% HP, casts Heal below 50% and Stun whenever it
 | G1 kit + mace | nothing | 0% | 0% |
 | G1 kit + mace | Heal + Stun | 100% (74s, 45% HP) | 0% |
 | G1 kit + mace | Heal + Stun + 5 greater potions | 100% (73s, 45% HP) | 0% |
-| G3 kit + mace | nothing | 100% (22s, 74% HP) | 100% (53s, 55% HP) |
-| G3 kit + mace | Heal + Stun | 100% (22s, 86% HP) | 100% (53s, 69% HP) |
-| G3 kit + mace | Heal + Stun + 5 greater potions | 100% (22s, 86% HP) | 100% (53s, 69% HP) |
+| G3 kit + mace | nothing | 100% (20s, 76% HP) | 100% (47s, 59% HP) |
+| G3 kit + mace | Heal + Stun | 100% (20s, 90% HP) | 100% (47s, 73% HP) |
+| G3 kit + mace | Heal + Stun + 5 greater potions | 100% (20s, 90% HP) | 100% (47s, 74% HP) |
 | G6 kit + mace | nothing | 100% (7s, 98% HP) | 100% (16s, 96% HP) |
 | G6 kit + mace | Heal + Stun | 100% (6s, 100% HP) | 100% (16s, 98% HP) |
 | G6 kit + mace | Heal + Stun + 5 greater potions | 100% (7s, 100% HP) | 100% (16s, 98% HP) |
@@ -77,9 +77,9 @@ A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he
 |---|---|---|---|
 | 15 (1000 HP, armor 15) | G2 kit + mace | at the level | 100% (64s) |
 | 15 (1000 HP, armor 15) | G1 kit + mace | behind | 0% |
-| 25 (1354 HP, armor 20) | G3 kit + mace | at the level | 100% (66s) |
+| 25 (1354 HP, armor 20) | G3 kit + mace | at the level | 100% (58s) |
 | 25 (1354 HP, armor 20) | G1 kit + mace | behind | 0% |
-| 35 (1707 HP, armor 25) | G4 kit + mace | at the level | 100% (67s) |
+| 35 (1707 HP, armor 25) | G4 kit + mace | at the level | 100% (59s) |
 | 35 (1707 HP, armor 25) | G2 kit + mace | behind | 0% |
-| 45 (2061 HP, armor 30) | G5 kit + mace | at the level | 100% (62s) |
+| 45 (2061 HP, armor 30) | G5 kit + mace | at the level | 100% (52s) |
 | 45 (2061 HP, armor 30) | G3 kit + mace | behind | 0% |

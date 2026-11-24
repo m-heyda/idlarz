@@ -143,13 +143,13 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_winged_sapphire_pendant` | <img src="../../public/pixel/items/neck/winged_sapphire_pendant.png" width="96" alt="art_winged_sapphire_pendant"> | 64x64 | planned | winged_sapphire_pendant | `pixel/items/neck/winged_sapphire_pendant.png` |
+| `art_winged_sapphire_pendant` | <img src="../../public/pixel/items/neck/winged_sapphire_pendant.png" width="96" alt="art_winged_sapphire_pendant"> | 64x64 | used | winged_sapphire_pendant | `pixel/items/neck/winged_sapphire_pendant.png` |
 
 ## neck G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_seraph_collar` | <img src="../../public/pixel/items/neck/seraph_collar.png" width="96" alt="art_seraph_collar"> | 64x64 | planned | seraph_collar | `pixel/items/neck/seraph_collar.png` |
+| `art_seraph_collar` | <img src="../../public/pixel/items/neck/seraph_collar.png" width="96" alt="art_seraph_collar"> | 64x64 | used | seraph_collar | `pixel/items/neck/seraph_collar.png` |
 
 ## ring
 
@@ -206,10 +206,10 @@ Neck, ring and charm icons.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_sapphire_teardrop_ring` | <img src="../../public/pixel/items/ring/sapphire_teardrop_ring.png" width="96" alt="art_sapphire_teardrop_ring"> | 64x64 | planned | sapphire_teardrop_ring | `pixel/items/ring/sapphire_teardrop_ring.png` |
+| `art_sapphire_teardrop_ring` | <img src="../../public/pixel/items/ring/sapphire_teardrop_ring.png" width="96" alt="art_sapphire_teardrop_ring"> | 64x64 | used | sapphire_teardrop_ring | `pixel/items/ring/sapphire_teardrop_ring.png` |
 
 ## ring G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_crimson_crown_ring` | <img src="../../public/pixel/items/ring/crimson_crown_ring.png" width="96" alt="art_crimson_crown_ring"> | 64x64 | planned | crimson_crown_ring | `pixel/items/ring/crimson_crown_ring.png` |
+| `art_crimson_crown_ring` | <img src="../../public/pixel/items/ring/crimson_crown_ring.png" width="96" alt="art_crimson_crown_ring"> | 64x64 | used | crimson_crown_ring | `pixel/items/ring/crimson_crown_ring.png` |

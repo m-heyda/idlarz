@@ -29,6 +29,22 @@ const STATUS_COLOR: Record<string, string> = {
 	reuse: '#c07ad8',
 };
 
+/** The order the status groups are listed in: what is wired first, then what is planned, then what nothing uses (the part to review and trim) */
+const STATUS_ORDER = ['used', 'planned', 'retired', 'placeholder', 'spare', 'unused', 'reuse'];
+const STATUS_TITLE: Record<string, string> = {
+	used: 'Used: in the game now',
+	planned: 'Planned: made for something that is not built yet',
+	retired: 'Retired: no longer drops, old saves keep it',
+	placeholder: 'Placeholder: a stand-in until real art arrives',
+	spare: 'Spare: generated, nobody asked for it yet',
+	unused: 'Unused: nothing references it (review: wire it, keep it, or delete it)',
+	reuse: 'Pool: raw art, copy only what you use',
+};
+const statusRank = (status: string): number => {
+	const i = STATUS_ORDER.indexOf(status);
+	return i < 0 ? STATUS_ORDER.length : i;
+};
+
 /** Card grid of one manifest category: search by name, filter by status/subcategory/variant, click a card to copy its name. */
 export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ category, scale = 2 }) => {
 	const rows = useMemo(() => ALL.filter((e) => e.category === category), [category]);
@@ -36,12 +52,14 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 	const [status, setStatus] = useState('all');
 	const [sub, setSub] = useState('all');
 	const [slot, setSlot] = useState('all');
-	const [sort, setSort] = useState('default');
+	// grouped by status by default: used, then planned, then unused, so what to review is in one block
+	const [sort, setSort] = useState('status');
 	const [variant, setVariant] = useState('default');
 	const [copied, setCopied] = useState('');
 	const [onlyTrash, setOnlyTrash] = useState(false);
 	const trash = useTrashMarks();
-	const statuses = [...new Set(rows.map((e) => e.status))];
+	const statuses = [...new Set(rows.map((e) => e.status))].sort((a, b) => statusRank(a) - statusRank(b));
+	const counts = new Map(statuses.map((s) => [s, rows.filter((e) => e.status === s).length]));
 	const subs = [...new Set(rows.map((e) => e.subcategory))];
 	const hasVariants = rows.some((e) => e.variants);
 	const slots = [...new Set(rows.flatMap((e) => (e.slot ? [e.slot] : [])))];
@@ -51,7 +69,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 			: sort === 'grade'
 				? `${e.grade ?? 'zz'} ${e.slot ?? ''} ${e.name}`
 				: sort === 'status'
-					? `${e.status} ${e.name}`
+					? `${String(statusRank(e.status)).padStart(2, '0')} ${e.subcategory} ${e.name}`
 					: '';
 	const shown = rows.filter(
 		(e) =>
@@ -109,7 +127,7 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 				<select value={sort} onChange={(e) => setSort(e.target.value)} style={field}>
 					{['default', 'slot', 'grade', 'status'].map((v) => (
 						<option key={v} value={v}>
-							{v === 'default' ? 'sort: group' : `sort: ${v}`}
+							{v === 'default' ? 'sort: group' : v === 'status' ? 'sort: status (grouped)' : `sort: ${v}`}
 						</option>
 					))}
 				</select>
@@ -139,77 +157,114 @@ export const AssetGallery: React.FC<{ category: string; scale?: number }> = ({ c
 					{copied && ` · copied ${copied}`}
 				</span>
 			</div>
+			<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 12 }}>
+				{statuses.map((s) => (
+					<button
+						type='button'
+						key={s}
+						onClick={() => setStatus(status === s ? 'all' : s)}
+						style={{ ...field, borderColor: status === s ? STATUS_COLOR[s] : '#4a3f36', color: STATUS_COLOR[s] }}
+						title={STATUS_TITLE[s]}
+					>
+						{s} {counts.get(s)}
+					</button>
+				))}
+			</div>
 			<div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(150px, 1fr))', gap: 10 }}>
-				{shown.map((e) => (
-					<div key={e.name} style={{ position: 'relative' }}>
-						<button
-							type='button'
-							onClick={() => trash.toggle(e.src)}
-							title={trash.marks[e.src] ? 'marked as trash: click to unmark' : 'mark as trash'}
-							style={{ position: 'absolute', top: 4, right: 4, zIndex: 1, ...field, padding: '0 6px', background: trash.marks[e.src] ? '#8a2f2f' : '#241e1a' }}
-						>
-							{trash.marks[e.src] ? 'trash' : '🗑'}
-						</button>
-						<div
-							style={{
-								textAlign: 'left',
-								width: '100%',
-								background: '#1d1814',
-								border: `1px solid ${trash.marks[e.src] ? '#c04a4a' : '#3a3029'}`,
-								opacity: trash.marks[e.src] ? 0.55 : 1,
-								borderRadius: 6,
-								padding: 8,
-								color: 'inherit',
-							}}
-						>
+				{shown.map((e, index) => (
+					<React.Fragment key={e.name}>
+						{sort === 'status' && (index === 0 || shown[index - 1].status !== e.status) && (
 							<div
 								style={{
-									height: 112,
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									background: 'repeating-conic-gradient(#2a231e 0% 25%, #211b17 0% 50%) 0 / 16px 16px',
-									borderRadius: 4,
-									overflow: 'hidden',
+									gridColumn: '1 / -1',
+									margin: '14px 0 2px',
+									paddingBottom: 4,
+									borderBottom: `2px solid ${STATUS_COLOR[e.status] ?? '#4a3f36'}`,
+									fontWeight: 700,
 								}}
 							>
-								{/* eslint-disable-next-line @next/next/no-img-element */}
-								<img
-									src={srcOf(e)}
-									alt={e.name}
+								<span style={{ color: STATUS_COLOR[e.status] }}>{e.status.toUpperCase()}</span> · {shown.filter((x) => x.status === e.status).length} ·{' '}
+								{STATUS_TITLE[e.status] ?? ''}
+							</div>
+						)}
+						<div style={{ position: 'relative' }}>
+							<button
+								type='button'
+								onClick={() => trash.toggle(e.src)}
+								title={trash.marks[e.src] ? 'marked as trash: click to unmark' : 'mark as trash'}
+								style={{
+									position: 'absolute',
+									top: 4,
+									right: 4,
+									zIndex: 1,
+									...field,
+									padding: '0 6px',
+									background: trash.marks[e.src] ? '#8a2f2f' : '#241e1a',
+								}}
+							>
+								{trash.marks[e.src] ? 'trash' : '🗑'}
+							</button>
+							<div
+								style={{
+									textAlign: 'left',
+									width: '100%',
+									background: '#1d1814',
+									border: `1px solid ${trash.marks[e.src] ? '#c04a4a' : '#3a3029'}`,
+									opacity: trash.marks[e.src] ? 0.55 : 1,
+									borderRadius: 6,
+									padding: 8,
+									color: 'inherit',
+								}}
+							>
+								<div
 									style={{
-										imageRendering: 'pixelated',
-										width: e.size[0] * scale,
-										height: e.size[1] * scale,
-										maxWidth: '100%',
-										maxHeight: '100%',
-										objectFit: 'contain',
+										height: 112,
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										background: 'repeating-conic-gradient(#2a231e 0% 25%, #211b17 0% 50%) 0 / 16px 16px',
+										borderRadius: 4,
+										overflow: 'hidden',
 									}}
-								/>
-							</div>
-							<div style={{ fontSize: 12, marginTop: 6, wordBreak: 'break-all', fontWeight: 600 }}>{e.name}</div>
-							<div style={{ fontSize: 11, opacity: 0.7 }}>
-								{e.size.join('x')} · <span style={{ color: STATUS_COLOR[e.status] }}>{e.status}</span>
-							</div>
-							{e.usedBy.length > 0 && <div style={{ fontSize: 11, opacity: 0.7, wordBreak: 'break-all' }}>{e.usedBy.join(', ')}</div>}
-							<div style={{ fontSize: 10, marginTop: 4, color: '#c9b98f', wordBreak: 'break-all', fontFamily: 'ui-monospace, monospace', userSelect: 'all' }}>
-								{pathOf(e)}
-							</div>
-							<div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
-								<button
-									type='button'
-									onClick={() => copy(pathOf(e), `path of ${e.name}`)}
-									style={{ ...field, padding: '1px 6px', fontSize: 11 }}
-									title={pathOf(e)}
 								>
-									copy path
-								</button>
-								<button type='button' onClick={() => copy(e.name)} style={{ ...field, padding: '1px 6px', fontSize: 11 }} title='Copy the asset name'>
-									copy name
-								</button>
+									{/* eslint-disable-next-line @next/next/no-img-element */}
+									<img
+										src={srcOf(e)}
+										alt={e.name}
+										style={{
+											imageRendering: 'pixelated',
+											width: e.size[0] * scale,
+											height: e.size[1] * scale,
+											maxWidth: '100%',
+											maxHeight: '100%',
+											objectFit: 'contain',
+										}}
+									/>
+								</div>
+								<div style={{ fontSize: 12, marginTop: 6, wordBreak: 'break-all', fontWeight: 600 }}>{e.name}</div>
+								<div style={{ fontSize: 11, opacity: 0.7 }}>
+									{e.size.join('x')} · <span style={{ color: STATUS_COLOR[e.status] }}>{e.status}</span>
+								</div>
+								{e.usedBy.length > 0 && <div style={{ fontSize: 11, opacity: 0.7, wordBreak: 'break-all' }}>{e.usedBy.join(', ')}</div>}
+								<div style={{ fontSize: 10, marginTop: 4, color: '#c9b98f', wordBreak: 'break-all', fontFamily: 'ui-monospace, monospace', userSelect: 'all' }}>
+									{pathOf(e)}
+								</div>
+								<div style={{ display: 'flex', gap: 4, marginTop: 6 }}>
+									<button
+										type='button'
+										onClick={() => copy(pathOf(e), `path of ${e.name}`)}
+										style={{ ...field, padding: '1px 6px', fontSize: 11 }}
+										title={pathOf(e)}
+									>
+										copy path
+									</button>
+									<button type='button' onClick={() => copy(e.name)} style={{ ...field, padding: '1px 6px', fontSize: 11 }} title='Copy the asset name'>
+										copy name
+									</button>
+								</div>
 							</div>
 						</div>
-					</div>
+					</React.Fragment>
 				))}
 			</div>
 		</div>

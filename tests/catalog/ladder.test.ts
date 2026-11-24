@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { ITEM_CATALOG, SETS, STAT_DEFS, levelScale, weaponDps } from '../../src/catalog';
+import { CRAFT_ONLY_GRADES } from '../../src/catalog/items/grades';
+import { CRAFTED_LEGENDARIES } from '../../src/catalog/items/ladder';
 import { ARMOUR_SLOTS, GRADES, GRADE_INFO, LADDER, LIVE_GRADES, LADDER_ITEMS, SPECIAL_SET, WEAPON_TYPES } from '../../src/catalog/items/ladder';
 import { gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities } from '../../src/catalog/items/grades';
 import { shopItems } from '../../src/catalog/loot';
@@ -26,9 +28,11 @@ test('every cell of the ladder resolves to an item', () => {
 	}
 });
 
-test('generated ladder items are graded by tag, inside the grade window, and enabled only for the live grades (G1-G6)', () => {
+test('generated ladder items are graded by tag, inside the grade window, and enabled only for the live grades (G1-G6) and the craft-only ones (G7, G8)', () => {
 	for (const def of LADDER_ITEMS) {
-		assert.equal(def.enabled, LIVE_GRADES.includes(gradeOf(def)), def.id);
+		const craftOnly = CRAFT_ONLY_GRADES.includes(gradeOf(def)) || CRAFTED_LEGENDARIES.includes(def.id);
+		assert.equal(def.enabled, LIVE_GRADES.includes(gradeOf(def)) || craftOnly, def.id);
+		assert.equal(def.craftOnly, craftOnly ? true : undefined, `${def.id}: craft-only exactly for G7, G8 and the three crafted legendaries`);
 		assert.ok(GRADES.includes(gradeOf(def)), def.id);
 		assert.deepEqual([def.minItemLevel, def.maxItemLevel], gradeOwnedLevels(gradeOf(def)), def.id);
 		assert.deepEqual(def.allowedRarities, gradeOwnedRarities(gradeOf(def)), def.id);

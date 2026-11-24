@@ -49,7 +49,7 @@ export const CASTLE_WARD = { fromLevel: 7 };
  *
  * - **Modifier** added to every resource: see {@link castleModifier}. **Flat XP**: +0.5 xp/s per level above 1 (`xpBonus`).
  * - **Timers** (`durationsSec`), level 1 to 2 first: 30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d, then 4.5 d, 6 d, 8 d, 11 d, 14 d for levels 11 to 15. Master Builders (Ember shop) cuts them 5% per level ({@link castleUpgradeDuration}).
- * - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. The full per-step table is in `docs/generated/balance-tables.md`.
+ * - **Costs** per step (`upgradeCosts`): coal appears from 2 to 3, food and meat from 3 to 4. **From 6 to 7 on a step also eats a biome extract** (owner 2026-11-24, so the Extractors matter): herbs (plains) for level 7, sap (forest) 8, iron ore (hills) 9, spores (swamp) 10, then frostshard, pearls, salt, herbs and sap for the Castle Expansion levels 11-15, each about 3x the one before from 1,500. The rebirth gate (castle 6) never needs one. The full per-step table is in `docs/generated/balance-tables.md`.
  * - **Range** (violet area), **area bonus** and **ward**: {@link CASTLE_RANGE}, {@link CASTLE_AREA_BONUS}, {@link CASTLE_WARD}.
  *
  * @category Economy/Castle
@@ -72,15 +72,15 @@ export const CASTLE_UPGRADE = {
 		{ gold: 1000000, wood: 100000, stone: 100000, coal: 50000, food: 200000, meat: 40000 },
 		{ gold: 4000000, wood: 400000, stone: 400000, coal: 200000, food: 2000000, meat: 100000 },
 		{ gold: 8000000, wood: 2000000, stone: 2000000, coal: 1000000, food: 4000000, meat: 500000 },
-		{ gold: 30000000, wood: 3000000, stone: 3000000, coal: 1600000, food: 16000000, meat: 800000 },
-		{ gold: 48000000, wood: 4800000, stone: 4800000, coal: 2600000, food: 25600000, meat: 1280000 },
-		{ gold: 76800000, wood: 7600000, stone: 7600000, coal: 4000000, food: 41000000, meat: 2000000 },
-		{ gold: 122800000, wood: 12200000, stone: 12200000, coal: 6600000, food: 65600000, meat: 3200000 },
+		{ gold: 30000000, wood: 3000000, stone: 3000000, coal: 1600000, food: 16000000, meat: 800000, herbs: 1500 },
+		{ gold: 48000000, wood: 4800000, stone: 4800000, coal: 2600000, food: 25600000, meat: 1280000, sap: 4500 },
+		{ gold: 76800000, wood: 7600000, stone: 7600000, coal: 4000000, food: 41000000, meat: 2000000, ironOre: 13500 },
+		{ gold: 122800000, wood: 12200000, stone: 12200000, coal: 6600000, food: 65600000, meat: 3200000, spores: 40500 },
 		// 10 -> 15 (Castle Expansion): every step costs about 1.6 x the one before
-		{ gold: 196500000, wood: 19500000, stone: 19500000, coal: 10500000, food: 105000000, meat: 5100000 },
-		{ gold: 314400000, wood: 31200000, stone: 31200000, coal: 16800000, food: 168000000, meat: 8200000 },
-		{ gold: 503000000, wood: 50000000, stone: 50000000, coal: 26900000, food: 268800000, meat: 13100000 },
-		{ gold: 805000000, wood: 80000000, stone: 80000000, coal: 43000000, food: 430000000, meat: 21000000 },
-		{ gold: 1288000000, wood: 128000000, stone: 128000000, coal: 68800000, food: 688000000, meat: 33600000 },
-	],
+		{ gold: 196500000, wood: 19500000, stone: 19500000, coal: 10500000, food: 105000000, meat: 5100000, frostshard: 120000 },
+		{ gold: 314400000, wood: 31200000, stone: 31200000, coal: 16800000, food: 168000000, meat: 8200000, pearls: 365000 },
+		{ gold: 503000000, wood: 50000000, stone: 50000000, coal: 26900000, food: 268800000, meat: 13100000, salt: 1100000 },
+		{ gold: 805000000, wood: 80000000, stone: 80000000, coal: 43000000, food: 430000000, meat: 21000000, herbs: 3300000 },
+		{ gold: 1288000000, wood: 128000000, stone: 128000000, coal: 68800000, food: 688000000, meat: 33600000, sap: 10000000 },
+	] as Record<string, number>[],
 };

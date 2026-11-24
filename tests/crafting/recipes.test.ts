@@ -3,7 +3,7 @@ import { INGREDIENT_BY_ID } from '../../src/catalog/ingredients';
 import assert from 'node:assert/strict';
 import { COMPONENTS, RECIPES, RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { ITEM_CATALOG } from '../../src/catalog';
-import { healHpOf } from '../../src/catalog/buffs';
+import { hasEffects } from '../../src/catalog/buffs';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CRAFTING } from '../../src/config/crafting';
 import { craftBlock, craftCumulativeXp, craftLevelOf, craftLimit, craftNeeds, craftXpToNext, maxCraftable, recipeCostGold } from '../../src/lib/crafting';
@@ -25,7 +25,7 @@ test('recipe ids are unique and every input and output exists', () => {
 });
 
 test('potion, component and good recipes: potions are stackable consumables, goods are stacks with no effect, components stay in the stock (gear is in gearRecipes.test.ts)', () => {
-	for (const r of RECIPES.filter((x) => x.kind !== 'gear')) {
+	for (const r of RECIPES.filter((x) => x.kind !== 'gear' && x.kind !== 'legendary')) {
 		assert.ok(r.kind === 'potion' || r.kind === 'component' || r.kind === 'good', r.id);
 		if (r.kind === 'component') {
 			assert.ok('component' in r.output);
@@ -35,7 +35,7 @@ test('potion, component and good recipes: potions are stackable consumables, goo
 		const def = ITEM_CATALOG[(r.output as { item: string }).item];
 		assert.equal(def.kind, 'consumable');
 		assert.ok((def.stackMax ?? 1) > 1);
-		if (r.kind === 'potion') assert.ok(healHpOf(def) > 0);
+		if (r.kind === 'potion') assert.ok(hasEffects(def), `${r.id}: a potion does something when drunk`);
 		else assert.equal(def.effects, undefined, `${r.id}: a trade good has no effect`);
 	}
 });
@@ -61,13 +61,13 @@ test('every component has exactly one recipe that makes it, and every component 
 	}
 });
 
-test('no printer: a crafted potion costs less than the shop price and more than its sell value', () => {
+test('no printer: a crafted potion costs more than its sell value, and less than the shop price when the shop sells it', () => {
 	for (const r of RECIPES.filter((x) => x.kind === 'potion')) {
 		const def = ITEM_CATALOG[(r.output as { item: string }).item];
 		const cost = recipeCostGold(r) / r.output.qty;
-		assert.ok(def.shop !== undefined && def.sellValue !== undefined, `${r.id} has a shop price and a sell value`);
-		assert.ok(cost < def.shop!, `${r.id}: cost ${cost} is below the shop price ${def.shop}`);
-		assert.ok(cost > def.sellValue!, `${r.id}: cost ${cost} is above the sell value ${def.sellValue}`);
+		assert.ok(def.sellValue !== undefined, `${r.id} has a sell value`);
+		if (def.shop !== undefined) assert.ok(cost < def.shop, `${r.id}: cost ${cost} is below the shop price ${def.shop}`);
+		assert.ok(cost > def.sellValue, `${r.id}: cost ${cost} is above the sell value ${def.sellValue}`);
 	}
 });
 

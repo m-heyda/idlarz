@@ -3,7 +3,7 @@ import { BUILDING_RULES, BUILDINGS_FLAG, IDOL_RULES } from '@/config/buildings';
 import { HARD_LIMITS } from '@/config/limits';
 import { busyBuilders } from '@/lib/builders';
 import { limitOf, type LimitContext } from '@/lib/limits';
-import { BUILDINGS, buildingDef, type BuildingDef } from '@/catalog/buildings';
+import { BUILDINGS, buildingDef, fitsBiome, type BuildingDef } from '@/catalog/buildings';
 import { calculateTileCost, tileCostAsResources } from '@/utils/game/costs';
 import { emberEffect } from '@/utils/game/rebirth';
 import { biomeCount, forEachOwned, getTile, setTile, type World } from '@/utils/world';
@@ -68,12 +68,12 @@ export const shortestUpgradeSec = (toLevel: number, idol = false): number =>
 	toLevel <= 1 ? buildingUpgradeDuration(0, undefined, 0, 'idol') : buildingUpgradeDuration(toLevel - 1, undefined, 0, idol ? 'idol' : 'building');
 
 /**
- * How many castle or building upgrades can run at once: 1 for everyone, +1 for the Gem shop's one-time Builder #2 (1,000 gems, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 3 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
+ * How many castle or building upgrades can run at once: 1 for everyone, +1 per level of the Gem shop's Additional builder (three levels, 20,000 gems in all, permanent, kept over a rebirth) and +1 for the Ember shop's one-level Extra Builder: 5 at most (`HARD_LIMITS.builders` is only the ceiling a save may hold).
  *
  * @category Economy/Buildings
  * @order 8
  * @formula
- * builders = 1 + (Builder #2 bought ? 1 : 0) + (Extra Builder bought ? 1 : 0)
+ * builders = 1 + (Additional builder level, 0 to 3) + (Extra Builder bought ? 1 : 0)
  */
 export const builderCount = (ctx: LimitContext = {}): number => Math.min(HARD_LIMITS.builders, limitOf('builders', ctx));
 
@@ -131,6 +131,19 @@ export const idolT3Cost = (level: number): number => {
 	return t3Costs[i] ?? (t3Costs[t3Costs.length - 1] ?? 0) * Math.pow(t3Growth, i - t3Costs.length + 1);
 };
 
+/**
+ * The T3 extract a Producer or an Extractor upgrade asks for (level 3 and up, `BUILDING_RULES.t3Costs`): 1,000 / 5,000 / 25,000 for levels 3 to 5, then x5 per level (the Ember shop's building cap lifts it past 5). The biome's own extract: a Producer
+ * needs its biome's Extractor to be built and working before it goes past level 2, and an Extractor eats a little of what it makes.
+ *
+ * @category Economy/Buildings
+ * @order 8
+ */
+export const buildingT3Cost = (level: number): number => {
+	const { t3Costs, t3Growth } = BUILDING_RULES;
+	const i = Math.floor(level) - 3;
+	return i < 0 ? 0 : (t3Costs[i] ?? (t3Costs[t3Costs.length - 1] ?? 0) * Math.pow(t3Growth, i - t3Costs.length + 1));
+};
+
 const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partial<Resources> => {
 	const { tilePrices, priceTileCap, levelGrowth } = BUILDING_RULES.cost;
 	const tile = tileCostAsResources(calculateTileCost(Math.min(Math.max(1, ownedTiles), priceTileCap)));
@@ -141,6 +154,11 @@ const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partia
 	if (def?.kind === 'idol' && level >= 3) {
 		const t3 = BUILDINGS.find((b) => b.kind === 'extractor' && b.biome === def.biome)?.produces[0];
 		if (t3) out[t3] = idolT3Cost(level);
+	}
+	// a Producer or an Extractor level from 3 needs the extract of its biome as well (where the biome has an Extractor)
+	if ((def?.kind === 'producer' || def?.kind === 'extractor') && level >= 3) {
+		const t3 = BUILDINGS.find((b) => b.kind === 'extractor' && b.biome === def.biome)?.produces[0];
+		if (t3) out[t3] = buildingT3Cost(level);
 	}
 	return out;
 };
@@ -198,7 +216,29 @@ export interface BuildingContext {
 	idolMax?: number;
 	/** The Producer and Extractor level cap in force ({@link limitOf} `buildingMaxLevel`); absent = the base */
 	buildingMax?: number;
+	/** How many copies of one Producer or Extractor may stand ({@link limitOf} `buildingCopies`); absent = 1 */
+	buildingCopies?: number;
 }
+
+/** How many copies of this building the map may hold: an Idol is always one, a Producer or an Extractor `buildingCopies` (1 at the start, up to 4 with the Ember shop's Building Slots and the Gem shop's Building Slot). */
+export const copiesAllowed = (def: Pick<BuildingDef, 'kind' | 'copies'> | undefined, buildingCopies = 1): number =>
+	def?.kind === 'idol'
+		? 1
+		: def?.kind === 'general'
+			? Math.max(1, Math.min(HARD_LIMITS.buildingCopies, def.copies ?? 1))
+			: Math.max(1, Math.min(HARD_LIMITS.buildingCopies, Math.floor(buildingCopies)));
+
+/** The most copies of one Producer or Extractor standing on the map (0 when there is none): the number the server checks against what the account can own. */
+export const maxCopiesOf = (tiles: World): number => {
+	const counts = new Map<string, number>();
+	for (const b of builtBuildings(tiles))
+		if (buildingDef(b.id)?.kind === 'producer' || buildingDef(b.id)?.kind === 'extractor') counts.set(b.id, (counts.get(b.id) ?? 0) + 1);
+	return Math.max(0, ...counts.values());
+};
+
+/** How many of building `id` stand on the map or are waiting to be built (a first Idol build is a running upgrade without a tile level yet). */
+export const copiesOf = (ctx: Pick<BuildingContext, 'tiles' | 'buildingUpgrades'>, id: string): number =>
+	builtBuildings(ctx.tiles).filter((b) => b.id === id).length + ctx.buildingUpgrades.filter((u) => u.building === id).length;
 
 /** Why a tile cannot take this building, or null when it can: owned, not the castle, no building, chest or monster on it, and of the building's biome. */
 const tileProblem = (ctx: BuildingContext, x: number, y: number, def: BuildingDef): string | null => {
@@ -209,7 +249,7 @@ const tileProblem = (ctx: BuildingContext, x: number, y: number, def: BuildingDe
 	if (upgradeAt(ctx, x, y)) return 'Under construction';
 	if (tile.hasChest) return 'A chest is here';
 	if (monsterAt(ctx.monsters as Monster[], x, y)) return 'A monster is here';
-	if (tile.biome !== def.biome) return `Needs ${BIOMES[def.biome]?.label ?? def.biome}`;
+	if (!fitsBiome(def, tile.biome)) return def.kind === 'general' ? 'Not on water' : `Needs ${BIOMES[def.biome]?.label ?? def.biome}`;
 	return null;
 };
 
@@ -230,14 +270,15 @@ export const needsConstruction = (def: BuildingDef | undefined, idolLevels: Reco
 	def?.kind === 'idol' && rememberedIdolLevel(idolLevels, def.biome) === 0;
 
 /**
- * Why `id` cannot be built on tile (x, y) now, or null when it can: the system is on, the type exists, **one of each type per map**, and the tile fits.
+ * Why `id` cannot be built on tile (x, y) now, or null when it can: the system is on, the type exists, **at most `copiesAllowed` of each type per map** (one at the start, one Idol always), and the tile fits.
  * Paying is the caller's check, so the menu can show the price next to the reason.
  */
 export const buildProblem = (ctx: BuildingContext, x: number, y: number, id: string): string | null => {
 	if (!buildingsEnabled()) return 'Buildings are not available yet';
 	const def = buildingDef(id);
 	if (!def) return 'Unknown building';
-	if (builtBuildings(ctx.tiles).some((b) => b.id === id) || ctx.buildingUpgrades.some((u) => u.building === id)) return `The ${def.label} is already built`;
+	const allowed = copiesAllowed(def, ctx.buildingCopies);
+	if (copiesOf(ctx, id) >= allowed) return allowed > 1 ? `All ${allowed} ${def.label}s are built` : `The ${def.label} is already built`;
 	return tileProblem(ctx, x, y, def);
 };
 

@@ -206,13 +206,13 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runed_hauberk` | <img src="../../public/pixel/items/chest/runed_hauberk.png" width="96" alt="art_runed_hauberk"> | 64x64 | planned | runed_hauberk | `pixel/items/chest/runed_hauberk.png` |
+| `art_runed_hauberk` | <img src="../../public/pixel/items/chest/runed_hauberk.png" width="96" alt="art_runed_hauberk"> | 64x64 | used | runed_hauberk | `pixel/items/chest/runed_hauberk.png` |
 
 ## chest G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ancient_cuirass` | <img src="../../public/pixel/items/chest/ancient_cuirass.png" width="96" alt="art_ancient_cuirass"> | 64x64 | planned | ancient_cuirass | `pixel/items/chest/ancient_cuirass.png` |
+| `art_ancient_cuirass` | <img src="../../public/pixel/items/chest/ancient_cuirass.png" width="96" alt="art_ancient_cuirass"> | 64x64 | used | ancient_cuirass | `pixel/items/chest/ancient_cuirass.png` |
 
 ## chest G9
 
@@ -345,14 +345,14 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_frostglass_boots` | <img src="../../public/pixel/items/feet/frostglass_boots.png" width="96" alt="art_frostglass_boots"> | 64x64 | planned | frostglass_boots | `pixel/items/feet/frostglass_boots.png` |
+| `art_frostglass_boots` | <img src="../../public/pixel/items/feet/frostglass_boots.png" width="96" alt="art_frostglass_boots"> | 64x64 | used | frostglass_boots | `pixel/items/feet/frostglass_boots.png` |
 
 ## feet G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_drake_scale_boots` | <img src="../../public/pixel/items/feet/drake_scale_boots.png" width="96" alt="art_drake_scale_boots"> | 64x64 | planned | drake_scale_boots | `pixel/items/feet/drake_scale_boots.png` |
-| `art_sunsilk_boots` | <img src="../../public/pixel/items/feet/sunsilk_boots.png" width="96" alt="art_sunsilk_boots"> | 64x64 | planned | sunsilk_boots | `pixel/items/feet/sunsilk_boots.png` |
+| `art_drake_scale_boots` | <img src="../../public/pixel/items/feet/drake_scale_boots.png" width="96" alt="art_drake_scale_boots"> | 64x64 | used | drake_scale_boots | `pixel/items/feet/drake_scale_boots.png` |
+| `art_sunsilk_boots` | <img src="../../public/pixel/items/feet/sunsilk_boots.png" width="96" alt="art_sunsilk_boots"> | 64x64 | used | sunsilk_boots | `pixel/items/feet/sunsilk_boots.png` |
 
 ## hands
 
@@ -404,13 +404,13 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runed_gloves` | <img src="../../public/pixel/items/hands/runed_gloves.png" width="96" alt="art_runed_gloves"> | 64x64 | planned | runed_gloves | `pixel/items/hands/runed_gloves.png` |
+| `art_runed_gloves` | <img src="../../public/pixel/items/hands/runed_gloves.png" width="96" alt="art_runed_gloves"> | 64x64 | used | runed_gloves | `pixel/items/hands/runed_gloves.png` |
 
 ## hands G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ancient_handguards` | <img src="../../public/pixel/items/hands/ancient_handguards.png" width="96" alt="art_ancient_handguards"> | 64x64 | planned | ancient_handguards | `pixel/items/hands/ancient_handguards.png` |
+| `art_ancient_handguards` | <img src="../../public/pixel/items/hands/ancient_handguards.png" width="96" alt="art_ancient_handguards"> | 64x64 | used | ancient_handguards | `pixel/items/hands/ancient_handguards.png` |
 
 ## hands G9
 
@@ -488,13 +488,13 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runed_circlet` | <img src="../../public/pixel/items/head/runed_circlet.png" width="96" alt="art_runed_circlet"> | 64x64 | planned | runed_circlet | `pixel/items/head/runed_circlet.png` |
+| `art_runed_circlet` | <img src="../../public/pixel/items/head/runed_circlet.png" width="96" alt="art_runed_circlet"> | 64x64 | used | runed_circlet | `pixel/items/head/runed_circlet.png` |
 
 ## head G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_ancient_warhelm` | <img src="../../public/pixel/items/head/ancient_warhelm.png" width="96" alt="art_ancient_warhelm"> | 64x64 | planned | ancient_warhelm | `pixel/items/head/ancient_warhelm.png` |
+| `art_ancient_warhelm` | <img src="../../public/pixel/items/head/ancient_warhelm.png" width="96" alt="art_ancient_warhelm"> | 64x64 | used | ancient_warhelm | `pixel/items/head/ancient_warhelm.png` |
 
 ## head G9
 
@@ -575,14 +575,14 @@ Head, shoulder, chest, hands, legs, feet, cape and belt icons, by grade.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_runed_skirt` | <img src="../../public/pixel/items/legs/runed_skirt.png" width="96" alt="art_runed_skirt"> | 64x64 | planned | runed_skirt | `pixel/items/legs/runed_skirt.png` |
-| `art_verdant_greaves` | <img src="../../public/pixel/items/legs/verdant_greaves.png" width="96" alt="art_verdant_greaves"> | 64x64 | planned | verdant_greaves | `pixel/items/legs/verdant_greaves.png` |
+| `art_runed_skirt` | <img src="../../public/pixel/items/legs/runed_skirt.png" width="96" alt="art_runed_skirt"> | 64x64 | used | runed_skirt | `pixel/items/legs/runed_skirt.png` |
+| `art_verdant_greaves` | <img src="../../public/pixel/items/legs/verdant_greaves.png" width="96" alt="art_verdant_greaves"> | 64x64 | used | verdant_greaves | `pixel/items/legs/verdant_greaves.png` |
 
 ## legs G8
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_royal_silk_trousers` | <img src="../../public/pixel/items/legs/royal_silk_trousers.png" width="96" alt="art_royal_silk_trousers"> | 64x64 | planned | royal_silk_trousers | `pixel/items/legs/royal_silk_trousers.png` |
+| `art_royal_silk_trousers` | <img src="../../public/pixel/items/legs/royal_silk_trousers.png" width="96" alt="art_royal_silk_trousers"> | 64x64 | used | royal_silk_trousers | `pixel/items/legs/royal_silk_trousers.png` |
 
 ## shoulder
 

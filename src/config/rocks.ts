@@ -73,6 +73,8 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'resource', id: 'stone', minutes: [2, 4], floor: 25 },
 		{ kind: 'resource', id: 'coal', minutes: [1, 2], floor: 15 },
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.1, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_flint', chance: 0.25, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_iron_ore', chance: 0.12, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.02, qty: [1, 1] },
 	],
 	uncommon: [
@@ -82,6 +84,10 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.1, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.04, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_geode', chance: 0.05, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_iron_ore', chance: 0.15, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_jasper', chance: 0.08, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_malachite', chance: 0.06, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_turquoise', chance: 0.05, qty: [1, 1] },
 	],
 	rare: [
 		{ kind: 'resource', id: 'stone', minutes: [10, 15], floor: 120 },
@@ -91,6 +97,11 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_copper_ore', chance: 0.15, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.08, qty: [1, 2] },
 		{ kind: 'ingredient', id: 'ing_geode', chance: 0.08, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_iron_ore', chance: 0.2, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_malachite', chance: 0.08, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_turquoise', chance: 0.08, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_lapis', chance: 0.06, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_garnet', chance: 0.05, qty: [1, 1] },
 	],
 	epic: [
 		{ kind: 'resource', id: 'stone', minutes: [20, 30], floor: 250 },
@@ -101,6 +112,10 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_ember_coal', chance: 0.15, qty: [1, 3] },
 		{ kind: 'ingredient', id: 'ing_obsidian', chance: 0.12, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_dark_shard', chance: 0.08, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_lapis', chance: 0.1, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_garnet', chance: 0.1, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_ruby', chance: 0.03, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_sapphire', chance: 0.03, qty: [1, 1] },
 	],
 	// MVP (the pool is adjusted later): much more stone and coal than an epic rock, the better ores often, and Ember Coal now and then (1 to 3)
 	legendary: [
@@ -115,5 +130,9 @@ export const ROCK_DROPS: Record<RockTier, readonly RockDrop[]> = {
 		{ kind: 'ingredient', id: 'ing_dark_shard', chance: 0.2, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_emerald_star', chance: 0.1, qty: [1, 1] },
 		{ kind: 'ingredient', id: 'ing_heart_gem', chance: 0.03, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_lapis', chance: 0.2, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_garnet', chance: 0.2, qty: [1, 2] },
+		{ kind: 'ingredient', id: 'ing_ruby', chance: 0.1, qty: [1, 1] },
+		{ kind: 'ingredient', id: 'ing_sapphire', chance: 0.1, qty: [1, 1] },
 	],
 };

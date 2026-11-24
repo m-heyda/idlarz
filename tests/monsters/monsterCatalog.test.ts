@@ -80,7 +80,7 @@ test('a monster without its own art has a stand-in file that exists; a monster w
 	const standIns = MONSTER_CATALOG.filter((m) => m.enabled && !m.art).map((m) => m.id);
 	assert.equal(
 		standIns.length,
-		20,
+		16,
 		'roster v2 monsters without art yet (and the Highland Gnoll, Spore Hound and Blighted Husk) wear the stand-in; every other live monster has its real art',
 	);
 });

@@ -1,11 +1,11 @@
 import type { PixelIconName } from '@/config/pixelIcons';
 import { ITEM_ICONS } from '@/config/itemIcons';
 import type { EquipmentSlot, ItemDef, WeaponType } from '@/types/game';
-import { STAT_DEFS, baseStat, levelScale, type ItemStatKey, type ItemStats, type StatDef } from '../stats';
+import { STAT_DEFS, baseStat, levelScale, levelTail, type ItemStatKey, type ItemStats, type StatDef } from '../stats';
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
-import { GRADES, GRADE_INFO, LIVE_GRADES, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
+import { GRADES, GRADE_INFO, gradeAvailability, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
 import { LEGENDARY_ITEMS } from './legendary';
 import { OBSIDIAN_ITEMS } from './obsidian';
 import { RESERVE_ITEMS } from './reuse';
@@ -60,7 +60,8 @@ const SLOT_STATS: Record<ArmourSlot | 'offHand', PerIndex> = {
 	feet: { armor: 0.57, maxHp: 0.57 },
 	neck: { armor: 0.29, maxHp: 1.14, critChance: 0.21, goldFind: 0.86 },
 	cape: { armor: 0.43, maxHp: 0.71, dodge: 0.29 },
-	ring: { maxHp: 0.86, critChance: 0.21 },
+	// a ring is an offence slot: flat damage and crit (two rings are about a third of a weapon's damage); item attack speed is not a gear stat, so it comes from weapons only
+	ring: { damage: 0.3, maxHp: 0.5, critChance: 0.35, superCrit: 0.07 },
 	charm: { armor: 0.14, maxHp: 1, superCrit: 0.14 },
 	// The belt's own stats (potion cooldown and power, potion slots, bag slots; IDL-138) are not in the stats pipeline yet, so a belt
 	// carries the plain defence of an accessory until they land (IDL-139 follow-up).
@@ -127,7 +128,11 @@ const weaponStats = (type: LadderWeapon, index: number, tier: number): ItemStats
 };
 
 /** Blightbound is the fragile set: no armor and no max HP on its pieces, Luck instead */
+/** The first two grades keep the old defensive ring (a flat point of damage per ring is a third of a starter weapon: the early bosses are tuned without it) */
+const EARLY_RING: PerIndex = { maxHp: 0.86, critChance: 0.21 };
+
 const forGrade = (grade: Grade, perIndex: PerIndex): PerIndex => {
+	if (perIndex === SLOT_STATS.ring && (grade === 'G1' || grade === 'G2')) return EARLY_RING;
 	if (grade !== 'S3') return perIndex;
 	const { armor, maxHp, ...rest } = perIndex;
 	return armor || maxHp ? { ...rest, luck: 0.15 } : rest;
@@ -231,6 +236,9 @@ const OBSIDIAN_CELLS: Partial<Record<string, string>> = {
 	staff: 'obsidian_staff',
 };
 
+/** The three legendary weapons the Crafting tab makes (IDL-120, the `legendary_*` recipes of `catalog/recipes.ts`): G9 pieces that are enabled and `craftOnly`, so a save can hold one and nothing else ever gives one out. */
+export const CRAFTED_LEGENDARIES: readonly string[] = ['dawnsplitter', 'stormstring', 'starlight_wand'];
+
 // ---- building ----------------------------------------------------------------------------------------------------------
 const slug = (name: string): string =>
 	name
@@ -259,7 +267,20 @@ const iconOf = new Map(ITEM_ICONS.flatMap((e) => (e.item ? [[e.item, e.icon] as 
 
 const generated: ItemDef[] = [];
 
-const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<ItemDef['slot']>, stats: ItemStats, weaponType?: WeaponType): void => {
+/** The flat stats of a cell grown by the late-game tail of the item level its grade starts at (`levelTail`: 1 for G1-G6, 2.3 at G7, 5.1 at G8, 11 at G9, 21 for the sets), so a higher grade is a real step up and a level above it steeper still */
+const withTail = (grade: Grade, stats: ItemStats): ItemStats => {
+	const tail = levelTail(GRADE_INFO[grade].levels[0]);
+	if (tail === 1) return stats;
+	const out: ItemStats = {};
+	for (const [key, value] of Object.entries(stats) as [ItemStatKey, number][]) {
+		const flat = ((STAT_DEFS[key] as StatDef).levelShare ?? 1) >= 1;
+		out[key] = flat ? (WHOLE.has(key) ? Math.max(1, Math.round(value * tail)) : Math.round(value * tail * 100) / 100) : value;
+	}
+	return out;
+};
+
+const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<ItemDef['slot']>, rawStats: ItemStats, weaponType?: WeaponType): void => {
+	const stats = withTail(grade, rawStats);
 	const id = slug(name);
 	const obsidian = grade === 'G6' ? OBSIDIAN_CELLS[key] : undefined;
 	LADDER[grade][key] = obsidian ?? id;
@@ -273,12 +294,12 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 	// The icon comes from the registry (config/itemIcons): the line whose `item` is this id, real pass 1 art where there is a free one,
 	// else the art_ph_ placeholder of the cell. A grade with no such line yet shows the slot silhouette.
 	const signature = SIGNATURE_STATS[id];
-	const def = gear(id, name, slot, info.rarities[0], signature ? signature.stats : stats, {
+	const def = gear(id, name, slot, info.rarities[0], signature ? withTail(grade, signature.stats) : stats, {
 		tier: info.tier,
 		grade,
 		levelWindow: gradeOwnedLevels(grade),
 		// G1-G3 are live (IDL-220); the rest stay disabled data
-		enabled: LIVE_GRADES.includes(grade),
+		...(CRAFTED_LEGENDARIES.includes(id) ? { enabled: true, craftOnly: true as const } : gradeAvailability(grade)),
 		...(iconOf.get(id) ? { icon: iconOf.get(id) as PixelIconName } : {}),
 		...(set ? { set } : {}),
 		...(weaponType ? { weaponType } : {}),
@@ -338,7 +359,7 @@ export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
 			// what it is generated at is the grade's; what a piece already owned may be (minItemLevel .. maxItemLevel, allowedRarities) stays, so no save breaks
 			dropLevels: gradeLevels(grade),
 			dropRarities: gradeRarities(grade),
-			enabled: LIVE_GRADES.includes(grade),
+			...gradeAvailability(grade),
 		};
 	});
 

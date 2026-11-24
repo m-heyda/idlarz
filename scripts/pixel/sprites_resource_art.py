@@ -19,6 +19,7 @@ USED = {
     'res_fish': 'fish', 'res_iron': 'iron-ore',
     # the T3 extracts
     'res_herbs': 'herbs', 'res_sap': 'sap', 'res_spores': 'spores', 'res_frostshard': 'frostshard', 'res_pearls': 'pearls', 'res_salt': 'salt',
+    'res_venom': 'venom', 'res_dye': 'dye', 'res_royal_jelly': 'royal-jelly', 'res_corrupted_core': 'corrupted-core', 'res_scrap_steel': 'scrap-steel',
 }
 
 

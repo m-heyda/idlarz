@@ -28,6 +28,23 @@ const RARE: readonly { id: string; chance: number; minLevel: number }[] = [
 	{ id: 'junk_amethyst', chance: 0.004, minLevel: 20 },
 ];
 
+/**
+ * What a chest also holds in gems and ore (IDL-358): ingredients for the crafting bag, a chance each (before Luck) from the chest's own level. The common stones come early and often, the finest gems are rare finds of the late chests.
+ * Drawn after everything else of the chest, so the reward and the junk above are the rolls they always were.
+ */
+const CHEST_FINDS: readonly { id: string; chance: number; minLevel: number; qty: readonly [number, number] }[] = [
+	{ id: 'junk_copper_ore', chance: 0.22, minLevel: 3, qty: [1, 3] },
+	{ id: 'junk_flint', chance: 0.15, minLevel: 4, qty: [1, 2] },
+	{ id: 'junk_iron_ore', chance: 0.12, minLevel: 8, qty: [1, 2] },
+	{ id: 'junk_jasper', chance: 0.08, minLevel: 6, qty: [1, 1] },
+	{ id: 'junk_malachite', chance: 0.07, minLevel: 8, qty: [1, 1] },
+	{ id: 'junk_turquoise', chance: 0.06, minLevel: 10, qty: [1, 1] },
+	{ id: 'junk_garnet', chance: 0.03, minLevel: 24, qty: [1, 1] },
+	{ id: 'junk_lapis', chance: 0.03, minLevel: 24, qty: [1, 1] },
+	{ id: 'junk_ruby', chance: 0.008, minLevel: 42, qty: [1, 1] },
+	{ id: 'junk_sapphire', chance: 0.008, minLevel: 44, qty: [1, 1] },
+];
+
 /** A boss always drops these, in a number that grows with its level (and a little with Luck). */
 const BOSS: readonly { id: string; base: number; perLevel: number }[] = [
 	{ id: 'junk_claw', base: 3, perLevel: 1 / 8 },
@@ -50,6 +67,8 @@ export interface JunkRollContext {
 	boss: boolean;
 	/** A golden monster: everything is tripled */
 	lucky: boolean;
+	/** A chest: its own gem and ore finds (`CHEST_FINDS`) drop on top */
+	chest?: boolean;
 	/** The monster's type: its ingredients (`catalog/monsterDrops.ts`) drop on top of the junk. Left out (the debug panel, tests of the plain junk), no ingredient drops. */
 	type?: string;
 }
@@ -106,6 +125,12 @@ export const rollJunkLoot = (ctx: JunkRollContext, rng: Rng): JunkLoot => {
 			give(ing.id, n);
 		}
 	}
+	// a chest's gem and ore finds come last of all
+	if (ctx.chest)
+		for (const find of CHEST_FINDS) {
+			if (ctx.level < find.minLevel || rng() >= find.chance * luck) continue;
+			give(find.id, find.qty[0] + Math.floor(rng() * (find.qty[1] - find.qty[0] + 1)));
+		}
 	return { drops, stash };
 };
 

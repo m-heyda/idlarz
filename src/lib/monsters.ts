@@ -1,5 +1,5 @@
 import { COMBAT, MONSTERS, type BossModifiers, type MonsterDef } from '@/config/combatConfig';
-import { levelScale } from '@/catalog/stats';
+import { levelScale, levelTail } from '@/catalog/stats';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
 import { castleDistance } from '@/lib/distance';
 import { limitOf, type LimitContext } from '@/lib/limits';
@@ -94,13 +94,13 @@ export const maxLevelOf = (spawnLevel: number, ctx: LimitContext = {}, growCap?:
 /**
  * The level of a monster of this age: its spawn level plus one per growth interval, up to the growth limit.
  *
- * Growth: +1 level per 1,800 s on the map (`LIMITS.monsterGrowthIntervalSec`), at most +10 above the spawn level (`LIMITS.monsterGrowthLevels`, hard 40). The level is a function of age.
+ * Growth: +1 level per 900 s on the map (`LIMITS.monsterGrowthIntervalSec`), at most +10 above the spawn level (`LIMITS.monsterGrowthLevels`, hard 40). The level is a function of age.
  * A monster whose spawn was capped for a weak player has a smaller `growCap`.
  *
  * @category Monsters/Level scaling
  * @order 4
  * @formula
- * level = spawnLevel + min(growthLevels, floor(ageSec / 1800))
+ * level = spawnLevel + min(growthLevels, floor(ageSec / 900))
  */
 export const levelAtAge = (spawnLevel: number, ageSec: number, ctx: LimitContext = {}, growCap?: number): number =>
 	spawnLevel + Math.min(growthLevels(ctx, growCap), Math.floor(Math.max(0, ageSec) / limitOf('monsterGrowthIntervalSec', ctx)));
@@ -132,7 +132,7 @@ const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
 export const monsterStats = (type: MonsterType, level: number, elapsedSec = 0): MonsterStats => {
 	const d = monsterDef(type);
 	const steps = Math.max(1, Math.floor(level)) - d.refLevel;
-	const gear = d.scaling === 'gear' ? levelScale(Math.max(1, Math.floor(level))) / levelScale(d.refLevel) : null;
+	const gear = d.scaling === 'gear' ? (levelScale(Math.max(1, Math.floor(level))) * levelTail(level)) / (levelScale(d.refLevel) * levelTail(d.refLevel)) : null;
 	return {
 		maxHp: roundHalfUp(d.hp * (gear ?? Math.pow(d.hpPerLevel, steps))),
 		attack: roundHalfUp(d.attack * (gear ?? Math.pow(d.attackPerLevel, steps)) * (1 + (d.modifiers?.brutal?.attackPct ?? 0) / 100)),

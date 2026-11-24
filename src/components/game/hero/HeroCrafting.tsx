@@ -3,13 +3,28 @@ import { Button, HoverTip, Inset, Panel, ProgressBar, SearchInput, Slot } from '
 import { CollapsibleGroup, CraftQueue, PAPER_INK, Slider, type CraftQueueEntry } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip, TipLine, TipRows } from '../../../../packages/design-system/src/components/tooltips';
 import { ITEM_CATALOG, RARITIES, formatStatValue, statLabel } from '@/catalog';
-import { COMPONENTS, LEGENDARY_RECIPES, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
+import { COMPONENTS, RECIPES, RECIPE_BY_ID, type Recipe, type RecipeKind } from '@/catalog/recipes';
 import { gearBaseStats, gearItemLevels, gearOdds } from '@/lib/craftGear';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { craftGroups } from '@/lib/craftCategories';
-import { craftBlock, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, craftXpToNext, finishedOf, maxCraftable, stashKeyOf } from '@/lib/crafting';
+import {
+	craftBlock,
+	craftCostFactor,
+	craftLevelOf,
+	craftLimit,
+	craftNeeds,
+	craftTimeSec,
+	craftXpOf,
+	craftXpToNext,
+	finishedOf,
+	maxCraftable,
+	stashKeyOf,
+} from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { attributesWithGear } from '@/lib/gearAttributes';
+import type { LimitContext } from '@/lib/limits';
+import { resolveItem } from '@/lib/itemInstance';
+import { ENCHANT } from '@/config/crafting';
 import { selectQueue, useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -25,6 +40,10 @@ interface Have {
 	craftLevel: number;
 	resources: Partial<Record<string, number>>;
 	stock: Record<string, number>;
+	/** What raises the crafting limits (Ember and Gem shop): craft speed and the batch run time */
+	limits: LimitContext;
+	/** The share of the resources a craft pays now (`craftCostFactor`) */
+	costFactor: number;
 }
 
 /** What a recipe's kind is called in a tooltip (one thing, capitalised). */
@@ -124,7 +143,77 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 					? `, bad luck bonus x${tidy(odds.pityMultiplier.toFixed(2))} on ${RARITIES[best.id as keyof typeof RARITIES]?.label ?? best.id}`
 					: ''}
 			</div>
-			<div className='ds-paper-note'>You choose the grade and the slot; the piece is random. It goes to your bag, marked Crafted.</div>
+			<div className='ds-paper-note'>
+				You choose the type and the tier; the piece (a base of that type) and its affixes are random. It goes to your bag, marked Crafted.
+			</div>
+		</div>
+	);
+};
+
+/**
+ * The enchant craft (IDL-120), under the gear recipes: pick a piece of gear in the bag, then reroll one of its affixes or add one (up to what its rarity carries) for Ichor from the Crafting bag (distilled at the workbench from the Corrupted Core of a Blight Core Siphon). Without Ichor the button says
+ * "Needs Ichor: distil it from Corrupted Core" and stays off; the server judges everything again (`applyEnchant`).
+ */
+const EnchantPanel: React.FC = () => {
+	const bag = useGameStore((state) => state.bag);
+	const ichor = useCraftStore((state) => state.craft?.stock.ing_ichor ?? 0);
+	const busy = useCraftStore((state) => state.busy);
+	const enchant = useCraftStore((state) => state.enchant);
+	const showToast = useUiStore((state) => state.showToast);
+	const [slot, setSlot] = useState(-1);
+	const [affix, setAffix] = useState(0);
+	const pieces = bag.flatMap((s, index) => {
+		const item = s && 'item' in s ? s.item : null;
+		const resolved = item ? resolveItem(item) : null;
+		return item && resolved && resolved.def.generation !== 'named' ? [{ index, resolved }] : [];
+	});
+	const chosen = pieces.find((p) => p.index === slot) ?? null;
+	const rarity = chosen?.resolved.rarity;
+	const canAdd = !!chosen && !!rarity && chosen.resolved.instance.affixes.length < rarity.maxAffixes;
+	const note = ichor < ENCHANT.ichor.reroll ? 'Needs Ichor: distil it from Corrupted Core' : null;
+	const run = (mode: 'reroll' | 'add') => chosen && void enchant(chosen.index, mode, affix).then(showToast);
+	return (
+		<div data-slot='enchant'>
+			<div className='ds-capi'>Enchant (Ichor {formatInt(ichor)})</div>
+			<div className='ds-paper-note'>
+				Reroll one affix of a piece in your bag ({ENCHANT.ichor.reroll} Ichor) or add one ({ENCHANT.ichor.add}).
+			</div>
+			<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', paddingTop: 6 }}>
+				<select
+					className='ds-paper-input'
+					aria-label='Piece to enchant'
+					value={slot}
+					onChange={(event) => {
+						setSlot(Number(event.target.value));
+						setAffix(0);
+					}}
+				>
+					<option value={-1}>Choose a piece...</option>
+					{pieces.map((p) => (
+						<option key={p.index} value={p.index}>
+							{p.resolved.name} (item level {p.resolved.instance.level})
+						</option>
+					))}
+				</select>
+				{chosen && chosen.resolved.affixes.length > 0 ? (
+					<select className='ds-paper-input' aria-label='Affix to reroll' value={affix} onChange={(event) => setAffix(Number(event.target.value))}>
+						{chosen.resolved.affixes.map((a, i) => (
+							<option key={a.id} value={i}>
+								{a.name}: {a.stat} {a.value}
+							</option>
+						))}
+					</select>
+				) : null}
+			</div>
+			<div style={{ display: 'flex', gap: 8, paddingTop: 6 }}>
+				<Button disabled={!chosen || busy || ichor < ENCHANT.ichor.reroll || chosen.resolved.affixes.length === 0} onClick={() => run('reroll')}>
+					Reroll
+				</Button>
+				<Button disabled={!chosen || busy || !canAdd || ichor < ENCHANT.ichor.add} onClick={() => run('add')}>
+					Add affix
+				</Button>
+			</div>
+			{note ? <div className='ds-paper-note'>{note}</div> : null}
 		</div>
 	);
 };
@@ -133,9 +222,10 @@ const GearOddsPanel: React.FC<{ recipe: Recipe; craftLevel: number }> = ({ recip
 const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }) => {
 	const busy = useCraftStore((state) => state.busy);
 	const craftItem = useCraftStore((state) => state.craftItem);
-	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots') && !!recipe.timeSec;
+	const prestige = useGameStore((state) => state.prestige);
+	const slotsFull = useCraftStore(selectQueue).length >= craftLimit('craftQueueSlots', { prestige }) && !!recipe.timeSec;
 	const showToast = useUiStore((state) => state.showToast);
-	const perCraft = craftTimeSec(recipe);
+	const perCraft = craftTimeSec(recipe, have.limits);
 	const max = maxCraftable(recipe, have);
 	const [wanted, setWanted] = useState(1);
 	const [draft, setDraft] = useState<string | null>(null);
@@ -146,7 +236,7 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 	const description = 'component' in recipe.output ? COMPONENTS[recipe.output.component].description : null;
 	const isGear = 'gear' in recipe.output;
 	const block = count > 0 ? craftBlock(recipe, count, have) : 'resources';
-	const needs = craftNeeds(recipe, Math.max(1, count));
+	const needs = craftNeeds(recipe, Math.max(1, count), have.costFactor);
 
 	return (
 		<Panel parchment className='ds-ledger ds-craft-ticket'>
@@ -241,8 +331,8 @@ const RecipeTicket: React.FC<{ recipe: Recipe; have: Have }> = ({ recipe, have }
 
 			{isGear && !locked ? <GearOddsPanel recipe={recipe} craftLevel={have.craftLevel} /> : null}
 
-			{/* reserved for the later "infuse with affixes" options (enchanted crafts, legendaries); empty while no recipe has any */}
-			<div data-slot='infuse' />
+			{/* the enchant craft (IDL-120): reroll or add one affix of a piece in the bag, for Ichor */}
+			<div data-slot='infuse'>{isGear && !locked ? <EnchantPanel /> : null}</div>
 
 			<Button
 				tone='gold'
@@ -276,11 +366,14 @@ const Queue: React.FC = () => {
 	const cancel = useCraftStore((state) => state.cancel);
 	const showToast = useUiStore((state) => state.showToast);
 	const now = useServerNow();
+	const prestige = useGameStore((state) => state.prestige);
+	const gemCraft = useGameStore((state) => state.gemCraft);
+	const limits = { prestige, gemCraft };
 	const entries: CraftQueueEntry[] = queue.map((entry, slot) => {
 		const recipe = RECIPE_BY_ID[entry.recipeId];
-		const done = finishedOf(entry, now);
+		const done = finishedOf(entry, now, limits);
 		const left = Math.max(0, (entry.count - done) * entry.timeSec - (now - entry.startedAt) / 1000 + done * entry.timeSec);
-		const stalled = done < entry.count && now - entry.startedAt >= craftLimit('craftOfflineHours') * 3_600_000;
+		const stalled = done < entry.count && now - entry.startedAt >= craftLimit('craftOfflineHours', limits) * 3_600_000;
 		return {
 			id: slot,
 			name: recipe ? outputName(recipe) : entry.recipeId,
@@ -294,7 +387,7 @@ const Queue: React.FC = () => {
 	return (
 		<CraftQueue
 			entries={entries}
-			slots={craftLimit('craftQueueSlots')}
+			slots={craftLimit('craftQueueSlots', limits)}
 			onCollect={(id) => act(() => claim(Number(id)))}
 			onCancel={(id) => act(() => cancel(Number(id)))}
 			onCollectAll={() => act(() => claim('all'))}
@@ -304,7 +397,7 @@ const Queue: React.FC = () => {
 };
 
 /** Every recipe the tab shows: the craftable ones and the display-only legendaries. The categories and the search are `lib/craftCategories.ts`. */
-const SHOWN: Recipe[] = [...RECIPES, ...LEGENDARY_RECIPES];
+const SHOWN: Recipe[] = RECIPES;
 const ALL_GROUPS = craftGroups(SHOWN);
 
 /**
@@ -346,21 +439,27 @@ export const CraftingSidebar: React.FC = () => {
  * The Crafting tab of the Hero window (the right side; the level and the queue are in `CraftingSidebar`): the crafting level bar, the queue (Collect all lights up when something finished), a search box and the recipe list in folding categories (Weapons, Armor by slot, Potions, Jewelry by kind, Components, Legendary; see `lib/craftCategories.ts`; each by required level, a locked recipe is dimmed and tagged with the level it needs, hover shows its cost and XP) next to the paper ticket of the chosen recipe.
  * Everything the old Crafting window did: amount by slider or typed text, cost colours, XP and time, gear odds, queue slots, Collect, Cancel.
  */
-const HeroCrafting: React.FC = () => {
+const HeroCrafting: React.FC<{ initialQuery?: string }> = ({ initialQuery = '' }) => {
 	const craft = useCraftStore((state) => state.craft);
 	const refresh = useCraftStore((state) => state.refresh);
 	const resources = useGameStore((state) => state.resources);
 	const [selectedId, setSelectedId] = useState<string | null>(null);
 	const [closed, setClosed] = useState<ReadonlySet<string>>(new Set());
-	const [query, setQuery] = useState('');
+	const [query, setQuery] = useState(initialQuery);
 	useEffect(() => void refresh(), [refresh]);
 
 	const { level } = craftLevelOf(craft?.xp ?? 0);
-	const have: Have = useMemo(() => ({ craftLevel: level, resources, stock: craft?.stock ?? {} }), [level, resources, craft?.stock]);
+	const prestige = useGameStore((state) => state.prestige);
+	const gemCraft = useGameStore((state) => state.gemCraft);
+	const have: Have = useMemo(() => {
+		const limits = { prestige, gemCraft };
+		return { craftLevel: level, resources, stock: craft?.stock ?? {}, limits, costFactor: craftCostFactor(limits) };
+	}, [level, resources, craft?.stock, prestige, gemCraft]);
 	const searching = query.trim() !== '';
 	const groups = useMemo(() => craftGroups(SHOWN, query), [query]);
-	const firstRecipes = ALL_GROUPS[0].sections[0].recipes;
-	const selected = SHOWN.find((r) => r.id === selectedId) ?? firstRecipes.find((r) => r.unlock <= level) ?? firstRecipes[0];
+	// nothing chosen yet: the first recipe the player can craft now, else the first in the list
+	const listed = ALL_GROUPS.flatMap((group) => group.sections.flatMap((section) => section.recipes));
+	const selected = SHOWN.find((r) => r.id === selectedId) ?? listed.find((r) => r.unlock <= level) ?? listed[0];
 	const toggleKind = (kind: string) =>
 		setClosed((before) => {
 			const out = new Set(before);

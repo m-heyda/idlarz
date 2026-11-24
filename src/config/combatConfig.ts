@@ -610,7 +610,7 @@ export const MONSTERS = {
 	dumpback: normal('swamp', 'Dumpback', 'even'),
 	rotHeron: normal('swamp', 'Rot Heron', 'fierce'),
 	scrapGolem: normal('swamp', 'Scrap Golem', 'tough'),
-	bogfireWisp: normal('swamp', 'Bogfire Wisp', 'glass'),
+	bogfireWisp: normal('swamp', 'Sludge Cyclops', 'glass'),
 	bossMireMatriarch: withModifiers(boss('swamp', 'The Mire Matriarch', ['The Matriarch gurgles with laughter.', 'The mire swallows the proud.']), {
 		venom: { pctPerSec: 0.4, durationSec: 8, maxStacks: 5, regenCutPct: 50 },
 	}),

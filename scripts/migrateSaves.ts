@@ -3,6 +3,7 @@
  * feeds it rows, the tests feed it fixtures. The counts and the fixed reason texts of the code are all that is ever printed: no name, no id, no number out of a player's game.
  */
 import { isDeepStrictEqual } from 'node:util';
+import { OPTIONAL_KEYS } from '../src/catalog/resourceKeys';
 import { SAVE_SCHEMA, decodeSave, sealWire, unpackBody } from '../src/lib/saveFormat';
 import { SAVE_UPGRADES, upgradeBody, type BodyUpgrade } from '../src/lib/saveUpgrade';
 import { sanitizeSave } from '../src/lib/sanitizeSave';
@@ -62,6 +63,18 @@ export interface LedgerMigration {
 
 const DATE_COLUMNS = ['anchor_at', 'reset_at'] as const;
 
+/** Drops an optional resource (a key the saves may leave out) that holds 0, at any depth: a row written before a resource existed lacks it, the reader fills it in with 0, and that is the same row, not a repaired one (a new resource is an additive change). */
+const withoutZeroOptionals = (value: unknown): unknown => {
+	if (Array.isArray(value)) return value.map(withoutZeroOptionals);
+	if (value === null || typeof value !== 'object') return value;
+	const optional: ReadonlySet<string> = new Set(OPTIONAL_KEYS);
+	return Object.fromEntries(
+		Object.entries(value as Record<string, unknown>)
+			.filter(([key, v]) => !(optional.has(key) && v === 0))
+			.map(([key, v]) => [key, withoutZeroOptionals(v)]),
+	);
+};
+
 /** A row with its timestamps in one format and no bookkeeping column, so two rows can be compared field by field (Postgres writes timestamps differently from `toISOString`, and jsonb reorders keys: the comparison is deep, not textual). */
 const comparable = (row: Record<string, unknown>): Record<string, unknown> => {
 	const { updated_at: _updatedAt, user_id: _userId, ...rest } = row;
@@ -70,7 +83,7 @@ const comparable = (row: Record<string, unknown>): Record<string, unknown> => {
 	// a column that is null or absent is the same thing (the reader defaults it): a row written before a column existed is not a different row
 	const out: Record<string, unknown> = Object.fromEntries(Object.entries(rest).filter(([, value]) => value !== null && value !== undefined));
 	for (const column of DATE_COLUMNS) if (typeof out[column] === 'string') out[column] = new Date(out[column] as string).toISOString();
-	return out;
+	return withoutZeroOptionals(out) as Record<string, unknown>;
 };
 
 /**

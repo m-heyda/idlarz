@@ -36,10 +36,39 @@ export const CRAFTING = {
 };
 
 /**
+ * The enchant craft (IDL-120): at the workbench a piece of gear in the bag gets one affix **rerolled** (a new affix of another group, a fresh roll) or **added** (up to the most its rarity carries). It takes Ichor from the crafting stash
+ * (distilled at the workbench from the Corrupted Core of the Blight's Core Siphon; without it the button says "Needs Ichor: distil it from Corrupted Core"). Intelligence leans the new roll up like a gear craft does, and the roll is sealed on its own counter (`craft.ordEnchant`), so it never shifts the pieces
+ * the gear crafts roll. Named legendaries cannot be enchanted.
+ *
+ * @category Economy/Crafting
+ * @order 9
+ */
+export const ENCHANT = { ichor: { reroll: 3, add: 10 } } as const;
+
+/**
+ * The time-shift potion (IDL-355): each moves the clock `seconds` forward (an hour of income at the away efficiency, building and castle timers an hour shorter) and at most `perDay` can be drunk a day (UTC day), so a stack is no way to skip the game.
+ *
+ * @category Economy/Crafting
+ * @order 7
+ */
+export const TIME_SHIFT = { seconds: 3600, perDay: 3 } as const;
+
+/**
+ * The most the crafting discounts can take off the resources of a recipe together (Ember shop Thrifty Hands up to 15% and the Gem shop's Bulk Discount 10%, `craftCostFactor`), and the headroom the gear recipe values carry for it: a gear recipe is priced
+ * 1 / (1 - `CRAFT_DISCOUNT_MAX`) higher than the sell-value gate needs, so even with every discount a craft still costs more than the piece sells for (tests/crafting/gearRecipes.test.ts, "no gold printer").
+ *
+ * @category Economy/Crafting
+ * @order 5
+ */
+export const CRAFT_DISCOUNT_MAX = 0.25;
+export const CRAFT_COST_HEADROOM = 1 / (1 - CRAFT_DISCOUNT_MAX);
+
+/**
  * Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
  * the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
  *
- * - **Grades**: G1-G4 (`ceilingGrade`); a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, owner 2026-11-07).
+ * - **Grades**: G1-G8 (`ceilingGrade`): eight tiers of every item type; a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, G7 65, G8 80, owner 2026-11-07). G1-G6 are live grades (they drop); G7 and G8 are craft-only (`CRAFT_ONLY_GRADES`: nothing drops them). G9 comes through the legendary recipes.
+ * - **Type**: a weapon or off-hand recipe also names the weapon type (sword, mace, bow, shield, tome ...), so only bases of that type roll; the other slots have one type each.
  * - **Item level**: inside the grade's window, rising with the crafting level from the grade's unlock to the next grade's (`gradeLevel`), +-1 around the centre. Never above the window, so a Hide recipe always makes Hide gear.
  * - **Rarity**: the profile's weights among the rarities the grade carries (`GRADE_INFO`), Luck multiplying rare and better (`rarityLuckMultiplier`); the crafting level caps it (`rarityCeiling`: up to rare, epic from 50, never legendary).
  * - **Pity**, per grade, kept in `craft.pity` across rebirths: every craft that misses the grade's best rarity adds `pity.perMiss` to a multiplier on that rarity's weight (up to `pity.maxMultiplier`), a hit resets it. A grade with one rarity has none.
@@ -49,9 +78,9 @@ export const CRAFTING = {
  * @order 2
  */
 export const CRAFT_GEAR = {
-	ceilingGrade: 'G4',
-	/** The crafting level a grade after the last recipe grade unlocks at (G5, 35): the item level window of G4 is climbed until then */
-	nextUnlock: 35,
+	ceilingGrade: 'G8',
+	/** The crafting level a grade after the last recipe grade unlocks at (G9, 95): the item level window of G8 is climbed until then (the crafting cap is 80, so G8 starts at its bottom) */
+	nextUnlock: 95,
 	/** Best rarity by crafting level: the highest `from` that is at or below the level applies */
 	rarityCeiling: [
 		{ from: 1, rarity: 'rare' },
@@ -63,5 +92,5 @@ export const CRAFT_GEAR = {
 	/** Intelligence of a new character: the points above it count */
 	baseIntelligence: 5,
 	/** Seconds one craft takes, by grade */
-	timeSec: { G1: 20, G2: 30, G3: 45, G4: 60 },
+	timeSec: { G1: 20, G2: 30, G3: 45, G4: 60, G5: 75, G6: 90, G7: 105, G8: 120 },
 } as const;

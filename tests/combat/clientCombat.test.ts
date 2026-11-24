@@ -441,7 +441,7 @@ test('tick never moves the monsters: they age on the map and stay where the serv
 	run(3600);
 	assert.equal(api().monsters.length, 1, 'no local spawning, killing or removing');
 	assert.deepEqual([api().monsters[0].x, api().monsters[0].y], [CASTLE_X + 2, CASTLE_Y]);
-	assert.equal(api().monsters[0].level, 3, 'an hour old: two growth intervals');
+	assert.equal(api().monsters[0].level, 5, 'an hour old: four growth intervals of a quarter hour');
 });
 
 test('no chest or monster appears from local timers: the server is the only source', () => {

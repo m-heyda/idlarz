@@ -159,9 +159,34 @@ test('the stored resource keys come from the catalog, in the order saves have al
 			'pearls',
 			'salt',
 			'wool',
+			'venom',
+			'dye',
+			'royalJelly',
+			'corruptedCore',
+			'scrapSteel',
 		],
 	);
-	assert.deepEqual([...OPTIONAL_KEYS], ['eggs', 'milk', 'hide', 'herbs', 'sap', 'ironOre', 'spores', 'frostshard', 'pearls', 'salt', 'wool']);
+	assert.deepEqual(
+		[...OPTIONAL_KEYS],
+		[
+			'eggs',
+			'milk',
+			'hide',
+			'herbs',
+			'sap',
+			'ironOre',
+			'spores',
+			'frostshard',
+			'pearls',
+			'salt',
+			'wool',
+			'venom',
+			'dye',
+			'royalJelly',
+			'corruptedCore',
+			'scrapSteel',
+		],
+	);
 	assert.deepEqual([...FARM_KEYS], ['meat', 'eggs', 'milk', 'hide', 'wool']);
 	assert.deepEqual([...FARM_PRODUCT_KEYS], ['eggs', 'milk', 'hide', 'wool']);
 	for (const table of [INITIAL_RESOURCES, BASE_GENERATION_RATES, CASTLE_BASE_RATES, zeroResources()]) assert.deepEqual(Object.keys(table), [...STORED_KEYS]);

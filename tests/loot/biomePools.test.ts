@@ -14,7 +14,11 @@ import type { Equipment } from '@/types/game';
 /** The data as it will be when every grade is live (IDL-238): enables each item of the ladder */
 const allGradesLive = (): LootData => {
 	const d = JSON.parse(JSON.stringify(LOOT_DATA)) as LootData;
-	for (const item of Object.values(d.items)) if (gradeOfItem(item)) item.enabled = true;
+	for (const item of Object.values(d.items))
+		if (gradeOfItem(item)) {
+			item.enabled = true;
+			delete item.craftOnly; // every grade is live in this picture, so G7 and G8 drop like the rest
+		}
 	return d;
 };
 

@@ -70,6 +70,38 @@ const BASE_ICON_SIZES = {
 	comp_cured_leather: [40, 40], // the leather roll (cut from the reuse pool, 40 px)
 	comp_plank_bundle: [40, 40], // the plank (cut from the reuse pool, 40 px)
 	comp_arcane_essence: [40, 40], // the pink potion (reuse pool art, 40 px): the base of the magic potions
+	// refined crafting components (crafting rework 2026-11-19): ingots, cut gems, tools, extracts; recoloured or resampled from the supplied sprites
+	comp_copper_ingot: [40, 40],
+	comp_copper_nails: [40, 40],
+	comp_iron_nails: [40, 40],
+	comp_steel_rivets: [40, 40],
+	comp_silver_rivets: [40, 40],
+	comp_gold_studs: [40, 40],
+	comp_iron_ingot: [40, 40],
+	comp_steel_ingot: [40, 40],
+	comp_silver_ingot: [40, 40],
+	comp_gold_ingot: [40, 40],
+	comp_obsidian_edge: [40, 40],
+	comp_gem_grit: [40, 40],
+	comp_polish_cloth: [40, 40],
+	comp_stone_block: [40, 40],
+	comp_cloth_bolt: [40, 40],
+	comp_herb_extract: [40, 40],
+	comp_fungal_extract: [40, 40],
+	comp_vital_extract: [40, 40],
+	comp_cut_amethyst: [40, 40],
+	comp_cut_geode: [40, 40],
+	comp_cut_crystal: [40, 40],
+	comp_cut_emerald: [40, 40],
+	comp_cut_moon: [40, 40],
+	comp_cut_heart: [40, 40],
+	comp_cut_jasper: [40, 40],
+	comp_cut_malachite: [40, 40],
+	comp_cut_turquoise: [40, 40],
+	comp_cut_lapis: [40, 40],
+	comp_cut_garnet: [40, 40],
+	comp_cut_ruby: [40, 40],
+	comp_cut_sapphire: [40, 40],
 	skill_heal: [32, 32], // the green lotus of the Heal skill
 	skill_stun: [32, 32], // the golden fist of the Stun skill
 	water_ripple: [128, 6], // 8 frames of 16x6 (map water, WaterLayer)
@@ -100,6 +132,11 @@ const BASE_ICON_SIZES = {
 	res_frostshard: [40, 40],
 	res_pearls: [40, 40],
 	res_salt: [40, 40],
+	res_venom: [40, 40],
+	res_dye: [40, 40],
+	res_royal_jelly: [40, 40],
+	res_corrupted_core: [40, 40],
+	res_scrap_steel: [40, 40],
 	res_fish: [40, 40],
 	res_mana: [40, 40],
 	res_crystal: [40, 40],
@@ -216,6 +253,11 @@ export const RESOURCE_PIXEL_ICONS: Partial<Record<string, PixelIconName>> = {
 	frostshard: 'res_frostshard',
 	pearls: 'res_pearls',
 	salt: 'res_salt',
+	venom: 'res_venom',
+	dye: 'res_dye',
+	royalJelly: 'res_royal_jelly',
+	corruptedCore: 'res_corrupted_core',
+	scrapSteel: 'res_scrap_steel',
 };
 
 // Sprites that twinkle: name -> its 6-frame strip (see the .px-shine class)
