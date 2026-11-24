@@ -6,6 +6,7 @@ import {
 	affixMagnitude,
 	affixesValue,
 	levelScale,
+	levelTail,
 	qualityValue,
 	valueCurve,
 	qualityMultiplier,
@@ -53,7 +54,12 @@ export const affixFits = (affix: AffixDef, item: ItemDef, itemLevel: number, rar
 
 /** The authored stats of a base at an item level, with the quality and rarity multipliers. An instance at the authored level and quality 50 returns the authored values exactly. */
 export const baseStatsAt = (def: ItemDef, level: number, quality: number, rarity: RarityDef): ItemStats =>
-	scaleStats(def.stats ?? {}, levelScale(level) / levelScale(def.minItemLevel ?? 1), qualityMultiplier(quality) * rarity.statMultiplier);
+	scaleStats(
+		def.stats ?? {},
+		levelScale(level) / levelScale(def.minItemLevel ?? 1),
+		qualityMultiplier(quality) * rarity.statMultiplier,
+		levelTail(level) / levelTail(def.minItemLevel ?? 1),
+	);
 
 const sumBlocks = (blocks: ItemStats[]): ItemStats => {
 	const out: ItemStats = {};

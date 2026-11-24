@@ -167,6 +167,13 @@ export const MAX_ITEM_LEVEL = 100;
 /** Each item level adds this share of the level-1 power (linear: 1 at level 1, 1.63 at 10, 7.9 at 100). */
 const POWER_PER_LEVEL = 0.07;
 
+/**
+ * Above this item level (the start of the Obsidian grade) flat gear power also compounds, so late gear keeps climbing instead of flattening out. See {@link levelTail}.
+ */
+const POWER_KNEE = 55;
+/** The compound growth per item level above {@link POWER_KNEE}. */
+const POWER_GROWTH_ABOVE_KNEE = 1.07;
+
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
 
 // ---- item value curve ---------------------------------------------------------------------------------------------
@@ -226,6 +233,19 @@ export const affixesValue = (rolls: readonly number[]): number =>
  */
 export const levelScale = (itemLevel: number): number => 1 + POWER_PER_LEVEL * (clampItemLevel(itemLevel) - 1);
 
+/**
+ * The late-game growth of flat gear power: 1 up to item level 55, then 1.07 per level (1.07^25 = 5.4 at level 80, 1.07^45 = 21 at level 100). It multiplies the flat stats (damage, armor, max HP, regen, spell power, ...: the ones that follow the whole level curve)
+ * on top of {@link levelScale}, and bosses with `scaling: 'gear'` follow it too, so a piece of item level 80 hits about 11x harder than one of level 32 and one of level 100 about 50x, and the late bosses (millions of HP) and their attacks keep pace with it.
+ * Percentage stats (crit, dodge, ...) only follow a share of the linear curve and never this tail, so their caps are never rushed.
+ *
+ * @category Loot/Items
+ * @order 2
+ * @formula
+ * levelTail(L) = 1.07^max(L - 55, 0)        L clamped to 1..100
+ * flat stat(instance) = baseStats x levelScale(L) / levelScale(min) x levelTail(L) / levelTail(min) x quality
+ */
+export const levelTail = (itemLevel: number): number => Math.pow(POWER_GROWTH_ABOVE_KNEE, Math.max(0, clampItemLevel(itemLevel) - POWER_KNEE));
+
 /** The quality roll moves base stats by at most this much either way (quality 0-100, 50 = the authored value). */
 const QUALITY_SPREAD = 0.08;
 
@@ -246,17 +266,19 @@ const statLevelFactor = (key: StatKey, ratio: number): number => 1 + (ratio - 1)
  * Scales a stat block from one item level to another (`levelRatio`, each stat following its own share of it) and by a plain
  * `multiplier` (quality, rarity), rounding every stat. A ratio and multiplier of exactly 1 return the same values.
  */
-export const scaleStats = (stats: ItemStats, levelRatio: number, multiplier = 1): ItemStats => {
+export const scaleStats = (stats: ItemStats, levelRatio: number, multiplier = 1, tailRatio = 1): ItemStats => {
 	const out: ItemStats = {};
 	for (const key of STAT_KEYS) {
 		const value = stats[key];
-		if (value) out[key] = roundStat(key, value * statLevelFactor(key, levelRatio) * multiplier);
+		if (value)
+			out[key] = roundStat(key, value * statLevelFactor(key, levelRatio) * (((STAT_DEFS[key] as StatDef).levelShare ?? 1) >= 1 ? tailRatio : 1) * multiplier);
 	}
 	return out;
 };
 
 /** What one point of an affix on this stat is worth at an item level: the level-1 wooden-tier value, grown by the stat's share of the curve. */
-export const affixMagnitude = (stat: ItemStatKey, itemLevel: number): number => STAT_BASE_BY_TIER[stat][0] * statLevelFactor(stat, levelScale(itemLevel));
+export const affixMagnitude = (stat: ItemStatKey, itemLevel: number): number =>
+	STAT_BASE_BY_TIER[stat][0] * statLevelFactor(stat, levelScale(itemLevel)) * (((STAT_DEFS[stat] as StatDef).levelShare ?? 1) >= 1 ? levelTail(itemLevel) : 1);
 
 export const emptyStats = (): StatTotals => Object.fromEntries(STAT_KEYS.map((key) => [key, 0])) as StatTotals;
 
