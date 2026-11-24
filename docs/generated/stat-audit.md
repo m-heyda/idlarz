@@ -172,7 +172,7 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 
 - **REJECTED**: the save is refused (`sanitizeSave`).
 - **CLAMPED**: accepted, but the server replaces the number with the one it can explain (XP, Embers) or pays the save from the last trusted economy (castle level, rates, merchant levels).
-- **FLAGGED**: accepted and stored as claimed; the flag removes ranking eligibility for good. Shadow mode: `ENFORCEMENT.enabled` would refuse these (gold_jump, playtime_fast, gems_increase) once switched on.
+- **FLAGGED**: accepted and stored as claimed; the flag removes ranking eligibility for good. Shadow mode: `ENFORCEMENT.enabled` would refuse the two flags on its allowlist (gold_jump, gems_increase) once switched on; every other flag, playtime_fast included, only records.
 - **SILENT**: accepted with no flag at all.
 
 ### Who computes what (from the code, `@category Saves & Server` and `docs/plan/14-server-audit-and-data-plan.md`)

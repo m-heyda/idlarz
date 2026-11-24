@@ -12,7 +12,7 @@ import { biomeArtUrl } from '@/config/biomeArt';
 import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent, tidy } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
-import { askServerRebirth } from '@/lib/serverRebirth';
+import { askServerRebirth, blocksLocalRebirth } from '@/lib/serverRebirth';
 import { rebirthRunSummary, rebirthUnlockIntro, rebirthUnlockList, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
 import GameWindow from '../GameWindow';
@@ -147,6 +147,10 @@ const RebirthDialog: React.FC = () => {
 						: 'The server does not see your rebirth yet. Give the game a few seconds to save, then try again.',
 					'error',
 				);
+				return;
+			}
+			if (blocksLocalRebirth(answer)) {
+				notify('The server could not be reached, so this rebirth would not count. Try again in a moment.', 'error');
 				return;
 			}
 			// what the run had reached, read before the rebirth wipes it

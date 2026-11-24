@@ -1,3 +1,4 @@
+import { EMBER_MODEL } from '@/lib/cloudSave/emberModel';
 import { currentCloudSaver } from '@/lib/manualCloudSave';
 import { newClaimId } from '@/lib/offlineClient';
 import { requestRebirth } from '@/lib/rewardsClient';
@@ -27,3 +28,10 @@ export const askServerRebirth = async (keep: readonly KeepRef[] = []): Promise<S
 	if (reply.value.ok) return { status: 'ok', gain: reply.value.gain, kept: reply.value.kept ?? [] };
 	return { status: 'refused', ...(reply.value.reason === 'bad_keep' ? { badKeep: true } : {}) };
 };
+
+/**
+ * Whether the browser must NOT rebirth on its own after this answer: only when the server demands to run every rebirth (`EMBER_MODEL.requireServerRebirth`, switched on with enforcement) and it could not be asked (`unavailable`). A rebirth the server
+ * never recorded is reverted by the next save, so starting it locally would lose the run; the dialog says "try again" instead. With the switch off (today) this is always false and the browser rebirths locally as before.
+ */
+export const blocksLocalRebirth = (answer: ServerRebirthResult, requireServer: boolean = EMBER_MODEL.requireServerRebirth): boolean =>
+	requireServer && answer.status === 'unavailable';
