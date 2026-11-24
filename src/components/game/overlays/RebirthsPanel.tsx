@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Button, Panel } from '../../../../packages/design-system/src/components/primitives';
 import type { RebirthEntry } from '@/lib/cloudSave/rebirthHistory';
 import { fetchRebirths } from '@/lib/rebirthClient';
 import { useGameStore } from '@/stores/gameStore';
@@ -12,12 +13,12 @@ const date = (iso: string) => {
 
 /** One run as a card: the headline numbers of the run that ended with this rebirth. */
 const Run: React.FC<{ entry: RebirthEntry; latest: boolean }> = ({ entry, latest }) => (
-	<div className='px-card text-xs' data-latest={latest}>
+	<Panel className='text-xs' style={{ padding: '8px 10px' }}>
 		<div className='flex items-baseline justify-between gap-3 mb-1'>
-			<span className='px-tip-title'>
+			<b data-latest={latest}>
 				Rebirth {formatNumber(entry.rebirthNo)}
 				{latest && <span className='ml-2 text-[#9be26a] normal-case'>last run</span>}
-			</span>
+			</b>
 			<span className='text-[#a89878]'>{date(entry.at)}</span>
 		</div>
 		<div className='grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-0.5'>
@@ -30,7 +31,7 @@ const Run: React.FC<{ entry: RebirthEntry; latest: boolean }> = ({ entry, latest
 			<Stat label='Click level' value={String(entry.clickLevel + 1)} />
 			<Stat label='Embers gained' value={`+${formatCompact(entry.embersGained)}`} tone='text-purple-300' />
 		</div>
-	</div>
+	</Panel>
 );
 
 const Stat: React.FC<{ label: string; value: string; tone?: string }> = ({ label, value, tone = 'text-[#ecdcb4]' }) => (
@@ -61,9 +62,9 @@ const RebirthsPanel: React.FC = () => {
 		<div className='flex flex-col gap-3'>
 			<div className='flex items-center justify-between gap-3 text-xs'>
 				<span className='text-[#a89878]'>Every rebirth you did, with what that run had reached when it ended.</span>
-				<button className='px-btn px-btn-sm' onClick={toggleRebirth}>
+				<Button size='sm' onClick={toggleRebirth}>
 					Rebirth window
-				</button>
+				</Button>
 			</div>
 			{entries === undefined && <p className='text-xs text-[#a89878]'>Loading...</p>}
 			{entries === null && <p className='text-xs text-[#a89878]'>The history could not be loaded. Check your connection and open this tab again.</p>}
