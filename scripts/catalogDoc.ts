@@ -71,6 +71,18 @@ export const renderItemCatalog = (): string => {
 	out("| Click Gold | more gold per map click | `clickForGold` (clicks are the browser's income, checked only by plausibility) |");
 	out("| Damage / Max HP | percent on top of the flat stat | `damagePerHit` / `maxHp`, shared by the browser and the server's fights |");
 	out();
+	out('### Legendary perks (IDL-143, IDL-144)');
+	out();
+	out(
+		'A legendary can carry fixed perks: numbers on the item itself, never rolled and never scaled by item level or rarity, summed into the gear next to the set bonuses and held by the same family caps. The roster is data (`LEGENDARY_PERKS` in `src/catalog/items/reuse.ts`); these items are still disabled until their drop sources exist (IDL-146).',
+	);
+	out();
+	out('| Item | Type | Perk | Item stats |');
+	out('|---|---|---|---|');
+	for (const def of ITEMS.filter((item) => item.perks)) {
+		out(`| ${def.name} (\`${def.id}\`) | ${def.weaponType ?? def.slot} | ${formatStats(def.perks!)} | ${formatStats(def.stats ?? {})} |`);
+	}
+	out();
 	for (const set of Object.values(SETS)) {
 		out(`### ${set.label} (${set.size} slots)`);
 		out();

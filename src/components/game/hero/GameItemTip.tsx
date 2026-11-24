@@ -119,7 +119,11 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 		});
 		return [{ heading: category.label, rows: tipRows }];
 	});
-	const affixes = (resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name }));
+	const affixes = [
+		...(resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name })),
+		// a legendary's fixed perks (IDL-143), listed under its affixes
+		...Object.entries(resolved?.perks ?? {}).map(([stat, value]) => ({ text: formatStat(stat as StatKey, value as number), name: 'Legendary perk' })),
+	];
 
 	// what changes against the worn piece, one line each: green for a gain, red for a loss
 	const gain = (n: number) => (n > 0 ? ('green' as const) : ('red' as const));

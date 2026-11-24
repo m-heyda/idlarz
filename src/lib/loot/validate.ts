@@ -1,5 +1,6 @@
 import { STAT_DEFS, MAX_ITEM_LEVEL } from '@/catalog/stats';
 import type { RollsDef } from '@/catalog/lootConfig';
+import { PERK_CAPS, type PerkFamily } from '@/catalog/perkCaps';
 import { EQUIPMENT_LAYOUT } from '@/catalog';
 import { affixFits } from '@/lib/itemInstance';
 import { LOOT_DATA, type LootData } from './data';
@@ -70,6 +71,15 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 		if (!item.slot || !SLOTS.has(item.slot)) err(`item ${id}: unknown slot ${item.slot}`);
 		if (min === undefined || max === undefined || !(min >= 1) || !(max <= MAX_ITEM_LEVEL) || min > max) err(`item ${id}: bad item level window ${min}-${max}`);
 		if (!item.tags?.length) err(`item ${id}: no tags`);
+		if (item.perks) {
+			if (item.generation !== 'named') err(`item ${id}: only a named item carries perks`);
+			for (const [stat, value] of Object.entries(item.perks)) {
+				if (!(stat in STAT_DEFS)) err(`item ${id}: perk on unknown stat ${stat}`);
+				else if (!(Number.isFinite(value) && (value as number) > 0)) err(`item ${id}: perk ${stat} must be positive`);
+				else if (stat in PERK_CAPS && (value as number) > PERK_CAPS[stat as PerkFamily])
+					err(`item ${id}: perk ${stat} ${value} is above the family cap ${PERK_CAPS[stat as PerkFamily]}`);
+			}
+		}
 		if (!(item.poolWeight && item.poolWeight > 0)) err(`item ${id}: poolWeight must be positive`);
 		if (item.generation === 'base') {
 			if (!item.allowedRarities?.length) err(`item ${id}: a base needs allowedRarities`);

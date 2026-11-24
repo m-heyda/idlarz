@@ -1,6 +1,7 @@
 import type { PixelIconName } from '@/config/pixelIcons';
 import type { EquipmentRarity, ItemDef } from '@/types/game';
-import { baseStat } from '../stats';
+import { baseStat, type ItemStats } from '../stats';
+import { LEGENDARY_PERK_TIERS } from '../perkCaps';
 import { ITEM_ICONS } from '@/config/itemIcons';
 import { gear, type GearOptions } from './define';
 import { gradeAvailability, gradeLevels, gradeOwnedLevels, gradeOwnedRarities, gradeRarities, type Grade } from './grades';
@@ -313,6 +314,28 @@ const RESERVE_BASE: ItemDef[] = [
 	}),
 ];
 
+/** The mid tier of a legendary perk, in the units of its stat (percent, percentage points or Gold Find): 15, the `rare` step of {@link LEGENDARY_PERK_TIERS} */
+const MID_PERK = LEGENDARY_PERK_TIERS.xpPct.rare;
+
+/**
+ * The perks of the legendary roster (IDL-143, IDL-144; decided by the owner 2026-11-07, docs/plan/28 section 6): one headline family each, fixed numbers by tier from `LEGENDARY_PERK_TIERS`, summed with the set bonuses before the
+ * family caps. NOT here yet: Runeforged Titanhammer (building time -25 %, needs the build-time stat, IDL-145), Tidecaller Axe (chest interval, needs its own hook), Cindercrescent Glaive's Burn and Amethyst Spire's potion refund
+ * (named effect handlers, IDL-46). Those four keep their stats only; Cindercrescent Glaive takes its +10 % damage now.
+ *
+ * @category Loot/Items
+ * @order 9
+ */
+export const LEGENDARY_PERKS: Readonly<Record<string, ItemStats>> = {
+	dawnbringer_trident: { incomePct: LEGENDARY_PERK_TIERS.incomePct.top },
+	reapers_crescent: { killRewardPct: LEGENDARY_PERK_TIERS.killRewardPct.top },
+	frostbloom_fan: { xpPct: LEGENDARY_PERK_TIERS.xpPct.rare },
+	voidrune_blade: { offlineEff: MID_PERK },
+	nightfall_edge: { clickPct: LEGENDARY_PERK_TIERS.clickPct.rare },
+	stormtrident: { maxHpPct: MID_PERK },
+	cinderflight_bow: { goldFind: MID_PERK },
+	cindercrescent_glaive: { damagePct: LEGENDARY_PERK_TIERS.damagePct.top },
+};
+
 /** Grade of a reserve item = the grade its art is registered with (config/itemIcons), so one table says it */
 const gradeOfIcon = new Map(ITEM_ICONS.flatMap((e) => (e.grade ? [[e.icon, e.grade as Grade] as const] : [])));
 
@@ -321,7 +344,8 @@ const gradeOfIcon = new Map(ITEM_ICONS.flatMap((e) => (e.grade ? [[e.icon, e.gra
  * affixes treat it like a ladder item of its grade. The live grades (G1-G3) are enabled; the rest, and every named item (legendary
  * folder), stay disabled. Ids and icons never change.
  */
-export const RESERVE_ITEMS: ItemDef[] = RESERVE_BASE.map((def) => {
+export const RESERVE_ITEMS: ItemDef[] = RESERVE_BASE.map((base) => {
+	const def: ItemDef = LEGENDARY_PERKS[base.id] ? { ...base, perks: LEGENDARY_PERKS[base.id] } : base;
 	const grade = def.generation === 'named' ? undefined : gradeOfIcon.get(def.icon as string);
 	if (!grade) return def;
 	return {

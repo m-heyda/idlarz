@@ -109,6 +109,11 @@ export interface ItemDef {
 	/** Weapons only: attacks per second. Not a summed stat; the base for attack-speed combat (catalog `weaponDps`) */
 	attackSpeed?: number;
 	stats?: ItemStats;
+	/**
+	 * A legendary's perks (IDL-143): fixed numbers on the item, never rolled and never scaled by item level or rarity, in the stats the set bonuses use (`incomePct`, `xpPct`, `killRewardPct`, `offlineEff`, `clickPct`, `maxHpPct`,
+	 * `damagePct` ...). They are summed into the item's stats, so the gear sum, the family caps, the server's summary and the tooltip all see them like any other stat. Only named items carry them.
+	 */
+	perks?: ItemStats;
 	set?: string;
 	/** A plain loot family (wood, cloth, steel): matches affixes and pools like a set does, but gives no set bonus */
 	family?: string;

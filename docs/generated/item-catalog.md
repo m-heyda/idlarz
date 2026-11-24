@@ -28,6 +28,21 @@ Set-only stats (no item rolls them) and where they pay out. The server derives e
 | Click Gold | more gold per map click | `clickForGold` (clicks are the browser's income, checked only by plausibility) |
 | Damage / Max HP | percent on top of the flat stat | `damagePerHit` / `maxHp`, shared by the browser and the server's fights |
 
+### Legendary perks (IDL-143, IDL-144)
+
+A legendary can carry fixed perks: numbers on the item itself, never rolled and never scaled by item level or rarity, summed into the gear next to the set bonuses and held by the same family caps. The roster is data (`LEGENDARY_PERKS` in `src/catalog/items/reuse.ts`); these items are still disabled until their drop sources exist (IDL-146).
+
+| Item | Type | Perk | Item stats |
+|---|---|---|---|
+| Cindercrescent Glaive (`cindercrescent_glaive`) | spear | +10% Damage | +30 Damage, +8% Crit Chance, +6% Super Crit |
+| Frostbloom Fan (`frostbloom_fan`) | wand | +15% XP Gain | +20 Damage, +18% Spell Power, +0.90/s Mana Regen |
+| Voidrune Blade (`voidrune_blade`) | sword | +15% Away Income | +31 Damage, +8% Crit Chance, +8% Super Crit |
+| Reaper's Crescent (`reapers_crescent`) | axe | +25% Kill Rewards | +34 Damage, +6% Crit Chance, +3.0% Life Leech |
+| Nightfall Edge (`nightfall_edge`) | sword | +15% Click Gold | +32 Damage, +10% Crit Chance, +6% Super Crit |
+| Stormtrident (`stormtrident`) | spear | +15% Max HP | +29 Damage, +12% Crit Chance, +8% Super Crit |
+| Dawnbringer Trident (`dawnbringer_trident`) | spear | +25% Income | +30 Damage, +6 Luck, +12% Gold Find |
+| Cinderflight Bow (`cinderflight_bow`) | bow | +15% Gold Find | +25 Damage, +18% Crit Chance, +10% Super Crit |
+
 ### Obsidian Set (13 slots)
 
 The prospector's set: it pays the kingdom (income, XP, kill rewards, away time) and keeps its wearer alive, without raw offence.

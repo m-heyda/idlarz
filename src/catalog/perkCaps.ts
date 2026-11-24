@@ -20,8 +20,8 @@ export const PERK_CAPS: Record<PerkFamily, number> = {
 };
 
 /**
- * The magnitude of a legendary perk by tier, in percent of its family (IDL-149: 8 / 15 / 25 for every family, damage 4 / 6 / 10). Data for the legendary
- * roster (IDL-144): no item carries these yet, so nothing reads them in the game today.
+ * The magnitude of a legendary perk by tier, in percent of its family (IDL-149: 8 / 15 / 25 for every family, damage 4 / 6 / 10). The legendary roster
+ * (`LEGENDARY_PERKS` in `catalog/items/reuse.ts`, IDL-144) reads these as the fixed `perks` of its items (IDL-143); those items are disabled until their sources exist (IDL-146).
  *
  * @category Economy/Perk caps
  */

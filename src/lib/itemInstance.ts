@@ -35,7 +35,9 @@ export interface ResolvedItem {
 	/** The base stats at this level and quality (no affixes) */
 	baseStats: ItemStats;
 	affixes: ResolvedAffix[];
-	/** Base stats plus affixes: what wearing it gives */
+	/** The fixed perks of a legendary (empty for everything else), already inside `stats` */
+	perks: ItemStats;
+	/** Base stats plus affixes plus perks: what wearing it gives */
 	stats: ItemStats;
 	/** "Keen Iron Sword of Precision" */
 	name: string;
@@ -97,12 +99,13 @@ export const resolveItem = (instance: ItemInstance, data: LootData = LOOT_DATA):
 			value: affixValue(affix, roll.roll, instance.level, rarity.affixMultiplier),
 		});
 	}
-	const stats = sumBlocks([baseStats, ...affixes.map((a) => ({ [a.stat]: a.value }) as ItemStats)]);
+	const perks: ItemStats = def.perks ?? {};
+	const stats = sumBlocks([baseStats, ...affixes.map((a) => ({ [a.stat]: a.value }) as ItemStats), perks]);
 	const prefix = affixes.find((a) => a.position === 'prefix');
 	const suffix = affixes.find((a) => a.position === 'suffix');
 	const name = [prefix?.name, def.name, suffix?.name].filter(Boolean).join(' ');
 
-	const resolved: ResolvedItem = { instance, def, rarity, baseStats, affixes, stats, name };
+	const resolved: ResolvedItem = { instance, def, rarity, baseStats, affixes, perks, stats, name };
 	if (useCache) cache.set(instance, resolved);
 	return resolved;
 };
