@@ -326,12 +326,12 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 	potions_chest: { id: 'potions_chest', includeIds: ['potion_minor', 'potion_greater'], weights: { potion_minor: 60, potion_greater: 25 }, enabled: true },
 };
 
-/** A normal monster's profile; each biome gets a copy that draws from its own pool (same rolls, same rarities). Epic weighs 2 (it was 1 and could only drop from item level 55; IDL-382): among a grade's own rarities that is about 6 % epic in G3, 5 % in G4 and 18 % in G5, 2 % in the open top grade. */
+/** A normal monster's profile; each biome gets a copy that draws from its own pool (same rolls, same rarities). Epic weighs 1.5 (it was 1 and could only drop from item level 55; IDL-382): among a grade's own rarities that is about 4 % epic in G3 and G4, 14 % in G5 (only rare and epic) and 1.5 % in the open top grade, where common is back. */
 const NORMAL_MONSTER: LootProfile = {
 	id: 'normal_monster',
 	rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerLevel: 0.01 },
 	itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
-	rarityWeights: { common: 62, uncommon: 24, rare: 9, epic: 2, legendary: 0.4 },
+	rarityWeights: { common: 62, uncommon: 24, rare: 9, epic: 1.5, legendary: 0.4 },
 	rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
 	generalPoolId: 'general_equipment',
 	bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
