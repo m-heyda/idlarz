@@ -234,6 +234,30 @@ for (const row of biomeRows) {
 }
 
 out();
+out('## First epic (IDL-382)');
+out();
+out(
+	'How many kills (normal monsters) or fights (bosses) until the first epic or better piece drops, with the pity counters carried between kills: normal monsters have epic bad-luck protection (`LootProfile.rarityPity`: +5 % epic weight per eligible roll without one, up to x3; a hit starts over), bosses do not need it. The monster rows are the numbers to watch when an epic weight or the drop rarities of a grade change.',
+);
+out();
+out('| Source | Level | Kills until an epic: mean | p10 | p50 | p90 |');
+out('|---|---:|---:|---:|---:|---:|');
+const isEpic = (drops: ReturnType<typeof generateLoot>['drops']) =>
+	drops.some((d) => d.kind === 'gear' && (LOOT_DATA.rarities[d.item.rarity]?.order ?? 0) >= LOOT_DATA.rarities.epic.order);
+for (const [sourceId, level] of [
+	['monster', 20],
+	['monster', 30],
+	['monster', 40],
+	['monster', 50],
+	['monster', 70],
+	['boss', 25],
+	['boss', 45],
+	['boss', 70],
+] as const) {
+	const k = summary(killsUntil(sourceId, level, RUNS, LOOT_DATA, SEED, isEpic));
+	out(`| ${sourceId} | ${level} | ${k.mean.toFixed(1)} | ${k.p10} | ${k.p50} | ${k.p90} |`);
+}
+out();
 out('## What Luck does');
 out();
 out(

@@ -118,6 +118,8 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 			else if (w > 0 && data.rarities[r].enabled) positive++;
 		}
 		for (const r of Object.keys(profile.rarityLevelGate ?? {})) if (!data.rarities[r]) err(`${at}: level gate for unknown rarity ${r}`);
+		const rp = profile.rarityPity;
+		if (rp && (!data.rarities[rp.rarity] || !(rp.perMiss >= 0) || !(rp.maxMultiplier >= 1) || !rp.group)) err(`${at}: bad rarity pity`);
 		if (profile.generalPoolId && positive === 0) err(`${at}: no enabled rarity has a positive weight`);
 		const tableIds = new Set<string>();
 		for (const t of profile.bonusTables) {

@@ -192,3 +192,21 @@ test("a kill pays pelts: a share of the farm hide income for the monster's rewar
 	const lucky = rollKillLoot({ type: 'thistleBoar', level: 5 }, { ...ctx, hidePerSec: 4, lucky: true }, () => 0.5).hide;
 	assert.ok(lucky > Math.floor(4 * rat * COMBAT.rewards.hideShare), 'a lucky monster pays its multiplier on pelts too');
 });
+
+test('epic and better gear is never junk and never auto-sold by default (IDL-382: they drop often enough now to land in the bag)', async () => {
+	const { isJunk } = await import('@/lib/loot/junk');
+	const { isAutoSold } = await import('@/lib/loot/autoSell');
+	for (const rarity of ['epic', 'legendary']) {
+		const piece = { base: 'iron_sword', level: 1, rarity, quality: 50, affixes: [] };
+		assert.equal(isJunk(piece, { wornLevel: 80 }), false, `${rarity} far below the worn level is not junk`);
+		assert.equal(isAutoSold(piece, null), false, 'the default filter (off) keeps everything');
+	}
+	// the Goods tab offers common to rare only (its choices drop the last two enabled rarities)
+	const { RARITIES, RARITY_ORDER } = await import('@/catalog');
+	assert.deepEqual(RARITY_ORDER.filter((id) => RARITIES[id].enabled).slice(0, -2), ['common', 'uncommon', 'rare']);
+	assert.equal(
+		isJunk({ base: 'iron_sword', level: 1, rarity: 'rare', quality: 50, affixes: [], junk: true }, { wornLevel: 80 }),
+		true,
+		"only the player's own mark overrides",
+	);
+});

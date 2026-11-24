@@ -86,6 +86,11 @@ export interface LootProfile {
 	/** Pool the general equipment rolls draw from; null = no general rolls */
 	generalPoolId: string | null;
 	bonusTables: BonusTable[];
+	/**
+	 * Bad-luck protection on a rarity of the general rolls (IDL-382): every general roll that could have been `rarity` (or better) and was not adds one miss, a hit resets the counter, and each miss raises that rarity's
+	 * weight by `perMiss` (x1 + perMiss x misses, at most `maxMultiplier`). The counter is shared by every profile with the same `group` (a player who changes biome keeps it) and travels with the other pity counters.
+	 */
+	rarityPity?: { rarity: string; group: string; perMiss: number; maxMultiplier: number };
 	enabled: boolean;
 }
 
@@ -326,15 +331,17 @@ export const LOOT_POOLS: Record<string, PoolDef> = {
 	potions_chest: { id: 'potions_chest', includeIds: ['potion_minor', 'potion_greater'], weights: { potion_minor: 60, potion_greater: 25 }, enabled: true },
 };
 
-/** A normal monster's profile; each biome gets a copy that draws from its own pool (same rolls, same rarities). Epic weighs 1.5 (it was 1 and could only drop from item level 55; IDL-382): among a grade's own rarities that is about 4 % epic in G3 and G4, 14 % in G5 (only rare and epic) and 1.5 % in the open top grade, where common is back. */
+/** A normal monster's profile; each biome gets a copy that draws from its own pool (same rolls, same rarities). Epic weighs 1.1 with the bad-luck protection below (it was 1 and could only drop from item level 55; IDL-382): among a grade's own rarities that is about 3 % epic in G3 and G4, 10 % in G5 (only rare and epic) and 1 % in the open top grade before the protection, where common is back. */
 const NORMAL_MONSTER: LootProfile = {
 	id: 'normal_monster',
 	rolls: { min: 1, max: 1, chancePerRoll: 0.12, chancePerLevel: 0.01 },
 	itemLevel: { offset: 0, variance: 1, min: 1, max: 100 },
-	rarityWeights: { common: 62, uncommon: 24, rare: 9, epic: 1.5, legendary: 0.4 },
+	rarityWeights: { common: 62, uncommon: 24, rare: 9, epic: 1.1, legendary: 0.4 },
 	rarityLevelGate: { rare: 3, epic: 8, legendary: 15 },
 	generalPoolId: 'general_equipment',
 	bonusTables: [{ id: 'rat_potion', poolId: 'potions_rat', chance: 0.25, chancePerLevel: 0.015, mode: 'fixed', itemLevel: { offset: 0, variance: 0 } }],
+	// bad-luck protection for the first epic: +5 % epic weight per eligible roll without one, up to x3 (about 40 rolls, a bit over 100 kills); a hit starts over
+	rarityPity: { rarity: 'epic', group: 'monster', perMiss: 0.05, maxMultiplier: 3 },
 	enabled: true,
 };
 
