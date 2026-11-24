@@ -53,10 +53,10 @@ test('an attribute affix resolves, is valued like the other stats and is accepte
 	const item = withAffix('neck', 'intelligence_prefix', 100);
 	assert.equal(instanceProblem(item), null);
 	const resolved = resolveItem(item)!;
-	const value = affixValue(AFFIX_CATALOG.intelligence_prefix, 100, 20);
+	const value = affixValue(AFFIX_CATALOG.intelligence_prefix, 100, 20, resolved.rarity.affixMultiplier);
 	assert.ok(value >= 5, `a level 20 Intelligence roll is worth something (${value})`);
 	assert.equal(resolved.stats.intelligence, value);
-	const low = affixValue(AFFIX_CATALOG.intelligence_prefix, 0, 20);
+	const low = affixValue(AFFIX_CATALOG.intelligence_prefix, 0, 20, resolved.rarity.affixMultiplier);
 	assert.ok(low < value, 'a better roll is worth more');
 	assert.ok(Number.isInteger(value), 'attributes are whole numbers');
 });

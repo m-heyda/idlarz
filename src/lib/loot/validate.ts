@@ -45,6 +45,7 @@ export const validateLootData = (data: LootData = LOOT_DATA, { maxCastleLevel = 
 		ranks.add(r.order);
 		if (!(r.minAffixes >= 0) || !(r.maxAffixes >= r.minAffixes)) err(`rarity ${id}: bad affix range ${r.minAffixes}-${r.maxAffixes}`);
 		if (!(r.statMultiplier > 0)) err(`rarity ${id}: statMultiplier must be positive`);
+		if (!(r.affixMultiplier > 0)) err(`rarity ${id}: affixMultiplier must be positive`);
 		if (r.enabled && (!r.label || !r.color || !r.glow || !(r.sellValue >= 0))) err(`rarity ${id}: enabled but missing label, colour, glow or sell value`);
 	}
 

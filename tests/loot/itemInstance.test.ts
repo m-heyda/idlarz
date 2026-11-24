@@ -123,3 +123,26 @@ test('capped percentage stats follow only a share of the level curve, so crit an
 	const top = AFFIXES.filter((a) => a.stat === 'critChance').map((a) => affixValue(a, 100, 100));
 	assert.ok(Math.max(...top) < 15, `a single max crit affix at the level cap is ${Math.max(...top)}`);
 });
+
+test('rarity raises the numbers (IDL-382): the same base and level is worth more as rare, epic and legendary, in its base stats and in every affix', () => {
+	const at = (rarity: string, affixes: ItemInstance['affixes'] = []): ItemInstance => ({ base: 'iron_sword', level: 30, rarity, quality: 50, affixes });
+	const damage = (rarity: string) => resolveItem(at(rarity))!.baseStats.damage!;
+	assert.equal(damage('uncommon'), damage('common'), 'common and uncommon share the plain numbers');
+	assert.ok(damage('rare') > damage('uncommon'));
+	assert.ok(damage('epic') > damage('rare'));
+	assert.ok(damage('legendary') > damage('epic'));
+	const sharp = AFFIXES.find((a) => a.stat === 'damage')!;
+	const roll = (rarity: string) => resolveItem(at(rarity, [{ id: sharp.id, roll: 50 }]))!.affixes[0].value;
+	assert.ok(roll('rare') > roll('uncommon'));
+	assert.ok(roll('epic') > roll('rare'));
+	assert.ok(roll('legendary') > roll('epic'));
+	// the same roll, only the rarity differs: the affix is scaled by exactly the rarity's multiplier
+	assert.equal(roll('epic'), affixValue(sharp, 50, 30, RARITIES.epic.affixMultiplier));
+});
+
+test('a named item keeps its authored numbers whatever its rarity multiplier is', () => {
+	const named: ItemInstance = { base: 'emberbrand', level: ITEM_CATALOG.emberbrand.minItemLevel ?? 1, rarity: 'legendary', quality: 50, affixes: [] };
+	const authored = ITEM_CATALOG.emberbrand.stats!;
+	const got = resolveItem(named)!.stats;
+	for (const [key, value] of Object.entries(authored)) assert.equal((got as Record<string, number>)[key], Math.round((value as number) * 100) / 100, key);
+});

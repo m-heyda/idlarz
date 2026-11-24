@@ -107,7 +107,14 @@ test('item stats: every gear base at several levels and qualities matches 1 + 0.
 				const got = resolveItem(inst)!.stats;
 				const ratio = o.levelScale(level) / o.levelScale(min);
 				for (const [key, authored] of Object.entries(def.stats ?? {})) {
-					const want = roundStat(key, (authored as number) * factor(key, ratio) * tail(key, o.levelTail(level) / o.levelTail(min)) * o.quality(quality));
+					const want = roundStat(
+						key,
+						(authored as number) *
+							factor(key, ratio) *
+							tail(key, o.levelTail(level) / o.levelTail(min)) *
+							o.quality(quality) *
+							(def.generation === 'named' ? 1 : RARITIES[rarityId as keyof typeof RARITIES].statMultiplier),
+					);
 					assert.equal((got as Record<string, number>)[key], want, `${def.id} L${level} q${quality} ${key}`);
 					checked++;
 				}
@@ -116,7 +123,7 @@ test('item stats: every gear base at several levels and qualities matches 1 + 0.
 	assert.ok(checked > 1000, `only ${checked} stat values were checked`);
 });
 
-test('item stats: an item at its authored level and quality 50 returns its authored numbers exactly, and every rarity multiplier is 1', () => {
+test('item stats: an item at its authored level and quality 50 returns its authored numbers exactly, and a common or uncommon piece has no multiplier', () => {
 	const noisy: string[] = [];
 	for (const def of gearItems) {
 		const got = resolveItem(plainItem(def.id))!.stats as Record<string, number>;
@@ -128,7 +135,8 @@ test('item stats: an item at its authored level and quality 50 returns its autho
 	// FINDING (cosmetic): one authored value carries floating point noise (0.1 + 0.2 style). The resolved item is clean (rounded to 2 places),
 	// but the catalog literal is not. This list pins it so a new one is noticed.
 	assert.deepEqual(noisy, ['apprentice_tome:manaRegen=0.30000000000000004']);
-	for (const rarity of Object.values(RARITIES)) assert.equal(rarity.statMultiplier, 1, `${rarity.id} must not scale base stats`);
+	for (const rarity of Object.values(RARITIES))
+		if (rarity.order <= RARITIES.uncommon.order) assert.equal(rarity.statMultiplier, 1, `${rarity.id} must not scale base stats`);
 });
 
 test('affixes: each affix at levels 1..100 and rolls 0..100 = tier-1 base x level factor x power x roll range', () => {
@@ -141,7 +149,12 @@ test('affixes: each affix at levels 1..100 and rolls 0..100 = tier-1 base x leve
 				const hi = affix.roll[1];
 				const want = roundStat(
 					affix.stat,
-					TIER1[affix.stat] * factor(affix.stat, o.levelScale(level)) * tail(affix.stat, o.levelTail(level)) * affix.power * (lo + (hi - lo) * (roll / 100)),
+					TIER1[affix.stat] *
+						factor(affix.stat, o.levelScale(level)) *
+						tail(affix.stat, o.levelTail(level)) *
+						affix.power *
+						(lo + (hi - lo) * (roll / 100)) *
+						RARITIES.rare.affixMultiplier,
 				);
 				assert.equal(resolved.affixes[0].value, want, `${affix.id} L${level} roll ${roll}`);
 				// the stat on the item is the base's own plus the affix, rounded to 2 places

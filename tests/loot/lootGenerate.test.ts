@@ -80,7 +80,7 @@ test('a weak source never drops items above its level cap', () => {
 });
 
 test('rarity is rolled independently of the drop chance and follows the normalised weights', () => {
-	// Rat level 11: item level 10-12, grade G2, which carries common (70) and uncommon (22) only
+	// Rat level 11: item level 10-12, grade G2, which drops common (62), uncommon (24) and rare (9)
 	const rng = mulberry32(11);
 	const counts: Record<string, number> = {};
 	let total = 0;
@@ -92,9 +92,10 @@ test('rarity is rolled independently of the drop chance and follows the normalis
 	}
 	// drop chance 0.12 + 0.01 per level above 1
 	assert.ok(Math.abs(total / 60000 - 0.22) < 0.01, `drops per kill ${total / 60000}`);
-	assert.ok(Math.abs(counts.common / total - 70 / 92) < 0.03, `common ${counts.common / total}`);
-	assert.ok(Math.abs(counts.uncommon / total - 22 / 92) < 0.03);
-	assert.equal(counts.rare ?? 0, 0);
+	assert.ok(Math.abs(counts.common / total - 62 / 95) < 0.03, `common ${counts.common / total}`);
+	assert.ok(Math.abs(counts.uncommon / total - 24 / 95) < 0.03);
+	assert.ok(Math.abs(counts.rare / total - 9 / 95) < 0.03);
+	assert.equal(counts.epic ?? 0, 0, 'G2 does not drop epic');
 });
 
 test('higher monster levels raise the item level, and rarer rarities unlock with the grade', () => {
@@ -112,8 +113,8 @@ test('higher monster levels raise the item level, and rarer rarities unlock with
 		assert.equal(maxLevel, level + 1); // source level, +1 variance
 		return [...seen].sort();
 	};
-	assert.deepEqual(rarities(20), ['uncommon'], 'G3 carries uncommon only');
-	assert.deepEqual(rarities(36), ['rare', 'uncommon'], 'G4 carries uncommon and rare');
+	assert.deepEqual(rarities(20), ['epic', 'rare', 'uncommon'], 'G3 drops uncommon, rare and epic (IDL-382)');
+	assert.deepEqual(rarities(36), ['epic', 'rare', 'uncommon'], 'G4 drops uncommon, rare and epic');
 });
 
 test('every rolled instance is valid and resolves', () => {
@@ -275,6 +276,7 @@ test('new content is data only: a fake rarity drops through the unchanged genera
 		minAffixes: 2,
 		maxAffixes: 2,
 		statMultiplier: 1,
+		affixMultiplier: 1,
 		enabled: true,
 	};
 	for (const item of Object.values(data.items))
@@ -317,4 +319,22 @@ test('guaranteed rolls always drop and a zero-weight rarity never does', () => {
 		assert.equal(general.length, 1);
 		assert.equal(general[0].rarity, 'common');
 	}
+});
+
+test('epic drops below the Obsidian grade (IDL-382): normal monsters and bosses roll epic pieces at item levels 19-54, at a visible rate', () => {
+	const rng = mulberry32(382);
+	let drops = 0;
+	let epic = 0;
+	for (let i = 0; i < 40000; i++) {
+		for (const item of gear(generateLoot({ sourceId: 'monster', level: 25 }, rng).drops)) {
+			drops++;
+			if (item.rarity === 'epic') epic++;
+			assert.equal(instanceProblem(item), null);
+		}
+	}
+	// G3 drops uncommon / rare / epic (24 / 9 / 2): epic is 2 of 35 among its drops, about 6 %
+	assert.ok(epic / drops > 0.03 && epic / drops < 0.09, `epic share of monster drops at level 25: ${epic / drops}`);
+	let bossEpic = 0;
+	for (let i = 0; i < 2000; i++) for (const item of gear(generateLoot({ sourceId: 'boss', level: 30 }, rng).drops)) if (item.rarity === 'epic') bossEpic++;
+	assert.ok(bossEpic > 100, `a level 30 boss drops epic in a good part of its fights (${bossEpic} of 2000)`);
 });

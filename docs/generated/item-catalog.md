@@ -187,46 +187,46 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 
 Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (the monster level; castle level 1 for chests).
 
-- **monster level 1** (profile `normal_monster`, item level 1): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster level 5** (profile `normal_monster`, item level 5): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster level 9** (profile `normal_monster`, item level 9): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster level 20** (profile `normal_monster`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster level 1** (profile `normal_monster`, item level 1): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster level 5** (profile `normal_monster`, item level 5): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster level 9** (profile `normal_monster`, item level 9): 33 bases eligible; Common 63.9%, Uncommon 24.7%, Rare 9.3%, Epic 2.1%
+- **monster level 20** (profile `normal_monster`, item level 20): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_plains level 1** (profile `normal_monster_plains`, item level 1): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster_plains level 20** (profile `normal_monster_plains`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_plains level 1** (profile `normal_monster_plains`, item level 1): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster_plains level 20** (profile `normal_monster_plains`, item level 20): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_forest level 4** (profile `normal_monster_forest`, item level 4): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster_forest level 24** (profile `normal_monster_forest`, item level 24): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_forest level 4** (profile `normal_monster_forest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster_forest level 24** (profile `normal_monster_forest`, item level 24): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_swamp level 8** (profile `normal_monster_swamp`, item level 8): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_swamp level 28** (profile `normal_monster_swamp`, item level 28): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_swamp level 8** (profile `normal_monster_swamp`, item level 8): 33 bases eligible; Common 63.9%, Uncommon 24.7%, Rare 9.3%, Epic 2.1%
+- **monster_swamp level 28** (profile `normal_monster_swamp`, item level 28): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_tundra level 12** (profile `normal_monster_tundra`, item level 12): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_tundra level 30** (profile `normal_monster_tundra`, item level 30): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_tundra level 12** (profile `normal_monster_tundra`, item level 12): 33 bases eligible; Common 63.9%, Uncommon 24.7%, Rare 9.3%, Epic 2.1%
+- **monster_tundra level 30** (profile `normal_monster_tundra`, item level 30): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_coast level 2** (profile `normal_monster_coast`, item level 2): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster_coast level 22** (profile `normal_monster_coast`, item level 22): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_coast level 2** (profile `normal_monster_coast`, item level 2): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster_coast level 22** (profile `normal_monster_coast`, item level 22): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_hills level 6** (profile `normal_monster_hills`, item level 6): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster_hills level 26** (profile `normal_monster_hills`, item level 26): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_hills level 6** (profile `normal_monster_hills`, item level 6): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster_hills level 26** (profile `normal_monster_hills`, item level 26): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 63.9%, Uncommon 24.7%, Rare 9.3%, Epic 2.1%
+- **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_jungle level 16** (profile `normal_monster_jungle`, item level 16): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_jungle level 47** (profile `normal_monster_jungle`, item level 47): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_jungle level 16** (profile `normal_monster_jungle`, item level 16): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
+- **monster_jungle level 47** (profile `normal_monster_jungle`, item level 47): 36 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_fields level 20** (profile `normal_monster_fields`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_fields level 52** (profile `normal_monster_fields`, item level 52): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_fields level 20** (profile `normal_monster_fields`, item level 20): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
+- **monster_fields level 52** (profile `normal_monster_fields`, item level 52): 36 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_orchard level 24** (profile `normal_monster_orchard`, item level 24): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_orchard level 56** (profile `normal_monster_orchard`, item level 56): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_orchard level 24** (profile `normal_monster_orchard`, item level 24): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
+- **monster_orchard level 56** (profile `normal_monster_orchard`, item level 56): 31 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_blight level 28** (profile `normal_monster_blight`, item level 28): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_blight level 60** (profile `normal_monster_blight`, item level 60): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_blight level 28** (profile `normal_monster_blight`, item level 28): 33 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
+- **monster_blight level 60** (profile `normal_monster_blight`, item level 60): 31 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_battlefield level 32** (profile `normal_monster_battlefield`, item level 32): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_battlefield level 64** (profile `normal_monster_battlefield`, item level 64): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster_battlefield level 32** (profile `normal_monster_battlefield`, item level 32): 32 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
+- **monster_battlefield level 64** (profile `normal_monster_battlefield`, item level 64): 31 bases eligible; Common 63.7%, Uncommon 24.6%, Rare 9.2%, Epic 2.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
 - **boss level 15** (profile `boss`, item level 15): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss level 45** (profile `boss`, item level 45): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
