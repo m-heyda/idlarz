@@ -113,7 +113,8 @@ export const MONSTER_DROPS: Readonly<Record<string, readonly IngredientDrop[]>> 
 	boneCleaver: [d('bones', 0.2, [1, 4]), d('blood', 0.1)],
 	frostguardKnight: [d('copper_ore', 0.1), d('coins', 0.1, [1, 3]), d('silver_ore', 0.05, [1, 2], 0.08, 12)],
 	gildedChampion: [d('coins', 0.2, [2, 5]), d('heart_gem', 0.004, [1, 1], 0.01, 20), d('gold_ore', 0.03, [1, 2], 0.05, 20)],
-	bannerWraith: [d('moon', 0.03, [1, 1], 0.02, 12), d('coins', 0.1, [1, 3])],
+	// the only places the Hourglass Sand (tier 4, the Elixir of Time Shift needs 5) falls: the battlefield's time-worn dead and the Cinder Warlord (IDL-381; a starting point for the balance pass)
+	bannerWraith: [d('moon', 0.03, [1, 1], 0.02, 12), d('coins', 0.1, [1, 3]), d('hourglass_sand', 0.01, [1, 1], 0.01, 20)],
 	frostFlameKnight: [d('ember_coal', 0.12, [1, 3]), d('obsidian', 0.05, [1, 1], 0.03, 12)],
 };
 
@@ -133,7 +134,7 @@ export const BOSS_DROPS: Readonly<Record<string, readonly IngredientDrop[]>> = {
 	bossHarvestMatron: [d('wheat_sheaf', 1, [5, 8], 0.3), d('feather', 1, [4, 6], 0.2)],
 	bossBlossomReaper: [d('grapes', 1, [4, 6], 0.2), d('moon', 1, [1, 2], 0.05)],
 	bossEyedMaw: [d('dark_shard', 1, [1, 2], 0.06), d('orange_mushrooms', 1, [4, 6], 0.2)],
-	bossCinderWarlord: [d('fire_drop', 1, [1, 2], 0.05), d('heart_gem', 1, [1, 1], 0.015), d('coins', 1, [6, 10], 0.3)],
+	bossCinderWarlord: [d('fire_drop', 1, [1, 2], 0.05), d('heart_gem', 1, [1, 1], 0.015), d('coins', 1, [6, 10], 0.3), d('hourglass_sand', 1, [1, 2], 0.03)],
 };
 
 /** The ingredient table of a monster: its family's, its own, and for a boss the guaranteed ones (an ingredient listed twice keeps the most specific row). Empty for a type the catalog does not know. */

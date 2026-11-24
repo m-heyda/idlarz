@@ -218,19 +218,23 @@ export const organizeBag = (bag: BagSlot[]): BagSlot[] => {
 	return Array.from({ length: bag.length }, (_, i) => organized[i] ?? null);
 };
 
-/** The gear slot an item goes into: rings take the first free ring slot (else replace the first), everything else its own slot. */
-const targetSlot = (def: ItemDef, equipment: Equipment): EquipmentSlot | null => {
+/** The gear slot an item goes into: rings take the first free ring slot (else replace the first), everything else its own slot. `prefer` (a ring slot) lets a comparison ask about the other ring (IDL-343). */
+const targetSlot = (def: ItemDef, equipment: Equipment, prefer?: EquipmentSlot): EquipmentSlot | null => {
 	if (!def.slot) return null;
+	if (def.slot === 'ring' && (prefer === 'ring1' || prefer === 'ring2')) return prefer;
 	if (def.slot === 'ring') return !equipment.ring1 ? 'ring1' : !equipment.ring2 ? 'ring2' : 'ring1';
 	return def.slot;
 };
 
-/** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. */
-export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number): { bag: BagSlot[]; equipment: Equipment } | null => {
+/** The ring slot a ring does NOT take by default (the first free one, else the first): the one Ctrl compares with and equips into (IDL-343). */
+export const otherRingSlot = (equipment: Equipment): 'ring1' | 'ring2' => (!equipment.ring1 ? 'ring2' : !equipment.ring2 ? 'ring1' : 'ring2');
+
+/** Equips the gear in a bag slot, sending whatever was in that gear slot back into the freed bag slot. `prefer` (a ring slot) puts a ring into that one instead of the default. */
+export const equipFromBag = (bag: BagSlot[], equipment: Equipment, index: number, prefer?: EquipmentSlot): { bag: BagSlot[]; equipment: Equipment } | null => {
 	if (!validIndex(bag, index)) return null;
 	const item = gearOf(bag[index]);
 	const def = item ? ITEM_CATALOG[item.base] : undefined;
-	const target = def ? targetSlot(def, equipment) : null;
+	const target = def ? targetSlot(def, equipment, prefer) : null;
 	if (!item || !def || !target) return null;
 
 	const displaced = equipment[target];
@@ -280,9 +284,9 @@ export interface ItemComparison {
 }
 
 /** Compares a piece of gear with what is worn in the slot it would take; null for anything that is not gear. */
-export const compareToEquipped = (item: ItemInstance, equipment: Equipment): ItemComparison | null => {
+export const compareToEquipped = (item: ItemInstance, equipment: Equipment, prefer?: EquipmentSlot): ItemComparison | null => {
 	const def = ITEM_CATALOG[item.base];
-	const slot = def ? targetSlot(def, equipment) : null;
+	const slot = def ? targetSlot(def, equipment, prefer) : null;
 	if (!def || !slot || !resolveItem(item)) return null;
 	const before = aggregateStats(equipment);
 	const after = aggregateStats({ ...equipment, [slot]: item });
@@ -357,8 +361,8 @@ export const primaryKeyOf = (def: Pick<ItemDef, 'kind' | 'stats'>): 'damage' | '
  * The hover comparison: the hovered piece against the one worn in its slot, stat by stat with new / lost / up / down,
  * plus the set progress the swap changes. Pure; `compareToEquipped` stays the plain net-delta view.
  */
-export const compareDetailed = (item: ItemInstance, equipment: Equipment): DetailedComparison | null => {
-	const base = compareToEquipped(item, equipment);
+export const compareDetailed = (item: ItemInstance, equipment: Equipment, prefer?: EquipmentSlot): DetailedComparison | null => {
+	const base = compareToEquipped(item, equipment, prefer);
 	const resolved = resolveItem(item);
 	if (!base || !resolved) return null;
 	const def = resolved.def;

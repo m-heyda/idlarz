@@ -111,7 +111,6 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 	const rows: StatRow[] = comparison
 		? comparison.rows.filter((row) => row.status !== 'lost' && row.key !== primaryKey)
 		: STAT_KEYS.filter((key) => stats[key] && key !== primaryKey).map((key) => ({ key, was: 0, now: stats[key]!, delta: 0, status: 'same' as const }));
-	const lost = comparison ? comparison.rows.filter((row) => row.status === 'lost' && row.key !== primaryKey) : [];
 	const swing = comparison?.swing;
 
 	return (
@@ -183,17 +182,6 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 				);
 			})}
 			{!primary && rows.length === 0 && !hasEffects(def) && <div className='px-tip-muted text-xs'>No stats</div>}
-
-			{lost.length > 0 && (
-				<div className='px-tip-lost'>
-					<div className='px-tip-lost-title'>Properties lost when equipped:</div>
-					{lost.map((row) => (
-						<div key={row.key} className='px-tip-lost-line'>
-							{formatStatValue(row.key, row.was).replace(/^/, '+')} {statLabel(row.key)}
-						</div>
-					))}
-				</div>
-			)}
 
 			{comparison && tierChanges.length > 0 && (
 				<div className='px-tip-section'>

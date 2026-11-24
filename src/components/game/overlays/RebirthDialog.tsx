@@ -260,8 +260,9 @@ const RebirthDialog: React.FC = () => {
 							</div>
 						</div>
 						<p className='rb-note'>
-							A higher castle level and more tiles give more Embers (castle level {limitOf('castleMaxLevel', { prestige })} is the best you can do). The castle
-							bonus today is +{pct(castleModifier(castleLevel))}; it starts again from level 1.
+							A higher castle level and more tiles give more Embers (castle level {limitOf('castleMaxLevel', { prestige })} is the best you can do), and the
+							permanent income bonus grows with every Ember you have ever earned, so both raise it. The castle bonus is separate: it is +
+							{pct(castleModifier(castleLevel))} today and starts again from level 1.
 						</p>
 						{unlocks.length > 0 && (
 							<div className='rb-unlocks'>
@@ -286,7 +287,7 @@ const RebirthDialog: React.FC = () => {
 						)}
 						<div className='flex justify-center'>
 							<Button tone='gold' disabled={!canRebirth} onClick={() => setConfirming(true)}>
-								Rebirth for {formatHeaderAmount(gain)} Embers
+								Rebirth &amp; earn {formatHeaderAmount(gain)} Embers
 							</Button>
 						</div>
 						{!canRebirth && <p className='rb-note rb-note-center'>Meet every requirement above to rebirth. The Ember shop is open while you work on it.</p>}

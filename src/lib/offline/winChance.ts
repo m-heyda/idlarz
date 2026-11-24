@@ -18,6 +18,12 @@ export interface PotionStock {
 	count: number;
 }
 
+/** The Bestiary mastery bonuses against one monster (percent, `masteryBonusesFor`): the fight engine applies them, so the estimate counts them too (IDL-372). */
+export interface MasteryEdge {
+	damage: number;
+	defense: number;
+}
+
 export interface WinEstimate {
 	/** 0-1 */
 	chance: number;
@@ -68,10 +74,18 @@ const monsterDps = (p: PlayerProfile, type: MonsterType, level: number, elapsedS
  * killSec    = monster HP / (attacks/s x expectedHit)           expectedHit: crits and super crits weighted, monster armor applied
  * surviveSec = (HP + potions that fit between cooldowns) / (monster dps - regen - leech)
  * chance     = min(logistic(6 x ln(surviveSec / killSec)), logistic(6 x ln(limit / killSec)))
+ * mastery    = our damage x (1 + damage mastery / 100), the monster's damage x (1 - defense mastery / 100)
  */
-export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, level: number, potions: PotionStock[] = []): WinEstimate => {
+export const estimateWin = (
+	p: PlayerProfile,
+	hp: number,
+	type: MonsterType,
+	level: number,
+	potions: PotionStock[] = [],
+	mastery?: MasteryEdge,
+): WinEstimate => {
 	const m = monsterStats(type, level);
-	const dps = (p.attacksPerSec || 0) * expectedHit(p, m.armor);
+	const dps = (p.attacksPerSec || 0) * expectedHit(p, m.armor) * (1 + Math.max(0, mastery?.damage ?? 0) / 100);
 	if (!(dps > 0)) return { chance: 0, killSec: Infinity, surviveSec: 0 };
 	const killSec = m.maxHp / dps;
 	const limit = Math.min(COMBAT.maxFightSec, monsterDef(type).timeLimitSec ?? Infinity);
@@ -88,7 +102,7 @@ export const estimateWin = (p: PlayerProfile, hp: number, type: MonsterType, lev
 		potionHp += potion.healHp * (p.potionPower ?? 1) * used;
 		drinks -= used;
 	}
-	const net = monsterDps(p, type, level, killSec / 2, killSec) - healPerSec; // Enrage: the attack speed of the middle of the fight stands for the whole
+	const net = monsterDps(p, type, level, killSec / 2, killSec) * (1 - Math.min(100, Math.max(0, mastery?.defense ?? 0)) / 100) - healPerSec; // Enrage: the attack speed of the middle of the fight stands for the whole
 	const surviveSec = net <= 0 ? Infinity : (Math.max(0, hp) + potionHp) / net;
 	if (!Number.isFinite(surviveSec)) return { chance: 1, killSec, surviveSec };
 

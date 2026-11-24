@@ -1,5 +1,27 @@
-// Suffixes for large numbers: thousand steps from K (the first at 10,000), then M, B, T, Qa, Qi, Sx; beyond that scientific
-const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx'];
+// Suffixes for large numbers: thousand steps from K (the first at 10,000), then M, B, T, Qa, Qi, Sx, Sp, Oc, No, Dc (1e33); beyond that scientific
+const SUFFIXES = ['', 'K', 'M', 'B', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No', 'Dc'];
+
+/**
+ * How numbers from a million up are written (a Settings choice, `numberNotation`): `suffix` 1.23M, `scientific` 1.23e6, `engineering` 1.23e6 with the exponent a multiple of three (12.3e6). Below a million every mode reads the same.
+ *
+ * @category Architecture/Formatting
+ */
+export type NumberNotation = 'suffix' | 'scientific' | 'engineering';
+let notation: NumberNotation = 'suffix';
+
+/** Sets the notation every `format*` function uses from now on (called by the settings store). */
+export const setNumberNotation = (mode: NumberNotation): void => {
+	notation = mode;
+};
+
+/** 1.23e24 / 123e21 text for a large positive number in the scientific and engineering modes. */
+const exponential = (abs: number): string => {
+	if (notation === 'engineering') {
+		const exp = Math.floor(Math.log10(abs) / 3) * 3;
+		return `${tidy((abs / Math.pow(10, exp)).toFixed(2))}e${exp}`;
+	}
+	return tidy(abs.toExponential(2).replace('e+', 'e'));
+};
 
 /**
  * Drops the zeros a fixed-decimals number carries at the end: "7.00" is "7", "1.50K" is "1.5K", "0.90" is "0.9", "1.00M" is "1M" (a number with no decimal point is left alone). Every number the game shows goes through this, so a value
@@ -34,6 +56,7 @@ const compact = (n: number): string | null => {
 	const abs = Math.abs(n);
 	if (abs < 1_000_000) return null;
 	if (!Number.isFinite(n)) return n > 0 ? '∞' : '-∞';
+	if (notation !== 'suffix') return `${n < 0 ? '-' : ''}${exponential(abs)}`;
 	const tier = Math.floor(Math.log10(abs) / 3);
 	if (tier >= SUFFIXES.length) return tidy(n.toExponential(2).replace('e+', 'e'));
 	return `${tidy((n / Math.pow(1000, tier)).toFixed(2))}${SUFFIXES[tier]}`;
@@ -77,6 +100,7 @@ export const formatHeaderAmount = (num: number | undefined): string => {
 	const sign = num < 0 ? '-' : '';
 	const abs = Math.abs(num);
 	if (abs < 1000) return `${sign}${Math.floor(abs)}`;
+	if (notation !== 'suffix' && abs >= 1_000_000) return `${sign}${exponential(abs)}`;
 
 	let tier = Math.floor(Math.log10(abs) / 3);
 	if (tier >= SUFFIXES.length) return `${sign}${tidy(abs.toExponential(1).replace('e+', 'e'))}`;

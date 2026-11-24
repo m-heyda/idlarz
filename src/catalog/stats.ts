@@ -35,22 +35,22 @@ export const STAT_DEFS = {
 	damage: { label: 'Damage', integer: true },
 	armor: { label: 'Armor', integer: true },
 	maxHp: { label: 'Max HP', integer: true },
-	critChance: { label: 'Crit Chance', short: 'CRIT CH', unit: '%', levelShare: 0.3 }, // chance in % that a hit crits (x2 damage), added to the character's own
+	critChance: { label: 'Crit Chance', unit: '%', levelShare: 0.3 }, // chance in % that a hit crits (x2 damage), added to the character's own
 	superCrit: { label: 'Super Crit', unit: '%', levelShare: 0.3 }, // chance in % that a crit becomes a super crit (x5), on top of the base chance
-	regen: { label: 'HP Regen', short: 'HP REG', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
+	regen: { label: 'HP Regen', unit: '/s', decimals: 1, levelShare: 0.6 }, // HP per second, in and out of fights
 	luck: { label: 'Luck', integer: true, levelShare: 0.5 }, // adds to the Luck of the character: better chest and kill gold and rarer chest finds
 	goldFind: { label: 'Gold Find', unit: '%', levelShare: 0.5 }, // % more gold from kills and chests
 	dodge: { label: 'Dodge', unit: '%', decimals: 1, levelShare: 0.3 }, // chance in % that a monster's hit misses (capped by COMBAT.maxDodge)
 	maxMana: { label: 'Max Mana', integer: true, levelShare: 0.7 }, // added to the character's mana pool (skills spend it)
-	manaRegen: { label: 'Mana Regen', short: 'MP REG', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
-	spellPower: { label: 'Spell Power', short: 'SPELL PWR', unit: '%', levelShare: 0.4 }, // % more healing from skills
+	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
+	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
 	// the five attributes as gear stats: they add to the points the player spent while the item is worn (lib/gearAttributes.ts); Intelligence is the crafting stat (quality of crafted gear)
-	strength: { label: 'Strength', short: 'STR', integer: true, levelShare: 0.5 },
-	dexterity: { label: 'Dexterity', short: 'DEX', integer: true, levelShare: 0.5 },
-	intelligence: { label: 'Intelligence', short: 'INT', integer: true, levelShare: 0.5 },
-	vitality: { label: 'Vitality', short: 'VIT', integer: true, levelShare: 0.5 },
-	charisma: { label: 'Charisma', short: 'CHA', integer: true, levelShare: 0.5 },
+	strength: { label: 'Strength', integer: true, levelShare: 0.5 },
+	dexterity: { label: 'Dexterity', integer: true, levelShare: 0.5 },
+	intelligence: { label: 'Intelligence', integer: true, levelShare: 0.5 },
+	vitality: { label: 'Vitality', integer: true, levelShare: 0.5 },
+	charisma: { label: 'Charisma', integer: true, levelShare: 0.5 },
 
 	// ---- belt-only stats: the potion belt (IDL-138 / IDL-153). Nothing but a belt carries them; see lib/potionBelt.ts ----------
 	potionCooldownPct: { label: 'Potion Cooldown', unit: '%', slotOnly: 'belt', levelShare: 0 }, // % shorter shared potion cooldown (never below COMBAT.potionCooldownMinSec)
@@ -292,14 +292,14 @@ export const sumStats = (...blocks: (ItemStats | undefined)[]): StatTotals => {
 	return total;
 };
 
-/** The names of the derived combat numbers that are not an item stat, in the same short style as `StatDef.short` (item cards, the Stats tab and the Hero window use them). */
+/** The names of the derived combat numbers that are not an item stat, spelled out like the stat labels (IDL-340: one capitalisation everywhere, no CRIT CH / HP REG) (item cards, the Stats tab and the Hero window use them). */
 export const COMBAT_NAMES = {
 	dps: 'DPS',
-	attackSpeed: 'ATK SPD',
-	critChance: 'CRIT CH',
-	hpRegen: 'HP REG',
-	mpRegen: 'MP REG',
-	spellPower: 'SPELL PWR',
+	attackSpeed: 'Attack Speed',
+	critChance: 'Crit Chance',
+	hpRegen: 'HP Regen',
+	mpRegen: 'Mana Regen',
+	spellPower: 'Spell Power',
 } as const;
 
 /** What a stat is called on the screen: its short name when it has one (CRIT CH, HP REG), else its label. */

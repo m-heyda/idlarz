@@ -88,7 +88,7 @@ test('tooltip lines: diffs colour by better or worse, costs by affordable or not
 	assert.match(tile, /Click to explore/);
 });
 
-test('ItemTooltip shows the set block, lost properties, the Equipped mark and the hints only when given', () => {
+test('ItemTooltip shows the set block, the Equipped mark and the hints only when given', () => {
 	const full = html(
 		h(ItemTooltip, {
 			rarity: 'epic',
@@ -96,13 +96,11 @@ test('ItemTooltip shows the set block, lost properties, the Equipped mark and th
 			name: 'Blade',
 			type: 'Epic sword',
 			equippedLabel: true,
-			lost: ['+3% Life leech'],
 			set: { title: 'Cloudwalker set (1/5)', pieces: [{ name: 'Blade', worn: true }], bonuses: [{ count: 2, text: '+4% Income', active: false }] },
 			hints: 'Shift + click sell',
 		}),
 	);
-	for (const text of ['Equipped', 'Properties lost when equipped', '+3% Life leech', 'Cloudwalker set (1/5)', 'Shift + click sell'])
-		assert.ok(full.includes(text), text);
+	for (const text of ['Equipped', 'Cloudwalker set (1/5)', 'Shift + click sell']) assert.ok(full.includes(text), text);
 	const bare = html(h(ItemTooltip, { rarity: 'common', icon: '/x.png', name: 'Stick', type: 'Common' }));
 	assert.doesNotMatch(bare, /Equipped|ds-tip-set|Shift/);
 });

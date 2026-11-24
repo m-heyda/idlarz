@@ -63,13 +63,17 @@ interface TipProps {
 	hints?: 'bag' | 'merchant';
 	/** The band over the card: Equipped (the worn piece) or Comparing (the hovered one next to it) */
 	banner?: 'equipped' | 'comparing';
+	/** The heading of the changes list: "Difference", or "Difference: replacing Ring 2" for a ring (IDL-343) */
+	compareLabel?: string;
+	/** A ring card: the hint line says Ctrl compares with the other ring */
+	ringHint?: boolean;
 }
 
 /**
  * One item card drawn by the design system's `ItemTooltip` from the game's own data: the same lines the game's card always had (kind line, item level and quality, the headline stat with its change, attack speed and DPS, stats by
  * colour group with their changes, affixes, lost properties, set changes and the set block, effects, Drink button, flavour and lore, price, key hints), only drawn in the new style.
  */
-const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, hints, banner }) => {
+const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, hints, banner, compareLabel, ringHint }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	// what the merchant really pays: the same inputs a sale uses (Haggler, Idols, the Lighthouse)
 	const sellCtx = useGameStore(
@@ -110,13 +114,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			const change = row.status === 'new' ? row.now : row.delta; // a stat the worn piece lacks is all gain
 			return {
 				label: statLabel(row.key),
-				value: (
-					<WithChange
-						text={formatStatValue(row.key, row.now).replace(/^/, '+')}
-						delta={withDiff && row.status !== 'same' ? change : 0}
-						change={formatStatChange(row.key, change)}
-					/>
-				),
+				value: <WithChange text={formatStatValue(row.key, row.now).replace(/^/, '+')} delta={0} change={formatStatChange(row.key, change)} />,
 			};
 		});
 		return [{ heading: category.label, rows: tipRows }];
@@ -156,7 +154,9 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 						return { label: statLabel(row.key), value: formatStatChange(row.key, change), tone: gain(change) };
 					}),
 				...lost.map((row) => ({ label: statLabel(row.key), value: formatStatChange(row.key, -row.was), tone: 'red' as const })),
-			];
+			]
+				// gains first, then losses (a stable sort keeps the stat order inside each group), IDL-340
+				.sort((a, b) => (a.tone === b.tone ? 0 : a.tone === 'green' ? -1 : 1));
 
 	const effectRows: TipRow[] = (def.effects ?? []).map((effect) => ({ label: describeEffect(effect), value: '', tone: 'green' as const }));
 	const hintText: { key: string; text: string }[] =
@@ -172,6 +172,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					]
 				: [];
 
+	if (ringHint) hintText.push({ key: 'Ctrl', text: 'compare with other slot' });
 	const showHints = buyPrice === undefined && !wornLabel;
 
 	return (
@@ -186,17 +187,15 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					: undefined
 			}
 			banner={banner ? { text: banner === 'equipped' ? 'Equipped' : 'Comparing', tone: banner } : undefined}
-			primary={
-				primaryKey ? { label: statLabel(primaryKey), value: formatCompact(stats[primaryKey] ?? 0, 2), diff: withDiff ? primaryDelta : undefined } : undefined
-			}
+			primary={primaryKey ? { label: statLabel(primaryKey), value: formatCompact(stats[primaryKey] ?? 0, 2), diff: undefined } : undefined}
 			speed={
 				def.kind === 'weapon' && def.attackSpeed
 					? [
-							{ label: COMBAT_NAMES.attackSpeed, value: String(def.attackSpeed), diff: withDiff && swing ? swing.speed.delta : undefined },
+							{ label: COMBAT_NAMES.attackSpeed, value: String(def.attackSpeed), diff: undefined },
 							{
 								label: COMBAT_NAMES.dps,
 								value: formatCompact(weaponDps({ stats, attackSpeed: def.attackSpeed }), 2),
-								diff: withDiff && swing ? swing.dps.delta : undefined,
+								diff: undefined,
 							},
 						]
 					: undefined
@@ -204,7 +203,6 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			rows={[...(emptySlot ? [{ label: `Empty ${EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot`, value: '', tone: 'muted' as const }] : []), ...effectRows]}
 			groups={groups}
 			affixes={affixes}
-			lost={lost.map((row) => `${formatStatValue(row.key, row.was).replace(/^/, '+')} ${statLabel(row.key)}`)}
 			extra={
 				comparison && tierChanges.length > 0 ? (
 					<>
@@ -255,7 +253,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					: undefined
 			}
 			compare={differences.length > 0 ? differences : undefined}
-			compareWith='Difference'
+			compareWith={compareLabel ?? 'Difference'}
 			flavor={def.description}
 			lore={def.lore}
 			hints={showHints && hintText.length > 1 ? hintText : undefined}
@@ -280,10 +278,34 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
  */
 export const GameItemTip: React.FC<Omit<TipProps, 'comparison' | 'wornLabel'> & { compare?: boolean }> = ({ compare, ...rest }) => {
 	const equipment = useGameStore((state) => state.equipment);
-	const comparison = compare && rest.item ? compareDetailed(rest.item, equipment) : null;
+	// a ring can replace either worn ring: the card compares with the first free (else the first) ring slot, and holding Ctrl compares with the other one (IDL-343)
+	const [ctrl, setCtrl] = React.useState(false);
+	React.useEffect(() => {
+		const sync = (event: KeyboardEvent) => setCtrl(event.ctrlKey);
+		const off = () => setCtrl(false);
+		window.addEventListener('keydown', sync);
+		window.addEventListener('keyup', sync);
+		window.addEventListener('blur', off);
+		return () => {
+			window.removeEventListener('keydown', sync);
+			window.removeEventListener('keyup', sync);
+			window.removeEventListener('blur', off);
+		};
+	}, []);
+	const isRing = !!rest.item && ITEM_CATALOG[rest.item.base]?.slot === 'ring';
+	const first = compare && rest.item ? compareDetailed(rest.item, equipment) : null;
+	const other = first?.slot === 'ring1' ? 'ring2' : 'ring1';
+	const comparison = isRing && ctrl && first && rest.item ? compareDetailed(rest.item, equipment, other) : first;
+	const ringLabel = isRing && comparison ? `Difference: replacing Ring ${comparison.slot === 'ring1' ? 1 : 2}` : undefined;
 	return (
 		<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-			<GameItemCard {...rest} comparison={comparison} banner={comparison?.equipped ? 'comparing' : undefined} />
+			<GameItemCard
+				{...rest}
+				comparison={comparison}
+				banner={comparison?.equipped ? 'comparing' : undefined}
+				compareLabel={ringLabel}
+				ringHint={isRing && !!comparison}
+			/>
 			{comparison?.equipped ? <GameItemCard item={comparison.equipped} wornLabel banner='equipped' /> : null}
 		</div>
 	);

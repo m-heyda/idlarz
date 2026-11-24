@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { ITEM_CATALOG } from '../../src/catalog';
 import { describeEffect } from '../../src/catalog/buffs';
 import { sourcesOf } from '../../src/catalog/ingredients';
+import { BOSS_DROPS, MONSTER_DROPS } from '../../src/catalog/monsterDrops';
 import { RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { TIME_SHIFT } from '../../src/config/crafting';
 import { ROCK_DROPS } from '../../src/config/rocks';
@@ -12,7 +13,7 @@ import { applyUse, applyTimeShift } from '../../src/lib/offline/consumables';
 import { inventoryFromCore } from '../../src/lib/offline/inventory';
 import type { Ledger } from '../../src/lib/offline/ledger';
 
-// IDL-355: the time-shift potion: craftable in data, but its Hourglass Sand has no source yet, and the server pays the hour.
+// IDL-355: the time-shift potion: craftable, its Hourglass Sand drops from the Banner Wraith and the Cinder Warlord (IDL-381), and the server pays the hour.
 
 const setup = (qty = 5) => simSetup({ equipment: fullSet('steel'), potions: [{ id: 'elixir_time_shift', qty }], monsters: [], seed: 'time-shift' });
 const seeded = (s: ReturnType<typeof setup>): Ledger => ({ ...s.ledger, inv: inventoryFromCore(s.stored.core as Record<string, unknown>) });
@@ -38,7 +39,7 @@ test('the potion: an epic brew whose effect moves the clock an hour, described f
 	assert.match(describeEffect(def.effects![0]), /1 hour/);
 });
 
-test('the recipe is the most expensive brew, costs more than the hour it pays, and its Hourglass Sand has no source anywhere', () => {
+test('the recipe is the most expensive brew, costs more than the hour it pays, and its Hourglass Sand has a source', () => {
 	const recipe = RECIPE_BY_ID.elixir_time_shift;
 	assert.ok(recipe && recipe.kind === 'potion' && recipe.unlock >= 60);
 	assert.ok(recipe.inputs.some((i) => 'component' in i && i.component === 'ing_hourglass_sand'));
@@ -46,8 +47,10 @@ test('the recipe is the most expensive brew, costs more than the hour it pays, a
 	assert.ok(recipeCostGold(recipe) > 21_600_000, `${recipeCostGold(recipe)}`);
 	for (const other of Object.values(RECIPE_BY_ID).filter((r) => r.kind === 'potion' && r.id !== recipe.id))
 		assert.ok(recipeCostGold(other) < recipeCostGold(recipe), other.id);
-	// no rock, monster or boss drops the sand yet: that is what the Linear ticket brainstorms
-	assert.deepEqual(sourcesOf('junk_hourglass_sand'), []);
+	// the sand is a rare drop of the Banner Wraith and the Cinder Warlord (IDL-381); no rock drops it
+	assert.ok(sourcesOf('junk_hourglass_sand').length > 0, 'the sand has a source');
+	assert.ok(MONSTER_DROPS.bannerWraith.some((drop) => drop.id === 'junk_hourglass_sand'));
+	assert.ok(BOSS_DROPS.bossCinderWarlord.some((drop) => drop.id === 'junk_hourglass_sand' && drop.chance === 1));
 	for (const table of Object.values(ROCK_DROPS)) assert.ok(!table.some((drop) => drop.kind === 'ingredient' && drop.id === 'ing_hourglass_sand'));
 });
 

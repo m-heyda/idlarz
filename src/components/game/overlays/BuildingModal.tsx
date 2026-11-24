@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BUILDING_LORE, buildingDef, buildingKindLabel, type BuildingDef } from '@/catalog/buildings';
-import { BUILDING_RULES } from '@/config/buildings';
+import { BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import { idolDef } from '@/catalog/idols';
 import { BIOMES } from '@/config/biomes';
@@ -25,7 +25,7 @@ import { monsterAt } from '@/lib/monsters';
 import { canAffordBundle } from '@/utils/game/costs';
 import { economyTiles } from '@/utils/game/tiles';
 import { formatNumber, formatTime } from '@/utils/formatters';
-import { getTile } from '@/utils/world';
+import { forEachOwned, getTile } from '@/utils/world';
 import audioManager from '@/utils/audioManager';
 import type { Resources } from '@/types/game';
 import CostGrid from '../CostGrid';
@@ -92,6 +92,34 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	if (now && next) for (const key of Object.keys(next) as (keyof Resources)[]) gain[key] = (next[key] ?? 0) - (now[key] ?? 0);
 	const bonusPct = Math.round(producerBonus(owned) * 100);
 
+	// a general building makes nothing: its level is its bonus (`GENERAL_RULES.perLevel` % of its effect per level, every copy adds its own, `idolEconomy`)
+	let copyCount = 0;
+	let allCopiesPct = 0;
+	if (def.kind === 'general')
+		forEachOwned(tiles, (t) => {
+			if (t.building !== def.id) return;
+			copyCount += 1;
+			allCopiesPct += levelOfTile(t) * GENERAL_RULES.perLevel;
+		});
+	const generalSection =
+		def.kind === 'general' ? (
+			<>
+				<div className='bw-label'>Its bonus</div>
+				<div>
+					+{level * GENERAL_RULES.perLevel} % {def.effectText}
+				</div>
+				{!atTop && !running && (
+					<div className='bw-up'>
+						Level {nextLevel}: +{nextLevel * GENERAL_RULES.perLevel} % {def.effectText}
+					</div>
+				)}
+				<div className='bw-note'>
+					Makes no resources: each level adds +{GENERAL_RULES.perLevel} %. You can build up to {def.copies ?? 1} of them and every copy adds its own bonus
+					{copyCount > 1 ? ` (all ${copyCount} copies together: +${allCopiesPct} %)` : ''}.
+				</div>
+			</>
+		) : null;
+
 	const upgrade = () => {
 		if (problem) return;
 		audioManager.playSound('click');
@@ -130,7 +158,9 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 
 				<div className='bw-main'>
 					<div className='bw-sec'>
-						{def.kind === 'idol' && idol ? (
+						{generalSection ? (
+							generalSection
+						) : def.kind === 'idol' && idol ? (
 							<>
 								<div className='bw-label'>Its bonus</div>
 								<div>

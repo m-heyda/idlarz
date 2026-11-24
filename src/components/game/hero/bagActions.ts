@@ -1,7 +1,8 @@
 import type React from 'react';
 import { ITEM_CATALOG } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
-import { gearOf, slotQty } from '@/lib/inventory';
+import { gearOf, otherRingSlot, slotQty } from '@/lib/inventory';
+import { ctrlHeld } from '@/lib/heldKeys';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
 import { clearDrag, getDrag } from '@/lib/inventoryDrag';
 import { openMenuAt } from '@/lib/globalMenu';
@@ -20,7 +21,12 @@ export const activateBagSlot = (index: number): void => {
 	const slot = state.bag[index];
 	if (!slot) return;
 	if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) state.drinkBagItem(index);
-	else if (!state.equipItem(index)) say(blocked() ?? 'Cannot equip that');
+	else {
+		// Ctrl + double-click puts a ring into the other ring slot, the one the card compared with
+		const gear = gearOf(slot);
+		const ring = gear && ITEM_CATALOG[gear.base]?.slot === 'ring';
+		if (!state.equipItem(index, ring && ctrlHeld() ? otherRingSlot(state.equipment) : undefined)) say(blocked() ?? 'Cannot equip that');
+	}
 };
 
 /** Shift + click sells the whole stack (or the piece) at once, at the merchant's price with Haggler; refused in a fight (the toast says so). */

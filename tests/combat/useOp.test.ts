@@ -39,6 +39,10 @@ test('a profile with no buffs is the very same profile; buffs scale the numbers 
 	assert.equal(buffed.maxHp, Math.round(base.maxHp * 1.1));
 	assert.equal(buffed.crit, COMBAT.crit.maxCritChance / 100);
 	assert.equal(buffed.dodge, COMBAT.maxDodge / 100);
+	// the Elixir of Arcana (IDL-156): +50% mana regeneration, nothing else changes
+	const arcana = withBuffs(base, { manaRegenPct: 50 });
+	assert.equal(arcana.mpRegen, base.mpRegen * 1.5);
+	assert.equal(arcana.hit, base.hit);
 	assert.equal(profileWithBuffs(coreOf(s), [buff('might', 'damagePct', 50, 200)], 100).hit, base.hit * 1.5);
 	assert.equal(profileWithBuffs(coreOf(s), [buff('might', 'damagePct', 50, 100)], 100).hit, base.hit, 'ended at 100: not counted');
 });

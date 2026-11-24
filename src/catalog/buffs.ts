@@ -7,7 +7,7 @@ import type { ItemDef } from '@/types/game';
  * The stats a timed buff can change. Each is an additive percent (`amount` 10 = +10 %) that the fight reads on top of the gear's own numbers.
  * Economy stats (gold, XP, click) are not buffable until the server owns the economy actions (IDL-22).
  */
-export type BuffStat = 'damagePct' | 'atkSpeedPct' | 'armorPct' | 'critChance' | 'maxHpPct' | 'dodge';
+export type BuffStat = 'damagePct' | 'atkSpeedPct' | 'armorPct' | 'critChance' | 'maxHpPct' | 'dodge' | 'manaRegenPct';
 
 /** One buff family: potions of the same family never stack, they refresh each other. `stat` is the single stat the family changes. */
 export interface BuffFamilyDef {
@@ -29,6 +29,7 @@ export const BUFF_FAMILIES = {
 	keenEye: { label: 'Keen Eye', stat: 'critChance' },
 	fortitude: { label: 'Fortitude', stat: 'maxHpPct' },
 	warding: { label: 'Warding', stat: 'dodge' },
+	arcana: { label: 'Arcana', stat: 'manaRegenPct' },
 } as const satisfies Record<string, BuffFamilyDef>;
 
 const BUFF_STAT_LABEL: Record<BuffStat, string> = {
@@ -38,6 +39,7 @@ const BUFF_STAT_LABEL: Record<BuffStat, string> = {
 	critChance: 'Crit Chance',
 	maxHpPct: 'Max HP',
 	dodge: 'Dodge',
+	manaRegenPct: 'Mana Regeneration',
 };
 
 export type BuffFamily = keyof typeof BUFF_FAMILIES;
