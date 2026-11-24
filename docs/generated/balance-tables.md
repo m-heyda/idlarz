@@ -446,5 +446,8 @@ Shop (cost in points of the next level, by current level):
 | Imperial Decree | 1 | 1 | 150 | 150 | 150 | 150 | 150 | 150 |
 | Extra Builder | 1 | 1 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
 | Extra Craft Slot | 1 | 2 | 50 | 200 | 800 | 3200 | 51200 | 13107200 |
+| Workbench | 0.25 | 4 | 20 | 40 | 80 | 160 | 640 | 10240 |
+| Night Shift | 8 | 3 | 15 | 38 | 94 | 235 | 1465 | 57221 |
+| Thrifty Hands | 3 | 5 | 10 | 18 | 33 | 59 | 189 | 1984 |
 | Quest Rarity | 2 | 10 | 5 | 7 | 10 | 14 | 27 | 104 |
 | Quest Slots | 1 | 5 | 25 | 50 | 100 | 200 | 800 | 12800 |

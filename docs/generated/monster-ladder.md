@@ -57,9 +57,9 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Scrap Golem | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
 | Scrap Golem | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Bogfire Wisp | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Bogfire Wisp | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
-| Bogfire Wisp | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Sludge Cyclops | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
+| Sludge Cyclops | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
+| Sludge Cyclops | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 63% | 98% |
 | The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 45% | 100% |
 | The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 33% | 100% |
