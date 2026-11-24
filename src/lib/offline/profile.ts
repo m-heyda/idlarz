@@ -91,6 +91,9 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		potionCooldownSec: potionCooldownSec(gear),
 		potionPower: potionPower(gear),
 		potionSlots: potionSlotCount(gear),
+		// a legendary's handlers (IDL-46): only present when worn, so a profile without them is exactly the one there was before
+		...(gear.burnPct > 0 ? { burnPct: gear.burnPct } : {}),
+		...(gear.potionRefundPct > 0 ? { potionRefundPct: gear.potionRefundPct } : {}),
 	};
 };
 

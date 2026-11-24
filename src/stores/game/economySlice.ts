@@ -11,6 +11,7 @@ import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
 import { builderBusy, builderCount } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
@@ -84,7 +85,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, idolEconomy(state.tiles, state.idolLevels).buildTimePct),
+					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, buildTimeCutPct(state.tiles, state.idolLevels, state.equipment)),
 				},
 			});
 			return true;

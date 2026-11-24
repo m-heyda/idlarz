@@ -41,6 +41,9 @@ const profileOf = (ctx: FightCtx): PlayerProfile => (ctx.c.fight ? ctx.c.fight.p
 /** What a potion restores for this hero: its HP times the belt's Potion Power. */
 const potionHeal = (ctx: FightCtx, id: string): number => quickHealOf(ITEM_CATALOG[id]) * (profileOf(ctx).potionPower ?? 1);
 
+/** How long a Burn lasts after the critical hit that lit it (seconds) */
+export const BURN_SEC = 3;
+
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
 	const healHp = potionHeal(ctx, id);
@@ -48,7 +51,10 @@ export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
 	c.hp += healed;
-	ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
+	// Potion refund (a legendary's handler): in a fight the potion may stay in the bag, rolled from the fight's sealed stream (only drawn when the perk is worn, so no other fight changes)
+	const refund = profileOf(ctx).potionRefundPct ?? 0;
+	const refunded = !!c.fight && refund > 0 && rngFor(ctx, c.fight)() * 100 < refund;
+	if (!refunded) ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
 	if (c.fight) c.cd.potion = potionCooldownAgainst(c.fight.type, profileOf(ctx).potionCooldownSec ?? COMBAT.potionCooldownSec);
 	pushEvent(ctx, t, 'potion', { id, amount: Math.round(healed) });
 	return true;
@@ -180,6 +186,14 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const stunned = Math.min(f.stunLeft, dt);
 	f.stunLeft -= stunned;
 
+	// Burn (a legendary's handler): the flames work first, so a monster they finish is not swung at
+	if (f.burn) {
+		const burned = Math.min(dt, f.burn.leftSec);
+		f.monsterHp = Math.max(0, f.monsterHp - f.burn.perSec * burned);
+		f.burn.leftSec -= burned;
+		if (f.burn.leftSec <= EPS) delete f.burn;
+	}
+
 	// the player's swings
 	f.playerTimer += dt;
 	const period = 1 / Math.max(0.05, p.attacksPerSec);
@@ -192,6 +206,8 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const damage = monster.armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(monster.armor)))) : raw;
 		f.monsterHp = Math.max(0, f.monsterHp - damage);
 		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + (damage * p.leechPct) / 100);
+		// a critical hit sets the monster alight for BURN_SEC; a new one refreshes it with its own hit (never stacks)
+		if (p.burnPct && rolled.crit !== 'none') f.burn = { leftSec: BURN_SEC, perSec: (damage * p.burnPct) / 100 };
 		pushEvent(ctx, t, kind, { amount: damage });
 	}
 	if (f.monsterHp <= 0) {

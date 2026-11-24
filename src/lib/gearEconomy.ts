@@ -50,3 +50,9 @@ const gearAttributeXpPct = (equipment: Equipment): number => {
 /** The total XP bonus in %: the attributes' (Intelligence, Charisma) plus the worn gear's and the class's (together held under the XP perk cap, {@link classXpBucket}). */
 export const xpGainPct = (characterStats: Pick<CharacterStats, 'xpGainMultiplier'>, equipment: Equipment, playerClass?: unknown): number =>
 	characterStats.xpGainMultiplier + gearAttributeXpPct(equipment) + classXpBucket(aggregateStats(equipment).xpPct, playerClass);
+
+/** The % off every build timer that the worn gear gives (a legendary's perk, IDL-145); it joins the Dwarf Statue's share under the combined cap (`buildTimeReduction`). */
+export const gearBuildTimePct = (equipment: Equipment): number => aggregateStats(equipment).buildTimePct;
+
+/** The % chest speed the worn gear gives (a legendary's perk); it joins the class and Idol chest speed in `chestIntervalSec`. */
+export const gearChestSpeedPct = (equipment: Equipment): number => aggregateStats(equipment).chestSpeedPct;

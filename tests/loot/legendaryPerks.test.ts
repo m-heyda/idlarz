@@ -47,6 +47,8 @@ test('the economy perks reach the server summary: gearEconomy reads the same sum
 	// combat perks: the fight profile reads the same aggregate
 	assert.equal(aggregateStats(wearing('stormtrident')).maxHpPct, 15);
 	assert.equal(aggregateStats(wearing('cindercrescent_glaive')).damagePct, 10);
+	assert.equal(aggregateStats(wearing('cindercrescent_glaive')).burnPct, 30);
+	assert.equal(aggregateStats(wearing('amethyst_spire')).potionRefundPct, 15);
 });
 
 test('a perk and the set bonuses share one family cap: income 25 from a legendary plus 26 from the Obsidian set stops at 50', () => {
@@ -80,4 +82,44 @@ test('the roster keeps one headline family each, stays inside the caps, and the 
 	const over: LootData = JSON.parse(JSON.stringify(LOOT_DATA));
 	over.items.dawnbringer_trident.perks = { incomePct: 99 };
 	assert.ok(validateLootData(over).errors.some((e) => /above the family cap/.test(e)));
+});
+
+test('build time (IDL-145): the Titanhammer cuts every timer by 25 % in the bucket shared with the Ember upgrades, capped at 60 %, and the server judges timers with the same number', async () => {
+	const { buildTimeCutPct } = await import('@/lib/buildTimeCut');
+	const { buildTimeReduction, castleUpgradeDuration } = await import('@/lib/buildings').then(async (b) => ({ ...b, ...(await import('@/utils/game/castle')) }));
+	const { summarize } = await import('@/lib/cloudSave/summary');
+	const { honestGame } = await import('../audit/cheats');
+	const game = honestGame();
+	const worn: Equipment = { mainHand: piece('runeforged_titanhammer') };
+	assert.equal(buildTimeCutPct(game.tiles, game.idolLevels, {}), 0, 'nothing worn: no cut');
+	assert.equal(buildTimeCutPct(game.tiles, game.idolLevels, worn), 25);
+	assert.equal(buildTimeReduction(undefined, 25), 0.25);
+	assert.equal(buildTimeReduction(undefined, 25 + 50), 0.6, 'the cap holds with other sources on top');
+	const plain = castleUpgradeDuration(3, undefined, 0);
+	assert.equal(Math.round(castleUpgradeDuration(3, undefined, 25)), Math.round(plain * 0.75));
+	// the server's summary of the same save: the cut is part of what a saved timer is judged against
+	assert.equal(summarize({ ...game, equipment: worn }).derived.buildTimeReduction, 0.25);
+	assert.equal(summarize({ ...game, equipment: {} }).derived.buildTimeReduction, undefined);
+});
+
+test('chest speed: the Tidecaller Axe adds 15 % to the chest speed the server paces chests with, and the Character window shows the same number', async () => {
+	const { chestIntervalSec } = await import('@/lib/luck');
+	const { summarize } = await import('@/lib/cloudSave/summary');
+	const { effectiveStats } = await import('@/lib/effectiveStats');
+	const { honestGame } = await import('../audit/cheats');
+	const game = honestGame();
+	const worn: Equipment = { mainHand: piece('tidecaller_axe') };
+	assert.equal(aggregateStats(worn).chestSpeedPct, 15);
+	assert.equal(summarize({ ...game, equipment: worn }).derived.idol?.chestSpeedPct, 15);
+	assert.equal(summarize({ ...game, equipment: {} }).derived.idol?.chestSpeedPct, undefined);
+	assert.ok(Math.abs(chestIntervalSec(0, 15) - chestIntervalSec(0, 0) / 1.15) < 1e-9);
+	const shown = (equipment: Equipment) =>
+		effectiveStats({
+			characterStats: game.characterStats,
+			equipment,
+			prestige: game.prestige,
+			merchantUpgrades: game.merchantUpgrades,
+			playerClass: game.playerClass,
+		}).chestRateBonus;
+	assert.ok(shown(worn) > shown({}) + 14, 'the Character window counts it');
 });

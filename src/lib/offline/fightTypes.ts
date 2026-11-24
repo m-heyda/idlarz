@@ -32,6 +32,9 @@ export interface PlayerProfile {
 	potionCooldownSec?: number;
 	potionPower?: number;
 	potionSlots?: number;
+	/** A worn legendary's handlers (absent: none): a crit sets the monster alight for this % of the hit per second (Burn), and the chance in % that a potion drunk in a fight is not used up (Potion refund) */
+	burnPct?: number;
+	potionRefundPct?: number;
 }
 
 /** The one fight a player has open. The monster stands on its ticket; the player's numbers are frozen in `profile`. */
@@ -53,6 +56,8 @@ export interface FightRecord {
 	hurt?: number;
 	/** Venom (a boss modifier): the poison on the hero, `stacks` of it for `leftSec` more seconds; `acc` is the damage not yet reported as an event. Absent: not poisoned. */
 	poison?: { stacks: number; leftSec: number; acc: number };
+	/** Burn (a legendary's handler): the monster is alight, taking `perSec` damage for `leftSec` more seconds. A new crit replaces it (never stacks). Absent: not burning. */
+	burn?: { leftSec: number; perSec: number };
 	/** Seconds the fight has lasted, and what is left of a boss's clock (null: no clock) */
 	elapsed: number;
 	timeLeftSec: number | null;

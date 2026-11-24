@@ -62,7 +62,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 | --- | --- | --- | --- | --- | --- |
 | `art_battle_axe` | <img src="../../public/pixel/items/mainHand/battle_axe.png" width="96" alt="art_battle_axe"> | 64x64 | planned | battle_axe | `pixel/items/mainHand/battle_axe.png` |
 | `art_reapers_crescent` | <img src="../../public/pixel/items/legendary/reapers_crescent.png" width="96" alt="art_reapers_crescent"> | 64x64 | used | reapers_crescent | `pixel/items/legendary/reapers_crescent.png` |
-| `art_tidecaller_axe` | <img src="../../public/pixel/items/legendary/tidecaller_axe.png" width="96" alt="art_tidecaller_axe"> | 64x64 | planned | tidecaller_axe | `pixel/items/legendary/tidecaller_axe.png` |
+| `art_tidecaller_axe` | <img src="../../public/pixel/items/legendary/tidecaller_axe.png" width="96" alt="art_tidecaller_axe"> | 64x64 | used | tidecaller_axe | `pixel/items/legendary/tidecaller_axe.png` |
 
 ## mainHand/axe G1
 
@@ -470,7 +470,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `art_obsidian_maul` | <img src="../../public/pixel/items/mainHand/obsidian_maul.png" width="96" alt="art_obsidian_maul"> | 64x64 | used | obsidian_maul | `pixel/items/mainHand/obsidian_maul.png` |
-| `art_runeforged_titanhammer` | <img src="../../public/pixel/items/legendary/runeforged_titanhammer.png" width="96" alt="art_runeforged_titanhammer"> | 64x64 | planned | runeforged_titanhammer | `pixel/items/legendary/runeforged_titanhammer.png` |
+| `art_runeforged_titanhammer` | <img src="../../public/pixel/items/legendary/runeforged_titanhammer.png" width="96" alt="art_runeforged_titanhammer"> | 64x64 | used | runeforged_titanhammer | `pixel/items/legendary/runeforged_titanhammer.png` |
 | `item_titan_maul` | <img src="../../public/pixel/icons/item_titan_maul.png" width="80" alt="item_titan_maul"> | 40x40 | used | titan_maul | `pixel/icons/item_titan_maul.png` |
 
 ## mainHand/maul G1
@@ -633,7 +633,7 @@ Main-hand and off-hand icons (swords, axes, bows, staves, shields, tomes ...), b
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `art_amethyst_spire` | <img src="../../public/pixel/items/legendary/amethyst_spire.png" width="96" alt="art_amethyst_spire"> | 64x64 | planned | amethyst_spire | `pixel/items/legendary/amethyst_spire.png` |
+| `art_amethyst_spire` | <img src="../../public/pixel/items/legendary/amethyst_spire.png" width="96" alt="art_amethyst_spire"> | 64x64 | used | amethyst_spire | `pixel/items/legendary/amethyst_spire.png` |
 | `art_oak_staff` | <img src="../../public/pixel/items/mainHand/oak_staff.png" width="96" alt="art_oak_staff"> | 64x64 | planned | oak_staff | `pixel/items/mainHand/oak_staff.png` |
 | `art_obsidian_staff` | <img src="../../public/pixel/items/mainHand/obsidian_staff.png" width="96" alt="art_obsidian_staff"> | 64x64 | used | obsidian_staff | `pixel/items/mainHand/obsidian_staff.png` |
 | `art_wooden_staff` | <img src="../../public/pixel/items/mainHand/wooden_staff.png" width="96" alt="art_wooden_staff"> | 64x64 | planned | wooden_staff | `pixel/items/mainHand/wooden_staff.png` |

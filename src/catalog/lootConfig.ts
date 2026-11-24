@@ -229,7 +229,8 @@ export const BOSS_LOOT: Record<LootBiome, BossLootDef> = {
 	jungle: { uniques: ['dawnbringer_trident'], setId: null, levels: { min: 38, max: 68 } },
 	fields: { uniques: ['reapers_crescent'], setId: null, levels: { min: 46, max: 76 } },
 	orchard: { uniques: [], setId: null, levels: { min: 54, max: 84 } },
-	blight: { uniques: [], setId: null, levels: { min: 60, max: 92 } },
+	// IDL-145: the third top-tier legendary, Runeforged Titanhammer (-25 % build time), from the Blight's boss
+	blight: { uniques: ['runeforged_titanhammer'], setId: null, levels: { min: 60, max: 92 } },
 	battlefield: { uniques: [], setId: null, levels: { min: 68, max: 100 } },
 };
 
@@ -250,6 +251,8 @@ export const MONSTER_LEGENDARY_IDS: readonly string[] = [
 	'stormtrident',
 	'cinderflight_bow',
 	'cindercrescent_glaive',
+	'tidecaller_axe',
+	'amethyst_spire',
 ];
 export const MONSTER_LEGENDARY_CHANCE = 0.002;
 export const MONSTER_LEGENDARY_MIN_LEVEL = 15;

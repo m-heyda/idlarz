@@ -17,7 +17,7 @@ import {
 	type BuildingContext,
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
@@ -69,7 +69,13 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 					resources: subtractBundle(s.resources, cost),
 					buildingUpgrades: [
 						...s.buildingUpgrades,
-						{ x, y, toLevel: 1, remainingSec: buildingUpgradeDuration(0, s.prestige, idolEconomy(s.tiles, s.idolLevels).buildTimePct, 'idol'), building: id },
+						{
+							x,
+							y,
+							toLevel: 1,
+							remainingSec: buildingUpgradeDuration(0, s.prestige, buildTimeCutPct(s.tiles, s.idolLevels, s.equipment), 'idol'),
+							building: id,
+						},
 					],
 				});
 				return true;
@@ -106,7 +112,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 						remainingSec: buildingUpgradeDuration(
 							level,
 							s.prestige,
-							idolEconomy(s.tiles, s.idolLevels).buildTimePct,
+							buildTimeCutPct(s.tiles, s.idolLevels, s.equipment),
 							buildingDef(tile?.building)?.kind === 'idol' ? 'idol' : 'building',
 						),
 					},

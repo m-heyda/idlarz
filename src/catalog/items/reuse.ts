@@ -315,8 +315,7 @@ const RESERVE_BASE: ItemDef[] = [
 ];
 
 /**
- * The top-tier legendaries (income, building time, kill reward: 25 %): they come only from a boss's own table, never from a chest or a monster (`legendary_top`, IDL-146). Runeforged Titanhammer is on the list but stays
- * disabled with the rest of the perkless roster until its building-time perk has a stat to run on (IDL-145).
+ * The top-tier legendaries (income, building time, kill reward: 25 %): they come only from a boss's own table, never from a chest or a monster (`legendary_top`, IDL-146): Dawnbringer Trident from the Jungle's boss, Reaper's Crescent from the Fields', Runeforged Titanhammer from the Blight's.
  */
 export const LEGENDARY_TOP: readonly string[] = ['dawnbringer_trident', 'reapers_crescent', 'runeforged_titanhammer'];
 
@@ -325,8 +324,7 @@ const MID_PERK = LEGENDARY_PERK_TIERS.xpPct.rare;
 
 /**
  * The perks of the legendary roster (IDL-143, IDL-144; decided by the owner 2026-11-07, docs/plan/28 section 6): one headline family each, fixed numbers by tier from `LEGENDARY_PERK_TIERS`, summed with the set bonuses before the
- * family caps. NOT here yet: Runeforged Titanhammer (building time -25 %, needs the build-time stat, IDL-145), Tidecaller Axe (chest interval, needs its own hook), Cindercrescent Glaive's Burn and Amethyst Spire's potion refund
- * (named effect handlers, IDL-46). Those four keep their stats only; Cindercrescent Glaive takes its +10 % damage now.
+ * family caps. Runeforged Titanhammer (build time -25 %, `buildTimePct`, IDL-145) and Tidecaller Axe (chest speed +15 %, `chestSpeedPct`) have their stats now. The two handlers of IDL-46 are stats too: Cindercrescent Glaive's Burn (`burnPct`, 30) and Amethyst Spire's Potion refund (`potionRefundPct`, 15), applied in `fightStep` and `drink` (offline/fightSteps.ts).
  *
  * @category Loot/Items
  * @order 9
@@ -339,7 +337,14 @@ export const LEGENDARY_PERKS: Readonly<Record<string, ItemStats>> = {
 	nightfall_edge: { clickPct: LEGENDARY_PERK_TIERS.clickPct.rare },
 	stormtrident: { maxHpPct: MID_PERK },
 	cinderflight_bow: { goldFind: MID_PERK },
-	cindercrescent_glaive: { damagePct: LEGENDARY_PERK_TIERS.damagePct.top },
+	// +10 % damage and Burn: a crit sets the monster alight, 30 % of that hit per second for 3 s (IDL-46)
+	cindercrescent_glaive: { damagePct: LEGENDARY_PERK_TIERS.damagePct.top, burnPct: 30 },
+	// Potion refund: 15 % of the potions drunk in a fight are not used up (IDL-46)
+	amethyst_spire: { potionRefundPct: MID_PERK },
+	// IDL-145: -25 % on every castle, building and Idol timer, in the bucket shared with the Ember upgrades and the Dwarf Statue (cap 60 %)
+	runeforged_titanhammer: { buildTimePct: LEGENDARY_PERK_TIERS.incomePct.top },
+	// +15 % chest speed: a chest every 720 s / 1.15 (the class's and the Idols' chest speed add to it)
+	tidecaller_axe: { chestSpeedPct: MID_PERK },
 };
 
 /** Grade of a reserve item = the grade its art is registered with (config/itemIcons), so one table says it */

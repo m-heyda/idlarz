@@ -67,6 +67,10 @@ export const STAT_DEFS = {
 	offlineEff: { label: 'Away Income', unit: '%', setOnly: true }, // percentage points added to the share of the income paid while away
 	offlineCapHours: { label: 'Away Time', unit: 'h', setOnly: true }, // hours added to the longest away time that is paid
 	clickPct: { label: 'Click Gold', unit: '%', setOnly: true }, // % more gold per map click
+	burnPct: { label: 'Burn', unit: '%', setOnly: true }, // a critical hit sets the monster alight: it takes this % of that hit per second for 3 s (a re-crit refreshes, never stacks; `fightStep`)
+	potionRefundPct: { label: 'Potion Refund', unit: '%', setOnly: true }, // % chance that a potion drunk in a fight is not used up (rolled from the fight's sealed stream)
+	buildTimePct: { label: 'Build Time', unit: '%', setOnly: true }, // % off every castle, building and Idol timer, in the same bucket as the Dwarf Statue (`buildTimeReduction`, together at most the 60 % cap with the Ember upgrades)
+	chestSpeedPct: { label: 'Chest Speed', unit: '%', setOnly: true }, // % faster chests: the chest interval is divided by 1 + this (with the class and Idol chest speed, `chestIntervalSec`)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
@@ -100,6 +104,8 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	armor: 'combat',
 	maxHp: 'combat',
 	maxHpPct: 'combat',
+	burnPct: 'combat',
+	potionRefundPct: 'combat',
 	regen: 'combat',
 	dodge: 'combat',
 	maxMana: 'combat',
@@ -113,6 +119,8 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	offlineEff: 'economy',
 	offlineCapHours: 'economy',
 	clickPct: 'economy',
+	buildTimePct: 'economy',
+	chestSpeedPct: 'economy',
 };
 
 type SetOnlyKey = { [K in StatKey]: (typeof STAT_DEFS)[K] extends { setOnly: true } ? K : never }[StatKey];

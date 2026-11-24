@@ -26,7 +26,7 @@ One name per picture, grouped by what it is. Biomes, terrain atlases and ground 
 | Category | Assets | Used | Planned | Unused |
 | --- | --- | --- | --- | --- |
 | [Potions](potions.md) | 73 | 66 | 0 | 7 |
-| [Weapons](weapons.md) | 235 | 192 | 16 | 27 |
+| [Weapons](weapons.md) | 235 | 195 | 13 | 27 |
 | [Armor](armor.md) | 174 | 95 | 27 | 52 |
 | [Accessories](accessories.md) | 53 | 45 | 8 | 0 |
 | [Monsters](monsters.md) | 57 | 57 | 0 | 0 |

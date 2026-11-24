@@ -104,6 +104,7 @@ test('rarity follows the family: wood and cloth common, steel uncommon, obsidian
 	// the three classics plus the roster legendaries whose perk is live (IDL-143, IDL-146); the ones still waiting for a perk stay disabled
 	const live = Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary' && d.enabled !== false && !d.craftOnly);
 	assert.deepEqual(live.map((d) => d.id).sort(), [
+		'amethyst_spire',
 		'cindercrescent_glaive',
 		'cinderflight_bow',
 		'dawnbringer_trident',
@@ -111,8 +112,10 @@ test('rarity follows the family: wood and cloth common, steel uncommon, obsidian
 		'frostbloom_fan',
 		'nightfall_edge',
 		'reapers_crescent',
+		'runeforged_titanhammer',
 		'starfall_bow',
 		'stormtrident',
+		'tidecaller_axe',
 		'titan_maul',
 		'voidrune_blade',
 	]);

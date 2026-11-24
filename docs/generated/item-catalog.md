@@ -34,12 +34,15 @@ A legendary can carry fixed perks: numbers on the item itself, never rolled and 
 
 | Item | Type | Perk | Item stats |
 |---|---|---|---|
-| Cindercrescent Glaive (`cindercrescent_glaive`) | spear | +10% Damage | +30 Damage, +8% Crit Chance, +6% Super Crit |
+| Runeforged Titanhammer (`runeforged_titanhammer`) | maul | +25% Build Time | +44 Damage, +4% Crit Chance, +6% Super Crit |
+| Cindercrescent Glaive (`cindercrescent_glaive`) | spear | +10% Damage, +30% Burn | +30 Damage, +8% Crit Chance, +6% Super Crit |
 | Frostbloom Fan (`frostbloom_fan`) | wand | +15% XP Gain | +20 Damage, +18% Spell Power, +0.90/s Mana Regen |
 | Voidrune Blade (`voidrune_blade`) | sword | +15% Away Income | +31 Damage, +8% Crit Chance, +8% Super Crit |
 | Reaper's Crescent (`reapers_crescent`) | axe | +25% Kill Rewards | +34 Damage, +6% Crit Chance, +3.0% Life Leech |
 | Nightfall Edge (`nightfall_edge`) | sword | +15% Click Gold | +32 Damage, +10% Crit Chance, +6% Super Crit |
+| Tidecaller Axe (`tidecaller_axe`) | axe | +15% Chest Speed | +33 Damage, +6% Crit Chance, +4.0% Dodge |
 | Stormtrident (`stormtrident`) | spear | +15% Max HP | +29 Damage, +12% Crit Chance, +8% Super Crit |
+| Amethyst Spire (`amethyst_spire`) | staff | +15% Potion Refund | +26 Damage, +18% Spell Power, +36 Max Mana |
 | Dawnbringer Trident (`dawnbringer_trident`) | spear | +25% Income | +30 Damage, +6 Luck, +12% Gold Find |
 | Cinderflight Bow (`cinderflight_bow`) | bow | +15% Gold Find | +25 Damage, +18% Crit Chance, +10% Super Crit |
 
@@ -296,6 +299,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
   - bonus `king_potions` from pool `potions_king`
 - **boss_blight level 60** (profile `boss_blight`, item level 60): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_blight level 92** (profile `boss_blight`, item level 92): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+  - bonus `unique` from pool `boss_unique_blight`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
 - **boss_battlefield level 68** (profile `boss_battlefield`, item level 68): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_battlefield level 100** (profile `boss_battlefield`, item level 100): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
@@ -307,7 +311,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 6.1%, Epic 1.0%
 - **craft level 100** (profile `craft`, item level 100): 31 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 6.1%, Epic 1.0%
 
-Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_jungle`, `equipment_fields`, `equipment_orchard`, `equipment_blight`, `equipment_battlefield`, `equipment_craft`, `legendary_weapons`, `legendary_top`, `monster_legendary`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_general_jungle`, `boss_general_fields`, `boss_general_orchard`, `boss_general_blight`, `boss_general_battlefield`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `boss_unique_jungle`, `boss_unique_fields`, `potions_rat`, `potions_king`, `potions_chest`
+Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_jungle`, `equipment_fields`, `equipment_orchard`, `equipment_blight`, `equipment_battlefield`, `equipment_craft`, `legendary_weapons`, `legendary_top`, `monster_legendary`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_general_jungle`, `boss_general_fields`, `boss_general_orchard`, `boss_general_blight`, `boss_general_battlefield`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `boss_unique_jungle`, `boss_unique_fields`, `boss_unique_blight`, `potions_rat`, `potions_king`, `potions_chest`
 
 ## Merchant stock
 

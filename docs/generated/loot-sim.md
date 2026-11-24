@@ -62,7 +62,7 @@ Each biome's boss drops from a source of its own (`boss_<biome>`, IDL-44): a gua
 | boss_jungle | 58 | Dawnbringer Trident | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
 | boss_fields | 66 | Reaper's Crescent | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
 | boss_orchard | 74 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_blight | 82 | nothing yet | 1.00 | - | - | - | - | - |
+| boss_blight | 82 | Runeforged Titanhammer | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
 | boss_battlefield | 90 | nothing yet | 1.00 | - | - | - | - | - |
 
 ### A full set from one boss (projection)
@@ -183,7 +183,7 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 - **boss_jungle**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
 - **boss_fields**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
 - **boss_orchard**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
-- **boss_blight**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
+- **boss_blight**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: unique, king_potions
 - **boss_battlefield**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 20.0%, uncommon 30.0%, rare 30.0%, epic 15.0%, legendary 5.0%; bonus: king_potions
 - **basic_chest**: 1-1 roll(s), 0 guaranteed, 82% per roll; rarity weights common 62.0%, uncommon 24.0%, rare 9.0%, epic 4.0%, legendary 1.0%; bonus: chest_legendary, chest_potion
 - **craft**: 1-1 roll(s), 1 guaranteed, 100% per roll; rarity weights common 70.7%, uncommon 22.2%, rare 6.1%, epic 1.0%; bonus: none

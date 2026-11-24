@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
 import { activeBuildTimers } from '@/lib/buildTimers';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { useGameStore } from '@/stores/gameStore';
 import { useViewStore } from '@/stores/viewStore';
 import { getTile } from '@/utils/world';
@@ -22,7 +22,8 @@ const BuildTimers: React.FC = () => {
 	const prestige = useGameStore((state) => state.prestige);
 	const idolLevels = useGameStore((state) => state.idolLevels);
 	const centerOn = useViewStore((state) => state.centerOn);
-	const buildTimePct = useMemo(() => idolEconomy(tiles, idolLevels ?? {}).buildTimePct, [tiles, idolLevels]);
+	const equipment = useGameStore((state) => state.equipment);
+	const buildTimePct = useMemo(() => buildTimeCutPct(tiles, idolLevels, equipment), [tiles, idolLevels, equipment]);
 
 	const timers = activeBuildTimers({
 		castleUpgrade,

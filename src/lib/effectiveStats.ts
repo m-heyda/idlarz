@@ -78,7 +78,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		potionSlots: potionSlotCount(gear),
 		luck,
 		/** % more chests than without Luck */
-		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct + idol.chestSpeedPct),
+		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct + idol.chestSpeedPct + gear.chestSpeedPct),
 		/** % better odds for rare-and-better gear from Luck */
 		rarityLuckBonus: (rarityLuckMultiplier(luck) - 1) * 100,
 		/** % chance that a chest also holds 5-50 gems */
@@ -95,7 +95,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
-		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct) * 100,
+		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct + gear.buildTimePct) * 100,
 		/** Set bonuses of the worn gear: % more income (every resource but XP), % more gold and XP from kills, % more gold per click */
 		gearIncome: economy.incomePct,
 		killRewards: economy.killRewardPct + idol.killRewardPct,
