@@ -149,7 +149,6 @@ export const ItemWithCompare: Story = {
 					{ heading: 'Utility', rows: [{ label: 'Luck', value: <TipDiff value='6' diff={-1} /> }] },
 				]}
 				affixes={[{ text: '+14 Fire damage', name: 'of Embers' }]}
-				lost={['+3% Life leech']}
 				setChanges={[{ label: 'Cloudwalker', from: 2, to: 3, size: 5 }]}
 				set={{
 					title: 'Cloudwalker set (3/5)',

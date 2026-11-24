@@ -65,13 +65,15 @@ interface TipProps {
 	banner?: 'equipped' | 'comparing';
 	/** The heading of the changes list: "Difference", or "Difference: replacing Ring 2" for a ring (IDL-343) */
 	compareLabel?: string;
+	/** A ring card: the hint line says Ctrl compares with the other ring */
+	ringHint?: boolean;
 }
 
 /**
  * One item card drawn by the design system's `ItemTooltip` from the game's own data: the same lines the game's card always had (kind line, item level and quality, the headline stat with its change, attack speed and DPS, stats by
  * colour group with their changes, affixes, lost properties, set changes and the set block, effects, Drink button, flavour and lore, price, key hints), only drawn in the new style.
  */
-const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, hints, banner, compareLabel }) => {
+const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel, buyPrice, hints, banner, compareLabel, ringHint }) => {
 	const equipment = useGameStore((state) => state.equipment);
 	// what the merchant really pays: the same inputs a sale uses (Haggler, Idols, the Lighthouse)
 	const sellCtx = useGameStore(
@@ -170,6 +172,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					]
 				: [];
 
+	if (ringHint) hintText.push({ key: 'Ctrl', text: 'compare with your other ring' });
 	const showHints = buyPrice === undefined && !wornLabel;
 
 	return (
@@ -200,7 +203,6 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			rows={[...(emptySlot ? [{ label: `Empty ${EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot`, value: '', tone: 'muted' as const }] : []), ...effectRows]}
 			groups={groups}
 			affixes={affixes}
-			lost={[]}
 			extra={
 				comparison && tierChanges.length > 0 ? (
 					<>
@@ -276,36 +278,35 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
  */
 export const GameItemTip: React.FC<Omit<TipProps, 'comparison' | 'wornLabel'> & { compare?: boolean }> = ({ compare, ...rest }) => {
 	const equipment = useGameStore((state) => state.equipment);
-	// a ring can replace either worn ring: the player picks which one the comparison is about (IDL-343)
-	const [ringPick, setRingPick] = React.useState<'ring1' | 'ring2' | null>(null);
+	// a ring can replace either worn ring: the card compares with the first free (else the first) ring slot, and holding Ctrl compares with the other one (IDL-343)
+	const [ctrl, setCtrl] = React.useState(false);
+	React.useEffect(() => {
+		const sync = (event: KeyboardEvent) => setCtrl(event.ctrlKey);
+		const off = () => setCtrl(false);
+		window.addEventListener('keydown', sync);
+		window.addEventListener('keyup', sync);
+		window.addEventListener('blur', off);
+		return () => {
+			window.removeEventListener('keydown', sync);
+			window.removeEventListener('keyup', sync);
+			window.removeEventListener('blur', off);
+		};
+	}, []);
 	const isRing = !!rest.item && ITEM_CATALOG[rest.item.base]?.slot === 'ring';
-	const comparison = compare && rest.item ? compareDetailed(rest.item, equipment, isRing ? (ringPick ?? undefined) : undefined) : null;
-	const showPicker = compare && isRing && !!comparison && !!(equipment.ring1 || equipment.ring2);
-	const slotName1 = (slot: 'ring1' | 'ring2') => `Ring ${slot === 'ring1' ? 1 : 2}`;
-	const compareLabel = showPicker && comparison ? `Difference: replacing ${slotName1(comparison.slot as 'ring1' | 'ring2')}` : undefined;
+	const first = compare && rest.item ? compareDetailed(rest.item, equipment) : null;
+	const other = first?.slot === 'ring1' ? 'ring2' : 'ring1';
+	const comparison = isRing && ctrl && first && rest.item ? compareDetailed(rest.item, equipment, other) : first;
+	const ringLabel = isRing && comparison ? `Difference: replacing Ring ${comparison.slot === 'ring1' ? 1 : 2}` : undefined;
 	return (
-		<div>
-			{showPicker && comparison && (
-				<div role='group' aria-label='Ring to replace' style={{ display: 'flex', gap: 6, marginBottom: 6 }} data-testid='ring-picker'>
-					{(['ring1', 'ring2'] as const).map((slot) => (
-						<button
-							key={slot}
-							type='button'
-							aria-pressed={comparison.slot === slot}
-							onClick={() => setRingPick(slot)}
-							className='ds-kbd'
-							style={{ cursor: 'pointer', opacity: comparison.slot === slot ? 1 : 0.6, borderColor: comparison.slot === slot ? '#f4d57e' : undefined }}
-						>
-							Replace {slotName1(slot)}
-							{equipment[slot] ? '' : ' (empty)'}
-						</button>
-					))}
-				</div>
-			)}
-			<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
-				<GameItemCard {...rest} comparison={comparison} banner={comparison?.equipped ? 'comparing' : undefined} compareLabel={compareLabel} />
-				{comparison?.equipped ? <GameItemCard item={comparison.equipped} wornLabel banner='equipped' /> : null}
-			</div>
+		<div style={{ display: 'flex', alignItems: 'flex-start', gap: 8 }}>
+			<GameItemCard
+				{...rest}
+				comparison={comparison}
+				banner={comparison?.equipped ? 'comparing' : undefined}
+				compareLabel={ringLabel}
+				ringHint={isRing && !!comparison}
+			/>
+			{comparison?.equipped ? <GameItemCard item={comparison.equipped} wornLabel banner='equipped' /> : null}
 		</div>
 	);
 };

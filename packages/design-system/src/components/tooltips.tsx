@@ -182,8 +182,6 @@ export interface ItemTooltipProps {
 	groups?: ItemStatGroup[];
 	/** Affix lines (blue), each "+12 Fire damage" with the affix name */
 	affixes?: { text: string; name: string }[];
-	/** Properties the worn piece has and this one lacks */
-	lost?: string[];
 	/** Set changes when it replaces a worn piece: "Cloudwalker 2 -> 3 / 5" */
 	setChanges?: { label: string; from: number; to: number; size: number }[];
 	set?: TipSetBlockProps;
@@ -207,7 +205,7 @@ export interface ItemTooltipProps {
 }
 
 /**
- * An item tooltip with everything the game's card shows: kind line, item level and quality, the primary stat with its change, attack speed and DPS, stats grouped by colour, blue affix lines, lost properties, set changes and the set block,
+ * An item tooltip with everything the game's card shows: kind line, item level and quality, the primary stat with its change, attack speed and DPS, stats grouped by colour, blue affix lines, set changes and the set block,
  * flavour and lore, the sell or buy price footer, a Drink button and a key hints line. Every part is optional.
  */
 export const ItemTooltip: React.FC<ItemTooltipProps> = ({
@@ -221,7 +219,6 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	rows,
 	groups,
 	affixes,
-	lost,
 	setChanges,
 	set,
 	flavor,
@@ -261,16 +258,6 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 				{a.text} <span className='ds-tip-affix'>{a.name}</span>
 			</TipLine>
 		))}
-		{lost && lost.length > 0 ? (
-			<div className='ds-tip-lost'>
-				<TipSection>Properties lost when equipped</TipSection>
-				{lost.map((l) => (
-					<TipLine key={l} tone='red'>
-						{l}
-					</TipLine>
-				))}
-			</div>
-		) : null}
 		{setChanges?.map((c) => (
 			<TipLine key={c.label} tone={c.to >= c.from ? 'green' : 'red'}>
 				{c.label} {c.from} → {c.to} / {c.size}
