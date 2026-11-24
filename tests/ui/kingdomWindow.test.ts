@@ -6,6 +6,8 @@ import { DEFAULT_WINDOW_POS, useWindowStore, WIN_IDS } from '../../src/stores/wi
 import { kingdomSummary } from '../../src/lib/kingdomSummary';
 import { BUILDINGS } from '../../src/catalog/buildings';
 import { limitOf } from '../../src/lib/limits';
+import { MONSTERS } from '../../src/config/combatConfig';
+import type { Monster } from '../../src/types/game';
 import { useGameStore } from '../../src/stores/gameStore';
 import { api, freshGame } from '../helpers';
 
@@ -64,4 +66,44 @@ test('an open Kingdom overview shows the castle, land, buildings and monsters se
 	const landTiles = kingdomSummary(useGameStore.getInitialState()).land.byBiome.reduce((sum, row) => sum + row.count, 0);
 	assert.ok(landTiles > 0);
 	assert.equal((out.match(/class="kd-cell"/g) ?? []).length, landTiles, 'one square per owned tile');
+});
+
+test('IDL-377: land rows carry their share of the owned tiles, buildings are grouped by biome in the fixed order, locked is not missing', () => {
+	freshGame();
+	const s = kingdomSummary(api());
+	for (const row of s.land.byBiome) assert.ok(Math.abs(row.pct - (row.count / s.land.owned) * 100) < 1e-9);
+	assert.equal(s.buildings.groups.flatMap((g) => g.rows).length, BUILDINGS.length, 'every building is in exactly one group');
+	const order = { producer: 0, extractor: 1, idol: 2, general: 3 };
+	for (const group of s.buildings.groups) {
+		const kinds = group.rows.map((row) => order[row.kind]);
+		assert.deepEqual(
+			kinds,
+			[...kinds].sort((a, b) => a - b),
+			`${group.biome}: Producer, Extractor, Idol, then general`,
+		);
+	}
+	const jungle = s.buildings.groups.find((g) => g.biome === 'jungle');
+	assert.ok(jungle && jungle.rows.every((row) => row.lockedUntilRebirth === 1), 'jungle needs one rebirth on a fresh account');
+	const plains = s.buildings.groups.find((g) => g.biome === 'plains');
+	assert.ok(plains && plains.rows.every((row) => row.lockedUntilRebirth === 0));
+	assert.equal(s.buildings.available, s.buildings.rows.filter((row) => row.lockedUntilRebirth === 0).length);
+	assert.ok(s.buildings.available < s.buildings.total, 'the later biomes are locked, not missing');
+});
+
+test('IDL-378: the map counters: golden is a subset of the monsters, fully grown plus still growing is all of them, chests and ore nodes are read', () => {
+	freshGame();
+	const base = api();
+	const type = Object.keys(MONSTERS)[0] as Monster['type'];
+	const monsters: Monster[] = [
+		{ id: 9001, type, x: 1, y: 1, lucky: true, level: 5, spawnLevel: 5, ageSec: 0 },
+		{ id: 9002, type, x: 2, y: 2, level: 5 + limitOf('monsterGrowthLevels', { prestige: base.prestige }), spawnLevel: 5, ageSec: 1e9 },
+	];
+	const s = kingdomSummary({ ...base, monsters }, 4);
+	assert.equal(s.monsters.total, 2);
+	assert.equal(s.monsters.lucky, 1);
+	assert.equal(s.monsters.maxed, 1);
+	assert.equal(s.monsters.growing, 1);
+	assert.equal(s.monsters.maxed + s.monsters.growing, s.monsters.total);
+	assert.equal(s.monsters.rocks, 4);
+	assert.equal(s.monsters.chests, base.tiles.stats.chests);
 });

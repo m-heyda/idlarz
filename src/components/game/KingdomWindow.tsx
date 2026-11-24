@@ -5,6 +5,7 @@ import { biomeColor } from '@/config/biomePalette';
 import { castleIconName, pixelIconSrc } from '@/config/pixelIcons';
 import { kingdomSummary } from '@/lib/kingdomSummary';
 import { useGameStore } from '@/stores/gameStore';
+import { useRockStore } from '@/stores/rockStore';
 import { formatNumber } from '@/utils/formatters';
 import GameWindow from './GameWindow';
 import '@/styles/Kingdom.css';
@@ -27,7 +28,8 @@ const KingdomWindow: React.FC = () => {
 			gemBuilders: state.gemBuilders,
 		})),
 	);
-	const summary = useMemo(() => kingdomSummary(input), [input]);
+	const rockCount = useRockStore((state) => Object.keys(state.rocks).length);
+	const summary = useMemo(() => kingdomSummary(input, rockCount), [input, rockCount]);
 	const { castle, builders, land, buildings, monsters } = summary;
 	// the land heatmap: one square per tile (or per `perCell` tiles on a huge realm), the biomes in runs, left to right and wrapping to the width of the window
 	const perCell = Math.max(1, Math.ceil(land.owned / HEAT_MAX_CELLS));
@@ -80,6 +82,7 @@ const KingdomWindow: React.FC = () => {
 											<span className='kd-swatch' style={{ background: biomeColor(row.biome) }} />
 											{row.label}
 											<b className='kd-count'>{formatNumber(row.count)}</b>
+											<span className='kd-sub'>{row.pct.toFixed(1)}%</span>
 										</span>
 									))}
 								</div>
@@ -90,23 +93,40 @@ const KingdomWindow: React.FC = () => {
 
 				<Panel>
 					<SectionLabel>
-						Buildings ({buildings.built} of {buildings.total})
+						Buildings ({buildings.built} of {buildings.available} available)
 					</SectionLabel>
+					{buildings.available < buildings.total && (
+						<div className='kd-sub kd-note'>{buildings.total - buildings.available} more open with later rebirths (marked Locked).</div>
+					)}
 					<Inset>
-						<div className='kd-rows kd-rows-wide'>
-							{buildings.rows.map((row) => (
-								<div key={row.id} className='kd-building' data-built={row.level > 0}>
-									<span>
-										{row.label} <span className='kd-sub'>{row.kind}</span>
-									</span>
-									{row.level > 0 ? <DiamondLevel level={row.level} max={Math.max(row.cap, row.level)} small /> : <span className='kd-sub'>not built</span>}
-									<span className='kd-lvl'>
-										{row.level > 0 ? `Lv ${row.level} / ${row.cap}` : `cap ${row.cap}`}
-										{row.upgrading ? ' ↑' : ''}
-									</span>
+						{buildings.groups.map((group) => (
+							<div key={group.biome} className='kd-group' data-testid='kingdom-building-group'>
+								<div className='kd-group-head'>
+									{group.biome !== 'land' && <span className='kd-swatch' style={{ background: biomeColor(group.biome) }} />}
+									{group.label}
 								</div>
-							))}
-						</div>
+								<div className='kd-rows kd-rows-wide'>
+									{group.rows.map((row) => (
+										<div key={row.id} className='kd-building' data-built={row.level > 0} data-locked={row.lockedUntilRebirth > 0}>
+											<span>
+												{row.label} <span className='kd-sub'>{row.kind}</span>
+											</span>
+											{row.level > 0 ? (
+												<DiamondLevel level={row.level} max={Math.max(row.cap, row.level)} small />
+											) : row.lockedUntilRebirth > 0 ? (
+												<span className='kd-sub'>Locked: rebirth {row.lockedUntilRebirth}</span>
+											) : (
+												<span className='kd-sub'>Not built</span>
+											)}
+											<span className='kd-lvl'>
+												{row.level > 0 ? `Lv ${row.level} / ${row.cap}` : `cap ${row.cap}`}
+												{row.upgrading ? ' ↑' : ''}
+											</span>
+										</div>
+									))}
+								</div>
+							</div>
+						))}
 					</Inset>
 				</Panel>
 
@@ -116,6 +136,15 @@ const KingdomWindow: React.FC = () => {
 						<Stat label='Monsters' value={formatNumber(monsters.total)} />
 						<Stat label='Bosses' value={formatNumber(monsters.bosses)} />
 						<Stat label='Strongest' value={monsters.total ? `Lv ${formatNumber(monsters.highestLevel)}` : '-'} />
+					</div>
+					<div className='kd-stats' data-testid='kingdom-map-counters'>
+						<Stat label='Golden' value={formatNumber(monsters.lucky)} />
+						<Stat label='Fully grown' value={formatNumber(monsters.maxed)} />
+						<Stat label='Still growing' value={formatNumber(monsters.growing)} />
+					</div>
+					<div className='kd-stats'>
+						<Stat label='Unopened chests' value={formatNumber(monsters.chests)} />
+						<Stat label='Ore nodes' value={formatNumber(monsters.rocks)} />
 					</div>
 				</Panel>
 			</div>

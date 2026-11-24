@@ -111,6 +111,29 @@
 	opacity: 0.55;
 }
 
+.kd-group + .kd-group {
+	margin-top: 12px;
+}
+.kd-group-head {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 6px;
+	font-size: 12px;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	color: #f4d57e;
+}
+.kd-building[data-locked='true'] {
+	opacity: 0.4;
+}
+.kd-note {
+	margin: 2px 0 6px;
+}
+.kd-stats + .kd-stats {
+	margin-top: 10px;
+}
+
 .kd-sub {
 	color: #a89878;
 	font-size: 11px;
