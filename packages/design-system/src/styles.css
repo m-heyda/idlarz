@@ -989,7 +989,8 @@
 }
 
 .ds-tip-wide .ds-tip-keys {
-	gap: 6px;
+	gap: 4px 6px;
+	flex-wrap: wrap;
 	font-size: 10px;
 }
 

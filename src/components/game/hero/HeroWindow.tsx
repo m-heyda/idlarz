@@ -446,7 +446,13 @@ const CraftingBag: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCra
 					<HoverTip
 						key={entry.id}
 						tip={
-							<Tooltip className='ds-tip-wide' title={entry.name} icon={entry.icon} subtitle={KIND_LABEL[entry.kind]}>
+							<Tooltip
+								className='ds-tip-wide'
+								rarity={entry.tier ? TIER_RARITY[entry.tier] : 'common'}
+								title={entry.name}
+								icon={entry.icon}
+								subtitle={KIND_LABEL[entry.kind]}
+							>
 								{entry.about ? <TipLine>{entry.about}</TipLine> : null}
 								<TipRows rows={[{ label: 'You hold', value: formatNumber(entry.qty) }]} />
 								<div className='ds-tip-keys'>
@@ -464,7 +470,7 @@ const CraftingBag: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCra
 											<span>
 												<span className='ds-kbd'>Click</span>craft with it
 											</span>
-											<span>Kept here for recipes: it cannot be sold or taken out</span>
+											<span style={{ whiteSpace: 'normal' }}>Kept here for recipes: it cannot be sold or taken out</span>
 										</>
 									)}
 								</div>
