@@ -75,6 +75,20 @@ It refuses (and `--force-fresh` cannot override) a wrong e-mail, a missing profi
 3. Once nobody can still hold the old shape (the first reset has run for everyone who matters), delete `upgradeStoredBank` in `src/lib/offline/tickets.ts` (IDL-281). Not before.
 4. From now on every PR follows the save-compatibility rule in `CLAUDE.md` and `docs/plan/save-compatibility.md`.
 
+## A later chapter on demand (decided 2026-11-24)
+
+The 1.0 release does **not** reset anyone. The mechanism stays ready for a later date: nothing runs until `GAME_EPOCH` is raised again (2 to 3, one line in `src/config/epoch.ts`, merged on its own, same as the flip above). It differs from the first chapter in two things (`isLaterChapter`, JSDoc of `startNewChapter`):
+
+| Thing | First chapter (1 to 2, done) | Later chapter (2 to 3 and on) |
+| --- | --- | --- |
+| Gems | set to exactly 1000 | **kept as they are** |
+| Achievements | all deleted | all deleted **except the tester marks** (`early_tester`, `beta_tester`), so the tester avatar stays pickable |
+| Everything else (save, map, kills, glossary, tutorial, Idols, bag and gear, rankings row) | wiped, old game archived first | the same |
+
+Known side effects to weigh before you pull the trigger: the counters are zeroed, so the other achievements can be earned and claimed again for their gems; gem-shop purchases (`gemShop` in the ledger) are reset; the archive of each chapter is a separate pinned `epoch_archive` row, never trimmed (the row is matched by revision **and** save time, so a second archive never lands on the first).
+
+Before a later flip: run the same checks as "Before release day" (`check-live-saves`, the rehearsal on the test account with `GAME_EPOCH` raised on a preview, a stale second tab refused with 412). **`LOOT_SECRET` does not need rotating** for a reset: the new run id already makes every sealed roll new. Rolling back is the same one-line PR (set the number back; accounts that already reset stay reset).
+
 ## If something goes wrong
 
 - **A wave of errors on the chapter screen**: set `GAME_EPOCH` back to 1 in a one-line PR and deploy. The mechanism goes dark (nobody needs a reset, nothing is refused). Accounts that already reset stay reset, and their old game is in the `epoch_archive` row.
