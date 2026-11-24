@@ -737,9 +737,7 @@
 				"wool": 0,
 				"gems": 0
 			},
-			"ratsLeft": [
-				3
-			],
+			"ratsLeft": [3],
 			"king": 5,
 			"retryAt": {},
 			"potions": {

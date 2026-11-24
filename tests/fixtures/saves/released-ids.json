@@ -1293,22 +1293,8 @@
 		"tithe",
 		"packrat2"
 	],
-	"farmUpgradeIds": [
-		"feed",
-		"coop",
-		"dairy",
-		"tannery",
-		"shearing",
-		"pasture",
-		"pen",
-		"rooster"
-	],
-	"animalIds": [
-		"chicken",
-		"sheep",
-		"pig",
-		"cow"
-	],
+	"farmUpgradeIds": ["feed", "coop", "dairy", "tannery", "shearing", "pasture", "pen", "rooster"],
+	"animalIds": ["chicken", "sheep", "pig", "cow"],
 	"emberUpgradeIds": [
 		"thrift",
 		"builders",
@@ -1349,44 +1335,10 @@
 		"nightshift",
 		"thrifty"
 	],
-	"playerClassIds": [
-		"warrior",
-		"paladin",
-		"ranger",
-		"mage"
-	],
-	"rarityIds": [
-		"common",
-		"uncommon",
-		"rare",
-		"epic",
-		"legendary",
-		"unique"
-	],
-	"equipmentSlots": [
-		"head",
-		"shoulder",
-		"chest",
-		"hands",
-		"legs",
-		"feet",
-		"neck",
-		"cape",
-		"ring1",
-		"ring2",
-		"charm",
-		"belt",
-		"mainHand",
-		"offHand"
-	],
-	"buffFamilyIds": [
-		"might",
-		"haste",
-		"ironskin",
-		"keenEye",
-		"fortitude",
-		"warding"
-	],
+	"playerClassIds": ["warrior", "paladin", "ranger", "mage"],
+	"rarityIds": ["common", "uncommon", "rare", "epic", "legendary", "unique"],
+	"equipmentSlots": ["head", "shoulder", "chest", "hands", "legs", "feet", "neck", "cape", "ring1", "ring2", "charm", "belt", "mainHand", "offHand"],
+	"buffFamilyIds": ["might", "haste", "ironskin", "keenEye", "fortitude", "warding"],
 	"limits": {
 		"hard.monsterGrowthLevels": 40,
 		"hard.merchantOffers": 12,
