@@ -60,7 +60,7 @@ import { clampPrestige, settleEmbers } from './emberModel';
 import { stampShopFromServer } from '@/lib/emberShopMigration';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { rebirthRecordOf, type RebirthRecord } from './rebirthHistory';
-import { gemBuildersOf } from '@/config/gemShop';
+import { gemBuildersOf, gemCraftOf } from '@/config/gemShop';
 import type { PrestigeState } from '@/types/game';
 import { calculateLevel, reconcileCharacter } from '@/utils/game/character';
 import { restoreMerchantLevels, sameRunAs, trustedEconomy } from './trustedEconomy';
@@ -348,7 +348,15 @@ export const acceptSave = async (
 			summary = summarize(state);
 	}
 	summary.derived.xpBase = xpVerdict.base;
-	const flags = verifyTransition(previous, sent ?? claimed, nowMs, grants, ledger?.legacy.idols, ledgerUsable ? gemBuildersOf(ledger?.gemShop.bought) : 1); // judged as the player sent it (the XP check flags a clamp)
+	const flags = verifyTransition(
+		previous,
+		sent ?? claimed,
+		nowMs,
+		grants,
+		ledger?.legacy.idols,
+		ledgerUsable ? gemBuildersOf(ledger?.gemShop.bought) : 1,
+		ledgerUsable ? gemCraftOf(ledger?.gemShop.bought).slots : 1,
+	); // judged as the player sent it (the XP check flags a clamp)
 	// a save may still hold the balance from before a gem purchase (it was on its way when the shop sold something): `spentSinceSave` is what the ledger allows above its own balance
 	if (ledger && gemsClaimed > ledger.gems + ledger.gemShop.spentSinceSave) flags.push('gems_increase');
 	if (emberVerdict.clamped) flags.push('ember_jump');

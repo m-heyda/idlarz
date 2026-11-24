@@ -228,6 +228,14 @@ export const copiesAllowed = (def: Pick<BuildingDef, 'kind' | 'copies'> | undefi
 			? Math.max(1, Math.min(HARD_LIMITS.buildingCopies, def.copies ?? 1))
 			: Math.max(1, Math.min(HARD_LIMITS.buildingCopies, Math.floor(buildingCopies)));
 
+/** The most copies of one Producer or Extractor standing on the map (0 when there is none): the number the server checks against what the account can own. */
+export const maxCopiesOf = (tiles: World): number => {
+	const counts = new Map<string, number>();
+	for (const b of builtBuildings(tiles))
+		if (buildingDef(b.id)?.kind === 'producer' || buildingDef(b.id)?.kind === 'extractor') counts.set(b.id, (counts.get(b.id) ?? 0) + 1);
+	return Math.max(0, ...counts.values());
+};
+
 /** How many of building `id` stand on the map or are waiting to be built (a first Idol build is a running upgrade without a tile level yet). */
 export const copiesOf = (ctx: Pick<BuildingContext, 'tiles' | 'buildingUpgrades'>, id: string): number =>
 	builtBuildings(ctx.tiles).filter((b) => b.id === id).length + ctx.buildingUpgrades.filter((u) => u.building === id).length;

@@ -683,3 +683,19 @@ test('general buildings: stand on any land except the lake, each level of each c
 		assert.equal(idolEconomy(api().tiles).damagePct, 5, 'level 4 + level 1');
 	});
 });
+
+test('building_copies: a save with four copies of one Producer is flagged unless the ledger holds the Gem shop slot; three are fine', () => {
+	withBuildings(() => {
+		const [a, b, c, d] = gameWith('forest', 4, 5);
+		for (const t of [a, b, c, d]) api().buildBuilding(t.x, t.y, 'lumberyard');
+		const T0 = 1_000_000;
+		const first = summarize(pickPersisted(api()));
+		assert.equal(first.derived.maxCopies, Math.max(1, builtBuildings(api().tiles).length));
+		const flags = (summary: typeof first, slots: number) => verifyTransition({ summary, serverSavedAt: T0 }, summary, T0 + 5000, undefined, {}, 0, slots);
+		const four = { ...first, derived: { ...first.derived, maxCopies: 4 } };
+		const three = { ...first, derived: { ...first.derived, maxCopies: 3 } };
+		assert.equal(flags(four, 0).includes('building_copies'), true);
+		assert.equal(flags(four, 1).includes('building_copies'), false, 'the Gem shop slot allows the fourth');
+		assert.equal(flags(three, 0).includes('building_copies'), false);
+	});
+});

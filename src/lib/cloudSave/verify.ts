@@ -64,6 +64,7 @@ export type SaveFlag =
 	| 'prestige_regress'
 	| 'castle_jump'
 	| 'timer_jump'
+	| 'building_copies'
 	| 'ember_jump';
 
 /**
@@ -104,6 +105,7 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	prestige_regress: 'flag', // a New Game or an older save
 	castle_jump: 'flag', // recorded only: a castle or building level is paid as claimed, what it cost is judged by `networth_exceeds` (a browser left open or put to sleep, an auto-clicker or a save that came late are normal play)
 	timer_jump: 'flag',
+	building_copies: 'flag', // more copies of a Producer or Extractor than the account can own: recorded only
 	ember_jump: 'clamp',
 };
 
@@ -340,6 +342,7 @@ export const verifyTransition = (
 	grants?: GrantTotals,
 	trustedIdols?: Record<string, number>,
 	gemBuilders = 0,
+	gemSlots = 0,
 ): SaveFlag[] => {
 	const flags = new Set<SaveFlag>();
 
@@ -369,6 +372,8 @@ export const verifyTransition = (
 	const trustedAt = before.derived.trustedAt;
 	const frozen: FrozenCheck | null =
 		trustedAt === undefined ? null : { sinceTrustedSec: Math.max(0, (nowMs - trustedAt) / 1000), trustedIdols: trustedIdols ?? {}, gemBuilders };
+	// the Ember shop's two Building Slot levels are the save's own claim, the Gem shop's slot is the ledger's: without it a save may hold three copies at most
+	if ((next.derived.maxCopies ?? 0) > 3 + Math.max(0, Math.min(1, gemSlots))) flags.add('building_copies');
 	if (sameRun && castleJumped(before, next, timerSec, frozen)) flags.add('castle_jump');
 	if (sameRun && timerJumped(before, next, timerSec, trustedIdols, gemBuilders, frozen)) flags.add('timer_jump');
 
