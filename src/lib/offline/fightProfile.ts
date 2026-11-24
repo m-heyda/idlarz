@@ -10,7 +10,9 @@ import { bagCountOf } from '@/lib/offline/inventory';
 import { recordEncounter } from '@/lib/offline/stats';
 import type { MonsterTicket } from '@/lib/offline/tickets';
 import type { Inventory } from '@/lib/offline/types';
-import { estimateWin, type PotionStock } from '@/lib/offline/winChance';
+import { estimateWin, type MasteryEdge, type PotionStock } from '@/lib/offline/winChance';
+import { masteryBonusesFor } from '@/lib/mastery';
+import type { Ledger } from '@/lib/offline/ledger';
 import type { MonsterType } from '@/types/game';
 
 // SERVER ONLY. The numbers a fight is judged on: the player's profile (frozen into a fight when it starts), the monster's stats at its level,
@@ -29,22 +31,38 @@ export const potionsForEstimate = (inv: Inventory, c: CombatState, autoUseOwned:
  * line, so a player who is still resting is not judged on a low HP) and the potions auto-use would drink. A click on a monster skips this.
  */
 export const winnableBy =
-	(profile: PlayerProfile, hp: number, potions: PotionStock[]) =>
+	(profile: PlayerProfile, hp: number, potions: PotionStock[], masteryOf?: MasteryOf) =>
 	(type: MonsterType, level: number): boolean =>
-		estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions).chance >= COMBAT.auto.minWinChance;
+		estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions, masteryOf?.(type)).chance >= COMBAT.auto.minWinChance;
 
 /**
  * The win estimate of one monster as a whole percent (0-100), judged like {@link winnableBy} (HP at least the resume line, the potions auto-use would
  * drink). The Next strip shows it as a bucket ({@link winBucketOf}) with the exact value on hover; the browser never recomputes it.
  */
 export const winPctBy =
-	(profile: PlayerProfile, hp: number, potions: PotionStock[]) =>
+	(profile: PlayerProfile, hp: number, potions: PotionStock[], masteryOf?: MasteryOf) =>
 	(type: MonsterType, level: number): number =>
-		Math.round(estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions).chance * 100);
+		Math.round(estimateWin(profile, Math.max(hp, resumeHpOf(profile)), type, level, potions, masteryOf?.(type)).chance * 100);
+
+/** The mastery edge the ledger's claimed tiers give against a monster type (what the fight itself applies), for the estimates above. */
+export const masteryOfLedger =
+	(ledger: Ledger): MasteryOf =>
+	(type) => {
+		const totals = masteryBonusesFor(type, ledger.stats.masteryClaimed, ledger.stats.biomeClaimed);
+		return { damage: totals.damage, defense: totals.defense };
+	};
+
+/** Asks for the mastery edge against a monster type */
+export type MasteryOf = (type: MonsterType) => MasteryEdge;
 
 /** What auto-battle checks a monster against: the numbers it would fight with and the potions auto-use would drink. */
 export const winnable = (ctx: FightCtx) =>
-	winnableBy(ctx.profileNow, ctx.c.hp, potionsForEstimate(ctx.ledger.inv!, ctx.c, autoUseUnlocked(ctx.ledger.rebirths, prestigeOfCore(ctx.env.stored.core))));
+	winnableBy(
+		ctx.profileNow,
+		ctx.c.hp,
+		potionsForEstimate(ctx.ledger.inv!, ctx.c, autoUseUnlocked(ctx.ledger.rebirths, prestigeOfCore(ctx.env.stored.core))),
+		masteryOfLedger(ctx.ledger),
+	);
 
 /** The HP at which a rested hero starts the next fight (auto-battle's pick or the queue's head). */
 export const resumeHpOf = (profile: PlayerProfile): number => (profile.maxHp * COMBAT.auto.resumeHpPct) / 100;

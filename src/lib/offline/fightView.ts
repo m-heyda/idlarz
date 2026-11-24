@@ -4,7 +4,7 @@ import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
 import { autoUseUnlocked } from '@/lib/combat';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
-import { potionsForEstimate, resumeHpOf, winnableBy, winPctBy } from '@/lib/offline/fightProfile';
+import { masteryOfLedger, potionsForEstimate, resumeHpOf, winnableBy, winPctBy } from '@/lib/offline/fightProfile';
 import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fightTargets';
 import { projectFight } from '@/lib/offline/fightProject';
 import type { CombatView, FightPlan } from '@/lib/offline/fightTypes';
@@ -35,6 +35,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 			p,
 			c.hp,
 			potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, autoUseUnlocked(ledger.rebirths, prestigeOfCore(env.stored.core))),
+			masteryOfLedger(ledger),
 		);
 		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
 		const resume = resumeHpOf(p);
@@ -75,7 +76,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 				}
 			: null,
 		...(plan ? { plan } : {}),
-		queue: queueView(ledger, c, winPctBy(p, c.hp, potions)),
+		queue: queueView(ledger, c, winPctBy(p, c.hp, potions, masteryOfLedger(ledger))),
 		queueMax: limitOf('battleQueue'),
 		autoBattle: c.autoBattle,
 		autoUse: c.autoUse,
