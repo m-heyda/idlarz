@@ -60,6 +60,7 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Elixir of Ironskin | potion | 20 | 1 Herb Extract + 1 Iron Ingot + 3 Wet Clay + 1 Glass Vial + 100 Iron Ore | 10659 | 100 | - | - | 80 | 133.2 |
 | Elixir of Fortitude | potion | 22 | 2 Vital Extract + 4 Wild Grapes + 1 Glass Vial + 100 Herbs | 8147.5 | 95 | - | - | 90 | 90.5 |
 | Elixir of the Keen Eye | potion | 24 | 1 Fungal Extract + 1 Cut Jasper + 2 Glowberry + 1 Glass Vial + 100 Sap | 8229 | 145 | - | - | 100 | 82.3 |
+| Elixir of Arcana | potion | 26 | 2 Arcane Essence + 3 Glowberry + 1 Glass Vial + 100 Herbs | 5233.5 | 110 | - | - | 110 | 47.6 |
 | Elixir of Time Shift | potion | 70 | 5 Hourglass Sand + 5 Gold Ingot + 3 Cut Crystal + 1 Glass Vial + 8000000 Wood + 6000000 Stone + 6000000 Coal + 10000000 Food | 22116719.4 | 1000 | - | - | 500 | 44233.4 |
 | Elixir of Warding | potion | 30 | 1 Arcane Essence + 1 Cut Moonstone + 1 Vital Extract + 1 Glass Vial + 100 Frostshard | 12545.8 | 650 | - | - | 140 | 89.6 |
 | Dawnsplitter | legendary | 80 | 2000000000 Wood + 1500000000 Stone + 500 Plank Bundle + 50 War Medal | 2854541300 | 45000 | - | - | 100000 | 28545.4 |
@@ -144,6 +145,7 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Elixir of Ironskin | 50 | 72 | 5,760 | 767,448 | 833333333.3 | 13888888.9 |
 | Elixir of Fortitude | 50 | 72 | 6,480 | 586,620 | 833333333.3 | 13888888.9 |
 | Elixir of the Keen Eye | 55 | 65 | 6,545 | 538,625 | 916666666.7 | 15277777.8 |
+| Elixir of Arcana | 55 | 65 | 7,200 | 342,556 | 916666666.7 | 15277777.8 |
 | Elixir of Time Shift | 600 | 6 | 3,000 | 132,700,316 | 10000000000 | 166666666.7 |
 | Elixir of Warding | 60 | 60 | 8,400 | 752,748 | 1000000000 | 16666666.7 |
 | Dawnsplitter | 28800 | 0 | 12,500 | 356,817,663 | 480000000000 | 8000000000 |
