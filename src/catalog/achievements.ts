@@ -90,8 +90,6 @@ export interface AchievementRewards {
 	titleName?: string;
 	/** Deed points this tier adds once claimed (the Hall of Deeds total; absent: 0). Placeholder numbers until the balance pass. */
 	points?: number;
-	/** A bonus the tier will grant, as the text the window shows. **Placeholder only**: no stat bonus is applied until the bonus model exists (IDL-310). */
-	bonus?: string;
 }
 
 export interface AchievementDef {
@@ -224,7 +222,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		badge: 'badge_early_tester_wireframe',
 		rewards: { gems: 200, avatarId: 'beta_tester', titleId: 'beta-tester', points: 50 },
 	},
-	// The tiers of the Hall of Deeds (IDL-306), appended after the launch list. Goals are the mockup's; gems and points are placeholders until the balance pass (IDL-310) and bonuses are text only.
+	// The tiers of the Hall of Deeds (IDL-306), appended after the launch list. Goals are the mockup's; gems and points are placeholders until the balance pass (IDL-310).
 	{
 		id: 'slayer_100',
 		title: 'Slayer I',
@@ -239,7 +237,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Defeat 500 monsters.',
 		when: { kind: 'kills', min: 500 },
 		badge: 'badge_skull_bronze',
-		rewards: { gems: 75, points: 25, bonus: '+1% gold' },
+		rewards: { gems: 75, points: 25 },
 	},
 	{
 		id: 'slayer_2500',
@@ -247,7 +245,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Defeat 2,500 monsters.',
 		when: { kind: 'kills', min: 2500 },
 		badge: 'badge_skull_bronze',
-		rewards: { gems: 100, points: 50, bonus: '+2% gold' },
+		rewards: { gems: 100, points: 50 },
 	},
 	{
 		id: 'slayer_10000',
@@ -271,7 +269,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Slay 200 Mossback Wolves.',
 		when: { kind: 'kill', monster: 'mossbackWolf', min: 200 },
 		badge: 'badge_sword_silver',
-		rewards: { gems: 75, points: 15, bonus: '+2% hide' },
+		rewards: { gems: 75, points: 15 },
 	},
 	{
 		id: 'wolfsbane_1000',
@@ -279,7 +277,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Slay 1,000 Mossback Wolves.',
 		when: { kind: 'kill', monster: 'mossbackWolf', min: 1000 },
 		badge: 'badge_sword_silver',
-		rewards: { gems: 100, points: 40, bonus: 'wolf pet', titleId: 'wolfsbane', titleName: 'Wolfsbane' },
+		rewards: { gems: 100, points: 40, titleId: 'wolfsbane', titleName: 'Wolfsbane' },
 	},
 	{
 		id: 'untouched_1',
@@ -295,7 +293,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Win 25 fights without taking damage.',
 		when: { kind: 'flawless', min: 25 },
 		badge: 'badge_shield_silver',
-		rewards: { gems: 75, points: 20, bonus: '+1% dodge' },
+		rewards: { gems: 75, points: 20 },
 	},
 	{
 		id: 'untouched_100',
@@ -327,7 +325,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 500 tiles.',
 		when: { kind: 'tiles', min: 500 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 125, points: 40, bonus: '-1% tile cost' },
+		rewards: { gems: 125, points: 40 },
 	},
 	{
 		id: 'landlord_1000',
@@ -335,7 +333,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Buy 1,000 tiles.',
 		when: { kind: 'tiles', min: 1000 },
 		badge: 'badge_map_flag_bronze',
-		rewards: { gems: 150, points: 100, bonus: '-3% tile cost', titleId: 'landlord', titleName: 'Landlord' },
+		rewards: { gems: 150, points: 100, titleId: 'landlord', titleName: 'Landlord' },
 	},
 	{
 		id: 'hoarder_100k',
@@ -351,7 +349,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Hold 1,000,000 gold at once.',
 		when: { kind: 'goldPeak', min: 1_000_000 },
 		badge: 'badge_chest_bronze',
-		rewards: { gems: 75, points: 20, bonus: '+1% gold find' },
+		rewards: { gems: 75, points: 20 },
 	},
 	{
 		id: 'hoarder_10m',
@@ -375,7 +373,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Sell 10,000,000 resources to the merchant.',
 		when: { kind: 'unitsSold', min: 10_000_000 },
 		badge: 'badge_star_silver',
-		rewards: { gems: 75, points: 20, bonus: '+1% sell price' },
+		rewards: { gems: 75, points: 20 },
 	},
 	{
 		id: 'market_100m',
@@ -399,7 +397,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Craft 1,000 items.',
 		when: { kind: 'crafted', min: 1000 },
 		badge: 'badge_hammer_bronze',
-		rewards: { gems: 75, points: 20, bonus: '+5% craft speed' },
+		rewards: { gems: 75, points: 20 },
 	},
 	{
 		id: 'smith_10000',
@@ -439,7 +437,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		description: 'Fill 15 bestiary entries.',
 		when: { kind: 'entries', kills: MASTERY_ENTRY_KILLS, min: 15 },
 		badge: 'badge_scroll_check_silver',
-		rewards: { gems: 75, points: 25, bonus: '+5% XP' },
+		rewards: { gems: 75, points: 25 },
 	},
 	{
 		id: 'scholar_30',

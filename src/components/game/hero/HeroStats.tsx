@@ -19,6 +19,8 @@ import { gearAttributes } from '@/lib/gearAttributes';
 import { gearIncomePct } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { useRememberedOpen } from '@/hooks/useRememberedOpen';
+import { useAchievementStore } from '@/stores/achievementStore';
+import { deedBonuses } from '@/lib/deeds';
 import { useCraftStore } from '@/stores/craftStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -123,6 +125,7 @@ const resourceIcon = (key: string): string | undefined => {
  */
 const HeroStats: React.FC = () => {
 	const craftXp = useCraftStore((state) => state.craft?.xp ?? 0);
+	const milestonesClaimed = useAchievementStore((state) => state.milestonesClaimed);
 	const addStatPoint = useGameStore((state) => state.addStatPoint);
 	const resourceRates = useGameStore((state) => state.resourceRates);
 	const tiles = useGameStore((state) => state.tiles);
@@ -195,6 +198,7 @@ const HeroStats: React.FC = () => {
 		{ label: 'Life leech', value: pct(fx.lifeLeech, 1), color: I.red },
 	];
 
+	const deedBonusesNow = deedBonuses(milestonesClaimed);
 	const bonuses: PaperRowData[] = [
 		{ label: 'Luck', value: formatCompact(fx.luck), color: I.purple },
 		{ label: 'Chest rate (Luck)', value: `+${pct(fx.chestRateBonus, 1)}`, color: I.green },
@@ -207,6 +211,9 @@ const HeroStats: React.FC = () => {
 		{ label: COMBAT_NAMES.spellPower, value: pct(fx.spellPower, 1), color: I.purple },
 		{ label: 'XP gain', value: pct(fx.xpGain, 2), color: I.green },
 		{ label: 'Tile discount', value: pct(fx.tileDiscount, 2), color: I.blue },
+		...(deedBonusesNow.gold > 0 || deedBonusesNow.xp > 0
+			? [{ label: 'Hall of Deeds (milestones)', value: `+${deedBonusesNow.gold}% kill gold, +${deedBonusesNow.xp}% kill XP`, color: I.gold }]
+			: []),
 		...(fx.gearIncome > 0 ? [{ label: 'Income (set bonus)', value: `+${pct(fx.gearIncome, 0)}`, color: I.green }] : []),
 		...(fx.killRewards > 0 ? [{ label: 'Kill rewards (set bonus)', value: `+${pct(fx.killRewards, 0)} gold and XP`, color: I.green }] : []),
 		...(fx.gearClick > 0 ? [{ label: 'Click gold (set bonus)', value: `+${pct(fx.gearClick, 0)}`, color: I.green }] : []),
