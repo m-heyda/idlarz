@@ -105,6 +105,28 @@ export const TRADE_GOODS: ItemDef[] = [
 		sellValue: 62,
 		description: 'A small wooden charm with a stone eye. Sold, not worn.',
 	},
+	{
+		id: 'herb_crate',
+		name: 'Herb Crate',
+		kind: 'consumable',
+		rarity: 'common',
+		tier: 0,
+		stackMax: 100,
+		icon: 'res_herbs',
+		sellValue: 9_800,
+		description: 'A packed crate of dried herbs and sap, sealed for the apothecaries. Sold, not used.',
+	},
+	{
+		id: 'trade_pack',
+		name: 'Trade Pack',
+		kind: 'consumable',
+		rarity: 'common',
+		tier: 0,
+		stackMax: 100,
+		icon: 'res_pearls',
+		sellValue: 11_800,
+		description: 'Iron ore, salt and pearls bundled for the far markets. Caravans pay well for it. Sold, not used.',
+	},
 ];
 
 export type RecipeInput = { resource: MerchantResourceKey; qty: number } | { component: string; qty: number };
@@ -262,6 +284,34 @@ export const RECIPES: Recipe[] = [
 		unlock: 8,
 		xp: 18,
 		timeSec: 30,
+	},
+	// the biome extracts also have a market: a crate or a pack of them sells for about what they are worth in a recipe (at most 1.4x their craft value), a sink for what the Extractors make beyond what upgrades and crafts eat
+	{
+		id: 'herb_crate',
+		kind: 'good',
+		name: 'Herb Crate',
+		inputs: [
+			{ resource: 'herbs', qty: 100 },
+			{ resource: 'sap', qty: 50 },
+		],
+		output: { item: 'herb_crate', qty: 1 },
+		unlock: 20,
+		xp: 40,
+		timeSec: 60,
+	},
+	{
+		id: 'trade_pack',
+		kind: 'good',
+		name: 'Trade Pack',
+		inputs: [
+			{ resource: 'ironOre', qty: 60 },
+			{ resource: 'salt', qty: 60 },
+			{ resource: 'pearls', qty: 60 },
+		],
+		output: { item: 'trade_pack', qty: 1 },
+		unlock: 32,
+		xp: 60,
+		timeSec: 90,
 	},
 ];
 RECIPES.push(...REFINED_RECIPES);

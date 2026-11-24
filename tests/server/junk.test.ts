@@ -135,3 +135,22 @@ test('markJunk sets and clears the flag on a bag piece, refuses anything else, a
 	assert.ok(cleared.ok);
 	assert.equal(sellJunkRule(cleared.inv, ctx).ok, false);
 });
+
+test('a chest also holds gems and ore for the crafting bag (IDL-358): none under their minimum level, and a plain kill never drops them', async () => {
+	const { rollJunkLoot } = await import('../../src/lib/loot/junkDrops');
+	const roll = (level: number, chest: boolean) => {
+		const found = new Set<string>();
+		for (let n = 0; n < 4000; n++) {
+			let i = 0;
+			const rng = () => ((n * 7919 + i++ * 104729) % 10007) / 10007;
+			for (const key of Object.keys(rollJunkLoot({ level, gold: 100, luck: 100, boss: false, lucky: false, chest }, rng).stash)) found.add(key);
+		}
+		return found;
+	};
+	const high = roll(60, true);
+	assert.ok(high.has('ing_copper_ore') && high.has('ing_jasper'), 'the common stones come');
+	assert.ok(high.has('ing_ruby') || high.has('ing_sapphire'), 'and the finest gems are possible at the top');
+	const low = roll(2, true);
+	assert.ok(!['ing_copper_ore', 'ing_flint', 'ing_iron_ore', 'ing_jasper', 'ing_ruby'].some((id) => low.has(id)), 'a level 2 chest holds none of them');
+	assert.equal(roll(60, false).has('ing_jasper'), false, 'a plain kill without a type never drops them');
+});

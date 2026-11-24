@@ -9,7 +9,7 @@ import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
 import { LOOT_SOURCES } from '@/catalog/lootConfig';
-import { resolveSourceLevel, rollJunkDrops } from '@/lib/loot';
+import { resolveSourceLevel, rollJunkLoot } from '@/lib/loot';
 import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import { clearBuffsOnRebirth } from '@/lib/buffs';
@@ -216,16 +216,19 @@ export const redeemChest = (
 			const loot = rolled.kind === 'xp' ? { ...rolled, xp: Math.floor(rolled.xp * (1 + stored.summary.xpGainPct / 100)) } : rolled;
 			const gems = rollGemFind(luck, rng);
 			// every chest also holds some junk materials (IDL-312), rolled last so the reward above is the one it always was; the level is the chest's own
-			const junkDrops = rollJunkDrops(
+			const junkRoll = rollJunkLoot(
 				{
 					level: resolveSourceLevel(LOOT_SOURCES.chest.level!, stored.summary.castleLevel),
 					gold: stored.summary.rates.gold * 600,
 					luck,
 					boss: false,
 					lucky: false,
+					chest: true,
 				},
 				rng,
 			);
+			const junkDrops = junkRoll.drops;
+			const finds = stashIn(ledger.craft.stock, junkRoll.stash); // the gems and ore of the chest go into the crafting bag
 
 			const granted: Partial<GrantTotals> = { gems };
 			if (loot.kind === 'gold' || loot.kind === 'boost') granted.gold = loot.gold;
@@ -251,6 +254,7 @@ export const redeemChest = (
 				bank: taken.bank,
 				ordChest,
 				stats: recordChest(ledger.stats),
+				craft: Object.keys(finds.stored).length > 0 ? { ...ledger.craft, stock: finds.stock } : ledger.craft,
 				inv,
 				gems: Math.min(GEMS_CAP, ledger.gems + gems),
 				granted: addTotals(ledger.granted, granted),
@@ -266,6 +270,7 @@ export const redeemChest = (
 					serverNowSec: nowSec,
 					...(received ? { received } : {}),
 					junk: junkIn.received.stored,
+					...(Object.keys(finds.stored).length > 0 ? { finds: finds.stored } : {}),
 				},
 			};
 		},

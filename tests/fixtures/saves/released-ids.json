@@ -481,7 +481,9 @@
 		"elixir_time_shift",
 		"junk_hourglass_sand",
 		"junk_ichor",
-		"junk_war_medals"
+		"junk_war_medals",
+		"herb_crate",
+		"trade_pack"
 	],
 	"affixIds": [
 		"damage_prefix",
@@ -852,7 +854,9 @@
 		"legendary_stormstring",
 		"legendary_starlight_wand",
 		"ichor",
-		"war_medals"
+		"war_medals",
+		"herb_crate",
+		"trade_pack"
 	],
 	"componentIds": [
 		"glass_vial",

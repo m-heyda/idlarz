@@ -121,6 +121,8 @@ export type ChestReward =
 			received?: { convertedGold: number; autoSold: { count: number; gold: number } };
 			/** The junk materials the chest held on top of its reward (already in the bag; the gold of what did not fit is in `received`) */
 			junk?: Drop[];
+			/** The gems and ore the chest held for the crafting bag (crafting bag key -> amount; already stored) */
+			finds?: Record<string, number>;
 			inv?: Inventory;
 	  }
 	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };
