@@ -1,5 +1,5 @@
 // Geometry of the farm pasture: an isometric fenced pen on an endless repeating meadow, shown at a whole-pixel zoom and centred in the Farm window.
-// The parts (fence, barn, troughs ...) are loose PNGs from scripts/pixel/farm_parts.py laid out by farmLayout.ts from the lists below; animals walk on the
+// The parts (fence, barn, tubs ...) are loose PNGs from scripts/pixel/farm_parts.py laid out by farmLayout.ts from the lists below; animals walk on the
 // ground plane and are projected with the same camera. `PEN` is the frame whose centre is the window's centre.
 
 export const PEN = {
@@ -19,41 +19,28 @@ export const project = (gx: number, gy: number) => ({
 	y: PEN.oy - (gx + gy) * 0.3536 * PEN.scale,
 });
 
-// The props of the pasture: x, y (and the long side of a trough)
-export const TROUGHS: [number, number, 'x' | 'y'][] = [
-	[-3.3, 1.4, 'x'],
-	[8, -1.5, 'y'],
-	[-6, -7, 'x'],
-	[4, 10.5, 'x'],
-	[13.5, 11.5, 'x'],
-	[-7, -1, 'y'],
-	[1, -10, 'x'],
+// The props of the pasture (ground position x, y). Their art is the farm_rework set baked down in public/pixel/farm/: water tubs, a stone well, hay, barrels, log piles.
+export const TUBS: [number, number][] = [
+	[-3.3, 1.4],
+	[11, -1.5],
+	[-6, -7],
+	[4, 10.5],
 ];
-export const TANKS: [number, number][] = [
-	[-9, 9],
-	[11.5, 2.5],
-	[6, 13],
-	[-1, -4],
-];
+export const WELLS: [number, number][] = [[-9, 9]];
 export const HAY: [number, number][] = [
 	[-6, 7],
 	[10, 2],
 	[2, -6],
-	[-5, -3.5],
 	[-11, -1],
 	[14.5, 13],
-	[-3, -11],
 ];
 export const BARRELS: [number, number][] = [
 	[11.6, 5.6],
-	[12.4, 6.5],
-	[11.5, 7],
 	[-3.4, 9.2],
 	[-4.1, 9.9],
 ];
 export const CRATES: [number, number][] = [
 	[1.8, 12.4],
-	[2.7, 12.9],
 	[12, 14.2],
 	[-4.8, 12.4],
 ];
@@ -67,6 +54,7 @@ export const SPOTS: [number, number][] = [
 export const BARN = { x: 8.5, y: 8.5 };
 export const COOP = { x: -1, y: 11 };
 export const POND = { x: -12, y: -4 };
+export const STALL = { x: -13, y: 12.5 };
 
 /** Where animals may walk: inside the fence (at +-18), clear of its posts */
 export const BOUNDS = { x: 16.5, y: 16.5 };
@@ -76,14 +64,15 @@ const box = (x: number, y: number, hx: number, hy: number): [number, number, num
 // Rectangles animals keep out of (x0, x1, y0, y1): every prop plus about a body's width round it, so an animal never stands in
 // or on a building, a trough, a hay stack and so on (its feet stay a whole sprite away from the prop's footprint)
 const BLOCKED: [number, number, number, number][] = [
-	box(BARN.x, BARN.y, 3.4, 2.9),
+	box(BARN.x, BARN.y, 3.7, 3.2),
 	box(COOP.x, COOP.y, 2.2, 2.0),
+	box(STALL.x, STALL.y, 2.6, 2.2),
 	box(POND.x, POND.y, 3.3, 3.0),
-	...TROUGHS.map(([x, y, axis]) => (axis === 'x' ? box(x, y, 2.1, 1.5) : box(x, y, 1.5, 2.1))),
-	...TANKS.map(([x, y]) => box(x, y, 1.95, 1.95)),
+	...TUBS.map(([x, y]) => box(x, y, 1.95, 1.95)),
+	...WELLS.map(([x, y]) => box(x, y, 1.9, 1.9)),
 	...HAY.map(([x, y]) => box(x, y, 2.3, 2.3)),
 	...BARRELS.map(([x, y]) => box(x, y, 1.35, 1.35)),
-	...CRATES.map(([x, y]) => box(x, y, 1.4, 1.4)),
+	...CRATES.map(([x, y]) => box(x, y, 1.6, 1.6)),
 ];
 
 /** Animals keep at least this far (world units) from each other */

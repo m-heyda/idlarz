@@ -1,6 +1,6 @@
 # farm_rework (18 isometric props, 200x200, planned)
 
-A second set of farm art for the later **Farm rework 2** (Linear IDL-346). Made by the owner with Sprite Fusion on 2026-11-16, transparent background, isometric view. **Not wired into the game**: nothing reads these files yet. They are listed in Storybook under Assets > Map details with the status *planned*.
+A second set of farm art for the later **Farm rework 2** (Linear IDL-346). Made by the owner with Sprite Fusion on 2026-11-16, transparent background, isometric view. These are the **originals**. The game does not read them: 17 of the 18 are baked down (each at its own scale, 0.2 to 0.5, so props keep their relative size next to the 36 px animals) into `public/pixel/farm/` and laid out by `src/components/game/overlays/farmLayout.ts`. `fence_section` is still unused: it is front-facing, and the pen's fence needs both isometric axes.
 
 The farm that exists today uses `public/pixel/farm/` (smaller, top-down sprites). The new set is bigger (200 px) and isometric, so the rework has to decide scale and perspective before anything is mixed.
 
