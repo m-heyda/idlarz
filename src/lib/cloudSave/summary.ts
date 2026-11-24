@@ -1,7 +1,7 @@
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { worldFacts, type WorldFacts } from '@/lib/worldFacts';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
-import { builderCount, builtBuildings, maxBuildTimeReduction } from '@/lib/buildings';
+import { builderCount, builtBuildings, maxBuildTimeReduction, maxCopiesOf } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
@@ -45,6 +45,8 @@ export interface SaveDerived {
 	buildingUpgrades?: BuildingUpgradeState[];
 	/** Level of each building type on the map (absent while the building system is off): the server judges level changes against `buildingUpgrades` (`timer_jump` in verify.ts) */
 	buildings?: Record<string, number>;
+	/** The most copies of one Producer or Extractor on the map (absent while the building system is off, or when none stands): the server judges it against what the account can own (`building_copies` in verify.ts) */
+	maxCopies?: number;
 	/** For each of `buildingUpgrades`, the per-second rates once that upgrade alone is done (absent while the building system is off) */
 	ratesAfterBuildings?: (Resources | null)[];
 	/** Rows from before several builders: the one running building upgrade and the rates once it is done. Read only (through `derivedJobs`), never written. */
@@ -196,6 +198,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 						ratesAfterBuildings: (state.buildingUpgrades ?? []).map((job) => ratesAfterBuildingUpgrade(state, job)),
 						builders: builderCount({ prestige: state.prestige }),
 						buildings: Object.fromEntries(builtBuildings(state.tiles).map((b) => [b.id, b.level])),
+						maxCopies: maxCopiesOf(state.tiles),
 					}
 				: {}),
 			castleUpgrade: state.castleUpgrade ? { ...state.castleUpgrade } : null,

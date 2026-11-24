@@ -13,8 +13,8 @@
 export const LIMITS = {
 	/** Levels a monster may grow above the level it spawned at */
 	monsterGrowthLevels: 10,
-	/** Seconds of map time per level of growth */
-	monsterGrowthIntervalSec: 1800,
+	/** Seconds of map time per level of growth (900: twice as fast as the first 1,800, owner 2026-11-24, so a monster reaches its growth cap in 2.5 hours) */
+	monsterGrowthIntervalSec: 900,
 	/** Monsters that can wait in the battle queue while a fight is open (@category Combat) */
 	battleQueue: 10,
 	/** Pieces of gear on the merchant's shelf */
@@ -45,8 +45,10 @@ export const LIMITS = {
 	buildingMaxLevel: 5,
 	/** The highest castle level (the Castle Expansion Ember upgrade raises it, one level per upgrade level) */
 	castleMaxLevel: 10,
-	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Builder #2 and the Ember shop's Extra Builder add to it, see `builderCount`) */
+	/** Builders: how many castle or building upgrades can run at once (1 for everyone; the Gem shop's Additional builder (up to 3) and the Ember shop's Extra Builder add to it, see `builderCount`) */
 	builders: 1,
+	/** Copies of one Producer or Extractor on the map (1 for everyone; the Ember shop's Building Slots, two levels, and the Gem shop's Building Slot add one each, 4 at most). Idols stay one per map. */
+	buildingCopies: 1,
 } as const;
 
 export type LimitKey = keyof typeof LIMITS;
@@ -75,4 +77,6 @@ export const HARD_LIMITS = {
 	castleMaxLevel: 15,
 	/** Builders a save may hold timers for: 1 + the Gem shop's one + the Ember shop's, with room to grow */
 	builders: 8,
+	/** Copies of one Producer or Extractor a save may hold: 1 + two Ember levels + the Gem shop's slot */
+	buildingCopies: 4,
 } as const;

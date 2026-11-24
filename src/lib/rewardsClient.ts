@@ -90,6 +90,10 @@ export const requestCraftClaim = (key: string, slot: number | 'all' = 0): Promis
 export const requestCraftWithdraw = (key: string, id: string, qty: number): Promise<Reply<CraftReply>> =>
 	post<CraftReply>('/api/craft/stash', { key, id, qty });
 
+/** The enchant craft: reroll (`affix` = which) or add one affix of the gear in bag slot `index`, for Ichor. */
+export const requestCraftEnchant = (key: string, index: number, mode: 'reroll' | 'add', affix = 0): Promise<Reply<CraftReply>> =>
+	post<CraftReply>('/api/craft/enchant', { key, index, mode, affix });
+
 /** Ends a batch: the finished crafts are delivered, the unfinished ones refunded (the answer names the resources to give back). */
 export const requestCraftCancel = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/cancel', { key, slot });
 

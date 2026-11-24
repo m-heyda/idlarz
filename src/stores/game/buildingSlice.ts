@@ -40,6 +40,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			// the Ember shop's cap raises (Idol Mastery, Master Masonry)
 			idolMax: limitOf('idolMaxLevel', { prestige: s.prestige }),
 			buildingMax: limitOf('buildingMaxLevel', { prestige: s.prestige }),
+			buildingCopies: limitOf('buildingCopies', limitCtx(s)),
 		};
 	};
 

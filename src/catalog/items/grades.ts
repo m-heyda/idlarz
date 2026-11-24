@@ -50,6 +50,20 @@ export const GRADE_INFO: Record<Grade, GradeInfo> = {
  */
 export const LIVE_GRADES: readonly Grade[] = ['G1', 'G2', 'G3', 'G4', 'G5', 'G6'];
 
+/**
+ * The grades whose items exist only for crafting (IDL-152, owner 2026-11-24): G7 (Runed) and G8 (Ancient). Their items are enabled (the Crafting tab can make them) but carry `craftOnly`, so no loot pool but `equipment_craft` ever picks them: nothing drops, the merchant never sells them
+ * and boss, chest and monster tables are untouched. G9 and the special sets stay disabled data (the legendaries come through their own recipes). A grade leaves this list by joining `LIVE_GRADES`.
+ *
+ * @category Loot/Items
+ * @order 5
+ * @see LIVE_GRADES
+ */
+export const CRAFT_ONLY_GRADES: readonly Grade[] = ['G7', 'G8'];
+
+/** What a grade's items are: live grades are plain enabled items, craft-only grades are enabled with `craftOnly`, the rest stay disabled data. */
+export const gradeAvailability = (grade: Grade): { enabled: boolean; craftOnly?: true } =>
+	LIVE_GRADES.includes(grade) ? { enabled: true } : CRAFT_ONLY_GRADES.includes(grade) ? { enabled: true, craftOnly: true } : { enabled: false };
+
 /** The grade an item belongs to, read from its `grade:G3` tag (undefined for the pieces outside the ladder) */
 export const gradeOfItem = (item: { tags?: readonly string[] }): Grade | undefined => {
 	const tag = item.tags?.find((t) => t.startsWith('grade:'));

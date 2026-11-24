@@ -36,7 +36,14 @@ const FarmProps: React.FC<{ zoom: number; stageW: number; stageH: number }> = ({
 					alt=''
 					draggable={false}
 					className='farm-prop'
-					style={{ left: place.left * zoom, top: place.top * zoom, width: place.w * zoom, height: place.h * zoom, zIndex: place.z }}
+					style={{
+						left: place.left * zoom,
+						top: place.top * zoom,
+						width: place.w * zoom,
+						height: place.h * zoom,
+						zIndex: place.z,
+						...(prop.flip ? { transform: 'scaleX(-1)' } : null),
+					}}
 				/>
 			))}
 		</>

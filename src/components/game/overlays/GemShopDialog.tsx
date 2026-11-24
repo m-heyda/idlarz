@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, type GemItem, type GemShopTab } from '@/config/gemShop';
+import { BUILDER_ITEM, GEM_CONFIRM_ABOVE, GEM_SHOP, gemLevelOf, gemMaxedOf, gemNextPrice, type GemItem, type GemShopTab } from '@/config/gemShop';
 import { NICK_EFFECTS, nickColorValue } from '@/config/nickColors';
 import { CHARACTER_NAME_MAX } from '@/lib/authValidation';
 import { useGameStore } from '@/stores/gameStore';
@@ -83,7 +83,7 @@ const GemShopDialog: React.FC = () => {
 
 	/** The state of an item for the row: its price now, and why it cannot be bought (null = it can). */
 	const stateOf = (item: GemItem): { price: number; blocked: string | null } => {
-		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : item.price;
+		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : gemNextPrice(item, info?.bought);
 		if (item.id === 'name_change' && info?.nameChangedAt) {
 			const left = info.nameChangedAt + item.cooldownSec - nowSec;
 			if (left > 0) return { price, blocked: `Again in ${waitText(left)}` };
@@ -92,8 +92,8 @@ const GemShopDialog: React.FC = () => {
 		return { price, blocked: null };
 	};
 
-	/** A one-time item the account already has (bought, or included for an admin account; Builder #2 is never free): the row reads "Owned" */
-	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && ((admin && item.id !== BUILDER_ITEM) || (info?.bought?.[item.id] ?? 0) > 0);
+	/** A one-time item the account already has (bought, or included for an admin account; the Additional builder is never free): the row reads "Owned" */
+	const ownedOf = (item: GemItem): boolean => item.kind === 'once' && ((admin && item.id !== BUILDER_ITEM) || gemMaxedOf(item, info?.bought));
 
 	const buy = async (item: GemItem, value?: string) => {
 		setConfirm(null);
@@ -188,9 +188,9 @@ const GemShopDialog: React.FC = () => {
 			>
 				<UpgradeTile
 					name={item.name}
-					level={owned ? 1 : 0}
-					maxLevel={1}
-					now={owned ? item.blurb : undefined}
+					level={item.tiers ? gemLevelOf(item, info?.bought) : owned ? 1 : 0}
+					maxLevel={item.tiers?.length ?? 1}
+					now={owned || (item.tiers && gemLevelOf(item, info?.bought) > 0) ? item.blurb : undefined}
 					next={owned ? undefined : item.blurb}
 					nowLabel='You have'
 					emptyNow='not owned'

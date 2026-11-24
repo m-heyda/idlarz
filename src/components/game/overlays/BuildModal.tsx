@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
+import { buildingKindLabel } from '@/catalog/buildings';
 import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
 import type { PrestigeState } from '@/types/game';
 import { limitOf } from '@/lib/limits';
@@ -29,7 +30,7 @@ const Art: React.FC<{ def: BuildOption['def'] }> = ({ def }) => (
 const Head: React.FC<{ def: BuildOption['def']; extra?: string; details?: React.ReactNode }> = ({ def, extra, details }) => (
 	<div className='build-head'>
 		<span className='build-name'>{def.label}</span>
-		<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
+		<span className={`build-kind build-kind-${def.kind}`}>{buildingKindLabel(def)}</span>
 		{extra && <span className='build-extra'>{extra}</span>}
 		{details && (
 			<HoverTip tip={details} placement='above' align='center'>
@@ -145,7 +146,7 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const details = (def: BuildOption['def'], remembered?: number) => {
 		const text = buildingEffectText(def, ownedOfBiome(tiles, def.biome));
 		return (
-			<Tooltip title={def.label} subtitle={def.kind === 'idol' ? 'Idol' : def.kind === 'extractor' ? 'Extractor' : 'Producer'} className='ds-tip-compact'>
+			<Tooltip title={def.label} subtitle={buildingKindLabel(def)} className='ds-tip-compact'>
 				{text && (
 					<>
 						<TipLine>{text.scale}</TipLine>

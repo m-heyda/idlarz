@@ -9,7 +9,7 @@ import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
 import { rollChestLoot } from '@/lib/chests';
 import { LOOT_SOURCES } from '@/catalog/lootConfig';
-import { resolveSourceLevel, rollJunkDrops } from '@/lib/loot';
+import { resolveSourceLevel, rollJunkLoot } from '@/lib/loot';
 import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import { clearBuffsOnRebirth } from '@/lib/buffs';
@@ -37,11 +37,23 @@ import { ROCK_TIERS } from '@/config/rocks';
 import { miningPower, rollRockLoot, takeClicks } from '@/lib/rocks';
 import { stashIn } from '@/lib/offline/reward';
 import { moveIngredientStacks } from '@/lib/offline/ingredientMove';
-import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw, craftedGearAdded, type CraftEnv } from '@/lib/offline/craft';
+import {
+	applyCancel,
+	applyClaim,
+	applyClaimAll,
+	applyCraft,
+	applyWithdraw,
+	craftedGearAdded,
+	type CraftEnv,
+	applyEnchant,
+	type EnchantMode,
+} from '@/lib/offline/craft';
 import type { ChestReward, RockReply, CraftReply, FightReply, Inventory, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
 import { rebirthInventory } from '@/lib/offline/inventory';
 import { judgeRebirth } from '@/lib/cloudSave/serverRebirth';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { mergeJunkStacks } from '@/lib/offline/junkMerge';
+import { gemCraftOf } from '@/config/gemShop';
 import { craftLuckBonus } from '@/utils/game/merchant';
 import { keepCandidates, keepSlots, resolveKeep, type KeepRef } from '@/lib/rebirthKeep';
 import { claimAchievement, claimAllAchievements, reportOf, settleAchievements, type AchievementUnlock } from '@/lib/offline/achievements';
@@ -119,7 +131,7 @@ const onlineStep = async <T>(
 		const bank = await place(advanced);
 		const env: CombatEnv = { secret: deps.secret, userId, stored, nowSec };
 		// ingredient stacks the player held before the Crafting bag existed move over (a pass that finds nothing once it has run)
-		const out = await body({ ledger: moveIngredientStacks({ ...ledger, bank }), stored, bank, nowSec, env, place });
+		const out = await body({ ledger: mergeJunkStacks(moveIngredientStacks({ ...ledger, bank })), stored, bank, nowSec, env, place });
 		// what this request made due is paid now, so the answer (and its stored copy, which a retry gets back) carries the toast
 		const settled = settleAchievements(out.ledger, stored.summary, nowMs);
 		unlocked = settled.unlocked;
@@ -204,16 +216,19 @@ export const redeemChest = (
 			const loot = rolled.kind === 'xp' ? { ...rolled, xp: Math.floor(rolled.xp * (1 + stored.summary.xpGainPct / 100)) } : rolled;
 			const gems = rollGemFind(luck, rng);
 			// every chest also holds some junk materials (IDL-312), rolled last so the reward above is the one it always was; the level is the chest's own
-			const junkDrops = rollJunkDrops(
+			const junkRoll = rollJunkLoot(
 				{
 					level: resolveSourceLevel(LOOT_SOURCES.chest.level!, stored.summary.castleLevel),
 					gold: stored.summary.rates.gold * 600,
 					luck,
 					boss: false,
 					lucky: false,
+					chest: true,
 				},
 				rng,
 			);
+			const junkDrops = junkRoll.drops;
+			const finds = stashIn(ledger.craft.stock, junkRoll.stash); // the gems and ore of the chest go into the crafting bag
 
 			const granted: Partial<GrantTotals> = { gems };
 			if (loot.kind === 'gold' || loot.kind === 'boost') granted.gold = loot.gold;
@@ -239,6 +254,7 @@ export const redeemChest = (
 				bank: taken.bank,
 				ordChest,
 				stats: recordChest(ledger.stats),
+				craft: Object.keys(finds.stored).length > 0 ? { ...ledger.craft, stock: finds.stock } : ledger.craft,
 				inv,
 				gems: Math.min(GEMS_CAP, ledger.gems + gems),
 				granted: addTotals(ledger.granted, granted),
@@ -254,6 +270,7 @@ export const redeemChest = (
 					serverNowSec: nowSec,
 					...(received ? { received } : {}),
 					junk: junkIn.received.stored,
+					...(Object.keys(finds.stored).length > 0 ? { finds: finds.stored } : {}),
 				},
 			};
 		},
@@ -350,7 +367,18 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 		if (op.action === 'use') {
 			const used = applyUse(ledger, ctx.env, op.index);
 			if (!used.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: used.message } };
-			return { ledger: used.ledger, value: { ok: true, gold: 0, count: 0, inv: used.ledger.inv!, serverNowSec: ctx.nowSec, buffs: used.buffs } };
+			return {
+				ledger: used.ledger,
+				value: {
+					ok: true,
+					gold: 0,
+					count: 0,
+					inv: used.ledger.inv!,
+					serverNowSec: ctx.nowSec,
+					buffs: used.buffs,
+					...(used.shifted ? { shifted: used.shifted } : {}),
+				},
+			};
 		}
 		if (op.action === 'sellResource' || op.action === 'buyResource') {
 			// the merchant's resource trades (IDL-319): priced here, judged against what the last save and the rates can explain; allowed in a fight like the shop purchases
@@ -370,7 +398,8 @@ export type CraftRequest =
 	| { action?: 'craft'; recipeId: string; count: number }
 	| { action: 'claim'; slot: number | 'all' }
 	| { action: 'cancel'; slot: number }
-	| { action: 'withdraw'; id: string; qty: number };
+	| { action: 'withdraw'; id: string; qty: number }
+	| { action: 'enchant'; index: number; mode: EnchantMode; affix: number };
 
 /**
  * One crafting request (docs/plan/crafting-v0.md): `count` crafts of a recipe are queued as a timed batch (a recipe without a time is done at
@@ -391,17 +420,20 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
 			luck: ctx.stored.summary.derived.luck + craftLuckBonus(prestigeOfCore(ctx.stored.core)), // Artisan's Eye (Ember shop): crafted gear only
 			intelligence: ctx.stored.summary.derived.intelligence ?? 0,
 			xpPct: ctx.stored.summary.derived.idol?.craftXpPct ?? 0,
+			limits: { prestige: prestigeOfCore(ctx.stored.core), gemCraft: gemCraftOf(ledger.gemShop.bought) }, // Ember shop from the last accepted save, Gem shop from the ledger
 		};
 		const result =
 			'recipeId' in request
-				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct)
+				? applyCraft(ledger.inv!, ledger.craft, request.recipeId, request.count, nowMs, env.xpPct, env.limits)
 				: request.action === 'claim'
 					? request.slot === 'all'
 						? applyClaimAll(ledger.inv!, ledger.craft, nowMs, env)
 						: applyClaim(ledger.inv!, ledger.craft, request.slot, nowMs, env)
 					: request.action === 'withdraw'
 						? applyWithdraw(ledger.inv!, ledger.craft, request.id, request.qty, nowMs)
-						: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs, env);
+						: request.action === 'enchant'
+							? applyEnchant(ledger.inv!, ledger.craft, request.index, request.mode, request.affix, nowMs, env)
+							: applyCancel(ledger.inv!, ledger.craft, request.slot, nowMs, env);
 		const value: CraftReply = {
 			ok: result.ok,
 			...(result.reason ? { reason: result.reason } : {}),

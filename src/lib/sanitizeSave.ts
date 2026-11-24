@@ -4,11 +4,11 @@ import { isLiveBiome } from '@/config/biomeStage';
 import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { BIOMES } from '@/config/biomes';
 import { BUILDINGS_FLAG } from '@/config/buildings';
-import { buildingDef } from '@/catalog/buildings';
+import { buildingDef, fitsBiome } from '@/catalog/buildings';
 import { IDOLS } from '@/catalog/idols';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { HARD_LIMITS } from '@/config/limits';
-import { buildingLevelCap, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
+import { buildingLevelCap, copiesAllowed, buildingUpgradeDuration, levelOfTile, upgradeCapOf } from '@/lib/buildings';
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { GEMS_CAP, STARTING_GEMS, CLICK_LADDER, INITIAL_RESOURCES, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { DEFAULT_PLAYER_NAME, INITIAL_CHARACTER_STATS } from '@/config/character';
@@ -18,7 +18,7 @@ import { EQUIPMENT_LAYOUT, ITEM_CATALOG, LOOT_PROFILES, RARITIES } from '@/catal
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
 import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
-import { starterBag } from '@/lib/inventory';
+import { mergeJunk, starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
 import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
 import { refundOldShop } from '@/lib/emberShopMigration';
@@ -42,6 +42,9 @@ import type {
 	Resources,
 	Tile,
 } from '@/types/game';
+
+/** The most one bag stack may hold in a save: a junk stack is unlimited in practice (`JUNK_STACK`, a trillion), so the cap sits just above it; every stack is still cut to its item's own `stackMax` */
+const MAX_STACK_QTY = 1e12;
 
 /**
  * The part of the game state that is saved. Rates, window flags and the like are recomputed on load.
@@ -227,7 +230,7 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	let castleTile: Tile | null = null;
 	let owned = 0;
 	let chests = 0;
-	const buildingIds = new Set<string>();
+	const buildingCopies = new Map<string, number>(); // how many of each building type stand (a Producer or an Extractor up to HARD_LIMITS.buildingCopies, an Idol one)
 	for (const { x, y, t } of land) {
 		const key = tileKey(x, y);
 		if (at.has(key)) return fail('two tiles share a position');
@@ -261,8 +264,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			// building types, even ones that share a name with a new type) or one edited by hand always loads: unknown type, wrong biome, a second of its type, a chest on the tile, a bad level
 			const def = typeof t.building === 'string' ? buildingDef(t.building) : undefined;
 			const bl = t.buildingLevel === undefined ? 1 : int(t.buildingLevel, 1, def?.kind === 'idol' ? HARD_LIMITS.idolMaxLevel : HARD_LIMITS.buildingMaxLevel);
-			if (def && def.biome === t.biome && !tile.hasChest && !buildingIds.has(def.id) && bl !== null) {
-				buildingIds.add(def.id);
+			if (
+				def &&
+				fitsBiome(def, String(t.biome)) &&
+				!tile.hasChest &&
+				(buildingCopies.get(def.id) ?? 0) < copiesAllowed(def, HARD_LIMITS.buildingCopies) &&
+				bl !== null
+			) {
+				buildingCopies.set(def.id, (buildingCopies.get(def.id) ?? 0) + 1);
 				tile.building = def.id;
 				if (bl > 1) tile.buildingLevel = bl;
 			}
@@ -405,13 +414,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 			}
 			for (const key of Object.keys(entry)) if (!STACK_KEYS.has(key)) return fail('bag entry key');
 			const def = typeof entry.id === 'string' ? ITEM_CATALOG[entry.id] : undefined;
-			const qty = int(entry.qty, 1, 1e9);
+			const qty = int(entry.qty, 1, MAX_STACK_QTY);
 			if (!def || def.kind !== 'consumable' || qty === null) {
 				bag.push(null); // an id this version does not know (or a broken count): an empty slot
 				continue;
 			}
 			bag.push({ id: def.id, qty: Math.min(qty, def.stackMax ?? 1) }); // a stack above a lowered stack size is cut to it
 		}
+		bag = mergeJunk(bag); // junk that an older version split over several slots is one stack now
 	}
 
 	// Loot bookkeeping (optional: a save from before it has no pity and keeps everything)

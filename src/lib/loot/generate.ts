@@ -1,6 +1,6 @@
 import type { BonusTable, ItemLevelDef, LootProfile, RollsDef, SourceLevelDef } from '@/catalog/lootConfig';
 import type { RarityDef } from '@/catalog/rarity';
-import type { Grade } from '@/catalog/items/grades';
+import { gradeOfItem, type Grade } from '@/catalog/items/grades';
 import { MAX_ITEM_LEVEL, clampItemLevel } from '@/catalog/stats';
 import { affixFits } from '@/lib/itemInstance';
 import { LUCK } from '@/config/spawns';
@@ -38,8 +38,14 @@ export interface LootRequest {
 	extraGearRolls?: number;
 	/** Only items of this slot are eligible (a crafting recipe picks the slot, not the item) */
 	slot?: ItemDef['slot'];
+	/** Only weapons of this type are eligible (a crafting recipe for swords makes swords: a club never rolls a wand's spell power) */
+	weaponType?: ItemDef['weaponType'];
+	/** Only items of exactly this grade are eligible (a crafting recipe makes its own grade: the open window of the top live grade would otherwise let G6 pieces into a G7 craft) */
+	grade?: Grade;
 	/** No item rolled for this request gets a lower item level than this (a crafting recipe stays inside its grade's window) */
 	minItemLevel?: number;
+	/** Only these rarities are rolled (a crafted piece takes the rarities of its grade, so the top live grade, which is open to every rarity for drops, still crafts as its own grade) */
+	onlyRarities?: readonly string[];
 	/** No rarity above this one is rolled (the crafting level's rarity ceiling) */
 	maxRarity?: string;
 	/** 0 and up: rolls toward the top of the quality and of every affix magnitude (Intelligence, crafting only). 0 changes nothing, not even the random numbers drawn. */
@@ -130,6 +136,24 @@ const countSuccesses = (rolls: RollsDef, level: number, rng: Rng, chanceMultipli
 	return hits;
 };
 
+/**
+ * Picks one affix for an item (the roll of one slot of {@link rollAffixes}, also the enchant craft's): a weighted pick among the affixes that fit and whose group is not in `used`, with a roll leaning by `bias`. Null when none fits.
+ * The random numbers it draws (the pick, then the roll) are the ones the loot rolls have always drawn, so no sealed roll changes.
+ */
+export const pickAffix = (
+	def: ItemDef,
+	level: number,
+	rarity: RarityDef,
+	used: ReadonlySet<string>,
+	data: LootData,
+	rng: Rng,
+	bias = 0,
+): { id: string; roll: number; group: string } | null => {
+	const options = Object.values(data.affixes).filter((affix) => !used.has(affix.group) && affixFits(affix, def, level, rarity));
+	const affix = weightedPick(options, (a) => a.weight, rng);
+	return affix ? { id: affix.id, roll: rollLeaning(rng, bias), group: affix.group } : null;
+};
+
 /** Rolls the affixes of an item: a count from the rarity, picked without replacement, one per group, respecting item level and tags. */
 const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootData, rng: Rng, bias = 0): { id: string; roll: number }[] => {
 	if (def.generation === 'named') return [];
@@ -137,11 +161,10 @@ const rollAffixes = (def: ItemDef, level: number, rarity: RarityDef, data: LootD
 	const picked: { id: string; roll: number }[] = [];
 	const groups = new Set<string>();
 	for (let i = 0; i < want; i++) {
-		const options = Object.values(data.affixes).filter((affix) => !groups.has(affix.group) && affixFits(affix, def, level, rarity));
-		const affix = weightedPick(options, (a) => a.weight, rng);
+		const affix = pickAffix(def, level, rarity, groups, data, rng, bias);
 		if (!affix) break; // fewer compatible affixes than the rarity wants: take what exists (the validator reports it)
 		groups.add(affix.group);
-		picked.push({ id: affix.id, roll: rollLeaning(rng, bias) });
+		picked.push({ id: affix.id, roll: affix.roll });
 	}
 	return picked;
 };
@@ -189,12 +212,18 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const rarity = data.rarities[id];
 		if (!rarity?.enabled || !(weight > 0)) continue;
 		if (itemLevel < (profile.rarityLevelGate?.[id] ?? 1)) continue;
+		if (ctx.req.onlyRarities && !ctx.req.onlyRarities.includes(id)) continue;
 		const ceiling = ctx.req.maxRarity ? data.rarities[ctx.req.maxRarity] : undefined;
 		if (ceiling && rarity.order > ceiling.order) continue;
 		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
 		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
 		const candidates = all.filter(
-			(c) => c.def.generation === 'base' && (c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) && (!ctx.req.slot || c.def.slot === ctx.req.slot),
+			(c) =>
+				c.def.generation === 'base' &&
+				(c.def.dropRarities ?? c.def.allowedRarities)?.includes(id) &&
+				(!ctx.req.slot || c.def.slot === ctx.req.slot) &&
+				(!ctx.req.weaponType || c.def.weaponType === ctx.req.weaponType) &&
+				(!ctx.req.grade || gradeOfItem(c.def) === ctx.req.grade),
 		);
 		trace.eligible[id] = candidates.length;
 		if (candidates.length === 0) continue;

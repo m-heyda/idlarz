@@ -3,7 +3,7 @@
  * that never had this system (`tests/economy/buildingsFlagOff.test.ts` pins it), and saves written with it on still load, minus their buildings.
  *
  * What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
- * the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 with the Gem shop's Builder #2, +1 with the Ember shop's Extra Builder, 3 at most: one timer each, see `builderCount`);
+ * the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 per level of the Gem shop's Additional builder (3 levels), +1 with the Ember shop's Extra Builder, 5 at most: one timer each, see `builderCount`);
  * a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
  *
  * **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
@@ -35,8 +35,21 @@ export const BUILDING_RULES = {
 	producer: { tileEquivalents: 15, levelStep: 0.5, perOwnedTile: 0.02, bonusCap: 1 },
 	extractor: { baseRate: 0.3, levelStep: 0.4 },
 	cost: { tilePrices: 14, priceTileCap: 300, levelGrowth: 2 },
+	/** From level 3 a Producer or an Extractor upgrade also eats the biome's T3 extract (the same one the Idol takes, owner 2026-11-24, docs/plan/18): levels 3 / 4 / 5 cost 1,000 / 5,000 / 25,000, then x`t3Growth` per level above 5 */
+	t3Costs: [1000, 5000, 25000],
+	t3Growth: 5,
 	relocateShare: 0.5,
 };
+
+/**
+ * The general buildings (Watchtower, Marketplace, Training Yard, Scriptorium, Guild Hall, Garrison): they stand on any land biome except the lake, each has its own copy cap (`BuildingDef.copies`, 2 or 3, separate from the Producer and Extractor Building Slots), and
+ * make nothing: every level of every copy adds `perLevel` (1 %) of its effect, the same effects the Idols have and through the same server-derived economy (`idolEconomy`), so level 5 of a Watchtower is +5 % damage and three of them +15 %. Levels, timers, builders and the castle gate are
+ * the Producer's; the price is the Producer's too (resources only: no extract).
+ *
+ * @category Economy/Buildings
+ * @order 6
+ */
+export const GENERAL_RULES = { perLevel: 1 };
 
 /**
  * The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.

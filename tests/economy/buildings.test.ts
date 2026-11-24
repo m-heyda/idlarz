@@ -4,7 +4,8 @@ import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { api, freshGame, growTo, patchTileAt, setResources, tileAt, store } from '../helpers';
 import { BUILDING_RULES, BUILDINGS_FLAG } from '../../src/config/buildings';
-import { BUILDINGS, buildingDef, buildingsOfBiome } from '../../src/catalog/buildings';
+import { BUILDINGS, buildingDef, buildingsOfBiome, fitsBiome } from '../../src/catalog/buildings';
+import { idolEconomy } from '../../src/lib/idolEconomy';
 import { BIOMES } from '../../src/config/biomes';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
@@ -24,7 +25,11 @@ import {
 	extractorOutput,
 	buildingOutput,
 	relocationCost,
+	buildProblem,
+	copiesAllowed,
 } from '../../src/lib/buildings';
+import { limitOf } from '../../src/lib/limits';
+import { gemCraftOf } from '../../src/config/gemShop';
 import { buildingMenuItems } from '../../src/lib/buildingMenu';
 import { calculateResourceRates } from '../../src/utils/game/income';
 import { decodeSave, encodeSave, packBody, unpackBody } from '../../src/lib/saveFormat';
@@ -70,9 +75,9 @@ test('the flag ships on (owner decision: live on merge)', () => {
 	assert.equal(BUILDINGS_FLAG.enabled, true);
 });
 
-test('the catalog: a Producer and an Extractor for each of the seven home biomes, with real art', () => {
-	const homes = ['coast', 'forest', 'hills', 'lake', 'plains', 'swamp', 'tundra'];
-	assert.equal(BUILDINGS.length, 14 + 12, 'seven Producers, seven Extractors and the twelve Idols');
+test('the catalog: a Producer and an Extractor for each of the twelve biomes, with real art', () => {
+	const homes = ['battlefield', 'blight', 'coast', 'fields', 'forest', 'hills', 'jungle', 'lake', 'orchard', 'plains', 'swamp', 'tundra'];
+	assert.equal(BUILDINGS.length, 24 + 12 + 6, 'twelve Producers, twelve Extractors, the twelve Idols and six general buildings');
 	assert.equal(new Set(BUILDINGS.map((b) => b.id)).size, BUILDINGS.length);
 	for (const kind of ['producer', 'extractor'] as const)
 		assert.deepEqual(
@@ -82,8 +87,8 @@ test('the catalog: a Producer and an Extractor for each of the seven home biomes
 			homes,
 		);
 	for (const b of BUILDINGS) {
-		assert.ok(BIOMES[b.biome], b.id);
-		if (b.kind === 'idol') assert.equal(b.produces.length, 0, `${b.id} makes nothing`);
+		assert.ok(b.kind === 'general' || BIOMES[b.biome], b.id);
+		if (b.kind === 'idol' || b.kind === 'general') assert.equal(b.produces.length, 0, `${b.id} makes nothing`);
 		else if (b.kind === 'producer')
 			for (const key of b.produces)
 				assert.ok((BIOMES[b.biome].resourceGeneration as Record<string, number>)[key] > 0, `${b.id} makes ${key}, which its biome does not`);
@@ -95,14 +100,15 @@ test('the catalog: a Producer and an Extractor for each of the seven home biomes
 		assert.ok(existsSync(join(process.cwd(), 'public', file)), `${b.id}: ${file}`);
 		assert.equal(buildingDef(b.id), b);
 	}
-	// the seven extracts are the seven T3 materials of the home biomes, each made by one Extractor
+	// the twelve extracts are the T3 materials of the twelve biomes, each made by one Extractor
 	assert.deepEqual(
 		BUILDINGS.filter((b) => b.kind === 'extractor')
 			.map((b) => b.produces[0])
 			.sort(),
-		['frostshard', 'herbs', 'ironOre', 'pearls', 'salt', 'sap', 'spores'],
+		['corruptedCore', 'dye', 'frostshard', 'herbs', 'ironOre', 'pearls', 'royalJelly', 'salt', 'sap', 'scrapSteel', 'spores', 'venom'],
 	);
-	assert.equal(buildingsOfBiome('forest').length, 3, 'Producer, Extractor and Idol');
+	assert.equal(buildingsOfBiome('forest').length, 9, 'Producer, Extractor, Idol and the six general buildings');
+	assert.equal(buildingsOfBiome('lake').length, 3, 'no general building on water');
 	assert.equal(buildingsOfBiome('castle').length, 0);
 });
 
@@ -265,11 +271,12 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 	});
 });
 
-test('builders: 1 for everyone, +1 with the Gem shop Builder #2; the castle takes a builder like a building does', () => {
+test('builders: 1 for everyone, +1 per level of the Gem shop Additional builder (up to 3); the castle takes a builder like a building does', () => {
 	withBuildings(() => {
 		assert.equal(builderCount(), 1);
 		assert.equal(builderCount({ gemBuilders: 1 }), 2);
-		assert.equal(builderCount({ gemBuilders: 9 }), 2, 'the Gem shop gives one, whatever a forged number says');
+		assert.equal(builderCount({ gemBuilders: 3 }), 4);
+		assert.equal(builderCount({ gemBuilders: 9 }), 4, 'the Gem shop gives three at most, whatever a forged number says');
 		const [a, b] = gameWith('forest', 2, 5);
 		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
 		assert.equal(api().buildBuilding(b.x, b.y, 'saptapper'), true);
@@ -289,8 +296,8 @@ test('builders: 1 for everyone, +1 with the Gem shop Builder #2; the castle take
 		assert.equal(tileAt(api().tiles, a.x, a.y).buildingLevel, 2);
 		assert.equal(tileAt(api().tiles, b.x, b.y).buildingLevel, 2);
 
-		// a castle upgrade and a building upgrade at once
-		setResources(RICH);
+		// a castle upgrade and a building upgrade at once (a Producer's third level also eats a little sap, BUILDING_RULES.t3Costs)
+		setResources({ ...RICH, sap: 10_000 });
 		assert.equal(api().upgradeCastle(), true);
 		assert.equal(api().upgradeBuilding(a.x, a.y), true);
 		assert.equal(api().upgradeBuilding(b.x, b.y), false, 'the castle holds the other builder');
@@ -407,7 +414,7 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.equal(back.state.buildingUpgrades?.[0]?.toLevel, 2);
 		assert.equal(Math.round(back.state.buildingUpgrades![0].remainingSec), 540);
 
-		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a second of its type, a level the castle does not allow
+		// a building that cannot be valid is dropped, never a reason to refuse the save: wrong biome, a fifth of its type, a level the castle does not allow
 		const loads = (tiles: typeof wrongBiome) => {
 			const r = decodeSave(encodeSave({ ...pickPersisted(api()), tiles }));
 			assert.ok(r.ok, r.ok ? '' : r.reason);
@@ -417,7 +424,11 @@ test('the save round trip keeps buildings and the running upgrade; invalid ones 
 		assert.equal(tileAt(loads(wrongBiome)!.tiles, b.x, b.y).building, undefined);
 		const twice = patchTile(api().tiles, b.x, b.y, { building: 'lumberyard' });
 		const twiceState = loads(twice)!;
-		assert.equal(builtBuildings(twiceState.tiles).length, 1, 'only one of a type survives');
+		assert.equal(
+			builtBuildings(twiceState.tiles).length,
+			2,
+			'two of a type survive (a save may hold up to HARD_LIMITS.buildingCopies; the build rule enforces what the account owns)',
+		);
 		const tooHigh = patchTile(api().tiles, a.x, a.y, { buildingLevel: 5 });
 		const high = loads(tooHigh)!;
 		assert.equal(tileAt(high.tiles, a.x, a.y).building, undefined, 'castle level 3 does not allow level 5');
@@ -602,13 +613,13 @@ test('timer_jump: a completion is bound to its own building, an Idol floor is th
 	});
 });
 
-test('Extra Builder (Ember shop): one level adds one builder (3 with the Gem shop one), and two parallel timers pass verify without the Gem shop one', () => {
+test('Extra Builder (Ember shop): one level adds one builder (5 with all three Gem shop levels), and two parallel timers pass verify without the Gem shop one', () => {
 	withBuildings(() => {
 		const prestige = (level: number) => ({ ...api().prestige, upgrades: { extrabuilder: level } });
 		assert.equal(builderCount({ prestige: prestige(1) }), 2);
 		assert.equal(builderCount({ prestige: prestige(2) }), 2, 'the shop sells one level; a stored higher one is cut to it');
-		assert.equal(builderCount({ prestige: prestige(1), gemBuilders: 1 }), 3, 'with Builder #2 from the Gem shop: the most there is');
-		assert.equal(builderCount({ prestige: prestige(5), gemBuilders: 9 }), 3);
+		assert.equal(builderCount({ prestige: prestige(1), gemBuilders: 1 }), 3, 'with a Gem shop builder level it adds one');
+		assert.equal(builderCount({ prestige: prestige(5), gemBuilders: 9 }), 5, 'the most there is: 1 + 1 Ember + 3 Gem shop');
 
 		const [a, b] = gameWith('forest', 2, 5);
 		api().buildBuilding(a.x, a.y, 'lumberyard');
@@ -624,5 +635,67 @@ test('Extra Builder (Ember shop): one level adds one builder (3 with the Gem sho
 		// without the Ember level the same two timers are refused
 		const none = { ...two, derived: { ...two.derived, builders: 1 } };
 		assert.equal(verifyTransition({ summary: first, serverSavedAt: T0 }, none, T0 + 5000, undefined, {}, 0).includes('timer_jump'), true);
+	});
+});
+
+test('building copies: 1 of each Producer and Extractor at the start, 2 / 3 with the Ember Building Slots, 4 with the Gem shop slot too; an Idol stays one', () => {
+	withBuildings(() => {
+		const copies = (ctx: Parameters<typeof limitOf>[1]) => limitOf('buildingCopies', ctx);
+		assert.equal(copies({}), 1);
+		const prestige = (level: number) => ({ ...api().prestige, upgrades: { buildslots: level } });
+		assert.equal(copies({ prestige: prestige(1) }), 2);
+		assert.equal(copies({ prestige: prestige(2) }), 3);
+		assert.equal(copies({ prestige: prestige(2), gemCraft: gemCraftOf({ building_slot: 1 }) }), 4);
+		assert.equal(copies({ prestige: prestige(9), gemCraft: gemCraftOf({ building_slot: 1 }) }), 4, 'never past the hard limit');
+		assert.equal(copiesAllowed(buildingDef('lumberyard'), 4), 4);
+		assert.equal(copiesAllowed(buildingDef('idol_forest'), 4), 1);
+
+		const tiles = gameWith('forest', 3, 5);
+		const [a, b, c] = tiles;
+		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
+		const base = {
+			tiles: api().tiles,
+			monsters: api().monsters,
+			castleLevel: 3,
+			castleUpgrade: null,
+			buildingUpgrades: [],
+			ownedTiles: 20,
+		};
+		assert.match(buildProblem({ ...base, buildingCopies: 1 }, b.x, b.y, 'lumberyard') ?? '', /already built/);
+		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, b.x, b.y, 'lumberyard'), null, 'a second copy with a Building Slot');
+		assert.equal(buildProblem({ ...base, buildingCopies: 2 }, c.x, c.y, 'saptapper'), null, 'other types are not affected');
+	});
+});
+
+test('general buildings: stand on any land except the lake, each level of each copy adds 1 % of its effect through the Idol economy, with their own copy caps', () => {
+	withBuildings(() => {
+		for (const id of ['watchtower', 'marketplace', 'trainingyard', 'scriptorium', 'guildhall', 'garrison']) {
+			const def = buildingDef(id)!;
+			assert.equal(def.kind, 'general');
+			assert.ok(fitsBiome(def, 'forest') && fitsBiome(def, 'swamp') && !fitsBiome(def, 'lake') && !fitsBiome(def, 'castle'), id);
+			assert.ok([2, 3].includes(copiesAllowed(def, 1)), `${id} has its own cap`);
+		}
+		const [a, b] = gameWith('forest', 2, 5);
+		assert.equal(api().buildBuilding(a.x, a.y, 'watchtower'), true);
+		assert.equal(api().buildBuilding(b.x, b.y, 'watchtower'), true, 'a second Watchtower, no Building Slot needed');
+		assert.equal(idolEconomy(api().tiles).damagePct, 2, 'two level-1 Watchtowers: 1 % each');
+		store.setState({ tiles: patchTile(api().tiles, a.x, a.y, { buildingLevel: 4 }) });
+		assert.equal(idolEconomy(api().tiles).damagePct, 5, 'level 4 + level 1');
+	});
+});
+
+test('building_copies: a save with four copies of one Producer is flagged unless the ledger holds the Gem shop slot; three are fine', () => {
+	withBuildings(() => {
+		const [a, b, c, d] = gameWith('forest', 4, 5);
+		for (const t of [a, b, c, d]) api().buildBuilding(t.x, t.y, 'lumberyard');
+		const T0 = 1_000_000;
+		const first = summarize(pickPersisted(api()));
+		assert.equal(first.derived.maxCopies, Math.max(1, builtBuildings(api().tiles).length));
+		const flags = (summary: typeof first, slots: number) => verifyTransition({ summary, serverSavedAt: T0 }, summary, T0 + 5000, undefined, {}, 0, slots);
+		const four = { ...first, derived: { ...first.derived, maxCopies: 4 } };
+		const three = { ...first, derived: { ...first.derived, maxCopies: 3 } };
+		assert.equal(flags(four, 0).includes('building_copies'), true);
+		assert.equal(flags(four, 1).includes('building_copies'), false, 'the Gem shop slot allows the fourth');
+		assert.equal(flags(three, 0).includes('building_copies'), false);
 	});
 });

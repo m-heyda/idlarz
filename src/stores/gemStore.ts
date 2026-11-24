@@ -6,7 +6,7 @@ import { QUERY_KEYS, invalidate } from '@/lib/queryClient';
 import { notify } from '@/lib/notices';
 import { signalNeedClaim } from '@/lib/serverSession';
 import { RESOURCE_CAP } from '@/config/economy';
-import { gemBuildersOf } from '@/config/gemShop';
+import { gemBuildersOf, gemCraftOf } from '@/config/gemShop';
 import { ownedSkinsOf } from '@/config/castleSkins';
 import { RESOURCES } from '@/catalog';
 import { formatCompact } from '@/utils/formatters';
@@ -42,7 +42,7 @@ const applyReply = (reply: GemsReply) => {
 	if (reply.characterName) useGameStore.setState({ playerName: reply.characterName });
 	if (reply.attrs) game.applyServerAttrs(reply.attrs);
 	if (reply.bought) {
-		useGameStore.setState({ gemBuilders: gemBuildersOf(reply.bought) }); // Builder #2 is the ledger's record
+		useGameStore.setState({ gemBuilders: gemBuildersOf(reply.bought), gemCraft: gemCraftOf(reply.bought) }); // Additional builder and the crafting items are the ledger's record
 		useUiStore.getState().setOwnedSkins(ownedSkinsOf(reply.bought)); // and so are the castle skins
 	}
 };

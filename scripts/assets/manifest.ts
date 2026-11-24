@@ -604,6 +604,10 @@ export const buildManifest = (): AssetEntry[] => {
 				source: 'ui/biomes',
 			});
 		}
+	const reuseStatus = JSON.parse(readFileSync(join(ROOT, 'scripts', 'assets', 'reuse-status.json'), 'utf8')) as Record<
+		string,
+		{ status: AssetStatus; usedBy: string[] }
+	>;
 	for (const f of walk(join(PUBLIC, 'pixel', '__reuse'))) {
 		const kind = relative(join(PUBLIC, 'pixel', '__reuse'), f).split(sep)[0];
 		if (kind === 'equipment' || kind === 'sets') continue; // listed below with the armor and weapons
@@ -619,6 +623,8 @@ export const buildManifest = (): AssetEntry[] => {
 			});
 			continue;
 		}
+		// a pool picture that a game icon was made from says so (`reuse-status.json`: src -> used / planned and what uses it), so the review in Storybook sorts what is wired from what is not
+		const mark = reuseStatus[url(f)];
 		add({
 			name: `reuse_${snake(kind)}_${snake(basename(f))
 				.replace(/^sprite_fusion_/, 'sf_')
@@ -626,7 +632,8 @@ export const buildManifest = (): AssetEntry[] => {
 			category: 'unsorted',
 			subcategory: kind,
 			src: url(f),
-			status: 'reuse',
+			status: mark?.status ?? 'reuse',
+			usedBy: mark?.usedBy ?? [],
 			source: 'public/pixel/__reuse',
 		});
 	}
@@ -730,15 +737,15 @@ export const buildManifest = (): AssetEntry[] => {
 			});
 		}
 
-	// 6c. The second farm art set (200 px, isometric), waiting for the farm rework (IDL-346)
+	// 6c. The second farm art set (200 px, isometric): the originals. Most of it is baked down to the pen's pixel grid into public/pixel/farm/ (listed above as "farm part"); fence_section and the rest stay here as source
 	for (const f of walk(join(PUBLIC, 'pixel', 'farm_rework')))
 		add({
 			name: `farm_rework_${snake(basename(f, '.png'))}`,
 			category: 'map-details',
-			subcategory: 'farm rework (planned)',
+			subcategory: 'farm rework (source)',
 			src: url(f),
-			status: 'planned',
-			usedBy: ['Farm rework 2, IDL-346'],
+			status: f.endsWith('fence_section.png') ? 'planned' : 'used',
+			usedBy: f.endsWith('fence_section.png') ? ['Farm rework 2, IDL-346 (new fence)'] : ['farm window (baked into public/pixel/farm)'],
 			source: 'farm_rework',
 		});
 

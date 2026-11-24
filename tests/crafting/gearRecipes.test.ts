@@ -1,10 +1,21 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { CRAFT_GRADES, CRAFT_SLOTS, GEAR_RECIPES, GEAR_UNLOCK, RECIPE_BY_ID, RECIPES } from '../../src/catalog/recipes';
+import {
+	COMPONENTS,
+	CRAFT_GRADES,
+	CRAFT_TYPES,
+	GEAR_RECIPES,
+	GEAR_UNLOCK,
+	LEGACY_GEAR_RECIPES,
+	RECIPE_BY_ID,
+	RECIPES,
+	type CraftGrade,
+	type GearTarget,
+} from '../../src/catalog/recipes';
 import { ITEMS } from '../../src/catalog';
-import { GRADE_INFO, gradeLevels, gradeOfItem } from '../../src/catalog/items/grades';
+import { GRADE_INFO, gradeOfItem } from '../../src/catalog/items/grades';
 import { RARITIES } from '../../src/catalog/rarity';
-import { CRAFT_GEAR } from '../../src/config/crafting';
+import { CRAFT_DISCOUNT_MAX, CRAFT_GEAR } from '../../src/config/crafting';
 import { gearItemLevels, gearOdds, gearRequest, pityMultiplier, pityRarityOf, qualityBiasOf, rarityCeilingAt, rollGear } from '../../src/lib/craftGear';
 import { craftCumulativeXp, craftLimit, craftXpOf, emptyCraft, recipeCostGold } from '../../src/lib/crafting';
 import { generateLoot, rollLeaning } from '../../src/lib/loot/generate';
@@ -28,15 +39,20 @@ const inv = (free = 36): Inventory =>
 	}) as unknown as Inventory;
 const env: CraftEnv = { secret: 'gear-test-secret', userId: 'u', luck: 0, intelligence: 5 };
 const T0 = 1_000_000;
-const recipeFor = (grade: string, slot: string) =>
-	GEAR_RECIPES.find((r) => 'gear' in r.output && r.output.gear.grade === grade && r.output.gear.slot === slot)!;
+const recipeFor = (grade: string, slot: string, type?: string) =>
+	GEAR_RECIPES.find((r) => 'gear' in r.output && r.output.gear.grade === grade && r.output.gear.slot === slot && (!type || r.output.gear.type === type))!;
+/** Every target a recipe makes (the grade, the slot and, for weapons and off hands, the type) */
+const TARGETS: GearTarget[] = GEAR_RECIPES.map((r) => (r.output as { gear: GearTarget }).gear);
+/** A stock with plenty of every component, so a test about the roll is not about the refined chain */
+const richStock = (): Record<string, number> => Object.fromEntries(Object.keys(COMPONENTS).map((id) => [id, 1_000_000]));
 const bagItems = (i: Inventory) => i.bag.flatMap((s) => (s && 'item' in s ? [s.item] : []));
 /** A state that has crafting level `level` */
 const atLevel = (level: number, over: Partial<CraftState> = {}): CraftState => ({ ...emptyCraft(), xp: craftCumulativeXp(level), ...over });
 
-test('13 slots x 4 grades = 52 timed gear recipes, unlocked at G1 1, G2 8, G3 15, G4 25', () => {
-	assert.equal(GEAR_RECIPES.length, CRAFT_GRADES.length * CRAFT_SLOTS.length);
-	assert.deepEqual(GEAR_UNLOCK, { G1: 1, G2: 8, G3: 15, G4: 25 });
+test('eight tiers (G1-G8) of 12 weapon and off-hand types and 11 other slots = 184 timed gear recipes, unlocked at G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, G7 65, G8 80', () => {
+	assert.equal(GEAR_RECIPES.length, CRAFT_GRADES.length * (CRAFT_TYPES.mainHand.length + CRAFT_TYPES.offHand.length + 11));
+	assert.equal(GEAR_RECIPES.length, 184);
+	assert.deepEqual(GEAR_UNLOCK, { G1: 1, G2: 8, G3: 15, G4: 25, G5: 35, G6: 50, G7: 65, G8: 80 });
 	assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length, 'recipe ids stay unique');
 	for (const r of GEAR_RECIPES) {
 		assert.equal(r.kind, 'gear');
@@ -48,26 +64,47 @@ test('13 slots x 4 grades = 52 timed gear recipes, unlocked at G1 1, G2 8, G3 15
 		assert.equal(r.timeSec, CRAFT_GEAR.timeSec[g]);
 		// a recipe only asks for a component its level has unlocked: G1 (level 1) takes none
 		for (const input of r.inputs)
-			if ('component' in input) assert.ok(RECIPE_BY_ID[input.component].unlock <= r.unlock, `${r.id}: ${input.component} is unlocked by then`);
+			if ('component' in input) {
+				const maker = RECIPE_BY_ID[input.component];
+				assert.ok(maker, `${r.id}: ${input.component} has a recipe`);
+				assert.ok(maker.unlock <= r.unlock, `${r.id}: ${input.component} is unlocked by then`);
+			}
+	}
+	// every weapon and off-hand recipe names its type, no other slot does
+	for (const r of GEAR_RECIPES) {
+		const gear = (r.output as { gear: GearTarget }).gear;
+		const typed = gear.slot === 'mainHand' || gear.slot === 'offHand';
+		assert.equal(!!gear.type, typed, r.id);
+		if (gear.type) assert.ok((CRAFT_TYPES[gear.slot as 'mainHand' | 'offHand'] as readonly string[]).includes(gear.type), r.id);
+	}
+	// the first recipes (one per grade G1-G4 and weapon slot, any base) keep their ids for queued batches but are not new content
+	assert.equal(LEGACY_GEAR_RECIPES.length, 8);
+	for (const r of LEGACY_GEAR_RECIPES) {
+		assert.equal(r.legacy, true);
+		assert.equal(RECIPE_BY_ID[r.id], r);
+		assert.ok(/^gear_g[1-4]_(mainhand|offhand)$/.test(r.id), r.id);
 	}
 	assert.ok(recipeFor('G1', 'chest').inputs.every((i) => 'resource' in i));
 });
 
-test('every grade and slot a recipe names has bases to roll in the grade window', () => {
-	for (const r of GEAR_RECIPES) {
-		const { grade, slot } = (r.output as { gear: { grade: keyof typeof GEAR_UNLOCK; slot: string } }).gear;
-		const bases = ITEMS.filter((d) => d.enabled !== false && !d.tags?.includes('named') && gradeOfItem(d) === grade && d.slot === slot);
-		assert.ok(bases.length > 0, `${grade} ${slot} has a base`);
+test('every grade, slot and type a recipe names has bases to roll in the grade window', () => {
+	for (const { grade, slot, type } of TARGETS) {
+		const bases = ITEMS.filter(
+			(d) => d.enabled !== false && !d.tags?.includes('named') && gradeOfItem(d) === grade && d.slot === slot && (!type || d.weaponType === type),
+		);
+		assert.ok(bases.length > 0, `${grade} ${slot} ${type ?? ''} has a base`);
 	}
 });
 
 test('the item level climbs the grade window from its unlock to the next grade, and never leaves it', () => {
 	for (const grade of CRAFT_GRADES) {
-		const [lo, hi] = gradeLevels(grade);
+		const [lo, hi] = GRADE_INFO[grade].levels;
 		const start = gearItemLevels(grade, GEAR_UNLOCK[grade]);
 		const end = gearItemLevels(grade, 80);
 		assert.equal(start.min, lo, `${grade} starts at the bottom of its window`);
-		assert.equal(end.max, hi, `${grade} ends at the top of its window`);
+		// the crafting cap is 80: a grade whose next one unlocks above it (G8, next 95) is only at the bottom of its window then
+		if (CRAFT_GEAR.nextUnlock <= 80 || grade !== 'G8') assert.equal(end.max, hi, `${grade} ends at the top of its window`);
+		else assert.equal(end.min, lo, `${grade} is at the start of its window at the crafting cap`);
 		for (let level = 1; level <= 80; level++) {
 			const r = gearItemLevels(grade, level);
 			assert.ok(r.min >= lo && r.max <= hi && r.min <= r.max, `${grade} at ${level}`);
@@ -76,23 +113,30 @@ test('the item level climbs the grade window from its unlock to the next grade, 
 	assert.equal(gearItemLevels('G1', 4).min <= gearItemLevels('G1', 7).min, true);
 });
 
-test('a roll is a base of the recipe slot and grade, inside the item level range, marked crafted, sealed and valid', () => {
-	for (const grade of CRAFT_GRADES) {
-		for (const slot of CRAFT_SLOTS) {
-			for (let n = 1; n <= 12; n++) {
-				const level = 8 + n * 6;
+test('a roll is a base of the recipe slot, type and grade, inside the item level range, marked crafted, sealed and valid', () => {
+	for (const target of TARGETS) {
+		const { slot, type } = target;
+		const grade = target.grade as CraftGrade;
+		{
+			for (let n = 1; n <= 4; n++) {
+				const level = Math.min(80, GEAR_UNLOCK[grade] + n * 4);
 				const env2 = { craftLevel: level, luck: 50, intelligence: 40 };
-				const a = rollGear({ grade, slot }, env2, rng('a', n))!;
-				const b = rollGear({ grade, slot }, env2, rng('a', n))!;
+				const a = rollGear(target, env2, rng('a', n))!;
+				const b = rollGear(target, env2, rng('a', n))!;
 				assert.deepEqual(a, b, 'the same seal rolls the same piece');
 				const def = ITEMS.find((d) => d.id === a.item.base)!;
 				assert.equal(gradeOfItem(def), grade);
 				assert.equal(def.slot, slot);
+				if (type) assert.equal(def.weaponType, type, `${grade} ${slot} ${type}: a ${def.weaponType} rolled`);
 				assert.equal(a.item.crafted, true);
 				const range = gearItemLevels(grade, level);
 				assert.ok(a.item.level >= range.min && a.item.level <= range.max, `${grade} ${slot}: level ${a.item.level} in ${range.min}-${range.max}`);
 				assert.equal(instanceProblem(a.item), null, `${grade} ${slot} is a valid instance`);
-				assert.ok(RARITIES[a.item.rarity as keyof typeof RARITIES].order <= RARITIES.rare.order, 'no epic or legendary from a plain craft');
+				assert.ok(
+					RARITIES[a.item.rarity as keyof typeof RARITIES].order <= RARITIES[rarityCeilingAt(level) as keyof typeof RARITIES].order,
+					'never above the crafting level ceiling, never legendary',
+				);
+				assert.ok(GRADE_INFO[grade].rarities.includes(a.item.rarity as never), `${grade}: ${a.item.rarity} is a rarity of the grade`);
 			}
 		}
 	}
@@ -217,17 +261,18 @@ test("even with the pity counter working, the long-run share of rare at G4 stays
 	assert.ok(rare / N <= chest, `crafted rare share ${rare / N} vs chest ${chest}`);
 });
 
-test('no gold printer: every gear recipe costs more than the mean sell value of its piece, at the top of the item level window, with Intelligence and Luck', () => {
-	const N = 400;
-	for (const grade of CRAFT_GRADES) {
-		const cheapest = Math.min(...GEAR_RECIPES.filter((r) => 'gear' in r.output && r.output.gear.grade === grade).map((r) => recipeCostGold(r)));
+test('no gold printer: every gear recipe (every grade, slot and type) costs more than the mean sell value of its piece even with every crafting discount, at the top of the item level window, with Intelligence and Luck', () => {
+	const N = 80;
+	for (const recipe of GEAR_RECIPES) {
+		const target = (recipe.output as { gear: GearTarget }).gear;
+		const cost = recipeCostGold(recipe);
 		let worst = 0;
 		for (const luck of [0, 250]) {
 			let sum = 0;
-			for (let i = 0; i < N; i++) sum += sellValueOf(rollGear({ grade, slot: 'chest' }, { craftLevel: 80, luck, intelligence: 105 }, rng(`v${luck}`, i))!.item);
+			for (let i = 0; i < N; i++) sum += sellValueOf(rollGear(target, { craftLevel: 80, luck, intelligence: 105 }, rng(`v${luck}`, i))!.item);
 			worst = Math.max(worst, sum / N);
 		}
-		assert.ok(cheapest > worst * 1.05, `${grade}: cheapest recipe ${Math.round(cheapest)} vs mean sell ${Math.round(worst)}`);
+		assert.ok(cost * (1 - CRAFT_DISCOUNT_MAX) > worst * 1.05, `${recipe.id}: costs ${Math.round(cost)} vs mean sell ${Math.round(worst)}`);
 	}
 });
 
@@ -273,7 +318,7 @@ test('claiming a gear batch rolls sealed pieces into the bag, marked crafted, wi
 });
 
 test('Luck and Intelligence of the save reach the roll', () => {
-	const q = queued('G4', 'ring', 10, atLevel(25, { stock: { plank_bundle: 1000 } }));
+	const q = queued('G4', 'ring', 10, atLevel(25, { stock: richStock() }));
 	const done = T0 + 10 * q.r.timeSec! * 1000 + 1;
 	const quality = (e: CraftEnv) => {
 		const out = applyClaim(q.inv, q.craft, 0, done, e);
@@ -313,7 +358,7 @@ test('a bag with room for one takes one; the rest waits in the batch for a later
 });
 
 test("cancel delivers what is finished, refunds the rest's components and the XP is paid once", () => {
-	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 30 } }));
+	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 30, copper_nails: 100 } }));
 	const half = T0 + q.r.timeSec! * 1000 + 1;
 	const out = applyCancel(q.inv, q.craft, 0, half, env);
 	assert.equal(out.ok, true);

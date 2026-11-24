@@ -500,6 +500,11 @@
 				"pearls": 0,
 				"salt": 0,
 				"wool": 0,
+				"venom": 0,
+				"dye": 0,
+				"royalJelly": 0,
+				"corruptedCore": 0,
+				"scrapSteel": 0,
 				"gems": 0
 			},
 			"ratsLeft": [],
@@ -735,6 +740,11 @@
 				"pearls": 0,
 				"salt": 0,
 				"wool": 0,
+				"venom": 0,
+				"dye": 0,
+				"royalJelly": 0,
+				"corruptedCore": 0,
+				"scrapSteel": 0,
 				"gems": 0
 			},
 			"ratsLeft": [3],
@@ -775,7 +785,7 @@
 			"t=700 at=700 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp1000:stun0:el0:pt0:mt0:left75:ord4:seq0 queue= ev=91   poll=27.4   retry=0",
 			"t=701 at=701 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp995.6:stun0:el1:pt0.166667:mt1:left74:ord4:seq1 queue= ev=92   poll=26.4   retry=0",
 			"t=702 at=702 hp=101 mp=40 cd=0/0/0 fight=#2:bossGreatAuroch:L15:hp991.2:stun0:el2:pt0.333333:mt2:left73:ord4:seq2 queue= ev=93   poll=25.4   retry=0",
-			"t=2000 at=2000 hp=46 mp=40 cd=0/0/0 fight=- queue= ev=225   poll=600   retry=584"
+			"t=2000 at=2000 hp=49 mp=40 cd=0/0/0 fight=- queue= ev=220   poll=600   retry=581"
 		],
 		"events": {
 			"count": 126,
@@ -791,10 +801,10 @@
 			},
 			"amounts": {
 				"hit": 403.5,
-				"hurt": 236,
+				"hurt": 242,
 				"crit": 8.7
 			},
-			"digest": "148714b01e38f442b6e5094df9bef91a4937a5e2",
+			"digest": "80e59474a29d1bfd69c2880dc6b5ab599cf3d4b9",
 			"results": [
 				"1|1000000|engage||||2|bossGreatAuroch|15",
 				"52|1000033|defeated||||2|bossGreatAuroch|15",
@@ -804,15 +814,15 @@
 				"90|1000640|retreat||||2|bossGreatAuroch|15",
 				"91|1000700|engage||||2|bossGreatAuroch|15",
 				"133|1000727|defeated||||2|bossGreatAuroch|15",
-				"134|1001327|engage||||2|bossGreatAuroch|15",
-				"181|1001357|defeated||||2|bossGreatAuroch|15",
-				"182|1001957|engage||||2|bossGreatAuroch|16",
-				"224|1001984|defeated||||2|bossGreatAuroch|16",
-				"225|1001984|paused||||||"
+				"134|1001327|engage||||2|bossGreatAuroch|16",
+				"181|1001357|defeated||||2|bossGreatAuroch|16",
+				"182|1001957|engage||||2|bossGreatAuroch|17",
+				"219|1001981|defeated||||2|bossGreatAuroch|17",
+				"220|1001981|paused||||||"
 			]
 		},
 		"final": {
-			"hp": "46",
+			"hp": "49",
 			"mp": "40",
 			"kills": 1,
 			"granted": {
@@ -834,12 +844,17 @@
 				"pearls": 0,
 				"salt": 0,
 				"wool": 0,
+				"venom": 0,
+				"dye": 0,
+				"royalJelly": 0,
+				"corruptedCore": 0,
+				"scrapSteel": 0,
 				"gems": 0
 			},
 			"ratsLeft": [],
 			"king": 2,
 			"retryAt": {
-				"2": "2584"
+				"2": "2581"
 			},
 			"potions": {},
 			"ord": 6
@@ -928,6 +943,11 @@
 				"pearls": 0,
 				"salt": 0,
 				"wool": 0,
+				"venom": 0,
+				"dye": 0,
+				"royalJelly": 0,
+				"corruptedCore": 0,
+				"scrapSteel": 0,
 				"gems": 0
 			},
 			"ratsLeft": [],

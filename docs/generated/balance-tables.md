@@ -341,6 +341,11 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | pearls | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | salt | 0 | 0 | 0.000 | 20.0% | 0.000 |
 | wool | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| venom | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| dye | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| royalJelly | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| corruptedCore | 0 | 0 | 0.000 | 20.0% | 0.000 |
+| scrapSteel | 0 | 0 | 0.000 | 20.0% | 0.000 |
 
 ## 8. Click power and merchant
 
@@ -371,6 +376,11 @@ A real game rolls its 4 start tiles at random; this table uses one fixed ring (s
 | pearls | 5 | not for sale |
 | salt | 5 | not for sale |
 | wool | 2 | not for sale |
+| venom | 5 | not for sale |
+| dye | 5 | not for sale |
+| royalJelly | 5 | not for sale |
+| corruptedCore | 5 | not for sale |
+| scrapSteel | 5 | not for sale |
 
 ### Merchant bonuses and gear shop
 
@@ -445,5 +455,10 @@ Shop (cost in points of the next level, by current level):
 | Idol Mastery | 1 | 10 | 100 | 250 | 625 | 1563 | 9766 | 381470 |
 | Imperial Decree | 1 | 1 | 150 | 150 | 150 | 150 | 150 | 150 |
 | Extra Builder | 1 | 1 | 40 | 120 | 360 | 1080 | 9720 | 787320 |
+| Building Slots | 1 | 2 | 80 | 240 | 720 | 2160 | 19440 | 1574640 |
+| Extra Craft Slot | 1 | 2 | 50 | 200 | 800 | 3200 | 51200 | 13107200 |
+| Workbench | 0.25 | 4 | 20 | 40 | 80 | 160 | 640 | 10240 |
+| Night Shift | 8 | 3 | 15 | 38 | 94 | 235 | 1465 | 57221 |
+| Thrifty Hands | 3 | 5 | 10 | 18 | 33 | 59 | 189 | 1984 |
 | Quest Rarity | 2 | 10 | 5 | 7 | 10 | 14 | 27 | 104 |
 | Quest Slots | 1 | 5 | 25 | 50 | 100 | 200 | 800 | 12800 |

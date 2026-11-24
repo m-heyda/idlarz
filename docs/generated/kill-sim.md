@@ -47,7 +47,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
 | Rot Heron | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
 | Scrap Golem | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
-| Bogfire Wisp | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
+| Sludge Cyclops | 9 | 0 % | 499 | 900 | 250 s | 41.6 % | 0.00 % |
 | The Mire Matriarch (boss) | 27 | 0 % | 7,638 | 13,749 | 3,819 s | 636.5 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.0 %* |
 | Moss Snapper | 11 | 0 % | 690 | 1,244 | 345 s | 57.5 % | 0.00 % |
@@ -110,7 +110,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
 | Rot Heron | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
 | Scrap Golem | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
-| Bogfire Wisp | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
+| Sludge Cyclops | 10 | 0 % | 2,398 | 1,025 | 200 s | 33.3 % | 0.00 % |
 | The Mire Matriarch (boss) | 27 | 0 % | 45,830 | 34,373 | 3,819 s | 636.5 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.1 %* |
 | Moss Snapper | 12 | 0 % | 4,196 | 1,798 | 350 s | 58.3 % | 0.00 % |
@@ -173,7 +173,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 11 | 15 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.02 % |
 | Rot Heron | 11 | 4 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.00 % |
 | Scrap Golem | 11 | 22 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.05 % |
-| Bogfire Wisp | 11 | 8 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.01 % |
+| Sludge Cyclops | 11 | 8 % | 2,590 | 1,108 | 65 s | 10.8 % | 0.01 % |
 | The Mire Matriarch (boss) | 28 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *2.0 %* |
 | Moss Snapper | 13 | 0 % | 4,532 | 1,942 | 113 s | 18.9 % | 0.00 % |
@@ -236,7 +236,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 12 | 7 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
 | Rot Heron | 12 | 2 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
 | Scrap Golem | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
-| Bogfire Wisp | 12 | 3 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
+| Sludge Cyclops | 12 | 3 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.00 % |
 | The Mire Matriarch (boss) | 29 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.7 %* |
 | Moss Snapper | 14 | 0 % | 4,895 | 2,097 | 49 s | 8.2 % | 0.00 % |
@@ -299,7 +299,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 13 | 99 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
 | Rot Heron | 13 | 95 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.05 % |
 | Scrap Golem | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
-| Bogfire Wisp | 13 | 98 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
+| Sludge Cyclops | 13 | 98 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
 | The Mire Matriarch (boss) | 30 | 49 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.75 % |
 | *swamp total (if every spawn were here)* | | | | | | | *1.6 %* |
 | Moss Snapper | 15 | 62 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.06 % |
@@ -362,7 +362,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
 | Rot Heron | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
 | Scrap Golem | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
-| Bogfire Wisp | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
+| Sludge Cyclops | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
 | The Mire Matriarch (boss) | 31 | 99 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.67 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.8 %* |
 | Moss Snapper | 16 | 94 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.04 % |
@@ -425,7 +425,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
 | Rot Heron | 15 | 99 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
 | Scrap Golem | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
-| Bogfire Wisp | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
+| Sludge Cyclops | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
 | The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.5 %* |
 | Moss Snapper | 17 | 90 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
@@ -488,7 +488,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Rot Heron | 16 | 98 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Scrap Golem | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
-| Bogfire Wisp | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
+| Sludge Cyclops | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | The Mire Matriarch (boss) | 32 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.3 %* |
 | Moss Snapper | 18 | 73 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
@@ -551,7 +551,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dumpback | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
 | Rot Heron | 17 | 95 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
 | Scrap Golem | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
-| Bogfire Wisp | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
+| Sludge Cyclops | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
 | The Mire Matriarch (boss) | 33 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.2 %* |
 | Moss Snapper | 18 | 90 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
@@ -608,7 +608,7 @@ Gold and XP caps at the monster's reference level and the multiplier per level (
 | Dumpback | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | Rot Heron | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | Scrap Golem | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
-| Bogfire Wisp | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
+| Sludge Cyclops | 8 - 27 (grown) | 135 | 1,200 | 171 | 1.08 | 8,876 |
 | The Mire Matriarch | 25 - 43 (grown) | 3600 | 600,000 | 45,000 | 1.03 | 1,021,460 |
 | Frost Hare | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |
 | Icetusk Calf | 12 - 27 (grown) | 190 | 2,400 | 342 | 1.08 | 17,751 |

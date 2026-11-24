@@ -1,11 +1,13 @@
 import { ITEM_CATALOG, RESOURCES } from '@/catalog';
 import { GRADE_INFO } from '@/catalog/items/grades';
-import { COMPONENTS, CRAFT_SLOT_LABEL, type CraftSlot, type Recipe, type RecipeKind } from '@/catalog/recipes';
+import { COMPONENTS, CRAFT_SLOT_LABEL, CRAFT_TYPES, CRAFT_TYPE_LABEL, type CraftSlot, type CraftType, type Recipe, type RecipeKind } from '@/catalog/recipes';
+import type { ComponentGroup } from '@/catalog/refined';
 
 /**
  * The Crafting tab's navigation as data. A category is a folding group of the recipe list; it may have subcategories (Armor by slot, Jewelry by kind), each shown under its own small heading.
  * A recipe belongs to the first category (or subcategory) whose `has` accepts it. To add a kind of equipment later, add a row to a `children` list (or a new category) here: nothing in the window changes.
- * Trade goods are not shown for now (their recipes stay in the data); components have their own category so the half-products stay craftable.
+ * Weapons and off hands are split by item type (swords, bows, shields ...; `CRAFT_TYPES`), each section listing its tiers lowest level first; components by what they are (metals, cut gems, tools, extracts, materials); potions into healing and elixirs.
+ * Trade goods are not shown for now (their recipes stay in the data), and neither are `legacy` recipes (old ids kept for queued batches).
  */
 export interface CraftCategory {
 	id: string;
@@ -25,6 +27,25 @@ const slotIs =
 		return slot !== null && slots.includes(slot);
 	};
 
+const typeIs =
+	(slot: CraftSlot, type: CraftType) =>
+	(recipe: Recipe): boolean =>
+		'gear' in recipe.output && recipe.output.gear.slot === slot && recipe.output.gear.type === type;
+
+const groupIs =
+	(...groups: readonly ComponentGroup[]) =>
+	(recipe: Recipe): boolean => {
+		if (recipe.kind !== 'component' || !('component' in recipe.output)) return false;
+		const group = COMPONENTS[recipe.output.component]?.group;
+		return !!group && groups.includes(group);
+	};
+
+/** What a potion does: an elixir carries a timed buff, the others heal or restore mana */
+const isElixir = (recipe: Recipe): boolean => {
+	const effects = 'item' in recipe.output ? (ITEM_CATALOG[recipe.output.item]?.effects ?? []) : [];
+	return effects.some((effect) => effect.kind === 'buff');
+};
+
 const kindIs =
 	(kind: RecipeKind) =>
 	(recipe: Recipe): boolean =>
@@ -32,14 +53,31 @@ const kindIs =
 
 /** The categories of the recipe list, in display order */
 export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
-	{ id: 'components', label: 'Components', has: kindIs('component') },
+	{
+		id: 'components',
+		label: 'Components',
+		children: [
+			{ id: 'metals', label: 'Metals', has: groupIs('metal') },
+			{ id: 'fasteners', label: 'Nails and rivets', has: groupIs('fastener') },
+			{ id: 'gems', label: 'Cut gems', has: groupIs('gem') },
+			{ id: 'tools', label: 'Polishing tools', has: groupIs('tool') },
+			{ id: 'extracts', label: 'Extracts', has: groupIs('extract') },
+			{
+				id: 'materials',
+				label: 'Materials',
+				has: (recipe) => groupIs('material', 'part')(recipe) || ('component' in recipe.output && recipe.output.component.startsWith('ing_')),
+			}, // an ingredient made at the workbench (Ichor, War Medals) sits here too
+		],
+	},
 	{
 		id: 'weapons',
 		label: 'Weapons',
-		children: [
-			{ id: 'main-hand', label: 'Main-hand weapons', has: slotIs('mainHand') },
-			{ id: 'off-hand', label: 'Off hands', has: slotIs('offHand') },
-		],
+		children: CRAFT_TYPES.mainHand.map((type) => ({ id: type, label: CRAFT_TYPE_LABEL[type].many, has: typeIs('mainHand', type) })),
+	},
+	{
+		id: 'offhands',
+		label: 'Off hands',
+		children: CRAFT_TYPES.offHand.map((type) => ({ id: type, label: CRAFT_TYPE_LABEL[type].many, has: typeIs('offHand', type) })),
 	},
 	{
 		id: 'armor',
@@ -55,7 +93,14 @@ export const CRAFT_CATEGORIES: readonly CraftCategory[] = [
 			{ id: 'belts', label: 'Belts', has: slotIs('belt') },
 		],
 	},
-	{ id: 'potions', label: 'Potions', has: kindIs('potion') },
+	{
+		id: 'potions',
+		label: 'Potions',
+		children: [
+			{ id: 'healing', label: 'Healing and mana', has: (recipe) => recipe.kind === 'potion' && !isElixir(recipe) },
+			{ id: 'elixirs', label: 'Elixirs (timed buffs)', has: (recipe) => recipe.kind === 'potion' && isElixir(recipe) },
+		],
+	},
 	{
 		id: 'jewelry',
 		label: 'Jewelry',
@@ -112,6 +157,7 @@ export const recipeSearchText = (recipe: Recipe): string => {
 		parts.push(COMPONENTS[out.component]?.description ?? '');
 	} else {
 		parts.push(CRAFT_SLOT_LABEL[out.gear.slot], GRADE_INFO[out.gear.grade]?.label ?? '', out.gear.grade);
+		if (out.gear.type) parts.push(CRAFT_TYPE_LABEL[out.gear.type].one, CRAFT_TYPE_LABEL[out.gear.type].many);
 	}
 	for (const input of recipe.inputs)
 		parts.push('resource' in input ? (RESOURCES[input.resource]?.label ?? input.resource) : (COMPONENTS[input.component]?.name ?? input.component));
@@ -134,7 +180,7 @@ export const recipeMatches = (recipe: Recipe, query: string): boolean => {
  * the same shape either way and the window just draws it.
  */
 export const craftGroups = (recipes: readonly Recipe[], query = ''): CraftGroup[] => {
-	const shown = recipes.filter((recipe) => recipeMatches(recipe, query));
+	const shown = recipes.filter((recipe) => !recipe.legacy && recipeMatches(recipe, query));
 	const groups: CraftGroup[] = [];
 	for (const category of CRAFT_CATEGORIES) {
 		const sections: CraftSection[] = (category.children ?? [category])

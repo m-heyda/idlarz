@@ -9,6 +9,9 @@ import { openMenuAt } from '@/lib/globalMenu';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useWindowStore } from '@/stores/windowStore';
+
+/** The tooltip colour of each resource tier: the same ladder the Crafting bag uses for ingredient tiers (grey, green, blue, purple; currencies stay grey) */
+const TIER_RARITY = { currency: 'common', t0: 'common', t1: 'uncommon', t2: 'rare', t3: 'epic', t4: 'legendary' } as const;
 import { formatHeaderAmount, formatPercent, formatRateAuto } from '@/utils/formatters';
 
 const exactOf = (n: number) => Math.floor(n).toLocaleString('en-US');
@@ -69,6 +72,8 @@ const ResourceTrays: React.FC = () => {
 							value={compact ? '' : formatHeaderAmount(amount)}
 							rows={rows}
 							footer={footer}
+							rarity={TIER_RARITY[tier.id]}
+							subtitle={tier.label.replace(/s$/, '')}
 							chip={{ onClick: act, 'data-tutorial': `res-${key}` }}
 						/>,
 					];

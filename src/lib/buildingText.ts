@@ -1,5 +1,5 @@
 import { BIOMES } from '@/config/biomes';
-import { BUILDING_RULES } from '@/config/buildings';
+import { BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import type { BuildingDef } from '@/catalog/buildings';
 import { buildingOutput, producerBonus } from '@/lib/buildingOutput';
@@ -36,6 +36,13 @@ const perHour = (amounts: Partial<Resources>): string => {
  */
 export const buildingEffectText = (def: BuildingDef, ownedOfBiome: number): BuildingEffectText | null => {
 	if (def.kind === 'idol') return null;
+	if (def.kind === 'general')
+		return {
+			produces: `Adds ${GENERAL_RULES.perLevel} % ${def.effectText} for every level.`,
+			perLevel: `You can build up to ${def.copies ?? 1}: each copy adds its own bonus.`,
+			scale: 'Stands on any land except the lake. It makes no resources.',
+			levels: `Levels 1 to ${BUILDING_RULES.maxLevel}: upgrade it from its tile menu (each level needs the castle at that level, resources and build time).`,
+		};
 	const first = buildingOutput(def, 1, ownedOfBiome);
 	const second = buildingOutput(def, 2, ownedOfBiome);
 	const step: Partial<Resources> = {};

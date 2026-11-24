@@ -288,7 +288,42 @@ export const EMBER_UPGRADES = {
 		maxLevel: 1,
 		baseCost: 40,
 		costGrowth: 3,
-		effectPerLevel: 1, // one-time: +1 builder (base 1 + the gem shop's Builder #2 + this one = 3 at most)
+		effectPerLevel: 1, // one-time: +1 builder (base 1 + the Gem shop's three Additional builder levels + this one = 5 at most)
+	},
+	buildslots: {
+		label: 'Building Slots',
+		maxLevel: 2,
+		baseCost: 80,
+		costGrowth: 3, // 80 / 240 Embers
+		effectPerLevel: 1, // +1 copy of each Producer and Extractor per level (1 at the start; with the Gem shop's Building Slot 4 at most = `HARD_LIMITS.buildingCopies`)
+	},
+	craftslots: {
+		label: 'Extra Craft Slot',
+		maxLevel: 2,
+		baseCost: 50,
+		costGrowth: 4, // 50 / 200 Embers
+		effectPerLevel: 1, // +1 crafting queue slot per level (base `LIMITS.craftQueueSlots` 3, so 5 at most = `HARD_LIMITS.craftQueueSlots`)
+	},
+	workbench: {
+		label: 'Workbench',
+		maxLevel: 4,
+		baseCost: 20,
+		costGrowth: 2, // 20 / 40 / 80 / 160 Embers
+		effectPerLevel: 0.25, // +0.25 craft speed per level (base `LIMITS.craftSpeed` 1, 2 at most from here, up to `HARD_LIMITS.craftSpeed` with the Gem shop)
+	},
+	nightshift: {
+		label: 'Night Shift',
+		maxLevel: 3,
+		baseCost: 15,
+		costGrowth: 2.5, // 15 / 38 / 94 Embers
+		effectPerLevel: 8, // +8 hours a crafting batch may run without a claim, per level (base 8)
+	},
+	thrifty: {
+		label: 'Thrifty Hands',
+		maxLevel: 5,
+		baseCost: 10,
+		costGrowth: 1.8, // 10 / 18 / 33 / 59 / 105 Embers
+		effectPerLevel: 3, // -3% of the resources a craft takes, per level (15% at most; with the Gem shop's Bulk Discount at most `CRAFT_DISCOUNT_MAX`)
 	},
 	questrarity: {
 		label: 'Quest Rarity',

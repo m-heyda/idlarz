@@ -1,9 +1,18 @@
+import { ITEM_CATALOG } from '@/catalog';
 import { RECIPES, RECIPE_BY_ID, type Recipe } from '@/catalog/recipes';
+import type { ItemInstance } from '@/types/game';
 import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
 import { rollGear } from '@/lib/craftGear';
 import { sealedRng } from '@/lib/offline/seal';
-import { craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import { craftCostFactor, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import type { LimitContext } from '@/lib/limits';
+import { ENCHANT } from '@/config/crafting';
+import { LOOT_DATA } from '@/lib/loot/data';
+import { pickAffix } from '@/lib/loot/generate';
+import { gearOf } from '@/lib/inventory';
+import { instanceProblem } from '@/lib/itemInstance';
+import { qualityBiasOf } from '@/lib/craftGear';
 import type { GearTarget } from '@/catalog/recipes';
 import type { CraftQueueEntry, CraftRefusal, CraftReply, CraftState, Inventory } from '@/lib/offline/types';
 
@@ -27,6 +36,8 @@ export interface CraftEnv {
 	intelligence: number;
 	/** % more crafting XP from the Blossom Shrine (the Idol of the orchard), from the last accepted save */
 	xpPct?: number;
+	/** What raises the crafting limits and discounts (Ember shop from the last accepted save, Gem shop from the ledger): the batch run time and, at queue time, the speed, slots and cost */
+	limits?: LimitContext;
 }
 
 export interface CraftResult {
@@ -63,25 +74,50 @@ const takeComponents = (recipe: Recipe, count: number, stockIn: Record<string, n
 	return stock;
 };
 
+/** Whether the player already has the unique piece a legendary recipe makes: in the bag, worn, or being made in the queue. */
+const holdsUnique = (inv: Inventory, craft: CraftState, recipe: Recipe): boolean => {
+	const id = 'item' in recipe.output ? recipe.output.item : '';
+	return (
+		inv.bag.some((slot) => !!slot && 'item' in slot && slot.item.base === id) ||
+		Object.values(inv.equipment).some((item) => !!item && item.base === id) ||
+		craft.queue.some((entry) => entry.recipeId === recipe.id)
+	);
+};
+
 /**
  * Does or queues `count` crafts of `recipeId` at `nowMs`. Neither input is touched; the new ones are returned.
  * A timed recipe becomes a queue entry (needs a free slot); an instant one is done as in v0.0.
  */
-export const applyCraft = (inv: Inventory, craft: CraftState, recipeId: string, count: number, nowMs: number, xpPct = 0): CraftResult => {
+export const applyCraft = (
+	inv: Inventory,
+	craft: CraftState,
+	recipeId: string,
+	count: number,
+	nowMs: number,
+	xpPct = 0,
+	limits: LimitContext = {},
+): CraftResult => {
 	const recipe = recipeOf(recipeId);
 	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
 	if (!recipe) return refuse('unknown_recipe', inv, craft);
 	if (recipe.kind === 'gear' && !recipe.timeSec) return refuse('not_craftable', inv, craft);
 	if (craftLevelOf(craft.xp).level < recipe.unlock) return refuse('locked', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
+	if (recipe.kind === 'legendary') {
+		// a legendary: one at a time, one per request, and a free bag slot before anything is taken (a finished one is never turned into gold)
+		if (count !== 1) return refuse('bad_request', inv, craft);
+		if (holdsUnique(inv, craft, recipe)) return refuse('already_have', inv, craft);
+		if (!inv.bag.some((slot) => slot === null)) return refuse('bag_full', inv, craft);
+	}
 
 	const stock = takeComponents(recipe, count, craft.stock);
 	if (!stock) return refuse('no_components', inv, craft);
-	const spent = craft.spent + recipeResourceGold(recipe) * count;
+	const factor = craftCostFactor(limits);
+	const spent = craft.spent + recipeResourceGold(recipe) * factor * count;
 
 	if (recipe.timeSec) {
-		if (craft.queue.length >= craftLimit('craftQueueSlots')) return refuse('queue_full', inv, craft);
-		const entry: CraftQueueEntry = { recipeId, count, startedAt: nowMs, timeSec: craftTimeSec(recipe) };
+		if (craft.queue.length >= craftLimit('craftQueueSlots', limits)) return refuse('queue_full', inv, craft);
+		const entry: CraftQueueEntry = { recipeId, count, startedAt: nowMs, timeSec: craftTimeSec(recipe, limits), ...(factor < 1 ? { costFactor: factor } : {}) };
 		return { ok: true, inv, queued: count, craft: { ...craft, stock: dropEmpty(stock), spent, last: nowMs, queue: [...craft.queue, entry] } };
 	}
 
@@ -136,7 +172,7 @@ const deliverGear = (inv: Inventory, craft: CraftState, index: number, nowMs: nu
 	let bag = inv.bag;
 	let pity = craft.pity[target.grade] ?? 0;
 	let n = 0;
-	for (const want = finishedOf(entry, nowMs); n < want; n++) {
+	for (const want = finishedOf(entry, nowMs, env.limits); n < want; n++) {
 		const rng = sealedRng(env.secret, env.userId, 0, 'craft', craft.ord + n + 1);
 		const rolled = rollGear(target, { craftLevel, luck: env.luck, intelligence: env.intelligence, pity }, rng);
 		if (!rolled) break;
@@ -173,11 +209,53 @@ const deliverItems = (
 	env?: CraftEnv,
 ) => {
 	const entry = craft.queue[index];
-	const want = finishedOf(entry, nowMs);
+	const want = finishedOf(entry, nowMs, env?.limits);
 	const tried = addDrop(inv.bag, { kind: 'consumable', id: output.item, qty: want * output.qty });
 	const n = Math.floor((want * output.qty - tried.overflow) / output.qty);
 	// the bag takes exactly `n` crafts' worth (a partial craft is not delivered)
 	const bag = n === want || n < 1 ? (n < 1 ? inv.bag : tried.bag) : addDrop(inv.bag, { kind: 'consumable', id: output.item, qty: n * output.qty }).bag;
+	const left = entry.count - n;
+	const queue = craft.queue.slice();
+	if (left > 0) queue[index] = { ...entry, count: left, startedAt: Math.round(entry.startedAt + n * entry.timeSec * 1000) };
+	else queue.splice(index, 1);
+	return {
+		n,
+		inv: n > 0 ? { ...inv, bag, ver: inv.ver + 1 } : inv,
+		craft: { ...craft, xp: craft.xp + craftXpOf(recipe, n, env?.xpPct), ord: craft.ord + n, queue },
+	};
+};
+
+/**
+ * Delivers a finished legendary (a craft-only piece with a fixed rarity, no affixes yet: `docs` TODO of the special abilities): one piece into the bag as a `crafted` instance of the item at its first item level. It waits in the batch when the bag is full, like any
+ * crafted piece; `applyCraft` already checked there was a slot when it was queued.
+ */
+const deliverUnique = (
+	inv: Inventory,
+	craft: CraftState,
+	index: number,
+	nowMs: number,
+	recipe: Recipe,
+	output: { item: string; qty: number },
+	env?: CraftEnv,
+) => {
+	const entry = craft.queue[index];
+	const def = ITEM_CATALOG[output.item];
+	const want = Math.min(finishedOf(entry, nowMs, env?.limits), entry.count);
+	const instance: ItemInstance = {
+		base: def.id,
+		level: def.minItemLevel ?? 1,
+		rarity: def.fixedRarity ?? def.allowedRarities?.[0] ?? 'legendary',
+		quality: 50,
+		affixes: [],
+		crafted: true,
+	};
+	let bag = inv.bag;
+	let n = 0;
+	for (; n < want; n++) {
+		const added = addDrop(bag, { kind: 'gear', item: instance });
+		if (added.overflow > 0) break;
+		bag = added.bag;
+	}
 	const left = entry.count - n;
 	const queue = craft.queue.slice();
 	if (left > 0) queue[index] = { ...entry, count: left, startedAt: Math.round(entry.startedAt + n * entry.timeSec * 1000) };
@@ -195,9 +273,12 @@ const deliver = (inv: Inventory, craft: CraftState, index: number, nowMs: number
 	const recipe = recipeOf(entry.recipeId);
 	if (!recipe) return null;
 	if ('gear' in recipe.output) return deliverGear(inv, craft, index, nowMs, recipe, recipe.output.gear, env);
-	if ('item' in recipe.output) return deliverItems(inv, craft, index, nowMs, recipe, recipe.output, env);
+	if ('item' in recipe.output)
+		return ITEM_CATALOG[recipe.output.item]?.slot
+			? deliverUnique(inv, craft, index, nowMs, recipe, recipe.output, env)
+			: deliverItems(inv, craft, index, nowMs, recipe, recipe.output, env);
 	const stock = { ...craft.stock };
-	const n = fitting(recipe, finishedOf(entry, nowMs), stock);
+	const n = fitting(recipe, finishedOf(entry, nowMs, env?.limits), stock);
 	if (n > 0) stock[stashKeyOf(recipe)] = (stock[stashKeyOf(recipe)] ?? 0) + recipe.output.qty * n;
 	const left = entry.count - n;
 	const queue = craft.queue.slice();
@@ -226,7 +307,7 @@ export const applyClaim = (inv: Inventory, craft: CraftState, slot: number, nowM
 	const entry = Number.isInteger(slot) ? craft.queue[slot] : undefined;
 	if (!entry || !recipeOf(entry.recipeId)) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
-	if (finishedOf(entry, nowMs) < 1) return refuse('nothing_ready', inv, craft);
+	if (finishedOf(entry, nowMs, env?.limits) < 1) return refuse('nothing_ready', inv, craft);
 	const done = deliver(inv, craft, slot, nowMs, env);
 	if (!done) return refuse('no_batch', inv, craft);
 	if (done.n < 1) return refuse(isGear(entry) || isItem(entry) ? 'bag_full' : 'stock_full', inv, craft);
@@ -244,11 +325,11 @@ export const applyClaimAll = (inv: Inventory, craft: CraftState, nowMs: number, 
 	// last to first, so removing a used-up batch never shifts one still to do
 	for (let index = craft.queue.length - 1; index >= 0; index--) {
 		const entry = state.queue[index];
-		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs) < 1) continue;
+		if (!recipeOf(entry.recipeId) || finishedOf(entry, nowMs, env?.limits) < 1) continue;
 		ready = true;
 		const done = deliver(inventory, state, index, nowMs, env);
 		if (!done) continue;
-		if (done.n < finishedOf(entry, nowMs) && (isGear(entry) || isItem(entry))) gearWaiting = true;
+		if (done.n < finishedOf(entry, nowMs, env?.limits) && (isGear(entry) || isItem(entry))) gearWaiting = true;
 		crafted += done.n;
 		state = done.craft;
 		inventory = done.inv;
@@ -268,13 +349,13 @@ export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, now
 	if (!entry || !recipe) return refuse('no_batch', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
 
-	const delivered = finishedOf(entry, nowMs) > 0 ? deliver(inv, craft, slot, nowMs, env) : null;
+	const delivered = finishedOf(entry, nowMs, env?.limits) > 0 ? deliver(inv, craft, slot, nowMs, env) : null;
 	const after = delivered?.craft ?? craft;
 	const outInv = delivered?.inv ?? inv;
 	const index = delivered && delivered.craft.queue.length < craft.queue.length ? -1 : slot; // -1: the delivery used the entry up
 	const rest = index < 0 ? null : after.queue[index];
 	// unfinished = crafts that are not done yet (what is done but did not fit stays as the smaller batch)
-	const waiting = rest ? finishedOf(rest, nowMs) : 0;
+	const waiting = rest ? finishedOf(rest, nowMs, env?.limits) : 0;
 	const cancelled = rest ? rest.count - waiting : 0;
 
 	const stock = { ...after.stock };
@@ -282,10 +363,11 @@ export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, now
 	let spent = after.spent;
 	const refund: NonNullable<CraftReply['refund']> = [];
 	if (rest && cancelled > 0) {
-		const needs = craftNeeds(recipe, cancelled);
+		const factor = rest.costFactor ?? 1; // the discount the batch was paid with
+		const needs = craftNeeds(recipe, cancelled, factor);
 		for (const c of needs.components) stock[c.id] = (stock[c.id] ?? 0) + c.qty;
 		for (const r of needs.resources) refund.push({ key: r.key, qty: r.qty });
-		spent = Math.max(0, spent - recipeResourceGold(recipe) * cancelled);
+		spent = Math.max(0, spent - recipeResourceGold(recipe) * factor * cancelled);
 		if (waiting > 0) queue[index] = { ...rest, count: waiting };
 		else queue.splice(index, 1);
 	}
@@ -297,6 +379,70 @@ export const applyCancel = (inv: Inventory, craft: CraftState, slot: number, now
 		craft: { ...after, stock, queue, spent, last: nowMs },
 	};
 };
+
+export type EnchantMode = 'reroll' | 'add';
+
+/**
+ * The enchant craft (IDL-120, `ENCHANT`): one affix of a piece of gear in the bag is rerolled or one is added, for Ichor from the crafting stash.
+ *
+ * - `reroll`: the affix at `affix` is replaced by another affix (a group the piece does not already carry, a fresh roll); `add`: one more affix, up to the most the rarity carries.
+ * - Refused, with nothing taken, for a slot that holds no gear or a named legendary (`bad_item`), an affix index outside the piece (`bad_affix`), a piece that already has every affix its rarity allows or no affix left that fits (`affix_cap`),
+ *   too little Ichor (`needs_ichor`: distil it from Corrupted Core first), a missing roll environment or a request within a second of the last (`too_fast`).
+ * - The roll is sealed on its own lifetime counter (`craft.ordEnchant`, kind `'enchant'`), leaned up by Intelligence like a gear craft; the same request replayed (a lost answer) is the same result because the idempotency key replays the stored answer.
+ *
+ * @category Economy/Crafting
+ * @order 10
+ */
+export const applyEnchant = (
+	inv: Inventory,
+	craft: CraftState,
+	index: number,
+	mode: EnchantMode,
+	affix: number,
+	nowMs: number,
+	env?: CraftEnv,
+): CraftResult => {
+	if (!env) return refuse('not_craftable', inv, craft);
+	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
+	const slot = Number.isInteger(index) ? inv.bag[index] : null;
+	const item = slot ? gearOf(slot) : null;
+	const def = item ? LOOT_DATA.items[item.base] : undefined;
+	if (!item || !def || def.generation === 'named') return refuse('bad_item', inv, craft);
+	const rarity = LOOT_DATA.rarities[item.rarity];
+	if (!rarity) return refuse('bad_item', inv, craft);
+	if (mode === 'reroll' && !(Number.isInteger(affix) && affix >= 0 && affix < item.affixes.length)) return refuse('bad_affix', inv, craft);
+	if (mode === 'add' && item.affixes.length >= rarity.maxAffixes) return refuse('affix_cap', inv, craft);
+	const cost = mode === 'reroll' ? ENCHANT.ichor.reroll : ENCHANT.ichor.add;
+	if ((craft.stock.ing_ichor ?? 0) < cost) return refuse('needs_ichor', inv, craft);
+
+	const ord = (craft.ordEnchant ?? 0) + 1;
+	const rng = sealedRng(env.secret, env.userId, 0, 'enchant', ord);
+	const kept = item.affixes.filter((_, i) => mode === 'add' || i !== affix);
+	const used = new Set(kept.map((a) => LOOT_DATA.affixes[a.id]?.group).filter((g): g is string => !!g));
+	const picked = pickAffix(def, item.level, rarity, used, LOOT_DATA, rng, qualityBiasOf(env.intelligence));
+	if (!picked) return refuse('affix_cap', inv, craft);
+	const affixes =
+		mode === 'add'
+			? [...item.affixes, { id: picked.id, roll: picked.roll }]
+			: item.affixes.map((a, i) => (i === affix ? { id: picked.id, roll: picked.roll } : a));
+	const enchanted = { ...item, affixes };
+	if (instanceProblem(enchanted) !== null) return refuse('bad_item', inv, craft);
+
+	const bag = inv.bag.map((s, i) => (i === index ? { item: enchanted } : s));
+	const stock = dropEmpty({ ...craft.stock, ing_ichor: (craft.stock.ing_ichor ?? 0) - cost });
+	return { ok: true, crafted: 0, inv: { ...inv, bag, ver: inv.ver + 1 }, craft: { ...craft, stock, ordEnchant: ord, last: nowMs } };
+};
+
+/** Parses the body of /api/craft/enchant: the bag slot, the mode and (for a reroll) the affix index (null: not one). The values are checked again by `applyEnchant`. */
+export const parseEnchant = (raw: Record<string, unknown>): { index: number; mode: EnchantMode; affix: number } | null =>
+	typeof raw.index === 'number' &&
+	Number.isInteger(raw.index) &&
+	raw.index >= 0 &&
+	raw.index < 1000 &&
+	(raw.mode === 'reroll' || raw.mode === 'add') &&
+	(raw.affix === undefined || (typeof raw.affix === 'number' && Number.isInteger(raw.affix) && raw.affix >= 0 && raw.affix < 20))
+		? { index: raw.index, mode: raw.mode, affix: typeof raw.affix === 'number' ? raw.affix : 0 }
+		: null;
 
 /** Parses the body of /api/craft (null: not one). The numbers are checked again by `applyCraft`. */
 export const parseCraft = (raw: Record<string, unknown>): { recipeId: string; count: number } | null =>

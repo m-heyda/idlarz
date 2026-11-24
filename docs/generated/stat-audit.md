@@ -67,19 +67,19 @@ The flat base is pinned at 1000 per second and never raised (castle output, biom
 
 | Item | Slot | Stat | Authored at | L1 | L10 | L50 | L100 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| wooden_sword | mainHand | damage | 1 | 6 | 10 | 27 | 48 |
-| wooden_shield | offHand | armor | 1 | 2 | 3 | 9 | 16 |
-| leather_cap | head | armor | 1 | 1 | 2 | 4 | 8 |
-| leather_pauldrons | shoulder | armor | 1 | 1 | 2 | 4 | 8 |
-| leather_vest | chest | armor | 1 | 2 | 3 | 9 | 16 |
-| leather_gloves | hands | armor | 1 | 1 | 2 | 4 | 8 |
-| leather_leggings | legs | armor | 1 | 2 | 3 | 9 | 16 |
-| leather_boots | feet | armor | 1 | 1 | 2 | 4 | 8 |
-| wooden_pendant | neck | maxHp | 1 | 3 | 5 | 13 | 24 |
-| leather_cloak | cape | armor | 1 | 1 | 2 | 4 | 8 |
-| wooden_ring | ring | maxHp | 1 | 2 | 3 | 9 | 16 |
-| acorn_charm | charm | maxHp | 1 | 3 | 5 | 13 | 24 |
-| worn_leather_belt | belt | armor | 1 | 1 | 2 | 4 | 8 |
+| wooden_sword | mainHand | damage | 1 | 6 | 10 | 27 | 999 |
+| wooden_shield | offHand | armor | 1 | 2 | 3 | 9 | 333 |
+| leather_cap | head | armor | 1 | 1 | 2 | 4 | 167 |
+| leather_pauldrons | shoulder | armor | 1 | 1 | 2 | 4 | 167 |
+| leather_vest | chest | armor | 1 | 2 | 3 | 9 | 333 |
+| leather_gloves | hands | armor | 1 | 1 | 2 | 4 | 167 |
+| leather_leggings | legs | armor | 1 | 2 | 3 | 9 | 333 |
+| leather_boots | feet | armor | 1 | 1 | 2 | 4 | 167 |
+| wooden_pendant | neck | maxHp | 1 | 3 | 5 | 13 | 500 |
+| leather_cloak | cape | armor | 1 | 1 | 2 | 4 | 167 |
+| wooden_ring | ring | maxHp | 1 | 2 | 3 | 9 | 333 |
+| acorn_charm | charm | maxHp | 1 | 3 | 5 | 13 | 500 |
+| worn_leather_belt | belt | armor | 1 | 1 | 2 | 4 | 167 |
 
 Level factor: `1 + 0.07 x (level - 1)` relative to the base's authored level; capped stats follow only a share of it (crit, dodge, leech 30 %; regen 60 %; luck, gold find, mana regen 50 %; mana 70 %; spell power 40 %).
 

@@ -1,4 +1,4 @@
-import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, gemItemById, type DailyChestResource, type GemItem } from '@/config/gemShop';
+import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, gemItemById, gemMaxedOf, gemNextPrice, type DailyChestResource, type GemItem } from '@/config/gemShop';
 import { GEMS_CAP } from '@/config/economy';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { respecAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
@@ -65,7 +65,8 @@ export const claimDaily = (ledger: Ledger, nowSec: number, chest: readonly Daily
 };
 
 /** What a purchase costs this account now: the first attribute respec is free. */
-export const priceFor = (item: GemItem, attrs: Attrs | null): number => (item.id === 'attr_respec' && !(attrs?.freeUsed ?? false) ? 0 : item.price);
+export const priceFor = (item: GemItem, attrs: Attrs | null, bought?: Record<string, number>): number =>
+	item.id === 'attr_respec' && !(attrs?.freeUsed ?? false) ? 0 : gemNextPrice(item, bought);
 
 export interface SpendFacts {
 	nowSec: number;
@@ -99,8 +100,8 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 	if (ledger.gemShop.pending) return refuse('pending', 'A change is still being finished. Try again in a moment.');
 	const last = ledger.gemShop.lastAt[item.id] ?? 0;
 	if (item.cooldownSec > 0 && last > 0 && facts.nowSec - last < item.cooldownSec) return refuse('cooldown', 'You have to wait before buying that again.');
-	if (item.kind === 'once' && (ledger.gemShop.bought[item.id] ?? 0) > 0) return refuse('already_owned', 'You already own that.');
-	const price = priceFor(item, ledger.attrs);
+	if (gemMaxedOf(item, ledger.gemShop.bought)) return refuse('already_owned', 'You already own that.');
+	const price = priceFor(item, ledger.attrs, ledger.gemShop.bought);
 	if (ledger.gems < price) return refuse('short_balance', `You need ${price - ledger.gems} more gems.`);
 
 	let pending: PendingIdentity | null = null;

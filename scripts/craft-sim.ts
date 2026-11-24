@@ -5,7 +5,7 @@ import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { ITEM_CATALOG } from '../src/catalog';
 import { COMPONENTS, CRAFT_GRADES, CRAFT_SLOTS, GEAR_RECIPES, GEAR_UNLOCK, RECIPES as ALL_RECIPES } from '../src/catalog/recipes';
-import { GRADE_INFO, gradeLevels } from '../src/catalog/items/grades';
+import { CRAFT_ONLY_GRADES, GRADE_INFO, gradeLevels } from '../src/catalog/items/grades';
 import { CRAFT_GEAR } from '../src/config/crafting';
 import { gearItemLevels, rollGear } from '../src/lib/craftGear';
 import { generateLoot } from '../src/lib/loot/generate';
@@ -188,10 +188,11 @@ for (const grade of CRAFT_GRADES) {
 	const chest = dropSample('chest', level);
 	const boss = dropSample('boss', level);
 	const monster = dropSample('monster', level);
-	const pass = crafted <= chest * 1.03;
+	const craftOnly = CRAFT_ONLY_GRADES.includes(grade); // nothing drops G7/G8 gear, so a chest is no yardstick for it
+	const pass = craftOnly || crafted <= chest * 1.03;
 	gateFailed ||= !pass;
 	out(
-		`| ${grade} | ${level} | ${Math.round(crafted).toLocaleString('en')} | ${Math.round(chest).toLocaleString('en')} | ${Math.round(boss).toLocaleString('en')} | ${Math.round(monster).toLocaleString('en')} | ${(crafted / chest).toFixed(2)} | ${pass ? 'ok' : '**over a chest**'} |`,
+		`| ${grade} | ${level} | ${Math.round(crafted).toLocaleString('en')} | ${Math.round(chest).toLocaleString('en')} | ${Math.round(boss).toLocaleString('en')} | ${Math.round(monster).toLocaleString('en')} | ${(crafted / chest).toFixed(2)} | ${craftOnly ? 'craft-only (exempt)' : pass ? 'ok' : '**over a chest**'} |`,
 	);
 }
 out();

@@ -203,7 +203,11 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 		'levels past the base cap grow x5 a level',
 	);
 	assert.equal(buildingLevelCost(3, 20, buildingDef('idol_jungle')).sap, undefined, 'a biome without an Extractor asks for none');
-	assert.equal(buildingLevelCost(3, 20, buildingDef('lumberyard')).sap, undefined, 'only Idols');
+	assert.equal(
+		buildingLevelCost(3, 20, buildingDef('lumberyard')).sap,
+		BUILDING_RULES.t3Costs[0],
+		'a Producer asks for its biome extract too, but a smaller amount',
+	);
 	// and the upgrade really takes it from the stock
 	const [a] = gameWith('forest', 1, 5);
 	patchTileAt(a.x, a.y, { building: 'idol_forest', buildingLevel: 2 });
@@ -213,6 +217,24 @@ test('an Idol level from 3 also costs the T3 extract of its biome (where it has 
 	setResources({ sap: 100000 });
 	assert.equal(api().upgradeBuilding(a.x, a.y), true);
 	assert.equal(api().resources.sap, 100000 - IDOL_RULES.t3Costs[0]);
+});
+
+test('a Producer and an Extractor level from 3 cost the extract of their biome: 1,000 / 5,000 / 25,000, then x5 a level; levels 1 and 2 cost none', () => {
+	const lumberyard = buildingDef('lumberyard');
+	const sapTapper = buildingDef('saptapper');
+	for (const def of [lumberyard, sapTapper]) {
+		assert.ok(def);
+		assert.equal(buildingLevelCost(1, 20, def).sap, undefined);
+		assert.equal(buildingLevelCost(2, 20, def).sap, undefined);
+		assert.deepEqual(
+			[3, 4, 5, 6, 7].map((l) => buildingLevelCost(l, 20, def).sap),
+			[1000, 5000, 25000, 125000, 625000],
+			def.id,
+		);
+	}
+	assert.equal(buildingLevelCost(3, 20, buildingDef('herbgarden')).herbs, 1000, 'each Extractor eats its own biome extract');
+	assert.equal(buildingLevelCost(3, 20, buildingDef('herbgarden')).sap, undefined);
+	assert.equal(buildingLevelCost(6, 20, buildingDef('idol_forest')).sap, IDOL_RULES.t3Costs[2] * IDOL_RULES.t3Growth, 'the Idol ladder is its own');
 });
 
 test('Dwarf Statue shortens castle and building timers, capped at 60 % together with Master Builders', () => {

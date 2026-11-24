@@ -5,6 +5,7 @@ import {
 	buildProblem,
 	builtBuildings,
 	buildingLevelCost,
+	copiesAllowed,
 	moveProblem,
 	needsConstruction,
 	relocationCost,
@@ -12,6 +13,7 @@ import {
 	type BuildingContext,
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
+import { limitOf } from '@/lib/limits';
 import { monsterAt } from '@/lib/monsters';
 import { useUiStore, type ContextMenuItem } from '@/stores/uiStore';
 import type { MapGameStore } from '@/components/game/mapSource';
@@ -76,16 +78,19 @@ export function buildOptions(game: MapGameStore, x: number, y: number): { builds
 		buildingUpgrades: s.buildingUpgrades ?? [],
 		builders: builderCount({ prestige: s.prestige, gemBuilders: s.gemBuilders }),
 		ownedTiles: economyTiles(s.tiles, s.freeTiles),
+		buildingCopies: limitOf('buildingCopies', { prestige: s.prestige, gemCraft: s.gemCraft }),
 	};
 	const standing = builtBuildings(s.tiles);
 	for (const def of buildingsOfBiome(tile.biome)) {
-		const elsewhere = standing.find((b) => b.id === def.id);
+		const copies = standing.filter((b) => b.id === def.id);
+		const elsewhere = copies[0];
 		if (elsewhere) {
 			const cost = relocationCost(elsewhere.level, ctx.ownedTiles);
 			const problem = moveProblem(ctx, elsewhere.x, elsewhere.y, x, y) ?? (canAffordBundle(s.resources, cost) ? null : 'Not enough resources');
 			out.moves.push({ def, level: elsewhere.level, cost, problem, from: { x: elsewhere.x, y: elsewhere.y } });
-		} else {
-			// an Idol learned in an earlier run is placed again for free at its remembered level
+		}
+		if (copies.length < copiesAllowed(def, ctx.buildingCopies)) {
+			// a copy that can still be built (the first one, or one more with the Building Slots); an Idol learned in an earlier run is placed again for free at its remembered level
 			const remembered = def.kind === 'idol' ? rememberedIdolLevel(s.idolLevels ?? {}, def.biome) : 0;
 			const cost = remembered > 0 ? {} : buildingLevelCost(1, ctx.ownedTiles, def);
 			out.builds.push({

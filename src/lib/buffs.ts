@@ -144,6 +144,8 @@ export function drink(effects: readonly ConsumableEffect[], state: DrinkState, n
 		} else if (effect.kind === 'regen') {
 			if (hp < state.maxHp) useful = true;
 			regen = { hpPerSec: effect.hpPerSec * power, durationSec: effect.durationSec };
+		} else if (effect.kind === 'timeShift') {
+			return { ok: false, message: 'Only the clock can drink this' }; // `applyTimeShift` handles it (lib/offline/consumables.ts)
 		} else {
 			const added = addBuff(buffs, effect, nowSec);
 			if (!added.ok) return added;

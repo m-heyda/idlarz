@@ -1,10 +1,11 @@
-// Lays out the farm's loose parts (public/pixel/farm/*.png, made by scripts/pixel/farm_parts.py) as a list of props on the ground plane: the fence round the pen
-// with its gate, the buildings, troughs, tanks, hay, barrels, crates and pond, trodden dirt, and an endless apron of trees, bushes, stones and flowers
-// outside the fence. Pure: the same call gives the same props, and the apron is built from cells that do not depend on how far the window reaches, so a
+// Lays out the farm's loose parts (public/pixel/farm/*.png: the fence, gate, coop, pine, pond and dirt from scripts/pixel/farm_parts.py, everything else the
+// farm_rework Sprite Fusion set baked down to the pen's pixel grid) as a list of props on the ground plane: the fence round the pen with its gate, the barn,
+// coop, well, produce stall, water tubs, hay, barrels and log piles, the dirt road from the gate to the barn door, and an endless apron of trees, grass
+// tufts, rocks and flowers outside the fence. Pure: the same call gives the same props, and the apron is built from cells that do not depend on how far the window reaches, so a
 // bigger window only adds props at its edge. FarmProps.tsx draws them.
 import parts from '../../../../public/pixel/farm/index.json';
 import { mulberry32 } from '@/lib/rng';
-import { BARN, BARRELS, COOP, CRATES, HAY, POND, SPOTS, TANKS, TROUGHS, project } from './farmGeometry';
+import { BARN, BARRELS, COOP, CRATES, HAY, POND, SPOTS, STALL, TUBS, WELLS, project } from './farmGeometry';
 
 export type FarmPart = keyof typeof parts;
 
@@ -15,6 +16,8 @@ export interface FarmProp {
 	x: number;
 	y: number;
 	ground?: boolean;
+	/** drawn mirrored left to right (a second look for hay, rocks and tufts) */
+	flip?: boolean;
 }
 
 /** Half-extents of the fenced pen and the gate in its near-right fence (y = -HY) */
@@ -45,38 +48,50 @@ export const penProps = (): FarmProp[] => {
 		...fenceRun('y', -HX, -HY, HY),
 		...fenceRun('x', -HY, -HX, HX, GATE),
 		{ key: 'gate', part: 'gate', x: GATE[0], y: -HY },
-		{ key: 'barn', part: 'barn', x: BARN.x, y: BARN.y },
+		{ key: 'barn', part: 'red_barn', x: BARN.x, y: BARN.y },
 		{ key: 'coop', part: 'coop', x: COOP.x, y: COOP.y },
 		{ key: 'pond', part: 'pond', x: POND.x, y: POND.y, ground: true },
 		{ key: 'bucket', part: 'bucket', x: -1.9, y: 2.9 },
+		{ key: 'stall', part: 'produce_stall', x: STALL.x, y: STALL.y },
+		{ key: 'sign', part: 'signpost_blank', x: GATE[1] + 2.4, y: -HY + 1.4 },
+		{ key: 'sheaf-0', part: 'wheat_sheaf', x: BARN.x - 4.4, y: BARN.y - 4.4 },
+		{ key: 'sheaf-1', part: 'wheat_sheaf', x: BARN.x - 5.4, y: BARN.y - 3.6, flip: true },
 	];
-	TROUGHS.forEach(([x, y, axis], i) => {
-		props.push({ key: `dirt-trough-${i}`, part: 'dirt_1', x, y, ground: true });
-		props.push({ key: `trough-${i}`, part: axis === 'x' ? 'trough_x' : 'trough_y', x, y });
-	});
-	TANKS.forEach(([x, y], i) => {
-		props.push({ key: `dirt-tank-${i}`, part: 'dirt_0', x, y, ground: true });
-		props.push({ key: `tank-${i}`, part: 'tank', x, y });
-	});
-	HAY.forEach(([x, y], i) => props.push({ key: `hay-${i}`, part: 'hay', x, y }));
-	BARRELS.forEach(([x, y], i) => props.push({ key: `barrel-${i}`, part: 'barrel', x, y }));
-	CRATES.forEach(([x, y], i) => props.push({ key: `crate-${i}`, part: 'crate', x, y }));
-	SPOTS.forEach(([x, y], i) => props.push({ key: `spot-${i}`, part: 'dirt_2', x, y, ground: true }));
-	// the worn track from the gate to the barn door
+	// the dirt road from the gate to the barn door: down from the gate, across, then up to the door, a chain of overlapping worn patches
 	const gx = (GATE[0] + GATE[1]) / 2;
-	props.push({ key: 'dirt-gate', part: 'dirt_2', x: gx, y: -HY + 0.6, ground: true });
-	const steps = 8;
-	for (let i = 1; i < steps; i++) {
-		const t = i / steps;
-		props.push({ key: `track-${i}`, part: 'dirt_0', x: gx + t * (BARN.x - 1.2 - gx), y: -HY + 0.6 + t * (BARN.y - 1.5 + HY - 0.6), ground: true });
-	}
-	// scenery inside the fence: seeded stones, bushes along the fence and flowers (kept off the buildings and the water)
+	const PATH_Y = -8;
+	const road = (key: string, from: [number, number], to: [number, number]) => {
+		const n = Math.ceil(Math.hypot(to[0] - from[0], to[1] - from[1]) / 1.6);
+		for (let i = 0; i <= n; i++) {
+			const t = i / n;
+			props.push({
+				key: `${key}-${i}`,
+				part: i % 2 ? 'dirt_0' : 'dirt_1',
+				x: from[0] + (to[0] - from[0]) * t,
+				y: from[1] + (to[1] - from[1]) * t,
+				ground: true,
+			});
+		}
+	};
+	road('road-a', [gx, -HY + 0.6], [gx, PATH_Y]);
+	road('road-b', [gx, PATH_Y], [BARN.x, PATH_Y]);
+	road('road-c', [BARN.x, PATH_Y], [BARN.x, BARN.y - 3.4]);
+	TUBS.forEach(([x, y], i) => props.push({ key: `tub-${i}`, part: 'water_tub', x, y }));
+	WELLS.forEach(([x, y], i) => props.push({ key: `well-${i}`, part: 'stone_well', x, y }));
+	const HAY_PARTS: FarmPart[] = ['hay_roll_iso', 'hay_stack_block', 'hay_roll_front'];
+	HAY.forEach(([x, y], i) => props.push({ key: `hay-${i}`, part: HAY_PARTS[i % 3], x, y, flip: i % 2 === 1 }));
+	BARRELS.forEach(([x, y], i) => props.push({ key: `barrel-${i}`, part: i % 3 === 2 ? 'barrel_lid' : 'barrel_upright', x, y }));
+	CRATES.forEach(([x, y], i) => props.push({ key: `crate-${i}`, part: i % 2 === 0 ? 'log_pile' : 'barrel_lid', x, y, flip: i % 3 === 0 }));
+	SPOTS.forEach(([x, y], i) => props.push({ key: `spot-${i}`, part: 'dirt_2', x, y, ground: true }));
+	// scenery inside the fence: seeded rocks, grass tufts along the fence, a few bean sprouts and flowers (kept off the buildings and the water)
 	const rnd = mulberry32(7);
 	const taken: [number, number, number][] = [
 		[BARN.x, BARN.y, 3.2],
 		[COOP.x, COOP.y, 2.2],
 		[POND.x, POND.y, 3],
-		...[...TROUGHS.map(([x, y]) => [x, y] as [number, number]), ...TANKS, ...HAY, ...BARRELS, ...CRATES].map(([x, y]): [number, number, number] => [x, y, 1.6]),
+		[STALL.x, STALL.y, 2.6],
+		...props.filter((p) => p.key.startsWith('road-')).map((p): [number, number, number] => [p.x, p.y, 1.4]),
+		...[...TUBS, ...WELLS, ...HAY, ...BARRELS, ...CRATES].map(([x, y]): [number, number, number] => [x, y, 1.6]),
 	];
 	const free = (x: number, y: number, pad = 0) => taken.every(([tx, ty, r]) => Math.hypot(x - tx, y - ty) > r + pad);
 	const scatter = (n: number, pad: number): [number, number][] => {
@@ -88,22 +103,24 @@ export const penProps = (): FarmProp[] => {
 		}
 		return out;
 	};
-	scatter(22, 0.4).forEach(([x, y], i) => props.push({ key: `stone-${i}`, part: `stone_${i % 3}` as FarmPart, x, y }));
-	for (let i = 0; i < 24; i++) {
+	scatter(9, 0.6).forEach(([x, y], i) => props.push({ key: `stone-${i}`, part: i % 4 === 3 ? 'boulder_flat' : 'rock_cluster', x, y, flip: i % 2 === 1 }));
+	scatter(5, 0.8).forEach(([x, y], i) => props.push({ key: `sprout-${i}`, part: 'beanstalk_sprout', x, y }));
+	for (let i = 0; i < 16; i++) {
 		const t = (rnd() * 2 - 1) * 16;
 		const side = i % 4;
 		const [x, y] = side === 0 ? [t, HY - 0.9] : side === 1 ? [HX - 0.9, t] : side === 2 ? [-HX + 0.9, t] : [t, -HY + 0.9];
-		if (free(x, y) && !(side === 3 && t > GATE[0] - 1.5 && t < GATE[1] + 1.5)) props.push({ key: `edge-bush-${i}`, part: `bush_${i % 3}` as FarmPart, x, y });
+		if (free(x, y) && !(side === 3 && t > GATE[0] - 1.5 && t < GATE[1] + 1.5))
+			props.push({ key: `edge-tuft-${i}`, part: 'grass_tuft', x, y, flip: i % 2 === 1 });
 	}
-	scatter(90, 0.2).forEach(([x, y], i) => props.push({ key: `flower-${i}`, part: `flower_${i % 3}` as FarmPart, x, y }));
+	scatter(60, 0.2).forEach(([x, y], i) => props.push({ key: `flower-${i}`, part: `flower_${i % 3}` as FarmPart, x, y }));
 	return props;
 };
 
-/** World size of one apron cell; every cell decides its own trees, bushes, stones and flowers from its coordinates alone. */
+/** World size of one apron cell; every cell decides its own trees, grass tufts, rocks and flowers from its coordinates alone. */
 const CELL = 5;
 
 /**
- * The meadow outside the fence out to `reach` world units from the pen's centre (in x and y): conifers, bushes, stones and flowers, one deterministic
+ * The meadow outside the fence out to `reach` world units from the pen's centre (in x and y): conifers, grass tufts, rocks and flowers, one deterministic
  * set per cell of the grid, so asking for a larger reach only adds cells. The fenced pen and a margin round it stay free.
  */
 export const apronProps = (reach: number): FarmProp[] => {
@@ -118,8 +135,8 @@ export const apronProps = (reach: number): FarmProp[] => {
 			const [x, y] = at();
 			if (outside(x, y)) {
 				if (roll < 0.16) out.push({ key: `a-${cx}-${cy}-p`, part: 'pine', x, y });
-				else if (roll < 0.45) out.push({ key: `a-${cx}-${cy}-b`, part: `bush_${Math.floor(rnd() * 3)}` as FarmPart, x, y });
-				else if (roll < 0.6) out.push({ key: `a-${cx}-${cy}-s`, part: `stone_${Math.floor(rnd() * 3)}` as FarmPart, x, y });
+				else if (roll < 0.36) out.push({ key: `a-${cx}-${cy}-b`, part: 'grass_tuft', x, y, flip: rnd() < 0.5 });
+				else if (roll < 0.46) out.push({ key: `a-${cx}-${cy}-s`, part: rnd() < 0.3 ? 'boulder_flat' : 'rock_cluster', x, y, flip: rnd() < 0.5 });
 			}
 			const flowers = Math.floor(rnd() * 5);
 			for (let f = 0; f < flowers; f++) {

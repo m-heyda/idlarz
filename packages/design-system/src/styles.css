@@ -989,7 +989,8 @@
 }
 
 .ds-tip-wide .ds-tip-keys {
-	gap: 6px;
+	gap: 4px 6px;
+	flex-wrap: wrap;
 	font-size: 10px;
 }
 
@@ -4621,7 +4622,7 @@ button.ds-income-head:hover {
 
 /* crafting list: slightly bigger icons */
 .ds-hero .ds-craft-list {
-	width: 360px;
+	width: 450px;
 	--ds-slot-size: 52px;
 }
 

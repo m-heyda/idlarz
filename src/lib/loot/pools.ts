@@ -12,6 +12,7 @@ export interface Candidate {
 /** Whether an item belongs to a pool: listed by id, naming the pool in its own `pools`, or carrying every required tag. */
 const inPool = (item: ItemDef, pool: PoolDef): boolean => {
 	if (!pool.enabled || item.enabled === false) return false;
+	if (item.craftOnly && pool.id !== 'equipment_craft') return false; // made at the workbench only
 	if (pool.excludeIds?.includes(item.id)) return false;
 	if (pool.maxGrade && !gradeAllowed(item, pool.maxGrade)) return false;
 	if (pool.excludeTags?.some((tag) => item.tags?.includes(tag))) return false;

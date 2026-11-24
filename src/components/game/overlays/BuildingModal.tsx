@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { BUILDING_LORE, buildingDef, type BuildingDef } from '@/catalog/buildings';
+import { BUILDING_LORE, buildingDef, buildingKindLabel, type BuildingDef } from '@/catalog/buildings';
 import { BUILDING_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import { idolDef } from '@/catalog/idols';
@@ -114,7 +114,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 						<img src={def.art} alt={def.label} style={{ imageRendering: 'pixelated', width: 130, height: 130 }} />
 					</span>
 					<div className='build-head'>
-						<span className={`build-kind build-kind-${def.kind}`}>{def.kind === 'extractor' ? 'Extractor' : def.kind === 'idol' ? 'Idol' : 'Producer'}</span>
+						<span className={`build-kind build-kind-${def.kind}`}>{buildingKindLabel(def)}</span>
 						<span className='build-extra'>{biomeLabel}</span>
 					</div>
 					<div className='bw-levelcard'>

@@ -121,6 +121,8 @@ export type ChestReward =
 			received?: { convertedGold: number; autoSold: { count: number; gold: number } };
 			/** The junk materials the chest held on top of its reward (already in the bag; the gold of what did not fit is in `received`) */
 			junk?: Drop[];
+			/** The gems and ore the chest held for the crafting bag (crafting bag key -> amount; already stored) */
+			finds?: Record<string, number>;
 			inv?: Inventory;
 	  }
 	| { ok: false; reason: 'no_ticket'; tickets: PublicTickets; serverNowSec: number; gemsTotal: number; inv?: Inventory };
@@ -170,6 +172,8 @@ export interface InventoryReply {
 	message?: string;
 	/** The running buffs after a `use` (only on that operation) */
 	buffs?: ActiveBuff[];
+	/** A time-shift potion's payment (only on a `use` of one): the income of the hour and the timers it ran ahead; the browser applies it like an absence (`applyOfflineGrant`) without the rest */
+	shifted?: OfflineGrant;
 }
 
 /**
@@ -191,6 +195,10 @@ export interface CraftState {
 	last: number;
 	/** The timed batches that are running (docs/plan/crafting-v0.md, Timed batch queue); at most `craftQueueSlots` of them. Empty for most players. */
 	queue: CraftQueueEntry[];
+	/** Time-shift potions drunk on `day` (the UTC day number): the daily cap (`TIME_SHIFT.perDay`). Absent for most players. */
+	shift?: { day: number; used: number };
+	/** Enchants done, lifetime: the seal counter of the enchant rolls (kept apart from `ord` so an enchant never shifts a gear craft). Absent until the first one. */
+	ordEnchant?: number;
 }
 
 /**
@@ -205,6 +213,8 @@ export interface CraftQueueEntry {
 	startedAt: number;
 	/** Seconds one craft takes, speed multiplier included, fixed when the batch was queued */
 	timeSec: number;
+	/** The share of the resources the batch paid (`craftCostFactor`, left out = 1: no discount), so a cancel refunds what was charged whatever the player owns later */
+	costFactor?: number;
 }
 
 /** Why a craft was refused (nothing is charged and nothing is changed) */
@@ -220,7 +230,12 @@ export type CraftRefusal =
 	| 'queue_full'
 	| 'no_batch'
 	| 'nothing_ready'
-	| 'not_in_stash';
+	| 'not_in_stash'
+	| 'bad_item'
+	| 'bad_affix'
+	| 'affix_cap'
+	| 'needs_ichor'
+	| 'already_have';
 
 /** What /api/craft answers: whether it was done, why not, how many were made, and the bag and crafting state as they stand now. */
 export interface CraftReply {

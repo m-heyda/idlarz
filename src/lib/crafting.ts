@@ -2,9 +2,10 @@
 // overlay both use these, so a level and a price are the same on both sides.
 import { INGREDIENT_BY_ID } from '@/catalog/ingredients';
 import { JUNK_ITEMS } from '@/catalog/items/junk';
-import { RESOURCES, type MerchantResourceKey } from '@/catalog/resources';
+import { RESOURCES, craftValueOf, type MerchantResourceKey } from '@/catalog/resources';
 import { RECIPES, type Recipe } from '@/catalog/recipes';
-import { CRAFTING } from '@/config/crafting';
+import { CRAFTING, CRAFT_DISCOUNT_MAX } from '@/config/crafting';
+import { emberEffect } from '@/utils/game/emberEffects';
 import { HARD_LIMITS } from '@/config/limits';
 import { limitOf, type LimitContext } from '@/lib/limits';
 import type { CraftQueueEntry, CraftState } from '@/lib/offline/types';
@@ -124,7 +125,7 @@ export const stashKeyOf = (recipe: Recipe): string =>
 		? recipe.output.item
 		: 'component' in recipe.output
 			? recipe.output.component
-			: `gear:${recipe.output.gear.grade}:${recipe.output.gear.slot}`;
+			: `gear:${recipe.output.gear.grade}:${recipe.output.gear.slot}${recipe.output.gear.type ? `:${recipe.output.gear.type}` : ''}`;
 
 /** The recipe that makes a component (the first one, there is one per component). */
 const makerOf = (component: string): Recipe | undefined => RECIPES.find((r) => 'component' in r.output && r.output.component === component);
@@ -138,7 +139,7 @@ export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): nu
 	let sum = 0;
 	for (const input of recipe.inputs) {
 		if ('resource' in input) {
-			sum += input.qty * RESOURCES[input.resource].merchant.price;
+			sum += input.qty * craftValueOf(input.resource);
 			continue;
 		}
 		const maker = makerOf(input.component);
@@ -154,12 +155,23 @@ export const recipeCostGold = (recipe: Recipe, seen: readonly string[] = []): nu
 	return sum;
 };
 
-/** What `count` crafts of a recipe take: the merchant resources (paid by the browser) and the components (taken by the server from its stock). */
-export const craftNeeds = (recipe: Recipe, count: number) => {
+/**
+ * The share of a recipe's resources a craft pays now: 1 minus the Ember shop's Thrifty Hands (3% per level) and the Gem shop's Bulk Discount (10%), together at most `CRAFT_DISCOUNT_MAX`. Components and dropped ingredients are never discounted.
+ *
+ * @category Economy/Crafting
+ * @order 6
+ * @formula
+ * factor = 1 - min(0.25, 0.03 x Thrifty Hands level + 0.10 if Bulk Discount is owned)        resource qty = ceil(recipe qty x crafts x factor), at least 1
+ */
+export const craftCostFactor = (ctx: LimitContext = {}): number =>
+	1 - Math.min(CRAFT_DISCOUNT_MAX, emberEffect(ctx.prestige, 'thrifty') / 100 + (ctx.gemCraft?.discount ?? 0));
+
+/** What `count` crafts of a recipe take: the merchant resources (paid by the browser, `factor` of them with a discount) and the components (taken by the server from its stock). */
+export const craftNeeds = (recipe: Recipe, count: number, factor = 1) => {
 	const resources: { key: MerchantResourceKey; qty: number }[] = [];
 	const components: { id: string; qty: number }[] = [];
 	for (const input of recipe.inputs) {
-		if ('resource' in input) resources.push({ key: input.resource, qty: input.qty * count });
+		if ('resource' in input) resources.push({ key: input.resource, qty: Math.max(1, Math.ceil(input.qty * count * factor - 1e-9)) });
 		else components.push({ id: input.component, qty: input.qty * count });
 	}
 	return { resources, components };
@@ -171,10 +183,10 @@ export type CraftBlock = 'locked' | 'resources' | 'components';
 export const craftBlock = (
 	recipe: Recipe,
 	count: number,
-	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number> },
+	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number>; costFactor?: number },
 ): CraftBlock | null => {
 	if (have.craftLevel < recipe.unlock) return 'locked';
-	const needs = craftNeeds(recipe, count);
+	const needs = craftNeeds(recipe, count, have.costFactor);
 	if (needs.resources.some((n) => (have.resources[n.key] ?? 0) < n.qty)) return 'resources';
 	if (needs.components.some((n) => (have.stock[n.id] ?? 0) < n.qty)) return 'components';
 	return null;
@@ -183,11 +195,12 @@ export const craftBlock = (
 /** Most crafts of a recipe the player can start now: the scarcest input decides, capped at the batch cap (0 when locked). */
 export const maxCraftable = (
 	recipe: Recipe,
-	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number> },
+	have: { craftLevel: number; resources: Partial<Record<string, number>>; stock: Record<string, number>; costFactor?: number },
 ): number => {
 	if (have.craftLevel < recipe.unlock) return 0;
-	const one = craftNeeds(recipe, 1);
+	const one = craftNeeds(recipe, 1, have.costFactor);
 	let most = craftLimit('craftBatchCap');
+	// with a discount the cost of one craft rounds up, so a big batch can cost slightly less than count x one: the exact check is `craftBlock`
 	for (const n of one.resources) most = Math.min(most, Math.floor((have.resources[n.key] ?? 0) / n.qty));
 	for (const n of one.components) most = Math.min(most, Math.floor((have.stock[n.id] ?? 0) / n.qty));
 	return Math.max(0, most);

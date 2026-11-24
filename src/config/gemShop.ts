@@ -19,6 +19,10 @@ export type GemItemId =
 	| 'name_void'
 	| 'name_galaxy'
 	| 'builder_2'
+	| 'master_workbench'
+	| 'overnight_orders'
+	| 'bulk_discount'
+	| 'building_slot'
 	| `castle_skin_${number}`;
 
 export interface GemItem {
@@ -31,8 +35,10 @@ export interface GemItem {
 	name: string;
 	/** One line: what the player gets. */
 	blurb: string;
-	/** Gems charged per purchase. */
+	/** Gems charged per purchase (for an item with `tiers`: the price of the first level). */
 	price: number;
+	/** A `once` item bought in levels (Additional builder): the price of each level, in order; the purchase count in `bought` is the level. Absent: one purchase. */
+	tiers?: readonly number[];
 	/** Seconds that must pass between two purchases of this item (0 = none). */
 	cooldownSec: number;
 }
@@ -51,7 +57,7 @@ export const DAY_SEC = 86_400;
  *
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
- * - **Builder #2** (1000, once; Upgrades tab): a second builder, so two castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; it is the ledger's record and the server's save check allows two timers only with it.
+ * - **Additional builder** (id `builder_2`, three levels of 2,000 / 6,000 / 12,000 = 20,000 gems; Upgrades tab): each level is one more builder, so up to three more castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; the purchase count in the ledger is the level and the server's save check allows that many timers. An account that bought the old one-time Builder #2 owns level 1.
  *
  * - **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
  *
@@ -157,9 +163,46 @@ export const GEM_SHOP: readonly GemItem[] = [
 		id: 'builder_2',
 		tab: 'upgrades',
 		kind: 'once',
-		name: 'Builder #2',
-		blurb: 'A second builder: two castle or building upgrades can run at the same time. Permanent, it survives a rebirth.',
+		name: 'Additional builder',
+		blurb: 'One more builder: another castle or building upgrade can run at the same time. Three levels, each dearer. Permanent, it survives a rebirth.',
+		price: 2000,
+		tiers: [2000, 6000, 12000],
+		cooldownSec: 0,
+	},
+	{
+		id: 'master_workbench',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Master Workbench',
+		blurb: 'Crafting batches finish 50% faster. Permanent, it survives a rebirth.',
+		price: 1500,
+		cooldownSec: 0,
+	},
+	{
+		id: 'overnight_orders',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Overnight Orders',
+		blurb: 'A crafting batch may run 24 hours longer without a claim. Permanent, it survives a rebirth.',
 		price: 1000,
+		cooldownSec: 0,
+	},
+	{
+		id: 'building_slot',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Building Slot',
+		blurb: 'Build one more copy of every Producer and Extractor on the map. Permanent, it survives a rebirth.',
+		price: 6000,
+		cooldownSec: 0,
+	},
+	{
+		id: 'bulk_discount',
+		tab: 'upgrades',
+		kind: 'once',
+		name: 'Bulk Discount',
+		blurb: 'Every craft takes 10% fewer resources. Permanent, it survives a rebirth.',
+		price: 1500,
 		cooldownSec: 0,
 	},
 ];
@@ -167,8 +210,46 @@ export const GEM_SHOP: readonly GemItem[] = [
 /** The id of the Builder #2 purchase (`ledger.gemShop.bought`). */
 export const BUILDER_ITEM: GemItemId = 'builder_2';
 
-/** Builders the Gem shop gave an account: 1 once Builder #2 is in `bought`, else 0 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
-export const gemBuildersOf = (bought: Record<string, number> | undefined): number => ((bought?.[BUILDER_ITEM] ?? 0) > 0 ? 1 : 0);
+/** The most builders the Gem shop adds: one per level of the Additional builder. */
+export const GEM_BUILDERS_MAX = 3;
+
+/** Builders the Gem shop gave an account: the level of the Additional builder in `bought`, 0 to 3 (the server's ledger is the record; the game mirrors it as `gemBuilders`). */
+export const gemBuildersOf = (bought: Record<string, number> | undefined): number =>
+	Math.min(GEM_BUILDERS_MAX, Math.max(0, Math.floor(bought?.[BUILDER_ITEM] ?? 0)));
+
+/** How many times an item has been bought (its level, for one with `tiers`). */
+export const gemLevelOf = (item: GemItem, bought: Record<string, number> | undefined): number => Math.max(0, Math.floor(bought?.[item.id] ?? 0));
+
+/** True when nothing more of a `once` item can be bought: owned, or every level of a tiered one. */
+export const gemMaxedOf = (item: GemItem, bought: Record<string, number> | undefined): boolean =>
+	item.kind === 'once' && gemLevelOf(item, bought) >= (item.tiers?.length ?? 1);
+
+/** What the next purchase of an item costs: the price of its next level for a tiered item, else its price. */
+export const gemNextPrice = (item: GemItem, bought: Record<string, number> | undefined): number =>
+	item.tiers ? item.tiers[Math.min(gemLevelOf(item, bought), item.tiers.length - 1)] : item.price;
+
+/** What the Gem shop's crafting items give an account (the ledger's `bought` record is the truth; the game mirrors it as `gemCraft`): extra craft speed, extra hours a batch may run, and the share of the resources a craft saves. */
+export interface GemCraft {
+	speed: number;
+	hours: number;
+	discount: number;
+	/** The Building Slot item: one more copy of every Producer and Extractor (0 or 1). It lives here with the other Gem shop items the game mirrors from the ledger. */
+	slots: number;
+}
+export const NO_GEM_CRAFT: GemCraft = { speed: 0, hours: 0, discount: 0, slots: 0 };
+
+/**
+ * The crafting bonuses of the Gem shop's one-time items: Master Workbench +0.5 craft speed, Overnight Orders +24 hours of batch run, Bulk Discount -10% resources (read by `limitOf` and `craftCostFactor`).
+ *
+ * @category Economy/Gems
+ * @order 3
+ */
+export const gemCraftOf = (bought: Record<string, number> | undefined): GemCraft => ({
+	speed: (bought?.master_workbench ?? 0) > 0 ? 0.5 : 0,
+	hours: (bought?.overnight_orders ?? 0) > 0 ? 24 : 0,
+	discount: (bought?.bulk_discount ?? 0) > 0 ? 0.1 : 0,
+	slots: (bought?.building_slot ?? 0) > 0 ? 1 : 0,
+});
 
 /** A purchase above this many gems asks for a confirmation in the shop window. */
 export const GEM_CONFIRM_ABOVE = 300;

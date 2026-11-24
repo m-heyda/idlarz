@@ -10,7 +10,8 @@ import { isAutoSold, junkFor, junkSale, withJunkMark } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
 import type { EquipmentSlot } from '@/types/game';
-import { ratesWithGear, type GameGet, type GameSet } from './base';
+import { applyOfflineGrant } from '@/lib/offline/apply';
+import { limitCtx, ratesWithGear, type GameGet, type GameSet } from './base';
 import type { InventorySync } from './inventorySync';
 import audioManager from '@/utils/audioManager';
 
@@ -29,6 +30,11 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 			if (!stack || !hasEffects(ITEM_CATALOG[stack.id])) return false;
 			sendInventoryOp({ action: 'use', index: bagIndex }, (reply) => {
 				if (reply?.ok) audioManager.playSound('gulp');
+				// a time-shift potion: the server paid the hour, the browser runs its resources and timers ahead (as for an absence, but no rest)
+				if (reply?.ok && reply.shifted) {
+					const state = get();
+					set(applyOfflineGrant(state, reply.shifted, limitCtx(state)).patch);
+				}
 			});
 			return true;
 		},

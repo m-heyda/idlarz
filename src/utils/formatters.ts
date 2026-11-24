@@ -125,10 +125,10 @@ export const formatCompact = (n: number | undefined, decimals = 1): string => {
 	return trimmed(n, decimals);
 };
 
-/** A stack count on a bag slot: plain up to 999, then short in lower case from 1k (1k, 1.5k, 100k, 2.5m) */
+/** A stack count on a bag slot: plain up to 999, then short in lower case from 1k (1k, 1.5k, 100k, 2.5m, 3b, 1t) */
 export const formatStack = (n: number): string => {
 	if (!Number.isFinite(n) || n < 1000) return String(Math.max(0, Math.floor(n)));
-	const [div, unit] = n >= 1_000_000 ? [1_000_000, 'm'] : [1000, 'k'];
+	const [div, unit] = n >= 1e12 ? [1e12, 't'] : n >= 1e9 ? [1e9, 'b'] : n >= 1_000_000 ? [1_000_000, 'm'] : [1000, 'k'];
 	return `${Math.floor((n / div) * 10) / 10}${unit}`;
 };
 

@@ -182,21 +182,30 @@ test('Name colours: a one-time purchase of 1000 gems, a second one is refused an
 	assert.equal(short.reason, 'short_balance');
 });
 
-test('Builder #2: a one-time purchase of 1000 gems on the Upgrades tab; the ledger record is the second builder', async () => {
+test('Additional builder: three levels (2,000 / 6,000 / 12,000 gems, 20,000 in all) on the Upgrades tab; the purchase count in the ledger is the number of extra builders', async () => {
 	const item = GEM_SHOP.find((i) => i.id === 'builder_2');
-	assert.equal(item?.price, 1000);
+	assert.deepEqual(item?.tiers, [2000, 6000, 12000]);
+	assert.equal(
+		item?.tiers?.reduce((a, b) => a + b, 0),
+		20_000,
+	);
 	assert.equal(item?.kind, 'once');
 	assert.equal(item?.tab, 'upgrades');
 	assert.equal(gemBuildersOf({}), 0);
+	assert.equal(gemBuildersOf({ builder_2: 9 }), 3, 'never more than three');
 	const { m } = await started();
-	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gems: 1500 });
-	const bought = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, T0 + STEP));
-	assert.equal(bought.ok, true);
-	assert.equal(bought.paid, 1000);
-	assert.equal(gemBuildersOf(bought.bought), 1);
-	const again = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, T0 + STEP + 1000));
+	m.ledgers.set(ID, { ...m.ledgers.get(ID)!, gems: 25_000 });
+	let t = T0 + STEP;
+	for (const [level, price] of [2000, 6000, 12000].entries()) {
+		const bought = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, t));
+		assert.equal(bought.ok, true, `level ${level + 1}`);
+		assert.equal(bought.paid, price);
+		assert.equal(gemBuildersOf(bought.bought), level + 1);
+		t += 1000;
+	}
+	const again = ok(await gems(m, { action: 'spend', itemId: 'builder_2' }, t));
 	assert.equal(again.reason, 'already_owned');
-	assert.equal(m.ledgers.get(ID)!.gems, 500, 'nothing more is charged');
+	assert.equal(m.ledgers.get(ID)!.gems, 5000, 'nothing more is charged');
 });
 
 test('castle skins: fourteen one-time cosmetics of 2,500 gems each on the Cosmetics tab, owned through the ledger record', async () => {

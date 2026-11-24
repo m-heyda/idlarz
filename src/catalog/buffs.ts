@@ -51,7 +51,9 @@ export type ConsumableEffect =
 	| { kind: 'healMp'; amount: number }
 	/** Heals `hpPerSec` for `durationSec` seconds (a heal over time kept by the fight, not a buff record) */
 	| { kind: 'regen'; hpPerSec: number; durationSec: number }
-	| { kind: 'buff'; family: BuffFamily; stat: BuffStat; amount: number; durationSec: number };
+	| { kind: 'buff'; family: BuffFamily; stat: BuffStat; amount: number; durationSec: number }
+	/** Moves the clock forward (IDL-355): the server pays `seconds` of income at the away efficiency and the browser runs the castle and building timers (and the monsters' age) that many seconds ahead. Applied by `applyTimeShift`, never by `drink`. */
+	| { kind: 'timeShift'; seconds: number };
 
 /** The HP one potion restores at once (0 when it has no `healHp` effect). Sums the effects so a two-part potion still reads right. */
 export const healHpOf = (def: Pick<ItemDef, 'effects'> | undefined): number =>
@@ -79,6 +81,8 @@ export function describeEffect(effect: ConsumableEffect): string {
 			return `Restores ${fmt(effect.amount)} Mana`;
 		case 'regen':
 			return `Heals ${fmt(effect.hpPerSec)} HP per second for ${fmt(effect.durationSec)} s`;
+		case 'timeShift':
+			return `Moves the clock forward ${effect.seconds >= 3600 ? `${fmt(effect.seconds / 3600)} hour${effect.seconds === 3600 ? '' : 's'}` : `${fmt(effect.seconds / 60)} minutes`}: income and building timers`;
 		case 'buff': {
 			const min = effect.durationSec >= 120 && effect.durationSec % 60 === 0;
 			const time = min ? `${effect.durationSec / 60} min` : `${fmt(effect.durationSec)} s`;

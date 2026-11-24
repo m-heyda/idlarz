@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { zeroTotals, type GrantTotals } from '../../src/lib/offline/ledger';
 import assert from 'node:assert/strict';
 import { api, growTo, rebirthReadyGame, store } from '../helpers';
 import { pickPersisted, type PersistedGame } from '../../src/lib/sanitizeSave';
@@ -427,6 +428,15 @@ test('a castle level whose timer ran out on the clock raises no flag; a level th
 	assert.ok(flagsOf(castleAt(base, 1, null), castleAt(base, 2, null), T0 + 60_000).includes('castle_jump'));
 	// two levels at once
 	assert.ok(flagsOf(castleAt(base, 1, 10), castleAt(base, 3, null), T0 + 3600_000).includes('castle_jump'));
+});
+
+test('a time-shift potion lets the castle timer run ahead by the shifted seconds, and by no more', () => {
+	const prev = castleAt(game(), 1, 7200);
+	const next = castleAt({ ...prev, playSeconds: prev.playSeconds + 60 }, 1, 7200 - 60 - 3600);
+	const flags = (grants?: GrantTotals) => verifyTransition(snap(prev), summarize(next), T0 + 61_000, grants);
+	assert.ok(flags().includes('castle_jump'), 'an hour off the timer in a minute, with nothing paid for it');
+	assert.ok(!flags({ ...zeroTotals(), shiftSec: 3600 }).includes('castle_jump'), 'the server shifted an hour');
+	assert.ok(flags({ ...zeroTotals(), shiftSec: 1800 }).includes('castle_jump'), 'half an hour shifted does not explain an hour');
 });
 
 test('a running castle timer that lost more seconds than passed is a castle_jump; one that ran normally is not', () => {

@@ -107,7 +107,7 @@ const ROSTER: readonly RosterRow[] = [
 	normal('brambleImp', 'Bramble Imp', 'forest', true),
 	normal('rotcapStag', 'Rotcap Stag', 'forest', true),
 	normal('emberSquirrel', 'Ember Squirrel', 'forest', false, PLACEHOLDER),
-	normal('pineconeWarden', 'Pinecone Warden', 'forest', false, PLACEHOLDER),
+	normal('pineconeWarden', 'Pinecone Warden', 'forest', true),
 	boss('bossElderStag', 'The Elder Stag', 'forest', true),
 
 	// the first four were stand-ins (retired, see `RETIRED_MONSTERS`); the roster below has the real art
@@ -120,7 +120,7 @@ const ROSTER: readonly RosterRow[] = [
 	normal('magmaCrab', 'Magma Crab', 'hills', false, PLACEHOLDER),
 	normal('mawhornBrute', 'Mawhorn Brute', 'hills', true),
 	normal('quarryDrake', 'Quarry Drake', 'hills', false, PLACEHOLDER),
-	normal('cairnSentinel', 'Cairn Sentinel', 'hills', false, PLACEHOLDER),
+	normal('cairnSentinel', 'Cairn Sentinel', 'hills', true),
 	normal('quarryRatKnight', 'Quarry Rat Knight', 'hills', true),
 	normal('highlandGnoll', 'Highland Gnoll', 'hills', false, PLACEHOLDER),
 	boss('bossIronhorn', 'The Ironhorn', 'hills', true),
@@ -131,7 +131,8 @@ const ROSTER: readonly RosterRow[] = [
 	normal('dumpback', 'Dumpback', 'swamp', true),
 	normal('rotHeron', 'Rot Heron', 'swamp', true),
 	normal('scrapGolem', 'Scrap Golem', 'swamp', true),
-	normal('bogfireWisp', 'Bogfire Wisp', 'swamp', false, PLACEHOLDER),
+	// the id stays (ids are append-only); the picture is a sludge cyclops, so it is named for what it looks like
+	normal('bogfireWisp', 'Sludge Cyclops', 'swamp', true),
 	boss('bossMireMatriarch', 'The Mire Matriarch', 'swamp', true),
 
 	normal('frostHare', 'Frost Hare', 'tundra', true),
@@ -171,7 +172,7 @@ const ROSTER: readonly RosterRow[] = [
 	normal('bucketKnight', 'Bucket Knight', 'fields', true),
 	normal('hedgeBandit', 'Hedge Bandit', 'fields', true),
 	normal('crowMarshal', 'Crow Marshal', 'fields', false, PLACEHOLDER),
-	normal('millstoneGolem', 'Millstone Golem', 'fields', false, PLACEHOLDER),
+	normal('millstoneGolem', 'Millstone Golem', 'fields', true),
 	boss('bossHarvestMatron', 'The Harvest Matron', 'fields', true),
 
 	normal('greenscaleWarden', 'Greenscale Warden', 'orchard', true),
