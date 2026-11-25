@@ -17,19 +17,6 @@
 	cursor: pointer;
 }
 
-.inv-slot[data-equipped='true'] {
-	background-image: url('/pixel/ui/slot_frame_active.png');
-}
-
-.inv-slot[data-over='true'] {
-	outline: 2px solid #f0d27a;
-	outline-offset: -2px;
-}
-
-.inv-slot[data-locked='true'] {
-	opacity: 0.55;
-}
-
 /* Rarity glow: colour, blur and opacity come from the catalog (catalog/rarity.ts) through --glow / --glow-blur / --glow-alpha */
 .inv-icon {
 	filter: drop-shadow(0 0 var(--glow-blur, 3px) color-mix(in srgb, var(--glow, transparent) calc(var(--glow-alpha, 0.5) * 100%), transparent));
@@ -73,27 +60,6 @@
 	pointer-events: none;
 }
 
-/* a plain padlock drawn with two blocks: shackle above, body below */
-.inv-lock {
-	position: absolute;
-	width: 16px;
-	height: 14px;
-	background: #6a5a48;
-	box-shadow: 0 0 0 2px #1a1208;
-	pointer-events: none;
-}
-
-.inv-lock::before {
-	content: '';
-	position: absolute;
-	left: 3px;
-	top: -9px;
-	width: 10px;
-	height: 8px;
-	border: 2px solid #a89878;
-	border-bottom: 0;
-}
-
 /* The merchant's shelf: small slots standing on wooden planks, a Buy button hanging under each (the price shows on hover). The wood is CSS only
    (the kit's bronze and brown ramp: grain, a lit top edge, a dark underside, a front lip, nails), no image. Cells stand 4 to a plank. */
 
@@ -115,15 +81,6 @@
 
 /* the name and badge are one button: it opens the badge and title picker */
 
-/* hover wrapper of a button with a hover card: a disabled button would swallow the hover */
-.tip-btn-wrap {
-	display: block;
-	width: 100%;
-}
-.tip-btn:disabled {
-	pointer-events: none;
-}
-
 /* --- the Equipment tab: compact level bar, item level, the slots in groups --- */
 
 /* the stony XP bar of the hero scene, laid out in a row instead of pinned to the floor of the alcove */
@@ -144,27 +101,3 @@
 /* a panel title with the points pill: one separator under the whole row (the title's own line stopped at the pill) */
 
 /* the row a click on a header resource selected (IDL-315) */
-
-/* a legendary's story under its flavour line: two lines in the card, the full text in the title and the Glossary (IDL-317) */
-.px-tip-lore {
-	display: -webkit-box;
-	-webkit-line-clamp: 2;
-	-webkit-box-orient: vertical;
-	overflow: hidden;
-	margin-top: 4px;
-	color: #c9b27a;
-}
-
-/* a bag piece that Sell junk would sell (IDL-312): a small brown tag in the corner */
-.inv-slot[data-junk='true']::after {
-	content: '';
-	position: absolute;
-	top: 2px;
-	right: 2px;
-	width: 8px;
-	height: 8px;
-	background: #8a5a2a;
-	border: 1px solid #f0d27a;
-	transform: rotate(45deg);
-	pointer-events: none;
-}

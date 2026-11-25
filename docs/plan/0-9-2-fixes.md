@@ -15,22 +15,15 @@ Nothing of PR #295 was seen with a login. Walk through with a real account; any 
 
 Owner and dashboard work (no code): Supabase Confirm email, SMTP and redirect URLs, and `supabase/migrations/player_class_open.sql` on a branch first (required before a fifth hero class, IDL-280); Vercel `LOOT_SECRET` per deployment, optional firewall rate rules, the free-plan load check (IDL-126); the two enforcement switches (`ENFORCEMENT`, `EMBER_MODEL.requireServerRebirth`, IDL-208, IDL-211) after `restore-trust` and `check-live-saves`; a raised `GAME_EPOCH` (IDL-300) only when a later chapter is wanted.
 
-## Batch 1: quick wins (one PR, about a day; text, display, small pure code, measurement)
+## Batch 1: done (PR to staging, 0.9.2 batch 1)
 
-| Item | Where | Why quick |
-|---|---|---|
-| IDL-174 the "Base: +25 % gold" line in the stat panel and the tutorial wording | `src/components/game/hero/HeroStats.tsx`, `src/catalog/tutorial.ts` | wording only |
-| IDL-172 set-weapon tooltip | tooltip code (`src/components/game/itemUi.ts`) | display only |
-| IDL-176 Heal on Kill in the win estimate for chained fights | `src/lib/offline/winChance.ts` | pure function plus a unit test |
-| IDL-163 per-tier chest art (all eight tiers use `bonus_chest`) | `src/config/pixelIcons.ts`, `public/pixel/` | recolour the existing image (Sprite Fusion first, no generator) |
-| IDL-198 and IDL-100 the "run-2 ratio 60-70 %" re-measure | pace sim | measurement; record the number, may reveal a balance item |
+IDL-174, the set-weapon note of IDL-172 and the per-tier chest art of IDL-163 shipped; the run-2 ratio was read from the committed pace output and did not move (hardcore-rebirth6 1.8 d to 1.7 d, about 33 % of run 1; human-rebirth6 8.0 d against 7.0 d, castle timers set the pace). **Left over from it:** the Heal on Kill preview in the win estimate (IDL-176): the estimate already starts from the resume HP after a kill, only the Next-strip preview mid-fight lacks it; low value, no sim needed.
 
 ## Batch 2: small code with tests (one PR each, 1-2 days)
 
-- IDL-163 chest level from the monster instead of the castle: an optional level on the bag stack (additive; `tests/saves/saveFixtures.test.ts` and `appendOnly.test.ts` stay green, fixtures untouched).
-- IDL-176 fixed base-stat authoring of the four combat stats on items (they are affixes only today).
-- IDL-172 the unreachable super crit cap (`crit.maxSuperChance` in `src/config/combatConfig.ts`): cap or sources, update the JSDoc, run fight-sim.
-- IDL-383 `ItemTooltip.tsx` and `ItemSlot.tsx` onto `GameItemTip`, plus the QA pass at 1240 / 1440 / 1920.
+- IDL-383 **mostly done:** `ItemSlot` now uses `HoverTip` + `GameItemTip` and `ItemTooltip.tsx` (with `FloatingTip`, the unused `TipButton` and their `px-tooltip` CSS) is gone. **Not seen in the game yet:** hover a victory-loot slot and a potion on the fight bar at 1240 / 1440 / 1920 px (needs a real fight); the rest of IDL-383's QA list (Esc order, dock icons, tutorial anchors, `e2e/`) is still open.
+- IDL-176 fixed base-stat authoring of the four combat stats on items (they are affixes only today); needs a design pass first (IDL-387).
+- **Dropped after reading the code:** a chest level from the monster (IDL-163): an opened chest pays minutes of the player's own income (`rollMonsterChest`) and nothing reads a chest level, so a level on the bag stack would be dead data; it comes back with gear and bag tokens in the contents (Batch 3). The super crit cap of IDL-172 is already pinned (`tests/audit/combat.test.ts`, `tests/economy/merchantUpgrades.test.ts`): `crit.maxSuperChance` stays 50 as the guard for future perks (gear alone reaches about 33 %); only IDL-172 item 3 (affix level scale, a design question) remains.
 
 ## Batch 3: needs balance tooling or a decision (own PR, slow checks)
 

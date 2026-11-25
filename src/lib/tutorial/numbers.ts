@@ -1,10 +1,12 @@
 import type { TutorialNumbers } from '@/catalog/tutorial';
 import { CASTLE_UPGRADE } from '@/config/castle';
-import { COMBAT } from '@/config/combatConfig';
+import { INITIAL_CHARACTER_STATS } from '@/config/character';
+import { COMBAT, STAT_RULES } from '@/config/combatConfig';
 import { ANIMALS } from '@/config/farm';
 import { REBIRTH } from '@/config/rebirth';
 import { CHEST } from '@/config/spawns';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
+import { calculateStatResourceModifiers } from '@/utils/game/character';
 import { calculateAnimalCost } from '@/utils/game/farm';
 import { calculateTileCost } from '@/utils/game/costs';
 
@@ -44,5 +46,7 @@ export const buildNumbers = (): TutorialNumbers => {
 		rebirthCastle: REBIRTH.minCastleLevel,
 		rebirthTiles: REBIRTH.minTiles,
 		autoRebirths: COMBAT.auto.minRebirths,
+		startGoldPct: Math.round(calculateStatResourceModifiers(INITIAL_CHARACTER_STATS).gold * 100),
+		attributeBase: STAT_RULES.base,
 	};
 };

@@ -113,7 +113,14 @@ const BASE_ICON_SIZES = {
 	water_dolphin: [120, 24], // 5 poses of 24x24 of a leaping dolphin; WaterLayer moves the pose along the arc
 	water_splash: [80, 8], // 4 frames of 20x8: the ring where the dolphin leaves and enters the water
 	xp: [40, 40],
-	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips
+	bonus_chest: [32, 32], // the chest alone, for toasts and tooltips (the wooden monster chest)
+	chest_iron: [32, 32], // monster chest of the iron tier (IDL-163): the bonus_chest recoloured
+	chest_mossy: [32, 32], // monster chest of the mossy tier (IDL-163): the bonus_chest recoloured
+	chest_coral: [32, 32], // monster chest of the coral tier (IDL-163): the bonus_chest recoloured
+	chest_frost: [32, 32], // monster chest of the frost tier (IDL-163): the bonus_chest recoloured
+	chest_magma: [32, 32], // monster chest of the magma tier (IDL-163): the bonus_chest recoloured
+	chest_royal: [32, 32], // monster chest of the royal tier (IDL-163): the bonus_chest recoloured
+	chest_arcane: [32, 32], // monster chest of the arcane tier (IDL-163): the bonus_chest recoloured
 	chest_map: [48, 40], // the map pickup: chest on a grass patch
 	chest_map_anim: [192, 40], // 4 idle frames of chest_map (lock and lid glints)
 	// twinkle strips: 6 frames of the sprite with glints that swell and fade

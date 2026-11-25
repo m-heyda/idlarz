@@ -34,7 +34,7 @@ import { useGameStore } from '@/stores/gameStore';
 import type { Equipment, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { sellPayout } from '@/utils/game/merchant';
-import { itemIconName } from '../itemUi';
+import { itemIconName, setPieceSlotNote } from '../itemUi';
 
 const slotName = (slot: string): string => (slot === 'ring' ? 'Ring' : ((EQUIPMENT_SLOT_LABEL as Record<string, string>)[slot] ?? slot));
 
@@ -252,7 +252,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 					? {
 							title: `${set.label} (${setCount}/${set.size})`,
 							pieces: set.pieces.map((id) => ({
-								name: `${ITEM_CATALOG[id].name}${ITEM_CATALOG[id].slot ? ` (${slotName(ITEM_CATALOG[id].slot)})` : ''}`,
+								name: `${ITEM_CATALOG[id].name}${ITEM_CATALOG[id].slot ? ` (${setPieceSlotNote(slotName(ITEM_CATALOG[id].slot), ITEM_CATALOG[id].slot)})` : ''}`,
 								worn: equippedIds.includes(id),
 							})),
 							bonuses: Object.entries(set.bonuses).map(([count, bonus]) => ({
