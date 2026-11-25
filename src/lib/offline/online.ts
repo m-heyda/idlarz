@@ -648,7 +648,9 @@ export const characterStep = (
 		const attrs = ledger.attrs ?? newAttrs();
 		const xp = (ctx.stored.core.resources as { xp?: unknown } | undefined)?.xp;
 		const unseenXp = Math.max(0, (ledger.granted.xp ?? 0) - (ledger.grantedSeen.xp ?? 0));
-		const budget = attributeBudget(levelOfXp((typeof xp === 'number' ? xp : 0) + unseenXp), ledger.rebirths);
+		// the rebirths the stored save holds count too: the ledger learns a rebirth from the save that follows it, and until then it is one behind, which refused the 20 points that rebirth gave (the save pipeline and the browser already count them)
+		const rebirths = Math.max(ledger.rebirths, ctx.stored.summary.rebirths);
+		const budget = attributeBudget(levelOfXp((typeof xp === 'number' ? xp : 0) + unseenXp), rebirths);
 		const view = (a: Attrs, ok: boolean, reason?: CharacterReply['reason']): CharacterReply => ({
 			ok,
 			...(reason ? { reason } : {}),

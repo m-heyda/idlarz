@@ -354,6 +354,21 @@ test('the allocation: points up to the budget, never beyond, the answer carries 
 	assert.equal(bad.reason, 'bad_request');
 });
 
+test('the allocation budget counts the rebirths of the stored save when the ledger has not learned the last one yet (the +20 points of a rebirth are spendable)', async () => {
+	const { m, state } = await started(3);
+	const level = calculateLevel(state.resources.xp).level;
+	// the account rebirthed twice, but the ledger still says 0 (it learns a rebirth from the save that follows it)
+	const row = m.rows.get(ID)!;
+	m.rows.set(ID, { ...row, summary: { ...row.summary, rebirths: 2 } });
+	assert.equal(m.ledgers.get(ID)!.rebirths, 0);
+	const budget = attributeBudget(level, 2);
+	const all = ok(await characterStep(m.deps, ID, key(), { action: 'allocate', add: { vitality: budget - 3 } }, T0 + STEP));
+	assert.equal(all.ok, true, JSON.stringify(all));
+	assert.equal(all.available, 0);
+	const over = ok(await characterStep(m.deps, ID, key(), { action: 'allocate', add: { vitality: 1 } }, T0 + STEP + 1000));
+	assert.equal(over.reason, 'no_points');
+});
+
 test('allocatePoints rejects fractions, negatives and unknown attributes', () => {
 	const attrs = newAttrs();
 	for (const add of [{ strength: 0.5 }, { strength: -1 }, { strength: '2' }, { wisdom: 1 }, {}, null, [1]])
