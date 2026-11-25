@@ -1,6 +1,7 @@
 import type React from 'react';
 import { ITEM_CATALOG } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
+import { monsterChestTierOf } from '@/catalog/items/chests';
 import { gearOf, otherRingSlot, slotQty } from '@/lib/inventory';
 import { ctrlHeld } from '@/lib/heldKeys';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
@@ -15,12 +16,13 @@ import { sellPayout } from '@/utils/game/merchant';
 const blocked = () => (useGameStore.getState().combat.fight ? 'Finish the fight first' : null);
 const say = (message: string) => useUiStore.getState().showToast(message);
 
-/** Double-click on a bag slot: drink a potion or equip a piece of gear (the toast says why it did not work). */
+/** Double-click on a bag slot: open a chest, drink a potion or equip a piece of gear (the toast says why it did not work). */
 export const activateBagSlot = (index: number): void => {
 	const state = useGameStore.getState();
 	const slot = state.bag[index];
 	if (!slot) return;
-	if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) state.drinkBagItem(index);
+	if ('id' in slot && monsterChestTierOf(slot.id)) state.openChest(index);
+	else if ('id' in slot && hasEffects(ITEM_CATALOG[slot.id])) state.drinkBagItem(index);
 	else {
 		// Ctrl + double-click puts a ring into the other ring slot, the one the card compared with
 		const gear = gearOf(slot);
@@ -61,7 +63,7 @@ export const openBagMenu = (index: number, e: React.MouseEvent): void => {
 		ui.showToast(gold > 0 ? `Sold ${n > 1 ? `${formatNumber(n)} x ` : ''}${name} for ${formatNumber(gold)} Gold` : 'Finish the fight first');
 	};
 	const items: ContextMenuItem[] = [
-		{ id: 'use', label: hasEffects(def) ? 'Drink' : 'Equip', onSelect: () => activateBagSlot(index) },
+		{ id: 'use', label: monsterChestTierOf(def.id) ? 'Open' : hasEffects(def) ? 'Drink' : 'Equip', onSelect: () => activateBagSlot(index) },
 		{
 			id: 'sell',
 			label: `Sell${qty > 1 ? ' one' : ''}`,

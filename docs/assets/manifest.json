@@ -17882,6 +17882,7 @@
 	},
 	{
 		"usedBy": [
+			"src/catalog/items/chests.ts",
 			"src/components/game/MapHighlightBar.tsx"
 		],
 		"name": "bonus_chest",
@@ -18001,12 +18002,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/monsterChests.ts"
+		],
 		"name": "chest_map",
 		"category": "ui",
 		"subcategory": "chest",
 		"src": "/pixel/icons/chest_map.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			48,
@@ -18015,7 +18018,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/Tile.tsx"
+			"src/components/game/Tile.tsx",
+			"src/config/monsterChests.ts"
 		],
 		"name": "chest_map_anim",
 		"category": "ui",

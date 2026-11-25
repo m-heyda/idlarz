@@ -444,14 +444,14 @@
 				"heal": 168,
 				"potion": 280
 			},
-			"digest": "e2460591c5250ccbcce1648b40e51ba4ab419c34",
+			"digest": "6b26d13f1bbbabf2e72eacd5da3befca20a28c86",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|2",
 				"2|1000000.1|stun|10|||||",
 				"24|1000015.9|won||||1|thistleBoar|2 reward={\"gold\":97,\"xp\":136.07999999999998,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_brush\\\",\\\"qty\\\":3}\"],\"stored\":[{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_brush\",\"qty\":3}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}",
 				"25|1000015.9|engage||||3|thistleBoar|4",
 				"49|1000030.1|stun|10|||||",
-				"65|1000041.8|won||||3|thistleBoar|4 reward={\"gold\":340,\"xp\":476.1711360000001,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"patched_mantle\\\",\\\"level\\\":3,\\\"rarity\\\":\\\"common\\\",\\\"quality\\\":80,\\\"affixes\\\":[]}}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_feather\\\",\\\"qty\\\":24}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"patched_mantle\",\"level\":3,\"rarity\":\"common\",\"quality\":80,\"affixes\":[]}},{\"kind\":\"consumable\",\"id\":\"junk_feather\",\"qty\":24}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":true}",
+				"65|1000041.8|won||||3|thistleBoar|4 reward={\"gold\":340,\"xp\":476.1711360000001,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"patched_mantle\\\",\\\"level\\\":3,\\\"rarity\\\":\\\"common\\\",\\\"quality\\\":80,\\\"affixes\\\":[]}}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_feather\\\",\\\"qty\\\":24}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"chest_arcane\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"patched_mantle\",\"level\":3,\"rarity\":\"common\",\"quality\":80,\"affixes\":[]}},{\"kind\":\"consumable\",\"id\":\"junk_feather\",\"qty\":24},{\"kind\":\"consumable\",\"id\":\"chest_arcane\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":true}",
 				"66|1000071.6|engage||||2|thistleBoar|9",
 				"67|1000071.7|stun|10|||||",
 				"93|1000089.7|heal|28|||||",
@@ -701,7 +701,7 @@
 				"hit": 2229.9,
 				"hurt": 117
 			},
-			"digest": "cf3a6e3478d2e0c0a3e50c065834a4973c275f2b",
+			"digest": "5f49b5cf27e1d2d2b6071182f10d96163ec8ee68",
 			"results": [
 				"1|1000000|engage||||1|thistleBoar|11",
 				"2|1000000.1|stun|10|||||",
@@ -715,7 +715,7 @@
 				"69|1000091|engage||||5|bossGreatAuroch|15",
 				"70|1000091.1|stun|10|||||",
 				"95|1000121.1|stun|10|||||",
-				"100|1000127.7|won||||5|bossGreatAuroch|15 reward={\"gold\":3600,\"xp\":10800,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"tanned_leather_pants\\\",\\\"level\\\":15,\\\"rarity\\\":\\\"rare\\\",\\\"quality\\\":76,\\\"affixes\\\":[{\\\"id\\\":\\\"luck_suffix\\\",\\\"roll\\\":53},{\\\"id\\\":\\\"vitality_prefix\\\",\\\"roll\\\":10}]}}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":2}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_greater\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":78}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_teal_crystals\\\",\\\"qty\\\":4}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bacon\\\",\\\"qty\\\":5}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_horn\\\",\\\"qty\\\":3}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"tanned_leather_pants\",\"level\":15,\"rarity\":\"rare\",\"quality\":76,\"affixes\":[{\"id\":\"luck_suffix\",\"roll\":53},{\"id\":\"vitality_prefix\",\"roll\":10}]}},{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":2},{\"kind\":\"consumable\",\"id\":\"potion_greater\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":78},{\"kind\":\"consumable\",\"id\":\"junk_teal_crystals\",\"qty\":4},{\"kind\":\"consumable\",\"id\":\"junk_bacon\",\"qty\":5},{\"kind\":\"consumable\",\"id\":\"junk_horn\",\"qty\":3}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}"
+				"100|1000127.7|won||||5|bossGreatAuroch|15 reward={\"gold\":3600,\"xp\":10800,\"hide\":0,\"items\":[\"{\\\"kind\\\":\\\"gear\\\",\\\"item\\\":{\\\"base\\\":\\\"tanned_leather_pants\\\",\\\"level\\\":15,\\\"rarity\\\":\\\"rare\\\",\\\"quality\\\":76,\\\"affixes\\\":[{\\\"id\\\":\\\"luck_suffix\\\",\\\"roll\\\":53},{\\\"id\\\":\\\"vitality_prefix\\\",\\\"roll\\\":10}]}}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_minor\\\",\\\"qty\\\":2}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"potion_greater\\\",\\\"qty\\\":1}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bones\\\",\\\"qty\\\":78}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_teal_crystals\\\",\\\"qty\\\":4}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_bacon\\\",\\\"qty\\\":5}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"junk_horn\\\",\\\"qty\\\":3}\",\"{\\\"kind\\\":\\\"consumable\\\",\\\"id\\\":\\\"chest_royal\\\",\\\"qty\\\":1}\"],\"stored\":[{\"kind\":\"gear\",\"item\":{\"base\":\"tanned_leather_pants\",\"level\":15,\"rarity\":\"rare\",\"quality\":76,\"affixes\":[{\"id\":\"luck_suffix\",\"roll\":53},{\"id\":\"vitality_prefix\",\"roll\":10}]}},{\"kind\":\"consumable\",\"id\":\"potion_minor\",\"qty\":2},{\"kind\":\"consumable\",\"id\":\"potion_greater\",\"qty\":1},{\"kind\":\"consumable\",\"id\":\"junk_bones\",\"qty\":78},{\"kind\":\"consumable\",\"id\":\"junk_teal_crystals\",\"qty\":4},{\"kind\":\"consumable\",\"id\":\"junk_bacon\",\"qty\":5},{\"kind\":\"consumable\",\"id\":\"junk_horn\",\"qty\":3},{\"kind\":\"consumable\",\"id\":\"chest_royal\",\"qty\":1}],\"convertedGold\":0,\"autoSold\":{\"count\":0,\"gold\":0},\"pity\":{},\"lucky\":false}"
 			]
 		},
 		"final": {

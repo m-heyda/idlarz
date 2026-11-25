@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { COMBAT } from '../../src/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '../../src/catalog';
 import { TRADE_GOODS } from '../../src/catalog/recipes';
+import { monsterChestTierOf } from '../../src/catalog/items/chests';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { ITEM_STAT_KEYS, MAX_ITEM_LEVEL, familyPieces, STAT_BASE_BY_TIER, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../../src/catalog';
 import { CLOTH_ITEMS } from '../../src/catalog/items/cloth';
@@ -21,7 +22,10 @@ test('catalog keys equal item ids', () => {
 
 test('gear has a slot, potions have effects and stackMax, trade goods are slotless stacks', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
-		if (def.effects) {
+		if (monsterChestTierOf(def.id)) {
+			// a monster chest (IDL-163) is a stackable consumable that is opened, not drunk: no effects, no slot
+			assert.ok((def.stackMax ?? 0) > 1 && !def.slot && !def.effects, def.id);
+		} else if (def.effects) {
 			assert.ok(def.effects.length > 0, def.id);
 			assert.ok((def.stackMax ?? 0) > 1, def.id);
 			assert.equal(def.slot, undefined, def.id);

@@ -500,4 +500,6 @@ export interface GameState {
 	organizeBag: () => boolean;
 	applyServerInventory: (inv: import('@/lib/offline/types').Inventory | undefined) => void;
 	drinkBagItem: (bagIndex: number) => boolean;
+	/** Opens the monster chest in a bag slot (IDL-163): the server rolls and pays it; false when the slot holds no chest */
+	openChest: (bagIndex: number) => boolean;
 }

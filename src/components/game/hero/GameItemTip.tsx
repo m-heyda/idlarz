@@ -25,6 +25,7 @@ import {
 	weaponDps,
 } from '@/catalog';
 import { describeEffect, hasEffects } from '@/catalog/buffs';
+import { monsterChestTierOf } from '@/catalog/items/chests';
 import { itemTierLabel } from '@/catalog/stats';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } from '@/lib/inventory';
@@ -165,7 +166,13 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 	const hintText: { key: string; text: string }[] =
 		hints === 'bag'
 			? [
-					...(item ? [{ key: 'Dbl-click', text: 'equip' }] : hasEffects(def) ? [{ key: 'Dbl-click', text: 'drink' }] : []),
+					...(item
+						? [{ key: 'Dbl-click', text: 'equip' }]
+						: monsterChestTierOf(def.id)
+							? [{ key: 'Dbl-click', text: 'open' }]
+							: hasEffects(def)
+								? [{ key: 'Dbl-click', text: 'drink' }]
+								: []),
 					...(fighting ? [] : [{ key: 'Shift', text: '+click sell' }]),
 				]
 			: hints === 'merchant' && !fighting

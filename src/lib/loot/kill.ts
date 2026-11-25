@@ -3,6 +3,7 @@ import { CHEST, LUCK } from '@/config/spawns';
 import { isBoss, monsterDef, rewardLevelMult } from '@/lib/monsters';
 import type { Rng } from '@/lib/rng';
 import type { Drop, Monster } from '@/types/game';
+import { MONSTER_CHEST, monsterChestItemId, type MonsterChestTier } from '@/config/monsterChests';
 import { generateLoot } from './generate';
 import { rollJunkLoot } from './junkDrops';
 
@@ -79,6 +80,25 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
 	};
 };
 
+/**
+ * The monster chests a kill drops (IDL-163, `MONSTER_CHEST`): a boss always a Royal chest, a golden (lucky) monster always an Arcane chest on top, a normal monster the chest of its biome's tier with a 2 % chance. Rolled **after** everything else of the kill (the gear and the junk),
+ * so it adds drops and never changes the ones a kill had before; a boss and the golden chest draw no random number.
+ *
+ * @category Loot/Monster chests
+ * @order 2
+ */
+export const rollChestDrops = (monster: Pick<Monster, 'type'>, ctx: Pick<KillContext, 'lucky'>, rng: Rng): Drop[] => {
+	const chest = (tier: MonsterChestTier): Drop => ({ kind: 'consumable', id: monsterChestItemId(tier), qty: 1 });
+	const drops: Drop[] = [];
+	if (isBoss(monster.type)) drops.push(chest('royal'));
+	else {
+		const tier = MONSTER_CHEST.tierOfBiome[monsterDef(monster.type).spawn.biomes[0]];
+		if (tier && rng() >= 1 - MONSTER_CHEST.dropChance) drops.push(chest(tier));
+	}
+	if (ctx.lucky) drops.push(chest('arcane'));
+	return drops;
+};
+
 export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillContext, rng: Rng): KillLoot => {
 	const { gold, xp, hide } = killIncome(monster, ctx);
 
@@ -97,5 +117,6 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 	if (result.warnings.length) console.warn('[loot]', ...result.warnings);
 	// junk materials come last, so the rest of the kill's rolls are untouched
 	const junk = rollJunkLoot({ level: monster.level, gold, luck: ctx.luck, boss: isBoss(monster.type), lucky: !!ctx.lucky, type: monster.type }, rng);
-	return { gold, xp, hide, items: [...result.drops, ...junk.drops], stash: junk.stash, pity: result.pity };
+	const chests = rollChestDrops(monster, ctx, rng);
+	return { gold, xp, hide, items: [...result.drops, ...junk.drops, ...chests], stash: junk.stash, pity: result.pity };
 };

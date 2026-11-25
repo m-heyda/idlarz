@@ -2,6 +2,7 @@
 //   npm run loot-sim                 print the tables (100,000 kills per row)
 //   npm run loot-sim -- --md         also write docs/generated/loot-sim.md
 //   npm run loot-sim -- --kills 20000 --seed 7
+import { MONSTER_CHEST, MONSTER_CHEST_TIERS } from '../src/config/monsterChests';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
@@ -311,6 +312,27 @@ for (const id of SAMPLE) {
 		return `${level === l ? '' : '(' + level + ') '}${baseStatsAt(def, level, 50, RARITIES.common)[primary]}`;
 	});
 	out(`| ${def.name} (${primary}) | ${cells.join(' | ')} |`);
+}
+
+out();
+out('## Monster chests (IDL-163)');
+out();
+out(
+	`A normal kill drops the chest of its biome's tier with a ${(MONSTER_CHEST.dropChance * 100).toFixed(0)} % chance, a boss always a Royal chest, a golden monster always an Arcane chest. An opened chest pays minutes of the player's own income (gold, one resource, or XP) and half the time a potion; no gems, no stat gifts. The average chest of every tier must be worth at most ${(MONSTER_CHEST.maxHourlyShare * 100).toFixed(0)} % of an hour of income (\`tests/economy/monsterChestBudget.test.ts\`).`,
+);
+out();
+out('| Tier | Drops from | Minutes of income | Average | Share of an hour | Cap |');
+out('|---|---|---|---:|---:|---|');
+for (const tier of MONSTER_CHEST_TIERS) {
+	const def = MONSTER_CHEST.tiers[tier];
+	const biomes = Object.entries(MONSTER_CHEST.tierOfBiome)
+		.filter(([, t]) => t === tier)
+		.map(([biome]) => biome);
+	const from = tier === 'royal' ? 'every boss' : tier === 'arcane' ? 'every golden monster' : biomes.join(', ');
+	const average = (def.minutes[0] + def.minutes[1]) / 2;
+	out(
+		`| ${def.label} | ${from} | ${def.minutes[0]}-${def.minutes[1]} | ${average.toFixed(2)} min | ${((average / 60) * 100).toFixed(1)}% | ${average / 60 <= MONSTER_CHEST.maxHourlyShare + 1e-12 ? 'ok' : '**over**'} |`,
+	);
 }
 
 out();

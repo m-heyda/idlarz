@@ -220,6 +220,7 @@ export const needsNoFight = (op: InventoryOp): boolean =>
 	op.action !== 'buyOffer' &&
 	op.action !== 'autoSell' &&
 	op.action !== 'use' &&
+	op.action !== 'open' &&
 	op.action !== 'sellResource' &&
 	op.action !== 'buyResource';
 
@@ -354,7 +355,8 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 			return done(bump(inv, { bag }));
 		}
 		case 'use':
-			// drinking touches the hero's HP, mana and buffs too: it is applied by applyUse (consumables.ts), never here
+		case 'open':
+			// drinking touches the hero's HP, mana and buffs too: it is applied by applyUse (consumables.ts), never here; a chest is opened by applyOpen (openChest.ts), which rolls its contents
 			return refused(inv);
 		case 'sellResource':
 		case 'buyResource':
@@ -397,6 +399,8 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 			return typeof raw.id === 'string' && int(raw.qty) ? { action: 'buyShop', id: raw.id, qty: raw.qty } : null;
 		case 'use':
 			return int(raw.index) ? { action: 'use', index: raw.index } : null;
+		case 'open':
+			return int(raw.index) ? { action: 'open', index: raw.index } : null;
 		case 'sellResource':
 			return typeof raw.resource === 'string' && raw.resource.length <= 40 && typeof raw.qty === 'number' && Number.isFinite(raw.qty)
 				? { action: 'sellResource', resource: raw.resource, qty: raw.qty }

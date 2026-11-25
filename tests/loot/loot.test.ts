@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rollKillLoot } from '../../src/lib/loot';
+import { monsterChestTierOf } from '../../src/catalog/items/chests';
 import { emitCombat } from '../../src/lib/combatFx';
 import { COMBAT } from '../../src/config/combatConfig';
 import { ITEM_CATALOG } from '../../src/catalog';
@@ -15,7 +16,8 @@ const ctx = { goldPerSec: 100, xpPerSec: 2, luck: 0 };
 const T1 = { type: 'thistleBoar', level: 1 } as const;
 
 const baseOf = (d: Drop) => (d.kind === 'gear' ? d.item.base : d.id);
-const noJunk = (items: Drop[]) => items.filter((d) => d.kind === 'gear' || !ITEM_CATALOG[d.id].junk);
+// junk materials always drop and monster chests (IDL-163, 2 % of a roll at the top of the stream, tested in monsterChests.test.ts) are not part of what these tests are about
+const noJunk = (items: Drop[]) => items.filter((d) => d.kind === 'gear' || (!ITEM_CATALOG[d.id].junk && !monsterChestTierOf(d.id)));
 const gearOnly = (items: Drop[]) => items.filter((d) => d.kind === 'gear');
 const isLegendaryWeapon = (d: Drop) => ITEM_CATALOG[baseOf(d)].pools?.includes('legendary_weapons') ?? false;
 
