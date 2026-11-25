@@ -28,6 +28,9 @@ export const LOADOUTS: { name: string; equipment: Equipment }[] = [
 	{ name: 'G5 kit + mace', equipment: gradeKit('G5') },
 	{ name: 'G6 kit + mace', equipment: gradeKit('G6') },
 	{ name: 'G6 kit + bow', equipment: gradeKit('G6', 'bow') },
+	// the grades above the live ones are disabled data (IDL-379): here only to see where the next bosses stop being a wall
+	{ name: 'G7 kit + mace', equipment: gradeKit('G7') },
+	{ name: 'G8 kit + mace', equipment: gradeKit('G8') },
 ];
 
 const MONSTER_ROWS = [

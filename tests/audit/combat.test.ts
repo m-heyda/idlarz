@@ -150,9 +150,8 @@ test('item stats: an item at its authored level and quality 50 returns its autho
 			if (round2(authored as number) !== authored) noisy.push(`${def.id}:${key}=${authored}`);
 		}
 	}
-	// FINDING (cosmetic): one authored value carries floating point noise (0.1 + 0.2 style). The resolved item is clean (rounded to 2 places),
-	// but the catalog literal is not. This list pins it so a new one is noticed.
-	assert.deepEqual(noisy, ['apprentice_tome:manaRegen=0.30000000000000004']);
+	// no authored value may carry floating point noise (0.1 + 0.2 style): the apprentice tome's was written as 0.3 (IDL-172)
+	assert.deepEqual(noisy, []);
 	for (const rarity of Object.values(RARITIES))
 		if (rarity.order <= RARITIES.uncommon.order) assert.equal(rarity.statMultiplier, 1, `${rarity.id} must not scale base stats`);
 });

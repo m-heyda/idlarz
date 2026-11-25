@@ -3,7 +3,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
-import { armorAfterPen, armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
+import { armorAfterPen, armorReduction, autoUseUnlocked, leechHealAmount, mitigate, swing } from '@/lib/combat';
 import { isBoss, modifiersOf, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import { masteryBonusesFor, type MasteryTotals } from '@/lib/mastery';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
@@ -206,7 +206,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const armor = armorAfterPen(monster.armor, p.armorPenPct);
 		const damage = armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(armor)))) : raw;
 		f.monsterHp = Math.max(0, f.monsterHp - damage);
-		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + (damage * p.leechPct) / 100);
+		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + leechHealAmount(damage, p.leechPct));
 		// a critical hit sets the monster alight for BURN_SEC; a new one refreshes it with its own hit (never stacks)
 		if (p.burnPct && rolled.crit !== 'none') f.burn = { leftSec: BURN_SEC, perSec: (damage * p.burnPct) / 100 };
 		pushEvent(ctx, t, kind, { amount: damage });

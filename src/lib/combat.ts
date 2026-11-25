@@ -180,8 +180,11 @@ export const swing = (hit: number, odds: { crit: number; superCrit: number }, cr
 export const rollHit = (characterStats: CharacterStats, equipment: Equipment, rng: () => number): { damage: number; crit: CritKind } =>
 	swing(damagePerHit(equipment, characterStats), critOdds(characterStats, equipment), critExtraOf(characterStats, equipment), rng);
 
+/** HP a swing of `damage` gives back at `pct` % Life Leech: the one formula, shared by {@link leechHeal} and the fight engine (`fightStep`), so a test of one is a test of the other (IDL-172). */
+export const leechHealAmount = (damage: number, pct: number): number => (damage * pct) / 100;
+
 /** HP a swing of `damage` gives back through Life Leech. */
-export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => (damage * lifeLeechPercent(equipment, bonus)) / 100;
+export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => leechHealAmount(damage, lifeLeechPercent(equipment, bonus));
 
 /**
  * Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.
