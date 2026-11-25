@@ -4,12 +4,14 @@ import { ITEM_CATALOG } from '../../src/catalog';
 import { LADDER } from '../../src/catalog/items/ladder';
 import { STAT_RULES } from '../../src/config/combatConfig';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
-import { gearBossTimerSec, gearBuildTimePct, gearTileDiscountPct } from '../../src/lib/gearEconomy';
+import { gearBossTimerSec, gearBuildTimePct, gearIncome, gearTileDiscountPct } from '../../src/lib/gearEconomy';
 import { aggregateStats } from '../../src/lib/inventory';
 import { plainItem } from '../../src/lib/itemInstance';
 import { playerProfile } from '../../src/lib/offline/profile';
 import { bossClockSec } from '../../src/lib/offline/winChance';
 import { effectiveTileDiscount } from '../../src/utils/game/rebirth';
+import { calculateResourceBreakdown } from '../../src/utils/game/income';
+import { api, freshGame } from '../helpers';
 import type { Equipment, EquipmentSlot } from '../../src/types/game';
 
 // IDL-176: the economy stats of the ladder's gear. Build Speed (hands, chest), Tile Discount (cape, neck) and Boss Timer (head, shoulder) are fixed base stats from G4 on, each total capped where it is read.
@@ -27,7 +29,7 @@ const worn = (grade: 'G3' | 'G4' | 'G6' | 'S3'): Equipment => {
 	for (const [slot, cell] of cells) eq[slot] = plainItem(LADDER[grade][cell]!);
 	return eq;
 };
-const stat = (id: string, key: 'buildSpeed' | 'tileDiscount' | 'bossTimer') => ITEM_CATALOG[id]?.stats?.[key] ?? 0;
+const stat = (id: string, key: 'buildSpeed' | 'farmYield' | 'tileDiscount' | 'bossTimer') => ITEM_CATALOG[id]?.stats?.[key] ?? 0;
 
 test('the ladder gives each stat to its slots from G4 on, and G3 and below stay without them', () => {
 	for (const grade of ['G4', 'G6'] as const) {
@@ -70,4 +72,23 @@ test('Boss Timer reaches the profile, the fight clock and the win estimate, and 
 	// a boss's clock is its own limit plus the seconds the gear adds; a monster with no clock has none
 	assert.equal(bossClockSec('bossGreatAuroch', { bossTimerSec: 5 })! - bossClockSec('bossGreatAuroch', {})!, 5);
 	assert.equal(bossClockSec('thistleBoar', { bossTimerSec: 5 }), undefined, 'a normal monster has no clock');
+});
+
+test('Farm Yield (hands) raises the farm products and nothing else, and stops at its cap', () => {
+	assert.ok(stat(LADDER.G4.hands!, 'farmYield') > 0 && stat(LADDER.G6.hands!, 'farmYield') > stat(LADDER.G4.hands!, 'farmYield'));
+	assert.equal(stat(LADDER.G3.hands!, 'farmYield'), 0, 'G3 and below have none');
+	assert.equal(stat(LADDER.G6.chest!, 'farmYield'), 0, 'only the hands carry it');
+	assert.deepEqual(gearIncome({}), { incomePct: 0, farmYieldPct: 0 });
+	assert.equal(gearIncome(worn('S3')).farmYieldPct, Math.min(STAT_RULES.farmYieldCap, aggregateStats(worn('S3')).farmYield));
+	freshGame();
+	const s = api();
+	const at = (gear: Parameters<typeof calculateResourceBreakdown>[6]) =>
+		calculateResourceBreakdown(s.tiles, s.characterStats, { chicken: 5, cow: 3 }, s.prestige, s.farmUpgrades, s.merchantUpgrades, gear);
+	const plain = at(0);
+	const yielded = at({ incomePct: 0, farmYieldPct: 10 });
+	assert.ok(plain.meat.total > 0, 'the test farm produces meat');
+	assert.ok(Math.abs(yielded.meat.total / plain.meat.total - 1.1) < 1e-9, 'farm products grow by 10 %');
+	assert.equal(yielded.gold.total, plain.gold.total, 'gold is not a farm product');
+	assert.equal(yielded.wood.total, plain.wood.total);
+	assert.deepEqual(at({ incomePct: 0, farmYieldPct: 0 }).meat, plain.meat, 'a plain number is the Income % alone');
 });

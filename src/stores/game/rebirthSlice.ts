@@ -7,7 +7,7 @@ import { calculateCombatStats, calculateLevel, totalStatPoints } from '@/utils/g
 import { calculateResourceRates } from '@/utils/game/income';
 import { rebirthStatus, emberUpgradeCost } from '@/utils/game/rebirth';
 import { maxHp, maxMana } from '@/lib/combat';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { rebirthKit } from '@/lib/inventory';
 import { placeKept } from '@/lib/rebirthKeep';
 import type { ItemInstance, PrestigeState } from '@/types/game';
@@ -74,7 +74,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				fresh.farmUpgrades,
 				merchantUpgrades,
-				gearIncomePct(kit.equipment),
+				gearIncome(kit.equipment),
 			),
 			equipment: kit.equipment,
 			bag: placeKept(kit.bag, kept),
@@ -128,7 +128,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 							prestige,
 							state.farmUpgrades,
 							state.merchantUpgrades,
-							gearIncomePct(state.equipment),
+							gearIncome(state.equipment),
 						),
 					}
 				: {}),
@@ -150,7 +150,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				state.farmUpgrades,
 				state.merchantUpgrades,
-				gearIncomePct(state.equipment),
+				gearIncome(state.equipment),
 			),
 		});
 	},

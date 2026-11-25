@@ -38,8 +38,20 @@ export const gearEconomy = (equipment: Equipment): GearEconomy => {
 	};
 };
 
-/** The % income bonus of the worn gear (the extra argument of `calculateResourceRates`). */
+/** The % income bonus of the worn gear (the Income % of its set bonuses only; `gearIncome` is what `calculateResourceRates` takes). */
 export const gearIncomePct = (equipment: Equipment): number => aggregateStats(equipment).incomePct;
+
+/** What the worn gear gives the income: the set bonuses' Income % and the ladder's Farm Yield % (IDL-176, up to `STAT_RULES.farmYieldCap`). The extra argument of `calculateResourceBreakdown` and `calculateResourceRates`, which also take the plain Income % number. */
+export interface GearIncome {
+	incomePct: number;
+	farmYieldPct: number;
+}
+
+/** The gear's contribution to the income, for the browser and the server alike (`summarize`, the offline grant and every store slice read it through here). */
+export const gearIncome = (equipment: Equipment): GearIncome => {
+	const gear = aggregateStats(equipment);
+	return { incomePct: gear.incomePct, farmYieldPct: Math.min(STAT_RULES.farmYieldCap, Math.max(0, gear.farmYield)) };
+};
 
 /** The XP bonus in % that the worn gear's Intelligence and Charisma add, at the same rate as the points the player spends. */
 const gearAttributeXpPct = (equipment: Equipment): number => {

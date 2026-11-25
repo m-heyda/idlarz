@@ -11,7 +11,7 @@ import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
 import { bestWornGrade, generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { crossedGoldTier } from '@/lib/goldTiers';
-import { gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { castleLevelOf } from '@/lib/castleWard';
 import { completeUpgrade } from '@/lib/buildings';
@@ -63,7 +63,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 						state.prestige,
 						state.farmUpgrades,
 						state.merchantUpgrades,
-						gearIncomePct(state.equipment),
+						gearIncome(state.equipment),
 					);
 				}
 				newCastleUpgrade = null;
@@ -93,7 +93,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 					state.prestige,
 					state.farmUpgrades,
 					state.merchantUpgrades,
-					gearIncomePct(state.equipment),
+					gearIncome(state.equipment),
 				);
 			}
 			buildingFinished = true;

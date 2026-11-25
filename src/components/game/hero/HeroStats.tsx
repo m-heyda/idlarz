@@ -16,7 +16,7 @@ import { describeClassPassives } from '@/lib/classPassives';
 import { craftLevelOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearAttributes } from '@/lib/gearAttributes';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { useRememberedOpen } from '@/hooks/useRememberedOpen';
 import { useAchievementStore } from '@/stores/achievementStore';
@@ -149,7 +149,7 @@ const HeroStats: React.FC = () => {
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct(equipment)),
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment)),
 		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
 	);
 

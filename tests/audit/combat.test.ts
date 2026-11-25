@@ -66,6 +66,7 @@ const LEVEL_SHARE: Record<string, number> = {
 	thorns: 0.3,
 	healOnKill: 0.3,
 	buildSpeed: 0,
+	farmYield: 0,
 	tileDiscount: 0,
 	bossTimer: 0,
 	regen: 0.6,

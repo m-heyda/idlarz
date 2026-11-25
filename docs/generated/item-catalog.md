@@ -112,7 +112,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP, +2.1 s Boss Time |  | general pool |
 | Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP, +2.1 s Boss Time |  | general pool |
 | Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP, +2.8% Build Speed |  | general pool |
-| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance, +2.1% Build Speed |  | general pool |
+| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance, +2.1% Build Speed, +3.5% Farm Yield |  | general pool |
 | Obsidian Greaves | `obsidian_greaves` | armor | 3 | base | 8-100 | +7 Armor, +8 Max HP |  | general pool |
 | Obsidian Sabatons | `obsidian_sabatons` | armor | 3 | base | 8-100 | +4 Armor, +4 Max HP |  | general pool |
 | Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find, +1.4% Tile Discount |  | general pool |
@@ -123,7 +123,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +1281 Armor, +1281 Max HP, +6.6 s Boss Time |  | general pool |
 | Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +1050 Armor, +1050 Max HP, +6.6 s Boss Time |  | general pool |
 | Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +2121 Armor, +2541 Max HP, +8.8% Build Speed |  | general pool |
-| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance, +6.6% Build Speed |  | general pool |
+| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance, +6.6% Build Speed, +11.0% Farm Yield |  | general pool |
 | Sunhoney Skirt | `sunhoney_skirt` | armor | 5 | base | 100-100 | +1491 Armor, +1680 Max HP |  | general pool |
 | Sunhoney Slippers | `sunhoney_slippers` | armor | 5 | base | 100-100 | +840 Armor, +840 Max HP |  | general pool |
 | Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +420 Armor, +1680 Max HP, +7.68% Crit Chance, +12% Gold Find, +4.4% Tile Discount |  | general pool |
@@ -136,7 +136,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +1617 Armor, +1617 Max HP, +8.4 s Boss Time |  | general pool |
 | Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +1344 Armor, +1344 Max HP, +8.4 s Boss Time |  | general pool |
 | Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +2688 Armor, +3234 Max HP, +11.2% Build Speed |  | general pool |
-| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance, +8.4% Build Speed |  | general pool |
+| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance, +8.4% Build Speed, +14.0% Farm Yield |  | general pool |
 | Warlord's Cuisses | `warlords_cuisses` | armor | 5 | base | 100-100 | +1890 Armor, +2142 Max HP |  | general pool |
 | Warlord's Sabatons | `warlords_sabatons` | armor | 5 | base | 100-100 | +1071 Armor, +1071 Max HP |  | general pool |
 | Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +546 Armor, +2142 Max HP, +9.78% Crit Chance, +12% Gold Find, +5.6% Tile Discount |  | general pool |
@@ -149,7 +149,7 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
 | Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
 | Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck, +12.8% Build Speed |  | general pool |
-| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck, +9.6% Build Speed |  | general pool |
+| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck, +9.6% Build Speed, +16.0% Farm Yield |  | general pool |
 | Blightbound Leggings | `blightbound_leggings` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Shroud Treads | `shroud_treads` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck, +6.4% Tile Discount |  | general pool |

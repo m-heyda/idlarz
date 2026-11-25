@@ -19,7 +19,7 @@ import {
 import { castleLevelOf } from '@/lib/castleWard';
 import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
 import { economyTiles } from '@/utils/game/tiles';
@@ -46,7 +46,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 
 	const ratesOf = (tiles: ReturnType<GameGet>['tiles']) => {
 		const s = get();
-		return calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncomePct(s.equipment));
+		return calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncome(s.equipment));
 	};
 
 	return {

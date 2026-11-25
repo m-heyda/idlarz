@@ -3,7 +3,7 @@ import { persist } from 'zustand/middleware';
 import { calculateResourceRates } from '@/utils/game/income';
 import { EMPTY_PRESTIGE } from '@/utils/game/rebirth';
 import { withSaveEvents } from '@/lib/saveEvents';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { mulberry32 } from '@/lib/rng';
 import { markSaveReady, PERSIST_NAME, PERSIST_VERSION, saveStorage } from '@/lib/saveStorage';
 import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
@@ -69,7 +69,7 @@ export const useGameStore = create(
 				saved.prestige,
 				saved.farmUpgrades,
 				saved.merchantUpgrades,
-				gearIncomePct(saved.equipment),
+				gearIncome(saved.equipment),
 			);
 			return {
 				...current,

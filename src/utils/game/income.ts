@@ -10,6 +10,7 @@ import { biomeCount, forEachOwned, getTile, type World } from '@/utils/world';
 import { BUILDINGS_FLAG } from '@/config/buildings';
 import { buildingDef } from '@/catalog/buildings';
 import { buildingOutput } from '@/lib/buildingOutput';
+import type { GearIncome } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { castleModifier } from '@/utils/game/castle';
 import { calculateStatResourceModifiers } from '@/utils/game/character';
@@ -133,8 +134,8 @@ export const calculateResourceBreakdown = (
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
 	merchantUpgrades?: MerchantUpgrades,
-	/** The worn gear's Income % (set bonuses; `gearIncomePct` in lib/gearEconomy.ts) */
-	gearIncomePct = 0,
+	/** The worn gear's Income % and Farm Yield % (`gearIncome` in lib/gearEconomy.ts); a plain number is the Income % alone */
+	gear: GearIncome | number = 0,
 ): ResourceBreakdown => {
 	const base: Resources = { ...BASE_GENERATION_RATES };
 	const start: Resources = { ...BASE_GENERATION_RATES };
@@ -153,7 +154,10 @@ export const calculateResourceBreakdown = (
 	farm.meat *= skinner;
 	farm.hide *= skinner;
 	// the Harvest Scarecrow (the plains Idol) makes every farm product grow by its percentage; read from the map's standing Idols, which the server has already cut to the trusted level
-	const farmMult = 1 + idolEconomy(tiles).farmOutputPct / 100;
+	const farmYieldPct = typeof gear === 'number' ? 0 : gear.farmYieldPct;
+	const gearIncomePct = typeof gear === 'number' ? gear : gear.incomePct;
+	// the worn gear's Farm Yield (IDL-176) is in the same bucket as the Scarecrow: the two add
+	const farmMult = 1 + (idolEconomy(tiles).farmOutputPct + farmYieldPct) / 100;
 	if (farmMult !== 1) for (const key of FARM_KEYS) farm[key] *= farmMult;
 	for (const key of FARM_KEYS) {
 		base[key] = farm[key];
@@ -281,9 +285,9 @@ export const calculateResourceRates = (
 	prestige?: PrestigeState,
 	farmUpgrades?: FarmUpgrades,
 	merchantUpgrades?: MerchantUpgrades,
-	gearIncomePct = 0,
+	gear: GearIncome | number = 0,
 ): ResourceRates => {
-	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct);
+	const breakdown = calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gear);
 	const base = zeroResources();
 	const modifiers = zeroResources();
 	const total = zeroResources();

@@ -13,7 +13,7 @@ import { builderBusy, builderCount } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
-import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
 import { clickLimiter, findCastle, limitCtx, type GameGet, type GameSet } from './base';
@@ -40,7 +40,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 
 		const xpGain =

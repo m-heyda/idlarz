@@ -4,7 +4,7 @@ import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { builderCount, builtBuildings, maxBuildTimeReduction, maxCopiesOf } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
-import { gearBuildTimePct, gearChestSpeedPct, gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { gearBuildTimePct, gearChestSpeedPct, gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import { attributesWithGear } from '@/lib/gearAttributes';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
@@ -123,7 +123,7 @@ const ratesAfterBuildingUpgrade = (state: PersistedGame, job: BuildingUpgradeSta
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 };
 
@@ -144,7 +144,7 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 };
 
@@ -156,7 +156,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 	const idol = idolEconomy(state.tiles, state.idolLevels);
 	const fx = effectiveStats({

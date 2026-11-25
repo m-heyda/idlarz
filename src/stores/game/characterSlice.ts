@@ -5,7 +5,7 @@ import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { DEFAULT_PLAYER_NAME } from '@/config/character';
 import { calculateCombatStats, calculateLevel, reconcileCharacter } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { maxHp, maxMana } from '@/lib/combat';
 import { starterEquipmentFor } from '@/config/itemCatalog';
 import type { CharacterStats } from '@/types/game';
@@ -36,7 +36,7 @@ export const createCharacterSlice = (set: GameSet, get: GameGet, character: Char
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 
 		set({
@@ -65,7 +65,7 @@ export const createCharacterSlice = (set: GameSet, get: GameGet, character: Char
 				state.prestige,
 				state.farmUpgrades,
 				state.merchantUpgrades,
-				gearIncomePct(state.equipment),
+				gearIncome(state.equipment),
 			),
 		});
 	},

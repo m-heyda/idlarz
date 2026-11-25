@@ -77,6 +77,7 @@ export const STAT_DEFS = {
 	buildTimePct: { label: 'Build Time', unit: '%', setOnly: true }, // % off every castle, building and Idol timer, in the same bucket as the Dwarf Statue (`buildTimeReduction`, together at most the 60 % cap with the Ember upgrades)
 	// the three economy stats of IDL-176: fixed base stats of the ladder's gear from G4 on (hands and chest, cape and neck, head and shoulder), never random affixes; the total of each is capped where it is read (STAT_RULES)
 	buildSpeed: { label: 'Build Speed', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // % off every castle, building and Idol timer, in the same bucket as the Dwarf Statue and a legendary's build time (`gearBuildTimePct`; the gear's share counts up to STAT_RULES.buildSpeedCap)
+	farmYield: { label: 'Farm Yield', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // % more of every farm product, in the same bucket as the Harvest Scarecrow (`gearIncome`, `calculateResourceBreakdown`; the gear's share counts up to STAT_RULES.farmYieldCap)
 	tileDiscount: { label: 'Tile Discount', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // percentage points off the price of a tile, added to Charisma and Thrift inside the tile discount cap (`effectiveTileDiscount`; the gear's share counts up to STAT_RULES.tileDiscountGearCap)
 	bossTimer: { label: 'Boss Timer', short: 'Boss Time', unit: ' s', decimals: 1, setOnly: true, levelShare: 0 }, // seconds added to the clock of every boss fight (`playerProfile`; counts up to STAT_RULES.bossTimerCapSec)
 	chestSpeedPct: { label: 'Chest Speed', unit: '%', setOnly: true }, // % faster chests: the chest interval is divided by 1 + this (with the class and Idol chest speed, `chestIntervalSec`)
@@ -134,6 +135,7 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	clickPct: 'economy',
 	buildTimePct: 'economy',
 	buildSpeed: 'economy',
+	farmYield: 'economy',
 	tileDiscount: 'economy',
 	bossTimer: 'combat',
 	chestSpeedPct: 'economy',

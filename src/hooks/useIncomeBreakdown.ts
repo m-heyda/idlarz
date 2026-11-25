@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { useGameStore } from '@/stores/gameStore';
 import { calculateResourceBreakdown } from '@/utils/game/income';
 
@@ -16,7 +16,7 @@ export const useIncomeBreakdown = (): ReturnType<typeof calculateResourceBreakdo
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const equipment = useGameStore((state) => state.equipment);
 	return useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct(equipment)),
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment)),
 		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
 	);
 };

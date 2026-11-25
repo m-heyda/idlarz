@@ -5,7 +5,7 @@ import { ANIMALS, FARM_UPGRADES, type FarmUpgradeId } from '@/config/farm';
 import { affordableAnimals, animalBatchCost, farmCap, farmUpgradeCost, farmUpgradeLevel, farmUpgradeOpen } from '@/utils/game/farm';
 import { calculateResourceRates } from '@/utils/game/income';
 import { canAffordBundle, subtractBundle } from '@/utils/game/costs';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { type GameGet, type GameSet } from './base';
 import audioManager from '@/utils/audioManager';
 
@@ -31,7 +31,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 
 		set({
@@ -61,7 +61,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			state.prestige,
 			farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 		set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 		audioManager.playSound('buysell');

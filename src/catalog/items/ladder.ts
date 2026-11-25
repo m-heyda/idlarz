@@ -70,11 +70,11 @@ const SLOT_STATS: Record<ArmourSlot | 'offHand', PerIndex> = {
 };
 
 /**
- * The economy stats of IDL-176, fixed base stats of the ladder's gear from G4 on (`ECONOMY_FROM`): Build Speed on hands and chest, Tile Discount on cape and neck, Boss Timer (seconds) on head and shoulder. Per point of strength
- * index like the table above, never grown by the item level (their `levelShare` is 0); the totals are capped in `STAT_RULES`. Farm Yield is not here yet (IDL-176: it needs the farm output to take the gear).
+ * The economy stats of IDL-176, fixed base stats of the ladder's gear from G4 on (`ECONOMY_FROM`): Build Speed on hands and chest, Farm Yield on hands, Tile Discount on cape and neck, Boss Timer (seconds) on head and shoulder. Per point of strength
+ * index like the table above, never grown by the item level (their `levelShare` is 0); the totals are capped in `STAT_RULES`.
  */
 const ECONOMY_SLOT: Partial<Record<ArmourSlot, PerIndex>> = {
-	hands: { buildSpeed: 0.3 },
+	hands: { buildSpeed: 0.3, farmYield: 0.5 },
 	chest: { buildSpeed: 0.4 },
 	cape: { tileDiscount: 0.2 },
 	neck: { tileDiscount: 0.2 },
@@ -82,7 +82,7 @@ const ECONOMY_SLOT: Partial<Record<ArmourSlot, PerIndex>> = {
 	shoulder: { bossTimer: 0.3 },
 };
 /** The stats of `ECONOMY_SLOT`, which `gradeLegacyItems` also gives to the live pieces that fill a cell */
-const ECONOMY_KEYS = ['buildSpeed', 'tileDiscount', 'bossTimer'] as const;
+const ECONOMY_KEYS = ['buildSpeed', 'farmYield', 'tileDiscount', 'bossTimer'] as const;
 /** The first grade whose gear carries the economy stats */
 const ECONOMY_FROM: Grade = 'G4';
 
