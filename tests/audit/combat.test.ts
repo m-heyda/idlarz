@@ -20,7 +20,7 @@ import {
 import { STAT_DEFS, type StatKey } from '../../src/catalog/stats';
 import { aggregateStats } from '../../src/lib/inventory';
 import { attributesWithGear } from '../../src/lib/gearAttributes';
-import { critDamagePercent } from '../../src/lib/statBonuses';
+import { atkSpeedPercent, critDamagePercent } from '../../src/lib/statBonuses';
 import { baseStatsAt, plainItem, resolveItem } from '../../src/lib/itemInstance';
 import {
 	armorOf,
@@ -61,6 +61,7 @@ const LEVEL_SHARE: Record<string, number> = {
 	superCrit: 0.3,
 	dodge: 0.3,
 	lifeLeech: 0.3,
+	atkSpeed: 0.3,
 	critDamage: 0.3,
 	armorPen: 0.3,
 	thorns: 0.3,
@@ -96,6 +97,7 @@ const TIER1: Record<string, number> = {
 	manaRegen: 0.2,
 	spellPower: 4,
 	lifeLeech: 0.5,
+	atkSpeed: 1,
 	critDamage: 3,
 	armorPen: 2,
 	thorns: 2,
@@ -394,6 +396,13 @@ test('caps: Dodge 40 %, Life Leech 15 %, Crit 75 %, Super Crit 50 % hold however
 
 test('caps (IDL-176): Crit Damage 50 %, Armor Penetration 30 %, Thorns 25 %, Heal on Kill 8 % hold however much gear stacks', () => {
 	const c = character();
+	const speed = stacked('atkSpeed_prefix');
+	assert.ok(aggregateStats(speed).atkSpeed > 25, 'the test gear must overshoot the cap');
+	assert.equal(
+		attacksPerSecond(speed, c),
+		round2((ITEM_CATALOG[speed.mainHand!.base]?.attackSpeed ?? 1) * (1 + (atkSpeedPercent(attributesWithGear(c, speed)) + 25) / 100)),
+		'the gear adds at most 25 % attack speed',
+	);
 	const crit = stacked('critDamage_prefix');
 	assert.ok(aggregateStats(crit).critDamage > 50, 'the test gear must overshoot the cap');
 	assert.equal(critExtraOf(c, crit), 1 + (critDamagePercent(attributesWithGear(c, crit)) + 50) / 100);

@@ -190,6 +190,8 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | of Sorcery | suffix | spellPower | 1 | staff, wand, tome, neck, ring, charm |
 | Vampiric | prefix | lifeLeech | 5 | weapon |
 | of the Leech | suffix | lifeLeech | 5 | weapon |
+| Swift | prefix | atkSpeed | 8 | ring |
+| of Haste | suffix | atkSpeed | 8 | ring |
 | Brutal | prefix | critDamage | 8 | ring, neck |
 | of Carnage | suffix | critDamage | 8 | ring, neck |
 | Piercing | prefix | armorPen | 8 | weapon |

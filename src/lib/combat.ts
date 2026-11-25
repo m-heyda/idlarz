@@ -128,14 +128,15 @@ export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: C
 };
 
 /**
- * Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.
+ * Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus, the merchant's and the gear's Attack Speed (rings, capped at `STAT_RULES.atkSpeedGearCap`, IDL-379). The fight swings at exactly this speed.
  *
  * @category Combat/Player numbers
  * @order 5
  */
 export const attacksPerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
 	const base = equipment.mainHand ? (ITEM_CATALOG[equipment.mainHand.base]?.attackSpeed ?? 1) : 1;
-	return Math.round(base * (1 + ((stats ? atkSpeedPercent(attributesWithGear(stats, equipment)) : 0) + (bonus?.atkSpeedPct ?? 0)) / 100) * 100) / 100;
+	const gear = cappedGear(equipment, 'atkSpeed', STAT_RULES.atkSpeedGearCap);
+	return Math.round(base * (1 + ((stats ? atkSpeedPercent(attributesWithGear(stats, equipment)) : 0) + (bonus?.atkSpeedPct ?? 0) + gear) / 100) * 100) / 100;
 };
 
 /** Damage per second at that speed: what the damage readout is built on. */
@@ -213,7 +214,7 @@ export const lifeLeechPercent = (equipment: Equipment, bonus?: CombatBonus): num
 	Math.min(STAT_RULES.lifeLeechCap, Math.max(0, aggregateStats(equipment).lifeLeech + (bonus?.leechPct ?? 0)));
 
 /** One gear total of the IDL-176 combat stats, never below 0 and never above its cap in `STAT_RULES`. */
-const cappedGear = (equipment: Equipment, stat: 'critDamage' | 'armorPen' | 'thorns' | 'healOnKill', cap: number): number =>
+const cappedGear = (equipment: Equipment, stat: 'atkSpeed' | 'critDamage' | 'armorPen' | 'thorns' | 'healOnKill', cap: number): number =>
 	Math.min(cap, Math.max(0, aggregateStats(equipment)[stat]));
 
 /**

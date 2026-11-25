@@ -46,6 +46,7 @@ export const STAT_DEFS = {
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
 	// the four combat stats of IDL-176: each gear total is capped where it is read (STAT_RULES), `lib/combat.ts` and the fight engine apply them
+	atkSpeed: { label: 'Attack Speed', short: 'Atk Speed', unit: '%', decimals: 1, levelShare: 0.3 }, // % more attacks per second, on top of the weapon's speed and Dexterity (rings; capped by STAT_RULES.atkSpeedGearCap)
 	critDamage: { label: 'Crit Damage', unit: '%', levelShare: 0.3 }, // % extra on the x2 crit and x5 super crit multipliers, added to the attributes' (capped by STAT_RULES.critDamageGearCap)
 	armorPen: { label: 'Armor Penetration', short: 'Armor Pen', unit: '%', levelShare: 0.3 }, // % of the monster's armor ignored by every hit (capped by STAT_RULES.armorPenCap)
 	thorns: { label: 'Thorns', unit: '%', levelShare: 0.3 }, // % of the damage a monster's hit does to you that it takes back (capped by STAT_RULES.thornsCap)
@@ -101,6 +102,7 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	atkSpeed: 'combat',
 	critDamage: 'combat',
 	armorPen: 'combat',
 	thorns: 'combat',
@@ -166,6 +168,7 @@ export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, nu
 	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
 	spellPower: [4, 7, 10, 14, 18],
 	lifeLeech: [0.5, 1, 1.5, 2, 3],
+	atkSpeed: [1, 1.5, 2.5, 3.5, 5],
 	critDamage: [3, 5, 8, 12, 16],
 	armorPen: [2, 3, 5, 7, 10],
 	thorns: [2, 4, 6, 9, 12],
@@ -203,6 +206,17 @@ const POWER_PER_LEVEL = 0.07;
 const POWER_KNEE = 55;
 /** The compound growth per item level above {@link POWER_KNEE}. */
 const POWER_GROWTH_ABOVE_KNEE = 1.07;
+
+/**
+ * The tier of an item level, shown on the item card as "Tier II": I for levels 1-19, II for 20-39, III for 40-59, IV for 60-79 and V for 80 and up. A label for reading the level curve, not a stat (IDL-45).
+ *
+ * @category Loot/Items
+ * @order 4
+ */
+export const itemTierLabel = (itemLevel: number): 'I' | 'II' | 'III' | 'IV' | 'V' => {
+	const level = Math.max(1, Math.round(itemLevel));
+	return level >= 80 ? 'V' : level >= 60 ? 'IV' : level >= 40 ? 'III' : level >= 20 ? 'II' : 'I';
+};
 
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
 

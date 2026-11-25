@@ -25,6 +25,7 @@ import {
 	weaponDps,
 } from '@/catalog';
 import { describeEffect, hasEffects } from '@/catalog/buffs';
+import { itemTierLabel } from '@/catalog/stats';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
@@ -185,7 +186,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			type={`${rarity?.label ?? ''}${def.weaponType ? ` ${def.weaponType}` : ''} · ${slotLabel}`}
 			levelLine={
 				resolved
-					? `Item Level ${formatCompact(resolved.instance.level)} · Quality ${Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%${resolved.instance.crafted ? ' · Crafted' : ''}`
+					? `Tier ${itemTierLabel(resolved.instance.level)} · Item Level ${formatCompact(resolved.instance.level)} · Quality ${Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%${resolved.instance.crafted ? ' · Crafted' : ''}`
 					: undefined
 			}
 			banner={banner ? { text: banner === 'equipped' ? 'Equipped' : 'Comparing', tone: banner } : undefined}
