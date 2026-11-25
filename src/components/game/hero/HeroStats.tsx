@@ -195,7 +195,7 @@ const HeroStats: React.FC = () => {
 		{ label: 'Gold', value: formatNumber(resources.gold), color: I.gold },
 		{
 			label: 'Attribute gold',
-			value: `+${pct(calculateStatResourceModifiers(characterStats).gold * 100)} (base +${pct(STARTING_GOLD_BONUS)} from the starting 5 Int and 5 Cha)`,
+			value: `+${pct(calculateStatResourceModifiers(characterStats).gold * 100)} (start +${pct(STARTING_GOLD_BONUS)})`,
 			color: I.gold,
 		},
 		{ label: 'Crafting level', value: craftLevelOf(craftXp).level, color: I.gold },
