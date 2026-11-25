@@ -201,5 +201,5 @@ export const readyCountOf = (input: BestiaryInput): number => {
  */
 export const goldenTextOf = (): string => {
 	const g = LUCK.goldenMonster;
-	return `Golden monsters: ${Math.round(g.base * 100)}% of new monsters (up to ${Math.round(g.cap * 100)}% with Luck) pay x${g.rewardMultiplier} gold and XP and an extra gear roll, and count as a normal kill here.`;
+	return `Golden monsters: ${Math.round(g.base * 100)}% of new monsters (up to ${Math.round(g.cap * 100)}% with Luck) pay x${g.rewardMultiplier} gold and XP, an extra gear roll and always an Arcane chest, and count as a normal kill here.`;
 };
