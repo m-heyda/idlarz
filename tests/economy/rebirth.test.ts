@@ -105,7 +105,8 @@ test('rebirth grants points by the formula, resets the run and keeps the identit
 	assert.ok(s.level.level > 1);
 	assert.deepEqual(s.characterStats, {
 		...before.stats,
-		availablePoints: before.stats.availablePoints + Math.max(0, totalStatPoints(s.level.level) - totalStatPoints(before.level)),
+		// the level's points, and the 20 a rebirth adds for good (IDL-100)
+		availablePoints: before.stats.availablePoints + Math.max(0, totalStatPoints(s.level.level) - totalStatPoints(before.level)) + 20,
 	});
 	assert.equal(s.castleUpgrade, null);
 	assert.equal(s.resources.gold, INITIAL_RESOURCES.gold);

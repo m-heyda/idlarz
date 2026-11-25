@@ -115,6 +115,6 @@ test('a rebirth gives every attribute point back to spend (respec) and keeps the
 	assert.equal(api().rebirth(), true);
 	const stats = api().characterStats;
 	assert.equal(stats.strength, INITIAL_CHARACTER_STATS.strength, 'spent points are back');
-	assert.equal(stats.availablePoints, totalStatPoints(level), 'all the points of the level are free again');
+	assert.equal(stats.availablePoints, totalStatPoints(level) + 20, 'all the points of the level are free again, and the rebirth adds 20 (IDL-100)');
 	assert.equal(api().level.level, level);
 });

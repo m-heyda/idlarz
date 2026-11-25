@@ -52,7 +52,7 @@ export const createCharacterSlice = (set: GameSet, get: GameGet, character: Char
 		const state = get();
 		if (!Number.isFinite(xp) || xp < 0 || xp >= state.resources.xp) return;
 		const level = calculateLevel(xp);
-		const characterStats = reconcileCharacter(state.characterStats, xp);
+		const characterStats = reconcileCharacter(state.characterStats, xp, state.prestige.rebirths);
 		set({
 			resources: { ...state.resources, xp },
 			level,

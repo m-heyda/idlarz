@@ -333,7 +333,7 @@ export const acceptSave = async (
 			...state,
 			resources: { ...state.resources, xp: xpVerdict.xp },
 			level: calculateLevel(xpVerdict.xp),
-			characterStats: reconcileCharacter(state.characterStats, xpVerdict.xp),
+			characterStats: reconcileCharacter(state.characterStats, xpVerdict.xp, state.prestige.rebirths),
 		};
 		summary = summarize(state);
 	}

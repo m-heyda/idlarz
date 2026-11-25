@@ -1,7 +1,7 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { isRecord } from '@/lib/isRecord';
 import type { CharacterStats } from '@/types/game';
-import { calculateCombatStats, calculateLevel, totalStatPoints } from '@/utils/game/character';
+import { calculateCombatStats, calculateLevel, rebirthPoints, totalStatPoints } from '@/utils/game/character';
 
 // The attribute points are the server's (the ledger's `attrs` column): the browser previews a point at once and asks the server for it, the save pipeline puts the ledger's allocation over whatever an upload claims, and a respec is an operation
 // the server charges for. What is stored is only how many points the player put into each attribute above the start value; the points still free are always worked out from the level (`availablePoints = budget - spent`).
@@ -29,15 +29,16 @@ export const newAttrs = (): Attrs => ({ ver: 1, alloc: emptyAlloc(), freeUsed: f
 export const spentOf = (alloc: Record<AttrKey, number>): number => ATTR_KEYS.reduce((sum, key) => sum + alloc[key], 0);
 
 /**
- * How many attribute points a character holds in all: what its level has earned (`totalStatPoints`), plus a term per rebirth that is 0 today (the +20 pool of IDL-100 goes here, in the one place the budget is worked out).
+ * How many attribute points a character holds in all: what its level has earned (`totalStatPoints`), plus `LEVELING.attributePointsPerRebirth` (20) for every rebirth (IDL-100). The one place the budget is worked out: the server's allocation check, the browser's free points,
+ * the save sanitizer and `reconcileCharacter` all read it, so a rebirth's points are never refused, wiped or paid twice.
  *
  * @category Progression/Levels
  * @order 4
  * @formula
- * attributeBudget(level, rebirths) = totalStatPoints(level) + 0 x rebirths
+ * attributeBudget(level, rebirths) = totalStatPoints(level) + 20 x rebirths
  * @see totalStatPoints
  */
-export const attributeBudget = (level: number, rebirths = 0): number => totalStatPoints(level) + Math.max(0, Math.floor(rebirths)) * 0;
+export const attributeBudget = (level: number, rebirths = 0): number => totalStatPoints(level) + rebirthPoints(rebirths);
 
 /** Reads the stored column back: null for a missing column or anything that is not an allocation (the first request seeds it), otherwise a clean value (negative or fractional points read as zero). */
 export const readAttrs = (raw: unknown): Attrs | null => {
