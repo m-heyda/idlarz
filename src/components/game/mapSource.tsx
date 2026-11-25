@@ -26,7 +26,7 @@ export type MapGameState = Pick<
 	Partial<
 		Pick<
 			GameState,
-			'playerClass' | 'equipment' | 'buildingUpgrades' | 'gemBuilders' | 'gemCraft' | 'idolLevels' | 'buildBuilding' | 'upgradeBuilding' | 'moveBuilding'
+			'playerClass' | 'equipment' | 'buildingUpgrades' | 'gemBuilders' | 'gemCraft' | 'idolLevels' | 'buildBuilding' | 'upgradeBuilding'
 		>
 	>;
 

@@ -1,5 +1,5 @@
 // buildingSlice.ts
-// The per-biome building system (R7, IDL-91, IDL-92): build, level up and move a building. Every action refuses while BUILDINGS_FLAG is off, so a flag-off game never changes state through here.
+// The per-biome building system (R7, IDL-91, IDL-92): build and level up a building. Every action refuses while BUILDINGS_FLAG is off, so a flag-off game never changes state through here.
 
 import { buildingDef } from '@/catalog/buildings';
 import {
@@ -10,8 +10,6 @@ import {
 	buildingLevelCost,
 	buildingUpgradeDuration,
 	levelOfTile,
-	moveProblem,
-	relocationCost,
 	rememberedIdolLevel,
 	upgradeProblem,
 	type BuildingContext,
@@ -118,30 +116,6 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 					},
 				],
 			});
-			return true;
-		},
-
-		/** Moves the building to another tile of its biome for half its cost; instant, the level is kept. */
-		moveBuilding: (fromX: number, fromY: number, toX: number, toY: number): boolean => {
-			if (![fromX, fromY, toX, toY].every(Number.isInteger)) return false;
-			const ctx = context();
-			if (moveProblem(ctx, fromX, fromY, toX, toY)) return false;
-			const s = get();
-			const from = getTile(s.tiles, fromX, fromY);
-			const to = getTile(s.tiles, toX, toY);
-			const def = buildingDef(from?.building);
-			if (!from || !to || !def) return false;
-			const level = levelOfTile(from);
-			const cost = relocationCost(level, ctx.ownedTiles);
-			if (!canAffordBundle(s.resources, cost)) return false;
-			const { building: _b, buildingLevel: _l, ...bare } = from;
-			void _b;
-			void _l;
-			const tiles = setTiles(s.tiles, [
-				{ x: fromX, y: fromY, tile: bare },
-				{ x: toX, y: toY, tile: { ...to, building: def.id, buildingLevel: level } },
-			]);
-			set({ tiles, resources: subtractBundle(s.resources, cost), resourceRates: ratesOf(tiles) });
 			return true;
 		},
 	};

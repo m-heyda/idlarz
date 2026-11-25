@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IDOL_RULES } from '@/config/buildings';
 import { idolDef } from '@/catalog/idols';
 import { buildingKindLabel, buildingsOfBiome } from '@/catalog/buildings';
@@ -9,7 +9,7 @@ import { limitOf } from '@/lib/limits';
 import { buildingUpgradeDuration, ownedOfBiome } from '@/lib/buildings';
 import { buildingEffectText } from '@/lib/buildingText';
 import { formatTime } from '@/utils/formatters';
-import { buildOptions, type BuildOption, type MoveOption } from '@/lib/buildingMenu';
+import { buildOptions, type BuildOption, type OwnedOption } from '@/lib/buildingMenu';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import audioManager from '@/utils/audioManager';
@@ -79,11 +79,30 @@ export const IdolInfo: React.FC<{ id: string; remembered: number; buildTimePct?:
 /** The shortage is already visible (red costs, a disabled button), so it is not printed under every card; any other refusal still is. */
 const NOT_ENOUGH = 'Not enough resources';
 
-/** "Build here": the buildings of the tile's biome with art, output and price, and the ones standing elsewhere that can be moved here. */
+/** One collapsible group of the Build window: a header button with the name and the count, and the cards under it while it is open. */
+const Group: React.FC<{ title: string; count: number; open: boolean; onToggle: () => void; children: React.ReactNode }> = ({
+	title,
+	count,
+	open,
+	onToggle,
+	children,
+}) => (
+	<section className='bh-group'>
+		<button type='button' className='bh-group-head' aria-expanded={open} onClick={onToggle}>
+			<span className='bh-group-arrow' data-open={open}>
+				▸
+			</span>
+			<span className='bh-group-title'>{title}</span>
+			<span className='bh-group-count'>{count}</span>
+		</button>
+		{open && <div className='build-list bh-grid'>{children}</div>}
+	</section>
+);
+
+/** "Build here": the buildings of the tile's biome with art, output and price, in two groups you can fold: "Build new" (not built yet) and "Already owned" (standing, with a Buy for one more copy when the slots allow it). */
 const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const close = useUiStore((state) => state.closeBuildModal);
 	const buildBuilding = useGameStore((state) => state.buildBuilding);
-	const moveBuilding = useGameStore((state) => state.moveBuilding);
 	// re-evaluate whenever resources or the map change, so prices go green/red live
 	const tiles = useGameStore((state) => state.tiles);
 	useGameStore((state) => state.resources);
@@ -94,17 +113,18 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const buildTimePct = buildTimeCutPct(tiles, idolLevels, equipment);
 	const tile = getTile(tiles, x, y);
 	const free = !!tile && !tile.building;
-	const { builds, moves } = buildOptions(useGameStore, x, y);
+	const { builds, maxed } = buildOptions(useGameStore, x, y);
+	const [open, setOpen] = useState({ fresh: true, owned: true });
 
 	// the tile got a building, or nothing can be offered anymore: nothing left to choose
 	// a monster standing on the tile closes the window too: it has to be defeated before anything is built here
 	const blocked = !!monsterAt(monsters, x, y);
 	useEffect(() => {
-		if (!free || blocked || (builds.length === 0 && moves.length === 0)) close();
-	}, [free, blocked, builds.length, moves.length, close]);
+		if (!free || blocked || builds.length === 0) close();
+	}, [free, blocked, builds.length, close]);
 	if (!free || blocked) return null;
 
-	// one fixed place per building type (Producer, Extractor, Idol, then the general buildings): "Move here" keeps the place its "Build" card would have had, so nothing jumps when a building is built
+	// one fixed place per building type (Producer, Extractor, Idol, then the general buildings) inside each group
 	const position = new Map(buildingsOfBiome(tile?.biome ?? '').map((d, i) => [d.id, i]));
 	const at = (id: string) => position.get(id) ?? position.size;
 
@@ -114,13 +134,6 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		void buildBuilding?.(x, y, o.def.id);
 		close();
 	};
-	const move = (o: MoveOption) => {
-		if (o.problem) return;
-		audioManager.playSound('click');
-		void moveBuilding?.(o.from.x, o.from.y, x, y);
-		close();
-	};
-
 	/** The key line of an option: what it makes per hour and per level (an Idol: its effect per level), kept to one line; the rest is in the hover card */
 	const keyLine = (def: BuildOption['def']) => {
 		if (def.kind === 'idol') {
@@ -165,54 +178,66 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 		);
 	};
 
+	const fresh = builds.filter((o) => o.owned === 0).sort((a, b) => at(a.def.id) - at(b.def.id));
+	const owned: { def: BuildOption['def']; level: number; owned: number; buy: BuildOption | null }[] = [
+		...builds.filter((o) => o.owned > 0).map((o) => ({ def: o.def, level: o.level, owned: o.owned, buy: o })),
+		...maxed.map((o: OwnedOption) => ({ def: o.def, level: o.level, owned: o.owned, buy: null })),
+	].sort((a, b) => at(a.def.id) - at(b.def.id));
+	const maxLevelOf = (def: BuildOption['def']) => (def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige }));
+
+	const buyButton = (o: BuildOption) => (
+		<div className='bh-side'>
+			<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
+				Buy
+			</Button>
+		</div>
+	);
+
 	return (
 		<GameModal title='Build here' width={1080} onClose={close}>
-			<div className='build-list bh-grid'>
-				{builds.map((o) => (
-					<div key={o.def.id} className={`bh-row${o.problem ? ' build-row-off' : ''}`} style={{ order: at(o.def.id) * 2 }}>
-						<Art def={o.def} />
-						<div className='bh-info'>
-							<Head def={o.def} details={details(o.def, o.remembered)} />
-							<p className='build-blurb'>{o.def.blurb}</p>
-							{keyLine(o.def)}
-							<div className='build-foot'>
-								{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostGrid cost={o.cost} />}
+			{fresh.length > 0 && (
+				<Group title='Build new' count={fresh.length} open={open.fresh} onToggle={() => setOpen((o) => ({ ...o, fresh: !o.fresh }))}>
+					{fresh.map((o) => (
+						<div key={o.def.id} className={`bh-row${o.problem ? ' build-row-off' : ''}`}>
+							<Art def={o.def} />
+							<div className='bh-info'>
+								<Head def={o.def} details={details(o.def, o.remembered)} />
+								<p className='build-blurb'>{o.def.blurb}</p>
+								{keyLine(o.def)}
+								<div className='build-foot'>
+									{o.remembered ? <span className='build-free'>Free: learned at level {o.remembered}</span> : <CostGrid cost={o.cost} />}
+								</div>
+								{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
 							</div>
-							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
+							{buyButton(o)}
 						</div>
-						<div className='bh-side'>
-							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => build(o)}>
-								Buy
-							</Button>
-						</div>
-					</div>
-				))}
-				{moves.map((o) => (
-					<div key={`move-${o.def.id}`} className={`bh-row${o.problem ? ' build-row-off' : ''}`} style={{ order: at(o.def.id) * 2 + 1 }}>
-						<Art def={o.def} />
-						<div className='bh-info'>
-							<Head def={o.def} extra={`level ${o.level}, built elsewhere`} />
-							<span title={`Level ${o.level} of ${o.def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige })}`}>
-								<DiamondLevel
-									level={o.level}
-									max={o.def.kind === 'idol' ? limitOf('idolMaxLevel', { prestige }) : limitOf('buildingMaxLevel', { prestige })}
-									small
-								/>
-							</span>
-							<p className='build-blurb'>Move it here: level kept, half price.</p>
-							<div className='build-foot'>
-								<CostGrid cost={o.cost} />
+					))}
+				</Group>
+			)}
+			{owned.length > 0 && (
+				<Group title='Already owned' count={owned.length} open={open.owned} onToggle={() => setOpen((o) => ({ ...o, owned: !o.owned }))}>
+					{owned.map((o) => (
+						<div key={o.def.id} className={`bh-row${o.buy?.problem ? ' build-row-off' : ''}`}>
+							<Art def={o.def} />
+							<div className='bh-info'>
+								<Head def={o.def} extra={o.owned > 1 ? `${o.owned} built` : 'built'} details={details(o.def, o.buy?.remembered)} />
+								<span title={`Level ${o.level} of ${maxLevelOf(o.def)}`}>
+									<DiamondLevel level={o.level} max={maxLevelOf(o.def)} small />
+								</span>
+								{keyLine(o.def)}
+								{o.buy && (
+									<div className='build-foot'>
+										<span className='build-extra'>One more:</span>
+										<CostGrid cost={o.buy.cost} />
+									</div>
+								)}
+								{o.buy?.problem && o.buy.problem !== NOT_ENOUGH && <p className='build-problem'>{o.buy.problem}</p>}
 							</div>
-							{o.problem && o.problem !== NOT_ENOUGH && <p className='build-problem'>{o.problem}</p>}
+							{o.buy ? buyButton(o.buy) : null}
 						</div>
-						<div className='bh-side'>
-							<Button tone='gold' className='build-action' disabled={!!o.problem} title={o.problem ?? undefined} onClick={() => move(o)}>
-								Move
-							</Button>
-						</div>
-					</div>
-				))}
-			</div>
+					))}
+				</Group>
+			)}
 		</GameModal>
 	);
 };

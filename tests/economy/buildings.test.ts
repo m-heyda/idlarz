@@ -14,7 +14,6 @@ import {
 	buildingLevelCap,
 	maxLevelOf,
 	buildingLevelCost,
-	buildingTotalCost,
 	builderBusy,
 	builderCount,
 	buildingUpgradeDuration,
@@ -24,7 +23,6 @@ import {
 	producerOutput,
 	extractorOutput,
 	buildingOutput,
-	relocationCost,
 	buildProblem,
 	copiesAllowed,
 } from '../../src/lib/buildings';
@@ -156,15 +154,13 @@ test('levels are gated by min(5, castle level); timers are 10 min, 45 min, 3 h, 
 	assert.equal(buildingUpgradeDuration(1, { ...api().prestige, upgrades: { builders: 2 } }), 600, 'the castle upgrade does not shorten a building');
 });
 
-test('prices: x2 per level on the price of 14 tiles; moving costs half of everything the building cost', () => {
+test('prices: x2 per level on the price of 14 tiles', () => {
 	const one = buildingLevelCost(1, 100);
 	const two = buildingLevelCost(2, 100);
 	assert.ok(one.gold! > 0);
 	assert.ok(Math.abs(two.gold! / one.gold! - 2) < 0.01);
 	// counted to at most 300 tiles
 	assert.deepEqual(buildingLevelCost(1, 300), buildingLevelCost(1, 99999));
-	const total = buildingTotalCost(3, 100);
-	assert.equal(relocationCost(3, 100).gold, Math.floor(total.gold! / 2));
 });
 
 test('with the flag off every action refuses and nothing changes', () => {
@@ -228,7 +224,7 @@ test('a Producer adds its output to the income (once the flag is on) and the fla
 	withoutBuildings(() => assert.equal(rates(), off, 'flag off: the building on the tile makes nothing'));
 });
 
-test('a monster standing on a building blocks its upgrade, its move and its menu entry until it is defeated', () => {
+test('a monster standing on a building blocks its upgrade and its menu entry until it is defeated', () => {
 	withBuildings(() => {
 		const [a] = gameWith('forest', 1, 1);
 		assert.equal(api().buildBuilding(a.x, a.y, 'lumberyard'), true);
@@ -237,7 +233,6 @@ test('a monster standing on a building blocks its upgrade, its move and its menu
 		store.setState({ monsters: [{ id: 1, type: 'thistleBoar', x: a.x, y: a.y, level: 1 } as never] });
 		assert.equal(api().upgradeBuilding(a.x, a.y), false, 'no upgrade under a monster');
 		assert.deepEqual(api().buildingUpgrades, []);
-		assert.equal(api().moveBuilding(a.x, a.y, a.x + 1, a.y), false, 'no move from under a monster');
 		assert.deepEqual(buildingMenuItems(store, a.x, a.y), [], 'no menu entries under a monster');
 		store.setState({ monsters: [] });
 		assert.equal(api().upgradeBuilding(a.x, a.y), true, 'defeated: the building works again');
@@ -258,7 +253,6 @@ test('upgrading: gated by the castle level, paid now, one timer shared with the 
 		// the builder is taken
 		assert.equal(api().upgradeBuilding(a.x, a.y), false);
 		assert.equal(api().upgradeCastle(), false, 'the castle waits for the building');
-		assert.equal(api().moveBuilding(a.x, a.y, a.x + 1, a.y), false, 'it cannot move while it is being upgraded');
 		const before = api().resourceRates.total.wood;
 		for (let t = 0; t < 700; t += 10) api().tick(10_000);
 		assert.deepEqual(api().buildingUpgrades, []);
@@ -381,22 +375,6 @@ test('the timer runs at most one tick catch-up per call, like the castle', () =>
 		const left = api().buildingUpgrades[0];
 		assert.ok(left === null || left.remainingSec > 0);
 		assert.ok(MAX_CATCHUP_SEC >= 1);
-	});
-});
-
-test('moving: to another tile of the biome for half the price, level kept', () => {
-	withBuildings(() => {
-		const [a, b] = gameWith('forest', 2, 3);
-		api().buildBuilding(a.x, a.y, 'lumberyard');
-		patchTileAt(a.x, a.y, { buildingLevel: 2 });
-		const gold = api().resources.gold;
-		assert.equal(api().moveBuilding(a.x, a.y, a.x, a.y), false);
-		assert.equal(api().moveBuilding(a.x, a.y, CASTLE_X, CASTLE_Y), false);
-		assert.equal(api().moveBuilding(a.x, a.y, b.x, b.y), true);
-		assert.equal(tileAt(api().tiles, a.x, a.y).building, undefined);
-		assert.equal(tileAt(api().tiles, b.x, b.y).building, 'lumberyard');
-		assert.equal(tileAt(api().tiles, b.x, b.y).buildingLevel, 2);
-		assert.ok(api().resources.gold < gold);
 	});
 });
 
