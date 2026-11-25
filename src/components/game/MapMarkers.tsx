@@ -1,5 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
+import { MARK_PREFS, MARK_TARGETS, type MarkKind, type MarkPref, type MonsterFilter } from '@/config/mapMarks';
+import { monsterMatches } from '@/lib/monsterMarks';
 import { useRockStore } from '@/stores/rockStore';
 import { useUiStore } from '@/stores/uiStore';
 import { ownedRowMajor, type World } from '@/utils/world';
@@ -11,7 +13,7 @@ import '@/styles/MapMarkers.css';
 //  - `MapMarkers` (default): for the nearest one that is out of view, a small arrow on the edge of the screen that points the way (a canvas, drawn from the view store).
 // Nothing runs while all three are off.
 
-export type MarkKind = 'chests' | 'ores' | 'monsters';
+export type { MarkKind };
 export const MARK_COLOURS: Record<MarkKind, string> = { chests: '#f6d77a', ores: '#b98cff', monsters: '#ff8f7d' };
 const PULSE_MS = 1700;
 /** The edge arrow keeps this far from the borders of the screen (the header is above, the dock below) */
@@ -24,15 +26,29 @@ const chestTiles = (world: World): { x: number; y: number }[] => {
 	return spots;
 };
 
-/** The kind that is switched on (at most one: the buttons are a choice), or null. */
-export const markedKind = (marks: { markChests: boolean; markOres: boolean; markMonsters: boolean }): MarkKind | null =>
-	marks.markChests ? 'chests' : marks.markOres ? 'ores' : marks.markMonsters ? 'monsters' : null;
+/** What is switched on (at most one mark: the buttons and tiles are a choice): the kind of thing and, for monsters, which of them; or null. */
+export const markedTarget = (marks: Record<MarkPref, boolean>): { kind: MarkKind; filter: MonsterFilter } | null => {
+	const pref = MARK_PREFS.find((key) => marks[key]);
+	return pref ? MARK_TARGETS[pref] : null;
+};
 
-/** The tiles of the marked kind. Chests are read off the map when it changes, monsters by their places (the list itself is a new array every tick), ores from the rock store. */
-const useMarked = (kind: MarkKind | null): { x: number; y: number }[] => {
+type Target = { kind: MarkKind; filter: MonsterFilter } | null;
+
+/** The tiles of the marked kind. Chests are read off the map when it changes, monsters by their places (the list itself is a new array every tick; a monster filter keeps only the matching ones), ores from the rock store. */
+const useMarked = (target: Target): { x: number; y: number }[] => {
 	const game = useMapGame();
+	const kind = target?.kind ?? null;
+	const filter = target?.filter ?? 'all';
 	const tiles = game((state) => (kind === 'chests' ? state.tiles : null));
-	const monsterPlaces = game((state) => (kind === 'monsters' ? state.monsters.map((m) => `${m.x},${m.y}`).join(';') : ''));
+	const monsterPlaces = game((state) => {
+		if (kind !== 'monsters') return '';
+		const highestLevel = state.monsters.reduce((top, monster) => Math.max(top, monster.level), 0);
+		const ctx = { limits: { prestige: state.prestige }, highestLevel };
+		return state.monsters
+			.filter((monster) => monsterMatches(filter, monster, ctx))
+			.map((m) => `${m.x},${m.y}`)
+			.join(';');
+	});
 	const rocks = useRockStore((state) => (kind === 'ores' ? state.rocks : null));
 	return useMemo(() => {
 		if (kind === 'chests' && tiles) return chestTiles(tiles);
@@ -42,18 +58,25 @@ const useMarked = (kind: MarkKind | null): { x: number; y: number }[] => {
 	}, [kind, tiles, monsterPlaces, rocks]);
 };
 
-const useKind = (): MarkKind | null => {
+const useTarget = (): Target => {
 	const markChests = useUiStore((state) => state.markChests);
 	const markOres = useUiStore((state) => state.markOres);
 	const markMonsters = useUiStore((state) => state.markMonsters);
-	return markedKind({ markChests, markOres, markMonsters });
+	const markBosses = useUiStore((state) => state.markBosses);
+	const markGolden = useUiStore((state) => state.markGolden);
+	const markGrown = useUiStore((state) => state.markGrown);
+	const markGrowing = useUiStore((state) => state.markGrowing);
+	const markStrongest = useUiStore((state) => state.markStrongest);
+	const marks: Record<MarkPref, boolean> = { markChests, markOres, markMonsters, markBosses, markGolden, markGrown, markGrowing, markStrongest };
+	return markedTarget(marks);
 };
 
 /** The rings, in world pixels: mounted inside the map's world, before the tooltip layer. */
 export const MapMarkerRings: React.FC = () => {
-	const kind = useKind();
-	const marked = useMarked(kind);
-	if (!kind) return null;
+	const target = useTarget();
+	const marked = useMarked(target);
+	if (!target) return null;
+	const kind = target.kind;
 	return (
 		<>
 			{marked.slice(0, 300).map(({ x, y }) => (
@@ -75,8 +98,9 @@ export const MapMarkerRings: React.FC = () => {
 const MapMarkers: React.FC = () => {
 	const viewStore = useMapView();
 	const { game } = useMapSource();
-	const kind = useKind();
-	const marked = useMarked(kind);
+	const target = useTarget();
+	const kind = target?.kind ?? null;
+	const marked = useMarked(target);
 	const w = viewStore((state) => state.w);
 	const h = viewStore((state) => state.h);
 	const canvasRef = useRef<HTMLCanvasElement>(null);

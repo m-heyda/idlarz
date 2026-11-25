@@ -60,7 +60,7 @@ test('an open Kingdom overview shows the castle, land, buildings and monsters se
 	assert.match(out, /Castle/);
 	assert.match(out, /Land/);
 	assert.match(out, /Buildings \(0 of /);
-	assert.match(out, /Monsters on the map/);
+	assert.match(out, /Find on the map/);
 	assert.match(out, /kingdom-heatmap/, 'the land is a heatmap of squares');
 	// (a static render reads the store's initial state, which already owns its starter land)
 	const landTiles = kingdomSummary(useGameStore.getInitialState()).land.byBiome.reduce((sum, row) => sum + row.count, 0);
@@ -106,4 +106,34 @@ test('IDL-378: the map counters: golden is a subset of the monsters, fully grown
 	assert.equal(s.monsters.maxed + s.monsters.growing, s.monsters.total);
 	assert.equal(s.monsters.rocks, 4);
 	assert.equal(s.monsters.chests, base.tiles.stats.chests);
+});
+
+test('the Kingdom overview has one "Find on the map" section: a pressable tile for chests, ore nodes, monsters and each monster kind', () => {
+	freshGame();
+	// eslint-disable-next-line @typescript-eslint/no-require-imports
+	const KingdomWindow = require('../../src/components/game/KingdomWindow').default;
+	const out = renderToStaticMarkup(React.createElement(KingdomWindow));
+	assert.match(out, /Find on the map/);
+	assert.doesNotMatch(out, /Unopened chests|Monsters on the map/, 'one section now: the counts live on the tiles');
+	const cards = out.match(/class="kd-tile kd-mark-card"[^>]*>/g) ?? [];
+	assert.equal(cards.length, 8, 'chests, ore nodes, monsters, bosses, strongest, golden, fully grown and still growing');
+	assert.ok(
+		cards.every((card) => /aria-pressed="false"/.test(card)),
+		'nothing is marked on a fresh game',
+	);
+	for (const name of ['Highlight chests', 'Highlight ores', 'Highlight monsters', 'Highlight bosses', 'Highlight the strongest', 'Highlight golden monsters'])
+		assert.match(out, new RegExp(name + ': [0-9,]+ on the map'));
+	for (const name of ['Bosses', 'Strongest', 'Golden', 'Fully grown', 'Still growing'])
+		assert.match(out, new RegExp('<span>' + name + '</span>'), name + ' is a tile');
+});
+
+test('the summary counts the monsters at the highest level (the Strongest tile)', () => {
+	freshGame();
+	const base = api();
+	const type = Object.keys(MONSTERS)[0] as Monster['type'];
+	const at = (id: number, level: number): Monster => ({ id, type, x: id, y: 1, level, spawnLevel: level, ageSec: 0 });
+	assert.equal(kingdomSummary({ ...base, monsters: [] }, 0).monsters.strongest, 0);
+	const s = kingdomSummary({ ...base, monsters: [at(1, 3), at(2, 9), at(3, 9)] }, 0);
+	assert.equal(s.monsters.highestLevel, 9);
+	assert.equal(s.monsters.strongest, 2);
 });

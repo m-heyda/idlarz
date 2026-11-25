@@ -130,10 +130,6 @@
 .kd-note {
 	margin: 2px 0 6px;
 }
-.kd-stats + .kd-stats {
-	margin-top: 10px;
-}
-
 .kd-sub {
 	color: #a89878;
 	font-size: 11px;
@@ -145,7 +141,91 @@
 	color: #a89878;
 }
 
-.kd-stats {
+/* "Find on the map": one grid of tiles, four a row, every tile as tall as the tallest (rows are `1fr` of the grid, each tile fills its cell). All are pressable: a press rings that kind on the map like the buttons under the minimap (MapMarkers.css),
+   gold frame and glow when lit, dim when there are none. */
+.kd-tiles {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	grid-auto-rows: 1fr;
+	gap: 8px;
+}
+.kd-tiles > .ds-hovertip {
 	display: flex;
-	justify-content: space-around;
+	min-width: 0;
+}
+.kd-tile {
+	box-sizing: border-box;
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 3px;
+	padding: 12px 6px 10px;
+	color: #d8c8a0;
+	background: rgba(26, 22, 17, 0.72);
+	border: 1px solid rgba(150, 126, 78, 0.45);
+	border-radius: 4px;
+}
+.kd-tile img {
+	flex: none;
+	margin-bottom: 2px;
+}
+.kd-tile b {
+	font-size: 18px;
+	line-height: 1.2;
+	font-variant-numeric: tabular-nums;
+	color: #f1e6c8;
+}
+.kd-tile span {
+	font-size: 12px;
+	line-height: 1.2;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	text-align: center;
+}
+.kd-tile small {
+	font-size: 11px;
+	line-height: 1.2;
+	color: #a89878;
+	text-align: center;
+}
+.kd-mark-card {
+	cursor: pointer;
+	transition:
+		border-color 120ms,
+		background 120ms,
+		box-shadow 120ms,
+		transform 80ms;
+}
+.kd-mark-card img {
+	display: block;
+	image-rendering: pixelated;
+	opacity: 0.85;
+	pointer-events: none;
+}
+.kd-mark-card:hover {
+	border-color: rgba(190, 160, 96, 0.8);
+	background: rgba(40, 33, 24, 0.82);
+}
+.kd-mark-card:hover img {
+	opacity: 1;
+}
+.kd-mark-card:active {
+	transform: translateY(1px);
+}
+.kd-mark-card[data-empty='true'] {
+	opacity: 0.6;
+}
+.kd-mark-card[data-active='true'] {
+	border-color: rgba(240, 210, 122, 0.85);
+	background: rgba(64, 52, 28, 0.85);
+	box-shadow: 0 0 8px rgba(240, 210, 122, 0.4);
+}
+.kd-mark-card[data-active='true'] img {
+	opacity: 1;
+}
+.kd-mark-card[data-active='true'] small {
+	color: #f4d57e;
 }

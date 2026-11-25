@@ -81,6 +81,7 @@ test('the Bestiary line about golden monsters follows the Luck numbers and the p
 	assert.match(text, new RegExp(`${Math.round(LUCK.goldenMonster.base * 100)}% of new monsters`));
 	assert.match(text, new RegExp(`up to ${Math.round(LUCK.goldenMonster.cap * 100)}%`));
 	assert.match(text, new RegExp(`x${LUCK.goldenMonster.rewardMultiplier} gold and XP`));
+	assert.match(text, /Arcane chest/, 'a golden monster always drops an Arcane chest (MONSTER_CHEST)');
 	const base = { entries: [], biomes: [], activeText: 'None yet' };
 	// with no entries the panel draws nothing at all, so only check the contract of the prop here
 	assert.equal(renderToStaticMarkup(React.createElement(BestiaryPanel, { ...base, goldenText: text })), '');
