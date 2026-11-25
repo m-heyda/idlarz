@@ -369,6 +369,22 @@ test('the allocation budget counts the rebirths of the stored save when the ledg
 	assert.equal(over.reason, 'no_points');
 });
 
+test('a ledger that missed a rebirth (its write lost a race) is brought up to the stored save by the next accepted save', async () => {
+	const { m, state } = await started(3);
+	// the stored save holds 2 rebirths, the ledger still says 0
+	const row = m.rows.get(ID)!;
+	m.rows.set(ID, { ...row, summary: { ...row.summary, rebirths: 2 } });
+	assert.equal(m.ledgers.get(ID)!.rebirths, 0);
+	const next: PersistedGame = {
+		...state,
+		playSeconds: state.playSeconds + 30,
+		prestige: { ...state.prestige, rebirths: 2, legacyEarned: 50, legacyPoints: 50 },
+	};
+	const out = await acceptSave(m.saves, ID, 'Zoë', encodeSave(next), 1, T0 + STEP, false, m.ledgerRepo);
+	assert.equal(out.kind, 'ok', JSON.stringify(out));
+	assert.equal(m.ledgers.get(ID)!.rebirths, 2, 'the ledger counts the rebirths of the stored save');
+});
+
 test('allocatePoints rejects fractions, negatives and unknown attributes', () => {
 	const attrs = newAttrs();
 	for (const add of [{ strength: 0.5 }, { strength: -1 }, { strength: '2' }, { wisdom: 1 }, {}, null, [1]])
