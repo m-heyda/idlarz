@@ -119,7 +119,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `ui_daily_gift` | <img src="../../public/pixel/ui/daily_gift.png" width="96" alt="ui_daily_gift"> | 384x48 | used |  | `pixel/ui/daily_gift.png` |
 | `ui_frame_modal` | <img src="../../public/pixel/ui/frame_modal.png" width="72" alt="ui_frame_modal"> | 36x36 | used |  | `pixel/ui/frame_modal.png` |
 | `ui_frame_panel` | <img src="../../public/pixel/ui/frame_panel.png" width="48" alt="ui_frame_panel"> | 12x12 | used | code | `pixel/ui/frame_panel.png` |
-| `ui_frame_tip` | <img src="../../public/pixel/ui/frame_tip.png" width="48" alt="ui_frame_tip"> | 12x12 | used | code | `pixel/ui/frame_tip.png` |
+| `ui_frame_tip` | <img src="../../public/pixel/ui/frame_tip.png" width="48" alt="ui_frame_tip"> | 12x12 | used |  | `pixel/ui/frame_tip.png` |
 | `ui_header_divider` | <img src="../../public/pixel/ui/header_divider.png" width="48" alt="ui_header_divider"> | 9x56 | used |  | `pixel/ui/header_divider.png` |
 | `ui_header_edge` | <img src="../../public/pixel/ui/header_edge.png" width="96" alt="ui_header_edge"> | 64x10 | used |  | `pixel/ui/header_edge.png` |
 | `ui_header_xp_fill` | <img src="../../public/pixel/ui/header_xp_fill.png" width="48" alt="ui_header_xp_fill"> | 2x4 | used |  | `pixel/ui/header_xp_fill.png` |
@@ -127,7 +127,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | `ui_range_corner` | <img src="../../public/pixel/ui/range_corner.png" width="48" alt="ui_range_corner"> | 20x20 | used | code | `pixel/ui/range_corner.png` |
 | `ui_range_tint` | <img src="../../public/pixel/ui/range_tint.png" width="48" alt="ui_range_tint"> | 16x16 | used | code | `pixel/ui/range_tint.png` |
 | `ui_slot_frame` | <img src="../../public/pixel/ui/slot_frame.png" width="96" alt="ui_slot_frame"> | 48x48 | used | code | `pixel/ui/slot_frame.png` |
-| `ui_slot_frame_active` | <img src="../../public/pixel/ui/slot_frame_active.png" width="96" alt="ui_slot_frame_active"> | 48x48 | used | code | `pixel/ui/slot_frame_active.png` |
+| `ui_slot_frame_active` | <img src="../../public/pixel/ui/slot_frame_active.png" width="96" alt="ui_slot_frame_active"> | 48x48 | used |  | `pixel/ui/slot_frame_active.png` |
 | `ui_slot_frame_s` | <img src="../../public/pixel/ui/slot_frame_s.png" width="80" alt="ui_slot_frame_s"> | 40x40 | used |  | `pixel/ui/slot_frame_s.png` |
 | `ui_slot_frame_s_active` | <img src="../../public/pixel/ui/slot_frame_s_active.png" width="80" alt="ui_slot_frame_s_active"> | 40x40 | used |  | `pixel/ui/slot_frame_s_active.png` |
 | `ui_spark_sheet` | <img src="../../public/pixel/ui/spark_sheet.png" width="96" alt="ui_spark_sheet"> | 66x11 | used | code | `pixel/ui/spark_sheet.png` |
