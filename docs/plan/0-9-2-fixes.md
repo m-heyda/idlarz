@@ -21,10 +21,9 @@ IDL-174, the set-weapon note of IDL-172 and the per-tier chest art of IDL-163 sh
 
 ## Batch 2: small code with tests (one PR each, 1-2 days)
 
-- IDL-163 chest level from the monster instead of the castle: an optional level on the bag stack (additive; `tests/saves/saveFixtures.test.ts` and `appendOnly.test.ts` stay green, fixtures untouched).
-- IDL-176 fixed base-stat authoring of the four combat stats on items (they are affixes only today).
-- IDL-172 the unreachable super crit cap (`crit.maxSuperChance` in `src/config/combatConfig.ts`): cap or sources, update the JSDoc, run fight-sim.
 - IDL-383 `ItemTooltip.tsx` and `ItemSlot.tsx` onto `GameItemTip`, plus the QA pass at 1240 / 1440 / 1920.
+- IDL-176 fixed base-stat authoring of the four combat stats on items (they are affixes only today); needs a design pass first (IDL-387).
+- **Dropped after reading the code:** a chest level from the monster (IDL-163): an opened chest pays minutes of the player's own income (`rollMonsterChest`) and nothing reads a chest level, so a level on the bag stack would be dead data; it comes back with gear and bag tokens in the contents (Batch 3). The super crit cap of IDL-172 is already pinned (`tests/audit/combat.test.ts`, `tests/economy/merchantUpgrades.test.ts`): `crit.maxSuperChance` stays 50 as the guard for future perks (gear alone reaches about 33 %); only IDL-172 item 3 (affix level scale, a design question) remains.
 
 ## Batch 3: needs balance tooling or a decision (own PR, slow checks)
 
