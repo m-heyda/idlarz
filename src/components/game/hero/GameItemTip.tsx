@@ -25,6 +25,8 @@ import {
 	weaponDps,
 } from '@/catalog';
 import { describeEffect, hasEffects } from '@/catalog/buffs';
+import { monsterChestTierOf } from '@/catalog/items/chests';
+import { itemTierLabel } from '@/catalog/stats';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { compareDetailed, primaryKeyOf, type DetailedComparison, type StatRow } from '@/lib/inventory';
 import { resolveItem, sellValueOf } from '@/lib/itemInstance';
@@ -119,7 +121,9 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 		});
 		return [{ heading: category.label, rows: tipRows }];
 	});
-	const affixes = (resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name }));
+	const affixes = [...(resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name }))];
+	// a legendary's fixed perks (IDL-143) in their own gold block under the affixes (IDL-147)
+	const perks = Object.entries(resolved?.perks ?? {}).map(([stat, value]) => ({ text: formatStat(stat as StatKey, value as number) }));
 
 	// what changes against the worn piece, one line each: green for a gain, red for a loss
 	const gain = (n: number) => (n > 0 ? ('green' as const) : ('red' as const));
@@ -162,7 +166,13 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 	const hintText: { key: string; text: string }[] =
 		hints === 'bag'
 			? [
-					...(item ? [{ key: 'Dbl-click', text: 'equip' }] : hasEffects(def) ? [{ key: 'Dbl-click', text: 'drink' }] : []),
+					...(item
+						? [{ key: 'Dbl-click', text: 'equip' }]
+						: monsterChestTierOf(def.id)
+							? [{ key: 'Dbl-click', text: 'open' }]
+							: hasEffects(def)
+								? [{ key: 'Dbl-click', text: 'drink' }]
+								: []),
 					...(fighting ? [] : [{ key: 'Shift', text: '+click sell' }]),
 				]
 			: hints === 'merchant' && !fighting
@@ -183,7 +193,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			type={`${rarity?.label ?? ''}${def.weaponType ? ` ${def.weaponType}` : ''} · ${slotLabel}`}
 			levelLine={
 				resolved
-					? `Item Level ${formatCompact(resolved.instance.level)} · Quality ${Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%${resolved.instance.crafted ? ' · Crafted' : ''}`
+					? `Tier ${itemTierLabel(resolved.instance.level)} · Item Level ${formatCompact(resolved.instance.level)} · Quality ${Math.round(qualityMultiplier(resolved.instance.quality) * 100)}%${resolved.instance.crafted ? ' · Crafted' : ''}`
 					: undefined
 			}
 			banner={banner ? { text: banner === 'equipped' ? 'Equipped' : 'Comparing', tone: banner } : undefined}
@@ -203,6 +213,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			rows={[...(emptySlot ? [{ label: `Empty ${EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot`, value: '', tone: 'muted' as const }] : []), ...effectRows]}
 			groups={groups}
 			affixes={affixes}
+			perks={perks}
 			extra={
 				comparison && tierChanges.length > 0 ? (
 					<>

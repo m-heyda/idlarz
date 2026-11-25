@@ -28,17 +28,35 @@ Set-only stats (no item rolls them) and where they pay out. The server derives e
 | Click Gold | more gold per map click | `clickForGold` (clicks are the browser's income, checked only by plausibility) |
 | Damage / Max HP | percent on top of the flat stat | `damagePerHit` / `maxHp`, shared by the browser and the server's fights |
 
+### Legendary perks (IDL-143, IDL-144)
+
+A legendary can carry fixed perks: numbers on the item itself, never rolled and never scaled by item level or rarity, summed into the gear next to the set bonuses and held by the same family caps. The roster is data (`LEGENDARY_PERKS` in `src/catalog/items/reuse.ts`); these items are still disabled until their drop sources exist (IDL-146).
+
+| Item | Type | Perk | Item stats |
+|---|---|---|---|
+| Runeforged Titanhammer (`runeforged_titanhammer`) | maul | +25% Build Time | +44 Damage, +4% Crit Chance, +6% Super Crit |
+| Cindercrescent Glaive (`cindercrescent_glaive`) | spear | +10% Damage, +30% Burn | +30 Damage, +8% Crit Chance, +6% Super Crit |
+| Frostbloom Fan (`frostbloom_fan`) | wand | +15% XP Gain | +20 Damage, +18% Spell Power, +0.90/s Mana Regen |
+| Voidrune Blade (`voidrune_blade`) | sword | +15% Away Income | +31 Damage, +8% Crit Chance, +8% Super Crit |
+| Reaper's Crescent (`reapers_crescent`) | axe | +25% Kill Rewards | +34 Damage, +6% Crit Chance, +3.0% Life Leech |
+| Nightfall Edge (`nightfall_edge`) | sword | +15% Click Gold | +32 Damage, +10% Crit Chance, +6% Super Crit |
+| Tidecaller Axe (`tidecaller_axe`) | axe | +15% Chest Speed | +33 Damage, +6% Crit Chance, +4.0% Dodge |
+| Stormtrident (`stormtrident`) | spear | +15% Max HP | +29 Damage, +12% Crit Chance, +8% Super Crit |
+| Amethyst Spire (`amethyst_spire`) | staff | +15% Potion Refund | +26 Damage, +18% Spell Power, +36 Max Mana |
+| Dawnbringer Trident (`dawnbringer_trident`) | spear | +25% Income | +30 Damage, +6 Luck, +12% Gold Find |
+| Cinderflight Bow (`cinderflight_bow`) | bow | +15% Gold Find | +25 Damage, +18% Crit Chance, +10% Super Crit |
+
 ### Obsidian Set (13 slots)
 
 The prospector's set: it pays the kingdom (income, XP, kill rewards, away time) and keeps its wearer alive, without raw offence.
 
 | Pieces worn | Bonus | Total so far |
 |---|---|---|
-| 2 | +6% Income, +20 Max HP | +20 Max HP, +6% Income |
-| 4 | +10% XP Gain, +10% Gold Find, +6 Armor | +6 Armor, +20 Max HP, +10% Gold Find, +6% Income, +10% XP Gain |
-| 6 | +12% Kill Rewards, +5 Damage, +3 Luck | +5 Damage, +6 Armor, +20 Max HP, +3 Luck, +10% Gold Find, +6% Income, +10% XP Gain, +12% Kill Rewards |
-| 9 | +15% Away Income, +10% Click Gold, +8% Income, +40 Max HP | +5 Damage, +6 Armor, +60 Max HP, +3 Luck, +10% Gold Find, +14% Income, +10% XP Gain, +12% Kill Rewards, +15% Away Income, +10% Click Gold |
-| 12 | +12% Income, +15% XP Gain, +25% Kill Rewards, +3h Away Time, +20% Gold Find, +10 Armor, +6% Super Crit | +5 Damage, +16 Armor, +60 Max HP, +6% Super Crit, +3 Luck, +30% Gold Find, +26% Income, +25% XP Gain, +37% Kill Rewards, +15% Away Income, +3h Away Time, +10% Click Gold |
+| 2 | +6% Income, +24 Max HP | +24 Max HP, +6% Income |
+| 4 | +10% XP Gain, +10% Gold Find, +7 Armor | +7 Armor, +24 Max HP, +10% Gold Find, +6% Income, +10% XP Gain |
+| 6 | +12% Kill Rewards, +6 Damage, +3 Luck | +6 Damage, +7 Armor, +24 Max HP, +3 Luck, +10% Gold Find, +6% Income, +10% XP Gain, +12% Kill Rewards |
+| 9 | +15% Away Income, +10% Click Gold, +8% Income, +48 Max HP | +6 Damage, +7 Armor, +72 Max HP, +3 Luck, +10% Gold Find, +14% Income, +10% XP Gain, +12% Kill Rewards, +15% Away Income, +10% Click Gold |
+| 12 | +12% Income, +15% XP Gain, +25% Kill Rewards, +3h Away Time, +20% Gold Find, +12 Armor, +6% Super Crit | +6 Damage, +19 Armor, +72 Max HP, +6% Super Crit, +3 Luck, +30% Gold Find, +26% Income, +25% XP Gain, +37% Kill Rewards, +15% Away Income, +3h Away Time, +10% Click Gold |
 
 Pieces: obsidian_aegis, obsidian_helm, obsidian_pauldrons, obsidian_cuirass, obsidian_gauntlets, obsidian_greaves, obsidian_sabatons, obsidian_pendant, obsidian_cloak, obsidian_ring, obsidian_charm, obsidian_belt
 
@@ -91,51 +109,51 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Item | Id | Kind | Tier | Type | Item levels | Stats at its first level | Shop | Drops from |
 |---|---|---|---|---|---|---|---|---|
 | Obsidian Aegis | `obsidian_aegis` | offhand (shield) | 3 | base | 8-100 | +11 Armor, +12 Max HP |  | general pool |
-| Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP |  | general pool |
-| Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP |  | general pool |
-| Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP |  | general pool |
-| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance |  | general pool |
+| Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP, +2.1 s Boss Time |  | general pool |
+| Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP, +2.1 s Boss Time |  | general pool |
+| Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP, +2.8% Build Speed |  | general pool |
+| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance, +2.1% Build Speed, +3.5% Farm Yield |  | general pool |
 | Obsidian Greaves | `obsidian_greaves` | armor | 3 | base | 8-100 | +7 Armor, +8 Max HP |  | general pool |
 | Obsidian Sabatons | `obsidian_sabatons` | armor | 3 | base | 8-100 | +4 Armor, +4 Max HP |  | general pool |
-| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find |  | general pool |
-| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge |  | general pool |
+| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find, +1.4% Tile Discount |  | general pool |
+| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge, +1.4% Tile Discount |  | general pool |
 | Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% Crit Chance |  | general pool |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | base | 8-100 | +1 Armor, +7 Max HP, +1% Super Crit |  | general pool |
 | Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-100 | +7 Armor, +13 Max HP |  | general pool |
-| Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +1281 Armor, +1281 Max HP |  | general pool |
-| Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +1050 Armor, +1050 Max HP |  | general pool |
-| Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +2121 Armor, +2541 Max HP |  | general pool |
-| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance |  | general pool |
+| Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +1281 Armor, +1281 Max HP, +6.6 s Boss Time |  | general pool |
+| Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +1050 Armor, +1050 Max HP, +6.6 s Boss Time |  | general pool |
+| Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +2121 Armor, +2541 Max HP, +8.8% Build Speed |  | general pool |
+| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance, +6.6% Build Speed, +11.0% Farm Yield |  | general pool |
 | Sunhoney Skirt | `sunhoney_skirt` | armor | 5 | base | 100-100 | +1491 Armor, +1680 Max HP |  | general pool |
 | Sunhoney Slippers | `sunhoney_slippers` | armor | 5 | base | 100-100 | +840 Armor, +840 Max HP |  | general pool |
-| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +420 Armor, +1680 Max HP, +7.68% Crit Chance, +12% Gold Find |  | general pool |
-| Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +630 Armor, +1050 Max HP, +4.0% Dodge |  | general pool |
+| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +420 Armor, +1680 Max HP, +7.68% Crit Chance, +12% Gold Find, +4.4% Tile Discount |  | general pool |
+| Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +630 Armor, +1050 Max HP, +4.0% Dodge, +4.4% Tile Discount |  | general pool |
 | Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +441 Damage, +735 Max HP, +12.8% Crit Chance, +2.56% Super Crit |  | general pool |
 | Hive Charm | `hive_charm` | accessory | 5 | base | 100-100 | +210 Armor, +1491 Max HP, +5.12% Super Crit |  | general pool |
 | Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +420 Armor, +840 Max HP |  | general pool |
 | Honeycomb Scepter | `honeycomb_scepter` | weapon (mace) | 5 | base | 100-100 | +5839 Damage |  | general pool |
 | Golden Ledger | `golden_ledger` | offhand (tome) | 5 | base | 100-100 | +1281 Max HP, +10.7/s HP Regen, +24 Max Mana, +3.24/s Mana Regen, +23.62% Spell Power |  | general pool |
-| Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +1617 Armor, +1617 Max HP |  | general pool |
-| Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +1344 Armor, +1344 Max HP |  | general pool |
-| Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +2688 Armor, +3234 Max HP |  | general pool |
-| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance |  | general pool |
+| Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +1617 Armor, +1617 Max HP, +8.4 s Boss Time |  | general pool |
+| Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +1344 Armor, +1344 Max HP, +8.4 s Boss Time |  | general pool |
+| Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +2688 Armor, +3234 Max HP, +11.2% Build Speed |  | general pool |
+| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance, +8.4% Build Speed, +14.0% Farm Yield |  | general pool |
 | Warlord's Cuisses | `warlords_cuisses` | armor | 5 | base | 100-100 | +1890 Armor, +2142 Max HP |  | general pool |
 | Warlord's Sabatons | `warlords_sabatons` | armor | 5 | base | 100-100 | +1071 Armor, +1071 Max HP |  | general pool |
-| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +546 Armor, +2142 Max HP, +9.78% Crit Chance, +12% Gold Find |  | general pool |
-| Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +819 Armor, +1344 Max HP, +4.0% Dodge |  | general pool |
+| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +546 Armor, +2142 Max HP, +9.78% Crit Chance, +12% Gold Find, +5.6% Tile Discount |  | general pool |
+| Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +819 Armor, +1344 Max HP, +4.0% Dodge, +5.6% Tile Discount |  | general pool |
 | Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +567 Damage, +945 Max HP, +16.29% Crit Chance, +3.26% Super Crit |  | general pool |
 | War Medal Charm | `war_medal_charm` | accessory | 5 | base | 100-100 | +273 Armor, +1890 Max HP, +6.52% Super Crit |  | general pool |
 | Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +546 Armor, +1071 Max HP |  | general pool |
 | Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +5650 Damage, +9.31% Crit Chance |  | general pool |
 | Ashen Tower Shield | `ashen_tower_shield` | offhand (shield) | 5 | base | 100-100 | +2961 Armor, +3234 Max HP |  | general pool |
-| Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck |  | general pool |
+| Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
+| Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
+| Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck, +12.8% Build Speed |  | general pool |
+| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck, +9.6% Build Speed, +16.0% Farm Yield |  | general pool |
 | Blightbound Leggings | `blightbound_leggings` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Shroud Treads | `shroud_treads` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck |  | general pool |
-| Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck |  | general pool |
+| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck, +6.4% Tile Discount |  | general pool |
+| Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck, +6.4% Tile Discount |  | general pool |
 | Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +651 Damage, +18.62% Crit Chance, +3.72% Super Crit, +10 Luck |  | general pool |
 | Core Charm | `core_charm` | accessory | 5 | base | 100-100 | +7.45% Super Crit, +10 Luck |  | general pool |
 | Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +10 Luck |  | general pool |
@@ -172,6 +190,16 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | of Sorcery | suffix | spellPower | 1 | staff, wand, tome, neck, ring, charm |
 | Vampiric | prefix | lifeLeech | 5 | weapon |
 | of the Leech | suffix | lifeLeech | 5 | weapon |
+| Swift | prefix | atkSpeed | 8 | ring |
+| of Haste | suffix | atkSpeed | 8 | ring |
+| Brutal | prefix | critDamage | 8 | ring, neck |
+| of Carnage | suffix | critDamage | 8 | ring, neck |
+| Piercing | prefix | armorPen | 8 | weapon |
+| of the Breaker | suffix | armorPen | 8 | weapon |
+| Spiked | prefix | thorns | 6 | offhand |
+| of Thorns | suffix | thorns | 6 | offhand |
+| Reviving | prefix | healOnKill | 8 | ring, charm |
+| of the Victor | suffix | healOnKill | 8 | ring, charm |
 | Mighty | prefix | strength | 3 | weapon, hands, shoulder, chest, belt |
 | of the Bear | suffix | strength | 3 | weapon, hands, shoulder, chest, belt |
 | Nimble | prefix | dexterity | 3 | weapon, hands, feet, legs, cape |
@@ -187,47 +215,60 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 
 Rarity chances are the profile weights normalised over the rarities that pass their item level gate; level is the item level at the source (the monster level; castle level 1 for chests).
 
-- **monster level 1** (profile `normal_monster`, item level 1): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster level 5** (profile `normal_monster`, item level 5): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster level 9** (profile `normal_monster`, item level 9): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster level 20** (profile `normal_monster`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+- **monster level 1** (profile `normal_monster`, item level 1): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster level 5** (profile `normal_monster`, item level 5): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster level 9** (profile `normal_monster`, item level 9): 33 bases eligible; Common 64.5%, Uncommon 25.0%, Rare 9.4%, Epic 1.1%
+- **monster level 20** (profile `normal_monster`, item level 20): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_plains level 1** (profile `normal_monster_plains`, item level 1): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster_plains level 20** (profile `normal_monster_plains`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_plains level 1** (profile `normal_monster_plains`, item level 1): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster_plains level 20** (profile `normal_monster_plains`, item level 20): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_forest level 4** (profile `normal_monster_forest`, item level 4): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster_forest level 24** (profile `normal_monster_forest`, item level 24): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_forest level 4** (profile `normal_monster_forest`, item level 4): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster_forest level 24** (profile `normal_monster_forest`, item level 24): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_swamp level 8** (profile `normal_monster_swamp`, item level 8): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_swamp level 28** (profile `normal_monster_swamp`, item level 28): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_swamp level 8** (profile `normal_monster_swamp`, item level 8): 33 bases eligible; Common 64.5%, Uncommon 25.0%, Rare 9.4%, Epic 1.1%
+- **monster_swamp level 28** (profile `normal_monster_swamp`, item level 28): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_tundra level 12** (profile `normal_monster_tundra`, item level 12): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_tundra level 30** (profile `normal_monster_tundra`, item level 30): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_tundra level 12** (profile `normal_monster_tundra`, item level 12): 33 bases eligible; Common 64.5%, Uncommon 25.0%, Rare 9.4%, Epic 1.1%
+- **monster_tundra level 30** (profile `normal_monster_tundra`, item level 30): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_coast level 2** (profile `normal_monster_coast`, item level 2): 33 bases eligible; Common 76.1%, Uncommon 23.9%
-- **monster_coast level 22** (profile `normal_monster_coast`, item level 22): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_coast level 2** (profile `normal_monster_coast`, item level 2): 33 bases eligible; Common 72.1%, Uncommon 27.9%
+- **monster_coast level 22** (profile `normal_monster_coast`, item level 22): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_hills level 6** (profile `normal_monster_hills`, item level 6): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 7.1%
-- **monster_hills level 26** (profile `normal_monster_hills`, item level 26): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_hills level 6** (profile `normal_monster_hills`, item level 6): 33 bases eligible; Common 65.3%, Uncommon 25.3%, Rare 9.5%
+- **monster_hills level 26** (profile `normal_monster_hills`, item level 26): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 70.0%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%
-- **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_lake level 10** (profile `normal_monster_lake`, item level 10): 33 bases eligible; Common 64.5%, Uncommon 25.0%, Rare 9.4%, Epic 1.1%
+- **monster_lake level 29** (profile `normal_monster_lake`, item level 29): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_jungle level 16** (profile `normal_monster_jungle`, item level 16): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_jungle level 47** (profile `normal_monster_jungle`, item level 47): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_jungle level 16** (profile `normal_monster_jungle`, item level 16): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
+- **monster_jungle level 47** (profile `normal_monster_jungle`, item level 47): 36 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_fields level 20** (profile `normal_monster_fields`, item level 20): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_fields level 52** (profile `normal_monster_fields`, item level 52): 36 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_fields level 20** (profile `normal_monster_fields`, item level 20): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
+- **monster_fields level 52** (profile `normal_monster_fields`, item level 52): 36 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_orchard level 24** (profile `normal_monster_orchard`, item level 24): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_orchard level 56** (profile `normal_monster_orchard`, item level 56): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_orchard level 24** (profile `normal_monster_orchard`, item level 24): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
+- **monster_orchard level 56** (profile `normal_monster_orchard`, item level 56): 31 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_blight level 28** (profile `normal_monster_blight`, item level 28): 33 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_blight level 60** (profile `normal_monster_blight`, item level 60): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_blight level 28** (profile `normal_monster_blight`, item level 28): 33 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
+- **monster_blight level 60** (profile `normal_monster_blight`, item level 60): 31 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
-- **monster_battlefield level 32** (profile `normal_monster_battlefield`, item level 32): 32 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
-- **monster_battlefield level 64** (profile `normal_monster_battlefield`, item level 64): 31 bases eligible; Common 69.9%, Uncommon 22.0%, Rare 7.0%, Epic 1.0%, Legendary 0.2%
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
+- **monster_battlefield level 32** (profile `normal_monster_battlefield`, item level 32): 32 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
+- **monster_battlefield level 64** (profile `normal_monster_battlefield`, item level 64): 31 bases eligible; Common 64.2%, Uncommon 24.9%, Rare 9.3%, Epic 1.1%, Legendary 0.4%
   - bonus `rat_potion` from pool `potions_rat`, chance 0.25
+  - bonus `monster_legendary` from pool `monster_legendary`, chance 0.002
 - **boss level 15** (profile `boss`, item level 15): 33 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss level 45** (profile `boss`, item level 45): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
@@ -257,15 +298,18 @@ Rarity chances are the profile weights normalised over the rarities that pass th
   - bonus `king_potions` from pool `potions_king`
 - **boss_jungle level 38** (profile `boss_jungle`, item level 38): 32 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_jungle level 68** (profile `boss_jungle`, item level 68): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+  - bonus `unique` from pool `boss_unique_jungle`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
 - **boss_fields level 46** (profile `boss_fields`, item level 46): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_fields level 76** (profile `boss_fields`, item level 76): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+  - bonus `unique` from pool `boss_unique_fields`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
 - **boss_orchard level 54** (profile `boss_orchard`, item level 54): 36 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_orchard level 84** (profile `boss_orchard`, item level 84): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
   - bonus `king_potions` from pool `potions_king`
 - **boss_blight level 60** (profile `boss_blight`, item level 60): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_blight level 92** (profile `boss_blight`, item level 92): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
+  - bonus `unique` from pool `boss_unique_blight`, chance 0.05
   - bonus `king_potions` from pool `potions_king`
 - **boss_battlefield level 68** (profile `boss_battlefield`, item level 68): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
 - **boss_battlefield level 100** (profile `boss_battlefield`, item level 100): 19 bases eligible; Common 20.0%, Uncommon 30.0%, Rare 30.0%, Epic 15.0%, Legendary 5.0%
@@ -277,7 +321,7 @@ Rarity chances are the profile weights normalised over the rarities that pass th
 - **craft level 1** (profile `craft`, item level 1): 33 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 6.1%, Epic 1.0%
 - **craft level 100** (profile `craft`, item level 100): 31 bases eligible; Common 70.7%, Uncommon 22.2%, Rare 6.1%, Epic 1.0%
 
-Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_jungle`, `equipment_fields`, `equipment_orchard`, `equipment_blight`, `equipment_battlefield`, `equipment_craft`, `legendary_weapons`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_general_jungle`, `boss_general_fields`, `boss_general_orchard`, `boss_general_blight`, `boss_general_battlefield`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `potions_rat`, `potions_king`, `potions_chest`
+Pools: `general_equipment`, `equipment_plains`, `equipment_forest`, `equipment_swamp`, `equipment_tundra`, `equipment_coast`, `equipment_hills`, `equipment_lake`, `equipment_jungle`, `equipment_fields`, `equipment_orchard`, `equipment_blight`, `equipment_battlefield`, `equipment_craft`, `legendary_weapons`, `legendary_top`, `monster_legendary`, `boss_general`, `boss_general_plains`, `boss_general_forest`, `boss_general_swamp`, `boss_general_tundra`, `boss_general_coast`, `boss_general_hills`, `boss_general_lake`, `boss_general_jungle`, `boss_general_fields`, `boss_general_orchard`, `boss_general_blight`, `boss_general_battlefield`, `boss_unique_forest`, `boss_unique_swamp`, `boss_unique_tundra`, `boss_unique_jungle`, `boss_unique_fields`, `boss_unique_blight`, `potions_rat`, `potions_king`, `potions_chest`
 
 ## Merchant stock
 

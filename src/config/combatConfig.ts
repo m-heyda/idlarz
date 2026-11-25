@@ -95,6 +95,15 @@ export const STAT_RULES = {
 	mana: { base: 20, perIntelligence: 4, regenBase: 0.5, regenPerIntelligence: 0.05 }, // max mana and mana per second
 	magicWeaponTypes: ['staff', 'wand'] as readonly string[], // these scale with Intelligence, every other weapon with Strength
 	lifeLeechCap: 15, // % of the damage dealt returned as HP: the gear's Life Leech never counts above this
+	atkSpeedGearCap: 25, // % more attacks per second that the gear's Attack Speed (rings) never counts above
+	critDamageGearCap: 50, // % extra crit damage the gear's Crit Damage never counts above (on top of the attributes', IDL-176)
+	armorPenCap: 30, // % of a monster's armor that Armor Penetration never ignores more than
+	thornsCap: 25, // % of a monster's hit that Thorns never returns more than
+	buildSpeedCap: 15, // % off build timers that the gear's Build Speed never counts above (together with the Dwarf Statue, a legendary and Embers still under the 60 % build time cap)
+	farmYieldCap: 25, // % more farm products that the gear's Farm Yield never gives above
+	tileDiscountGearCap: 10, // percentage points of tile discount the gear never gives above (the tile discount cap still holds on top)
+	bossTimerCapSec: 30, // seconds the gear's Boss Timer never adds above to a boss fight's clock
+	healOnKillCap: 8, // % of max HP that Heal on Kill never restores more than per kill
 };
 
 /** `boss` monsters get their own spawn timer, a banner in the fight and boss-only drops (the loot source `lootSourceId` names the profile). */

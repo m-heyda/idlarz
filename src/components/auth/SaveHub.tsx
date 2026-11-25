@@ -6,6 +6,7 @@ import { archiveForNewGame, resetSave, type SavePeek } from '@/lib/saveStorage';
 import { newGameCloud } from '@/lib/cloudClient';
 import type { CloudInfo } from '@/lib/startPlan';
 import { countOwnedTiles } from '@/utils/game/tiles';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 import GameModal from '@/components/game/GameModal';
 import AvatarArt from '@/components/game/AvatarArt';
 
@@ -53,9 +54,9 @@ const SaveCard: React.FC<CardProps> = ({ title, name, bust, level, tiles, playSe
 		</div>
 		{note && <p className='text-xs text-[#e0a040] text-center mt-1'>{note}</p>}
 		{action && (
-			<button className={action.blue ? 'px-btn px-btn-blue mt-2' : 'px-btn mt-2'} onClick={action.onClick}>
+			<Button tone={action.blue ? 'gold' : 'stone'} className='mt-2' onClick={action.onClick}>
 				{action.label}
-			</button>
+			</Button>
 		)}
 	</div>
 );
@@ -126,9 +127,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 						</p>
 					)}
 					<div className='flex flex-col items-center gap-2'>
-						<button className='px-btn' onClick={() => enter('fresh')}>
-							Start a new game
-						</button>
+						<Button onClick={() => enter('fresh')}>Start a new game</Button>
 						<button type='button' className='text-xs text-[#a89878] underline' onClick={onLogout}>
 							Log out
 						</button>
@@ -177,9 +176,7 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 
 				{!confirming ? (
 					<div className='flex flex-col items-center gap-2'>
-						<button className='px-btn' onClick={() => setConfirming(true)}>
-							New Game
-						</button>
+						<Button onClick={() => setConfirming(true)}>New Game</Button>
 						<button type='button' className='text-xs text-[#a89878] underline' onClick={onLogout}>
 							Log out
 						</button>
@@ -190,18 +187,17 @@ const SaveHub: React.FC<Props> = ({ mode, local, cloud, onEnter, onNewGame, onLo
 							Start over? Your kingdom will be replaced by a fresh one{cloud ? ', here and in your account' : ''}. A copy of the old game is kept.
 						</p>
 						<div className='flex gap-2'>
-							<button
-								className='px-btn'
+							<Button
 								onClick={() => {
 									setConfirming(false);
 									setProblem(null);
 								}}
 							>
 								Keep playing
-							</button>
-							<button className='px-btn' onClick={wipe}>
+							</Button>
+							<Button tone='danger' onClick={wipe}>
 								Yes, new game
-							</button>
+							</Button>
 						</div>
 					</div>
 				)}

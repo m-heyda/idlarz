@@ -4,7 +4,7 @@ import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { builderCount, builtBuildings, maxBuildTimeReduction, maxCopiesOf } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
-import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { gearBuildTimePct, gearChestSpeedPct, gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import { attributesWithGear } from '@/lib/gearAttributes';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
@@ -123,7 +123,7 @@ const ratesAfterBuildingUpgrade = (state: PersistedGame, job: BuildingUpgradeSta
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 };
 
@@ -144,7 +144,7 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 };
 
@@ -156,7 +156,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(state.equipment),
+		gearIncome(state.equipment),
 	).total;
 	const idol = idolEconomy(state.tiles, state.idolLevels);
 	const fx = effectiveStats({
@@ -168,6 +168,9 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		playerClass: state.playerClass,
 	});
 	const gear = gearEconomy(state.equipment);
+	// what the worn gear adds to the build-time cut and the chest speed (a legendary's perks, IDL-145): the server judges timers and paces chests with the same numbers the browser shows
+	const gearBuildTime = gearBuildTimePct(state.equipment);
+	const gearChestSpeed = gearChestSpeedPct(state.equipment);
 	// the standing Idols (a pure function of the map and the account's trusted Idol levels) add to the same numbers the gear does
 	const limits = {
 		prestige: state.prestige,
@@ -207,11 +210,14 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			goldFind: fx.goldFind,
 			intelligence: attributesWithGear(state.characterStats, state.equipment).intelligence, // worn Intelligence gear counts for crafted gear
 			killRewardPct: gear.killRewardPct + idol.killRewardPct,
-			...(maxBuildTimeReduction(state.prestige, idol.buildTimePct) > 0 ? { buildTimeReduction: maxBuildTimeReduction(state.prestige, idol.buildTimePct) } : {}),
-			...(idol.chestSpeedPct || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct
+			...(maxBuildTimeReduction(state.prestige, idol.buildTimePct + gearBuildTime) > 0
+				? { buildTimeReduction: maxBuildTimeReduction(state.prestige, idol.buildTimePct + gearBuildTime) }
+				: {}),
+			...(idol.chestSpeedPct || gearChestSpeed || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct
 				? {
 						idol: {
-							chestSpeedPct: idol.chestSpeedPct,
+							// the Idols' and the worn gear's chest speed together (the class's is added where the interval is read, `bankContext`)
+							chestSpeedPct: idol.chestSpeedPct + gearChestSpeed,
 							craftXpPct: idol.craftXpPct,
 							damagePct: idol.damagePct,
 							hpArmorPct: idol.hpArmorPct,

@@ -42,6 +42,31 @@ export const BUILDING_RULES = {
 };
 
 /**
+ * The biome milestones (IDL-198, decided 2026-11-07): owning enough tiles of one biome makes its Producer and Extractor stronger in steps. Each step reached adds `step` (+25 %) to the building's size bonus, inside the same additive bracket as the per-tile bonus
+ * (`1 + producerBonus + milestoneBonus`), so there is no new multiplier bucket and the castle, Ember and gear modifiers apply on top as before. The count is the biome's tiles on the map, so the steps start again with a new run.
+ *
+ * | Biome | Steps at owned tiles |
+ * | --- | --- |
+ * | plains, forest | 75 / 150 / 300 |
+ * | swamp, tundra | 100 / 200 / 400 |
+ * | the five rebirth biomes (jungle, fields, orchard, blight, battlefield) | 125 / 250 / 500 |
+ * | hills, lake, coast | none |
+ *
+ * The rebirth biomes are read from `REBIRTH_BIOME_OUTPUT` (`milestoneThresholds`), not listed twice.
+ *
+ * @category Economy/Buildings
+ * @order 3
+ * @formula
+ * milestoneBonus(biome, owned) = 0.25 x (number of the biome's thresholds that owned has reached)
+ * Producer and Extractor output = base x (1 + levelStep x (level - 1)) x (1 + min(bonusCap, perOwnedTile x owned) + milestoneBonus(biome, owned))
+ */
+export const BIOME_MILESTONES = {
+	step: 0.25,
+	home: { plains: [75, 150, 300], forest: [75, 150, 300], swamp: [100, 200, 400], tundra: [100, 200, 400] } as Record<string, readonly number[]>,
+	rebirth: [125, 250, 500] as readonly number[],
+};
+
+/**
  * The general buildings (Watchtower, Marketplace, Training Yard, Scriptorium, Guild Hall, Garrison): they stand on any land biome except the lake, each has its own copy cap (`BuildingDef.copies`, 2 or 3, separate from the Producer and Extractor Building Slots), and
  * make nothing: every level of every copy adds `perLevel` (1 %) of its effect, the same effects the Idols have and through the same server-derived economy (`idolEconomy`), so level 5 of a Watchtower is +5 % damage and three of them +15 %. Levels, timers, builders and the castle gate are
  * the Producer's; the price is the Producer's too (resources only: no extract).

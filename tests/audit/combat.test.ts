@@ -19,20 +19,26 @@ import {
 } from '../../src/catalog';
 import { STAT_DEFS, type StatKey } from '../../src/catalog/stats';
 import { aggregateStats } from '../../src/lib/inventory';
+import { attributesWithGear } from '../../src/lib/gearAttributes';
+import { atkSpeedPercent, critDamagePercent } from '../../src/lib/statBonuses';
 import { baseStatsAt, plainItem, resolveItem } from '../../src/lib/itemInstance';
 import {
 	armorOf,
+	armorPenPercent,
 	armorReduction,
 	attacksPerSecond,
+	critExtraOf,
 	critOdds,
 	damagePerHit,
 	damagePerSecond,
 	dodgeChance,
+	healOnKillPercent,
 	lifeLeechPercent,
 	manaRegenPerSec,
 	maxHp,
 	maxMana,
 	mitigate,
+	thornsPercent,
 	type CombatBonus,
 } from '../../src/lib/combat';
 import { effectiveStats } from '../../src/lib/effectiveStats';
@@ -55,6 +61,15 @@ const LEVEL_SHARE: Record<string, number> = {
 	superCrit: 0.3,
 	dodge: 0.3,
 	lifeLeech: 0.3,
+	atkSpeed: 0.3,
+	critDamage: 0.3,
+	armorPen: 0.3,
+	thorns: 0.3,
+	healOnKill: 0.3,
+	buildSpeed: 0,
+	farmYield: 0,
+	tileDiscount: 0,
+	bossTimer: 0,
 	regen: 0.6,
 	luck: 0.5,
 	goldFind: 0.5,
@@ -82,6 +97,11 @@ const TIER1: Record<string, number> = {
 	manaRegen: 0.2,
 	spellPower: 4,
 	lifeLeech: 0.5,
+	atkSpeed: 1,
+	critDamage: 3,
+	armorPen: 2,
+	thorns: 2,
+	healOnKill: 0.3,
 	strength: 2,
 	dexterity: 2,
 	intelligence: 2,
@@ -107,7 +127,14 @@ test('item stats: every gear base at several levels and qualities matches 1 + 0.
 				const got = resolveItem(inst)!.stats;
 				const ratio = o.levelScale(level) / o.levelScale(min);
 				for (const [key, authored] of Object.entries(def.stats ?? {})) {
-					const want = roundStat(key, (authored as number) * factor(key, ratio) * tail(key, o.levelTail(level) / o.levelTail(min)) * o.quality(quality));
+					const want = roundStat(
+						key,
+						(authored as number) *
+							factor(key, ratio) *
+							tail(key, o.levelTail(level) / o.levelTail(min)) *
+							o.quality(quality) *
+							(def.generation === 'named' ? 1 : RARITIES[rarityId as keyof typeof RARITIES].statMultiplier),
+					);
 					assert.equal((got as Record<string, number>)[key], want, `${def.id} L${level} q${quality} ${key}`);
 					checked++;
 				}
@@ -116,7 +143,7 @@ test('item stats: every gear base at several levels and qualities matches 1 + 0.
 	assert.ok(checked > 1000, `only ${checked} stat values were checked`);
 });
 
-test('item stats: an item at its authored level and quality 50 returns its authored numbers exactly, and every rarity multiplier is 1', () => {
+test('item stats: an item at its authored level and quality 50 returns its authored numbers exactly, and a common or uncommon piece has no multiplier', () => {
 	const noisy: string[] = [];
 	for (const def of gearItems) {
 		const got = resolveItem(plainItem(def.id))!.stats as Record<string, number>;
@@ -125,10 +152,10 @@ test('item stats: an item at its authored level and quality 50 returns its autho
 			if (round2(authored as number) !== authored) noisy.push(`${def.id}:${key}=${authored}`);
 		}
 	}
-	// FINDING (cosmetic): one authored value carries floating point noise (0.1 + 0.2 style). The resolved item is clean (rounded to 2 places),
-	// but the catalog literal is not. This list pins it so a new one is noticed.
-	assert.deepEqual(noisy, ['apprentice_tome:manaRegen=0.30000000000000004']);
-	for (const rarity of Object.values(RARITIES)) assert.equal(rarity.statMultiplier, 1, `${rarity.id} must not scale base stats`);
+	// no authored value may carry floating point noise (0.1 + 0.2 style): the apprentice tome's was written as 0.3 (IDL-172)
+	assert.deepEqual(noisy, []);
+	for (const rarity of Object.values(RARITIES))
+		if (rarity.order <= RARITIES.uncommon.order) assert.equal(rarity.statMultiplier, 1, `${rarity.id} must not scale base stats`);
 });
 
 test('affixes: each affix at levels 1..100 and rolls 0..100 = tier-1 base x level factor x power x roll range', () => {
@@ -141,7 +168,12 @@ test('affixes: each affix at levels 1..100 and rolls 0..100 = tier-1 base x leve
 				const hi = affix.roll[1];
 				const want = roundStat(
 					affix.stat,
-					TIER1[affix.stat] * factor(affix.stat, o.levelScale(level)) * tail(affix.stat, o.levelTail(level)) * affix.power * (lo + (hi - lo) * (roll / 100)),
+					TIER1[affix.stat] *
+						factor(affix.stat, o.levelScale(level)) *
+						tail(affix.stat, o.levelTail(level)) *
+						affix.power *
+						(lo + (hi - lo) * (roll / 100)) *
+						RARITIES.rare.affixMultiplier,
 				);
 				assert.equal(resolved.affixes[0].value, want, `${affix.id} L${level} roll ${roll}`);
 				// the stat on the item is the base's own plus the affix, rounded to 2 places
@@ -169,12 +201,12 @@ test("MISMATCH 5 (design question): affixes grow with the ABSOLUTE item level, b
 const SET_TOTALS: Record<string, Partial<Record<StatKey, number>>> = {
 	obsidian: {
 		incomePct: 26,
-		maxHp: 60,
+		maxHp: 72,
 		xpPct: 25,
 		goldFind: 30,
-		armor: 16,
+		armor: 19,
 		killRewardPct: 37,
-		damage: 5,
+		damage: 6,
 		luck: 3,
 		offlineEff: 15,
 		clickPct: 10,
@@ -360,6 +392,31 @@ test('caps: Dodge 40 %, Life Leech 15 %, Crit 75 %, Super Crit 50 % hold however
 	assert.ok(aggregateStats(sup).superCrit + 5 < 50, 'gear alone stays under the super crit cap');
 	assert.equal(critOdds(c, sup, { ...NO_BONUS, superCritPct: 60 }).superCrit, 0.5, 'but the clamp holds when something does overshoot');
 	assert.equal(dodgeChance({}), 0);
+});
+
+test('caps (IDL-176): Crit Damage 50 %, Armor Penetration 30 %, Thorns 25 %, Heal on Kill 8 % hold however much gear stacks', () => {
+	const c = character();
+	const speed = stacked('atkSpeed_prefix');
+	assert.ok(aggregateStats(speed).atkSpeed > 25, 'the test gear must overshoot the cap');
+	assert.equal(
+		attacksPerSecond(speed, c),
+		round2((ITEM_CATALOG[speed.mainHand!.base]?.attackSpeed ?? 1) * (1 + (atkSpeedPercent(attributesWithGear(c, speed)) + 25) / 100)),
+		'the gear adds at most 25 % attack speed',
+	);
+	const crit = stacked('critDamage_prefix');
+	assert.ok(aggregateStats(crit).critDamage > 50, 'the test gear must overshoot the cap');
+	assert.equal(critExtraOf(c, crit), 1 + (critDamagePercent(attributesWithGear(c, crit)) + 50) / 100);
+	const pen = stacked('armorPen_prefix');
+	assert.ok(aggregateStats(pen).armorPen > 30);
+	assert.equal(armorPenPercent(pen), 30);
+	const thorns = stacked('thorns_prefix');
+	assert.ok(aggregateStats(thorns).thorns > 25);
+	assert.equal(thornsPercent(thorns), 25);
+	const heal = stacked('healOnKill_prefix');
+	assert.ok(aggregateStats(heal).healOnKill > 8);
+	assert.equal(healOnKillPercent(heal), 8);
+	for (const none of [armorPenPercent({}), thornsPercent({}), healOnKillPercent({})]) assert.equal(none, 0);
+	assert.equal(critExtraOf(c, {}), 1 + critDamagePercent(attributesWithGear(c, {})) / 100, 'no gear: only the attributes');
 });
 
 test('max HP: (85 + 3 per Vit + 0.25 per Cha + gear) x (1 + set Max HP %), rounded once at the end', () => {

@@ -118,3 +118,18 @@ test('IDL-372: the estimate counts the Bestiary mastery edge: more damage kills 
 	assert.ok(tough.surviveSec > plain.surviveSec, 'a defense edge lasts longer');
 	assert.ok(tough.chance >= plain.chance);
 });
+
+test('Thorns shorten the expected fight, and Heal on Kill does not change a single fight (IDL-176)', () => {
+	const s = simSetup({ equipment: STARTER_EQUIPMENT, monsters: [{ type: 'thistleBoar', level: 9 }], seed: 'thorns' });
+	const profile = playerProfile(s.stored.core);
+	const plain = estimateWin(profile, profile.maxHp, 'thistleBoar', 9);
+	const thorned = estimateWin({ ...profile, thornsPct: 25 }, profile.maxHp, 'thistleBoar', 9);
+	assert.ok(thorned.killSec < plain.killSec, `${thorned.killSec} vs ${plain.killSec}`);
+	assert.ok(thorned.chance >= plain.chance);
+	assert.deepEqual(
+		estimateWin({ ...profile, healOnKillPct: 8 }, profile.maxHp, 'thistleBoar', 9),
+		plain,
+		'a heal at the end of the fight is not in the estimate of that fight',
+	);
+	assert.deepEqual(estimateWin({ ...profile, thornsPct: 0 }, profile.maxHp, 'thistleBoar', 9), plain);
+});

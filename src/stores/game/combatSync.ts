@@ -4,6 +4,8 @@
 import { COMBAT } from '@/config/combatConfig';
 import { RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { writeCursor } from '@/lib/combatCursor';
+import { announceDrops } from '@/lib/loot/announce';
+import { useUiStore } from '@/stores/uiStore';
 import { emitCombat } from '@/lib/combatFx';
 import { PLAN_FX_KINDS, type CombatView, type FightEvent } from '@/lib/offline/fightTypes';
 import type { FightReply } from '@/lib/offline/types';
@@ -99,6 +101,8 @@ export const createCombatSync = (set: GameSet, get: GameGet, inv: InventorySync,
 					convertedGold: e.reward.convertedGold ?? 0,
 					autoSold: e.reward.autoSold ?? { count: 0, gold: 0 },
 				};
+				// an epic or better piece that reached the bag gets its own notice, so it is seen with the fight window closed or minimised
+				for (const found of announceDrops(received.stored)) useUiStore.getState().showToast(found.text, found.rarity);
 				resources.gold = Math.min(resources.gold + e.reward.gold + received.convertedGold + received.autoSold.gold, RESOURCE_CAP);
 				resources.xp = Math.min(resources.xp + e.reward.xp, XP_CAP);
 				resources.hide = Math.min(resources.hide + (e.reward.hide ?? 0), RESOURCE_CAP);

@@ -15,6 +15,15 @@ export const BASELINE_EPOCH = 1;
 /** The data epoch the server is on. Raising it is the release: see the doc block above. */
 export const GAME_EPOCH = 2;
 
+/**
+ * The epoch of the first chapter reset (the New Chapter release, 1 to 2). That reset normalised every account (gems to the flat starting gift, every achievement deleted); a reset **after** it
+ * is a "later chapter" (`isLaterChapter`) and is gentler: gems stay as they are and the tester marks (`TESTER_MARKS`) are kept. Everything else of the game is wiped exactly as before.
+ */
+export const FIRST_CHAPTER_EPOCH = 2;
+
+/** Whether an account on `profileEpoch` has already been through a chapter reset (so the next one is a later chapter: gems and tester marks stay). null and 1 are accounts that never were. */
+export const isLaterChapter = (profileEpoch: number | null | undefined): boolean => (profileEpoch ?? 0) >= FIRST_CHAPTER_EPOCH;
+
 /** The request header that carries the epoch the browser last saw. */
 export const EPOCH_HEADER = 'x-game-epoch';
 

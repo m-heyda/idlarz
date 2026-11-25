@@ -128,14 +128,15 @@ export const damagePerHit = (equipment: Equipment, stats?: Attributes, bonus?: C
 };
 
 /**
- * Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus and the merchant's. The fight swings at exactly this speed.
+ * Attacks per second: the weapon's speed (1 bare-handed), the Dexterity bonus, the merchant's and the gear's Attack Speed (rings, capped at `STAT_RULES.atkSpeedGearCap`, IDL-379). The fight swings at exactly this speed.
  *
  * @category Combat/Player numbers
  * @order 5
  */
 export const attacksPerSecond = (equipment: Equipment, stats?: Attributes, bonus?: CombatBonus): number => {
 	const base = equipment.mainHand ? (ITEM_CATALOG[equipment.mainHand.base]?.attackSpeed ?? 1) : 1;
-	return Math.round(base * (1 + ((stats ? atkSpeedPercent(attributesWithGear(stats, equipment)) : 0) + (bonus?.atkSpeedPct ?? 0)) / 100) * 100) / 100;
+	const gear = cappedGear(equipment, 'atkSpeed', STAT_RULES.atkSpeedGearCap);
+	return Math.round(base * (1 + ((stats ? atkSpeedPercent(attributesWithGear(stats, equipment)) : 0) + (bonus?.atkSpeedPct ?? 0) + gear) / 100) * 100) / 100;
 };
 
 /** Damage per second at that speed: what the damage readout is built on. */
@@ -176,17 +177,15 @@ export const swing = (hit: number, odds: { crit: number; superCrit: number }, cr
 	return { damage: Math.max(1, round1(hit * COMBAT.crit.mult * critExtra)), crit: 'crit' };
 };
 
-/** One swing of this character with this gear (the attributes' extra crit damage included). */
+/** One swing of this character with this gear (the attributes' and the gear's extra crit damage included). */
 export const rollHit = (characterStats: CharacterStats, equipment: Equipment, rng: () => number): { damage: number; crit: CritKind } =>
-	swing(
-		damagePerHit(equipment, characterStats),
-		critOdds(characterStats, equipment),
-		1 + critDamagePercent(attributesWithGear(characterStats, equipment)) / 100,
-		rng,
-	);
+	swing(damagePerHit(equipment, characterStats), critOdds(characterStats, equipment), critExtraOf(characterStats, equipment), rng);
+
+/** HP a swing of `damage` gives back at `pct` % Life Leech: the one formula, shared by {@link leechHeal} and the fight engine (`fightStep`), so a test of one is a test of the other (IDL-172). */
+export const leechHealAmount = (damage: number, pct: number): number => (damage * pct) / 100;
 
 /** HP a swing of `damage` gives back through Life Leech. */
-export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => (damage * lifeLeechPercent(equipment, bonus)) / 100;
+export const leechHeal = (damage: number, equipment: Equipment, bonus?: CombatBonus): number => leechHealAmount(damage, lifeLeechPercent(equipment, bonus));
 
 /**
  * Armor against monster hits: the gear's plus (when the attributes are given) what Dexterity, Vitality and Strength add.
@@ -213,6 +212,46 @@ export const manaRegenPerSec = (stats: Attributes, equipment: Equipment): number
  */
 export const lifeLeechPercent = (equipment: Equipment, bonus?: CombatBonus): number =>
 	Math.min(STAT_RULES.lifeLeechCap, Math.max(0, aggregateStats(equipment).lifeLeech + (bonus?.leechPct ?? 0)));
+
+/** One gear total of the IDL-176 combat stats, never below 0 and never above its cap in `STAT_RULES`. */
+const cappedGear = (equipment: Equipment, stat: 'atkSpeed' | 'critDamage' | 'armorPen' | 'thorns' | 'healOnKill', cap: number): number =>
+	Math.min(cap, Math.max(0, aggregateStats(equipment)[stat]));
+
+/**
+ * What a crit's multiplier is multiplied by on top of x2 and x5: `1 + (the attributes' crit damage + the gear's Crit Damage) / 100`. The gear's share counts up to `STAT_RULES.critDamageGearCap` (50 %).
+ *
+ * @category Combat/Player numbers
+ * @order 11
+ */
+export const critExtraOf = (characterStats: Attributes, equipment: Equipment): number =>
+	1 + (critDamagePercent(attributesWithGear(characterStats, equipment)) + cappedGear(equipment, 'critDamage', STAT_RULES.critDamageGearCap)) / 100;
+
+/**
+ * The gear's Armor Penetration (%): the share of a monster's armor every hit ignores, up to `STAT_RULES.armorPenCap` (30 %). The monster's armor in a hit is `armor x (1 - pen / 100)`.
+ *
+ * @category Combat/Player numbers
+ * @order 12
+ */
+export const armorPenPercent = (equipment: Equipment): number => cappedGear(equipment, 'armorPen', STAT_RULES.armorPenCap);
+
+/** The armor a monster has against a hit of someone with `penPct` Armor Penetration. */
+export const armorAfterPen = (armor: number, penPct: number | undefined): number => (penPct && penPct > 0 ? armor * (1 - penPct / 100) : armor);
+
+/**
+ * The gear's Thorns (%): the share of the damage a monster's hit does to you that comes back on the monster, up to `STAT_RULES.thornsCap` (25 %). A dodged hit returns nothing.
+ *
+ * @category Combat/Player numbers
+ * @order 13
+ */
+export const thornsPercent = (equipment: Equipment): number => cappedGear(equipment, 'thorns', STAT_RULES.thornsCap);
+
+/**
+ * The gear's Heal on Kill (%): the share of your max HP restored the moment a monster dies, up to `STAT_RULES.healOnKillCap` (8 %).
+ *
+ * @category Combat/Player numbers
+ * @order 14
+ */
+export const healOnKillPercent = (equipment: Equipment): number => cappedGear(equipment, 'healOnKill', STAT_RULES.healOnKillCap);
 
 /**
  * The share (0-0.75) of a hit that `armor` takes away: armor / (armor + K) up to 50 %, then every further point counts half as much,

@@ -24,7 +24,7 @@ import {
 	shopPriceOf,
 } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { addDrop, averageItemLevel } from '@/lib/inventory';
 import { plainItem } from '@/lib/itemInstance';
 import { castleLevelOf } from '@/lib/castleWard';
@@ -184,7 +184,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 								state.prestige,
 								state.farmUpgrades,
 								merchantUpgrades,
-								gearIncomePct(state.equipment),
+								gearIncome(state.equipment),
 							),
 						}
 					: {}),

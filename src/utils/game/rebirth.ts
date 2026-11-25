@@ -4,7 +4,8 @@ import { EMBER_UPGRADES, REBIRTH, SHOP_VERSION, type EmberUpgradeId } from '@/co
 import { emberEffect, emberLevel } from '@/utils/game/emberEffects';
 import { INITIAL_RESOURCES } from '@/config/economy';
 import { classPassives } from '@/lib/classPassives';
-import type { CharacterStats, GameState, PrestigeState, Resources } from '@/types/game';
+import { gearTileDiscountPct } from '@/lib/gearEconomy';
+import type { CharacterStats, Equipment, GameState, PrestigeState, Resources } from '@/types/game';
 import { getTile } from '@/utils/world';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
 import { economyTiles } from '@/utils/game/tiles';
@@ -59,22 +60,27 @@ export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): numb
 /**
  * Percent off tile cost: Charisma plus Thrift, capped.
  *
- * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
+ * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points) + the worn gear's Tile Discount (cape and neck of G4 and up, at most 10 points, IDL-176), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
  * Buildings take Thrift only.
  *
  * @category Economy/Tiles
  * @order 4
  * @formula
- * discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount)
+ * discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount + min(10, gear Tile Discount))
  */
 export const effectiveTileDiscount = (
 	stats: Pick<CharacterStats, 'tileCostDiscount'>,
 	prestige: PrestigeState | undefined,
 	merchant?: MerchantUpgrades,
 	playerClass?: unknown,
+	equipment?: Equipment,
 ): number =>
 	Math.min(
-		stats.tileCostDiscount + emberEffect(prestige, 'thrift') * 100 + merchantEffect(merchant, 'bulk') + classPassives(playerClass).tileDiscountPct,
+		stats.tileCostDiscount +
+			emberEffect(prestige, 'thrift') * 100 +
+			merchantEffect(merchant, 'bulk') +
+			classPassives(playerClass).tileDiscountPct +
+			gearTileDiscountPct(equipment),
 		tileDiscountCap(prestige),
 	);
 

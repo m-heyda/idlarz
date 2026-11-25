@@ -24,7 +24,7 @@ import TileTooltip from './TileTooltip';
 import { openTileMenu } from './TileMenu';
 import { buildingDef } from '@/catalog/buildings';
 import { buildingUpgradeDuration } from '@/lib/buildings';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { rockSprite } from '@/config/rocks';
 import { hitRockAt } from '@/lib/rockClient';
 import { rockKey, useRockStore } from '@/stores/rockStore';
@@ -84,7 +84,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 		const total = buildingUpgradeDuration(
 			job.toLevel - 1,
 			state.prestige,
-			idolEconomy(state.tiles, state.idolLevels ?? {}).buildTimePct,
+			buildTimeCutPct(state.tiles, state.idolLevels, state.equipment ?? {}),
 			def?.kind === 'idol' ? 'idol' : 'building',
 		);
 		const done = total > 0 ? Math.min(1, Math.max(0, 1 - job.remainingSec / total)) : 0;

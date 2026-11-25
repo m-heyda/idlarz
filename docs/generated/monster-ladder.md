@@ -14,13 +14,13 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Burrow Badger | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Dust Strider | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Dust Strider | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 70% | 100% |
+| Dust Strider | 20 (grown) | 0% | 0% | 0% | 0% | 83% | 100% |
 | Gravel Quail | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Gravel Quail | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Gravel Quail | 20 (grown) | 0% | 0% | 0% | 0% | 83% | 100% |
+| Gravel Quail | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Stonehorn Bison | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Stonehorn Bison | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 48% | 100% |
+| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
 | The Great Auroch | 15 (castle 1) | 80% | 88% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 23 (castle 8) | 5% | 35% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 33 (grown) | 0% | 3% | 100% | 100% | 100% | 100% |
@@ -43,46 +43,46 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Elder Stag | 28 (castle 8) | 0% | 0% | 0% | 48% | 100% | 100% |
 | The Elder Stag | 38 (grown) | 0% | 0% | 0% | 15% | 100% | 100% |
 | Garbage Ogre | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 10% | 100% |
+| Garbage Ogre | 17 (castle 8) | 0% | 0% | 0% | 0% | 30% | 100% |
 | Garbage Ogre | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Toxic Zombie | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Toxic Zombie | 17 (castle 8) | 0% | 0% | 0% | 0% | 8% | 100% |
+| Toxic Zombie | 17 (castle 8) | 0% | 0% | 0% | 0% | 28% | 100% |
 | Toxic Zombie | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Dumpback | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Dumpback | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 75% |
+| Dumpback | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 90% |
 | Dumpback | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rot Heron | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Rot Heron | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 20% |
+| Rot Heron | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 38% |
 | Rot Heron | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Scrap Golem | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Scrap Golem | 17 (castle 8) | 0% | 0% | 0% | 0% | 23% | 100% |
 | Scrap Golem | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Sludge Cyclops | 8 (castle 1) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Sludge Cyclops | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 80% |
+| Sludge Cyclops | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 83% |
 | Sludge Cyclops | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 63% | 98% |
-| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 45% | 100% |
-| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 33% | 100% |
+| The Mire Matriarch | 25 (castle 1) | 0% | 0% | 0% | 0% | 65% | 100% |
+| The Mire Matriarch | 33 (castle 8) | 0% | 0% | 0% | 0% | 55% | 100% |
+| The Mire Matriarch | 43 (grown) | 0% | 0% | 0% | 0% | 38% | 100% |
 | Frost Hare | 12 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
 | Frost Hare | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Hare | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Icetusk Calf | 12 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
-| Icetusk Calf | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 20% |
+| Icetusk Calf | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 35% |
 | Icetusk Calf | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Rime Wraith | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rime Wraith | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 5% |
 | Rime Wraith | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rime Wraith | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Moth | 12 (castle 1) | 0% | 0% | 0% | 38% | 100% | 100% |
 | Frost Moth | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Frost Moth | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Glacier Yeti | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
+| Glacier Yeti | 12 (castle 1) | 0% | 0% | 0% | 0% | 0% | 8% |
 | Glacier Yeti | 17 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Glacier Yeti | 27 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 3% |
+| The Winter Wyrm | 30 (castle 1) | 0% | 0% | 0% | 0% | 0% | 5% |
 | The Winter Wyrm | 38 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Winter Wyrm | 48 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Granite Ram | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Granite Ram | 15 (castle 8) | 0% | 0% | 0% | 0% | 90% | 100% |
+| Granite Ram | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Granite Ram | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Cave Goblin Miner | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Cave Goblin Miner | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
@@ -94,7 +94,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Hill Giant | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Hill Giant | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Magma Knight | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Magma Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 88% | 100% |
+| Magma Knight | 15 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Magma Knight | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Magma Crab | 6 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Magma Crab | 15 (castle 8) | 0% | 0% | 0% | 10% | 100% | 100% |
@@ -116,19 +116,19 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Highland Gnoll | 25 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | The Ironhorn | 22 (castle 1) | 0% | 0% | 0% | 3% | 100% | 100% |
 | The Ironhorn | 30 (castle 8) | 0% | 0% | 0% | 0% | 100% | 100% |
-| The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
+| The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
 | Net Gull | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Net Gull | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 5% |
 | Drowned Sailor | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 20% |
+| Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 30% |
 | Tideglass Jelly | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Tideglass Jelly | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 33% |
 | Barnacle Brute | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -153,19 +153,19 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Lilypad Warden | 10 (castle 1) | 0% | 0% | 0% | 100% | 100% | 100% |
 | Lilypad Warden | 19 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Lilypad Warden | 29 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 95% |
-| The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 88% |
-| The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 78% |
+| The Lake Hydra | 27 (castle 1) | 0% | 0% | 0% | 0% | 0% | 100% |
+| The Lake Hydra | 35 (castle 8) | 0% | 0% | 0% | 0% | 0% | 98% |
+| The Lake Hydra | 45 (grown) | 0% | 0% | 0% | 0% | 0% | 95% |
 | Skull Vine | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Skull Vine | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Skull Vine | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Eye Horror | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Eye Horror | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Eye Horror | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Zombie Triceratops | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 23% |
+| Zombie Triceratops | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 53% |
 | Zombie Triceratops | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Zombie Triceratops | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
-| Vinewhip Panther | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Vinewhip Panther | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 5% |
 | Vinewhip Panther | 23 (castle 8) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Vinewhip Panther | 33 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Mossback Idol | 16 (castle 1) | 0% | 0% | 0% | 0% | 0% | 0% |

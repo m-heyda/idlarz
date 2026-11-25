@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { BestiaryPanel } from '../../../packages/design-system/src/views/bestiary';
-import { activeTextOf, biomeGoalsOf, entriesOf, type BestiaryInput } from '@/lib/bestiary/entries';
+import { activeTextOf, biomeGoalsOf, entriesOf, goldenTextOf, type BestiaryInput } from '@/lib/bestiary/entries';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
 import GameWindow from './GameWindow';
 
@@ -32,6 +32,7 @@ const BestiaryWindow: React.FC = () => {
 				entries={entries}
 				biomes={biomes}
 				activeText={activeTextOf(input)}
+				goldenText={goldenTextOf()}
 				busy={busy}
 				onClaim={(id, tier) => void claim({ action: 'claim', type: id, tier })}
 				onClaimBiome={(biome, tier) => void claim({ action: 'claimBiome', biome, tier })}

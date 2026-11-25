@@ -3,7 +3,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
-import { armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
+import { armorAfterPen, armorReduction, autoUseUnlocked, leechHealAmount, mitigate, swing } from '@/lib/combat';
 import { isBoss, modifiersOf, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import { masteryBonusesFor, type MasteryTotals } from '@/lib/mastery';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
@@ -41,6 +41,9 @@ const profileOf = (ctx: FightCtx): PlayerProfile => (ctx.c.fight ? ctx.c.fight.p
 /** What a potion restores for this hero: its HP times the belt's Potion Power. */
 const potionHeal = (ctx: FightCtx, id: string): number => quickHealOf(ITEM_CATALOG[id]) * (profileOf(ctx).potionPower ?? 1);
 
+/** How long a Burn lasts after the critical hit that lit it (seconds) */
+export const BURN_SEC = 3;
+
 export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	const c = ctx.c;
 	const healHp = potionHeal(ctx, id);
@@ -48,7 +51,10 @@ export const drink = (ctx: FightCtx, t: number, id: string): boolean => {
 	if (c.fight && c.cd.potion > 0) return false;
 	const healed = Math.min(healHp, maxHpNow(ctx) - c.hp);
 	c.hp += healed;
-	ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
+	// Potion refund (a legendary's handler): in a fight the potion may stay in the bag, rolled from the fight's sealed stream (only drawn when the perk is worn, so no other fight changes)
+	const refund = profileOf(ctx).potionRefundPct ?? 0;
+	const refunded = !!c.fight && refund > 0 && rngFor(ctx, c.fight)() * 100 < refund;
+	if (!refunded) ctx.ledger = { ...ctx.ledger, inv: takeOne(ctx.ledger.inv!, id) ?? ctx.ledger.inv! };
 	if (c.fight) c.cd.potion = potionCooldownAgainst(c.fight.type, profileOf(ctx).potionCooldownSec ?? COMBAT.potionCooldownSec);
 	pushEvent(ctx, t, 'potion', { id, amount: Math.round(healed) });
 	return true;
@@ -180,6 +186,14 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const stunned = Math.min(f.stunLeft, dt);
 	f.stunLeft -= stunned;
 
+	// Burn (a legendary's handler): the flames work first, so a monster they finish is not swung at
+	if (f.burn) {
+		const burned = Math.min(dt, f.burn.leftSec);
+		f.monsterHp = Math.max(0, f.monsterHp - f.burn.perSec * burned);
+		f.burn.leftSec -= burned;
+		if (f.burn.leftSec <= EPS) delete f.burn;
+	}
+
 	// the player's swings
 	f.playerTimer += dt;
 	const period = 1 / Math.max(0.05, p.attacksPerSec);
@@ -189,15 +203,20 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const kind = rolled.crit === 'none' ? 'hit' : rolled.crit;
 		// Bestiary mastery: a permanent bonus against this monster (and its biome once the goal is claimed), `masteryBonusesFor`
 		const raw = rolled.damage * (1 + masteryOf(ctx, f).damage / 100);
-		const damage = monster.armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(monster.armor)))) : raw;
+		const armor = armorAfterPen(monster.armor, p.armorPenPct);
+		const damage = armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(armor)))) : raw;
 		f.monsterHp = Math.max(0, f.monsterHp - damage);
-		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + (damage * p.leechPct) / 100);
+		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + leechHealAmount(damage, p.leechPct));
+		// a critical hit sets the monster alight for BURN_SEC; a new one refreshes it with its own hit (never stacks)
+		if (p.burnPct && rolled.crit !== 'none') f.burn = { leftSec: BURN_SEC, perSec: (damage * p.burnPct) / 100 };
 		pushEvent(ctx, t, kind, { amount: damage });
 	}
 	if (f.monsterHp <= 0) {
 		const paid = payKill(env.secret, env.userId, ctx.ledger, env.stored, f.n, t, { elapsedSec: f.elapsed, flawless: !(f.hurt && f.hurt > 0) });
 		if (!paid) return endFight(ctx, t, 'retreat');
 		ctx.ledger = paid.ledger;
+		// Heal on Kill: a share of max HP comes back the moment the monster dies
+		if (p.healOnKillPct) c.hp = Math.min(p.maxHp, c.hp + (p.maxHp * p.healOnKillPct) / 100);
 		pushEvent(ctx, t, 'won', {
 			n: f.n,
 			type: f.type,
@@ -237,6 +256,11 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		c.hp = Math.max(0, c.hp - amount);
 		f.hurt = (f.hurt ?? 0) + amount;
 		pushEvent(ctx, t, 'hurt', { amount, crit });
+		// Thorns: a share of what the hit did comes back on the monster; the kill is paid on the next step, so no more swings from a dead monster
+		if (p.thornsPct) {
+			f.monsterHp = Math.max(0, f.monsterHp - (amount * p.thornsPct) / 100);
+			if (f.monsterHp <= 0) break;
+		}
 		if (venom) f.poison = { stacks: Math.min(venom.maxStacks, (f.poison?.stacks ?? 0) + 1), leftSec: venom.durationSec, acc: f.poison?.acc ?? 0 };
 	}
 	if (c.hp <= 0) endFight(ctx, t, 'defeated');

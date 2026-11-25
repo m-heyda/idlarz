@@ -44,7 +44,7 @@ New server-owned things the features add (all follow the lazy, additive, ledger 
 
 Items, monsters, biomes, resources and affixes stay as TypeScript modules (`src/catalog`, `config/*`). Reasons: the API routes and the browser import the same files, so they cannot disagree; the database would add reads on every fight (the free-plan hot spot); content changes ship with a deploy anyway because art and tests ship with them; a catalog row cannot be unit-tested the way the current simulations (`fight-sim`, `loot-sim`, `tests/catalog/catalog.test.ts`) are. Revisit only if content must change **without a deploy** (live events); then add one small `catalog_overrides` jsonb row read once per process and cached, not a table per catalog.
 
-Not secret either: the catalogs are in the client bundle by design. The secrets are `LOOT_SECRET` and the seed of every roll, which stay server-only. (Rotate the example `LOOT_SECRET` in `.env.example` before any public release, as noted in the ROADMAP.)
+Not secret either: the catalogs are in the client bundle by design. The secrets are `LOOT_SECRET` and the seed of every roll, which stay server-only. (`.env.example` holds an empty `LOOT_SECRET`; set a new value in every deployment before any public release, as noted in the ROADMAP.)
 
 ## 5. Free-plan budget (the real constraint)
 

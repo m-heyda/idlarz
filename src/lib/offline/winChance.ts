@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { armorReduction, mitigate } from '@/lib/combat';
+import { armorAfterPen, armorReduction, mitigate } from '@/lib/combat';
 import { modifiersOf, monsterDef, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
@@ -32,6 +32,12 @@ export interface WinEstimate {
 	surviveSec: number;
 }
 
+/** The clock of a boss fight in seconds: the boss's own limit plus the gear's Boss Timer (IDL-176); undefined for a monster that has no clock. */
+export const bossClockSec = (type: MonsterType, p: Pick<PlayerProfile, 'bossTimerSec'>): number | undefined => {
+	const limit = monsterDef(type).timeLimitSec;
+	return limit === undefined ? undefined : limit + (p.bossTimerSec ?? 0);
+};
+
 const logistic = (x: number): number => 1 / (1 + Math.exp(-x));
 
 /** Expected damage of one swing after the monster's armor: crits and super crits weighted in. */
@@ -39,7 +45,7 @@ const expectedHit = (p: PlayerProfile, armor: number): number => {
 	const crit = Math.min(1, Math.max(0, p.crit));
 	const superCrit = Math.min(1, Math.max(0, p.superCrit));
 	const multiplier = 1 - crit + crit * ((1 - superCrit) * COMBAT.crit.mult + superCrit * COMBAT.crit.superMult) * p.critExtra;
-	return Math.max(1, p.hit * multiplier * (1 - armorReduction(armor)));
+	return Math.max(1, p.hit * multiplier * (1 - armorReduction(armorAfterPen(armor, p.armorPenPct))));
 };
 
 /** Expected damage per second the monster does to this player (dodges, crits and armor in). */
@@ -71,7 +77,8 @@ const monsterDps = (p: PlayerProfile, type: MonsterType, level: number, elapsedS
  *
  * @category Combat/Win chance
  * @formula
- * killSec    = monster HP / (attacks/s x expectedHit)           expectedHit: crits and super crits weighted, monster armor applied
+ * killSec    = monster HP / (attacks/s x expectedHit + thorns share of the monster's damage per second)      expectedHit: crits and super crits weighted, monster armor applied
+ * Heal on Kill is not in it: it only helps the next fight, and this is the estimate of one fight.
  * surviveSec = (HP + potions that fit between cooldowns) / (monster dps - regen - leech)
  * chance     = min(logistic(6 x ln(surviveSec / killSec)), logistic(6 x ln(limit / killSec)))
  * mastery    = our damage x (1 + damage mastery / 100), the monster's damage x (1 - defense mastery / 100)
@@ -87,8 +94,16 @@ export const estimateWin = (
 	const m = monsterStats(type, level);
 	const dps = (p.attacksPerSec || 0) * expectedHit(p, m.armor) * (1 + Math.max(0, mastery?.damage ?? 0) / 100);
 	if (!(dps > 0)) return { chance: 0, killSec: Infinity, surviveSec: 0 };
-	const killSec = m.maxHp / dps;
-	const limit = Math.min(COMBAT.maxFightSec, monsterDef(type).timeLimitSec ?? Infinity);
+	// Thorns (IDL-176): a share of every hit the monster lands comes back on it, so it dies sooner. One extra pass: the monster's damage at the middle of the fight without thorns gives the extra damage per second
+	const thorns = Math.min(100, Math.max(0, p.thornsPct ?? 0)) / 100;
+	let dealt = dps;
+	if (thorns > 0) {
+		const plainKillSec = m.maxHp / dps;
+		const incoming = monsterDps(p, type, level, plainKillSec / 2, plainKillSec) * (1 - Math.min(100, Math.max(0, mastery?.defense ?? 0)) / 100);
+		dealt = dps + incoming * thorns;
+	}
+	const killSec = m.maxHp / dealt;
+	const limit = Math.min(COMBAT.maxFightSec, bossClockSec(type, p) ?? Infinity);
 	if (killSec > limit) return { chance: 0, killSec, surviveSec: 0 };
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown

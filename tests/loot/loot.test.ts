@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { rollKillLoot } from '../../src/lib/loot';
+import { monsterChestTierOf } from '../../src/catalog/items/chests';
 import { emitCombat } from '../../src/lib/combatFx';
 import { COMBAT } from '../../src/config/combatConfig';
 import { ITEM_CATALOG } from '../../src/catalog';
@@ -15,7 +16,8 @@ const ctx = { goldPerSec: 100, xpPerSec: 2, luck: 0 };
 const T1 = { type: 'thistleBoar', level: 1 } as const;
 
 const baseOf = (d: Drop) => (d.kind === 'gear' ? d.item.base : d.id);
-const noJunk = (items: Drop[]) => items.filter((d) => d.kind === 'gear' || !ITEM_CATALOG[d.id].junk);
+// junk materials always drop and monster chests (IDL-163, 2 % of a roll at the top of the stream, tested in monsterChests.test.ts) are not part of what these tests are about
+const noJunk = (items: Drop[]) => items.filter((d) => d.kind === 'gear' || (!ITEM_CATALOG[d.id].junk && !monsterChestTierOf(d.id)));
 const gearOnly = (items: Drop[]) => items.filter((d) => d.kind === 'gear');
 const isLegendaryWeapon = (d: Drop) => ITEM_CATALOG[baseOf(d)].pools?.includes('legendary_weapons') ?? false;
 
@@ -29,8 +31,8 @@ test('rng 0 drops a piece of plain gear and a potion from a rat, rng 0.999 drops
 	assert.deepEqual(noJunk(rollKillLoot(T1, ctx, () => 0.999).items), []);
 });
 
-test('rats never drop the legendary weapons, whatever the rng', () => {
-	for (const level of [1, 5, 9, 20] as const) {
+test('low-level monsters never drop the legendary weapons, whatever the rng (the rare monster legendary starts at level 15)', () => {
+	for (const level of [1, 5, 9] as const) {
 		for (let i = 0; i < 200; i++) {
 			const r = rollKillLoot({ type: 'thistleBoar', level }, ctx, () => i / 200);
 			for (const item of r.items) {
@@ -191,4 +193,51 @@ test("a kill pays pelts: a share of the farm hide income for the monster's rewar
 	assert.ok(king > rollKillLoot({ type: 'thistleBoar', level: 9 }, { ...ctx, hidePerSec: 4 }, () => 0.5).hide, 'the boss pays more than any normal monster');
 	const lucky = rollKillLoot({ type: 'thistleBoar', level: 5 }, { ...ctx, hidePerSec: 4, lucky: true }, () => 0.5).hide;
 	assert.ok(lucky > Math.floor(4 * rat * COMBAT.rewards.hideShare), 'a lucky monster pays its multiplier on pelts too');
+});
+
+test('epic and better gear is never junk and never auto-sold by default (IDL-382: they drop often enough now to land in the bag)', async () => {
+	const { isJunk } = await import('@/lib/loot/junk');
+	const { isAutoSold } = await import('@/lib/loot/autoSell');
+	for (const rarity of ['epic', 'legendary']) {
+		const piece = { base: 'iron_sword', level: 1, rarity, quality: 50, affixes: [] };
+		assert.equal(isJunk(piece, { wornLevel: 80 }), false, `${rarity} far below the worn level is not junk`);
+		assert.equal(isAutoSold(piece, null), false, 'the default filter (off) keeps everything');
+	}
+	// the Goods tab offers common to rare only (its choices drop the last two enabled rarities)
+	const { RARITIES, RARITY_ORDER } = await import('@/catalog');
+	assert.deepEqual(RARITY_ORDER.filter((id) => RARITIES[id].enabled).slice(0, -2), ['common', 'uncommon', 'rare']);
+	assert.equal(
+		isJunk({ base: 'iron_sword', level: 1, rarity: 'rare', quality: 50, affixes: [], junk: true }, { wornLevel: 80 }),
+		true,
+		"only the player's own mark overrides",
+	);
+});
+
+test('epic and better pieces get a drop notice, everything else does not (IDL-382)', async () => {
+	const { announceDrops } = await import('@/lib/loot/announce');
+	const gear = (rarity: string) => ({ kind: 'gear' as const, item: { base: 'iron_sword', level: 20, rarity, quality: 50, affixes: [] } });
+	const found = announceDrops([gear('common'), gear('rare'), gear('epic'), gear('legendary'), { kind: 'consumable', id: 'potion_minor', qty: 2 }]);
+	assert.deepEqual(
+		found.map((f) => [f.rarity, f.text.startsWith(f.rarity === 'epic' ? 'Epic drop: ' : 'Legendary drop: ')]),
+		[
+			['legendary', true],
+			['epic', true],
+		],
+		'the strongest first; common, rare and potions stay quiet',
+	);
+	assert.deepEqual(announceDrops([]), []);
+});
+
+test('a monster of level 15 or more can drop a mid-tier legendary on a low roll, never a top-tier one, and never below level 15 (IDL-146)', async () => {
+	const { generateLoot } = await import('@/lib/loot/generate');
+	const { MONSTER_LEGENDARY_IDS, MONSTER_LEGENDARY_MIN_LEVEL } = await import('@/catalog/lootConfig');
+	const named = (level: number, roll: number) =>
+		generateLoot({ sourceId: 'monster', level }, () => roll)
+			.drops.flatMap((d) => (d.kind === 'gear' ? [d.item.base] : []))
+			.filter((id) => ITEM_CATALOG[id].generation === 'named');
+	assert.deepEqual(named(MONSTER_LEGENDARY_MIN_LEVEL - 1, 0), [], 'nothing named below the gate');
+	const found = named(MONSTER_LEGENDARY_MIN_LEVEL + 5, 0);
+	assert.ok(found.length > 0 && found.every((id) => MONSTER_LEGENDARY_IDS.includes(id)), `a low roll gives a mid-tier legendary (${found})`);
+	for (const id of MONSTER_LEGENDARY_IDS) assert.ok(!ITEM_CATALOG[id].pools?.includes('legendary_top'), `${id} is not top tier`);
+	assert.deepEqual(named(40, 0.5), [], 'a normal roll gives none');
 });

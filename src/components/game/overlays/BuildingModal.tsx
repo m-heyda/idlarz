@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BUILDING_LORE, buildingDef, buildingKindLabel, type BuildingDef } from '@/catalog/buildings';
-import { BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
+import { BIOME_MILESTONES, BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import { idolDef } from '@/catalog/idols';
 import { BIOMES } from '@/config/biomes';
@@ -12,12 +12,13 @@ import {
 	idolFloorTiles,
 	levelOfTile,
 	ownedOfBiome,
-	producerBonus,
+	biomeBonus,
 	upgradeProblem,
 	type BuildingContext,
 } from '@/lib/buildings';
 import { castleLevelOf } from '@/lib/castleWard';
-import { idolEconomy, idolValueText } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
+import { idolValueText } from '@/lib/idolEconomy';
 import { limitOf } from '@/lib/limits';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
@@ -50,6 +51,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const gemBuilders = useGameStore((state) => state.gemBuilders);
 	const freeTiles = useGameStore((state) => state.freeTiles);
 	const idolLevels = useGameStore((state) => state.idolLevels);
+	const equipment = useGameStore((state) => state.equipment);
 	const prestige = useGameStore((state) => state.prestige);
 	const upgradeBuilding = useGameStore((state) => state.upgradeBuilding);
 
@@ -85,12 +87,12 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const nextLevel = level + 1;
 	const cost = atTop ? {} : buildingLevelCost(nextLevel, ownedTiles, def);
 	const problem = atTop ? null : (upgradeProblem(ctx, x, y) ?? (canAffordBundle(resources, cost) ? null : 'Not enough resources'));
-	const buildTimePct = idolEconomy(tiles, idolLevels ?? {}).buildTimePct;
+	const buildTimePct = buildTimeCutPct(tiles, idolLevels, equipment);
 	const now = def.kind === 'idol' ? null : buildingOutput(def, level, owned);
 	const next = def.kind === 'idol' || atTop ? null : buildingOutput(def, nextLevel, owned);
 	const gain: Partial<Resources> = {};
 	if (now && next) for (const key of Object.keys(next) as (keyof Resources)[]) gain[key] = (next[key] ?? 0) - (now[key] ?? 0);
-	const bonusPct = Math.round(producerBonus(owned) * 100);
+	const bonusPct = Math.round(biomeBonus(def.biome, owned) * 100);
 
 	// a general building makes nothing: its level is its bonus (`GENERAL_RULES.perLevel` % of its effect per level, every copy adds its own, `idolEconomy`)
 	let copyCount = 0;
@@ -195,8 +197,8 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 								</div>
 								<div className='bw-note'>
 									{biomeLabel} bonus: +{bonusPct} % from your {owned} {biomeLabel.toLowerCase()} tile{owned === 1 ? '' : 's'} (each adds +
-									{Math.round(BUILDING_RULES.producer.perOwnedTile * 100)} %, up to +{Math.round(BUILDING_RULES.producer.bonusCap * 100)} %). Before the castle
-									and Ember bonuses.
+									{Math.round(BUILDING_RULES.producer.perOwnedTile * 100)} %, up to +{Math.round(BUILDING_RULES.producer.bonusCap * 100)} %), and every biome
+									milestone adds +{Math.round(BIOME_MILESTONES.step * 100)} %. Before the castle and Ember bonuses.
 								</div>
 							</>
 						)}

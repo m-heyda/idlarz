@@ -112,7 +112,7 @@ export const buildSeedGame = (nowMs: number, tutorialStepIds: readonly string[] 
 		store.setState({
 			resources: { ...s.resources, xp: verdict.xp },
 			level: calculateLevel(verdict.xp),
-			characterStats: reconcileCharacter(s.characterStats, verdict.xp),
+			characterStats: reconcileCharacter(s.characterStats, verdict.xp, s.prestige.rebirths),
 		} as never);
 	}
 

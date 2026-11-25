@@ -37,8 +37,9 @@ export const TileStatus = memo(
 		const prestige = game((state) => state.prestige);
 		const merchantUpgrades = game((state) => state.merchantUpgrades);
 		const playerClass = game((state) => state.playerClass);
+		const equipment = game((state) => state.equipment);
 		const freeTiles = game((state) => state.freeTiles);
-		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass);
+		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment);
 
 		const cost = useMemo(() => calculateTileCost(economyTiles(tiles, freeTiles), discount), [tiles, discount, freeTiles]);
 

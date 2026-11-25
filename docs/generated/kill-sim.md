@@ -139,14 +139,14 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dust Strider | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
 | Gravel Quail | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
 | Stonehorn Bison | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
-| The Great Auroch (boss) | 18 | 98 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.56 % |
+| The Great Auroch (boss) | 18 | 99 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.56 % |
 | *plains total (if every spawn were here)* | | | | | | | *1.6 %* |
 | Wreck Crab | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Net Gull | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Drowned Sailor | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Tideglass Jelly | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Barnacle Brute | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
-| The Reef Leviathan (boss) | 20 | 90 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.33 % |
+| The Reef Leviathan (boss) | 20 | 91 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.37 % |
 | *coast total (if every spawn were here)* | | | | | | | *2.5 %* |
 | Mossback Wolf | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.11 % |
 | Bramble Imp | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.11 % |
@@ -191,7 +191,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
 | The Winter Wyrm (boss) | 33 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **9.8 %** (bosses 6.5 %; XP 28.8 %) |
+| **All kills together** | | | | | | | **9.8 %** (bosses 6.6 %; XP 29.0 %) |
 
 ## castle 4: hero level 17, knight + mace, 100 gold/s, 12.00 XP/s
 
@@ -209,14 +209,14 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Drowned Sailor | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
 | Tideglass Jelly | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
 | Barnacle Brute | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
-| The Reef Leviathan (boss) | 21 | 93 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.49 % |
+| The Reef Leviathan (boss) | 21 | 94 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.52 % |
 | *coast total (if every spawn were here)* | | | | | | | *1.1 %* |
 | Mossback Wolf | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Bramble Imp | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Rotcap Stag | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Ember Squirrel | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Pinecone Warden | 8 | 99 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
-| The Elder Stag (boss) | 24 | 75 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.00 % |
+| The Elder Stag (boss) | 24 | 78 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.08 % |
 | *forest total (if every spawn were here)* | | | | | | | *1.7 %* |
 | Granite Ram | 10 | 62 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
 | Cave Goblin Miner | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.08 % |
@@ -228,7 +228,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Cairn Sentinel | 10 | 55 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
 | Quarry Rat Knight | 10 | 96 % | 1,599 | 684 | 16 s | 2.7 % | 0.09 % |
 | Highland Gnoll | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.08 % |
-| The Hill Giant (boss) | 26 | 52 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.39 % |
+| The Hill Giant (boss) | 26 | 55 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.49 % |
 | The Ironhorn (boss) | 26 | 38 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.02 % |
 | *hills total (if every spawn were here)* | | | | | | | *2.1 %* |
 | Garbage Ogre | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
@@ -254,7 +254,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
 | The Winter Wyrm (boss) | 34 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **10.9 %** (bosses 9.6 %; XP 33.4 %) |
+| **All kills together** | | | | | | | **11.1 %** (bosses 9.8 %; XP 34.0 %) |
 
 ## castle 5: hero level 30, obsidian + maul, 300 gold/s, 20.00 XP/s
 
@@ -297,27 +297,27 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Garbage Ogre | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
 | Toxic Zombie | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
 | Dumpback | 13 | 99 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
-| Rot Heron | 13 | 95 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.05 % |
+| Rot Heron | 13 | 96 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.05 % |
 | Scrap Golem | 13 | 100 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
 | Sludge Cyclops | 13 | 98 % | 3,021 | 1,292 | 10 s | 1.7 % | 0.04 % |
-| The Mire Matriarch (boss) | 30 | 49 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.75 % |
-| *swamp total (if every spawn were here)* | | | | | | | *1.6 %* |
-| Moss Snapper | 15 | 62 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.06 % |
-| Reed Nymph | 15 | 32 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.02 % |
-| Pike Lurker | 15 | 16 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.01 % |
-| Tidepool Golem | 15 | 62 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.06 % |
-| Silt Eel | 15 | 31 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.02 % |
-| Lilypad Warden | 15 | 11 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.00 % |
-| The Lake Hydra (boss) | 32 | 44 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.68 % |
-| *lake total (if every spawn were here)* | | | | | | | *1.3 %* |
-| Frost Hare | 15 | 5 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
-| Icetusk Calf | 15 | 28 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.02 % |
+| The Mire Matriarch (boss) | 30 | 57 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.87 % |
+| *swamp total (if every spawn were here)* | | | | | | | *1.7 %* |
+| Moss Snapper | 15 | 68 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.06 % |
+| Reed Nymph | 15 | 39 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.03 % |
+| Pike Lurker | 15 | 20 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.01 % |
+| Tidepool Golem | 15 | 68 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.06 % |
+| Silt Eel | 15 | 37 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.03 % |
+| Lilypad Warden | 15 | 15 % | 5,286 | 2,265 | 18 s | 2.9 % | 0.00 % |
+| The Lake Hydra (boss) | 32 | 48 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.74 % |
+| *lake total (if every spawn were here)* | | | | | | | *1.4 %* |
+| Frost Hare | 15 | 7 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
+| Icetusk Calf | 15 | 34 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.03 % |
 | Rime Wraith | 15 | 0 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
-| Frost Moth | 15 | 16 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.01 % |
+| Frost Moth | 15 | 20 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.01 % |
 | Glacier Yeti | 15 | 0 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
 | The Winter Wyrm (boss) | 35 | 0 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.00 % |
-| *tundra total (if every spawn were here)* | | | | | | | *0.7 %* |
-| **All kills together** | | | | | | | **9.9 %** (bosses 9.1 %; XP 35.9 %) |
+| *tundra total (if every spawn were here)* | | | | | | | *0.9 %* |
+| **All kills together** | | | | | | | **10.1 %** (bosses 9.3 %; XP 36.8 %) |
 
 ## castle 6: hero level 42, obsidian + titan maul, 700 gold/s, 50.00 XP/s
 
@@ -365,22 +365,22 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Sludge Cyclops | 14 | 100 % | 3,263 | 1,395 | 4.7 s | 0.8 % | 0.02 % |
 | The Mire Matriarch (boss) | 31 | 99 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.67 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.8 %* |
-| Moss Snapper | 16 | 94 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.04 % |
-| Reed Nymph | 16 | 84 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.03 % |
-| Pike Lurker | 16 | 62 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
-| Tidepool Golem | 16 | 94 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.04 % |
-| Silt Eel | 16 | 81 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.03 % |
-| Lilypad Warden | 16 | 46 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
-| The Lake Hydra (boss) | 33 | 98 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.66 % |
-| *lake total (if every spawn were here)* | | | | | | | *1.0 %* |
-| Frost Hare | 15 | 70 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.03 % |
-| Icetusk Calf | 15 | 94 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.05 % |
+| Moss Snapper | 16 | 95 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.04 % |
+| Reed Nymph | 16 | 87 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.03 % |
+| Pike Lurker | 16 | 68 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.03 % |
+| Tidepool Golem | 16 | 95 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.04 % |
+| Silt Eel | 16 | 85 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.03 % |
+| Lilypad Warden | 16 | 52 % | 5,709 | 2,446 | 8.2 s | 1.4 % | 0.02 % |
+| The Lake Hydra (boss) | 33 | 98 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.67 % |
+| *lake total (if every spawn were here)* | | | | | | | *1.1 %* |
+| Frost Hare | 15 | 75 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.04 % |
+| Icetusk Calf | 15 | 96 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.04 % |
 | Rime Wraith | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
-| Frost Moth | 15 | 89 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.04 % |
+| Frost Moth | 15 | 92 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.04 % |
 | Glacier Yeti | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
-| The Winter Wyrm (boss) | 36 | 92 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.62 % |
-| *tundra total (if every spawn were here)* | | | | | | | *1.3 %* |
-| **All kills together** | | | | | | | **6.5 %** (bosses 5.9 %; XP 22.1 %) |
+| The Winter Wyrm (boss) | 36 | 94 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.63 % |
+| *tundra total (if every spawn were here)* | | | | | | | *1.4 %* |
+| **All kills together** | | | | | | | **6.6 %** (bosses 6.0 %; XP 22.3 %) |
 
 ## castle 7: hero level 58, obsidian + titan maul, 1,300 gold/s, 80.00 XP/s
 
@@ -428,22 +428,22 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Sludge Cyclops | 15 | 100 % | 3,524 | 1,507 | 2.7 s | 0.5 % | 0.01 % |
 | The Mire Matriarch (boss) | 31 | 100 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.5 %* |
-| Moss Snapper | 17 | 90 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
-| Reed Nymph | 17 | 70 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
-| Pike Lurker | 17 | 46 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
-| Tidepool Golem | 17 | 90 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
-| Silt Eel | 17 | 66 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
-| Lilypad Warden | 17 | 35 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Moss Snapper | 17 | 92 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
+| Reed Nymph | 17 | 81 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
+| Pike Lurker | 17 | 59 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
+| Tidepool Golem | 17 | 92 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
+| Silt Eel | 17 | 71 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.02 % |
+| Lilypad Warden | 17 | 41 % | 6,166 | 2,641 | 4.7 s | 0.8 % | 0.01 % |
 | The Lake Hydra (boss) | 33 | 99 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.36 % |
-| *lake total (if every spawn were here)* | | | | | | | *0.5 %* |
-| Frost Hare | 16 | 55 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
-| Icetusk Calf | 16 | 91 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.03 % |
-| Rime Wraith | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
-| Frost Moth | 16 | 79 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
+| *lake total (if every spawn were here)* | | | | | | | *0.6 %* |
+| Frost Hare | 16 | 68 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
+| Icetusk Calf | 16 | 95 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.03 % |
+| Rime Wraith | 16 | 1 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
+| Frost Moth | 16 | 82 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
 | Glacier Yeti | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
-| The Winter Wyrm (boss) | 36 | 96 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
+| The Winter Wyrm (boss) | 36 | 97 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.7 %* |
-| **All kills together** | | | | | | | **3.7 %** (bosses 3.4 %; XP 14.4 %) |
+| **All kills together** | | | | | | | **3.7 %** (bosses 3.4 %; XP 14.6 %) |
 
 ## castle 8: hero level 70, obsidian + titan maul, 2,200 gold/s, 120.00 XP/s
 
@@ -485,28 +485,28 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | *hills total (if every spawn were here)* | | | | | | | *0.2 %* |
 | Garbage Ogre | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Toxic Zombie | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
-| Dumpback | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
+| Dumpback | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Rot Heron | 16 | 98 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Scrap Golem | 16 | 100 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | Sludge Cyclops | 16 | 99 % | 3,806 | 1,627 | 1.7 s | 0.3 % | 0.01 % |
 | The Mire Matriarch (boss) | 32 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.3 %* |
-| Moss Snapper | 18 | 73 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
-| Reed Nymph | 18 | 53 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
-| Pike Lurker | 18 | 25 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
-| Tidepool Golem | 18 | 73 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
-| Silt Eel | 18 | 41 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
-| Lilypad Warden | 18 | 15 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
+| Moss Snapper | 18 | 83 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Reed Nymph | 18 | 59 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Pike Lurker | 18 | 29 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
+| Tidepool Golem | 18 | 83 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Silt Eel | 18 | 46 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.01 % |
+| Lilypad Warden | 18 | 18 % | 6,660 | 2,853 | 3.0 s | 0.5 % | 0.00 % |
 | The Lake Hydra (boss) | 34 | 100 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.3 %* |
-| Frost Hare | 16 | 77 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
-| Icetusk Calf | 16 | 97 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Frost Hare | 16 | 81 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Icetusk Calf | 16 | 98 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
 | Rime Wraith | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
-| Frost Moth | 16 | 88 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.01 % |
+| Frost Moth | 16 | 90 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.02 % |
 | Glacier Yeti | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
-| The Winter Wyrm (boss) | 37 | 97 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
+| The Winter Wyrm (boss) | 37 | 98 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.5 %* |
-| **All kills together** | | | | | | | **2.3 %** (bosses 2.1 %; XP 10.1 %) |
+| **All kills together** | | | | | | | **2.3 %** (bosses 2.1 %; XP 10.2 %) |
 
 ## castle 9: hero level 84, obsidian + titan maul, 3,300 gold/s, 200.00 XP/s
 
@@ -546,30 +546,30 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | The Hill Giant (boss) | 30 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | The Ironhorn (boss) | 30 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *hills total (if every spawn were here)* | | | | | | | *0.1 %* |
-| Garbage Ogre | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
-| Toxic Zombie | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
-| Dumpback | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
-| Rot Heron | 17 | 95 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
-| Scrap Golem | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
-| Sludge Cyclops | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
+| Garbage Ogre | 17 | 100 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Toxic Zombie | 17 | 100 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Dumpback | 17 | 99 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Rot Heron | 17 | 96 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.01 % |
+| Scrap Golem | 17 | 100 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
+| Sludge Cyclops | 17 | 98 % | 4,111 | 1,758 | 1.2 s | 0.2 % | 0.00 % |
 | The Mire Matriarch (boss) | 33 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *swamp total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Moss Snapper | 18 | 90 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
-| Reed Nymph | 18 | 71 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
-| Pike Lurker | 18 | 41 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
-| Tidepool Golem | 18 | 90 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
-| Silt Eel | 18 | 59 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
-| Lilypad Warden | 18 | 27 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| Moss Snapper | 18 | 91 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Reed Nymph | 18 | 75 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Pike Lurker | 18 | 47 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
+| Tidepool Golem | 18 | 91 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Silt Eel | 18 | 69 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.01 % |
+| Lilypad Warden | 18 | 32 % | 6,660 | 2,853 | 2.0 s | 0.3 % | 0.00 % |
 | The Lake Hydra (boss) | 35 | 100 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *lake total (if every spawn were here)* | | | | | | | *0.2 %* |
-| Frost Hare | 17 | 51 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
-| Icetusk Calf | 17 | 91 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
+| Frost Hare | 17 | 57 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
+| Icetusk Calf | 17 | 93 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
 | Rime Wraith | 17 | 0 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
-| Frost Moth | 17 | 80 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
+| Frost Moth | 17 | 83 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.01 % |
 | Glacier Yeti | 17 | 0 % | 8,222 | 3,515 | 2.5 s | 0.4 % | 0.00 % |
-| The Winter Wyrm (boss) | 38 | 98 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
+| The Winter Wyrm (boss) | 38 | 99 % | 760,062 | 171,014 | 230 s | 38.4 % | 0.15 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.3 %* |
-| **All kills together** | | | | | | | **1.6 %** (bosses 1.5 %; XP 6.5 %) |
+| **All kills together** | | | | | | | **1.7 %** (bosses 1.5 %; XP 6.6 %) |
 
 ## Summary
 
@@ -577,13 +577,13 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 |---|---|---|---|---|---|---|---|
 | castle 1 | 2.0 | 10.1 % | 0.0 % | 10.1 % | 14.6 % | Thistle Boar (level 2) | 16.2 % |
 | castle 2 | 12 | 6.8 % | 1.4 % | 5.4 % | 13.3 % | Thistle Boar (level 3) | 4.8 % |
-| castle 3 | 40 | 9.8 % | 6.5 % | 3.3 % | 28.8 % | Thistle Boar (level 4) | 1.6 % |
-| castle 4 | 100 | 10.9 % | 9.6 % | 1.3 % | 33.4 % | Thistle Boar (level 5) | 0.7 % |
-| castle 5 | 300 | 9.9 % | 9.1 % | 0.8 % | 35.9 % | Thistle Boar (level 6) | 0.2 % |
-| castle 6 | 700 | 6.5 % | 5.9 % | 0.6 % | 22.1 % | Thistle Boar (level 7) | 0.1 % |
-| castle 7 | 1,300 | 3.7 % | 3.4 % | 0.3 % | 14.4 % | Thistle Boar (level 8) | 0.1 % |
-| castle 8 | 2,200 | 2.3 % | 2.1 % | 0.2 % | 10.1 % | Thistle Boar (level 9) | 0.0 % |
-| castle 9 | 3,300 | 1.6 % | 1.5 % | 0.1 % | 6.5 % | Thistle Boar (level 9) | 0.0 % |
+| castle 3 | 40 | 9.8 % | 6.6 % | 3.3 % | 29.0 % | Thistle Boar (level 4) | 1.6 % |
+| castle 4 | 100 | 11.1 % | 9.8 % | 1.3 % | 34.0 % | Thistle Boar (level 5) | 0.7 % |
+| castle 5 | 300 | 10.1 % | 9.3 % | 0.9 % | 36.8 % | Thistle Boar (level 6) | 0.2 % |
+| castle 6 | 700 | 6.6 % | 6.0 % | 0.6 % | 22.3 % | Thistle Boar (level 7) | 0.1 % |
+| castle 7 | 1,300 | 3.7 % | 3.4 % | 0.3 % | 14.6 % | Thistle Boar (level 8) | 0.1 % |
+| castle 8 | 2,200 | 2.3 % | 2.1 % | 0.2 % | 10.2 % | Thistle Boar (level 9) | 0.0 % |
+| castle 9 | 3,300 | 1.7 % | 1.5 % | 0.1 % | 6.6 % | Thistle Boar (level 9) | 0.0 % |
 
 ## Caps
 

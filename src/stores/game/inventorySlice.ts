@@ -9,6 +9,9 @@ import { sellValueOf } from '@/lib/itemInstance';
 import { isAutoSold, junkFor, junkSale, withJunkMark } from '@/lib/loot';
 import { ITEM_CATALOG, RARITIES } from '@/catalog';
 import { hasEffects } from '@/catalog/buffs';
+import { monsterChestTierOf } from '@/catalog/items/chests';
+import { notify } from '@/lib/notices';
+import { openedChestText } from '@/lib/openedChestText';
 import type { EquipmentSlot } from '@/types/game';
 import { applyOfflineGrant } from '@/lib/offline/apply';
 import { limitCtx, ratesWithGear, type GameGet, type GameSet } from './base';
@@ -35,6 +38,23 @@ export const createInventorySlice = (set: GameSet, get: GameGet, inv: InventoryS
 					const state = get();
 					set(applyOfflineGrant(state, reply.shifted, limitCtx(state)).patch);
 				}
+			});
+			return true;
+		},
+
+		// Opens the monster chest in a bag slot (IDL-163): the server takes it from the bag, rolls what it holds from a sealed stream and pays it in the same step, so nothing is previewed; the browser applies the payment like an absence's pay and says what came
+		openChest: (bagIndex: number) => {
+			const slot = Number.isInteger(bagIndex) ? get().bag[bagIndex] : null;
+			const stack = slot ? stackOf(slot) : null;
+			if (!stack || !monsterChestTierOf(stack.id)) return false;
+			sendInventoryOp({ action: 'open', index: bagIndex }, (reply) => {
+				if (!reply?.ok || !reply.opened) {
+					notify(reply?.message ?? 'The chest could not be opened', 'error');
+					return;
+				}
+				const state = get();
+				set(applyOfflineGrant(state, reply.opened.grant, limitCtx(state)).patch);
+				notify(openedChestText(reply.opened));
 			});
 			return true;
 		},

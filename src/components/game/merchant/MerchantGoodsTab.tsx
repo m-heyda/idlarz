@@ -5,6 +5,7 @@ import { SelectBox } from '../../../../packages/design-system/src/components/com
 import { HintTooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { ITEM_CATALOG, RARITIES, RARITY_ORDER } from '@/catalog';
+import { monsterChestTierOf } from '@/catalog/items/chests';
 import { MERCHANT_GOODS, MERCHANT_SHOP_ITEMS } from '@/config/merchant';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { averageItemLevel, gearOf, slotQty } from '@/lib/inventory';
@@ -155,6 +156,8 @@ const MerchantGoodsTab: React.FC = () => {
 		let total = 0;
 		let stacks = 0;
 		for (const { slot, index } of entries) {
+			// a monster chest is opened, not swept away with the rest (IDL-163); sell one by hand if you want its gold
+			if ('id' in slot && monsterChestTierOf(slot.id)) continue;
 			const paid = sellItem(index, slotQty(slot));
 			if (paid > 0) {
 				total += paid;

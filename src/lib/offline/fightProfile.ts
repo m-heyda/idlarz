@@ -3,14 +3,14 @@ import { quickHealOf } from '@/catalog/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { autoUseUnlocked } from '@/lib/combat';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
-import { levelAtAge, monsterDef, monsterStats } from '@/lib/monsters';
+import { levelAtAge, monsterStats } from '@/lib/monsters';
 import { pushEvent, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatState, PlayerProfile } from '@/lib/offline/fightTypes';
 import { bagCountOf } from '@/lib/offline/inventory';
 import { recordEncounter } from '@/lib/offline/stats';
 import type { MonsterTicket } from '@/lib/offline/tickets';
 import type { Inventory } from '@/lib/offline/types';
-import { estimateWin, type MasteryEdge, type PotionStock } from '@/lib/offline/winChance';
+import { bossClockSec, estimateWin, type MasteryEdge, type PotionStock } from '@/lib/offline/winChance';
 import { masteryBonusesFor } from '@/lib/mastery';
 import type { Ledger } from '@/lib/offline/ledger';
 import type { MonsterType } from '@/types/game';
@@ -89,7 +89,8 @@ export const startFight = (ctx: FightCtx, t: number, target: { ticket: MonsterTi
 		monsterTimer: 0,
 		stunLeft: 0,
 		elapsed: 0,
-		timeLeftSec: monsterDef(target.type).timeLimitSec ?? null,
+		// a boss's clock, plus the seconds the gear's Boss Timer adds (IDL-176)
+		timeLeftSec: bossClockSec(target.type, profile) ?? null,
 		ord: c.ord,
 		seq: 0,
 		profile,

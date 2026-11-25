@@ -565,7 +565,7 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 								</Button>
 							</HoverTip>
 						</span>
-						<span className='ds-dim ds-bag-hint'>Dbl-click equips or drinks, right-click for more. Drag to rearrange.</span>
+						<span className='ds-dim ds-bag-hint'>Dbl-click equips, drinks or opens, right-click for more. Drag to rearrange.</span>
 					</div>
 				</>
 			)}

@@ -11,8 +11,9 @@ import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
 import { builderBusy, builderCount } from '@/lib/buildings';
 import { idolEconomy } from '@/lib/idolEconomy';
+import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
-import { gearEconomy, gearIncomePct, xpGainPct } from '@/lib/gearEconomy';
+import { gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import type { BiomeType, ClickInput, Resources } from '@/types/game';
 import { MAX_OWNED_TILES, hasOwnedNeighbour, inRange, isOwnedAt, ownedCount, setTile } from '@/utils/world';
 import { clickLimiter, findCastle, limitCtx, type GameGet, type GameSet } from './base';
@@ -23,7 +24,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
-		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
+		const cost = calculateTileCost(
+			owned,
+			effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+		);
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
@@ -36,7 +40,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 
 		const xpGain =
@@ -62,7 +66,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 			const owned = economyTiles(state.tiles, state.freeTiles);
 			const purchased = owned - 1;
-			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
+			const cost = calculateTileCost(
+				owned,
+				effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+			);
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
 			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased, Math.random, state.prestige.rebirths));
@@ -84,7 +91,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, idolEconomy(state.tiles, state.idolLevels).buildTimePct),
+					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, buildTimeCutPct(state.tiles, state.idolLevels, state.equipment)),
 				},
 			});
 			return true;

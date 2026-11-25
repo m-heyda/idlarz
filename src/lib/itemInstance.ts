@@ -35,15 +35,20 @@ export interface ResolvedItem {
 	/** The base stats at this level and quality (no affixes) */
 	baseStats: ItemStats;
 	affixes: ResolvedAffix[];
-	/** Base stats plus affixes: what wearing it gives */
+	/** The fixed perks of a legendary (empty for everything else), already inside `stats` */
+	perks: ItemStats;
+	/** Base stats plus affixes plus perks: what wearing it gives */
 	stats: ItemStats;
 	/** "Keen Iron Sword of Precision" */
 	name: string;
 }
 
-/** The value of one rolled affix at an item level. */
-export const affixValue = (affix: AffixDef, roll: number, itemLevel: number): number =>
-	roundStat(affix.stat, affixMagnitude(affix.stat, itemLevel) * affix.power * lerp(affix.roll[0], affix.roll[1], Math.min(100, Math.max(0, roll)) / 100));
+/** The value of one rolled affix at an item level, times the rarity's `affixMultiplier` (IDL-382; 1 when not given). */
+export const affixValue = (affix: AffixDef, roll: number, itemLevel: number, rarityMultiplier = 1): number =>
+	roundStat(
+		affix.stat,
+		affixMagnitude(affix.stat, itemLevel) * affix.power * lerp(affix.roll[0], affix.roll[1], Math.min(100, Math.max(0, roll)) / 100) * rarityMultiplier,
+	);
 
 /** Whether an affix can roll on an item of this level and rarity (tags, level, rank, enabled). */
 export const affixFits = (affix: AffixDef, item: ItemDef, itemLevel: number, rarity: RarityDef): boolean =>
@@ -52,12 +57,12 @@ export const affixFits = (affix: AffixDef, item: ItemDef, itemLevel: number, rar
 	rarity.order >= (affix.minRarityRank ?? 0) &&
 	(affix.tags.length === 0 || affix.tags.some((tag) => item.tags?.includes(tag)));
 
-/** The authored stats of a base at an item level, with the quality and rarity multipliers. An instance at the authored level and quality 50 returns the authored values exactly. */
+/** The authored stats of a base at an item level, with the quality and rarity multipliers (a named item keeps its authored numbers: no rarity multiplier). An instance at the authored level and quality 50 returns the authored values exactly. */
 export const baseStatsAt = (def: ItemDef, level: number, quality: number, rarity: RarityDef): ItemStats =>
 	scaleStats(
 		def.stats ?? {},
 		levelScale(level) / levelScale(def.minItemLevel ?? 1),
-		qualityMultiplier(quality) * rarity.statMultiplier,
+		qualityMultiplier(quality) * (def.generation === 'named' ? 1 : rarity.statMultiplier),
 		levelTail(level) / levelTail(def.minItemLevel ?? 1),
 	);
 
@@ -86,14 +91,21 @@ export const resolveItem = (instance: ItemInstance, data: LootData = LOOT_DATA):
 	for (const roll of instance.affixes) {
 		const affix = data.affixes[roll.id];
 		if (!affix) return null;
-		affixes.push({ id: affix.id, name: affix.name, position: affix.position, stat: affix.stat, value: affixValue(affix, roll.roll, instance.level) });
+		affixes.push({
+			id: affix.id,
+			name: affix.name,
+			position: affix.position,
+			stat: affix.stat,
+			value: affixValue(affix, roll.roll, instance.level, rarity.affixMultiplier),
+		});
 	}
-	const stats = sumBlocks([baseStats, ...affixes.map((a) => ({ [a.stat]: a.value }) as ItemStats)]);
+	const perks: ItemStats = def.perks ?? {};
+	const stats = sumBlocks([baseStats, ...affixes.map((a) => ({ [a.stat]: a.value }) as ItemStats), perks]);
 	const prefix = affixes.find((a) => a.position === 'prefix');
 	const suffix = affixes.find((a) => a.position === 'suffix');
 	const name = [prefix?.name, def.name, suffix?.name].filter(Boolean).join(' ');
 
-	const resolved: ResolvedItem = { instance, def, rarity, baseStats, affixes, stats, name };
+	const resolved: ResolvedItem = { instance, def, rarity, baseStats, affixes, perks, stats, name };
 	if (useCache) cache.set(instance, resolved);
 	return resolved;
 };

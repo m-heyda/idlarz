@@ -1,4 +1,5 @@
 // The loot pipeline's public face. Content lives in src/catalog (lootConfig, affixes, items); this folder is the logic.
+export * from './announce';
 export * from './autoSell';
 export * from './data';
 export * from './generate';

@@ -1,6 +1,7 @@
 import type { MerchantResourceKey } from '@/catalog/resources';
 import type { ActiveBuff } from '@/lib/buffs';
 import type { OfflineGrant } from '@/lib/offline/grant';
+import type { OpenedChest } from '@/lib/offline/openChest';
 import type { BagSlot, Drop, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 
 // What goes over the wire between /api/offline and the browser. Kept apart from service.ts (which pulls in node:crypto) so the client can import it.
@@ -47,7 +48,9 @@ export type InventoryOp =
 	| { action: 'sellResource'; resource: string; qty: number }
 	| { action: 'buyResource'; resource: string; qty: number }
 	/** Drinks one potion from the bag slot `index` (instant effects fill HP and mana, a buff is recorded with an end time) */
-	| { action: 'use'; index: number };
+	| { action: 'use'; index: number }
+	/** Opens the monster chest in the bag slot `index` (IDL-163): the chest leaves the bag and what it held is paid on the server (`lib/offline/openChest.ts`) */
+	| { action: 'open'; index: number };
 
 /**
  * The waiting chests and monsters as the client needs to see them. A monster is listed once the server has given it a tile: `x`, `y` and
@@ -178,6 +181,8 @@ export interface InventoryReply {
 	buffs?: ActiveBuff[];
 	/** A time-shift potion's payment (only on a `use` of one): the income of the hour and the timers it ran ahead; the browser applies it like an absence (`applyOfflineGrant`) without the rest */
 	shifted?: OfflineGrant;
+	/** What an opened monster chest held (only on an `open`): the income it paid as a grant with no time in it, the potion in the bag and the chest's name (IDL-163) */
+	opened?: OpenedChest;
 }
 
 /**

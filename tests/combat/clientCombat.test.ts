@@ -659,3 +659,31 @@ test('auto-use cannot be switched before the first rebirth: nothing is sent and 
 		globalThis.fetch = realFetch;
 	}
 });
+
+// ---------------------------------------------------------------------------------------------------- notices (IDL-300, IDL-382)
+
+test('three defeats in a row: the server pauses Auto-battle, the browser shows it off and says so (IDL-300)', () => {
+	syncedGame();
+	useUiStore.setState({ toasts: [] });
+	api().applyFightReply(reply(view({ eventNo: 1, autoBattle: false, events: [event(1, 'paused')] })));
+	assert.equal(api().combat.autoBattle, false, 'the switch shows off');
+	assert.ok(
+		useUiStore.getState().toasts.some((t) => /Auto-battle paused/.test(t.text)),
+		'and a notice says why',
+	);
+	// a later answer from the server keeps it off
+	api().applyFightReply(reply(view({ eventNo: 1, autoBattle: false })));
+	assert.equal(api().combat.autoBattle, false);
+});
+
+test('an epic or legendary piece in the bag raises its own notice, a rare one and potions do not (IDL-382)', () => {
+	syncedGame();
+	useUiStore.setState({ toasts: [] });
+	const piece = (rarity: string): Drop => ({ kind: 'gear', item: { base: 'iron_sword', level: 20, rarity, quality: 50, affixes: [] } });
+	const { after, ev } = serverKill([piece('rare'), piece('epic'), piece('legendary'), { kind: 'consumable', id: 'potion_minor', qty: 1 }]);
+	api().applyFightReply(reply(view({ eventNo: 1, events: [ev] }), { inv: after }));
+	const texts = useUiStore.getState().toasts.map((t) => `${t.tone}: ${t.text}`);
+	assert.equal(texts.length, 2, texts.join(' | '));
+	assert.match(texts[0], /^legendary: Legendary drop: /);
+	assert.match(texts[1], /^epic: Epic drop: /);
+});

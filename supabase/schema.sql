@@ -9,7 +9,8 @@ create table public.profiles (
   player_class text not null,
   created_at timestamptz not null default now(),
   constraint character_name_len check (char_length(character_name) between 1 and 9),
-  constraint player_class_known check (player_class in ('warrior', 'paladin', 'ranger', 'mage'))
+  -- the hero list lives in code (`PLAYER_CLASSES`); the database only checks the shape, so a new class needs no SQL (migration player_class_open, IDL-280)
+  constraint player_class_shape check (player_class ~ '^[a-z][a-z_]{0,31}$')
 );
 alter table public.profiles enable row level security;
 revoke all on table public.profiles from anon, authenticated, public;

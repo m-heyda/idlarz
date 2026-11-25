@@ -45,6 +45,12 @@ export const STAT_DEFS = {
 	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
+	// the four combat stats of IDL-176: each gear total is capped where it is read (STAT_RULES), `lib/combat.ts` and the fight engine apply them
+	atkSpeed: { label: 'Attack Speed', short: 'Atk Speed', unit: '%', decimals: 1, levelShare: 0.3 }, // % more attacks per second, on top of the weapon's speed and Dexterity (rings; capped by STAT_RULES.atkSpeedGearCap)
+	critDamage: { label: 'Crit Damage', unit: '%', levelShare: 0.3 }, // % extra on the x2 crit and x5 super crit multipliers, added to the attributes' (capped by STAT_RULES.critDamageGearCap)
+	armorPen: { label: 'Armor Penetration', short: 'Armor Pen', unit: '%', levelShare: 0.3 }, // % of the monster's armor ignored by every hit (capped by STAT_RULES.armorPenCap)
+	thorns: { label: 'Thorns', unit: '%', levelShare: 0.3 }, // % of the damage a monster's hit does to you that it takes back (capped by STAT_RULES.thornsCap)
+	healOnKill: { label: 'Heal on Kill', short: 'Kill Heal', unit: '%', decimals: 1, levelShare: 0.3 }, // % of your max HP restored when a monster dies (capped by STAT_RULES.healOnKillCap)
 	// the five attributes as gear stats: they add to the points the player spent while the item is worn (lib/gearAttributes.ts); Intelligence is the crafting stat (quality of crafted gear)
 	strength: { label: 'Strength', integer: true, levelShare: 0.5 },
 	dexterity: { label: 'Dexterity', integer: true, levelShare: 0.5 },
@@ -67,6 +73,15 @@ export const STAT_DEFS = {
 	offlineEff: { label: 'Away Income', unit: '%', setOnly: true }, // percentage points added to the share of the income paid while away
 	offlineCapHours: { label: 'Away Time', unit: 'h', setOnly: true }, // hours added to the longest away time that is paid
 	clickPct: { label: 'Click Gold', unit: '%', setOnly: true }, // % more gold per map click
+	burnPct: { label: 'Burn', unit: '%', setOnly: true }, // a critical hit sets the monster alight: it takes this % of that hit per second for 3 s (a re-crit refreshes, never stacks; `fightStep`)
+	potionRefundPct: { label: 'Potion Refund', unit: '%', setOnly: true }, // % chance that a potion drunk in a fight is not used up (rolled from the fight's sealed stream)
+	buildTimePct: { label: 'Build Time', unit: '%', setOnly: true }, // % off every castle, building and Idol timer, in the same bucket as the Dwarf Statue (`buildTimeReduction`, together at most the 60 % cap with the Ember upgrades)
+	// the three economy stats of IDL-176: fixed base stats of the ladder's gear from G4 on (hands and chest, cape and neck, head and shoulder), never random affixes; the total of each is capped where it is read (STAT_RULES)
+	buildSpeed: { label: 'Build Speed', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // % off every castle, building and Idol timer, in the same bucket as the Dwarf Statue and a legendary's build time (`gearBuildTimePct`; the gear's share counts up to STAT_RULES.buildSpeedCap)
+	farmYield: { label: 'Farm Yield', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // % more of every farm product, in the same bucket as the Harvest Scarecrow (`gearIncome`, `calculateResourceBreakdown`; the gear's share counts up to STAT_RULES.farmYieldCap)
+	tileDiscount: { label: 'Tile Discount', unit: '%', decimals: 1, setOnly: true, levelShare: 0 }, // percentage points off the price of a tile, added to Charisma and Thrift inside the tile discount cap (`effectiveTileDiscount`; the gear's share counts up to STAT_RULES.tileDiscountGearCap)
+	bossTimer: { label: 'Boss Timer', short: 'Boss Time', unit: ' s', decimals: 1, setOnly: true, levelShare: 0 }, // seconds added to the clock of every boss fight (`playerProfile`; counts up to STAT_RULES.bossTimerCapSec)
+	chestSpeedPct: { label: 'Chest Speed', unit: '%', setOnly: true }, // % faster chests: the chest interval is divided by 1 + this (with the class and Idol chest speed, `chestIntervalSec`)
 } as const satisfies Record<string, StatDef>;
 
 export type StatKey = keyof typeof STAT_DEFS;
@@ -87,6 +102,11 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	atkSpeed: 'combat',
+	critDamage: 'combat',
+	armorPen: 'combat',
+	thorns: 'combat',
+	healOnKill: 'combat',
 	strength: 'combat',
 	dexterity: 'combat',
 	vitality: 'combat',
@@ -100,6 +120,8 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	armor: 'combat',
 	maxHp: 'combat',
 	maxHpPct: 'combat',
+	burnPct: 'combat',
+	potionRefundPct: 'combat',
 	regen: 'combat',
 	dodge: 'combat',
 	maxMana: 'combat',
@@ -113,6 +135,12 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	offlineEff: 'economy',
 	offlineCapHours: 'economy',
 	clickPct: 'economy',
+	buildTimePct: 'economy',
+	buildSpeed: 'economy',
+	farmYield: 'economy',
+	tileDiscount: 'economy',
+	bossTimer: 'combat',
+	chestSpeedPct: 'economy',
 };
 
 type SetOnlyKey = { [K in StatKey]: (typeof STAT_DEFS)[K] extends { setOnly: true } ? K : never }[StatKey];
@@ -140,6 +168,11 @@ export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, nu
 	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
 	spellPower: [4, 7, 10, 14, 18],
 	lifeLeech: [0.5, 1, 1.5, 2, 3],
+	atkSpeed: [1, 1.5, 2.5, 3.5, 5],
+	critDamage: [3, 5, 8, 12, 16],
+	armorPen: [2, 3, 5, 7, 10],
+	thorns: [2, 4, 6, 9, 12],
+	healOnKill: [0.3, 0.5, 0.8, 1.2, 1.6],
 	strength: [2, 3, 4, 5, 7],
 	dexterity: [2, 3, 4, 5, 7],
 	intelligence: [2, 3, 4, 5, 7],
@@ -173,6 +206,17 @@ const POWER_PER_LEVEL = 0.07;
 const POWER_KNEE = 55;
 /** The compound growth per item level above {@link POWER_KNEE}. */
 const POWER_GROWTH_ABOVE_KNEE = 1.07;
+
+/**
+ * The tier of an item level, shown on the item card as "Tier II": I for levels 1-19, II for 20-39, III for 40-59, IV for 60-79 and V for 80 and up. A label for reading the level curve, not a stat (IDL-45).
+ *
+ * @category Loot/Items
+ * @order 4
+ */
+export const itemTierLabel = (itemLevel: number): 'I' | 'II' | 'III' | 'IV' | 'V' => {
+	const level = Math.max(1, Math.round(itemLevel));
+	return level >= 80 ? 'V' : level >= 60 ? 'IV' : level >= 40 ? 'III' : level >= 20 ? 'II' : 'I';
+};
 
 export const clampItemLevel = (level: number): number => Math.min(MAX_ITEM_LEVEL, Math.max(1, Math.round(level)));
 

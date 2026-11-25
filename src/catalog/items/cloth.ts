@@ -30,7 +30,7 @@ export const CLOTH_ITEMS: ItemDef[] = [
 		'Apprentice Tome',
 		'offHand',
 		'common',
-		{ maxHp: 6, regen: 0.3, maxMana: baseStat('maxMana', 1), manaRegen: baseStat('manaRegen', 1) * 1.5 },
+		{ maxHp: 6, regen: 0.3, maxMana: baseStat('maxMana', 1), manaRegen: 0.3 },
 		{ ...cloth, weaponType: 'tome', description: 'Half the pages are doodles.' },
 	),
 	gear('cloth_hat', 'Apprentice Hat', 'head', 'common', { maxHp: 4, luck: 1, maxMana: 4 }, { ...cloth, description: 'Pointy, purple and slightly too big.' }),

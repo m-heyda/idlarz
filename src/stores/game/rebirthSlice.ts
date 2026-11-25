@@ -3,11 +3,11 @@
 
 import { EMBER_DISABLED, EMBER_UPGRADES, type EmberUpgradeId } from '@/config/rebirth';
 import { PACKRAT_IDS } from '@/config/merchant';
-import { calculateCombatStats, calculateLevel, totalStatPoints } from '@/utils/game/character';
+import { calculateCombatStats, calculateLevel, rebirthPoints, totalStatPoints } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { rebirthStatus, emberUpgradeCost } from '@/utils/game/rebirth';
 import { maxHp, maxMana } from '@/lib/combat';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { rebirthKit } from '@/lib/inventory';
 import { placeKept } from '@/lib/rebirthKeep';
 import type { ItemInstance, PrestigeState } from '@/types/game';
@@ -55,7 +55,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		const merchantUpgrades: Record<string, number> = {};
 		for (const id of PACKRAT_IDS) if (state.merchantUpgrades[id]) merchantUpgrades[id] = state.merchantUpgrades[id] as number;
 		// respec: every attribute goes back to its start and all the points the level has earned are free to spend again
-		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) };
+		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) + rebirthPoints(prestige.rebirths) };
 		Object.assign(characterStats, calculateCombatStats(characterStats));
 		// gear is wiped: the starter kit on, the starter bag, no pity (the server does the same to its inventory when the rebirth reaches it)
 		const kit = rebirthKit(merchantUpgrades, prestige, 0, state.playerClass); // Deep Pockets is an Ember upgrade: it survives too
@@ -74,7 +74,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				fresh.farmUpgrades,
 				merchantUpgrades,
-				gearIncomePct(kit.equipment),
+				gearIncome(kit.equipment),
 			),
 			equipment: kit.equipment,
 			bag: placeKept(kit.bag, kept),
@@ -128,7 +128,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 							prestige,
 							state.farmUpgrades,
 							state.merchantUpgrades,
-							gearIncomePct(state.equipment),
+							gearIncome(state.equipment),
 						),
 					}
 				: {}),
@@ -150,7 +150,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				state.farmUpgrades,
 				state.merchantUpgrades,
-				gearIncomePct(state.equipment),
+				gearIncome(state.equipment),
 			),
 		});
 	},

@@ -58,7 +58,7 @@ import AchievementNotification from '@/components/game/overlays/AchievementNotif
 import FloatingText from '@/components/game/FloatingText';
 import ClassPickerDialog from '@/components/game/ClassPickerDialog';
 import AvatarDialog from '@/components/game/AvatarDialog';
-import BadgeDialog from '@/components/game/BadgeDialog';
+import BadgeDialog, { useBadgeChoice } from '@/components/game/BadgeDialog';
 import SaveMenuDialog from '@/components/game/overlays/SaveMenuDialog';
 import SettingsDialog from '@/components/game/overlays/SettingsDialog';
 import RebirthDialog from '@/components/game/overlays/RebirthDialog';
@@ -128,6 +128,8 @@ export default function GameApp({ profile, userId, guest = false }: GameAppProps
 	const toggleSaveMenu = useUiStore((state) => state.toggleSaveMenu);
 	const loadSettings = useSettingsStore((state) => state.load);
 	useEffect(() => loadSettings(), [loadSettings]);
+	// the badge and title the account shows are loaded with the game, not on the first open of the Character window (IDL-301: the tester badge used to appear late)
+	useBadgeChoice();
 	const loadPrefs = useUiStore((state) => state.loadPrefs);
 	useEffect(() => loadPrefs(), [loadPrefs]);
 	const loadWindowPositions = useWindowStore((state) => state.loadPositions);

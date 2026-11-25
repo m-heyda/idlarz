@@ -19,9 +19,9 @@ export const SPAWN_LIMIT = {
  * - **Room**: monsters and chests together never exceed 30% of the free tiles (minimum 2), and at most 40 tickets wait in all, chests, monsters and the boss counted together
  *   (`ticketCap` on the server, which estimates free land from the owned-tile count; `spawnCap` in the browser, which counts it from the map).
  * - **Where** (`CHEST.placement`, {@link chestSpots}): every eligible owned tile weighs 1, +3 if it touches unowned land, +1 per 4 tiles of Chebyshev distance from the castle, x0.3 if another chest is within 2 tiles.
- * - **What is inside** ({@link rewardWeights}, {@link rollChestLoot}): relative weights gold 50, bundle 25, xp 12, boost 10, item 8 (`CHEST.rewards`). Each Luck point moves 1% of the gold weight (at most 60%) into boost (80%) and item (20%).
+ * - **What is inside** ({@link rewardWeights}, {@link rollChestLoot}): relative weights gold 50, bundle 40, xp 12, boost 10, item 8 (`CHEST.rewards`). Each Luck point moves 1% of the gold weight (at most 60%) into boost (80%) and item (20%).
  *   - gold: `gold/s x U(10..60 min) x (1 + 0.005 x Luck) x (1 + Gold Find %)`; boost is the same x1.5.
- *   - bundle: 1-2 of wood/stone/coal/food, each 10-30 min of its income, at least 25.
+ *   - bundle: 1-2 of wood/stone/coal/food, each 20-45 min of its income, at least 25 (bundles were weight 25 and 10-30 min until IDL-197, to make picking chests up worth more than waiting).
  *   - xp: 10-30 min of XP income, at least 60.
  *   - item: one roll of the `chest` loot source (82% gear, else a potion; 1.9% a legendary weapon instead), see {@link generateLoot}.
  *   - on top of any chest, a gem roll: `min(15%, 3% + 0.06% x Luck)`, 5-50 gems skewed low ({@link gemChance}).
@@ -46,12 +46,12 @@ export const CHEST = {
 	},
 
 	// What a chest holds: relative chances (they need not sum to 100)
-	rewards: { gold: 50, bundle: 25, xp: 12, boost: 10, item: 8 } as Record<'gold' | 'bundle' | 'xp' | 'boost' | 'item', number>,
+	rewards: { gold: 50, bundle: 40, xp: 12, boost: 10, item: 8 } as Record<'gold' | 'bundle' | 'xp' | 'boost' | 'item', number>,
 	boostMultiplier: 1.5, // the "lucky chest": gold x this
 	bundle: {
 		resources: ['wood', 'stone', 'coal', 'food'] as ('wood' | 'stone' | 'coal' | 'food')[],
 		count: [1, 2] as [number, number], // how many of them
-		minutes: [10, 30] as [number, number], // of that resource's income each
+		minutes: [20, 45] as [number, number], // of that resource's income each
 		floor: 25, // at least this much, so a slow resource still pays something
 	},
 	xp: { minutes: [10, 30] as [number, number], floor: 60 },

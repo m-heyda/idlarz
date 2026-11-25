@@ -2,6 +2,7 @@
 //   npm run loot-sim                 print the tables (100,000 kills per row)
 //   npm run loot-sim -- --md         also write docs/generated/loot-sim.md
 //   npm run loot-sim -- --kills 20000 --seed 7
+import { MONSTER_CHEST, MONSTER_CHEST_TIERS } from '../src/config/monsterChests';
 import { writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import {
@@ -234,6 +235,30 @@ for (const row of biomeRows) {
 }
 
 out();
+out('## First epic (IDL-382)');
+out();
+out(
+	'How many kills (normal monsters) or fights (bosses) until the first epic or better piece drops, with the pity counters carried between kills: normal monsters have epic bad-luck protection (`LootProfile.rarityPity`: +5 % epic weight per eligible roll without one, up to x3; a hit starts over), bosses do not need it. The monster rows are the numbers to watch when an epic weight or the drop rarities of a grade change.',
+);
+out();
+out('| Source | Level | Kills until an epic: mean | p10 | p50 | p90 |');
+out('|---|---:|---:|---:|---:|---:|');
+const isEpic = (drops: ReturnType<typeof generateLoot>['drops']) =>
+	drops.some((d) => d.kind === 'gear' && (LOOT_DATA.rarities[d.item.rarity]?.order ?? 0) >= LOOT_DATA.rarities.epic.order);
+for (const [sourceId, level] of [
+	['monster', 20],
+	['monster', 30],
+	['monster', 40],
+	['monster', 50],
+	['monster', 70],
+	['boss', 25],
+	['boss', 45],
+	['boss', 70],
+] as const) {
+	const k = summary(killsUntil(sourceId, level, RUNS, LOOT_DATA, SEED, isEpic));
+	out(`| ${sourceId} | ${level} | ${k.mean.toFixed(1)} | ${k.p10} | ${k.p50} | ${k.p90} |`);
+}
+out();
 out('## What Luck does');
 out();
 out(
@@ -287,6 +312,27 @@ for (const id of SAMPLE) {
 		return `${level === l ? '' : '(' + level + ') '}${baseStatsAt(def, level, 50, RARITIES.common)[primary]}`;
 	});
 	out(`| ${def.name} (${primary}) | ${cells.join(' | ')} |`);
+}
+
+out();
+out('## Monster chests (IDL-163)');
+out();
+out(
+	`A normal kill drops the chest of its biome's tier with a ${(MONSTER_CHEST.dropChance * 100).toFixed(0)} % chance, a boss always a Royal chest, a golden monster always an Arcane chest. An opened chest pays minutes of the player's own income (gold, one resource, or XP) and half the time a potion; no gems, no stat gifts. The average chest of every tier must be worth at most ${(MONSTER_CHEST.maxHourlyShare * 100).toFixed(0)} % of an hour of income (\`tests/economy/monsterChestBudget.test.ts\`).`,
+);
+out();
+out('| Tier | Drops from | Minutes of income | Average | Share of an hour | Cap |');
+out('|---|---|---|---:|---:|---|');
+for (const tier of MONSTER_CHEST_TIERS) {
+	const def = MONSTER_CHEST.tiers[tier];
+	const biomes = Object.entries(MONSTER_CHEST.tierOfBiome)
+		.filter(([, t]) => t === tier)
+		.map(([biome]) => biome);
+	const from = tier === 'royal' ? 'every boss' : tier === 'arcane' ? 'every golden monster' : biomes.join(', ');
+	const average = (def.minutes[0] + def.minutes[1]) / 2;
+	out(
+		`| ${def.label} | ${from} | ${def.minutes[0]}-${def.minutes[1]} | ${average.toFixed(2)} min | ${((average / 60) * 100).toFixed(1)}% | ${average / 60 <= MONSTER_CHEST.maxHourlyShare + 1e-12 ? 'ok' : '**over**'} |`,
+	);
 }
 
 out();

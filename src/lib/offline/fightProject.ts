@@ -36,7 +36,7 @@ export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): Fi
 	const sim: CombatState = {
 		...c,
 		cd: { ...c.cd },
-		fight: { ...f, ...(f.poison ? { poison: { ...f.poison } } : {}) },
+		fight: { ...f, ...(f.poison ? { poison: { ...f.poison } } : {}), ...(f.burn ? { burn: { ...f.burn } } : {}) },
 		queue: [...c.queue],
 		retryAt: { ...c.retryAt },
 		log: [],

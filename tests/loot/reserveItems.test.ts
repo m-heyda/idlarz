@@ -19,7 +19,7 @@ const gradeOf = (def: ItemDef) => def.tags?.find((t) => t.startsWith('grade:'))?
 /** A reserve item is live when it is a base item of grade G1-G3; named ones (legendary folder) and G4+ stay disabled */
 const isLive = (def: ItemDef) => LIVE_GRADES.includes(gradeOf(def) as never);
 const liveIds = new Set(RESERVE_ITEMS.filter(isLive).map((d) => d.id));
-const reserveIds = new Set(RESERVE_ITEMS.filter((d) => !isLive(d)).map((d) => d.id));
+const reserveIds = new Set(RESERVE_ITEMS.filter((d) => !isLive(d) && d.enabled === false).map((d) => d.id));
 
 test('reserve items are all in the catalog, enabled only at the live grades (G1-G3), and each has its 64 px art registered', () => {
 	assert.ok(RESERVE_ITEMS.length >= 90, 'the reuse art pass is in the catalog');
@@ -27,8 +27,8 @@ test('reserve items are all in the catalog, enabled only at the live grades (G1-
 		assert.equal(ITEM_CATALOG[def.id], def, `${def.id} resolves`);
 		assert.equal(
 			def.enabled !== false,
-			isLive(def) || CRAFT_ONLY_GRADES.includes(gradeOf(def) as never),
-			`${def.id} is enabled only if graded G1-G6 (or craft-only G7, G8)`,
+			isLive(def) || CRAFT_ONLY_GRADES.includes(gradeOf(def) as never) || !!def.perks,
+			`${def.id} is enabled only if graded G1-G6 (or craft-only G7, G8) or a legendary with a live perk (IDL-146)`,
 		);
 		assert.equal(def.icon, `art_${def.id}`, `${def.id} uses its own art`);
 		assert.ok(isItemArt(def.icon!), `${def.id} icon is item art`);

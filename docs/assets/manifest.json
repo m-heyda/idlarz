@@ -1773,7 +1773,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/reapers_crescent.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "axe",
 		"source": "itemIcons registry",
@@ -1790,7 +1790,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/axe",
 		"src": "/pixel/items/legendary/tidecaller_axe.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "axe",
 		"source": "itemIcons registry",
@@ -2023,7 +2023,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/bow",
 		"src": "/pixel/items/legendary/cinderflight_bow.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "bow",
 		"source": "itemIcons registry",
@@ -3177,7 +3177,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/maul",
 		"src": "/pixel/items/legendary/runeforged_titanhammer.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "maul",
 		"source": "itemIcons registry",
@@ -3463,7 +3463,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/cindercrescent_glaive.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "spear",
 		"source": "itemIcons registry",
@@ -3480,7 +3480,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/dawnbringer_trident.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "spear",
 		"source": "itemIcons registry",
@@ -3514,7 +3514,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/spear",
 		"src": "/pixel/items/legendary/stormtrident.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "spear",
 		"source": "itemIcons registry",
@@ -3729,7 +3729,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/staff",
 		"src": "/pixel/items/legendary/amethyst_spire.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "staff",
 		"source": "itemIcons registry",
@@ -4012,7 +4012,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/nightfall_edge.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "sword",
 		"source": "itemIcons registry",
@@ -4046,7 +4046,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/sword",
 		"src": "/pixel/items/legendary/voidrune_blade.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "sword",
 		"source": "itemIcons registry",
@@ -4365,7 +4365,7 @@
 		"category": "weapons",
 		"subcategory": "mainHand/wand",
 		"src": "/pixel/items/legendary/frostbloom_fan.png",
-		"status": "planned",
+		"status": "used",
 		"slot": "mainHand",
 		"weaponType": "wand",
 		"source": "itemIcons registry",
@@ -17882,6 +17882,7 @@
 	},
 	{
 		"usedBy": [
+			"src/catalog/items/chests.ts",
 			"src/components/game/MapHighlightBar.tsx"
 		],
 		"name": "bonus_chest",
@@ -18001,12 +18002,14 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/monsterChests.ts"
+		],
 		"name": "chest_map",
 		"category": "ui",
 		"subcategory": "chest",
 		"src": "/pixel/icons/chest_map.png",
-		"status": "unused",
+		"status": "used",
 		"source": "public/pixel/icons",
 		"size": [
 			48,
@@ -18015,7 +18018,8 @@
 	},
 	{
 		"usedBy": [
-			"src/components/game/Tile.tsx"
+			"src/components/game/Tile.tsx",
+			"src/config/monsterChests.ts"
 		],
 		"name": "chest_map_anim",
 		"category": "ui",

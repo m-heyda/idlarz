@@ -1,7 +1,7 @@
 import { CASTLE_UPGRADE, CASTLE_X, CASTLE_Y } from '@/config/castle';
 import { RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { maxHp, maxMana } from '@/lib/combat';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import type { LimitContext } from '@/lib/limits';
 import { afterAbsence } from '@/lib/merchant';
 import { completeUpgrade } from '@/lib/buildings';
@@ -82,7 +82,7 @@ export const applyOfflineGrant = (
 					state.prestige,
 					state.farmUpgrades,
 					state.merchantUpgrades,
-					gearIncomePct(state.equipment),
+					gearIncome(state.equipment),
 				);
 				castleReached = castleUpgrade.toLevel;
 			}
@@ -123,7 +123,7 @@ export const applyOfflineGrant = (
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncomePct(state.equipment),
+			gearIncome(state.equipment),
 		);
 	}
 
