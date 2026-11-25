@@ -1,7 +1,15 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRateLimiter, clientIp } from '../../src/lib/rateLimit';
-import { callbackNext, resetRedirectTo, siteOrigin } from '../../src/lib/authCallback';
+import {
+	callbackNext,
+	hasRecoveryCookie,
+	RECOVERY_COOKIE,
+	RECOVERY_MAX_AGE_SEC,
+	recoveryCookieOptions,
+	resetRedirectTo,
+	siteOrigin,
+} from '../../src/lib/authCallback';
 import { checkEmailOnly, checkNewPassword } from '../../src/lib/authValidation';
 import { handleResetRequest, liveLimiters, RESET_MESSAGE, type ResetAuth, type ResetDeps } from '../../src/lib/authReset';
 
@@ -146,4 +154,19 @@ test('the landing page owes a notice for an expired link and takes the parameter
 	assert.equal(landingNoticeOf('?next=%2Fplay'), null);
 	assert.equal(landingNoticeOf('?reset=ok'), null);
 	assert.equal(landingNoticeOf(''), null);
+});
+
+// ---- the recovery cookie (IDL-384) -------------------------------------------------------------------------------
+
+test('only a request carrying the recovery cookie counts as a recovery session', () => {
+	assert.equal(hasRecoveryCookie(`${RECOVERY_COOKIE}=1`), true);
+	assert.equal(hasRecoveryCookie(`sb-token=abc; ${RECOVERY_COOKIE}=1; other=2`), true);
+	for (const bad of [null, undefined, '', 'sb-token=abc', `${RECOVERY_COOKIE}=0`, `x${RECOVERY_COOKIE}=1`, `${RECOVERY_COOKIE}x=1`])
+		assert.equal(hasRecoveryCookie(bad), false, String(bad));
+});
+
+test('the recovery cookie is script-proof, same-site and short-lived', () => {
+	assert.deepEqual(recoveryCookieOptions(true), { httpOnly: true, sameSite: 'lax', secure: true, path: '/', maxAge: RECOVERY_MAX_AGE_SEC });
+	assert.equal(recoveryCookieOptions(false).secure, false);
+	assert.equal(RECOVERY_MAX_AGE_SEC, 900);
 });

@@ -7,6 +7,18 @@ export const CALLBACK_PATH = '/auth/callback';
 /** Where the callback sends a link that could not be used (expired, used twice, wrong browser). */
 export const RESET_EXPIRED_PATH = '/?reset=expired';
 
+/** The cookie that marks a recovery session (IDL-384): set by `/auth/callback` when it trades the code of the emailed reset link, required by `POST /api/auth/password`. */
+export const RECOVERY_COOKIE = 'idl_recovery';
+/** How long a recovery session may change the password after the emailed link was opened: 15 minutes. */
+export const RECOVERY_MAX_AGE_SEC = 15 * 60;
+
+/** The options of the recovery cookie: not readable by scripts, not sent along with a cross-site request, only over https where the site is served over https. */
+export const recoveryCookieOptions = (secure: boolean) => ({ httpOnly: true, sameSite: 'lax' as const, secure, path: '/', maxAge: RECOVERY_MAX_AGE_SEC });
+
+/** Whether the request's `Cookie` header carries the recovery cookie. */
+export const hasRecoveryCookie = (cookieHeader: string | null | undefined): boolean =>
+	(cookieHeader ?? '').split(';').some((part) => part.trim() === `${RECOVERY_COOKIE}=1`);
+
 /** What the landing page says when the emailed link could not be used (IDL-301) */
 export const RESET_EXPIRED_MESSAGE = 'That reset link has expired or was already used. Ask for a new one with "Forgot password".';
 
