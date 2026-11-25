@@ -9,6 +9,7 @@ import { claimOffline, type ServiceDeps } from '../../src/lib/offline/service';
 import { fightStep, redeemChest, syncTickets, type Online } from '../../src/lib/offline/online';
 import { castleDistance } from '../../src/lib/distance';
 import { MONSTERS } from '../../src/config/combatConfig';
+import { mulberry32 } from '../../src/lib/rng';
 import type { FightReply } from '../../src/lib/offline/types';
 
 const memory = () => {
@@ -37,9 +38,18 @@ const memory = () => {
 	return { saves, ledgerRepo, ledgers, deps };
 };
 
+/** The map these tests play on is the same every run: the start ring and the bought tiles come from `Math.random`, and on an unlucky lake-heavy map the 60 tiles hold fewer than five chest spots (a CI flake, 1 run in 25) */
+const MAP_SEED = 0x5eed60;
+
 const game = (): PersistedGame => {
-	api().resetGame();
-	growTo(60);
+	const realRandom = Math.random;
+	Math.random = mulberry32(MAP_SEED);
+	try {
+		api().resetGame();
+		growTo(60);
+	} finally {
+		Math.random = realRandom;
+	}
 	api().tick(1000);
 	store.setState({ playSeconds: 1000, resources: { ...api().resources, gold: 100, wood: 0, stone: 0, coal: 0, food: 0, hide: 0 } } as never);
 	return structuredClone(pickPersisted(api()));

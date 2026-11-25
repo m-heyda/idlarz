@@ -24,6 +24,12 @@ test('Slot passes native button props through and marks rarity, empty and equipp
 	assert.doesNotMatch(html(h(Slot, { rarity: 'common', count: 1 })), /data-rarity|ds-slot-count/);
 });
 
+test('Slot: epic, legendary and unique rims breathe, lower rarities do not (IDL-147)', () => {
+	for (const rarity of ['epic', 'legendary', 'unique'] as const) assert.match(html(h(Slot, { icon: '/x.png', rarity })), /data-pulse="true"/, rarity);
+	for (const rarity of ['common', 'uncommon', 'rare'] as const) assert.doesNotMatch(html(h(Slot, { icon: '/x.png', rarity })), /data-pulse/, rarity);
+	assert.doesNotMatch(html(h(Slot, { icon: '/x.png' })), /data-pulse/, 'an empty or unrated slot is still');
+});
+
 test('Tabs mark the active item, a badge and a disabled one', () => {
 	const out = html(
 		h(Tabs, {
