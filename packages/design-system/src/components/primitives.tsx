@@ -199,8 +199,11 @@ export interface SlotProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonEle
 	sub?: string;
 	className?: string;
 }
+/** The rarities whose rim breathes (the same ones as `glow.pulse` in the game's `RARITIES`): epic, legendary and the unique look */
+const PULSING: ReadonlySet<Rarity> = new Set<Rarity>(['epic', 'legendary', 'unique']);
+
 /**
- * An item or equipment slot. Rarity draws a coloured glowing rim; `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
+ * An item or equipment slot. Rarity draws a coloured glowing rim (epic and better breathe, `data-pulse`, still with reduced motion); `empty` dims the slot's silhouette. It is a plain button: every native attribute and handler (onClick, onDoubleClick,
  * onContextMenu, draggable, onDragStart, onDrop, aria-*, data-*) passes through, so the game keeps its own click, drag and drop logic.
  */
 export const Slot: React.FC<SlotProps> = ({
@@ -227,6 +230,7 @@ export const Slot: React.FC<SlotProps> = ({
 			{...rest}
 			className={cx('ds-slot', large && 'ds-slot-lg', className)}
 			data-rarity={glow ? rarity : undefined}
+			data-pulse={rarity && PULSING.has(rarity) ? 'true' : undefined}
 			style={glow ? ({ '--ds-rarity': `var(--ds-r-${rarity})`, ...style } as React.CSSProperties) : style}
 			data-empty={empty}
 			data-locked={locked}
