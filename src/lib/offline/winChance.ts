@@ -1,5 +1,5 @@
 import { COMBAT } from '@/config/combatConfig';
-import { armorReduction, mitigate } from '@/lib/combat';
+import { armorAfterPen, armorReduction, mitigate } from '@/lib/combat';
 import { modifiersOf, monsterDef, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { MonsterType } from '@/types/game';
@@ -39,7 +39,7 @@ const expectedHit = (p: PlayerProfile, armor: number): number => {
 	const crit = Math.min(1, Math.max(0, p.crit));
 	const superCrit = Math.min(1, Math.max(0, p.superCrit));
 	const multiplier = 1 - crit + crit * ((1 - superCrit) * COMBAT.crit.mult + superCrit * COMBAT.crit.superMult) * p.critExtra;
-	return Math.max(1, p.hit * multiplier * (1 - armorReduction(armor)));
+	return Math.max(1, p.hit * multiplier * (1 - armorReduction(armorAfterPen(armor, p.armorPenPct))));
 };
 
 /** Expected damage per second the monster does to this player (dodges, crits and armor in). */

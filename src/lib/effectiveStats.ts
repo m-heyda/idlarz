@@ -2,19 +2,22 @@ import { COMBAT } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import {
 	armorOf,
+	armorPenPercent,
 	armorReduction as armorReductionOf,
 	attacksPerSecond,
+	critExtraOf,
 	critOdds,
 	damagePerHit,
 	dodgeChance,
+	healOnKillPercent,
 	lifeLeechPercent,
 	manaRegenPerSec,
 	maxHp,
 	maxMana,
+	thornsPercent,
 } from '@/lib/combat';
 import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
-import { critDamagePercent } from '@/lib/statBonuses';
-import { attributesWithGear, withGearAttributes } from '@/lib/gearAttributes';
+import { withGearAttributes } from '@/lib/gearAttributes';
 import { classPassives, withClassBonus } from '@/lib/classPassives';
 import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
@@ -48,7 +51,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const bonus = withClassBonus(merchantCombat(merchantUpgrades, prestige), playerClass);
 	const passives = classPassives(playerClass);
 	const odds = critOdds(characterStats, equipment, bonus);
-	const critExtra = 1 + critDamagePercent(attributesWithGear(characterStats, equipment)) / 100;
+	const critExtra = critExtraOf(characterStats, equipment);
 	const armor = armorOf(equipment, characterStats, playerClass) * idolPct(idol.hpArmorPct);
 	const luck = withGearAttributes(characterStats, equipment).luck + merchantLuck(merchantUpgrades, prestige) + gear.luck + idol.luck;
 	const economy = gearEconomy(equipment);
@@ -65,6 +68,10 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		armorReduction: armorReductionOf(armor) * 100,
 		dodge: dodgeChance(equipment) * 100,
 		lifeLeech: lifeLeechPercent(equipment, bonus),
+		/** The gear's combat stats of IDL-176 (%, each capped by `STAT_RULES`) */
+		armorPen: armorPenPercent(equipment),
+		thorns: thornsPercent(equipment),
+		healOnKill: healOnKillPercent(equipment),
 		/** % chance that a click crits */
 		critChance: odds.crit * 100,
 		/** What a crit multiplies the click by */

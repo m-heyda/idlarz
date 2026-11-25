@@ -196,6 +196,10 @@ const HeroStats: React.FC = () => {
 		{ label: COMBAT_NAMES.hpRegen, value: `${formatCompact(fx.hpRegen)}/s`, color: I.green },
 		{ label: COMBAT_NAMES.attackSpeed, value: `${formatCompact(fx.attacksPerSecond, 2)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`, color: I.blue },
 		{ label: 'Life leech', value: pct(fx.lifeLeech, 1), color: I.red },
+		// the gear's combat stats of IDL-176: a row only when something is worn that gives it
+		...(fx.armorPen > 0 ? [{ label: 'Armor penetration', value: pct(fx.armorPen, 1), color: I.gold }] : []),
+		...(fx.thorns > 0 ? [{ label: 'Thorns', value: pct(fx.thorns, 1), color: I.red }] : []),
+		...(fx.healOnKill > 0 ? [{ label: 'Heal on kill', value: `${pct(fx.healOnKill, 1)} max HP`, color: I.green }] : []),
 	];
 
 	const deedBonusesNow = deedBonuses(milestonesClaimed);

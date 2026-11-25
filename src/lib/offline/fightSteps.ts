@@ -3,7 +3,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
-import { armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
+import { armorAfterPen, armorReduction, autoUseUnlocked, mitigate, swing } from '@/lib/combat';
 import { isBoss, modifiersOf, monsterStats, potionCooldownAgainst } from '@/lib/monsters';
 import { masteryBonusesFor, type MasteryTotals } from '@/lib/mastery';
 import { EPS, levelNow, maxHpNow, pushEvent, regenGain, rngFor, stockOf, type FightCtx } from '@/lib/offline/fightContext';
@@ -203,7 +203,8 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const kind = rolled.crit === 'none' ? 'hit' : rolled.crit;
 		// Bestiary mastery: a permanent bonus against this monster (and its biome once the goal is claimed), `masteryBonusesFor`
 		const raw = rolled.damage * (1 + masteryOf(ctx, f).damage / 100);
-		const damage = monster.armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(monster.armor)))) : raw;
+		const armor = armorAfterPen(monster.armor, p.armorPenPct);
+		const damage = armor > 0 ? Math.max(1, round1(raw * (1 - armorReduction(armor)))) : raw;
 		f.monsterHp = Math.max(0, f.monsterHp - damage);
 		if (p.leechPct > 0) c.hp = Math.min(p.maxHp, c.hp + (damage * p.leechPct) / 100);
 		// a critical hit sets the monster alight for BURN_SEC; a new one refreshes it with its own hit (never stacks)
@@ -214,6 +215,8 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		const paid = payKill(env.secret, env.userId, ctx.ledger, env.stored, f.n, t, { elapsedSec: f.elapsed, flawless: !(f.hurt && f.hurt > 0) });
 		if (!paid) return endFight(ctx, t, 'retreat');
 		ctx.ledger = paid.ledger;
+		// Heal on Kill: a share of max HP comes back the moment the monster dies
+		if (p.healOnKillPct) c.hp = Math.min(p.maxHp, c.hp + (p.maxHp * p.healOnKillPct) / 100);
 		pushEvent(ctx, t, 'won', {
 			n: f.n,
 			type: f.type,
@@ -253,6 +256,11 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		c.hp = Math.max(0, c.hp - amount);
 		f.hurt = (f.hurt ?? 0) + amount;
 		pushEvent(ctx, t, 'hurt', { amount, crit });
+		// Thorns: a share of what the hit did comes back on the monster; the kill is paid on the next step, so no more swings from a dead monster
+		if (p.thornsPct) {
+			f.monsterHp = Math.max(0, f.monsterHp - (amount * p.thornsPct) / 100);
+			if (f.monsterHp <= 0) break;
+		}
 		if (venom) f.poison = { stacks: Math.min(venom.maxStacks, (f.poison?.stacks ?? 0) + 1), leftSec: venom.durationSec, acc: f.poison?.acc ?? 0 };
 	}
 	if (c.hp <= 0) endFight(ctx, t, 'defeated');

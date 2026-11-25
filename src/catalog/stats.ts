@@ -45,6 +45,11 @@ export const STAT_DEFS = {
 	manaRegen: { label: 'Mana Regen', unit: '/s', decimals: 2, levelShare: 0.5 }, // mana per second, in and out of fights
 	spellPower: { label: 'Spell Power', unit: '%', levelShare: 0.4 }, // % more healing from skills
 	lifeLeech: { label: 'Life Leech', unit: '%', decimals: 1, levelShare: 0.3 }, // % of the damage dealt returned as HP (capped by STAT_RULES.lifeLeechCap)
+	// the four combat stats of IDL-176: each gear total is capped where it is read (STAT_RULES), `lib/combat.ts` and the fight engine apply them
+	critDamage: { label: 'Crit Damage', unit: '%', levelShare: 0.3 }, // % extra on the x2 crit and x5 super crit multipliers, added to the attributes' (capped by STAT_RULES.critDamageGearCap)
+	armorPen: { label: 'Armor Penetration', short: 'Armor Pen', unit: '%', levelShare: 0.3 }, // % of the monster's armor ignored by every hit (capped by STAT_RULES.armorPenCap)
+	thorns: { label: 'Thorns', unit: '%', levelShare: 0.3 }, // % of the damage a monster's hit does to you that it takes back (capped by STAT_RULES.thornsCap)
+	healOnKill: { label: 'Heal on Kill', short: 'Kill Heal', unit: '%', decimals: 1, levelShare: 0.3 }, // % of your max HP restored when a monster dies (capped by STAT_RULES.healOnKillCap)
 	// the five attributes as gear stats: they add to the points the player spent while the item is worn (lib/gearAttributes.ts); Intelligence is the crafting stat (quality of crafted gear)
 	strength: { label: 'Strength', integer: true, levelShare: 0.5 },
 	dexterity: { label: 'Dexterity', integer: true, levelShare: 0.5 },
@@ -91,6 +96,10 @@ export const STAT_CATEGORY: Record<StatKey, StatCategory> = {
 	critChance: 'combat',
 	superCrit: 'combat',
 	lifeLeech: 'combat',
+	critDamage: 'combat',
+	armorPen: 'combat',
+	thorns: 'combat',
+	healOnKill: 'combat',
 	strength: 'combat',
 	dexterity: 'combat',
 	vitality: 'combat',
@@ -148,6 +157,10 @@ export const STAT_BASE_BY_TIER: Record<ItemStatKey, readonly [number, number, nu
 	manaRegen: [0.2, 0.3, 0.45, 0.65, 0.9],
 	spellPower: [4, 7, 10, 14, 18],
 	lifeLeech: [0.5, 1, 1.5, 2, 3],
+	critDamage: [3, 5, 8, 12, 16],
+	armorPen: [2, 3, 5, 7, 10],
+	thorns: [2, 4, 6, 9, 12],
+	healOnKill: [0.3, 0.5, 0.8, 1.2, 1.6],
 	strength: [2, 3, 4, 5, 7],
 	dexterity: [2, 3, 4, 5, 7],
 	intelligence: [2, 3, 4, 5, 7],

@@ -35,6 +35,10 @@ export interface PlayerProfile {
 	/** A worn legendary's handlers (absent: none): a crit sets the monster alight for this % of the hit per second (Burn), and the chance in % that a potion drunk in a fight is not used up (Potion refund) */
 	burnPct?: number;
 	potionRefundPct?: number;
+	/** The gear's combat stats of IDL-176 (absent: none, so a profile without them is the one there was before): % of a monster's armor ignored, % of a monster's hit returned, % of max HP restored per kill */
+	armorPenPct?: number;
+	thornsPct?: number;
+	healOnKillPct?: number;
 }
 
 /** The one fight a player has open. The monster stands on its ticket; the player's numbers are frozen in `profile`. */

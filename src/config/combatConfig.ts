@@ -95,6 +95,10 @@ export const STAT_RULES = {
 	mana: { base: 20, perIntelligence: 4, regenBase: 0.5, regenPerIntelligence: 0.05 }, // max mana and mana per second
 	magicWeaponTypes: ['staff', 'wand'] as readonly string[], // these scale with Intelligence, every other weapon with Strength
 	lifeLeechCap: 15, // % of the damage dealt returned as HP: the gear's Life Leech never counts above this
+	critDamageGearCap: 50, // % extra crit damage the gear's Crit Damage never counts above (on top of the attributes', IDL-176)
+	armorPenCap: 30, // % of a monster's armor that Armor Penetration never ignores more than
+	thornsCap: 25, // % of a monster's hit that Thorns never returns more than
+	healOnKillCap: 8, // % of max HP that Heal on Kill never restores more than per kill
 };
 
 /** `boss` monsters get their own spawn timer, a banner in the fight and boss-only drops (the loot source `lootSourceId` names the profile). */

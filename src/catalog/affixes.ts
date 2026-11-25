@@ -73,6 +73,11 @@ export const AFFIXES: AffixDef[] = [
 	...pair({ stat: 'manaRegen', prefix: 'Flowing', suffix: 'of Clarity', power: 1.5, tags: [...MAGIC, 'head', 'chest', 'neck', 'ring', 'charm'], weight: 8 }),
 	...pair({ stat: 'spellPower', prefix: 'Wise', suffix: 'of Sorcery', power: 1.5, tags: [...MAGIC, 'neck', 'ring', 'charm'], weight: 6 }),
 	...pair({ stat: 'lifeLeech', prefix: 'Vampiric', suffix: 'of the Leech', power: 2, tags: WEAPON, minItemLevel: 5, weight: 5 }),
+	// the combat stats of IDL-176 (each gear total is capped in `STAT_RULES`): crit damage on rings and necks, armor penetration on weapons, thorns on off hands, heal on kill on rings and charms
+	...pair({ stat: 'critDamage', prefix: 'Brutal', suffix: 'of Carnage', power: 1.5, tags: ['ring', 'neck'], minItemLevel: 8, weight: 5 }),
+	...pair({ stat: 'armorPen', prefix: 'Piercing', suffix: 'of the Breaker', power: 1.5, tags: WEAPON, minItemLevel: 8, weight: 5 }),
+	...pair({ stat: 'thorns', prefix: 'Spiked', suffix: 'of Thorns', power: 1.5, tags: ['offhand'], minItemLevel: 6, weight: 6 }),
+	...pair({ stat: 'healOnKill', prefix: 'Reviving', suffix: 'of the Victor', power: 1.5, tags: ['ring', 'charm'], minItemLevel: 8, weight: 5 }),
 	// the attributes (lib/gearAttributes.ts): rarer than the plain stats, on the gear that suits them. Intelligence is the crafting stat: wear it while crafting.
 	...pair({
 		stat: 'strength',

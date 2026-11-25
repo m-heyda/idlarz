@@ -19,20 +19,26 @@ import {
 } from '../../src/catalog';
 import { STAT_DEFS, type StatKey } from '../../src/catalog/stats';
 import { aggregateStats } from '../../src/lib/inventory';
+import { attributesWithGear } from '../../src/lib/gearAttributes';
+import { critDamagePercent } from '../../src/lib/statBonuses';
 import { baseStatsAt, plainItem, resolveItem } from '../../src/lib/itemInstance';
 import {
 	armorOf,
+	armorPenPercent,
 	armorReduction,
 	attacksPerSecond,
+	critExtraOf,
 	critOdds,
 	damagePerHit,
 	damagePerSecond,
 	dodgeChance,
+	healOnKillPercent,
 	lifeLeechPercent,
 	manaRegenPerSec,
 	maxHp,
 	maxMana,
 	mitigate,
+	thornsPercent,
 	type CombatBonus,
 } from '../../src/lib/combat';
 import { effectiveStats } from '../../src/lib/effectiveStats';
@@ -55,6 +61,10 @@ const LEVEL_SHARE: Record<string, number> = {
 	superCrit: 0.3,
 	dodge: 0.3,
 	lifeLeech: 0.3,
+	critDamage: 0.3,
+	armorPen: 0.3,
+	thorns: 0.3,
+	healOnKill: 0.3,
 	regen: 0.6,
 	luck: 0.5,
 	goldFind: 0.5,
@@ -82,6 +92,10 @@ const TIER1: Record<string, number> = {
 	manaRegen: 0.2,
 	spellPower: 4,
 	lifeLeech: 0.5,
+	critDamage: 3,
+	armorPen: 2,
+	thorns: 2,
+	healOnKill: 0.3,
 	strength: 2,
 	dexterity: 2,
 	intelligence: 2,
@@ -373,6 +387,24 @@ test('caps: Dodge 40 %, Life Leech 15 %, Crit 75 %, Super Crit 50 % hold however
 	assert.ok(aggregateStats(sup).superCrit + 5 < 50, 'gear alone stays under the super crit cap');
 	assert.equal(critOdds(c, sup, { ...NO_BONUS, superCritPct: 60 }).superCrit, 0.5, 'but the clamp holds when something does overshoot');
 	assert.equal(dodgeChance({}), 0);
+});
+
+test('caps (IDL-176): Crit Damage 50 %, Armor Penetration 30 %, Thorns 25 %, Heal on Kill 8 % hold however much gear stacks', () => {
+	const c = character();
+	const crit = stacked('critDamage_prefix');
+	assert.ok(aggregateStats(crit).critDamage > 50, 'the test gear must overshoot the cap');
+	assert.equal(critExtraOf(c, crit), 1 + (critDamagePercent(attributesWithGear(c, crit)) + 50) / 100);
+	const pen = stacked('armorPen_prefix');
+	assert.ok(aggregateStats(pen).armorPen > 30);
+	assert.equal(armorPenPercent(pen), 30);
+	const thorns = stacked('thorns_prefix');
+	assert.ok(aggregateStats(thorns).thorns > 25);
+	assert.equal(thornsPercent(thorns), 25);
+	const heal = stacked('healOnKill_prefix');
+	assert.ok(aggregateStats(heal).healOnKill > 8);
+	assert.equal(healOnKillPercent(heal), 8);
+	for (const none of [armorPenPercent({}), thornsPercent({}), healOnKillPercent({})]) assert.equal(none, 0);
+	assert.equal(critExtraOf(c, {}), 1 + critDamagePercent(attributesWithGear(c, {})) / 100, 'no gear: only the attributes');
 });
 
 test('max HP: (85 + 3 per Vit + 0.25 per Cha + gear) x (1 + set Max HP %), rounded once at the end', () => {
