@@ -52,6 +52,10 @@ export interface TutorialNumbers {
 	rebirthCastle: number;
 	rebirthTiles: number;
 	autoRebirths: number;
+	/** The gold bonus the starting attributes already pay, in percent (income counts every point) */
+	startGoldPct: number;
+	/** Combat bonuses count the points above this */
+	attributeBase: number;
 }
 
 /** A small gift the server grants once per account when the step is done. */
@@ -214,7 +218,8 @@ export const TUTORIAL_PATH: readonly PathStep[] = [
 		focus: 'soft',
 		// the Stats tab of the Hero window carries the 'stat-add' anchor until it is open; then the first + button does
 		target: (f) => (isOpen(f, 'equipment') ? 'stat-add' : 'tab-equipment'),
-		text: () => 'Every level gives attribute points. Open your Hero window, then its Stats tab, and spend one.',
+		text: (n) =>
+			`Every level gives attribute points. Income bonuses count every point (your starting attributes already give +${n.startGoldPct} % gold); damage, armor and speed only the points above ${n.attributeBase}. Open your Hero window, then its Stats tab, and spend one.`,
 		ready: (f) => f.unspentPoints > 0 || f.pointsSpent > 0,
 		done: (f) => f.pointsSpent >= 1,
 		reward: STARTER_REWARDS.potions,

@@ -2,7 +2,7 @@ import { MONSTER_CHEST, MONSTER_CHEST_TIERS, monsterChestItemId, type MonsterChe
 import type { ItemDef } from '@/types/game';
 
 // Monster drop chests (IDL-163): bag items a kill sometimes drops and the player opens later. They are consumables with no effect (opening is its own op, `lib/offline/openChest.ts`), stack in the bag, are never junk (no sweep sells them) and
-// sell for their `sellValue` when the bag is full. The art is the existing treasure-chest icon for every tier until a tier of its own is drawn (Sprite Fusion, owner work); the card tells them apart by name and rarity. Ids are append-only.
+// sell for their `sellValue` when the bag is full. The art is the treasure-chest icon (`bonus_chest`) for the wooden tier and a recolour of it for each other tier (`public/pixel/icons/chest_<tier>.png`), until Sprite Fusion art replaces them (owner work). Ids are append-only.
 
 const RARITY_OF_TIER: Record<MonsterChestTier, ItemDef['rarity']> = {
 	wooden: 'common',
@@ -35,7 +35,7 @@ export const CHEST_ITEMS: ItemDef[] = MONSTER_CHEST_TIERS.map(
 		tier: 0,
 		stackMax: 99,
 		sellValue: MONSTER_CHEST.tiers[tier].sellValue,
-		icon: 'bonus_chest',
+		icon: tier === 'wooden' ? 'bonus_chest' : `chest_${tier}`,
 		description: DESCRIPTION[tier],
 	}),
 );
