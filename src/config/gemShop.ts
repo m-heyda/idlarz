@@ -268,6 +268,8 @@ export const DAILY_BONUS_GEMS: readonly number[] = [20, 25, 30, 35, 40, 45, 50];
  * The treasure chest of the last day (day 7) of the daily bonus, on top of its gems: `count` kinds of material picked at random from `resources`, each worth `minutes` of the player's own income of that kind (a random number in the range, so it grows with the kingdom),
  * never less than `floor`. It is rolled by the server when day 7 is claimed ({@link rollDailyChest}), from a sealed random number, and recorded as granted like any chest.
  *
+ * Sized against the ordinary chest (IDL-357, `tests/economy/chestBudget.test.ts`): on average 4 kinds x 60 min = 240 minutes of income spread over four resources, once a week, which is about 7 ordinary chests' worth of loot against the 840 a week of chests a player who picks up every one finds, so under 1 % of a week of chests: a treat, not an income source, and no distortion for the offline allowance.
+ *
  * @category Economy/Gems
  * @order 3
  */
