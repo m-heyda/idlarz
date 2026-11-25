@@ -13,3 +13,10 @@ export const itemIconName = (def: ItemDef): PixelIconName =>
 /** What an ItemSlot needs to draw a bag slot: gear is an instance, a consumable stack is an id and a count. */
 export const slotProps = (slot: BagSlot): { item?: ItemInstance; itemId?: string; qty?: number } =>
 	slot ? ('item' in slot ? { item: slot.item } : { itemId: slot.id, qty: slot.qty }) : {};
+
+/**
+ * The slot text of a set piece in a set block: "(Main Hand)" and, for the weapon, a reminder that it is a piece of the set (IDL-172): wearing another weapon
+ * takes a piece off the count, which can switch off the top bonus (a 14-piece set needs its weapon).
+ */
+export const setPieceSlotNote = (slotLabel: string, slot: string): string =>
+	slot === 'mainHand' ? `${slotLabel}: part of the set, another weapon loses a piece` : slotLabel;

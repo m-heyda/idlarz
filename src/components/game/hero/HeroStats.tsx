@@ -10,6 +10,8 @@ import {
 } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { COMBAT_NAMES, RESOURCES } from '@/catalog';
+import { INITIAL_CHARACTER_STATS } from '@/config/character';
+import { STAT_RULES } from '@/config/combatConfig';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
 import { describeClassPassives } from '@/lib/classPassives';
@@ -27,7 +29,7 @@ import { useUiStore } from '@/stores/uiStore';
 import type { CharacterStats, Resources } from '@/types/game';
 import audioManager from '@/utils/audioManager';
 import { formatCompact, formatNumber, formatPercent, formatRate, tidy } from '@/utils/formatters';
-import { getStatDescriptionGroups } from '@/utils/game/character';
+import { calculateStatResourceModifiers, getStatDescriptionGroups } from '@/utils/game/character';
 import { calculateResourceBreakdown, type ResourceBreakdownEntry } from '@/utils/game/income';
 import RebirthsPanel from '../overlays/RebirthsPanel';
 import { emberIncomeBonus } from '@/utils/game/rebirth';
@@ -69,8 +71,14 @@ const AttributeTip: React.FC<{ stat: (typeof BASE_STATS)[number] }> = ({ stat })
 				))}
 			</div>
 		))}
+		<div className='ds-tip-line' data-tone='muted'>
+			Income, mana and crit chance count every point; damage, armor, attack speed and crit damage count the points above {STAT_RULES.base}.
+		</div>
 	</Tooltip>
 );
+
+/** What the starting attributes already pay in gold, in percent (5 Intelligence and 5 Charisma at 2.5 % each = 25 %): every point counts for income, so a new character does not start at zero. */
+const STARTING_GOLD_BONUS = calculateStatResourceModifiers(INITIAL_CHARACTER_STATS).gold * 100;
 
 /** One folding block of the ledger whose open or shut state is remembered. */
 const Block: React.FC<{
@@ -176,6 +184,11 @@ const HeroStats: React.FC = () => {
 		{ label: 'Next level', value: pct(level.progress * 100, 1), color: I.purple },
 		{ label: 'XP', value: `${formatNumber(resources.xp)} (${formatRate(resourceRates.total.xp)})`, color: I.green },
 		{ label: 'Gold', value: formatNumber(resources.gold), color: I.gold },
+		{
+			label: 'Attribute gold',
+			value: `+${pct(calculateStatResourceModifiers(characterStats).gold * 100)} (base +${pct(STARTING_GOLD_BONUS)} from the starting 5 Int and 5 Cha)`,
+			color: I.gold,
+		},
 		{ label: 'Crafting level', value: craftLevelOf(craftXp).level, color: I.gold },
 		{ label: 'Tiles', value: formatCompact(countOwnedTiles(tiles)), color: I.blue },
 		{ label: 'Rebirths', value: `${formatNumber(prestige.rebirths)} (+${formatPercent(emberIncomeBonus(prestige.legacyEarned) * 100)})`, color: I.purple },

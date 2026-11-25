@@ -18003,6 +18003,87 @@
 	},
 	{
 		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_arcane",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_arcane.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_coral",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_coral.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_frost",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_frost.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_iron",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_iron.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_magma",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_magma.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
 			"src/config/monsterChests.ts"
 		],
 		"name": "chest_map",
@@ -18018,6 +18099,7 @@
 	},
 	{
 		"usedBy": [
+			"src/catalog/items/chests.ts",
 			"src/components/game/Tile.tsx",
 			"src/config/monsterChests.ts"
 		],
@@ -18030,6 +18112,38 @@
 		"size": [
 			192,
 			40
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_mossy",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_mossy.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
+		]
+	},
+	{
+		"usedBy": [
+			"src/catalog/items/chests.ts",
+			"src/config/monsterChests.ts"
+		],
+		"name": "chest_royal",
+		"category": "ui",
+		"subcategory": "chest",
+		"src": "/pixel/icons/chest_royal.png",
+		"status": "used",
+		"source": "public/pixel/icons",
+		"size": [
+			32,
+			32
 		]
 	},
 	{

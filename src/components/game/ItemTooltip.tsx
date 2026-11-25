@@ -28,7 +28,7 @@ import type { Equipment, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber } from '@/utils/formatters';
 import { describeEffect, hasEffects } from '@/catalog/buffs';
 import ResourceIcon from './ResourceIcon';
-import { RARITY_COLOR } from './itemUi';
+import { RARITY_COLOR, setPieceSlotNote } from './itemUi';
 
 /** A signed change in parentheses, green for a gain and red for a loss: "(+12%)", "(-16)". Nothing when it did not change. */
 const Diff: React.FC<{ delta: number; text: string }> = ({ delta, text }) =>
@@ -227,7 +227,7 @@ const ItemTooltipBody: React.FC<BodyProps> = ({ item, itemId, comparison, wornLa
 					{set.pieces.map((id) => (
 						<div key={id} style={{ color: equippedIds.includes(id) ? '#f0d27a' : '#6a5a48' }}>
 							{ITEM_CATALOG[id].name}
-							{ITEM_CATALOG[id].slot && ` (${slotName(ITEM_CATALOG[id].slot)})`}
+							{ITEM_CATALOG[id].slot && ` (${setPieceSlotNote(slotName(ITEM_CATALOG[id].slot), ITEM_CATALOG[id].slot)})`}
 						</div>
 					))}
 					{Object.entries(set.bonuses).map(([count, bonus]) => (
