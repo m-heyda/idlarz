@@ -18608,9 +18608,7 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
+		"usedBy": [],
 		"name": "ui_frame_tip",
 		"category": "ui",
 		"subcategory": "frames and bars",
@@ -18720,9 +18718,7 @@
 		]
 	},
 	{
-		"usedBy": [
-			"code"
-		],
+		"usedBy": [],
 		"name": "ui_slot_frame_active",
 		"category": "ui",
 		"subcategory": "frames and bars",
