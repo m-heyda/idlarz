@@ -47,7 +47,17 @@ export interface KingdomSummary {
 	/** `total` is every building type, `available` leaves out the ones whose biome is still locked; `built` counts the types standing */
 	buildings: { built: number; total: number; available: number; rows: KingdomBuildingRow[]; groups: KingdomBuildingGroup[] };
 	/** `lucky` (golden) is a subset of `total`; `maxed` have reached their growth limit, `growing` have not (`maxed + growing = total`) */
-	monsters: { total: number; bosses: number; highestLevel: number; lucky: number; maxed: number; growing: number; chests: number; rocks: number };
+	monsters: {
+		total: number;
+		bosses: number;
+		highestLevel: number;
+		strongest: number;
+		lucky: number;
+		maxed: number;
+		growing: number;
+		chests: number;
+		rocks: number;
+	};
 }
 
 /**
@@ -89,6 +99,7 @@ export const kingdomSummary = (state: KingdomInput, rocks = 0): KingdomSummary =
 	for (const group of groups) group.rows.sort((a, b) => order[a.kind] - order[b.kind]);
 
 	const owned = ownedCount(state.tiles);
+	const highestLevel = state.monsters.reduce((top, monster) => Math.max(top, monster.level), 0);
 	const maxed = state.monsters.filter((monster) => growthInfo(monster, { prestige }).maxed).length;
 	const byBiome = Object.entries(state.tiles.stats.byBiome)
 		.filter(([biome, count]) => biome !== 'castle' && biome !== 'empty' && count > 0)
@@ -116,7 +127,9 @@ export const kingdomSummary = (state: KingdomInput, rocks = 0): KingdomSummary =
 		monsters: {
 			total: state.monsters.length,
 			bosses: state.monsters.filter((monster) => isBoss(monster.type)).length,
-			highestLevel: state.monsters.reduce((top, monster) => Math.max(top, monster.level), 0),
+			highestLevel,
+			/** How many stand at that highest level (the ones the Strongest tile rings) */
+			strongest: highestLevel > 0 ? state.monsters.filter((monster) => monster.level >= highestLevel).length : 0,
 			lucky: state.monsters.filter((monster) => monster.lucky).length,
 			maxed,
 			growing: state.monsters.length - maxed,
