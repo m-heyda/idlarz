@@ -538,6 +538,7 @@ export const acceptSave = async (
 				!ledger.inv ||
 				legacyChanged ||
 				attrsChanged ||
+				ledger.rebirths < summary.rebirths ||
 				ledger.gemShop.spentSinceSave > 0 ||
 				JSON.stringify(counted.tradeSince) !== JSON.stringify(ledger.stats.tradeSince) ||
 				counted.goldPeak > ledger.stats.goldPeak
@@ -546,6 +547,8 @@ export const acceptSave = async (
 				await ledgers.commit(userId, ledger.ver, {
 					...ledger,
 					ver: ledger.ver + 1,
+					// the new-run branch above is the only other writer of this count and only fires when the stored save's count rises: a rebirth whose ledger write lost a race (or threw) would otherwise leave the ledger behind for good
+					rebirths: Math.max(ledger.rebirths, summary.rebirths),
 					grantedSeen: grantedSeenAfterSave(ledger, counted.tradeSince),
 					inv: ledger.inv ?? inventoryFromCore(split.core),
 					stats: counted,
