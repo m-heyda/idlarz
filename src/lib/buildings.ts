@@ -13,7 +13,16 @@ import type { BuildingUpgradeState, CastleUpgradeState, Monster, PrestigeState, 
 /** Whether the building system is switched on (`BUILDINGS_FLAG`, off by default). Every entry point of the system asks this first. */
 export const buildingsEnabled = (): boolean => BUILDINGS_FLAG.enabled;
 
-export { buildingOutput, extractorOutput, producerBonus, producerOutput } from '@/lib/buildingOutput';
+export {
+	biomeBonus,
+	buildingOutput,
+	extractorOutput,
+	milestoneBonus,
+	milestoneSteps,
+	milestoneThresholds,
+	producerBonus,
+	producerOutput,
+} from '@/lib/buildingOutput';
 
 /** The highest level a Producer or Extractor can be bought to at this castle level: `min(cap, castle level)`, where `cap` is `buildingMaxLevel` (base 5, Master Masonry raises it). */
 export const buildingLevelCap = (castleLevel: number, buildingMax: number = BUILDING_RULES.maxLevel): number =>

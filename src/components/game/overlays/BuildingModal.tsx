@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { BUILDING_LORE, buildingDef, buildingKindLabel, type BuildingDef } from '@/catalog/buildings';
-import { BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
+import { BIOME_MILESTONES, BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import { idolDef } from '@/catalog/idols';
 import { BIOMES } from '@/config/biomes';
@@ -12,7 +12,7 @@ import {
 	idolFloorTiles,
 	levelOfTile,
 	ownedOfBiome,
-	producerBonus,
+	biomeBonus,
 	upgradeProblem,
 	type BuildingContext,
 } from '@/lib/buildings';
@@ -92,7 +92,7 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	const next = def.kind === 'idol' || atTop ? null : buildingOutput(def, nextLevel, owned);
 	const gain: Partial<Resources> = {};
 	if (now && next) for (const key of Object.keys(next) as (keyof Resources)[]) gain[key] = (next[key] ?? 0) - (now[key] ?? 0);
-	const bonusPct = Math.round(producerBonus(owned) * 100);
+	const bonusPct = Math.round(biomeBonus(def.biome, owned) * 100);
 
 	// a general building makes nothing: its level is its bonus (`GENERAL_RULES.perLevel` % of its effect per level, every copy adds its own, `idolEconomy`)
 	let copyCount = 0;
@@ -197,8 +197,8 @@ const BuildingBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 								</div>
 								<div className='bw-note'>
 									{biomeLabel} bonus: +{bonusPct} % from your {owned} {biomeLabel.toLowerCase()} tile{owned === 1 ? '' : 's'} (each adds +
-									{Math.round(BUILDING_RULES.producer.perOwnedTile * 100)} %, up to +{Math.round(BUILDING_RULES.producer.bonusCap * 100)} %). Before the castle
-									and Ember bonuses.
+									{Math.round(BUILDING_RULES.producer.perOwnedTile * 100)} %, up to +{Math.round(BUILDING_RULES.producer.bonusCap * 100)} %), and every biome
+									milestone adds +{Math.round(BIOME_MILESTONES.step * 100)} %. Before the castle and Ember bonuses.
 								</div>
 							</>
 						)}

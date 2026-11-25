@@ -2,7 +2,8 @@ import { BIOMES } from '@/config/biomes';
 import { BUILDING_RULES, GENERAL_RULES } from '@/config/buildings';
 import { RESOURCES } from '@/catalog/resources';
 import type { BuildingDef } from '@/catalog/buildings';
-import { buildingOutput, producerBonus } from '@/lib/buildingOutput';
+import { biomeBonus, buildingOutput, milestoneThresholds } from '@/lib/buildingOutput';
+import { BIOME_MILESTONES } from '@/config/buildings';
 import type { Resources } from '@/types/game';
 import { formatNumber } from '@/utils/formatters';
 
@@ -49,7 +50,7 @@ export const buildingEffectText = (def: BuildingDef, ownedOfBiome: number): Buil
 	for (const key of Object.keys(first) as (keyof Resources)[]) step[key] = (second[key] ?? 0) - (first[key] ?? 0);
 	const biome = (BIOMES[def.biome]?.label ?? def.biome).toLowerCase();
 	const { perOwnedTile, bonusCap } = BUILDING_RULES.producer;
-	const grow = `Every ${biome} tile you own adds +${Math.round(perOwnedTile * 100)} % (up to +${Math.round(bonusCap * 100)} %), now +${Math.round(producerBonus(ownedOfBiome) * 100)} %.`;
+	const grow = `Every ${biome} tile you own adds +${Math.round(perOwnedTile * 100)} % (up to +${Math.round(bonusCap * 100)} %), now +${Math.round(biomeBonus(def.biome, ownedOfBiome) * 100)} %.${milestoneThresholds(def.biome).length ? ` At ${milestoneThresholds(def.biome).join(' / ')} tiles it grows by another +${Math.round(BIOME_MILESTONES.step * 100)} % each.` : ''}`;
 	return {
 		produces: `Produces ${perHour(first)} per hour.`,
 		perLevel: `Each level adds ${perHour(step)} per hour.`,

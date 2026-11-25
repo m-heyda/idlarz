@@ -1,6 +1,6 @@
 import { buildingDef } from '@/catalog/buildings';
 import { BIOMES } from '@/config/biomes';
-import { buildingOutput, ownedOfBiome, producerBonus } from '@/lib/buildings';
+import { biomeBonus, buildingOutput, ownedOfBiome } from '@/lib/buildings';
 import { RESOURCES } from '@/catalog';
 import { BuildingTooltip, ChestTooltip, MonsterTooltip, TipLine, Tooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BiomeTooltip } from './BiomeTooltip';
@@ -141,7 +141,7 @@ const BuildingTile: React.FC<{ id: string; level: number; tile: React.ReactNode 
 			nextLevel={atTop ? undefined : level + 1}
 			next={next}
 			tileExtra={tile}
-			biomeBonus={output ? `${biomeLabel} bonus: +${Math.round(producerBonus(owned) * 100)} % (${owned} tile${owned === 1 ? '' : 's'})` : undefined}
+			biomeBonus={output ? `${biomeLabel} bonus: +${Math.round(biomeBonus(def.biome, owned) * 100)} % (${owned} tile${owned === 1 ? '' : 's'})` : undefined}
 			idolText={idol ? `${idolValueText(idol, level)}${idol.applied ? '' : ' (coming soon: not applied yet)'}` : undefined}
 			rebirthNote={idol ? `Its level is kept when you rebirth; rebuild it free on any ${idol.biome} tile.` : undefined}
 			cta='Click to open and upgrade'

@@ -12,6 +12,7 @@ const entry = (over: Partial<ResourceBreakdownEntry>): ResourceBreakdownEntry =>
 	start: 0,
 	farm: 0,
 	biome: 0,
+	milestone: 0,
 	castleArea: 0,
 	castleXp: 0,
 	base: 0,

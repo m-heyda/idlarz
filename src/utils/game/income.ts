@@ -33,11 +33,13 @@ export interface ResourceBreakdownEntry {
 	farm: number;
 	/** Biome tiles, with the adjacency bonus and the yield scale applied (and the Producers while the buildings flag is on) */
 	biome: number;
+	/** What the biome milestones add to the Producers and Extractors (IDL-198): their output above what the per-tile bonus alone gives */
+	milestone: number;
 	/** What the castle area bonus adds on the tiles inside the castle range */
 	castleArea: number;
 	/** Flat XP from castle levels above 1 */
 	castleXp: number;
-	/** start + farm + biome + castleArea + castleXp */
+	/** start + farm + biome + milestone + castleArea + castleXp */
 	base: number;
 	/** Percentage bonuses (0.2 = +20%), added together before the ember multiplier */
 	castleMod: number;
@@ -147,6 +149,7 @@ export const calculateResourceBreakdown = (
 	}
 	const farmPart = zeroResources();
 	const biomePart = zeroResources();
+	const milestonePart = zeroResources();
 
 	// Meat and the other farm products come from the animals alone (the Skinner's bonus is on the meat and the hide)
 	const farm = calculateFarmOutput(farmLevels, farmUpgrades);
@@ -202,9 +205,15 @@ export const calculateResourceBreakdown = (
 		forEachOwned(tiles, (tile) => {
 			const def = buildingDef(tile.building);
 			if (!def) return;
-			for (const [resource, gain] of Object.entries(buildingOutput(def, tile.buildingLevel ?? 1, biomeCount(tiles, def.biome)))) {
-				base[resource as keyof Resources] += gain;
-				biomePart[resource as keyof Resources] += gain;
+			const owned = biomeCount(tiles, def.biome);
+			const level = tile.buildingLevel ?? 1;
+			const plain = buildingOutput(def, level, owned, false) as Record<string, number>;
+			for (const [resource, gain] of Object.entries(buildingOutput(def, level, owned))) {
+				const key = resource as keyof Resources;
+				const withoutMilestone = plain[key] ?? 0;
+				base[key] += gain;
+				biomePart[key] += withoutMilestone;
+				milestonePart[key] += gain - withoutMilestone;
 			}
 		});
 	}
@@ -262,6 +271,7 @@ export const calculateResourceBreakdown = (
 			start: start[key],
 			farm: farmPart[key],
 			biome: biomePart[key],
+			milestone: milestonePart[key],
 			castleArea: areaPart[key],
 			castleXp: key === 'xp' ? castleXp : 0,
 			base: base[key],
@@ -301,7 +311,7 @@ export const calculateResourceRates = (
 
 /** One line of "Where the income comes from": what it is and how much per second it adds to the total. */
 export interface IncomeSource {
-	id: 'start' | 'tiles' | 'farm' | 'castleArea' | 'castleXp';
+	id: 'start' | 'tiles' | 'milestones' | 'farm' | 'castleArea' | 'castleXp';
 	label: string;
 	/** Per second, **after** the percentage bonuses, so the lines add up to the total shown in the header */
 	value: number;
@@ -324,6 +334,7 @@ export const incomeSources = (entry: ResourceBreakdownEntry): { sources: IncomeS
 	const all: IncomeSource[] = [
 		{ id: 'start', label: 'Realm', value: entry.start * scale },
 		{ id: 'tiles', label: 'Tiles', value: entry.biome * scale },
+		{ id: 'milestones', label: 'Biome milestones', value: entry.milestone * scale },
 		{ id: 'farm', label: 'Farm', value: entry.farm * scale },
 		{ id: 'castleArea', label: 'Castle range', value: entry.castleArea * scale },
 		{ id: 'castleXp', label: 'Castle levels', value: entry.castleXp * scale },
