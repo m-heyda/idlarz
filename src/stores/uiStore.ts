@@ -75,6 +75,8 @@ const readMerchantPreset = (): MerchantAmount => {
 
 /** How long a short message stays up (ms) */
 const TOAST_MS = 2200;
+/** A drop notice (epic, legendary) stays longer: it is news the player should not miss while looking elsewhere */
+const DROP_TOAST_MS = 5000;
 /** How long a chest reward notice stays up (ms); the fade in ContextMenu.css (.chest-toast) runs the same time */
 const CHEST_NOTICE_MS = 3000;
 /** Most notices of one kind on screen at once; opening more drops the oldest */
@@ -85,8 +87,8 @@ interface ChestNotice {
 	id: number;
 	loot: ChestNoticeLoot;
 }
-/** How a notice looks: `info` (gold frame, the default) or `error` (red frame). */
-export type ToastTone = 'info' | 'error';
+/** How a notice looks: `info` (gold frame, the default), `error` (red frame), or `epic` / `legendary` (purple / orange frame and glow, for a drop of that rarity, IDL-382). */
+export type ToastTone = 'info' | 'error' | 'epic' | 'legendary';
 
 interface ToastMessage {
 	id: number;
@@ -279,7 +281,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 		if (last && last.text === text && last.tone === tone) {
 			// the same message again: one line with a counter, its time restarted
 			set((state) => ({ toasts: state.toasts.map((t) => (t.id === last.id ? { ...t, count: t.count + 1 } : t)) }));
-			schedule(last.id, TOAST_MS, () => get().dismissToast(last.id));
+			schedule(last.id, tone === 'epic' || tone === 'legendary' ? DROP_TOAST_MS : TOAST_MS, () => get().dismissToast(last.id));
 			return;
 		}
 		const id = ++toastId;
@@ -287,7 +289,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 		const dropped = next.splice(0, Math.max(0, next.length - MAX_NOTICES));
 		dropped.forEach((t) => noticeTimers.delete(t.id));
 		set({ toasts: next });
-		schedule(id, TOAST_MS, () => get().dismissToast(id));
+		schedule(id, tone === 'epic' || tone === 'legendary' ? DROP_TOAST_MS : TOAST_MS, () => get().dismissToast(id));
 	},
 	dismissToast: (id) => set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
 	chestNotices: [],

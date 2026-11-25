@@ -148,6 +148,10 @@ export const totalStatPoints = (level: number): number => {
 	return l - 1 + Math.max(0, Math.min(l, LEVELING.earlyBonusUntil) - 1) * LEVELING.earlyBonusPoints;
 };
 
+/** The attribute points `rebirths` rebirths add to the pool for good: `LEVELING.attributePointsPerRebirth` (20) each (IDL-100). */
+export const rebirthPoints = (rebirths: number): number =>
+	Math.max(0, Math.floor(Number.isFinite(rebirths) ? rebirths : 0)) * LEVELING.attributePointsPerRebirth;
+
 const ATTRIBUTES = ['strength', 'dexterity', 'intelligence', 'vitality', 'charisma'] as const;
 
 /**
@@ -158,12 +162,12 @@ const ATTRIBUTES = ['strength', 'dexterity', 'intelligence', 'vitality', 'charis
  * @category Progression/Levels
  * @order 6
  */
-export const reconcileCharacter = (stats: CharacterStats, xp: number): CharacterStats => {
+export const reconcileCharacter = (stats: CharacterStats, xp: number, rebirths = 0): CharacterStats => {
 	const level = calculateLevel(xp).level;
-	const expected = ATTRIBUTES.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level);
+	const expected = ATTRIBUTES.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level) + rebirthPoints(rebirths);
 	const total = ATTRIBUTES.reduce((sum, key) => sum + stats[key], 0) + stats.availablePoints;
 	if (total <= expected) return stats;
-	const next: CharacterStats = { ...stats, availablePoints: totalStatPoints(level) };
+	const next: CharacterStats = { ...stats, availablePoints: totalStatPoints(level) + rebirthPoints(rebirths) };
 	for (const key of ATTRIBUTES) next[key] = INITIAL_CHARACTER_STATS[key];
 	return Object.assign(next, calculateCombatStats(next));
 };

@@ -483,7 +483,16 @@
 		"junk_ichor",
 		"junk_war_medals",
 		"herb_crate",
-		"trade_pack"
+		"trade_pack",
+		"elixir_arcana",
+		"chest_wooden",
+		"chest_iron",
+		"chest_mossy",
+		"chest_coral",
+		"chest_frost",
+		"chest_magma",
+		"chest_royal",
+		"chest_arcane"
 	],
 	"affixIds": [
 		"damage_prefix",
@@ -521,7 +530,17 @@
 		"vitality_prefix",
 		"vitality_suffix",
 		"charisma_prefix",
-		"charisma_suffix"
+		"charisma_suffix",
+		"atkSpeed_prefix",
+		"atkSpeed_suffix",
+		"critDamage_prefix",
+		"critDamage_suffix",
+		"armorPen_prefix",
+		"armorPen_suffix",
+		"thorns_prefix",
+		"thorns_suffix",
+		"healOnKill_prefix",
+		"healOnKill_suffix"
 	],
 	"monsterIds": [
 		"thistleBoar",
@@ -856,7 +875,8 @@
 		"ichor",
 		"war_medals",
 		"herb_crate",
-		"trade_pack"
+		"trade_pack",
+		"elixir_arcana"
 	],
 	"componentIds": [
 		"glass_vial",
@@ -1366,7 +1386,7 @@
 	"playerClassIds": ["warrior", "paladin", "ranger", "mage"],
 	"rarityIds": ["common", "uncommon", "rare", "epic", "legendary", "unique"],
 	"equipmentSlots": ["head", "shoulder", "chest", "hands", "legs", "feet", "neck", "cape", "ring1", "ring2", "charm", "belt", "mainHand", "offHand"],
-	"buffFamilyIds": ["might", "haste", "ironskin", "keenEye", "fortitude", "warding"],
+	"buffFamilyIds": ["might", "haste", "ironskin", "keenEye", "fortitude", "warding", "arcana"],
 	"limits": {
 		"hard.monsterGrowthLevels": 40,
 		"hard.merchantOffers": 12,

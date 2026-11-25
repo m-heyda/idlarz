@@ -183,6 +183,8 @@ interface Ctx {
 	/** The monster's level (1 for sources without one): drives the per-level chances */
 	level: number;
 	rng: Rng;
+	/** The pity counters of this kill: starts as the request's and is what the result returns */
+	pity: Record<string, number>;
 	taken: Set<string>;
 	trace: RollTrace[];
 	warnings: string[];
@@ -198,6 +200,24 @@ const baseTrace = (ctx: Ctx, table: string, poolId: string, itemLevel: number): 
 	eligible: {},
 	rarityChances: {},
 });
+
+const pityKey = (pity: NonNullable<LootProfile['rarityPity']>): string => `rarity:${pity.group}:${pity.rarity}`;
+
+/** The weight multiplier the profile's rarity pity gives `rarityId` now (1 for every other rarity and for a profile without pity). */
+const rarityPityBoost = (ctx: Ctx, rarityId: string): number => {
+	const pity = ctx.profile.rarityPity;
+	if (!pity || pity.rarity !== rarityId) return 1;
+	return Math.min(pity.maxMultiplier, 1 + pity.perMiss * Math.max(0, ctx.pity[pityKey(pity)] ?? 0));
+};
+
+/** After a general roll: a roll that could have been the pity rarity (it had an eligible item) and was not it or better adds a miss; a hit resets the counter. */
+const noteRarityPity = (ctx: Ctx, byRarity: Record<string, Candidate[]>, rolled: string): void => {
+	const pity = ctx.profile.rarityPity;
+	if (!pity || !byRarity[pity.rarity]) return;
+	const order = (id: string) => ctx.data.rarities[id]?.order ?? 0;
+	const key = pityKey(pity);
+	ctx.pity[key] = order(rolled) >= order(pity.rarity) ? 0 : (ctx.pity[key] ?? 0) + 1;
+};
 
 /** One equipment roll from a pool with the rarity rolled from the profile's weights (the general path). */
 const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: number, preferMissing = false): LootDrop | null => {
@@ -231,7 +251,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const missing = preferMissing ? candidates.filter((c) => !ctx.taken.has(c.def.id)) : [];
 		byRarity[id] = missing.length ? missing : candidates;
 		const boost = ctx.req.rarityBoost?.rarity === id ? Math.max(0, ctx.req.rarityBoost.multiplier) : 1;
-		weights.push({ id, weight: weight * lucky * boost });
+		weights.push({ id, weight: weight * lucky * boost * rarityPityBoost(ctx, id) });
 	}
 	const total = weights.reduce((sum, w) => sum + w.weight, 0);
 	for (const w of weights) trace.rarityChances[w.id] = w.weight / total;
@@ -242,6 +262,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		ctx.warnings.push(`${ctx.req.sourceId}/${table}: nothing eligible in pool ${poolId} at item level ${itemLevel}`);
 		return null;
 	}
+	noteRarityPity(ctx, byRarity, rarityId);
 	const def = weightedPick(byRarity[rarityId], (c) => c.weight, ctx.rng)!.def;
 	if (preferMissing) ctx.taken.add(def.id);
 	const item = makeInstance(def, itemLevel, rarityId, data, ctx.rng, ctx.req.qualityBias);
@@ -360,8 +381,8 @@ export const generateLoot = (req: LootRequest, rng: Rng, data: LootData = LOOT_D
 	const level = Math.max(1, Math.floor(req.level ?? 1));
 	if (req.level === undefined && !source.level) warnings.push(`${req.sourceId}: the source has no level of its own and the caller gave none`);
 	const sourceLevel = req.level !== undefined ? clampItemLevel(req.level) : source.level ? resolveSourceLevel(source.level, req.castleLevel ?? 1) : 1;
-	const ctx: Ctx = { data, req, profile, sourceLevel, level, rng, taken: new Set(req.owned ?? []), trace: [], warnings };
 	const pity: Record<string, number> = { ...req.pity };
+	const ctx: Ctx = { data, req, profile, sourceLevel, level, rng, pity, taken: new Set(req.owned ?? []), trace: [], warnings };
 
 	let drops: LootDrop[] = [];
 	if (profile.generalPoolId) {

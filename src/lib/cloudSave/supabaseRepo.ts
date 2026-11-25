@@ -191,7 +191,14 @@ export const supabaseSaveRepo = (db: SupabaseClient): SaveRepo => {
 
 		async pinChapter(userId, save) {
 			const flags = [...new Set<string>([...save.flags, CHAPTER_ARCHIVE_FLAG])];
-			const updated = await db.from('save_history').update({ pinned: true, flags }).eq('user_id', userId).eq('rev', save.rev).select('id');
+			// matched by revision AND save time: a reset starts the revision count again, so after a second reset the new game's last revision can equal one an earlier chapter's archive already holds; matching the revision alone would flag that old row and store nothing of the new game
+			const updated = await db
+				.from('save_history')
+				.update({ pinned: true, flags })
+				.eq('user_id', userId)
+				.eq('rev', save.rev)
+				.eq('server_saved_at', iso(save.serverSavedAt))
+				.select('id');
 			if (updated.error) throw new Error(updated.error.message);
 			if (updated.data?.length) return;
 			const inserted = await db

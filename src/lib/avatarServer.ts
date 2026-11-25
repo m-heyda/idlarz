@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ADMIN_UNLOCK, classAvatarIds, fitAvatar } from '@/catalog/avatars';
-import { needsResetFor } from '@/config/epoch';
+import { isLaterChapter, needsResetFor } from '@/config/epoch';
 import { earnedAfterReset } from '@/lib/offline/chapter';
 import type { PlayerClassId } from '@/config/playerClasses';
 import { checkAvatar } from '@/lib/authValidation';
@@ -15,11 +15,14 @@ export const loadEarnedAchievements = async (db: SupabaseClient, userId: string)
 	if (profile.error) throw new Error(profile.error.message);
 	// the game admin's account also holds the pseudo id that unlocks the Admin avatar (`ADMIN_UNLOCK`); nobody else can
 	const extra = profile.data?.is_admin === true ? [ADMIN_UNLOCK] : [];
-	if (profile.data && needsResetFor(typeof profile.data.epoch === 'number' ? profile.data.epoch : null))
-		return [...earnedAfterReset(typeof profile.data.epoch === 'number' ? profile.data.epoch : null), ...extra];
+	const epoch = typeof profile.data?.epoch === 'number' ? profile.data.epoch : null;
+	const needsReset = profile.data ? needsResetFor(epoch) : false;
+	// a later chapter keeps the tester marks, so only an account that has to reset AND never had a chapter skips the table
+	if (needsReset && !isLaterChapter(epoch)) return [...earnedAfterReset(epoch), ...extra];
 	const { data, error } = await db.from('player_achievements').select('achievement_id').eq('user_id', userId);
 	if (error) throw new Error(error.message);
-	return [...(data ?? []).map((row) => String(row.achievement_id)), ...extra];
+	const rows = (data ?? []).map((row) => String(row.achievement_id));
+	return [...(needsReset ? earnedAfterReset(epoch, rows) : rows), ...extra];
 };
 
 /** The avatar ids this account may pick with `playerClass`: the class's own starters plus the rewards it has earned. */

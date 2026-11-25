@@ -3,8 +3,11 @@ import { checkAvatar, checkCredentials, checkProfile } from '@/lib/authValidatio
 import { GAME_EPOCH } from '@/config/epoch';
 import { adminConfigured, createSupabaseAdmin } from '@/lib/supabase/admin';
 import { fail, guardConfigured, isOutage, json, readBody, unavailable } from '@/lib/authRoute';
+import { AUTH_TOO_MANY, CONFIRM_EMAIL_MESSAGE, liveAuthLimiters, signUpOutcome, takeAuthAttempt } from '@/lib/authAttempts';
 
 export const dynamic = 'force-dynamic';
+
+const limiters = liveAuthLimiters();
 
 /** Whether another account already holds this name (case-insensitive, like the unique index `profiles_character_name_ci`). Throws on a failed read. */
 const nameTaken = async (name: string): Promise<boolean> => {
@@ -18,8 +21,7 @@ const nameTaken = async (name: string): Promise<boolean> => {
 };
 
 /**
- * Creates the account, signs the player in (Confirm email must be off in Supabase, otherwise there is no session)
- * and writes their profile row: reserved name, class and avatar, so a new player skips the "new chapter" screen (IDL-77). The name is checked for a holder
+ * Creates the account, signs the player in (with Confirm email off in Supabase) and writes their profile row: reserved name, class and avatar, so a new player skips the "new chapter" screen (IDL-77). The name is checked for a holder
  * BEFORE the account is created (409 `nameTaken`, nothing made), and the avatar has to be one of the two starters of the chosen class (a new account has earned nothing yet; `checkAvatar`). If only the profile write fails the account still exists: the response carries
  * `profile: null` and the client asks for name and hero again through /api/auth/profile.
  */
@@ -29,6 +31,7 @@ export async function POST(request: Request) {
 	const body = await readBody(request);
 	const credentials = checkCredentials(body);
 	if (!credentials.ok) return fail(credentials.error, 400);
+	if (!takeAuthAttempt(limiters, 'register', request.headers, credentials.value.email)) return fail(AUTH_TOO_MANY, 429);
 	const profileInput = checkProfile(body);
 	if (!profileInput.ok) return fail(profileInput.error, 400);
 	const avatar = checkAvatar(profileInput.value.avatarId, profileInput.value.playerClass, []);
@@ -44,7 +47,11 @@ export async function POST(request: Request) {
 				/registered|exists/i.test(error.message) ? 'That email already has an account. Log in instead.' : error.message,
 				error.status === 429 ? 429 : 400,
 			);
-		if (!data.user || !data.session) return fail('Sign-up needs email confirmation, which this game does not use yet.', 500);
+		const outcome = signUpOutcome(data);
+		if (outcome === 'failed') return fail('Sign-up did not go through. Try again.', 500);
+		// Confirm email on (public launch, IDL-126): the account exists and a link was emailed; with no session the profile cannot be written yet, the game asks for name and hero after the first login
+		if (outcome === 'confirm') return json({ confirmEmail: true, message: CONFIRM_EMAIL_MESSAGE }, 202);
+		if (!data.user || !data.session) return fail('Sign-up did not go through. Try again.', 500);
 
 		const { characterName, playerClass } = profileInput.value;
 		const { error: profileError } = await supabase.from('profiles').insert({ id: data.user.id, character_name: characterName, player_class: playerClass });

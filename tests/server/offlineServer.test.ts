@@ -403,8 +403,8 @@ const chapterRepo = (opts: { epoch?: number | null; taken?: boolean } = {}) => {
 		setEpoch: async (_id, epoch) => {
 			if (state.epoch === null || state.epoch < epoch) state.epoch = epoch;
 		},
-		clearAchievements: async () => {
-			state.granted = [];
+		clearAchievements: async (_id, keep) => {
+			state.granted = state.granted.filter((id) => keep.includes(id));
 		},
 		grantAchievement: async (_id, achievementId) => {
 			if (!state.granted.includes(achievementId)) state.granted.push(achievementId);
@@ -473,6 +473,36 @@ test('the flip: the old game is archived for good, then replaced completely: gem
 	assert.deepEqual(again, { kind: 'ok', already: true });
 	assert.equal(m.archives.length, 1, 'no second archive');
 	assert.equal(m.ledgers.get('u1')!.runId, after.runId, 'the ledger is not reset twice');
+});
+
+test('a later chapter (epoch 2 to 3) keeps the gems and the tester marks and wipes the rest, then a repeat changes nothing', async () => {
+	const m = memory();
+	assert.equal((await save(m, 'u1', game(), 0, T0)).kind, 'ok');
+	const before = m.ledgers.get('u1')!;
+	m.ledgers.set('u1', { ...before, gems: 4321, stats: { ...before.stats, chests: 9, achievements: ['castle_10'], seen: { thistleBoar: 3 } } });
+	const { repo, state } = chapterRepo({ epoch: 2 });
+	state.granted.push(EARLY_TESTER, BETA_TESTER, 'castle_10', 'boss_slayer');
+	const out = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + HOUR, 3);
+	assert.deepEqual(out, { kind: 'ok', already: false });
+	assert.equal(m.archives.length, 1, 'the game is archived first, again');
+	assert.equal(m.rows.has('u1'), false, 'the save is gone');
+	const after = m.ledgers.get('u1')!;
+	assert.equal(after.gems, 4321, 'gems stay exactly as they were: no flat starting gift on a later chapter');
+	assert.equal(after.stats.chests, 0, 'the counters start again');
+	assert.deepEqual([after.stats.achievements, after.stats.seen], [[], {}], 'achievements and the glossary are wiped');
+	assert.equal(after.runId, before.runId + 1, 'a new run: sealed rolls never repeat');
+	assert.deepEqual(state.granted, [EARLY_TESTER, BETA_TESTER], 'only the tester marks survive');
+	assert.equal(state.epoch, 3);
+	const again = await startNewChapter(m.deps, repo, 'u1', INPUT, T0 + 2 * HOUR, 3);
+	assert.deepEqual(again, { kind: 'ok', already: true });
+	assert.equal(m.archives.length, 1, 'no second archive');
+});
+
+test('the chapter screen offers the tester marks an account holds only from the second chapter on', () => {
+	assert.deepEqual(earnedAfterReset(2, ['castle_10', BETA_TESTER, 'boss_slayer']), [BETA_TESTER], 'a later chapter: the held tester marks, nothing else');
+	assert.deepEqual(earnedAfterReset(2, ['castle_10']), [], 'no mark held, none offered');
+	assert.deepEqual(earnedAfterReset(1, [EARLY_TESTER]), [], 'epoch 1 never had a chapter: not offered');
+	assert.deepEqual(earnedAfterReset(null, []), [EARLY_TESTER, BETA_TESTER]);
 });
 
 test('a name another account holds stops the reset before anything is deleted', async () => {

@@ -45,13 +45,15 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
  *
  * XP sources: passive `rates.xp x (1 + XP gain %)`, every tile purchase ({@link calculateXpGain}), and server payouts (kills, chests, away time).
  *
- * **Attribute points**: 1 per level, plus 2 extra per level for levels 2-30 (`earlyBonusUntil` 30, `earlyBonusPoints` 2), see {@link totalStatPoints}. There is no paragon level and no +20 points per rebirth in the code.
+ * **Attribute points**: 1 per level, plus 2 extra per level for levels 2-30 (`earlyBonusUntil` 30, `earlyBonusPoints` 2), see {@link totalStatPoints}. Every rebirth adds a flat `attributePointsPerRebirth` (20) on top ({@link attributeBudget}, IDL-100); there is no paragon level.
  *
  * @category Progression/Levels
  * @order 1
  * @see xpToNextLevel, totalStatPoints
  */
 export const LEVELING = {
+	/** Attribute points every rebirth adds to the pool for good (IDL-100): 20, so rebirth 5 has 100 more points to spend than the level alone gives */
+	attributePointsPerRebirth: 20,
 	maxLevel: 100,
 	softCapLevel: 80,
 	firstStepXp: 5000,

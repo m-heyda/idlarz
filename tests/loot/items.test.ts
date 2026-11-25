@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { COMBAT } from '../../src/config/combatConfig';
 import { EQUIPMENT_LAYOUT, ITEM_CATALOG, SETS, STARTER_BAG_ITEMS } from '../../src/catalog';
 import { TRADE_GOODS } from '../../src/catalog/recipes';
+import { monsterChestTierOf } from '../../src/catalog/items/chests';
 import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { ITEM_STAT_KEYS, MAX_ITEM_LEVEL, familyPieces, STAT_BASE_BY_TIER, WEAPON_ATTACK_SPEED, baseStat, levelScale, weaponDps } from '../../src/catalog';
 import { CLOTH_ITEMS } from '../../src/catalog/items/cloth';
@@ -21,7 +22,10 @@ test('catalog keys equal item ids', () => {
 
 test('gear has a slot, potions have effects and stackMax, trade goods are slotless stacks', () => {
 	for (const def of Object.values(ITEM_CATALOG)) {
-		if (def.effects) {
+		if (monsterChestTierOf(def.id)) {
+			// a monster chest (IDL-163) is a stackable consumable that is opened, not drunk: no effects, no slot
+			assert.ok((def.stackMax ?? 0) > 1 && !def.slot && !def.effects, def.id);
+		} else if (def.effects) {
 			assert.ok(def.effects.length > 0, def.id);
 			assert.ok((def.stackMax ?? 0) > 1, def.id);
 			assert.equal(def.slot, undefined, def.id);
@@ -101,7 +105,25 @@ test('rarity follows the family: wood and cloth common, steel uncommon, obsidian
 	assert.deepEqual([...rarityOf('knight')], ['uncommon']);
 	assert.deepEqual([...rarityOf('obsidian')], ['rare']);
 	// Only the enabled items count: the disabled reserve legendaries (catalog/items/reuse.ts) are not part of the game yet.
-	assert.equal(Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary' && d.enabled !== false && !d.craftOnly).length, 3);
+	// the three classics plus the roster legendaries whose perk is live (IDL-143, IDL-146); the ones still waiting for a perk stay disabled
+	const live = Object.values(ITEM_CATALOG).filter((d) => d.rarity === 'legendary' && d.enabled !== false && !d.craftOnly);
+	assert.deepEqual(live.map((d) => d.id).sort(), [
+		'amethyst_spire',
+		'cindercrescent_glaive',
+		'cinderflight_bow',
+		'dawnbringer_trident',
+		'emberbrand',
+		'frostbloom_fan',
+		'nightfall_edge',
+		'reapers_crescent',
+		'runeforged_titanhammer',
+		'starfall_bow',
+		'stormtrident',
+		'tidecaller_axe',
+		'titan_maul',
+		'voidrune_blade',
+	]);
+	for (const d of live) assert.ok(['emberbrand', 'starfall_bow', 'titan_maul'].includes(d.id) || d.perks, `${d.id} is a classic or carries a live perk`);
 });
 
 test('every weapon type has a steel or obsidian version and every weapon comes with its stats', () => {

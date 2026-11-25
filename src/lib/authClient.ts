@@ -57,6 +57,9 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			user?: { id?: string };
 			profile?: Profile | null;
 			error?: string;
+			/** Sign-up with Confirm email on: the account waits for its emailed link (HTTP 202) */
+			confirmEmail?: boolean;
+			message?: string;
 			unavailable?: boolean;
 			reason?: UnavailableReason;
 			epoch?: unknown;
@@ -66,6 +69,9 @@ const request = async (path: string, init?: RequestInit): Promise<AuthResult> =>
 			away?: { gapSec?: unknown; capSec?: unknown; efficiency?: unknown } | null;
 			identity?: { badge?: unknown; badgeName?: unknown; title?: unknown; nameColor?: unknown; admin?: unknown } | null;
 		};
+		// sign-up with Confirm email on: the account waits for its link, nobody is signed in
+		if (response.status === 202 && body.confirmEmail === true)
+			return { status: 'error', message: typeof body.message === 'string' ? body.message : 'Check your email to confirm your account.' };
 		if (response.ok) {
 			const epoch = typeof body.epoch === 'number' && Number.isInteger(body.epoch) && body.epoch >= 1 ? { epoch: body.epoch } : {};
 			const needsReset = body.needsReset === true ? { needsReset: true } : {};

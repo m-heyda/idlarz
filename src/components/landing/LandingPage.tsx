@@ -14,6 +14,9 @@ import type { ChangelogEntry } from '@/config/changelog';
 import { GAME_TITLE } from '@/config/branding';
 import { LANDING_BG, LANDING_LOGO } from '@/config/landing';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
+import Toast from '@/components/game/Toast';
+import { landingNoticeOf } from '@/lib/authCallback';
+import { notify } from '@/lib/notices';
 import { fetchCloud, readLink } from '@/lib/cloudClient';
 import { epochVerdict, readSeenEpoch } from '@/lib/epochGuard';
 import { peekSave } from '@/lib/saveStorage';
@@ -264,6 +267,12 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 	useEffect(() => {
 		const params = new URLSearchParams(window.location.search);
 		setNext(safeNextPath(params.get('next')));
+		// an expired or used reset link: say so once, and take the parameter out of the address
+		const notice = landingNoticeOf(window.location.search);
+		if (notice) {
+			notify(notice.message, 'error');
+			window.history.replaceState(null, '', `${window.location.pathname}${notice.rest}`);
+		}
 		// a guest who registers from the guest game lands on the Create account tab (`GuestChip`)
 		if (params.get('register') === '1') {
 			setMode('register');
@@ -304,6 +313,7 @@ const LandingPage: React.FC<{ changelog: readonly ChangelogEntry[] }> = ({ chang
 			<div className='ld-bg' style={{ backgroundImage: `url(${LANDING_BG})` }} aria-hidden='true' />
 			<div className='ld-shade' aria-hidden='true' />
 			<h1 className='sr-only'>{GAME_TITLE}</h1>
+			<Toast />
 			{/* eslint-disable-next-line @next/next/no-img-element */}
 			<img className='ld-logo' src={LANDING_LOGO} alt='' aria-hidden='true' draggable={false} />
 

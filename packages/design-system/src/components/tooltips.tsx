@@ -182,6 +182,8 @@ export interface ItemTooltipProps {
 	groups?: ItemStatGroup[];
 	/** Affix lines (blue), each "+12 Fire damage" with the affix name */
 	affixes?: { text: string; name: string }[];
+	/** A legendary's fixed perks (IDL-147): a gold block under the affixes, one line each ("+25% Income") */
+	perks?: { text: string }[];
 	/** Set changes when it replaces a worn piece: "Cloudwalker 2 -> 3 / 5" */
 	setChanges?: { label: string; from: number; to: number; size: number }[];
 	set?: TipSetBlockProps;
@@ -219,6 +221,7 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 	rows,
 	groups,
 	affixes,
+	perks,
 	setChanges,
 	set,
 	flavor,
@@ -258,6 +261,16 @@ export const ItemTooltip: React.FC<ItemTooltipProps> = ({
 				{a.text} <span className='ds-tip-affix'>{a.name}</span>
 			</TipLine>
 		))}
+		{perks && perks.length > 0 ? (
+			<div className='ds-tip-perks'>
+				<div className='ds-tip-perks-head'>{perks.length > 1 ? 'Legendary perks' : 'Legendary perk'}</div>
+				{perks.map((perk) => (
+					<div className='ds-tip-perk' key={perk.text}>
+						{perk.text}
+					</div>
+				))}
+			</div>
+		) : null}
 		{setChanges?.map((c) => (
 			<TipLine key={c.label} tone={c.to >= c.from ? 'green' : 'red'}>
 				{c.label} {c.from} → {c.to} / {c.size}

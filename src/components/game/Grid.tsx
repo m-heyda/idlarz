@@ -82,7 +82,7 @@ const Grid: React.FC = () => {
 			tileCostAsResources(
 				calculateTileCost(
 					economyTiles(state.tiles, state.freeTiles),
-					effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass),
+					effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
 				),
 			),
 		),

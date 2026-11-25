@@ -29,7 +29,7 @@ P0 foundation, **P1 front door** (landing, `/play`, offline bar, password reset)
 | **P7** | Rebirth respec, finish | +20 attribute points per rebirth | S | none |
 | **P8** | Jungle (rebirth 1) | the first new biome with its own material, buildings, art | L | 🎨 |
 | **P9** | Rankings, finish | paragon level display, preview of another player's map | M | small |
-| **P10** | Fields + Orchard (rebirth 2, 3) | two biomes, Cloth, Honey | L | 🎨 |
+| **P10** | Fields + Orchard (rebirth 2, 3) | two biomes with their buildings and extracts; art | L | 🎨 |
 | **P11** | Crafting, finish | enchanted craft button, then the rest of crafting v1 | S then L | small |
 | **P12** | Blight + Battlefield (rebirth 4, 5) | the two **special** biomes, Ichor, War Medals, bosses | L | 🎨 fancy |
 | **P13** | **MVP: landing v2** | new landing with all biomes; public-release checklist | M | 🎨 |
@@ -86,7 +86,7 @@ The unlock rule, the roster (placeholder art) and the intro screen are live; Jun
 | Step | What |
 |---|---|
 | 8.1 🎨 | Biome art: ground, deep tier, rim against every neighbour, props, decor, building pads, ambient critters, minimap and highlight colour (IDL-106) |
-| 8.2 | **Hardwood** (T2, 0.1/s per tile), header slot on discovery, offline yes and chests no; basic outputs gold and hide (IDL-107) |
+| 8.2 | Built in 0.9.0: the Jungle's Producer and Extractor (Canopy Camp, Venom Press) with the Venom extract. The planned T2 material Hardwood is dropped (decided 2026-11-24, IDL-107 closed): the extracts replace the T2 tier. |
 | 8.3 | Jungle Logging Camp, Serpent Pit (Venom), Totem of the Wild 🎨 (placeholders first) |
 | 8.4 | Guide and glossary entries for the biome and its monsters |
 
@@ -101,7 +101,7 @@ Paragon **bonuses** (points to spend) wait for their own design after P9 (IDL-10
 
 ### P10 · Fields and Blossom Orchard (rebirth 2 and 3)
 
-Same pattern as P8, twice: art 🎨, **Cloth** and **Honey** (sheep already give Wool on the farm), three buildings each (Hen Barn / Dye Works / Scarecrow King; Dairy Barn / Apiary / Blossom Shrine), Guide entries. The mild, pastoral biomes, closest to the current look, so the cheapest art. IDL-108, IDL-109.
+Same pattern as P8, twice: art 🎨 and Guide entries. Built in 0.9.0: the Producer and Extractor of both biomes (Windmill Farmstead and Dye Works, Blossom Yard and Royal Apiary) with the Dye and Royal Jelly extracts; Cloth and Honey as T2 materials are dropped (decided 2026-11-24, IDL-109 closed), and crafting makes Cloth Bolts from wool. The mild, pastoral biomes, closest to the current look, so the cheapest art. IDL-108, IDL-109.
 
 ### P11 · Crafting: finish
 
@@ -160,7 +160,7 @@ Placeholders are catalog keys, so art swaps in without a code change. New pictur
 |---|---|
 | Buildings: 3 per biome, 36 in all (21 home biomes, 15 new), 2 looks each | the old sprites |
 | New biomes: Jungle, Fields, Orchard, Blight, Battlefield (ground, rim, props, decor, pads, critters, minimap colour) | flat-colour dev palettes |
-| T2 icons: Hardwood, Cloth, Honey, Ichor, War Medals; T4 relic icons | tinted existing icons, a generic crate |
+| Icons: Ichor, War Medals and the T4 relics (Hardwood, Cloth and Honey are dropped) | tinted existing icons, a generic crate |
 | Monsters: the 20 stand-in monsters of roster v2 and the later biomes | stand-in pictures (IDL-373) |
 | Equipment pass 3: the starter families, chest, shoulders, gloves, capes, charms, tomes and the three special sets | the old `item_*` icons; the old icons and gear scripts go when the pass ends (IDL-218, IDL-33 to IDL-36, IDL-41) |
 | Landing v2 | the current landing image |

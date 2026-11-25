@@ -25,12 +25,15 @@ export const SET_DEFS: SetDef[] = [
 		id: 'obsidian',
 		label: 'Obsidian Set',
 		theme: "The prospector's set: it pays the kingdom (income, XP, kill rewards, away time) and keeps its wearer alive, without raw offence.",
+		// IDL-150 (2026-11-24): rare, epic and legendary pieces now carry x1.1 / x1.25 / x1.5 on their base stats (`RARITIES`), so the flat combat parts of the bonus (armor, max HP, damage) are scaled x1.2, the middle of that
+		// range, to stay the same share of a kit (a full Obsidian kit at item level 60 has 261 armor and 387 max HP common, 325 and 480 epic; the 12-piece bonus was 22 and 60, now 26 and 72). The economy parts (income, XP,
+		// kill reward, click, away time, gold find) are untouched: rarity does not scale them and the perk family caps (`catalog/perkCaps.ts`) hold them.
 		bonuses: {
-			2: { incomePct: 6, maxHp: 20 },
-			4: { xpPct: 10, goldFind: 10, armor: 6 },
-			6: { killRewardPct: 12, damage: 5, luck: 3 },
-			9: { offlineEff: 15, clickPct: 10, incomePct: 8, maxHp: 40 },
-			12: { incomePct: 12, xpPct: 15, killRewardPct: 25, offlineCapHours: 3, goldFind: 20, armor: 10, superCrit: 6 },
+			2: { incomePct: 6, maxHp: 24 },
+			4: { xpPct: 10, goldFind: 10, armor: 7 },
+			6: { killRewardPct: 12, damage: 6, luck: 3 },
+			9: { offlineEff: 15, clickPct: 10, incomePct: 8, maxHp: 48 },
+			12: { incomePct: 12, xpPct: 15, killRewardPct: 25, offlineCapHours: 3, goldFind: 20, armor: 12, superCrit: 6 },
 		},
 	},
 	// ---- the special sets S1-S3 (decided 2026-11-07, IDL-39; docs/plan/28-reuse-items-and-stats.md section 10): 14 pieces each, thresholds 3 / 6 / 9 / 12 / 14. Their

@@ -14,6 +14,7 @@ import { rollGemFind } from '@/lib/luck';
 import type { Rng } from '@/lib/rng';
 import { clearBuffsOnRebirth } from '@/lib/buffs';
 import { applyUse } from '@/lib/offline/consumables';
+import { applyOpen } from '@/lib/offline/openChest';
 import { combatView, dismissTicket, runCombat, type CombatEnv } from '@/lib/offline/fight';
 import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
@@ -379,6 +380,11 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 					...(used.shifted ? { shifted: used.shifted } : {}),
 				},
 			};
+		}
+		if (op.action === 'open') {
+			const opened = applyOpen(ledger, ctx.env, op.index);
+			if (!opened.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, message: opened.message } };
+			return { ledger: opened.ledger, value: { ok: true, gold: 0, count: 0, inv: opened.ledger.inv!, serverNowSec: ctx.nowSec, opened: opened.opened } };
 		}
 		if (op.action === 'sellResource' || op.action === 'buyResource') {
 			// the merchant's resource trades (IDL-319): priced here, judged against what the last save and the rates can explain; allowed in a fight like the shop purchases

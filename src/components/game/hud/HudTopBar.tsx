@@ -6,6 +6,8 @@ import { MERCHANT_RESOURCE_PRICES } from '@/config/merchant';
 import { pixelIconSrc, type PixelIconName, RESOURCE_PIXEL_ICONS } from '@/config/pixelIcons';
 import { resourceDiscovered } from '@/lib/resourceDiscovery';
 import { openMenuAt } from '@/lib/globalMenu';
+import { useIncomeBreakdown } from '@/hooks/useIncomeBreakdown';
+import { sourceRows } from '@/lib/incomeRows';
 import { useGameStore } from '@/stores/gameStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useWindowStore } from '@/stores/windowStore';
@@ -27,6 +29,8 @@ const iconUrl = (key: ResourceKey): string => pixelIconSrc((RESOURCE_PIXEL_ICONS
 const ResourceTrays: React.FC = () => {
 	const resources = useGameStore((state) => state.resources);
 	const resourceRates = useGameStore((state) => state.resourceRates);
+	// where each resource's income comes from, for the "Sources" block of its tooltip (IDL-339)
+	const breakdown = useIncomeBreakdown();
 	const gems = useGameStore((state) => state.gems);
 	const embers = useGameStore((state) => state.prestige.legacyPoints); // saved under its old name, see PrestigeState
 	const compact = useUiStore((state) => state.compactHeader);
@@ -60,6 +64,7 @@ const ResourceTrays: React.FC = () => {
 						...(rate && rate > 0 ? [{ label: 'Per hour', value: formatHeaderAmount(rate * 3600) }] : []),
 						...(bonus !== undefined && bonus > 0.0005 ? [{ label: 'Bonus', value: `+${formatPercent(bonus * 100)}`, tone: 'green' as const }] : []),
 					];
+					const sources = produced ? sourceRows((breakdown as unknown as Record<string, Parameters<typeof sourceRows>[0]>)[key]) : [];
 					const footer: [string, string] = [
 						price !== undefined ? `Sells for ${price}` : '',
 						isGems ? 'Click to open the Gem shop' : isEmbers ? 'Click to open Rebirth' : opensMerchant ? 'Click to open Merchant' : '',
@@ -71,6 +76,7 @@ const ResourceTrays: React.FC = () => {
 							name={RESOURCES[key].label}
 							value={compact ? '' : formatHeaderAmount(amount)}
 							rows={rows}
+							sources={sources.length ? sources : undefined}
 							footer={footer}
 							rarity={TIER_RARITY[tier.id]}
 							subtitle={tier.label.replace(/s$/, '')}

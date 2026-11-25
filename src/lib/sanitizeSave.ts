@@ -20,7 +20,7 @@ import { instanceProblem } from '@/lib/itemInstance';
 import { maxHp, maxMana } from '@/lib/combat';
 import { mergeJunk, starterBag } from '@/lib/inventory';
 import { limitOf } from '@/lib/limits';
-import { calculateCombatStats, calculateLevel, totalStatPoints, calculateXpGain } from '@/utils/game/character';
+import { calculateCombatStats, calculateLevel, rebirthPoints, totalStatPoints, calculateXpGain } from '@/utils/game/character';
 import { refundOldShop } from '@/lib/emberShopMigration';
 import { castleUpgradeDuration } from '@/utils/game/castle';
 import { EMPTY_PRESTIGE, emberSpent } from '@/utils/game/rebirth';
@@ -354,12 +354,14 @@ export const sanitizeSave = (raw: unknown): SanitizeResult => {
 	}
 	let available = int(raw.characterStats.availablePoints, 0, 100000);
 	if (available === null) return fail('available points');
-	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level.level);
+	// the pool is what the level earned plus 20 per rebirth (IDL-100); the rebirth count is read here before the prestige block validates it (a bad value fails there)
+	const savedRebirths = int(isRecord(raw.prestige) ? (raw.prestige.rebirths ?? 0) : 0, 0, 10000) ?? 0;
+	const expectedTotal = BASE_STAT_KEYS.length * INITIAL_CHARACTER_STATS.strength + totalStatPoints(level.level) + rebirthPoints(savedRebirths);
 	const total = allocated + available;
 	if (total > expectedTotal) {
 		// more points than the level pays for (a hand edit, or fewer points per level after a rebalance): a free respec, every point unspent, never a refused save
 		for (const key of BASE_STAT_KEYS) base[key] = INITIAL_CHARACTER_STATS[key];
-		available = totalStatPoints(level.level);
+		available = totalStatPoints(level.level) + rebirthPoints(savedRebirths);
 	} else {
 		// fewer than the level pays for (points per level were raised, or the save is a moment behind a level-up): the difference is credited
 		available += expectedTotal - total;

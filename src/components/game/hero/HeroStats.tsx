@@ -16,7 +16,7 @@ import { describeClassPassives } from '@/lib/classPassives';
 import { craftLevelOf } from '@/lib/crafting';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearAttributes } from '@/lib/gearAttributes';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import { useRememberedOpen } from '@/hooks/useRememberedOpen';
 import { useAchievementStore } from '@/stores/achievementStore';
@@ -149,7 +149,7 @@ const HeroStats: React.FC = () => {
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncomePct(equipment)),
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment)),
 		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
 	);
 
@@ -196,6 +196,11 @@ const HeroStats: React.FC = () => {
 		{ label: COMBAT_NAMES.hpRegen, value: `${formatCompact(fx.hpRegen)}/s`, color: I.green },
 		{ label: COMBAT_NAMES.attackSpeed, value: `${formatCompact(fx.attacksPerSecond, 2)}/s (+${pct(characterStats.atkSpeedIncrease, 2)})`, color: I.blue },
 		{ label: 'Life leech', value: pct(fx.lifeLeech, 1), color: I.red },
+		// the gear's combat stats of IDL-176: a row only when something is worn that gives it
+		...(fx.armorPen > 0 ? [{ label: 'Armor penetration', value: pct(fx.armorPen, 1), color: I.gold }] : []),
+		...(fx.thorns > 0 ? [{ label: 'Thorns', value: pct(fx.thorns, 1), color: I.red }] : []),
+		...(fx.bossTimer > 0 ? [{ label: 'Boss timer', value: `+${formatCompact(fx.bossTimer, 1)} s`, color: I.gold }] : []),
+		...(fx.healOnKill > 0 ? [{ label: 'Heal on kill', value: `${pct(fx.healOnKill, 1)} max HP`, color: I.green }] : []),
 	];
 
 	const deedBonusesNow = deedBonuses(milestonesClaimed);

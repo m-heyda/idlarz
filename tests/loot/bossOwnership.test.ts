@@ -84,7 +84,11 @@ test("no boss drops another biome's set, or any set it does not own; every uniqu
 				uniqueOwners.set(id, [...(uniqueOwners.get(id) ?? []), biome]);
 			}
 		}
-		for (const id of BOSS_LOOT[biome].uniques) assert.ok(LOOT_DATA.items[id]?.pools?.includes('legendary_weapons'), `${id} is a legendary weapon`);
+		for (const id of BOSS_LOOT[biome].uniques)
+			assert.ok(
+				LOOT_DATA.items[id]?.pools?.some((p) => p === 'legendary_weapons' || p === 'legendary_top'),
+				`${id} is a legendary weapon`,
+			);
 	}
 	for (const biome of biomes) for (const id of BOSS_LOOT[biome].uniques) assert.deepEqual(uniqueOwners.get(id), [biome], `${id} has exactly one boss`);
 	// the generic `boss` source (debug panel, craft-sim) drops no named item and no set piece either

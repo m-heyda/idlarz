@@ -18,14 +18,19 @@ export interface RarityDef {
 	/** How many affixes an item of this rarity rolls (inclusive range) */
 	minAffixes: number;
 	maxAffixes: number;
-	/** Multiplier on the base stats. 1 everywhere for now: rarity adds affixes, not a second multiplier on top of item level. */
+	/** Multiplier on the base stats of a generated piece (damage, armor, health ...): 1 for common and uncommon, more for rare and better (IDL-382). Named items keep their authored numbers. */
 	statMultiplier: number;
+	/** Multiplier on the value of every affix the piece rolled (IDL-382), on top of the roll: an epic Sharp affix is worth more than a rare one at the same item level and roll. */
+	affixMultiplier: number;
 	/** A disabled rarity is never rolled and never accepted from a save */
 	enabled: boolean;
 }
 
 /**
  * Rarities: everything the game knows about one, in one place: label, colour, glow, how many affixes it rolls, what it is worth and how it ranks. Adding a tier is one row here plus a weight in the loot profiles that should drop it.
+ *
+ * **Rarer is stronger** (IDL-382): `statMultiplier` scales the base stats (damage, armor, health ...) of a generated piece and `affixMultiplier` the value of every affix it rolled: common and uncommon x1, rare x1.1, epic x1.25, legendary x1.5. Named items (the legendary weapons) keep their authored numbers.
+ * Affix counts and the multipliers together are what an epic is worth; how often each rarity drops is the profiles' `rarityWeights` (`Loot/Config`) and the grades' `dropRarities` (`Loot/Items`).
  *
  * @category Loot/Items
  * @order 1
@@ -41,6 +46,7 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		minAffixes: 0,
 		maxAffixes: 0,
 		statMultiplier: 1,
+		affixMultiplier: 1,
 		enabled: true,
 	},
 	uncommon: {
@@ -53,6 +59,7 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		minAffixes: 1,
 		maxAffixes: 1,
 		statMultiplier: 1,
+		affixMultiplier: 1,
 		enabled: true,
 	},
 	rare: {
@@ -64,7 +71,8 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		glow: { blur: 4, alpha: 0.7, pulse: false },
 		minAffixes: 2,
 		maxAffixes: 3,
-		statMultiplier: 1,
+		statMultiplier: 1.1,
+		affixMultiplier: 1.1,
 		enabled: true,
 	},
 	epic: {
@@ -76,7 +84,8 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		glow: { blur: 5, alpha: 0.85, pulse: true },
 		minAffixes: 3,
 		maxAffixes: 4,
-		statMultiplier: 1,
+		statMultiplier: 1.25,
+		affixMultiplier: 1.25,
 		enabled: true,
 	},
 	legendary: {
@@ -88,7 +97,8 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		glow: { blur: 6, alpha: 0.95, pulse: true },
 		minAffixes: 4,
 		maxAffixes: 5,
-		statMultiplier: 1,
+		statMultiplier: 1.5,
+		affixMultiplier: 1.5,
 		enabled: true,
 	},
 	/**
@@ -104,7 +114,8 @@ export const RARITIES: Record<EquipmentRarity, RarityDef> = {
 		glow: { blur: 7, alpha: 1, pulse: true },
 		minAffixes: 5,
 		maxAffixes: 6,
-		statMultiplier: 1,
+		statMultiplier: 1.75,
+		affixMultiplier: 1.75,
 		enabled: false,
 	},
 };

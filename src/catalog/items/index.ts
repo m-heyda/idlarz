@@ -1,4 +1,5 @@
 import type { ItemDef } from '@/types/game';
+import { CHEST_ITEMS } from './chests';
 import { CLOTH_ITEMS } from './cloth';
 import { CONSUMABLES } from './consumables';
 import { LADDER_ITEMS, gradeLegacyItems } from './ladder';
@@ -23,6 +24,7 @@ export const ITEMS: ItemDef[] = withLore([
 	...gradeLegacyItems(WOODEN_ITEMS),
 	...CONSUMABLES,
 	...JUNK_ITEMS,
+	...CHEST_ITEMS,
 	...gradeLegacyItems(CLOTH_ITEMS),
 	...gradeLegacyItems(STEEL_ITEMS),
 	...gradeLegacyItems(OBSIDIAN_ITEMS),

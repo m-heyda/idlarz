@@ -15,7 +15,7 @@ import { type ChestLoot } from '@/lib/chests';
 import { createClickLimiter } from '@/lib/clickLimiter';
 import { maxHp, maxMana } from '@/lib/combat';
 import type { LimitContext } from '@/lib/limits';
-import { gearIncomePct } from '@/lib/gearEconomy';
+import { gearIncome } from '@/lib/gearEconomy';
 import { starterBag } from '@/lib/inventory';
 import { useUiStore } from '@/stores/uiStore';
 import { STARTER_EQUIPMENT } from '@/config/itemCatalog';
@@ -37,7 +37,7 @@ export const ratesWithGear = (
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncomePct(equipment),
+		gearIncome(equipment),
 	);
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
@@ -85,7 +85,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 	const stats = { ...INITIAL_CHARACTER_STATS };
 	Object.assign(stats, calculateCombatStats(stats)); // derived stats always follow the formulas
 	const equipment = { ...STARTER_EQUIPMENT };
-	const rates = calculateResourceRates(grid, stats, {}, prestige, undefined, undefined, gearIncomePct(equipment));
+	const rates = calculateResourceRates(grid, stats, {}, prestige, undefined, undefined, gearIncome(equipment));
 	return {
 		tiles: grid,
 		resources: startingResources(prestige),

@@ -257,3 +257,11 @@ test('a worn legendary can be kept too, and the same key replays the answer with
 	assert.deepEqual(replay.kept, a.kept);
 	assert.equal(m.ledgers.get(ID)!.inv!.ver, a.inv.ver, 'no second wipe');
 });
+
+test('the browser rebirths locally when the server cannot be asked today, and refuses to the day the server must run every rebirth (IDL-211)', async () => {
+	const { blocksLocalRebirth } = await import('@/lib/serverRebirth');
+	assert.equal(blocksLocalRebirth({ status: 'unavailable' }), false, 'today: the switch is off, the local rebirth stays allowed');
+	assert.equal(blocksLocalRebirth({ status: 'unavailable' }, true), true, 'switched on: a rebirth the server never saw would be reverted, so do not start it');
+	assert.equal(blocksLocalRebirth({ status: 'ok', gain: 5, kept: [] }, true), false);
+	assert.equal(blocksLocalRebirth({ status: 'refused' }, true), false, 'a refusal has its own notice');
+});

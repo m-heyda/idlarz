@@ -325,7 +325,7 @@ const play = (name: string, profile: Profile, ctx: Ctx, { cfg, utils, store, mon
 					st.prestige,
 					st.farmUpgrades,
 					st.merchantUpgrades,
-					gearEco.gearIncomePct(equipment),
+					gearEco.gearIncome(equipment),
 				),
 			}));
 		}

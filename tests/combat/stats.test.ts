@@ -10,6 +10,7 @@ import {
 	damagePerHit,
 	damagePerSecond,
 	leechHeal,
+	leechHealAmount,
 	lifeLeechPercent,
 	manaRegenPerSec,
 	maxHp,
@@ -27,7 +28,7 @@ import {
 	statMaxMana,
 } from '../../src/lib/statBonuses';
 import { plainItem } from '../../src/lib/itemInstance';
-import { calculateCombatStats, getStatDescription, getStatDescriptionGroups } from '../../src/utils/game/character';
+import { calculateCombatStats, calculateStatResourceModifiers, getStatDescription, getStatDescriptionGroups } from '../../src/utils/game/character';
 import { AFFIX_CATALOG } from '../../src/catalog/affixes';
 import { resolveItem } from '../../src/lib/itemInstance';
 import type { CharacterStats, Equipment, ItemInstance } from '../../src/types/game';
@@ -213,4 +214,31 @@ test('every listed effect has a reader: the derived values equal the functions t
 	assert.equal(c.def, statArmor(c));
 	assert.equal(c.mp, statMaxMana(c));
 	assert.equal(c.atkSpeedIncrease, atkSpeedPercent(c));
+});
+
+test('Life Leech: the fight engine and leechHeal use the one formula (IDL-172)', () => {
+	assert.equal(leechHealAmount(100, 7.5), 7.5);
+	assert.equal(leechHealAmount(100, 0), 0);
+	const eq = STARTER_EQUIPMENT;
+	assert.equal(leechHeal(40, eq), leechHealAmount(40, lifeLeechPercent(eq)));
+});
+
+test('attribute rules (IDL-174): economy and crit chance and mana count every point, damage, armor, attack speed and crit damage only the points above 5', () => {
+	const at = (stat: 'strength' | 'dexterity' | 'intelligence' | 'vitality' | 'charisma', value: number) => ({ ...INITIAL_CHARACTER_STATS, [stat]: value });
+	// a fresh character (all 5) has no combat bonus from the attributes, but the economy bonus of its starting points
+	const fresh = INITIAL_CHARACTER_STATS;
+	assert.equal(physicalDamagePercent(fresh), 0);
+	assert.equal(magicDamagePercent(fresh), 0);
+	assert.equal(statArmor(fresh), 0);
+	assert.equal(atkSpeedPercent(fresh), 0);
+	assert.equal(critDamagePercent(fresh), 0);
+	const startGold = calculateStatResourceModifiers(fresh).gold;
+	assert.ok(startGold > 0, 'the starting 5 Intelligence and 5 Charisma already pay an economy bonus');
+	// one more point: combat bonuses start from the 6th point, the economy bonus grows by the same step from the first
+	assert.equal(physicalDamagePercent(at('strength', 6)), STAT_RULES.physicalDamagePerStrength);
+	assert.equal(atkSpeedPercent(at('dexterity', 6)), STAT_RULES.atkSpeedPerDexterity);
+	assert.equal(critDamagePercent(at('charisma', 6)), STAT_RULES.critDamagePerPoint.charisma);
+	assert.ok(calculateStatResourceModifiers(at('intelligence', 6)).gold > startGold || calculateStatResourceModifiers(at('charisma', 6)).gold > startGold);
+	// below the start (cannot happen in play, but the rule is "above 5") nothing negative
+	assert.equal(physicalDamagePercent(at('strength', 3)), 0);
 });

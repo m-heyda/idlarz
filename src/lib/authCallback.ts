@@ -7,6 +7,32 @@ export const CALLBACK_PATH = '/auth/callback';
 /** Where the callback sends a link that could not be used (expired, used twice, wrong browser). */
 export const RESET_EXPIRED_PATH = '/?reset=expired';
 
+/** The cookie that marks a recovery session (IDL-384): set by `/auth/callback` when it trades the code of the emailed reset link, required by `POST /api/auth/password`. */
+export const RECOVERY_COOKIE = 'idl_recovery';
+/** How long a recovery session may change the password after the emailed link was opened: 15 minutes. */
+export const RECOVERY_MAX_AGE_SEC = 15 * 60;
+
+/** The options of the recovery cookie: not readable by scripts, not sent along with a cross-site request, only over https where the site is served over https. */
+export const recoveryCookieOptions = (secure: boolean) => ({ httpOnly: true, sameSite: 'lax' as const, secure, path: '/', maxAge: RECOVERY_MAX_AGE_SEC });
+
+/** Whether the request's `Cookie` header carries the recovery cookie. */
+export const hasRecoveryCookie = (cookieHeader: string | null | undefined): boolean =>
+	(cookieHeader ?? '').split(';').some((part) => part.trim() === `${RECOVERY_COOKIE}=1`);
+
+/** What the landing page says when the emailed link could not be used (IDL-301) */
+export const RESET_EXPIRED_MESSAGE = 'That reset link has expired or was already used. Ask for a new one with "Forgot password".';
+
+/**
+ * The notice the landing page owes its address (`?reset=expired`, set by {@link RESET_EXPIRED_PATH}), or null. `rest` is the query string without that parameter, for the address bar, so a reload does not repeat the notice and `next` / `register` survive.
+ */
+export const landingNoticeOf = (search: string): { message: string; rest: string } | null => {
+	const params = new URLSearchParams(search);
+	if (params.get('reset') !== 'expired') return null;
+	params.delete('reset');
+	const rest = params.toString();
+	return { message: RESET_EXPIRED_MESSAGE, rest: rest ? `?${rest}` : '' };
+};
+
 /**
  * The `next` of the auth callback: a path on this site only (single leading `/`, no `//`, no backslash, no control characters), else `/play`.
  * It comes from the address bar, so an open redirect through it would turn a real reset email into a phishing link.

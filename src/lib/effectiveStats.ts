@@ -2,21 +2,24 @@ import { COMBAT } from '@/config/combatConfig';
 import { aggregateStats } from '@/lib/inventory';
 import {
 	armorOf,
+	armorPenPercent,
 	armorReduction as armorReductionOf,
 	attacksPerSecond,
+	critExtraOf,
 	critOdds,
 	damagePerHit,
 	dodgeChance,
+	healOnKillPercent,
 	lifeLeechPercent,
 	manaRegenPerSec,
 	maxHp,
 	maxMana,
+	thornsPercent,
 } from '@/lib/combat';
 import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
-import { critDamagePercent } from '@/lib/statBonuses';
-import { attributesWithGear, withGearAttributes } from '@/lib/gearAttributes';
+import { withGearAttributes } from '@/lib/gearAttributes';
 import { classPassives, withClassBonus } from '@/lib/classPassives';
-import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
+import { gearBossTimerSec, gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
 import { NO_IDOL_ECONOMY, type IdolEconomy } from '@/lib/idolEconomy';
@@ -48,7 +51,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const bonus = withClassBonus(merchantCombat(merchantUpgrades, prestige), playerClass);
 	const passives = classPassives(playerClass);
 	const odds = critOdds(characterStats, equipment, bonus);
-	const critExtra = 1 + critDamagePercent(attributesWithGear(characterStats, equipment)) / 100;
+	const critExtra = critExtraOf(characterStats, equipment);
 	const armor = armorOf(equipment, characterStats, playerClass) * idolPct(idol.hpArmorPct);
 	const luck = withGearAttributes(characterStats, equipment).luck + merchantLuck(merchantUpgrades, prestige) + gear.luck + idol.luck;
 	const economy = gearEconomy(equipment);
@@ -65,6 +68,12 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		armorReduction: armorReductionOf(armor) * 100,
 		dodge: dodgeChance(equipment) * 100,
 		lifeLeech: lifeLeechPercent(equipment, bonus),
+		/** The gear's combat stats of IDL-176 (%, each capped by `STAT_RULES`) */
+		armorPen: armorPenPercent(equipment),
+		thorns: thornsPercent(equipment),
+		healOnKill: healOnKillPercent(equipment),
+		/** Seconds the gear's Boss Timer adds to a boss fight's clock (IDL-176) */
+		bossTimer: gearBossTimerSec(equipment),
 		/** % chance that a click crits */
 		critChance: odds.crit * 100,
 		/** What a crit multiplies the click by */
@@ -78,7 +87,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		potionSlots: potionSlotCount(gear),
 		luck,
 		/** % more chests than without Luck */
-		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct + idol.chestSpeedPct),
+		chestRateBonus: chestRateBonusPct(luck, passives.chestSpeedPct + idol.chestSpeedPct + gear.chestSpeedPct),
 		/** % better odds for rare-and-better gear from Luck */
 		rarityLuckBonus: (rarityLuckMultiplier(luck) - 1) * 100,
 		/** % chance that a chest also holds 5-50 gems */
@@ -92,10 +101,10 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		spellPower: gear.spellPower + passives.spellPowerPct,
 		xpGain: xpGainPct(characterStats, equipment, playerClass) + idol.xpPct,
 		/** % off TILES (not buildings): Charisma, the rebirth Thrift and the merchant's Bulk Discount, capped. Building cost takes the Ember Thrift only (calculateBuildingCost) */
-		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass),
+		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
-		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct) * 100,
+		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct + gear.buildTimePct) * 100,
 		/** Set bonuses of the worn gear: % more income (every resource but XP), % more gold and XP from kills, % more gold per click */
 		gearIncome: economy.incomePct,
 		killRewards: economy.killRewardPct + idol.killRewardPct,

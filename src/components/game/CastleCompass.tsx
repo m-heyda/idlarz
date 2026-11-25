@@ -1,4 +1,5 @@
 import React, { useLayoutEffect, useRef } from 'react';
+import { Button } from '../../../packages/design-system/src/components/primitives';
 import { compassArrow, type Insets } from '@/lib/castleFinder';
 import { useViewStore } from '@/stores/viewStore';
 import '@/styles/CastleCompass.css';
@@ -79,9 +80,9 @@ const CastleCompass: React.FC = () => {
 					<span className='compass-unit'>tiles</span>
 				</span>
 			</button>
-			<button type='button' className='px-btn px-btn-gold px-btn-sm compass-home' onClick={home}>
+			<Button tone='gold' size='sm' className='compass-home' onClick={home}>
 				Back to castle
-			</button>
+			</Button>
 		</div>
 	);
 };

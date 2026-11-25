@@ -16,16 +16,18 @@ interface GradeInfo {
 	levels: readonly [number, number];
 	/** The material tier (1-5) the grade belongs to, for the code that still reads `tier` */
 	tier: 1 | 2 | 3 | 4 | 5;
-	/** Rarities a base of this grade may roll as */
+	/** Rarities a craft of this grade may roll as (the crafting odds, `CRAFT_GEAR`) */
 	rarities: readonly EquipmentRarity[];
+	/** Rarities a base of this grade may DROP as when it differs from `rarities` (IDL-382): drops reach rare and epic earlier than a craft does. Always a superset of `rarities`. */
+	dropRarities?: readonly EquipmentRarity[];
 }
 
 export const GRADE_INFO: Record<Grade, GradeInfo> = {
 	G1: { label: 'Starter', index: 1, levels: [1, 8], tier: 1, rarities: ['common'] },
-	G2: { label: 'Hide', index: 1.6, levels: [9, 18], tier: 1, rarities: ['common', 'uncommon'] },
-	G3: { label: 'Iron', index: 2.4, levels: [19, 30], tier: 2, rarities: ['uncommon'] },
-	G4: { label: 'Steel', index: 3.5, levels: [31, 42], tier: 2, rarities: ['uncommon', 'rare'] },
-	G5: { label: 'Knight', index: 5, levels: [43, 54], tier: 3, rarities: ['rare'] },
+	G2: { label: 'Hide', index: 1.6, levels: [9, 18], tier: 1, rarities: ['common', 'uncommon'], dropRarities: ['common', 'uncommon', 'rare'] },
+	G3: { label: 'Iron', index: 2.4, levels: [19, 30], tier: 2, rarities: ['uncommon'], dropRarities: ['uncommon', 'rare', 'epic'] },
+	G4: { label: 'Steel', index: 3.5, levels: [31, 42], tier: 2, rarities: ['uncommon', 'rare'], dropRarities: ['uncommon', 'rare', 'epic'] },
+	G5: { label: 'Knight', index: 5, levels: [43, 54], tier: 3, rarities: ['rare'], dropRarities: ['rare', 'epic'] },
 	G6: { label: 'Obsidian', index: 7, levels: [55, 66], tier: 3, rarities: ['rare', 'epic'] },
 	G7: { label: 'Runed', index: 10, levels: [67, 78], tier: 4, rarities: ['epic'] },
 	G8: { label: 'Ancient', index: 14, levels: [79, 90], tier: 4, rarities: ['epic', 'legendary'] },
@@ -102,10 +104,14 @@ export const gradeLevels = (grade: Grade): readonly [number, number] => {
  *
  * The highest live grade takes every rarity until a grade that carries the others is live.
  *
+ * Drops reach rare and epic earlier than crafts do (IDL-382, owner report 2026-11-24: no epic had dropped): `dropRarities` of G2 adds rare, of G3 rare and epic, of G4 and G5 epic. Before, an epic could only drop as an
+ * Obsidian (G6) piece, i.e. from item level 55. Crafting keeps the narrower `rarities` (crafting odds, pity and ceilings are tuned on them).
+ *
  * @category Loot/Items
  * @order 7
  */
-export const gradeRarities = (grade: Grade): readonly EquipmentRarity[] => (grade === topLive() ? RARITY_ORDER : GRADE_INFO[grade].rarities);
+export const gradeRarities = (grade: Grade): readonly EquipmentRarity[] =>
+	grade === topLive() ? RARITY_ORDER : (GRADE_INFO[grade].dropRarities ?? GRADE_INFO[grade].rarities);
 
 /** Grades that were the highest live grade at some point, so their pieces were generated at any item level from the window start up, in any rarity (G3, PR 130) */
 const WAS_OPEN: readonly Grade[] = ['G3'];

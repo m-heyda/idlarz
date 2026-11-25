@@ -91,6 +91,8 @@ export interface GearOptions {
 	grade?: string;
 	/** Item level window in place of the one of the material tier (the ladder's grades have their own windows) */
 	levelWindow?: readonly [number, number];
+	/** A named item's fixed perks (see ItemDef.perks) */
+	perks?: ItemStats;
 }
 
 /** The icon each item has in the registry (`config/itemIcons/`): an item whose supplied art replaced its built icon is found here as `art_<id>`; every other art item is `item_<id>` */

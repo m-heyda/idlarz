@@ -4,15 +4,28 @@ import { COMBAT } from '@/config/combatConfig';
 import { isRecord } from '@/lib/isRecord';
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
-import { attacksPerSecond, critOdds, damagePerHit, dodgeChance, lifeLeechPercent, manaRegenPerSec, maxHp, maxMana, armorOf } from '@/lib/combat';
+import { gearBossTimerSec } from '@/lib/gearEconomy';
+import {
+	armorPenPercent,
+	attacksPerSecond,
+	critExtraOf,
+	critOdds,
+	damagePerHit,
+	dodgeChance,
+	healOnKillPercent,
+	lifeLeechPercent,
+	manaRegenPerSec,
+	maxHp,
+	maxMana,
+	armorOf,
+	thornsPercent,
+} from '@/lib/combat';
 import { healAmount } from '@/lib/skills';
 import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
 import { withClassBonus } from '@/lib/classPassives';
-import { critDamagePercent } from '@/lib/statBonuses';
 import type { PlayerProfile } from '@/lib/offline/fightTypes';
 import type { CharacterStats, Equipment } from '@/types/game';
 import { calculateCombatStats, calculateLevel } from '@/utils/game/character';
-import { attributesWithGear } from '@/lib/gearAttributes';
 import { merchantCombat } from '@/utils/game/merchant';
 import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 
@@ -80,7 +93,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		hit: damagePerHit(equipment, stats, bonus) * pct('damagePct'),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
-		critExtra: 1 + critDamagePercent(attributesWithGear(stats, equipment)) / 100,
+		critExtra: critExtraOf(stats, equipment),
 		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
 		armor: armorOf(equipment, stats, playerClass) * pct('hpArmorPct'),
 		dodge: dodgeChance(equipment),
@@ -91,6 +104,14 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		potionCooldownSec: potionCooldownSec(gear),
 		potionPower: potionPower(gear),
 		potionSlots: potionSlotCount(gear),
+		// a legendary's handlers (IDL-46): only present when worn, so a profile without them is exactly the one there was before
+		...(gear.burnPct > 0 ? { burnPct: gear.burnPct } : {}),
+		...(gear.potionRefundPct > 0 ? { potionRefundPct: gear.potionRefundPct } : {}),
+		// the gear's combat stats (IDL-176), each capped where it is summed
+		...(armorPenPercent(equipment) > 0 ? { armorPenPct: armorPenPercent(equipment) } : {}),
+		...(thornsPercent(equipment) > 0 ? { thornsPct: thornsPercent(equipment) } : {}),
+		...(healOnKillPercent(equipment) > 0 ? { healOnKillPct: healOnKillPercent(equipment) } : {}),
+		...(gearBossTimerSec(equipment) > 0 ? { bossTimerSec: gearBossTimerSec(equipment) } : {}),
 	};
 };
 
