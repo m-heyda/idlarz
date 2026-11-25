@@ -157,6 +157,21 @@ Base stats of a few items at item level 1, 10, 25, 50, 100 (common, quality 50, 
 | Emberbrand (damage) | (3) 33 | 47 | 78 | 128 | 4821 |
 | Steel Cuirass (armor) | (4) 7 | 9 | 16 | 26 | (50) 26 |
 
+## Monster chests (IDL-163)
+
+A normal kill drops the chest of its biome's tier with a 2 % chance, a boss always a Royal chest, a golden monster always an Arcane chest. An opened chest pays minutes of the player's own income (gold, one resource, or XP) and half the time a potion; no gems, no stat gifts. The average chest of every tier must be worth at most 10 % of an hour of income (`tests/economy/monsterChestBudget.test.ts`).
+
+| Tier | Drops from | Minutes of income | Average | Share of an hour | Cap |
+|---|---|---|---:|---:|---|
+| Wooden chest | plains, fields, orchard | 1-3 | 2.00 min | 3.3% | ok |
+| Iron Strongbox | hills, battlefield | 1.5-4 | 2.75 min | 4.6% | ok |
+| Mossy chest | forest, swamp, jungle | 2-5 | 3.50 min | 5.8% | ok |
+| Coral chest | coast, lake | 2.5-6 | 4.25 min | 7.1% | ok |
+| Frost chest | tundra | 3-7 | 5.00 min | 8.3% | ok |
+| Magma chest | blight | 3.5-8 | 5.75 min | 9.6% | ok |
+| Royal chest | every boss | 4-8 | 6.00 min | 10.0% | ok |
+| Arcane chest | every golden monster | 4-8 | 6.00 min | 10.0% | ok |
+
 ## Profiles
 
 - **normal_monster**: 1-1 roll(s), 0 guaranteed, 12% per roll; rarity weights common 64.2%, uncommon 24.9%, rare 9.3%, epic 1.1%, legendary 0.4%; bonus: rat_potion, monster_legendary

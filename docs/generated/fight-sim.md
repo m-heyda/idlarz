@@ -17,6 +17,8 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | G5 kit + mace | 73 | 0.8 | 58.4 | 124 | 284 | 13.1 | 7 |
 | G6 kit + mace | 94 | 0.8 | 75.2 | 192 | 448 | 13.7 | 13 |
 | G6 kit + bow | 67 | 1 | 67 | 192 | 448 | 38.7 | 18 |
+| G7 kit + mace | 330 | 0.8 | 264 | 558 | 940 | 22.4 | 10 |
+| G8 kit + mace | 1030 | 0.8 | 824 | 1759 | 2735 | 29.8 | 12 |
 
 # No potions, no skills
 
@@ -32,6 +34,8 @@ Cells: win % (mean seconds to win). The streams are seeded, so the table is repr
 | G5 kit + mace | 100% (2s) | 100% (4s) | 100% (9s) | 100% (20s) |
 | G6 kit + mace | 100% (2s) | 100% (3s) | 100% (7s) | 100% (16s) |
 | G6 kit + bow | 100% (2s) | 100% (3s) | 100% (6s) | 100% (14s) |
+| G7 kit + mace | 100% (1s) | 100% (1s) | 100% (2s) | 100% (5s) |
+| G8 kit + mace | 100% (1s) | 100% (1s) | 100% (1s) | 100% (2s) |
 
 # Level 30 builds
 
