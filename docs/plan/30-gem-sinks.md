@@ -119,7 +119,7 @@ Gems get their own track, **G**, that rides on the numbered phases of [RELEASE-P
 
 ## 9. Balance targets (sim, IDL-229)
 
-`scripts/gem-sim.ts` prints gems per day from chests (Luck 0 / 100 / 300, 50 and 100 % collection), achievements and the daily bonus, over 30 / 90 / 180 days, against the price book. Targets, each approved before it ships:
+**Built (IDL-229):** `npm run gem-sim -- --md` writes [docs/generated/gem-sim.md](../generated/gem-sim.md) (model in `scripts/gemSim.ts`, pinned by `tests/economy/gemSim.test.ts`). It prints gems per day from chests (Luck 0 / 100 / 300, 50 and 100 % collection), the daily bonus and the achievement, milestone and mastery pools, over 7 / 30 / 90 / 180 days, against the price book in `config/gemShop.ts` (the planned Cap Breaks as priced here). Targets, each approved before it ships:
 
 - an identity item (name change, attribute respec) is affordable in the first week;
 - the first QoL unlock in week 2;
