@@ -15,15 +15,9 @@ Nothing of PR #295 was seen with a login. Walk through with a real account; any 
 
 Owner and dashboard work (no code): Supabase Confirm email, SMTP and redirect URLs, and `supabase/migrations/player_class_open.sql` on a branch first (required before a fifth hero class, IDL-280); Vercel `LOOT_SECRET` per deployment, optional firewall rate rules, the free-plan load check (IDL-126); the two enforcement switches (`ENFORCEMENT`, `EMBER_MODEL.requireServerRebirth`, IDL-208, IDL-211) after `restore-trust` and `check-live-saves`; a raised `GAME_EPOCH` (IDL-300) only when a later chapter is wanted.
 
-## Batch 1: quick wins (one PR, about a day; text, display, small pure code, measurement)
+## Batch 1: done (PR to staging, 0.9.2 batch 1)
 
-| Item | Where | Why quick |
-|---|---|---|
-| IDL-174 the "Base: +25 % gold" line in the stat panel and the tutorial wording | `src/components/game/hero/HeroStats.tsx`, `src/catalog/tutorial.ts` | wording only |
-| IDL-172 set-weapon tooltip | tooltip code (`src/components/game/itemUi.ts`) | display only |
-| IDL-176 Heal on Kill in the win estimate for chained fights | `src/lib/offline/winChance.ts` | pure function plus a unit test |
-| IDL-163 per-tier chest art (all eight tiers use `bonus_chest`) | `src/config/pixelIcons.ts`, `public/pixel/` | recolour the existing image (Sprite Fusion first, no generator) |
-| IDL-198 and IDL-100 the "run-2 ratio 60-70 %" re-measure | pace sim | measurement; record the number, may reveal a balance item |
+IDL-174, the set-weapon note of IDL-172 and the per-tier chest art of IDL-163 shipped; the run-2 ratio was read from the committed pace output and did not move (hardcore-rebirth6 1.8 d to 1.7 d, about 33 % of run 1; human-rebirth6 8.0 d against 7.0 d, castle timers set the pace). **Left over from it:** the Heal on Kill preview in the win estimate (IDL-176): the estimate already starts from the resume HP after a kill, only the Next-strip preview mid-fight lacks it; low value, no sim needed.
 
 ## Batch 2: small code with tests (one PR each, 1-2 days)
 
