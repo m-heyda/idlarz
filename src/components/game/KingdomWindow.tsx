@@ -1,18 +1,21 @@
 import React, { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
-import { DiamondLevel, Inset, Panel, ProgressBar, SectionLabel, Stat } from '../../../packages/design-system/src/components/primitives';
+import { DiamondLevel, HoverTip, Inset, Panel, ProgressBar, SectionLabel } from '../../../packages/design-system/src/components/primitives';
+import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
 import { biomeColor } from '@/config/biomePalette';
+import { MARK_BUTTONS, MONSTER_MARK_TILES, type MarkPref } from '@/config/mapMarks';
 import { castleIconName, pixelIconSrc } from '@/config/pixelIcons';
 import { kingdomSummary } from '@/lib/kingdomSummary';
 import { useGameStore } from '@/stores/gameStore';
 import { useRockStore } from '@/stores/rockStore';
 import { formatNumber } from '@/utils/formatters';
 import GameWindow from './GameWindow';
+import { useMapMarks } from './useMapMarks';
 import '@/styles/Kingdom.css';
 
 /**
  * The Kingdom overview window (the crown icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome (a heatmap of one square per tile, coloured by biome, with the count per biome under it), every building with its level
- * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many monsters stand on the map. No income or resources: the resource windows have them. A first version, meant to grow.
+ * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many chests, ore nodes and monsters stand on the map. The last panel, "Find on the map", is one grid of equal tiles, all pressable: Chests, Ore nodes and Monsters, then Bosses, Strongest, Golden, Fully grown and Still growing with their counts. A press rings just those on the map and lights the tile (one mark at a time, the same marks as the buttons under the minimap, `useMapMarks` and `MARK_TARGETS`). No income or resources: the resource windows have them. A first version, meant to grow.
  */
 /** The most squares the land heatmap draws; above it each square stands for several tiles */
 const HEAT_MAX_CELLS = 400;
@@ -31,6 +34,22 @@ const KingdomWindow: React.FC = () => {
 	const rockCount = useRockStore((state) => Object.keys(state.rocks).length);
 	const summary = useMemo(() => kingdomSummary(input, rockCount), [input, rockCount]);
 	const { castle, builders, land, buildings, monsters } = summary;
+	const { on: marked, choose } = useMapMarks();
+	/** How many of each kind stand on the map, for the "Find on the map" tiles (the Strongest tile counts the monsters at the highest level) */
+	const markCount: Record<MarkPref, number> = {
+		markChests: monsters.chests,
+		markOres: monsters.rocks,
+		markMonsters: monsters.total,
+		markBosses: monsters.bosses,
+		markGolden: monsters.lucky,
+		markGrown: monsters.maxed,
+		markGrowing: monsters.growing,
+		markStrongest: monsters.strongest,
+	};
+	/** What a tile shows as its big number: the count, and for Strongest the level */
+	const markValue = (pref: MarkPref) =>
+		pref === 'markStrongest' ? (monsters.total ? `Lv ${formatNumber(monsters.highestLevel)}` : '-') : formatNumber(markCount[pref]);
+	const markNote = (pref: MarkPref) => (markCount[pref] === 0 ? 'None on the map' : marked[pref] ? 'Shown on the map' : 'Click to show');
 	// the land heatmap: one square per tile (or per `perCell` tiles on a huge realm), the biomes in runs, left to right and wrapping to the width of the window
 	const perCell = Math.max(1, Math.ceil(land.owned / HEAT_MAX_CELLS));
 	const cells = land.byBiome.flatMap((row) =>
@@ -131,20 +150,39 @@ const KingdomWindow: React.FC = () => {
 				</Panel>
 
 				<Panel>
-					<SectionLabel>Monsters on the map</SectionLabel>
-					<div className='kd-stats'>
-						<Stat label='Monsters' value={formatNumber(monsters.total)} />
-						<Stat label='Bosses' value={formatNumber(monsters.bosses)} />
-						<Stat label='Strongest' value={monsters.total ? `Lv ${formatNumber(monsters.highestLevel)}` : '-'} />
-					</div>
-					<div className='kd-stats' data-testid='kingdom-map-counters'>
-						<Stat label='Golden' value={formatNumber(monsters.lucky)} />
-						<Stat label='Fully grown' value={formatNumber(monsters.maxed)} />
-						<Stat label='Still growing' value={formatNumber(monsters.growing)} />
-					</div>
-					<div className='kd-stats'>
-						<Stat label='Unopened chests' value={formatNumber(monsters.chests)} />
-						<Stat label='Ore nodes' value={formatNumber(monsters.rocks)} />
+					<SectionLabel>Find on the map</SectionLabel>
+					<div className='kd-tiles' data-testid='kingdom-mark-cards'>
+						{[...MARK_BUTTONS, ...MONSTER_MARK_TILES.map((tile) => ({ ...tile, icon: undefined, size: 0, shift: [0, 0] as [number, number] }))].map(
+							({ pref, label, card, icon, text, size, shift }) => {
+								const scale = 1.4;
+								return (
+									<HoverTip key={pref} fill placement='above' align='center' tip={<HintTooltip title={label} text={text} />}>
+										<button
+											type='button'
+											className='kd-tile kd-mark-card'
+											data-active={marked[pref] ? 'true' : undefined}
+											data-empty={markCount[pref] === 0 ? 'true' : undefined}
+											aria-pressed={marked[pref]}
+											aria-label={`${label}: ${markCount[pref]} on the map`}
+											onClick={() => choose(pref)}
+										>
+											{icon ? (
+												// eslint-disable-next-line @next/next/no-img-element
+												<img
+													src={icon}
+													alt=''
+													draggable={false}
+													style={{ width: size * scale, height: size * scale, transform: `translate(${shift[0] * scale}px, ${shift[1] * scale}px)` }}
+												/>
+											) : null}
+											<b>{markValue(pref)}</b>
+											<span>{card}</span>
+											<small>{markNote(pref)}</small>
+										</button>
+									</HoverTip>
+								);
+							},
+						)}
 					</div>
 				</Panel>
 			</div>

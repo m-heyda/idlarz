@@ -17883,7 +17883,7 @@
 	{
 		"usedBy": [
 			"src/catalog/items/chests.ts",
-			"src/components/game/MapHighlightBar.tsx"
+			"src/config/mapMarks.ts"
 		],
 		"name": "bonus_chest",
 		"category": "ui",

@@ -195,10 +195,15 @@ interface UiState {
 	farmAnimalsOpen: boolean;
 	farmHudOpen: boolean;
 	farmUpgradesOpen: boolean;
-	/** The buttons under the map: mark the chests, the ores and the monsters (remembered, see MapMarkers) */
+	/** The map marks (remembered, see MapMarkers and config/mapMarks.ts): at most one is on. The minimap buttons use the first three; the Kingdom overview's Find on the map tiles all eight. */
 	markChests: boolean;
 	markOres: boolean;
 	markMonsters: boolean;
+	markBosses: boolean;
+	markGolden: boolean;
+	markGrown: boolean;
+	markGrowing: boolean;
+	markStrongest: boolean;
 	/** The Merchant window remembers its tab and the amount you set (also across visits): the typed value is not lost when you switch windows */
 	merchantTab: MerchantTab;
 	setMerchantTab: (tab: MerchantTab) => void;
@@ -383,5 +388,10 @@ export const useUiStore = create<UiState>((set, get) => ({
 			markChests: readPref('markChests'),
 			markOres: readPref('markOres'),
 			markMonsters: readPref('markMonsters'),
+			markBosses: readPref('markBosses'),
+			markGolden: readPref('markGolden'),
+			markGrown: readPref('markGrown'),
+			markGrowing: readPref('markGrowing'),
+			markStrongest: readPref('markStrongest'),
 		}),
 }));

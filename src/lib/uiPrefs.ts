@@ -12,7 +12,12 @@ export type UiPrefKey =
 	| 'farmUpgradesOpen'
 	| 'markChests'
 	| 'markOres'
-	| 'markMonsters';
+	| 'markMonsters'
+	| 'markBosses'
+	| 'markGolden'
+	| 'markGrown'
+	| 'markGrowing'
+	| 'markStrongest';
 
 /** What a first visit (and the server render) sees: the minimap on */
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
@@ -22,9 +27,14 @@ export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
 	farmAnimalsOpen: true, // the Farm window's animal shop, stats readout and upgrade drawer: what is folded stays folded
 	farmHudOpen: true,
 	farmUpgradesOpen: false,
-	markChests: false, // the buttons under the map that mark chests, ores and monsters start off
+	markChests: false, // the map marks (the buttons under the minimap and the Kingdom overview's Find on the map tiles) start off
 	markOres: false,
 	markMonsters: false,
+	markBosses: false, // ...the monster kinds the Kingdom overview can mark
+	markGolden: false,
+	markGrown: false,
+	markGrowing: false,
+	markStrongest: false,
 };
 
 const storageKey = (key: UiPrefKey) => scoped(`idlarz.ui.${key}`);
