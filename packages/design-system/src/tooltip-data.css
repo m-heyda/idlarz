@@ -42,6 +42,24 @@
 	opacity: 0.7;
 	font-size: 11px;
 }
+.ds-tip-perks {
+	margin: 6px 0 2px;
+	padding: 4px 8px 5px;
+	border-left: 2px solid #f4a93c;
+	background: linear-gradient(90deg, rgba(244, 169, 60, 0.18), rgba(244, 169, 60, 0));
+}
+.ds-tip-perks-head {
+	font-size: 9.5px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #f4a93c;
+}
+.ds-tip-perk {
+	font-size: 12px;
+	line-height: 1.35;
+	margin-top: 2px;
+	color: #ffe2a0;
+}
 .ds-tip-discount {
 	color: #ffb24a;
 }

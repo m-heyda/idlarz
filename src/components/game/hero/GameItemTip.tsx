@@ -119,11 +119,9 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 		});
 		return [{ heading: category.label, rows: tipRows }];
 	});
-	const affixes = [
-		...(resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name })),
-		// a legendary's fixed perks (IDL-143), listed under its affixes
-		...Object.entries(resolved?.perks ?? {}).map(([stat, value]) => ({ text: formatStat(stat as StatKey, value as number), name: 'Legendary perk' })),
-	];
+	const affixes = [...(resolved?.affixes ?? []).map((affix) => ({ text: formatStat(affix.stat as StatKey, affix.value), name: affix.name }))];
+	// a legendary's fixed perks (IDL-143) in their own gold block under the affixes (IDL-147)
+	const perks = Object.entries(resolved?.perks ?? {}).map(([stat, value]) => ({ text: formatStat(stat as StatKey, value as number) }));
 
 	// what changes against the worn piece, one line each: green for a gain, red for a loss
 	const gain = (n: number) => (n > 0 ? ('green' as const) : ('red' as const));
@@ -207,6 +205,7 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 			rows={[...(emptySlot ? [{ label: `Empty ${EQUIPMENT_SLOT_LABEL[comparison!.slot]} slot`, value: '', tone: 'muted' as const }] : []), ...effectRows]}
 			groups={groups}
 			affixes={affixes}
+			perks={perks}
 			extra={
 				comparison && tierChanges.length > 0 ? (
 					<>

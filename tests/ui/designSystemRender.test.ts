@@ -119,3 +119,22 @@ test('AttributeStrip: points to spend with enabled + buttons, then a Respec butt
 	assert.doesNotMatch(shut, /inside/, 'a folded block hides its body');
 	assert.match(shut, /aria-expanded="false"/);
 });
+
+test("ItemTooltip draws a legendary's perks in their own gold block, one line each, and nothing without perks (IDL-147)", () => {
+	const one = html(h(ItemTooltip, { rarity: 'legendary', icon: '/x.png', name: 'Trident', type: 'Legendary trident', perks: [{ text: '+25% Income' }] }));
+	assert.match(one, /ds-tip-perks/);
+	assert.match(one, />Legendary perk</);
+	assert.ok(one.includes('+25% Income'));
+	const two = html(
+		h(ItemTooltip, {
+			rarity: 'legendary',
+			icon: '/x.png',
+			name: 'Hammer',
+			type: 'Legendary hammer',
+			perks: [{ text: '-25% Build time' }, { text: '+10% Damage' }],
+		}),
+	);
+	assert.match(two, />Legendary perks</);
+	assert.doesNotMatch(html(h(ItemTooltip, { rarity: 'legendary', icon: '/x.png', name: 'Plain', type: 'Legendary', perks: [] })), /ds-tip-perks/);
+	assert.doesNotMatch(html(h(ItemTooltip, { rarity: 'rare', icon: '/x.png', name: 'Rare', type: 'Rare' })), /ds-tip-perks/);
+});
