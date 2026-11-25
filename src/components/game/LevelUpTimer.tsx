@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { formatTime, formatRate } from '@/utils/formatters';
-import { MAX_LEVEL } from '@/config/character';
-import { xpToNextLevel } from '@/utils/game/character';
+import { xpBarOf } from '@/lib/xpBar';
 
 // Level Up Timer Component that updates every second
 export const LevelUpTimer: React.FC<{
@@ -14,12 +13,15 @@ export const LevelUpTimer: React.FC<{
 	level: { level: number; progress: number };
 }> = ({ resourceRates, resources, level }) => {
 	const [timeRemaining, setTimeRemaining] = useState('Calculating...');
+	const [next, setNext] = useState('level up');
 
 	useEffect(() => {
 		const updateTimer = () => {
 			// Get current XP rate
 			const xpRate = resourceRates?.total?.xp || 0;
-			if (level.level >= MAX_LEVEL) {
+			const bar = xpBarOf(level, resources.xp);
+			setNext(bar.next);
+			if (bar.track === 'paragon' && bar.remaining === 0) {
 				setTimeRemaining('Max level');
 				return;
 			}
@@ -28,12 +30,8 @@ export const LevelUpTimer: React.FC<{
 				return;
 			}
 
-			// Calculate remaining XP to level up
-			const xpForNextLevel = xpToNextLevel(level.level);
-			const remainingXp = xpForNextLevel * (1 - level.progress);
-
-			// Calculate time in seconds
-			const timeInSeconds = remainingXp / xpRate;
+			// Calculate time in seconds (the XP still to go in this level, or in this paragon level past level 100)
+			const timeInSeconds = bar.remaining / xpRate;
 
 			// Format the time
 			setTimeRemaining(formatTime(timeInSeconds));
@@ -43,12 +41,12 @@ export const LevelUpTimer: React.FC<{
 		updateTimer();
 		const timer = setInterval(updateTimer, 1000);
 		return () => clearInterval(timer);
-	}, [resourceRates, resources.xp, level.level, level.progress]);
+	}, [resourceRates, resources.xp, level]);
 
 	return (
 		<div className='mt-0 text-center text-xs'>
 			<span className='text-green-400 mb-3 block'>{formatRate(resourceRates?.total?.xp || 0)} (XP)</span>
-			<div className='text-gray-400 mb-0.5 block'>Time until level up</div>
+			<div className='text-gray-400 mb-0.5 block'>Time until {next}</div>
 			<div className='text-yellow-400 text-sm font-medium'>{timeRemaining}</div>
 		</div>
 	);
