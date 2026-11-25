@@ -247,6 +247,28 @@
 	background: color-mix(in srgb, var(--ds-rarity) 9%, #0d1019);
 }
 
+/* Epic and better breathe: the outer glow swells and fades (IDL-147; the old item frame did the same). A legendary or unique rim glows a little wider. */
+.ds-slot[data-pulse='true'] {
+	animation: ds-slot-pulse 2.6s ease-in-out infinite;
+}
+.ds-slot[data-rarity='legendary'][data-pulse='true'],
+.ds-slot[data-rarity='unique'][data-pulse='true'] {
+	animation-duration: 2.2s;
+}
+@keyframes ds-slot-pulse {
+	50% {
+		box-shadow:
+			inset 0 0 0 2px #05060a,
+			inset 0 0 0 3px var(--ds-rarity),
+			0 0 11px 1px color-mix(in srgb, var(--ds-rarity) 70%, transparent);
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.ds-slot[data-pulse='true'] {
+		animation: none;
+	}
+}
+
 .ds-slot[data-empty='true'] img {
 	opacity: 0.3;
 	filter: grayscale(1);
