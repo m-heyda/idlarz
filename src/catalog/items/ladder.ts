@@ -1,7 +1,7 @@
 import type { PixelIconName } from '@/config/pixelIcons';
 import { ITEM_ICONS } from '@/config/itemIcons';
 import type { EquipmentSlot, ItemDef, WeaponType } from '@/types/game';
-import { STAT_DEFS, baseStat, levelScale, levelTail, type ItemStatKey, type ItemStats, type StatDef } from '../stats';
+import { STAT_DEFS, baseStat, levelScale, levelTail, type ItemStatKey, type ItemStats, type StatDef, type StatKey } from '../stats';
 import { WEAPON_ATTACK_SPEED } from '../weapons';
 import { CLOTH_ITEMS } from './cloth';
 import { gear } from './define';
@@ -48,8 +48,8 @@ type LadderWeapon = (typeof WEAPON_TYPES)[number];
 // What one point of strength index buys per slot (the live Obsidian piece divided by its index 7), so a G6 piece lands on the
 // Obsidian one and every other grade scales from there. Flat stats are whole numbers (at least 1), the rest have two decimals.
 
-type PerIndex = Partial<Record<ItemStatKey, number>>;
-const WHOLE: ReadonlySet<ItemStatKey> = new Set<ItemStatKey>(['damage', 'armor', 'maxHp', 'luck', 'maxMana']);
+type PerIndex = Partial<Record<StatKey, number>>;
+const WHOLE: ReadonlySet<StatKey> = new Set<StatKey>(['damage', 'armor', 'maxHp', 'luck', 'maxMana']);
 
 const SLOT_STATS: Record<ArmourSlot | 'offHand', PerIndex> = {
 	head: { armor: 0.86, maxHp: 0.86 },
@@ -68,6 +68,23 @@ const SLOT_STATS: Record<ArmourSlot | 'offHand', PerIndex> = {
 	belt: { armor: 0.29, maxHp: 0.57 },
 	offHand: { armor: 1.57, maxHp: 1.71 },
 };
+
+/**
+ * The economy stats of IDL-176, fixed base stats of the ladder's gear from G4 on (`ECONOMY_FROM`): Build Speed on hands and chest, Tile Discount on cape and neck, Boss Timer (seconds) on head and shoulder. Per point of strength
+ * index like the table above, never grown by the item level (their `levelShare` is 0); the totals are capped in `STAT_RULES`. Farm Yield is not here yet (IDL-176: it needs the farm output to take the gear).
+ */
+const ECONOMY_SLOT: Partial<Record<ArmourSlot, PerIndex>> = {
+	hands: { buildSpeed: 0.3 },
+	chest: { buildSpeed: 0.4 },
+	cape: { tileDiscount: 0.2 },
+	neck: { tileDiscount: 0.2 },
+	head: { bossTimer: 0.3 },
+	shoulder: { bossTimer: 0.3 },
+};
+/** The stats of `ECONOMY_SLOT`, which `gradeLegacyItems` also gives to the live pieces that fill a cell */
+const ECONOMY_KEYS = ['buildSpeed', 'tileDiscount', 'bossTimer'] as const;
+/** The first grade whose gear carries the economy stats */
+const ECONOMY_FROM: Grade = 'G4';
 
 /** The off hand of a caster: a tome (or orb) trades armor for mana and spell power */
 const TOME_STATS: PerIndex = { maxHp: 0.86, regen: 0.21, maxMana: 0.43, manaRegen: 0.07, spellPower: 0.57 };
@@ -106,11 +123,11 @@ const WEAPON_EXTRA: Partial<Record<LadderWeapon, PerIndex>> = {
  * window start as Obsidian is at 55, and the other grades follow the strength index from there.
  */
 const ANCHOR_RATIO = levelScale(GRADE_INFO.G6.levels[0]) / levelScale(8);
-const anchorFactor = (key: ItemStatKey): number => 1 + (ANCHOR_RATIO - 1) * ((STAT_DEFS[key] as StatDef).levelShare ?? 1);
+const anchorFactor = (key: StatKey): number => 1 + (ANCHOR_RATIO - 1) * ((STAT_DEFS[key] as StatDef).levelShare ?? 1);
 
 const scaled = (perIndex: PerIndex, index: number, tier: number): ItemStats => {
 	const stats: ItemStats = {};
-	for (const [key, per] of Object.entries(perIndex) as [ItemStatKey, number][]) {
+	for (const [key, per] of Object.entries(perIndex) as [StatKey, number][]) {
 		// Gold Find and Dodge always take the tier table's number (tests/loot/items.test.ts)
 		if (key === 'goldFind' || key === 'dodge') stats[key] = baseStat(key, tier);
 		else {
@@ -310,7 +327,10 @@ const cell = (grade: Grade, key: LadderCell, name: string, slot: NonNullable<Ite
 
 GRADES.forEach((grade, g) => {
 	const { index, tier } = GRADE_INFO[grade];
-	for (const slot of ARMOUR_SLOTS) cell(grade, slot, ARMOUR_NAMES[slot][g], slot, scaled(forGrade(grade, SLOT_STATS[slot]), index, tier));
+	for (const slot of ARMOUR_SLOTS) {
+		const economy = GRADES.indexOf(grade) >= GRADES.indexOf(ECONOMY_FROM) ? ECONOMY_SLOT[slot] : undefined;
+		cell(grade, slot, ARMOUR_NAMES[slot][g], slot, scaled({ ...forGrade(grade, SLOT_STATS[slot]), ...economy }, index, tier));
+	}
 	if (isSpecial(grade)) {
 		const sig = SET_SIGNATURE[grade];
 		cell(grade, 'weapon', sig.weaponName, 'mainHand', weaponStats(sig.weapon, index, tier), sig.weapon);
@@ -351,9 +371,16 @@ export const gradeLegacyItems = (defs: ItemDef[]): ItemDef[] =>
 		const mapped = MAPPED.get(def.id);
 		if (!mapped) return { ...def, enabled: false };
 		const { grade } = mapped;
+		// the ladder's economy stats (IDL-176) are the cell's, so a live piece that fills a G4+ cell carries them too; everything else of a live piece stays its own
+		const economy = Object.fromEntries(ECONOMY_KEYS.filter((key) => mapped.stats[key]).map((key) => [key, mapped.stats[key]]));
+		const stats = {
+			...def.stats,
+			...economy,
+			...(FIT_DAMAGE.has(def.id) ? { damage: fitDamage(def, mapped.stats.damage ?? 0, GRADE_INFO[grade].levels[0]) } : {}),
+		};
 		return {
 			...def,
-			...(FIT_DAMAGE.has(def.id) ? { stats: { ...def.stats, damage: fitDamage(def, mapped.stats.damage ?? 0, GRADE_INFO[grade].levels[0]) } } : {}),
+			...(Object.keys(economy).length > 0 || FIT_DAMAGE.has(def.id) ? { stats } : {}),
 			tier: GRADE_INFO[grade].tier,
 			tags: [...(def.tags ?? []), `grade:${grade}`],
 			// what it is generated at is the grade's; what a piece already owned may be (minItemLevel .. maxItemLevel, allowedRarities) stays, so no save breaks

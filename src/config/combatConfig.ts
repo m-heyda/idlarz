@@ -98,6 +98,9 @@ export const STAT_RULES = {
 	critDamageGearCap: 50, // % extra crit damage the gear's Crit Damage never counts above (on top of the attributes', IDL-176)
 	armorPenCap: 30, // % of a monster's armor that Armor Penetration never ignores more than
 	thornsCap: 25, // % of a monster's hit that Thorns never returns more than
+	buildSpeedCap: 15, // % off build timers that the gear's Build Speed never counts above (together with the Dwarf Statue, a legendary and Embers still under the 60 % build time cap)
+	tileDiscountGearCap: 10, // percentage points of tile discount the gear never gives above (the tile discount cap still holds on top)
+	bossTimerCapSec: 30, // seconds the gear's Boss Timer never adds above to a boss fight's clock
 	healOnKillCap: 8, // % of max HP that Heal on Kill never restores more than per kill
 };
 

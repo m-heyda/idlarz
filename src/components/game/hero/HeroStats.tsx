@@ -199,6 +199,7 @@ const HeroStats: React.FC = () => {
 		// the gear's combat stats of IDL-176: a row only when something is worn that gives it
 		...(fx.armorPen > 0 ? [{ label: 'Armor penetration', value: pct(fx.armorPen, 1), color: I.gold }] : []),
 		...(fx.thorns > 0 ? [{ label: 'Thorns', value: pct(fx.thorns, 1), color: I.red }] : []),
+		...(fx.bossTimer > 0 ? [{ label: 'Boss timer', value: `+${formatCompact(fx.bossTimer, 1)} s`, color: I.gold }] : []),
 		...(fx.healOnKill > 0 ? [{ label: 'Heal on kill', value: `${pct(fx.healOnKill, 1)} max HP`, color: I.green }] : []),
 	];
 

@@ -32,6 +32,12 @@ export interface WinEstimate {
 	surviveSec: number;
 }
 
+/** The clock of a boss fight in seconds: the boss's own limit plus the gear's Boss Timer (IDL-176); undefined for a monster that has no clock. */
+export const bossClockSec = (type: MonsterType, p: Pick<PlayerProfile, 'bossTimerSec'>): number | undefined => {
+	const limit = monsterDef(type).timeLimitSec;
+	return limit === undefined ? undefined : limit + (p.bossTimerSec ?? 0);
+};
+
 const logistic = (x: number): number => 1 / (1 + Math.exp(-x));
 
 /** Expected damage of one swing after the monster's armor: crits and super crits weighted in. */
@@ -88,7 +94,7 @@ export const estimateWin = (
 	const dps = (p.attacksPerSec || 0) * expectedHit(p, m.armor) * (1 + Math.max(0, mastery?.damage ?? 0) / 100);
 	if (!(dps > 0)) return { chance: 0, killSec: Infinity, surviveSec: 0 };
 	const killSec = m.maxHp / dps;
-	const limit = Math.min(COMBAT.maxFightSec, monsterDef(type).timeLimitSec ?? Infinity);
+	const limit = Math.min(COMBAT.maxFightSec, bossClockSec(type, p) ?? Infinity);
 	if (killSec > limit) return { chance: 0, killSec, surviveSec: 0 };
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown

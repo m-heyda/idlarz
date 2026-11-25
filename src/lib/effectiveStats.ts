@@ -19,7 +19,7 @@ import {
 import { potionCooldownSec, potionPower, potionSlotCount } from '@/lib/potionBelt';
 import { withGearAttributes } from '@/lib/gearAttributes';
 import { classPassives, withClassBonus } from '@/lib/classPassives';
-import { gearEconomy, xpGainPct } from '@/lib/gearEconomy';
+import { gearBossTimerSec, gearEconomy, xpGainPct } from '@/lib/gearEconomy';
 import { chestRateBonusPct, gemChance, goldenMonsterChance, rarityLuckMultiplier } from '@/lib/luck';
 import { offlineCapHours, offlineEfficiency } from '@/lib/offline/limits';
 import { NO_IDOL_ECONOMY, type IdolEconomy } from '@/lib/idolEconomy';
@@ -72,6 +72,8 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		armorPen: armorPenPercent(equipment),
 		thorns: thornsPercent(equipment),
 		healOnKill: healOnKillPercent(equipment),
+		/** Seconds the gear's Boss Timer adds to a boss fight's clock (IDL-176) */
+		bossTimer: gearBossTimerSec(equipment),
 		/** % chance that a click crits */
 		critChance: odds.crit * 100,
 		/** What a crit multiplies the click by */
@@ -99,7 +101,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		spellPower: gear.spellPower + passives.spellPowerPct,
 		xpGain: xpGainPct(characterStats, equipment, playerClass) + idol.xpPct,
 		/** % off TILES (not buildings): Charisma, the rebirth Thrift and the merchant's Bulk Discount, capped. Building cost takes the Ember Thrift only (calculateBuildingCost) */
-		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass),
+		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
 		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct + gear.buildTimePct) * 100,

@@ -139,14 +139,14 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Dust Strider | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
 | Gravel Quail | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
 | Stonehorn Bison | 4 | 100 % | 377 | 159 | 9.4 s | 1.6 % | 0.04 % |
-| The Great Auroch (boss) | 18 | 98 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.56 % |
+| The Great Auroch (boss) | 18 | 99 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.56 % |
 | *plains total (if every spawn were here)* | | | | | | | *1.6 %* |
 | Wreck Crab | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Net Gull | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Drowned Sailor | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Tideglass Jelly | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
 | Barnacle Brute | 5 | 100 % | 612 | 261 | 15 s | 2.5 % | 0.07 % |
-| The Reef Leviathan (boss) | 20 | 90 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.33 % |
+| The Reef Leviathan (boss) | 20 | 91 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 2.37 % |
 | *coast total (if every spawn were here)* | | | | | | | *2.5 %* |
 | Mossback Wolf | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.11 % |
 | Bramble Imp | 7 | 100 % | 952 | 405 | 24 s | 4.0 % | 0.11 % |
@@ -191,7 +191,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 163 s | 27.2 % | 0.00 % |
 | The Winter Wyrm (boss) | 33 | 0 % | 157,352 | 70,809 | 3,934 s | 655.6 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **9.8 %** (bosses 6.5 %; XP 28.8 %) |
+| **All kills together** | | | | | | | **9.8 %** (bosses 6.6 %; XP 29.0 %) |
 
 ## castle 4: hero level 17, knight + mace, 100 gold/s, 12.00 XP/s
 
@@ -209,14 +209,14 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Drowned Sailor | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
 | Tideglass Jelly | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
 | Barnacle Brute | 6 | 100 % | 661 | 282 | 6.6 s | 1.1 % | 0.03 % |
-| The Reef Leviathan (boss) | 21 | 93 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.49 % |
+| The Reef Leviathan (boss) | 21 | 94 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.52 % |
 | *coast total (if every spawn were here)* | | | | | | | *1.1 %* |
 | Mossback Wolf | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Bramble Imp | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Rotcap Stag | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Ember Squirrel | 8 | 100 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
 | Pinecone Warden | 8 | 99 % | 1,028 | 437 | 10 s | 1.7 % | 0.05 % |
-| The Elder Stag (boss) | 24 | 75 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.00 % |
+| The Elder Stag (boss) | 24 | 78 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 2.08 % |
 | *forest total (if every spawn were here)* | | | | | | | *1.7 %* |
 | Granite Ram | 10 | 62 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
 | Cave Goblin Miner | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.08 % |
@@ -228,7 +228,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Cairn Sentinel | 10 | 55 % | 1,599 | 684 | 16 s | 2.7 % | 0.06 % |
 | Quarry Rat Knight | 10 | 96 % | 1,599 | 684 | 16 s | 2.7 % | 0.09 % |
 | Highland Gnoll | 10 | 83 % | 1,599 | 684 | 16 s | 2.7 % | 0.08 % |
-| The Hill Giant (boss) | 26 | 52 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.39 % |
+| The Hill Giant (boss) | 26 | 55 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.49 % |
 | The Ironhorn (boss) | 26 | 38 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 1.02 % |
 | *hills total (if every spawn were here)* | | | | | | | *2.1 %* |
 | Garbage Ogre | 12 | 18 % | 2,797 | 1,196 | 28 s | 4.7 % | 0.01 % |
@@ -254,7 +254,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 14 | 0 % | 6,527 | 2,790 | 65 s | 10.9 % | 0.00 % |
 | The Winter Wyrm (boss) | 34 | 0 % | 405,183 | 145,866 | 4,052 s | 675.3 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.0 %* |
-| **All kills together** | | | | | | | **10.9 %** (bosses 9.6 %; XP 33.4 %) |
+| **All kills together** | | | | | | | **11.1 %** (bosses 9.8 %; XP 34.0 %) |
 
 ## castle 5: hero level 30, obsidian + maul, 300 gold/s, 20.00 XP/s
 
@@ -317,7 +317,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Glacier Yeti | 15 | 0 % | 7,049 | 3,014 | 23 s | 3.9 % | 0.00 % |
 | The Winter Wyrm (boss) | 35 | 0 % | 695,564 | 156,502 | 2,319 s | 386.4 % | 0.00 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.9 %* |
-| **All kills together** | | | | | | | **10.1 %** (bosses 9.2 %; XP 36.7 %) |
+| **All kills together** | | | | | | | **10.1 %** (bosses 9.3 %; XP 36.8 %) |
 
 ## castle 6: hero level 42, obsidian + titan maul, 700 gold/s, 50.00 XP/s
 
@@ -378,7 +378,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Rime Wraith | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
 | Frost Moth | 15 | 92 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.04 % |
 | Glacier Yeti | 15 | 1 % | 7,049 | 3,014 | 10 s | 1.7 % | 0.00 % |
-| The Winter Wyrm (boss) | 36 | 92 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.62 % |
+| The Winter Wyrm (boss) | 36 | 94 % | 716,431 | 161,197 | 1,023 s | 170.6 % | 0.63 % |
 | *tundra total (if every spawn were here)* | | | | | | | *1.4 %* |
 | **All kills together** | | | | | | | **6.6 %** (bosses 6.0 %; XP 22.3 %) |
 
@@ -441,9 +441,9 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Rime Wraith | 16 | 1 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
 | Frost Moth | 16 | 82 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.02 % |
 | Glacier Yeti | 16 | 0 % | 7,613 | 3,255 | 5.9 s | 1.0 % | 0.00 % |
-| The Winter Wyrm (boss) | 36 | 96 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
+| The Winter Wyrm (boss) | 36 | 97 % | 716,431 | 161,197 | 551 s | 91.9 % | 0.35 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.7 %* |
-| **All kills together** | | | | | | | **3.7 %** (bosses 3.4 %; XP 14.5 %) |
+| **All kills together** | | | | | | | **3.7 %** (bosses 3.4 %; XP 14.6 %) |
 
 ## castle 8: hero level 70, obsidian + titan maul, 2,200 gold/s, 120.00 XP/s
 
@@ -504,7 +504,7 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 | Rime Wraith | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
 | Frost Moth | 16 | 90 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.02 % |
 | Glacier Yeti | 16 | 1 % | 7,613 | 3,255 | 3.5 s | 0.6 % | 0.00 % |
-| The Winter Wyrm (boss) | 37 | 97 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
+| The Winter Wyrm (boss) | 37 | 98 % | 737,924 | 166,033 | 335 s | 55.9 % | 0.22 % |
 | *tundra total (if every spawn were here)* | | | | | | | *0.5 %* |
 | **All kills together** | | | | | | | **2.3 %** (bosses 2.1 %; XP 10.2 %) |
 
@@ -577,11 +577,11 @@ What the monsters pay against the income of a run (docs/plan/20-monster-families
 |---|---|---|---|---|---|---|---|
 | castle 1 | 2.0 | 10.1 % | 0.0 % | 10.1 % | 14.6 % | Thistle Boar (level 2) | 16.2 % |
 | castle 2 | 12 | 6.8 % | 1.4 % | 5.4 % | 13.3 % | Thistle Boar (level 3) | 4.8 % |
-| castle 3 | 40 | 9.8 % | 6.5 % | 3.3 % | 28.8 % | Thistle Boar (level 4) | 1.6 % |
-| castle 4 | 100 | 10.9 % | 9.6 % | 1.3 % | 33.4 % | Thistle Boar (level 5) | 0.7 % |
-| castle 5 | 300 | 10.1 % | 9.2 % | 0.9 % | 36.7 % | Thistle Boar (level 6) | 0.2 % |
+| castle 3 | 40 | 9.8 % | 6.6 % | 3.3 % | 29.0 % | Thistle Boar (level 4) | 1.6 % |
+| castle 4 | 100 | 11.1 % | 9.8 % | 1.3 % | 34.0 % | Thistle Boar (level 5) | 0.7 % |
+| castle 5 | 300 | 10.1 % | 9.3 % | 0.9 % | 36.8 % | Thistle Boar (level 6) | 0.2 % |
 | castle 6 | 700 | 6.6 % | 6.0 % | 0.6 % | 22.3 % | Thistle Boar (level 7) | 0.1 % |
-| castle 7 | 1,300 | 3.7 % | 3.4 % | 0.3 % | 14.5 % | Thistle Boar (level 8) | 0.1 % |
+| castle 7 | 1,300 | 3.7 % | 3.4 % | 0.3 % | 14.6 % | Thistle Boar (level 8) | 0.1 % |
 | castle 8 | 2,200 | 2.3 % | 2.1 % | 0.2 % | 10.2 % | Thistle Boar (level 9) | 0.0 % |
 | castle 9 | 3,300 | 1.7 % | 1.5 % | 0.1 % | 6.6 % | Thistle Boar (level 9) | 0.0 % |
 

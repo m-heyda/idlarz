@@ -24,7 +24,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 	const completePurchase = (x: number, y: number, biome: BiomeType): boolean => {
 		const state = get();
 		const owned = economyTiles(state.tiles, state.freeTiles);
-		const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
+		const cost = calculateTileCost(
+			owned,
+			effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+		);
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
 
@@ -63,7 +66,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 			const owned = economyTiles(state.tiles, state.freeTiles);
 			const purchased = owned - 1;
-			const cost = calculateTileCost(owned, effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass));
+			const cost = calculateTileCost(
+				owned,
+				effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+			);
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
 			return completePurchase(x, y, rollBiome(state.tiles, x, y, purchased, Math.random, state.prestige.rebirths));

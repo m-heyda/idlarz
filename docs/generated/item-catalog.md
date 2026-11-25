@@ -109,51 +109,51 @@ Gear is authored at the start of its item level window; bases roll their rarity,
 | Item | Id | Kind | Tier | Type | Item levels | Stats at its first level | Shop | Drops from |
 |---|---|---|---|---|---|---|---|---|
 | Obsidian Aegis | `obsidian_aegis` | offhand (shield) | 3 | base | 8-100 | +11 Armor, +12 Max HP |  | general pool |
-| Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP |  | general pool |
-| Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP |  | general pool |
-| Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP |  | general pool |
-| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance |  | general pool |
+| Obsidian Helm | `obsidian_helm` | armor | 3 | base | 8-100 | +6 Armor, +6 Max HP, +2.1 s Boss Time |  | general pool |
+| Obsidian Shoulderpads | `obsidian_pauldrons` | armor | 3 | base | 8-100 | +5 Armor, +5 Max HP, +2.1 s Boss Time |  | general pool |
+| Obsidian Cuirass | `obsidian_cuirass` | armor | 3 | base | 8-100 | +10 Armor, +12 Max HP, +2.8% Build Speed |  | general pool |
+| Obsidian Gauntlets | `obsidian_gauntlets` | armor | 3 | base | 8-100 | +3 Armor, +3 Max HP, +1.5% Crit Chance, +2.1% Build Speed |  | general pool |
 | Obsidian Greaves | `obsidian_greaves` | armor | 3 | base | 8-100 | +7 Armor, +8 Max HP |  | general pool |
 | Obsidian Sabatons | `obsidian_sabatons` | armor | 3 | base | 8-100 | +4 Armor, +4 Max HP |  | general pool |
-| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find |  | general pool |
-| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge |  | general pool |
+| Obsidian Pendant | `obsidian_pendant` | accessory | 3 | base | 8-100 | +2 Armor, +8 Max HP, +1.5% Crit Chance, +6% Gold Find, +1.4% Tile Discount |  | general pool |
+| Obsidian Cloak | `obsidian_cloak` | accessory | 3 | base | 8-100 | +3 Armor, +5 Max HP, +2.0% Dodge, +1.4% Tile Discount |  | general pool |
 | Obsidian Ring | `obsidian_ring` | accessory | 3 | base | 8-100 | +6 Max HP, +1.5% Crit Chance |  | general pool |
 | Obsidian Charm | `obsidian_charm` | accessory | 3 | base | 8-100 | +1 Armor, +7 Max HP, +1% Super Crit |  | general pool |
 | Obsidian Belt | `obsidian_belt` | accessory | 3 | base | 55-100 | +7 Armor, +13 Max HP |  | general pool |
-| Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +1281 Armor, +1281 Max HP |  | general pool |
-| Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +1050 Armor, +1050 Max HP |  | general pool |
-| Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +2121 Armor, +2541 Max HP |  | general pool |
-| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance |  | general pool |
+| Sunhoney Crown | `sunhoney_crown` | armor | 5 | base | 100-100 | +1281 Armor, +1281 Max HP, +6.6 s Boss Time |  | general pool |
+| Sunhoney Shawl | `sunhoney_shawl` | armor | 5 | base | 100-100 | +1050 Armor, +1050 Max HP, +6.6 s Boss Time |  | general pool |
+| Sunhoney Vestments | `sunhoney_vestments` | armor | 5 | base | 100-100 | +2121 Armor, +2541 Max HP, +8.8% Build Speed |  | general pool |
+| Sunhoney Gloves | `sunhoney_gloves` | armor | 5 | base | 100-100 | +630 Armor, +630 Max HP, +7.68% Crit Chance, +6.6% Build Speed |  | general pool |
 | Sunhoney Skirt | `sunhoney_skirt` | armor | 5 | base | 100-100 | +1491 Armor, +1680 Max HP |  | general pool |
 | Sunhoney Slippers | `sunhoney_slippers` | armor | 5 | base | 100-100 | +840 Armor, +840 Max HP |  | general pool |
-| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +420 Armor, +1680 Max HP, +7.68% Crit Chance, +12% Gold Find |  | general pool |
-| Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +630 Armor, +1050 Max HP, +4.0% Dodge |  | general pool |
+| Honeydrop Amulet | `honeydrop_amulet` | accessory | 5 | base | 100-100 | +420 Armor, +1680 Max HP, +7.68% Crit Chance, +12% Gold Find, +4.4% Tile Discount |  | general pool |
+| Sunhoney Cape | `sunhoney_cape` | accessory | 5 | base | 100-100 | +630 Armor, +1050 Max HP, +4.0% Dodge, +4.4% Tile Discount |  | general pool |
 | Honeycomb Ring | `honeycomb_ring` | accessory | 5 | base | 100-100 | +441 Damage, +735 Max HP, +12.8% Crit Chance, +2.56% Super Crit |  | general pool |
 | Hive Charm | `hive_charm` | accessory | 5 | base | 100-100 | +210 Armor, +1491 Max HP, +5.12% Super Crit |  | general pool |
 | Sunforged Cincture | `sunforged_cincture` | accessory | 5 | base | 100-100 | +420 Armor, +840 Max HP |  | general pool |
 | Honeycomb Scepter | `honeycomb_scepter` | weapon (mace) | 5 | base | 100-100 | +5839 Damage |  | general pool |
 | Golden Ledger | `golden_ledger` | offhand (tome) | 5 | base | 100-100 | +1281 Max HP, +10.7/s HP Regen, +24 Max Mana, +3.24/s Mana Regen, +23.62% Spell Power |  | general pool |
-| Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +1617 Armor, +1617 Max HP |  | general pool |
-| Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +1344 Armor, +1344 Max HP |  | general pool |
-| Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +2688 Armor, +3234 Max HP |  | general pool |
-| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance |  | general pool |
+| Ashen Warlord's Visor | `ashen_warlords_visor` | armor | 5 | base | 100-100 | +1617 Armor, +1617 Max HP, +8.4 s Boss Time |  | general pool |
+| Warlord's Bulwark | `warlords_bulwark` | armor | 5 | base | 100-100 | +1344 Armor, +1344 Max HP, +8.4 s Boss Time |  | general pool |
+| Ashen Plate | `ashen_plate` | armor | 5 | base | 100-100 | +2688 Armor, +3234 Max HP, +11.2% Build Speed |  | general pool |
+| Warlord's Gauntlets | `warlords_gauntlets` | armor | 5 | base | 100-100 | +819 Armor, +819 Max HP, +9.78% Crit Chance, +8.4% Build Speed |  | general pool |
 | Warlord's Cuisses | `warlords_cuisses` | armor | 5 | base | 100-100 | +1890 Armor, +2142 Max HP |  | general pool |
 | Warlord's Sabatons | `warlords_sabatons` | armor | 5 | base | 100-100 | +1071 Armor, +1071 Max HP |  | general pool |
-| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +546 Armor, +2142 Max HP, +9.78% Crit Chance, +12% Gold Find |  | general pool |
-| Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +819 Armor, +1344 Max HP, +4.0% Dodge |  | general pool |
+| Medal of the Fallen | `medal_of_the_fallen` | accessory | 5 | base | 100-100 | +546 Armor, +2142 Max HP, +9.78% Crit Chance, +12% Gold Find, +5.6% Tile Discount |  | general pool |
+| Warlord's Banner Cloak | `warlords_banner_cloak` | accessory | 5 | base | 100-100 | +819 Armor, +1344 Max HP, +4.0% Dodge, +5.6% Tile Discount |  | general pool |
 | Warlord's Signet | `warlords_signet` | accessory | 5 | base | 100-100 | +567 Damage, +945 Max HP, +16.29% Crit Chance, +3.26% Super Crit |  | general pool |
 | War Medal Charm | `war_medal_charm` | accessory | 5 | base | 100-100 | +273 Armor, +1890 Max HP, +6.52% Super Crit |  | general pool |
 | Warden Plate Belt | `warden_plate_belt` | accessory | 5 | base | 100-100 | +546 Armor, +1071 Max HP |  | general pool |
 | Ashen Warlord's Greataxe | `ashen_warlords_greataxe` | weapon (axe) | 5 | base | 100-100 | +5650 Damage, +9.31% Crit Chance |  | general pool |
 | Ashen Tower Shield | `ashen_tower_shield` | offhand (shield) | 5 | base | 100-100 | +2961 Armor, +3234 Max HP |  | general pool |
-| Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck |  | general pool |
+| Blightbound Cowl | `blightbound_cowl` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
+| Shroud Mantle | `shroud_mantle` | armor | 5 | base | 100-100 | +10 Luck, +9.6 s Boss Time |  | general pool |
+| Blightbound Robe | `blightbound_robe` | armor | 5 | base | 100-100 | +10 Luck, +12.8% Build Speed |  | general pool |
+| Shroud Claws | `shroud_claws` | armor | 5 | base | 100-100 | +11.17% Crit Chance, +10 Luck, +9.6% Build Speed |  | general pool |
 | Blightbound Leggings | `blightbound_leggings` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
 | Shroud Treads | `shroud_treads` | armor | 5 | base | 100-100 | +10 Luck |  | general pool |
-| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck |  | general pool |
-| Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck |  | general pool |
+| Ichor Locket | `ichor_locket` | accessory | 5 | base | 100-100 | +11.17% Crit Chance, +12% Gold Find, +10 Luck, +6.4% Tile Discount |  | general pool |
+| Blightbound Shroud | `blightbound_shroud` | accessory | 5 | base | 100-100 | +4.0% Dodge, +10 Luck, +6.4% Tile Discount |  | general pool |
 | Ichor Ring | `ichor_ring` | accessory | 5 | base | 100-100 | +651 Damage, +18.62% Crit Chance, +3.72% Super Crit, +10 Luck |  | general pool |
 | Core Charm | `core_charm` | accessory | 5 | base | 100-100 | +7.45% Super Crit, +10 Luck |  | general pool |
 | Hunter Trophy Belt | `hunter_trophy_belt` | accessory | 5 | base | 100-100 | +10 Luck |  | general pool |

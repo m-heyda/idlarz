@@ -4,6 +4,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { isRecord } from '@/lib/isRecord';
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
 import { aggregateStats } from '@/lib/inventory';
+import { gearBossTimerSec } from '@/lib/gearEconomy';
 import {
 	armorPenPercent,
 	attacksPerSecond,
@@ -110,6 +111,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		...(armorPenPercent(equipment) > 0 ? { armorPenPct: armorPenPercent(equipment) } : {}),
 		...(thornsPercent(equipment) > 0 ? { thornsPct: thornsPercent(equipment) } : {}),
 		...(healOnKillPercent(equipment) > 0 ? { healOnKillPct: healOnKillPercent(equipment) } : {}),
+		...(gearBossTimerSec(equipment) > 0 ? { bossTimerSec: gearBossTimerSec(equipment) } : {}),
 	};
 };
 

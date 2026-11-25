@@ -39,6 +39,8 @@ export interface PlayerProfile {
 	armorPenPct?: number;
 	thornsPct?: number;
 	healOnKillPct?: number;
+	/** Seconds the gear's Boss Timer (IDL-176) adds to a boss fight's clock (absent: none) */
+	bossTimerSec?: number;
 }
 
 /** The one fight a player has open. The monster stands on its ticket; the player's numbers are frozen in `profile`. */
