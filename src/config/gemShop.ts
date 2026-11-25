@@ -53,13 +53,15 @@ export const DAY_SEC = 86_400;
  * - **Name change** (200): once per 30 days, counted on the profile (it survives a game reset); a name another account holds, or one that breaks the name rules, is refused and costs nothing.
  * - **Attribute respec** (300): gives back every attribute point outside a rebirth (a rebirth does it free). **The first respec of an account is free** (a mistake with the new server-held allocation is forgiven once).
  *
- * - **Name colours** (1000, once): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
+ * - **Name colours** (750, once; lowered from 1000 so no single item takes the whole 1,000-gem start purse, IDL-229): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
  *
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
  *
  * - **Additional builder** (id `builder_2`, three levels of 2,000 / 6,000 / 12,000 = 20,000 gems; Upgrades tab): each level is one more builder, so up to three more castle or building upgrades run at once (`builderCount`). Permanent, kept over a rebirth; the purchase count in the ledger is the level and the server's save check allows that many timers. An account that bought the old one-time Builder #2 owns level 1.
  *
  * - **Castle skins** (2,500 each, once; Cosmetics tab, Skins): `CASTLE_SKINS`, a premium castle picture drawn in place of the level castle once bought and picked. Cosmetic only; each is its own purchase and the ledger's `bought` record is the ownership.
+ *
+ * - **Overnight Orders** (750, once): lowered from 1000 for the same reason as Name colours. No single item may cost 80 % or more of the start purse (`gemSim` check `purse-day1`).
  *
  * Nothing here is a ladder: the later shop tabs (limits, time, gear, cosmetics) are IDL-191..193 and appear when they have items.
  *
@@ -90,7 +92,7 @@ export const GEM_SHOP: readonly GemItem[] = [
 		kind: 'once',
 		name: 'Name colours',
 		blurb: 'Unlock the colour picker: fourteen colours for your nickname in the game, the landing page and the rankings.',
-		price: 1000,
+		price: 750,
 		cooldownSec: 0,
 	},
 	{
@@ -184,7 +186,7 @@ export const GEM_SHOP: readonly GemItem[] = [
 		kind: 'once',
 		name: 'Overnight Orders',
 		blurb: 'A crafting batch may run 24 hours longer without a claim. Permanent, it survives a rebirth.',
-		price: 1000,
+		price: 750,
 		cooldownSec: 0,
 	},
 	{

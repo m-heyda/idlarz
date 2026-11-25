@@ -81,8 +81,8 @@ test('the price book lists every shop item (a tiered one per level) and the plan
 
 test('the whole shop and the target checks, pinned', () => {
 	const r = runGemSim();
-	assert.equal(r.wholeList.total, 67_500);
-	assert.deepEqual(r.wholeList.days, { casual: 1011, regular: 224, dedicated: 75 });
+	assert.equal(r.wholeList.total, 67_000);
+	assert.deepEqual(r.wholeList.days, { casual: 1000, regular: 222, dedicated: 74 });
 	assert.equal(r.capBreaksAll, 14_625);
 	assert.deepEqual(
 		r.checks.map((c) => [c.id, c.ok]),
@@ -91,10 +91,10 @@ test('the whole shop and the target checks, pinned', () => {
 			['qol-week2', true],
 			['cap-break-week4-8', true],
 			['whole-list-months', true],
-			['purse-day1', false],
+			['purse-day1', true],
 		],
 	);
-	assert.match(r.checks.find((c) => c.id === 'purse-day1')!.detail, /Name colours \(1000\), Overnight Orders \(1000\)/);
+	assert.equal(r.checks.find((c) => c.id === 'purse-day1')!.detail, 'none');
 	assert.ok(STARTING_GEMS === 1000, 'the purse check is written for the 1,000 start purse');
 });
 

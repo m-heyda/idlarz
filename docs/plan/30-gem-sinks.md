@@ -127,6 +127,8 @@ Gems get their own track, **G**, that rides on the numbered phases of [RELEASE-P
 - the whole list is a multi-month goal;
 - no sink is cheap enough to empty the purse on day 1 (the 1,000 start purse is not a spending budget).
 
+**First findings, acted on:** Name colours and Overnight Orders were priced at exactly the purse (1,000) and are now 750, so the purse check passes. **Still open:** the first Cap Break (300) is affordable on day 1 for every profile, so the weeks 4-8 target holds only if the rebirth gate sets the pace; decide gate versus a higher base price (`CAP_BREAK` in the sim, IDL-231) before the Cap Breaks are built.
+
 ## 10. Risks
 
 | Risk | Where it bites | Mitigation |
