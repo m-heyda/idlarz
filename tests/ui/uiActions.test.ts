@@ -198,7 +198,7 @@ test('with the building system on the placeholder gives way to the real build me
 	here.onSelect();
 	assert.deepEqual(useUiStore.getState().buildModal, { x: at.x, y: at.y }, 'selecting it opens the window for this tile');
 	useUiStore.getState().closeBuildModal();
-	// what already stands is no longer offered as a build, and can be moved here instead
+	// what already stands is listed as owned: a Producer with one allowed copy has no Buy left
 	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, at.x, at.y, { building: 'lumberyard', buildingLevel: 1 }) }));
 	const other = gridCells().find(({ t, x, y }) => t.isOwned && t.biome !== 'castle' && !(x === at.x && y === at.y))!;
 	useGameStore.setState((s) => ({ tiles: patchTile(s.tiles, other.x, other.y, { biome: 'forest', hasChest: false }) }));
@@ -209,9 +209,9 @@ test('with the building system on the placeholder gives way to the real build me
 		'the Extractor and the Idol are not built yet',
 	);
 	assert.deepEqual(
-		second.moves.map((o) => o.def.id),
+		second.maxed.map((o) => o.def.id),
 		['lumberyard'],
-		'a Move option for the one that stands',
+		'the one that stands goes to the "Already owned" group, with no Buy',
 	);
 	assert.ok(items.some((i) => i.id === 'highlight'));
 	assert.equal(

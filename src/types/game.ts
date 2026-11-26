@@ -448,7 +448,6 @@ export interface GameState {
 	/** The building system (flag-gated, config/buildings.ts): build, start the next level of, or move the building of the given tile */
 	buildBuilding: (x: number, y: number, id: string) => boolean;
 	upgradeBuilding: (x: number, y: number) => boolean;
-	moveBuilding: (fromX: number, fromY: number, toX: number, toY: number) => boolean;
 	purchaseAnimal: (animalId: string, count?: number | 'max') => number; // animals bought
 	buyFarmUpgrade: (id: FarmUpgradeId) => boolean;
 	buyMerchantUpgrade: (id: MerchantUpgradeId) => boolean;

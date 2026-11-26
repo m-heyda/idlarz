@@ -7,7 +7,7 @@
  * | First ~100 tiles | easy: hours for an active bot, between a day and a half and two days for the `human` profile (the four free start tiles make the first hours a little slower than the old 3x3 start) |
  * | 200-300 tiles | a 2-3 day project |
  * | After 300 tiles | clearly steeper (the `(n/300)^3.5` tail, {@link tilePrice}); a map of tens of thousands of tiles stays buyable |
- * | First Rebirth (castle 6 + 400 tiles) | around day 5-7 for a person who checks in a few times a day (to become about day 4-6 when the shorter castle timers and cheaper early castle costs of `docs/plan/19-first-build-steps.md` ship) |
+ * | First Rebirth (castle 6 + 400 tiles) | around day 5-7 for a person who checks in a few times a day |
  * | Every later run | faster than the run before it (castle 6 again in roughly 60-70 % of the first run), flattening after the third run because the castle timers bound it |
  * | Level 80 / 100 | about the 3rd / 10th rebirth (the level curve is lifetime and carries over a rebirth, {@link LEVELING}) |
  * | First 10 minutes | first tile at about a minute, first animal before the first castle upgrade |

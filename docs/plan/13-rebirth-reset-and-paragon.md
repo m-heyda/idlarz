@@ -38,6 +38,8 @@ Total attribute points available after a rebirth: `totalStatPoints(level) + 20 x
 
 ## 5. Paragon (after level 100)
 
+> **Superseded by [paragon.md](paragon.md)** (2026-11-26): the curve, the points and upgrades, the milestones and the ranking are specified there; the numbers below (growth 1.06, cap 1000, all bonuses capped) are history.
+
 You still level past 100: the same lifetime XP keeps counting and each further level is a **paragon level**. This extends the draft in [ROADMAP](ROADMAP.md) ("Paragon levels"):
 
 - The level curve ends at `LEVELING.maxLevel` 100 with anchors up to 1.85e10 XP. Past it the step to the next level grows by a constant factor `paragonGrowth` (proposal 1.06, so a paragon level takes about as long as the late 90s) up to a cap (proposal paragon 1000) well below `XP_CAP` 1e21.

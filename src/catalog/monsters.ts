@@ -158,7 +158,7 @@ const ROSTER: readonly RosterRow[] = [
 	normal('lilypadWarden', 'Lilypad Warden', 'lake', false, PLACEHOLDER),
 	boss('bossLakeHydra', 'The Lake Hydra', 'lake', true),
 
-	// Rebirth biomes (docs/plan/12-rebirth-biomes.md): the jungle roster is live (rebirth 1), the other four wait. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
+	// Rebirth biomes (`BIOME_RULES.unlockAfterRebirths`): all five rosters are live. The jungle monsters take the names of the supplied sprites (owner decision 2026-11-10)
 	normal('skullVine', 'Skull Vine', 'jungle', true),
 	normal('eyeHorror', 'Eye Horror', 'jungle', true),
 	normal('zombieTriceratops', 'Zombie Triceratops', 'jungle', true),

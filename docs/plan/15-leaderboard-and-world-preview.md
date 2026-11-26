@@ -1,29 +1,8 @@
-# 15 · Rankings and "preview map" (the Rankings window is built; the preview map is still a draft)
+# 15 · Preview map of another player's world (draft; the Rankings are built)
 
-> **Built (migration `player_rankings`):** the Rankings window with the Level, Rebirths, Crafting and Tiles boards (Quests and Deeds are coming-soon tabs). It differs from the draft below in two ways: there is no `player_stats_daily` table; a `player_rankings` row per player keeps the rank and the previous rank, and `refresh_rankings()` (one SQL call, run by the first `GET /api/rankings` after 24 hours, no cron) rebuilds them; and the Tiles board uses `player_stats.best_tiles`, the most tiles ever owned. Rules: `src/lib/rankings.ts` (docs: Progression/Rankings). Not built yet: gold per hour, the `listed` opt-out, paragon, the preview map.
+The Rankings window is built (migration `player_rankings`, `GET /api/rankings`, six boards: Level, Rebirths, Crafting, Tiles, Kills and Deeds; Quests is a coming-soon tab) and is described by the JSDoc of `src/lib/rankings.ts`, `rankingsServer.ts` and the SQL in `supabase/migrations/player_rankings*.sql`. What is left is the **preview**: a player can peek at another player's generated world (biome layout and castle location only), from the eye icon of a Rankings row. Linear: IDL-115.
 
-
-Players see each other's name, avatar and a few numbers in rankings, and can peek at another player's generated world (biome layout and castle location only).
-
-## 1. What exists
-
-- `player_stats` (in `supabase/schema.sql`) is already the leaderboard table: one narrow row per player with `display_name, level, tiles_owned, castle_level, rebirths, legacy_earned, gold_per_min, play_seconds, trusted`, written **inside `save_player_state` on every accepted save** (atomic with the save). Public `select` for `anon` and `authenticated` on the listed columns, **only rows with `trusted = true`**, indexes per ranking. No UI reads it yet.
-- `trusted` = not a test account, a young game at the first save (`freshStart`) and never flagged (`pipeline.ts`). Today 0 of 5 rows are trusted, so the first ranked players will be new accounts or a decision to re-trust testers.
-- `profiles.player_class` (warrior, paladin, ranger, mage) is the avatar today; portraits exist (`CharacterPortrait`).
-- The map is in `player_worlds` (`land` = runs of biome letters, `extra` = buildings, levels, chests), **select-own only**.
-
-## 2. Rankings: no cron needed
-
-The data is already collected live, for free, inside the save call. A cron job would only duplicate it. Plan:
-
-1. **Migration `leaderboard_columns.sql`** (additive): `player_stats` + `xp numeric`, `paragon integer default 0`, `player_class text`; extend the column grant with `xp, paragon, player_class` (never `user_id` linkage to anything private). The server fills them in `save_player_state` (extend `p_stats`): `xp` from the clamped XP model, `paragon` derived from it ([13](13-rebirth-reset-and-paragon.md)), `player_class` from the profile.
-2. **Read path**: a route `GET /api/rankings?by=level|income|rebirths|tiles&limit=50&cursor=...` (or direct PostgREST from the browser with the existing policy). Keyset pagination on the existing indexes, 50 rows, cached 60 s (`Cache-Control: s-maxage=60`) so a busy page does not hit the database per viewer. Gold per hour = `gold_per_min x 60`, formatted in the UI.
-3. **Ranking order**: level, then paragon, then lifetime XP; separate boards for income (gold/h), rebirths then Embers earned, tiles. A player sees their own rank through a count on the same index (`count(*) where level > mine`), not by loading everyone.
-4. **UI**: a Rankings overlay (header menu), rows = avatar (class portrait), name, level / paragon, rebirths, gold/h, an eye icon. The own row is pinned.
-5. **Privacy**: other players can read only name, avatar (class), level/paragon, rebirths, tiles, castle level, income, play time, as the grant already says. No ids in the public payload (use `user_id` only as an opaque cursor/preview token; see 3). A "hide me from rankings" switch is a cheap column (`listed boolean`); proposal: add it with the migration.
-6. **When a cron does earn its place** (later): a daily snapshot table `player_stats_daily (user_id, day, level, xp, rebirths, gold_per_min)` for "gained this week" and seasons, with 30-day retention (about 100 bytes x 30 x players, trivial). `pg_cron` is not installed on the project; it is a dashboard toggle. Alternative without a cron: write the snapshot lazily on the first save of each day inside the same RPC. Recommendation: lazy daily row, no cron, until seasons exist.
-
-## 3. Preview map (the eye icon)
+## What is planned
 
 Goal: a read-only look at another player's world: biomes and castle only, in a clear "Previewing <name>" mode with a close button.
 
@@ -33,13 +12,7 @@ Goal: a read-only look at another player's world: biomes and castle only, in a c
 - **Rendering**: reuse `TerrainLayer`, `Minimap` and the biome art with an empty building/monster layer; the world is built with `packLand`'s inverse (`worldFromPart` in `lib/offline/placement.ts` already does it).
 - **Tests**: preview store has no path to `saveStorage`; a route test that `extra` never leaves the server; a rate-limit test.
 
-## 4. Decisions and open questions
+## Decided
 
-**Decided (2026-10-29):**
-- **Avatar is separate from the class** (`player_stats.avatar_id`, from `profiles.avatar_id`; [21](21-classes-avatars-achievements-offline-report.md)); the leaderboard shows avatar, name, level/paragon, rebirths, gold/h.
-- **Trusted players are listed by default, with an opt-out `listed` switch** in Settings. A player who is not listed has no ranking row and **cannot be previewed**; the preview route checks `listed` and `trusted`.
-- **Launch boards and snapshot (decided 2026-11-07, owner; IDL-113):** four boards at launch: level (then Paragon, then lifetime XP), income (gold/h), rebirths (then Embers earned) and tiles. The **lazy daily snapshot ships with the first migration**: `player_stats_daily (user_id, day, level, xp, rebirths, gold_per_min)` written inside the same save RPC, 30-day retention, no cron. Own row pinned; `listed` opt-out default on. The preview (IDL-115) returns `land` only and needs the avatar from `player_stats.avatar_id`.
-
-**Still open:**
-1. ~~Re-trust testers?~~ **Moot (decided by the plan):** the class-release reset ([21](21-classes-avatars-achievements-offline-report.md) section 6) deletes every save, so every game is fresh and `freshStart` is true for all; rankings start empty with everyone eligible.
-2. ~~Lazy daily snapshot~~ decided below (2026-11-07).
+- Only **trusted** players can be previewed (`trusted` on `player_stats`); a player who opts out of the rankings (a `listed` switch in Settings, not built yet) has no ranking row and cannot be previewed. The preview route checks both.
+- The preview returns `land` only (never `extra`, so buildings, levels and chests stay private) and needs the avatar and name from the ranking row; no account id leaves the server (an opaque token).

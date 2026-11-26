@@ -109,8 +109,12 @@ const GameItemCard: React.FC<TipProps> = ({ item, itemId, comparison, wornLabel,
 	const lost = comparison ? comparison.rows.filter((row) => row.status === 'lost' && row.key !== primaryKey) : [];
 	const swing = comparison?.swing;
 
+	// a legendary's perks have their own gold block, so the stat groups show only what is left without them (the Difference list keeps the full change)
+	const perkValues = (resolved?.perks ?? {}) as Partial<Record<StatKey, number>>;
+	const groupRows = rows.map((row) => ({ ...row, now: Math.round((row.now - (perkValues[row.key] ?? 0)) * 100) / 100 })).filter((row) => row.now > 0);
+
 	const groups = STAT_CATEGORIES.flatMap((category) => {
-		const catRows = rows.filter((row) => STAT_CATEGORY[row.key] === category.id);
+		const catRows = groupRows.filter((row) => STAT_CATEGORY[row.key] === category.id);
 		if (catRows.length === 0) return [];
 		const tipRows: TipRow[] = catRows.map((row) => {
 			const change = row.status === 'new' ? row.now : row.delta; // a stat the worn piece lacks is all gain
