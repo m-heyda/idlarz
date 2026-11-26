@@ -10,7 +10,7 @@ import {
 } from '../../../../packages/design-system/src/components/composites';
 import { Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { COMBAT_NAMES, RESOURCES } from '@/catalog';
-import { INITIAL_CHARACTER_STATS } from '@/config/character';
+import { INITIAL_CHARACTER_STATS, MAX_LEVEL } from '@/config/character';
 import { STAT_RULES } from '@/config/combatConfig';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { RESOURCE_PIXEL_ICONS, pixelIconSrc, type PixelIconName } from '@/config/pixelIcons';
@@ -29,7 +29,7 @@ import { useUiStore } from '@/stores/uiStore';
 import type { CharacterStats, Resources } from '@/types/game';
 import audioManager from '@/utils/audioManager';
 import { formatCompact, formatNumber, formatPercent, formatRate, tidy } from '@/utils/formatters';
-import { calculateStatResourceModifiers, getStatDescriptionGroups } from '@/utils/game/character';
+import { calculateParagon, calculateStatResourceModifiers, getStatDescriptionGroups } from '@/utils/game/character';
 import { calculateResourceBreakdown, type ResourceBreakdownEntry } from '@/utils/game/income';
 import RebirthsPanel from '../overlays/RebirthsPanel';
 import { emberIncomeBonus } from '@/utils/game/rebirth';
@@ -179,14 +179,23 @@ const HeroStats: React.FC = () => {
 		}
 	};
 
+	const paragon = calculateParagon(resources.xp);
 	const overview: PaperRowData[] = [
-		{ label: 'Level', value: formatCompact(level.level), color: I.gold },
-		{ label: 'Next level', value: pct(level.progress * 100, 1), color: I.purple },
+		{
+			label: 'Level',
+			value: paragon.paragon > 0 ? `${formatCompact(level.level)} ✦ ${formatCompact(paragon.paragon)}` : formatCompact(level.level),
+			color: I.gold,
+		},
+		{
+			label: level.level >= MAX_LEVEL ? 'Next paragon level' : 'Next level',
+			value: pct((level.level >= MAX_LEVEL ? paragon.progress : level.progress) * 100, 1),
+			color: I.purple,
+		},
 		{ label: 'XP', value: `${formatNumber(resources.xp)} (${formatRate(resourceRates.total.xp)})`, color: I.green },
 		{ label: 'Gold', value: formatNumber(resources.gold), color: I.gold },
 		{
 			label: 'Attribute gold',
-			value: `+${pct(calculateStatResourceModifiers(characterStats).gold * 100)} (base +${pct(STARTING_GOLD_BONUS)} from the starting 5 Int and 5 Cha)`,
+			value: `+${pct(calculateStatResourceModifiers(characterStats).gold * 100)} (start +${pct(STARTING_GOLD_BONUS)})`,
 			color: I.gold,
 		},
 		{ label: 'Crafting level', value: craftLevelOf(craftXp).level, color: I.gold },

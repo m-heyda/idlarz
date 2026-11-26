@@ -55,6 +55,11 @@ export const LEVELING = {
 	/** Attribute points every rebirth adds to the pool for good (IDL-100): 20, so rebirth 5 has 100 more points to spend than the level alone gives */
 	attributePointsPerRebirth: 20,
 	maxLevel: 100,
+	/** Paragon (docs/plan/paragon.md): the levels past `maxLevel`, from lifetime XP past the level-100 total. The step from paragon `p` to `p + 1` costs `paragonFirstStepXp x paragonGrowth^p`: 2.1e8 first (12 % of the 1.7e9 step 99 to 100), 0.2 % more per level, so paragon 500 is about 1.8e11 XP. */
+	paragonFirstStepXp: 2.1e8,
+	paragonGrowth: 1.002,
+	/** The highest paragon level: 2.3e15 XP in all, the most that stays below 2^53 where numbers are still exact (IDL-129) */
+	paragonCap: 5000,
 	softCapLevel: 80,
 	firstStepXp: 5000,
 	// A level gives 1 attribute point; the levels up to `earlyBonusUntil` give `earlyBonusPoints` more. Levels are slower than they were, and

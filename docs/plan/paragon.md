@@ -48,7 +48,7 @@ The grid (all numbers are placeholders until the sims; ids are append-only):
 
 - **Milestones every 100 paragon levels** (100, 200 ... 500, then every 100): gems once on Claim (Hall of Deeds style), a **title and a name frame** shown on the player's name (HUD, rankings, landing), and one bonus paragon point (my call: it keeps the milestone useful without touching pacing). Titles are data in `src/catalog` like the badges and titles of IDL-296; no new art.
 - **Deeds**: a new `paragon` condition kind in `AchievementCondition` (`src/catalog/achievements.ts`, `conditionProgress` in `src/lib/deeds.ts`), tiers at paragon 1, 10, 25, 50, 100, 200, 300, 400, 500, 750, 1,000, with deed points like the other tiers. They feed the existing deed milestones (`src/catalog/deedMilestones.ts`).
-- **Display**: past level 100 the XP bar becomes the paragon bar ("Paragon 37", progress to the next); the level shows as `100 + P37` on the name tag, in the Hero window and in the rankings. The plain `level` stays capped at 100 everywhere it is read today (unlocks, tutorial, deeds); paragon is a separate derived number, so nothing that reads `level` can break.
+- **Display**: past level 100 the XP bar becomes the paragon bar ("Paragon 37 · 25% · into / needed", the level box stays 100), the Overview reads `Level 100 ✦ 37` and "Next paragon level", and the Rankings show the mark `✦ 37` (already built, fed by `paragonOf`). The plain `level` stays capped at 100 everywhere it is read today (unlocks, tutorial, deeds); paragon is a separate derived number (`calculateParagon`), so nothing that reads `level` can break. Nothing is added to the save, `summarize` or the database.
 - **Ranking**: the Level board already orders by `level desc, xp desc, level_maxed_at asc` (`player_rankings` refresh, `supabase/migrations/player_rankings.sql`), so paragon order falls out of the XP that keeps counting; the board gets a Paragon column. A separate Paragon board is not needed. Ties at 100 keep the "first to the cap" tie-break.
 
 ## Server, saves and economy
@@ -71,11 +71,11 @@ For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (p
 2. **Points and the 20 upgrades** (IDL-186, IDL-187): the ledger column, spend and respec, the Paragon window, every bonus derived server-side, the sims and audit pins.
 3. **Milestones, deeds and cosmetics**: the `paragon` deed condition and tiers, the milestone rewards, titles and frames.
 
-## Needs the owner's call before project 1 starts
+## Owner calls
 
-1. **Timing against 1.0** (the standing rule is "0.9.x polish, new content for 1.0"): ship project 1 (display only) in 0.9.x and hold 2 and 3 for 1.0, or hold all three?
-2. The bonus paragon point at each milestone: keep (my call) or drop?
-3. The first respec free (my call, like the attribute respec) or always paid?
+1. **Timing: decided 2026-11-26, Paragon ships before 1.0** (all three projects, in 0.9.x; the changelog starts in `0.9.4.md`).
+2. The bonus paragon point at each milestone: kept (my call, approved with the design).
+3. The first respec is free (my call, approved with the design).
 
 ## Left to the builder
 

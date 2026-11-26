@@ -16,6 +16,7 @@ import {
 import { BASELINE_EPOCH, GAME_EPOCH } from '../../src/config/epoch';
 import { CRAFTING } from '../../src/config/crafting';
 import { MAX_LEVEL } from '../../src/config/character';
+import { calculateParagon, cumulativeXp } from '../../src/utils/game/character';
 import { craftCumulativeXp, craftLevelOf } from '../../src/lib/crafting';
 
 // The pure rules of the Rankings: the boards, the daily movement arrows and how a stored place becomes a row with the player's own choices.
@@ -64,8 +65,20 @@ test('the database gets the live caps from the config, never its own copy', () =
 	assert.equal(craftLevelOf(refreshArgs().p_craft_max_xp).level, CRAFTING.maxLevel, 'that much crafting XP is exactly the maximum level');
 });
 
-test('there is no paragon yet', () => {
-	assert.equal(paragonOf(1e12, MAX_LEVEL), 0);
+test('the paragon level is read from the lifetime XP, and only for a character at level 100', () => {
+	assert.ok(paragonOf(1e12, MAX_LEVEL) > 0);
+	assert.equal(paragonOf(cumulativeXp(MAX_LEVEL), MAX_LEVEL), 0, 'the level-100 total itself is paragon 0');
+	assert.equal(paragonOf(1e12, 60), 0, 'a level below 100 never has paragon, whatever the XP says');
+	assert.equal(paragonOf(0, MAX_LEVEL), 0, 'the other boards carry no XP');
+	assert.equal(paragonOf(Number.NaN, MAX_LEVEL), calculateParagon(Number.NaN).paragon, 'garbage XP is clamped, never NaN');
+	assert.ok(Number.isInteger(paragonOf(Number.NaN, MAX_LEVEL)));
+});
+
+test('a level-100 row on the Level board carries its paragon level', () => {
+	const rows = buildRankingRows([entry({ value: MAX_LEVEL, xp: 6.5e10 })], new Map([['u1', profile()]]), new Map([['u1', []]]), null);
+	assert.ok(rows[0].paragon > 150 && rows[0].paragon < 220, `paragon ${rows[0].paragon}`);
+	const other = buildRankingRows([entry({ value: 12, xp: 0 })], new Map([['u1', profile()]]), new Map([['u1', []]]), null);
+	assert.equal(other[0].paragon, 0);
 });
 
 test('a row carries the colour the player chose, the move, and no account id', () => {
