@@ -4,12 +4,12 @@ Written 2026-11-26 after a design talk with the owner. It **replaces section 5 o
 
 ## Why
 
-Two players have already reached level 100 and have nothing left to chase. The owner wants a Diablo 3 style endless track: levels past 100 that give points, spent in a grid of upgrades (combat, economy, luck and more), with milestones every 100 levels, deeds, a visible level and a place in the rankings. A first target: **paragon 500 in a few weeks** of active play; levels beyond 1,000 must stay possible and worth it.
+Two players have already reached level 100 and have nothing left to chase. The owner wants a Diablo 3 style endless track: levels past 100 that give points, spent in a grid of upgrades (combat, economy, luck and more), with milestones every 100 levels, deeds, a visible level and a place in the rankings. A first target: **paragon 500 as a long-term goal** (about four months of active play on the retuned curve); levels beyond 1,000 must stay possible and worth it.
 
 ## Decided by the owner
 
 - 4 categories with 5 upgrades each: **3 capped and 2 uncapped** per category (12 capped, 8 uncapped). Diablo-like bonuses for combat, economy, luck and the realm.
-- Paragon XP is **XP past level 100**, for everyone, from the moment the update ships: a player's banked XP counts. The curve is tough enough that the player with the most banked XP (about 4.6e10 past level 100, paragon 183 on this curve) does not land near 400.
+- Paragon XP is **XP past level 100**, for everyone, from the moment the update ships: a player's banked XP counts. The curve is tough enough that the player with the most banked XP (about 4.6e10 past level 100, paragon 61 on this curve) lands near 60, not 180 (retuned 2026-11-26 after the first curve put the two level-100 players at 184 and 25).
 - A milestone every 100 paragon levels, and **deeds** (the Hall of Deeds) for paragon levels.
 - Uncapped upgrades grow with a **square root** (each point worth less than the last, never zero, never explosive).
 
@@ -23,9 +23,9 @@ Two players have already reached level 100 and have nothing left to chase. The o
 
 Paragon level `n` costs `paragonFirstStepXp x paragonGrowth^(n-1)`; the total to reach it is `paragonFirstStepXp x (paragonGrowth^n - 1) / (paragonGrowth - 1)` on top of the 1.85e10 of level 100.
 
-- `paragonFirstStepXp` = 2.1e8 (12 % of the 1.7e9 step 99 to 100), `paragonGrowth` = 1.002 (a step grows 0.2 % per level: 2.1e8 at the start, 5.7e8 at paragon 500).
-- Totals past level 100: paragon 50 = 1.1e10, 100 = 2.3e10, 200 = 5.2e10, 300 = 8.6e10, 400 = 1.3e11, 500 = 1.8e11, 1,000 = 6.7e11. At 4-5e9 XP a day that is roughly 5 / 10 / 17 / 26 / 36 days to paragon 100 / 200 / 300 / 400 / 500 (rebirths and the Paragon XP upgrade make it faster).
-- **Ceiling: paragon 5,000** (`paragonCap`, 2.3e15 XP), the highest total that stays below 2^53 (9e15) where floats are still exact (IDL-129). Raise it only together with that ticket.
+- `paragonFirstStepXp` = 7e8 (41 % of the 1.7e9 step 99 to 100), `paragonGrowth` = 1.002 (a step grows 0.2 % per level: 7e8 at the start, 1.9e9 at paragon 500).
+- Totals past level 100: paragon 50 = 3.7e10, 100 = 7.7e10, 200 = 1.7e11, 300 = 2.9e11, 400 = 4.3e11, 500 = 6.0e11, 1,000 = 2.2e12. At 4-5e9 XP a day that is roughly 17 / 38 / 64 / 95 / 130 days to paragon 100 / 200 / 300 / 400 / 500 (rebirths and the Paragon XP upgrade make it faster).
+- **Ceiling: paragon 5,000** (`paragonCap`, 7.6e15 XP), still below 2^53 (9e15) where floats are exact (IDL-129). Raise it only together with that ticket.
 - The ratio and first step go in `LEVELING` (`src/config/character.ts`), the functions next to `calculateLevel` in `src/utils/game/character.ts`. Retune the two numbers, not the code.
 
 ## Points and upgrades
@@ -63,7 +63,7 @@ The grid (all numbers are placeholders until the sims; ids are append-only):
 1. **Flat uncapped (Diablo 3)**: simplest, but a linear bonus past ~paragon 300 breaks every pacing target. Rejected.
 2. **Logarithmic / asymptotic uncapped**: safe, but flattens before 1,000 or never truly uncaps. Rejected.
 3. **Square root (chosen)**: always worth a point, no explosion, easy to explain.
-For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (past the 1e21 XP cap and the 2^53 limit) and puts the banked-XP player at paragon 406 on day one; x1.002 fixes both.
+For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (past the 1e21 XP cap and the 2^53 limit) and puts the banked-XP player at paragon 406 on day one; x1.002 fixes both. The first x1.002 curve (first step 2.1e8) still gave the banked-XP player 184, so the first step is 7e8.
 
 ## Order of work (three projects, each its own plan and PRs)
 

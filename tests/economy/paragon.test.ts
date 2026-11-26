@@ -13,13 +13,13 @@ const near = (actual: number, expected: number, what: string) =>
 	);
 
 test('the totals follow the design: paragon 50 to 1,000', () => {
-	near(cumulativeParagonXp(50), 1.1e10, 'paragon 50');
-	near(cumulativeParagonXp(100), 2.3e10, 'paragon 100');
-	near(cumulativeParagonXp(200), 5.2e10, 'paragon 200');
-	near(cumulativeParagonXp(300), 8.6e10, 'paragon 300');
-	near(cumulativeParagonXp(400), 1.3e11, 'paragon 400');
-	near(cumulativeParagonXp(500), 1.8e11, 'paragon 500');
-	near(cumulativeParagonXp(1000), 6.7e11, 'paragon 1,000');
+	near(cumulativeParagonXp(50), 3.7e10, 'paragon 50');
+	near(cumulativeParagonXp(100), 7.7e10, 'paragon 100');
+	near(cumulativeParagonXp(200), 1.7e11, 'paragon 200');
+	near(cumulativeParagonXp(300), 2.9e11, 'paragon 300');
+	near(cumulativeParagonXp(400), 4.3e11, 'paragon 400');
+	near(cumulativeParagonXp(500), 6.0e11, 'paragon 500');
+	near(cumulativeParagonXp(1000), 2.2e12, 'paragon 1,000');
 	assert.equal(cumulativeParagonXp(0), 0);
 });
 
@@ -28,10 +28,10 @@ test('the ceiling stays below 2^53 so the XP is still exact', () => {
 	assert.ok(cumulativeParagonXp(5000) + base < 2 ** 53);
 });
 
-test('the steps: 2.1e8 first, growing 0.2 % a level, none at the ceiling', () => {
-	assert.equal(paragonStepXp(0), 2.1e8);
+test('the steps: 7e8 first, growing 0.2 % a level, none at the ceiling', () => {
+	assert.equal(paragonStepXp(0), 7e8);
 	const last = paragonStepXp(499);
-	assert.ok(last > 5.6e8 && last < 5.8e8, `step 499 = ${last}`);
+	assert.ok(last > 1.8e9 && last < 2.0e9, `step 499 = ${last}`);
 	assert.equal(paragonStepXp(5000), 0);
 	assert.equal(paragonStepXp(6000), 0);
 });
@@ -74,7 +74,7 @@ test('at the ceiling there is nothing to go', () => {
 	assert.equal(top.needed, 0);
 });
 
-test('the banked XP of the first level-100 player lands near paragon 183, not 400', () => {
-	const p = calculateParagon(6.5e10).paragon;
-	assert.ok(p > 150 && p < 220, `paragon ${p}`);
+test('the banked XP of the first level-100 player lands near paragon 60, not 180', () => {
+	const p = calculateParagon(base + 4.6e10).paragon;
+	assert.ok(p > 55 && p < 70, `paragon ${p}`);
 });

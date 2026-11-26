@@ -110,7 +110,7 @@ Notes from reading the code (not measured against the live project):
 
 - **Biomes unlocked by rebirth**: `BIOME_RULES` has `unlockAfterPurchases` today (swamp 6, tundra 10); a rebirth-based unlock plus a minimum castle distance and distance-weighted rolls is designed in [12](12-rebirth-biomes.md). A monster's `biomes` list already follows whatever biomes exist. The new monster families of the enemy rework need a generic ticket list in the ledger bank (not just a rule change).
 - **Per-biome loot and modifiers**; per-monster loot sources exist (`lootSourceId`).
-**Paragon (levels past 100)**: the design is [paragon.md](paragon.md): a curve that takes about five weeks to paragon 500, a grid of 4 x 5 upgrades (3 capped, 2 uncapped), milestones every 100 levels, deeds and the Rankings mark. Three projects, all before 1.0: IDL-114 (curve and display), IDL-186 and IDL-187 (points and the upgrades), IDL-394 (milestones and deeds).
+**Paragon (levels past 100)**: the design is [paragon.md](paragon.md): a curve that takes about four months to paragon 500, a grid of 4 x 5 upgrades (3 capped, 2 uncapped), milestones every 100 levels, deeds and the Rankings mark. Three projects, all before 1.0: IDL-114 (curve and display), IDL-186 and IDL-187 (points and the upgrades), IDL-394 (milestones and deeds).
 
 ## Gem sinks and the Gem shop (the shop is built; what is left is below; spec [30](30-gem-sinks.md))
 
