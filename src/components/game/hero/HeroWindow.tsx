@@ -20,6 +20,7 @@ import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/des
 import { xpBarOf } from '@/lib/xpBar';
 import { paragonFree } from '@/lib/offline/paragon';
 import HeroParagon from './HeroParagon';
+import HeroPets from './HeroPets';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
@@ -583,15 +584,6 @@ const SkillsSoon: React.FC = () => (
 	/>
 );
 
-/** The Pets tab for now: a coming-soon screen (the pet system itself is not built yet). */
-const PetsSoon: React.FC = () => (
-	<ComingSoon
-		title='Pets'
-		icon={pixelIconSrc('eggs')}
-		text='Hatch a companion and let it walk beside your hero. Pets are on the way: eggs, companions and what they can do.'
-	/>
-);
-
 /**
  * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats, Pets, Skills and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
  */
@@ -636,7 +628,7 @@ const HeroWindow: React.FC = () => {
 					) : tab === 'paragon' ? (
 						<HeroParagon />
 					) : tab === 'pets' ? (
-						<PetsSoon />
+						<HeroPets />
 					) : tab === 'skills' ? (
 						<SkillsSoon />
 					) : (
