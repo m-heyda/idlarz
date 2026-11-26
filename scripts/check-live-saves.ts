@@ -1,5 +1,5 @@
 /**
- * Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/14-server-audit-and-data-plan.md` section 6). Run it with the same Supabase environment **before** a release that
+ * Before a reset or a release that tightens the save rules: `npm run check-live-saves` is a read-only dry run (IDL-12; method in `docs/plan/save-compatibility.md` (section "Dry run against the real rows")). Run it with the same Supabase environment **before** a release that
  * tightens the save rules or switches on `ENFORCEMENT` (the epoch reset IDL-76, IDL-208), and again after, to see what the reset left. It prints counts and reasons only: saves rejected and why, saves that would be clamped or flagged, how many `ENFORCEMENT`
  * would refuse, how many players are in the middle of a castle upgrade, ledgers without a save or inventory. A last section is the new chapter dry run (IDL-254 item 2): accounts the flip would reset (and how many hold a save), name collisions with the forced renames they mean, and whether `player_ledger.stats` / `legacy` exist and how many rows are still null. It writes nothing. If it reports saves that would be refused, reset those players or write the conversion before the release.
  *
@@ -17,7 +17,7 @@
  * fixed reason texts of the code only: no names, no ids, no numbers out of a game. Read-only: it only SELECTs, nothing is written anywhere.
  *
  * Dev machine only. Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (environment or the git-ignored .env.local); neither is ever printed.
- * Check which project they point at first (the same rule as reset-players). See docs/plan/14-server-audit-and-data-plan.md section 6 and @category Ops.
+ * Check which project they point at first (the same rule as reset-players). See docs/plan/save-compatibility.md and @category Ops.
  */
 import { resolve } from 'node:path';
 import { createClient } from '@supabase/supabase-js';

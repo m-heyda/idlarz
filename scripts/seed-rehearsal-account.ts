@@ -1,5 +1,5 @@
 /**
- * Puts ONE throwaway account into a rebirthed mid-game state, fast, for the new chapter reset rehearsal (`docs/plan/new-chapter-release-runbook.md`, "Rehearsal seeding"). The dev console is gone and a real rebirth takes hours, so this writes the
+ * Puts ONE throwaway account into a rebirthed mid-game state, fast, for a rehearsal of a full reset (the New Chapter runbook is gone: it was done in 0.3.0). The dev console is gone and a real rebirth takes hours, so this writes the
  * state through the server's own save path instead (`scripts/lib/rehearsalSeed.ts` says what the account ends up holding). It reads and writes exactly one account and nothing else.
  *
  *   npm run seed-rehearsal -- --user <uuid> --expect-email <address>                 DRY RUN (the default): checks the account, prints what it would do as counts, writes nothing

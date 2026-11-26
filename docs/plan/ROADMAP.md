@@ -6,6 +6,8 @@ The one place to look when planning the next step. It lists only what is **still
 
 > **Status 2026-11-11:** the **New chapter shipped** (release 0.3.0, `GAME_EPOCH` 2: classes with passives, class-locked avatars, achievements, guided tutorial, full reset, landing and `/play`, buildings with Idols, live biomes at rebirth 1-5, farm and castle rework, potion belt, bigger bags, discovery). Sections below that call it "the next update" or "not built" are partly history; check Linear for the live state. **The game is desktop only (screens 1240 px and wider): there is no mobile or phone layout and none is planned** (IDL-123 canceled).
 
+**Proposal waiting for the owner (2026-11-26): [1-0-punch-list](1-0-punch-list.md), what to finish before 1.0.** The crafting rebalance (IDL-396) is built in PR 319; its numbers are in the code and in `docs/generated/craft-sim.md`.
+
 **UI refresh (layout and UX reference, not an asset refresh; Linear IDL-289, design system in code IDL-290):** [ui-refresh.md](ui-refresh.md) and the board file it describes. Settle these layouts before new mechanics are wired.
 
 ## Where each decision lives (2026-11-07 planning pass)
@@ -35,18 +37,15 @@ Every grade has an icon today (real supplied art; the Python placeholders are go
 
 ## The rebirth world (design docs; the New chapter part is built, the rest is open)
 
-One theme, ten docs. Built already: classes, avatars, achievements, tutorial, reset, landing and the Rankings ([21](21-classes-avatars-achievements-offline-report.md), [15](15-leaderboard-and-world-preview.md)), home-biome buildings and Idols ([18](18-biome-buildings-and-material-tiers.md), partly), live biomes at rebirth 1-5 (rule only, [12](12-rebirth-biomes.md)), monster discovery ([22](22-glossary-and-mastery.md), first part). Still open: the new biomes' data and art, the preview map, Paragon, the later gem shop slices. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
+One theme, a few docs. Built already: classes, avatars, achievements, tutorial, reset, landing and the Rankings ([15](15-leaderboard-and-world-preview.md)), home-biome buildings and Idols ([18](18-biome-buildings-and-material-tiers.md), partly), live biomes at rebirth 1-5 (rule only, [12](12-rebirth-biomes.md)), monster discovery ([22](22-glossary-and-mastery.md), first part). Still open: the new biomes' data and art, the preview map, Paragon, the later gem shop slices. Each doc lists what exists in the code, the design, the server and save impact, and its open questions. Numbers and names in them are proposals until the questions are answered.
 
 | Doc | Feature | Size | Needs first |
 |---|---|---|---|
-| [14](14-server-audit-and-data-plan.md) | **Server audit**, catalogs stay in code, free-plan budget, save-compat method (the polling-write fix is built) | S-M | nothing |
 | [12](12-rebirth-biomes.md) | **Five biomes, one per rebirth (1-5)**, distance rules, five T2 materials, merchant gating, monster slots per biome, dev tools, Guide text | L (art-heavy) | P0 rules need nothing; art per biome |
-| [13](13-rebirth-reset-and-paragon.md) | **Rebirth reset**: +20 points per rebirth (respec and the bag and gear wipe are built); **Paragon** after level 100 | M | nothing |
 | [15](15-leaderboard-and-world-preview.md) | **Preview map** of another player's world (the Rankings are built) | M | nothing |
 | [18](18-biome-buildings-and-material-tiers.md) | **Biome buildings** (Producer, Extractor, Idol per biome, one of each, upgrade timers), **material tiers T0-T4**, (the shorter timers and the resource-key registry are built) | L | Extractors feed crafting |
 | [20](20-monster-families-and-rewards.md) | **Monster families and rewards**: capped absolute rewards multiplied by level, hide/food goods, tiered item drops, spawn pressure, generic tickets | L | the biomes |
-| [21](21-classes-avatars-achievements-offline-report.md) | **Class bonuses, separate avatars, the one-time progress reset (reserved unique names), guided tutorial, offline report bar**; achievements and glossary as drafts | M-L | avatar art, class numbers |
-| [22](22-glossary-and-mastery.md) | **Glossary and mastery**: unknown black monsters, kill-count reveals, permanent mastery bonuses for kills and mined resources | M | the lifetime counters (`player_ledger.stats`), the New chapter release |
+| [22](22-glossary-and-mastery.md) | **Glossary overlay for resources, biomes, items, buildings** and **resource mastery** (the monster half is the built Bestiary) | M | nothing |
 | [17](17-crafting.md) | **Crafting** (Luck = rarity, Intelligence = affix quality, persistent crafting level, about 10 weeks to level 100, instant crafts, slot-themed extract recipes), enchanted craft (reroll/add one affix) locked behind Ichor | L | T2 materials; server-priced merchant to enforce it |
 
 **Principles agreed for the whole update**
@@ -58,7 +57,7 @@ One theme, ten docs. Built already: classes, avatars, achievements, tutorial, re
 - **Content will grow: about ten new items, new monsters and biomes are coming.** Crafting, loot and rewards are data-driven by tag and tier, never tuned against today's gear alone ([17](17-crafting.md), [20](20-monster-families-and-rewards.md)).
 - **Monster rewards are capped per monster and multiplied by level**, so weak monsters fade and strong ones pay (gold, hide/food, tiered items) ([20](20-monster-families-and-rewards.md)).
 
-Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` bump), nullable ledger columns applied before the code that reads them, no new per-click server calls, catalogs stay in TypeScript ([14](14-server-audit-and-data-plan.md)).
+Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` bump), nullable ledger columns applied before the code that reads them, no new per-click server calls, catalogs stay in TypeScript.
 
 ## Known bugs and leftovers
 
@@ -135,7 +134,7 @@ Loose ideas, not scheduled and not sized; each needs a design pass before it ent
 
 **Combat upgrades** (the two ability slots hold Heal and Stun; one weapon per rarity tier)
 - *Gem sockets* in gear (parked, IDL-137; the gem sinks that are planned are in [30](30-gem-sinks.md)).
-- *Skills rework: a skill tree with levels and player choice (draft only, nothing decided).* Today there are two ability slots holding Heal and Stun with fixed behaviour (`catalog/skills.ts`, `lib/skills.ts`), and classes are cosmetic. Idea: skills get **levels** (spent skill points, earned with character level and rebirths) and a **tree** per class or per school (for example healing, control, damage), where the player **chooses** which branch to deepen and which skills fill the slots, so builds differ. Draft questions: where points come from (character level, a separate pool that survives rebirth, respec cost); how many slots and when they unlock; whether a level changes numbers only (heal amount, stun length, cooldown, mana cost) or also adds modifiers (heal over time, stun chance on crit); how the choice interacts with *Auto-use* (`COMBAT.auto` uses a fixed preset today, it would follow the chosen loadout); that fights run on the server, so skill effects must be computed there and the chosen tree stored in the ledger or a validated save field; class bonuses of [21](21-classes-avatars-achievements-offline-report.md) as the entry point. A new tutorial step for each unlock.
+- *Skills rework: a skill tree with levels and player choice (draft only, nothing decided).* Today there are two ability slots holding Heal and Stun with fixed behaviour (`catalog/skills.ts`, `lib/skills.ts`), and classes are cosmetic. Idea: skills get **levels** (spent skill points, earned with character level and rebirths) and a **tree** per class or per school (for example healing, control, damage), where the player **chooses** which branch to deepen and which skills fill the slots, so builds differ. Draft questions: where points come from (character level, a separate pool that survives rebirth, respec cost); how many slots and when they unlock; whether a level changes numbers only (heal amount, stun length, cooldown, mana cost) or also adds modifiers (heal over time, stun chance on crit); how the choice interacts with *Auto-use* (`COMBAT.auto` uses a fixed preset today, it would follow the chosen loadout); that fights run on the server, so skill effects must be computed there and the chosen tree stored in the ledger or a validated save field; the four classes (`PLAYER_CLASSES`) as the entry point. A new tutorial step for each unlock.
 - *Set depth*: more sets per gear tier, set bonuses that scale with the item level (today they are fixed amounts), loadout swapping between an economy set and a combat set.
 
 **Server authority follow-ups**: the ledger-owned inventory above, server-run castle upgrades (start, cost, finish time), a server-priced merchant, enforcing `verify.ts`, and a server-owned `/api/rebirth`.
