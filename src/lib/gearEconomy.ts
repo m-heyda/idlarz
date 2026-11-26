@@ -54,7 +54,10 @@ export const gearIncome = (equipment: Equipment, paragon?: Partial<Record<Parago
 	const gear = aggregateStats(equipment);
 	// the Paragon Income upgrade is its own multiplicative bucket on top of the gear's (docs/plan/paragon.md): (1 + gear) x (1 + paragon) - 1
 	const bucket = paragon ? paragonBonuses(paragon).income : 0;
-	return { incomePct: bucket > 0 ? ((1 + gear.incomePct / 100) * (1 + bucket / 100) - 1) * 100 : gear.incomePct, farmYieldPct: Math.min(STAT_RULES.farmYieldCap, Math.max(0, gear.farmYield)) };
+	return {
+		incomePct: bucket > 0 ? ((1 + gear.incomePct / 100) * (1 + bucket / 100) - 1) * 100 : gear.incomePct,
+		farmYieldPct: Math.min(STAT_RULES.farmYieldCap, Math.max(0, gear.farmYield)),
+	};
 };
 
 /** The XP bonus in % that the worn gear's Intelligence and Charisma add, at the same rate as the points the player spends. */

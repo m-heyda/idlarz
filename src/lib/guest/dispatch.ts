@@ -57,7 +57,22 @@ import {
 const REBUILD_MS = 1500;
 
 /** The routes the engine answers (the ones that need the guest's saved game prepared first). */
-const ENGINE_ROUTES = ['offline', 'spawn', 'chest', 'rock', 'fight', 'inventory', 'craft', 'rebirth', 'gems', 'mastery', 'character', 'paragon', 'tutorial', 'pets'];
+const ENGINE_ROUTES = [
+	'offline',
+	'spawn',
+	'chest',
+	'rock',
+	'fight',
+	'inventory',
+	'craft',
+	'rebirth',
+	'gems',
+	'mastery',
+	'character',
+	'paragon',
+	'tutorial',
+	'pets',
+];
 
 const intOrUndefined = (value: unknown): number | undefined => (Number.isInteger(value) && (value as number) >= 0 ? (value as number) : undefined);
 const key = (value: unknown): string | null => (typeof value === 'string' && KEY.test(value) ? value : null);

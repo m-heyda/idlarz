@@ -27,7 +27,14 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 		const owned = economyTiles(state.tiles, state.freeTiles);
 		const cost = calculateTileCost(
 			owned,
-			effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment, paragonBonuses(state.paragonSpent).tileDiscount),
+			effectiveTileDiscount(
+				state.characterStats,
+				state.prestige,
+				state.merchantUpgrades,
+				state.playerClass,
+				state.equipment,
+				paragonBonuses(state.paragonSpent).tileDiscount,
+			),
 		);
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
@@ -46,7 +53,10 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 		const xpGain =
 			calculateXpGain(owned + 1) *
-			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) / 100);
+			(1 +
+				(xpGainPct(state.characterStats, state.equipment, state.playerClass) +
+					xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) /
+					100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -69,7 +79,14 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			const purchased = owned - 1;
 			const cost = calculateTileCost(
 				owned,
-				effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment, paragonBonuses(state.paragonSpent).tileDiscount),
+				effectiveTileDiscount(
+					state.characterStats,
+					state.prestige,
+					state.merchantUpgrades,
+					state.playerClass,
+					state.equipment,
+					paragonBonuses(state.paragonSpent).tileDiscount,
+				),
 			);
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
@@ -92,7 +109,11 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, buildTimeCutPct(state.tiles, state.idolLevels, state.equipment, state.paragonSpent)),
+					remainingSec: castleUpgradeDuration(
+						castle.tile.level,
+						state.prestige,
+						buildTimeCutPct(state.tiles, state.idolLevels, state.equipment, state.paragonSpent),
+					),
 				},
 			});
 			return true;

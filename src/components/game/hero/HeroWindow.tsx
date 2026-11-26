@@ -18,6 +18,8 @@ import {
 import { ComingSoon, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
 import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { xpBarOf } from '@/lib/xpBar';
+import { paragonFree } from '@/lib/offline/paragon';
+import HeroParagon from './HeroParagon';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
@@ -570,7 +572,7 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 	);
 };
 
-type HeroTab = 'bag' | 'stats' | 'pets' | 'skills' | 'craft';
+type HeroTab = 'bag' | 'stats' | 'paragon' | 'pets' | 'skills' | 'craft';
 
 /** The Skills tab for now: a coming-soon screen (the two skills the hero has, Heal and Stun, are on the left under Skills). */
 const SkillsSoon: React.FC = () => (
@@ -597,6 +599,7 @@ const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
 	const [craftQuery, setCraftQuery] = useState('');
 	const points = useGameStore((state) => state.characterStats.availablePoints);
+	const free = useGameStore((state) => paragonFree(state.resources.xp, state.paragonSpent));
 	return (
 		<GameWindow
 			id='equipment'
@@ -610,6 +613,7 @@ const HeroWindow: React.FC = () => {
 					items={[
 						{ id: 'bag', label: 'Bag' },
 						{ id: 'stats', label: 'Stats', badge: points > 0 ? points : undefined, anchor: tab === 'stats' ? undefined : 'stat-add' },
+						{ id: 'paragon', label: 'Paragon', badge: free > 0 ? free : undefined },
 						{ id: 'pets', label: 'Pets' },
 						{ id: 'skills', label: 'Skills' },
 						{ id: 'craft', label: 'Crafting' },
@@ -629,6 +633,8 @@ const HeroWindow: React.FC = () => {
 						/>
 					) : tab === 'stats' ? (
 						<HeroStats />
+					) : tab === 'paragon' ? (
+						<HeroParagon />
 					) : tab === 'pets' ? (
 						<PetsSoon />
 					) : tab === 'skills' ? (

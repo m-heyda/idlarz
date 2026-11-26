@@ -38,7 +38,10 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		});
 		const xpGain =
 			state.resourceRates.total.xp *
-			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) / 100);
+			(1 +
+				(xpGainPct(state.characterStats, state.equipment, state.playerClass) +
+					xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) /
+					100);
 		newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 		let newTiles = state.tiles;

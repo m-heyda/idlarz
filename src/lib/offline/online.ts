@@ -3,7 +3,17 @@ import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
 import { allocateParagon, fitParagon, newParagon, paragonBudget, paragonFree, type Paragon } from '@/lib/offline/paragon';
-import type { CharacterReply, CharacterRequest, ParagonReply, ParagonRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import type {
+	CharacterReply,
+	CharacterRequest,
+	ParagonReply,
+	ParagonRequest,
+	GemsReply,
+	GemsRequest,
+	MasteryReply,
+	MasteryRequest,
+	PendingIdentity,
+} from '@/lib/offline/gemTypes';
 import { claimAllMastery, claimBiomeGoal, claimMastery } from '@/lib/offline/mastery';
 import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
@@ -601,7 +611,10 @@ export const gemsStep = (
 		if (!spent.ok) return refused(spent.reason, spent.message);
 		return {
 			ledger: spent.ledger,
-			value: { ...gemsView(spent.ledger, ctx.nowSec, identity), paid: spent.paid, ...(request.itemId === 'attr_respec' ? { attrs: spent.ledger.attrs! } : {}),
+			value: {
+				...gemsView(spent.ledger, ctx.nowSec, identity),
+				paid: spent.paid,
+				...(request.itemId === 'attr_respec' ? { attrs: spent.ledger.attrs! } : {}),
 				...(request.itemId === 'paragon_respec' && spent.ledger.paragon ? { paragon: spent.ledger.paragon } : {}),
 			},
 		};

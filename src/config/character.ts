@@ -45,7 +45,7 @@ export const INITIAL_CHARACTER_STATS: CharacterStats = {
  *
  * XP sources: passive `rates.xp x (1 + XP gain %)`, every tile purchase ({@link calculateXpGain}), and server payouts (kills, chests, away time).
  *
- * **Attribute points**: 1 per level, plus 2 extra per level for levels 2-30 (`earlyBonusUntil` 30, `earlyBonusPoints` 2), see {@link totalStatPoints}. Every rebirth adds a flat `attributePointsPerRebirth` (20) on top ({@link attributeBudget}, IDL-100); there is no paragon level.
+ * **Attribute points**: 1 per level, plus 2 extra per level for levels 2-30 (`earlyBonusUntil` 30, `earlyBonusPoints` 2), see {@link totalStatPoints}. Every rebirth adds a flat `attributePointsPerRebirth` (20) on top ({@link attributeBudget}, IDL-100). The levels past 100 (paragon) give no attribute points but paragon points, see `config/paragon.ts`.
  *
  * @category Progression/Levels
  * @order 1

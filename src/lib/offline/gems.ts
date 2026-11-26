@@ -67,7 +67,9 @@ export const claimDaily = (ledger: Ledger, nowSec: number, chest: readonly Daily
 
 /** What a purchase costs this account now: the first attribute respec is free. */
 export const priceFor = (item: GemItem, attrs: Attrs | null, bought?: Record<string, number>, paragon?: Paragon | null): number =>
-	(item.id === 'attr_respec' && !(attrs?.freeUsed ?? false)) || (item.id === 'paragon_respec' && !(paragon?.freeUsed ?? false)) ? 0 : gemNextPrice(item, bought);
+	(item.id === 'attr_respec' && !(attrs?.freeUsed ?? false)) || (item.id === 'paragon_respec' && !(paragon?.freeUsed ?? false))
+		? 0
+		: gemNextPrice(item, bought);
 
 export interface SpendFacts {
 	nowSec: number;

@@ -63,7 +63,12 @@ export const createParagonSync = (set: GameSet, get: GameGet) => {
 			inFlight--;
 			if (reply.status === 'ok') {
 				if (!reply.value.ok) {
-					notify(reply.value.reason === 'no_points' ? 'The server has not counted that paragon level yet. Try again in a moment.' : 'The server did not take that point.', 'error');
+					notify(
+						reply.value.reason === 'no_points'
+							? 'The server has not counted that paragon level yet. Try again in a moment.'
+							: 'The server did not take that point.',
+						'error',
+					);
 					if (!busy()) ver = 0; // the truth wins even when it is not newer
 				}
 				if (!busy()) applyParagon(reply.value.paragon);

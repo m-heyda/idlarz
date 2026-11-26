@@ -28,7 +28,8 @@ export type GameGet = () => GameState;
 
 /** The income rates for the state with this gear on (a set bonus can add income). */
 export const ratesWithGear = (
-	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'> & Partial<Pick<GameState, 'paragonSpent'>>,
+	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'> &
+		Partial<Pick<GameState, 'paragonSpent'>>,
 	equipment: Equipment,
 ) =>
 	calculateResourceRates(

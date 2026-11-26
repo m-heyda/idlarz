@@ -1,6 +1,15 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, RockReply, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
-import type { CharacterReply, CharacterRequest, ParagonReply, ParagonRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest } from '@/lib/offline/gemTypes';
+import type {
+	CharacterReply,
+	CharacterRequest,
+	ParagonReply,
+	ParagonRequest,
+	GemsReply,
+	GemsRequest,
+	MasteryReply,
+	MasteryRequest,
+} from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { PetsReply, PetsRequest } from '@/lib/offline/pets';
 import type { AchievementReport } from '@/lib/offline/achievements';

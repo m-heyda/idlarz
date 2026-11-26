@@ -1,4 +1,4 @@
-# Paragon: levels past 100, points, upgrades, milestones and ranking (design, nothing built)
+# Paragon: what is left (the curve, the points and the 20 upgrades are built; milestones, deeds and cosmetics are open)
 
 Written 2026-11-26 after a design talk with the owner. It **replaces section 5 of [13](13-rebirth-reset-and-paragon.md)** and the numbers of IDL-104, IDL-186, IDL-187 and IDL-114 (paragon cap 400, growth 1.06, all bonuses capped). Hand-written plan like the other files here: it lists what is **not built**. Linear holds the tickets.
 
@@ -68,7 +68,7 @@ For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (p
 ## Order of work (three projects, each its own plan and PRs)
 
 1. **Curve, display and ranking** (IDL-114, the display half of IDL-186): the paragon functions, the server recompute, the paragon bar, `100 + P37` on tags and rankings, the Paragon column. No bonuses; safe to ship on its own.
-2. **Points and the 20 upgrades** (IDL-186, IDL-187): the ledger column, spend and respec, the Paragon window, every bonus derived server-side, the sims and audit pins.
+2. **Points and the 20 upgrades** (IDL-186, IDL-187): **built** (the code and its JSDoc are the record: `src/config/paragon.ts`, `src/lib/offline/paragon.ts`, `paragonStep` in `src/lib/offline/online.ts`, the Paragon tab `HeroParagon.tsx`). The ledger column `paragon` (migration `paragon_ledger.sql`, SQL first), `/api/paragon`, the gem shop's `paragon_respec`, and every bonus folded into `idolEconomy` (the one function the browser and the server both read), the fight profile (`idolFx`), the kill and loot rolls, tile discount and build timers. Still open: the sims (`fight-sim` with the combat upgrades at the cap and at 500 uncapped points, a pace profile with paragon points) and the coefficient tuning they decide; all numbers in the grid are placeholders until then.
 3. **Milestones, deeds and cosmetics**: the `paragon` deed condition and tiers, the milestone rewards, titles and frames.
 
 ## Owner calls
