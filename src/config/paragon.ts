@@ -1,7 +1,12 @@
 /**
  * The Paragon upgrades (docs/plan/paragon.md): one paragon point per paragon level, spent in a grid of 4 categories with 5 upgrades each. Three of the five in a category are **capped** (`PARAGON_CAP_POINTS` points, a flat effect per point),
- * the other two are **uncapped** and grow with a square root, so every point is worth a little less than the last and never nothing. The coefficients are placeholders until the sims have run (`fight-sim` for combat, the pace sim for economy).
- * Ids are append-only (they are stored in the ledger's `paragon` column and never renamed or reordered).
+ * the other two are **uncapped** and grow with a square root, so every point is worth a little less than the last and never nothing. Ids are append-only (they are stored in the ledger's `paragon` column and never renamed or reordered).
+ *
+ * **Tuned by the sims (IDL-187).** Combat: `npm run fight-sim` ("Paragon: the combat upgrades", gate in `src/lib/fightSim.ts`): fights get faster and safer, but a kit two grades behind a boss still loses with every capped upgrade full and 100 points in Damage and
+ * Maximum life, and the biggest spend leaves a boss fight of at least 15 s. That gate is why Life leech is +0.12 % per point (max +3 %): at +0.2 % it let that kit win a fifth of the level 45 fights, because leech multiplies with the extra damage. Economy:
+ * `npm run pace:local -- hardcore-rebirth6 hardcore-rebirth6-paragon hardcore-rebirth6-paragon-max` (the bot is limited by resources, so it shows what the bonuses are worth; the `human` bot is limited by castle timers and does not move): the capped economy
+ * upgrades plus 100 points in each uncapped one shorten a hardcore run by about a quarter (5.2 to 4.0 days to the first rebirth, 1.4 to 0.9 on the third run), and 1,000 points in each uncapped one by about half (2.7 days). The gate is "at most a quarter at about
+ * paragon 400, at most half at 1,000 points"; both hold, so no economy coefficient moved. `npm run stat-audit` (section 6) pins every upgrade at 0, 1, the cap, over it and at 5,000 points, and that the folded number (`PARAGON_IDOL_FIELD`) equals the effect.
  *
  * @category Progression/Paragon
  * @order 1
@@ -72,7 +77,7 @@ const up = (id: ParagonId, category: ParagonCategory, name: string, blurb: strin
 export const PARAGON_UPGRADES: readonly ParagonUpgrade[] = [
 	up('critDamage', 'combat', 'Critical damage', 'More damage on a critical hit.', '%', 2, true),
 	up('bossTimer', 'combat', 'Boss timer', 'More time to beat a boss.', 's', 0.6, true),
-	up('lifeLeech', 'combat', 'Life leech', 'Heal for a share of the damage you deal.', '%', 0.2, true),
+	up('lifeLeech', 'combat', 'Life leech', 'Heal for a share of the damage you deal.', '%', 0.12, true),
 	up('damage', 'combat', 'Damage', 'More damage, with no end.', '%', 2, false),
 	up('maxLife', 'combat', 'Maximum life', 'More hit points, with no end.', '%', 2, false),
 	up('income', 'economy', 'Income', 'More of every resource the map makes.', '%', 0.8, true),

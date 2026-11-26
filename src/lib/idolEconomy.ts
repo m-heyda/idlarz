@@ -3,7 +3,7 @@ import { idolDef, type IdolDef } from '@/catalog/idols';
 import { GENERAL_RULES, IDOL_RULES } from '@/config/buildings';
 import { LEVELING } from '@/config/character';
 import { HARD_LIMITS } from '@/config/limits';
-import type { ParagonId } from '@/config/paragon';
+import { PARAGON_IDS, type ParagonId } from '@/config/paragon';
 import { paragonBonuses } from '@/lib/offline/paragon';
 import { forEachOwned, type World } from '@/utils/world';
 
@@ -195,32 +195,37 @@ export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>, p
 	return out;
 };
 
+/** Which number of the {@link IdolEconomy} each Paragon upgrade adds to (the one place the upgrades are folded in; `scripts/stat-audit.ts` pins it at 0, 1, the cap and over it) */
+export const PARAGON_IDOL_FIELD: Record<ParagonId, keyof IdolEconomy> = {
+	damage: 'damagePct',
+	maxLife: 'maxHpPct',
+	critDamage: 'critDamagePct',
+	lifeLeech: 'lifeLeechPct',
+	bossTimer: 'bossTimerSec',
+	income: 'incomePct',
+	xpGain: 'xpPct',
+	tileDiscount: 'tileDiscountPct',
+	clickGold: 'clickGoldPct',
+	killRewards: 'killRewardPct',
+	luck: 'luck',
+	goldFind: 'goldFindPct',
+	goldenChance: 'goldenChancePts',
+	chestDrop: 'chestDropPts',
+	epicFind: 'epicFindPct',
+	offlineEff: 'offlineEffPts',
+	buildSpeed: 'buildTimePct',
+	potionPower: 'potionPowerPct',
+	paragonXp: 'paragonXpPct',
+	craftXp: 'craftXpPct',
+};
+
 /**
  * The Paragon points spent (the ledger's record, docs/plan/paragon.md) added to the same numbers the Idols fill, so every place that already applies an Idol's bonus applies the paragon's too, in the browser and on the server (`summarize`). Each
  * upgrade is worth `paragonBonuses` in its own unit; the ones with an Idol counterpart add to that field, the others fill their own.
  */
 const addParagon = (out: IdolEconomy, spent: Partial<Record<ParagonId, number>>): void => {
 	const b = paragonBonuses(spent);
-	out.damagePct += b.damage;
-	out.maxHpPct += b.maxLife;
-	out.critDamagePct += b.critDamage;
-	out.lifeLeechPct += b.lifeLeech;
-	out.bossTimerSec += b.bossTimer;
-	out.incomePct += b.income;
-	out.xpPct += b.xpGain;
-	out.tileDiscountPct += b.tileDiscount;
-	out.clickGoldPct += b.clickGold;
-	out.killRewardPct += b.killRewards;
-	out.luck += b.luck;
-	out.goldFindPct += b.goldFind;
-	out.goldenChancePts += b.goldenChance;
-	out.chestDropPts += b.chestDrop;
-	out.epicFindPct += b.epicFind;
-	out.offlineEffPts += b.offlineEff;
-	out.buildTimePct += b.buildSpeed;
-	out.potionPowerPct += b.potionPower;
-	out.paragonXpPct += b.paragonXp;
-	out.craftXpPct += b.craftXp;
+	for (const id of PARAGON_IDS) out[PARAGON_IDOL_FIELD[id]] += b[id];
 };
 
 /** The multiplier on max HP the Idols (War Memorial) and the Paragon Maximum life upgrade give. */
