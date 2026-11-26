@@ -64,7 +64,7 @@ Cross-cutting rules for all of it: additive save fields only (no `SAVE_SCHEMA` b
 
 Triaged on 2026-10-29; the fixed ones are removed.
 
-- **R7** (`dangerBonus` is 0 or 1 because monsters stand at most 9 tiles out) is decided: per-band danger offsets and spawn tables replace it ([20](20-monster-families-and-rewards.md) section 8, IDL-53); delete this line when IDL-53 ships.
+- **R7** (`dangerBonus` is 0 or 1 because monsters stand at most 9 tiles out) is decided: per-band danger offsets and spawn tables replace it ([20](20-monster-families-and-rewards.md) section 4, IDL-53); delete this line when IDL-53 ships.
 - **Open bugs are in Linear** (filter label Bug, plus the audit cleanups IDL-172).
 
 ## Server authority (the migration backlog, ranked)

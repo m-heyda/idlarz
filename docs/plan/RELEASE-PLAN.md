@@ -59,7 +59,7 @@ Clarify: the ladder above 1 trillion.
 |---|---|---|
 | 5.2 | `discovered: string[]` optional in the save core, with a legal-by-map server check; discovery survives rebirth (the five biome letters `j d o b w` exist and are frozen). Critical path of P8. IDL-87 | S |
 | 5.4 | `verify.ts` shadow flags `biome_locked` and `biome_too_near`. IDL-89 | S |
-| 5.5 | Sim: rebirth-aware expansion pattern to calibrate the minimum distances and the +12 offset. IDL-90 | M |
+| 5.5 | Sim: rebirth-aware expansion pattern to calibrate the minimum distances (there is no global offset in the code); the decided two-neighbour rule for gated biomes is not built either. IDL-90 | M |
 
 ### P6 · Buildings: finish
 
@@ -68,7 +68,7 @@ Clarify: the ladder above 1 trillion.
 | 6.5 | **Position bonus** `positionBonus(distance, castleLevel)` (castle area bonus on every building in range, frontier bonus beyond), folded into `buildingEconomy(world)` so offline grants, `verify.ts` and `netWorth.ts` agree. IDL-95 | M |
 | 6.9 | 🎨 Real building sprites: 21 for the home biomes, 2 looks each (levels 1-2 and 3-5, glow on level 5), replace the old sprites. IDL-99, IDL-245 | L (art) |
 
-Open numbers: whether the frontier bonus counts the +12 offset; the combined build-time cut stays at 60 % (see [18](18-biome-buildings-and-material-tiers.md) and [perk-caps](perk-caps.md)).
+Open numbers: the frontier bonus values; the combined build-time cut stays at 60 % (see [18](18-biome-buildings-and-material-tiers.md) and [perk-caps](perk-caps.md)).
 
 ### P8 · Jungle (rebirth 1)
 
@@ -114,7 +114,6 @@ Linear: IDL-110. The Lava biome after Battlefield is IDL-371.
 | 13.1 🎨 | Landing v2: all twelve biomes and the new buildings in view, a new Open Graph image. IDL-122. Landing v1 and its refresh are built; the baked-strip tooling was removed, so v2 is a new background image plus a copy edit, with no change to the route or the login flow |
 | 13.3 | Framework upgrades one at a time (Next 16, TypeScript 7, ESLint 10, `@types/node` 26). IDL-125 |
 | 13.4 | Public checklist: email confirmation turned on (password reset is already on), rotated secrets, rate limits, free-plan load check, the real flagged saves reviewed (IDL-208). IDL-126 |
-| 13.5 | Drop `BIOME_DISTANCE_OFFSET` to the calibrated value if the 5.5 sim says so. IDL-127 |
 
 ### Gem track (G2-G5): the remaining gem sinks ride on the phases above
 
