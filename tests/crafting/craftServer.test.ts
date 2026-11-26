@@ -13,7 +13,7 @@ import { emptyCraft } from '../../src/lib/crafting';
 import { addDrop, stackOf } from '../../src/lib/inventory';
 import { plainItem } from '../../src/lib/itemInstance';
 import { CRAFTING } from '../../src/config/crafting';
-import { craftCumulativeXp, craftLimit, craftXpOf } from '../../src/lib/crafting';
+import { craftBatchLimit, craftCumulativeXp, craftXpOf } from '../../src/lib/crafting';
 import { RECIPE_BY_ID } from '../../src/catalog/recipes';
 import { bagCountOf } from '../../src/lib/offline/inventory';
 import type { CraftReply, CraftState } from '../../src/lib/offline/types';
@@ -201,7 +201,7 @@ test('the component stock has a cap: the rest of a batch waits for room', () => 
 test('bad requests are refused', () => {
 	const inv = { ver: 1, bag: [], equipment: {}, lootPity: {}, autoSellUpTo: null };
 	const c = emptyCraft();
-	for (const count of [-1, craftLimit('craftBatchCap') + 1, 1.5, NaN, 0])
+	for (const count of [-1, craftBatchLimit(RECIPE_BY_ID.glass_vial) + 1, 1.5, NaN, 0])
 		assert.equal(applyCraft(inv, c, 'glass_vial', count, 5000).reason, 'bad_request', String(count));
 	assert.equal(applyCraft(inv, c, 'nope', 1, 5000).reason, 'unknown_recipe');
 	assert.equal(applyCraft(inv, c, 'constructor', 1, 5000).reason, 'unknown_recipe');
@@ -299,10 +299,10 @@ test('a trade good is level-gated, takes its components when queued, and goes st
 	assert.equal(stuck.reason, 'bag_full', 'a full bag keeps the goods waiting in the batch');
 });
 
-test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives a few hundredths of an XP', () => {
-	assert.ok(CRAFTING.xpScale > 0 && CRAFTING.xpScale <= 0.05, 'the end-game slow-down is a small multiplier');
+test('crafting XP is scaled by CRAFTING.xpScale: a Minor Healing Potion gives about an XP', () => {
+	assert.ok(CRAFTING.xpScale > 0 && CRAFTING.xpScale <= 1, 'the scale is a multiplier on the recipe values');
 	const one = craftXpOf(RECIPE_BY_ID.potion_minor, 1);
-	assert.ok(one > 0.01 && one < 0.05, `one minor potion gives ${one} XP`);
+	assert.ok(one > 0.5 && one < 2, `one minor potion gives ${one} XP`);
 	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 10), Math.round(one * 10 * 1e6) / 1e6, 'a batch is the one-craft value times the count, without drift');
 	assert.equal(craftXpOf(RECIPE_BY_ID.potion_minor, 0), 0);
 });

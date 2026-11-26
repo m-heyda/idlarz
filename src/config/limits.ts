@@ -31,8 +31,12 @@ export const LIMITS = {
 	offlineEfficiency: 0.5,
 	/** Shorter absences pay nothing and show no welcome-back window (a reload, a lunch break) */
 	offlineMinGapSec: 300,
-	/** Crafts one request may queue or do at once: effectively unlimited (a billion), so thousands or millions can be queued in one go */
-	craftBatchCap: 1_000_000_000,
+	/** Crafts one request of gear, a potion or a trade good may queue: 25 (it was effectively unlimited, a billion, so one request could queue months). The ceiling stays a billion: a released limit only grows */
+	craftBatchCap: 25,
+	/** Crafts one request of a component (planks, ingots, nails, extracts, cut gems) may queue: they take seconds each, so a batch is never more than a few hours */
+	craftComponentBatchCap: 1_000,
+	/** Hours one batch may take in all (a request is refused above it; a recipe that takes long has a smaller batch than the caps above) */
+	craftMaxBatchHours: 12,
 	/** Batches (one per recipe request) that can run side by side in the crafting queue */
 	craftQueueSlots: 3,
 	/** Hours a batch may run without a claim (it stops there and waits; the next claim restarts the clock) */
@@ -66,6 +70,8 @@ export const HARD_LIMITS = {
 	offlineCapHours: 72,
 	offlineEfficiency: 1,
 	craftBatchCap: 1_000_000_000,
+	craftComponentBatchCap: 100_000,
+	craftMaxBatchHours: 72,
 	craftQueueSlots: 5,
 	craftOfflineHours: 72,
 	craftSpeed: 4,

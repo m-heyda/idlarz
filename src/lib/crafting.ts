@@ -53,7 +53,7 @@ const STEPS = buildSteps();
 /** The crafting state of a player who never crafted (the ledger column reads as this when it is missing). */
 export const emptyCraft = (): CraftState => ({ xp: 0, ord: 0, stock: {}, pity: {}, spent: 0, last: 0, queue: [] });
 
-type CraftLimitKey = 'craftBatchCap' | 'craftQueueSlots' | 'craftOfflineHours' | 'craftSpeed';
+type CraftLimitKey = 'craftBatchCap' | 'craftComponentBatchCap' | 'craftMaxBatchHours' | 'craftQueueSlots' | 'craftOfflineHours' | 'craftSpeed';
 
 /** A crafting limit: base plus bonuses (`limitOf`), never above its hard ceiling and never below 1. Whole numbers except the speed. */
 export const craftLimit = (key: CraftLimitKey, ctx: LimitContext = {}): number => {
@@ -62,7 +62,28 @@ export const craftLimit = (key: CraftLimitKey, ctx: LimitContext = {}): number =
 };
 
 /** Seconds one craft of a recipe takes now (the speed multiplier applied); 0 for an instant recipe. */
-export const craftTimeSec = (recipe: Recipe, ctx: LimitContext = {}): number => (recipe.timeSec ? recipe.timeSec / craftLimit('craftSpeed', ctx) : 0);
+export const craftTimeSec = (recipe: Recipe, ctx: LimitContext = {}): number => {
+	if (!recipe.timeSec) return 0;
+	// a component is quick material work: never more than `CRAFTING.componentMaxSec` a piece, whatever its recipe says
+	const base = recipe.kind === 'component' ? Math.min(recipe.timeSec, CRAFTING.componentMaxSec) : recipe.timeSec;
+	return base / craftLimit('craftSpeed', ctx);
+};
+
+/**
+ * The most crafts one request of a recipe may hold: the batch cap of its kind (`craftComponentBatchCap` for a component, `craftBatchCap` for everything else; a legendary is always one) cut so that the whole batch takes at most `craftMaxBatchHours`. At least 1.
+ * A batch that is already queued keeps the count it was queued with, only new requests are held to this.
+ *
+ * @category Economy/Crafting
+ * @order 10
+ * @formula batch limit = max(1, min(cap of the kind, floor(craftMaxBatchHours x 3600 / seconds per craft)))
+ */
+export const craftBatchLimit = (recipe: Recipe, ctx: LimitContext = {}): number => {
+	if (recipe.kind === 'legendary') return 1;
+	const cap = recipe.kind === 'component' ? craftLimit('craftComponentBatchCap', ctx) : craftLimit('craftBatchCap', ctx);
+	const sec = craftTimeSec(recipe, ctx);
+	const byTime = sec > 0 ? Math.floor((craftLimit('craftMaxBatchHours', ctx) * 3600) / sec) : cap;
+	return Math.max(1, Math.min(cap, byTime));
+};
 
 /**
  * Crafts of a batch that are done at `nowMs`: min(count, floor(running time / timeSec)). The running time stops at the offline run cap
@@ -199,7 +220,7 @@ export const maxCraftable = (
 ): number => {
 	if (have.craftLevel < recipe.unlock) return 0;
 	const one = craftNeeds(recipe, 1, have.costFactor);
-	let most = craftLimit('craftBatchCap');
+	let most = craftBatchLimit(recipe);
 	// with a discount the cost of one craft rounds up, so a big batch can cost slightly less than count x one: the exact check is `craftBlock`
 	for (const n of one.resources) most = Math.min(most, Math.floor((have.resources[n.key] ?? 0) / n.qty));
 	for (const n of one.components) most = Math.min(most, Math.floor((have.stock[n.id] ?? 0) / n.qty));

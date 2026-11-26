@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { ITEM_CATALOG } from '@/catalog';
 import { RECIPE_BY_ID } from '@/catalog/recipes';
-import { craftBlock, craftCostFactor, craftLevelOf, craftLimit, craftNeeds, emptyCraft } from '@/lib/crafting';
+import { craftBatchLimit, craftBlock, craftCostFactor, craftLevelOf, craftNeeds, emptyCraft } from '@/lib/crafting';
 import type { BootSnapshot, CraftQueueEntry, CraftRefusal, CraftReply, CraftState } from '@/lib/offline/types';
 import { onAccountCleared } from '@/lib/bootSnapshot';
 import { newClaimId } from '@/lib/offlineClient';
@@ -93,7 +93,7 @@ export const useCraftStore = create<CraftStore>((set, get) => ({
 	craftItem: async (recipeId, count) => {
 		const recipe = Object.prototype.hasOwnProperty.call(RECIPE_BY_ID, recipeId) ? RECIPE_BY_ID[recipeId] : undefined;
 		const state = get();
-		if (!recipe || state.busy || !Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return 'Cannot craft that.';
+		if (!recipe || state.busy || !Number.isInteger(count) || count < 1 || count > craftBatchLimit(recipe)) return 'Cannot craft that.';
 		const craft = state.craft ?? emptyCraft();
 		const game = useGameStore.getState();
 		const costFactor = craftCostFactor({ prestige: game.prestige, gemCraft: game.gemCraft }); // Thrifty Hands and Bulk Discount

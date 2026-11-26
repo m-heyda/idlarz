@@ -153,7 +153,7 @@ const PART_RECIPES = [
 	recipe('fungal_extract', 'Fungal Extract', [ing('orange_mushrooms', 3), part('glass_vial', 1), res('spores', 60)], 'fungal_extract', 8, 8, 20),
 	recipe('vital_extract', 'Vital Extract', [ing('blood', 2), part('glass_vial', 1), res('herbs', 30), res('food', 20)], 'vital_extract', 6, 7, 18),
 	// the two reagents of the late crafts come from the Blight and Battlefield Extractors (IDL-120): their extracts are distilled and forged into them
-	recipe('ichor', 'Distilled Ichor', [part('glass_vial', 1), res('corruptedCore', 1000)], 'ing_ichor', 60, 40, 60),
+	recipe('ichor', 'Distilled Ichor', [part('glass_vial', 1), res('corruptedCore', 1000)], 'ing_ichor', 35, 40, 60),
 	recipe('war_medals', 'Forged War Medal', [part('gold_ingot', 1), res('scrapSteel', 1500)], 'ing_war_medals', 70, 50, 90),
 ];
 

@@ -6,7 +6,7 @@ import { ITEM_CATALOG } from '../../src/catalog';
 import { hasEffects } from '../../src/catalog/buffs';
 import { RESOURCES } from '../../src/catalog/resources';
 import { CRAFTING } from '../../src/config/crafting';
-import { craftBlock, craftCumulativeXp, craftLevelOf, craftLimit, craftNeeds, craftXpToNext, maxCraftable, recipeCostGold } from '../../src/lib/crafting';
+import { craftBatchLimit, craftBlock, craftCumulativeXp, craftLevelOf, craftNeeds, craftXpToNext, maxCraftable, recipeCostGold } from '../../src/lib/crafting';
 
 test('recipe ids are unique and every input and output exists', () => {
 	assert.equal(new Set(RECIPES.map((r) => r.id)).size, RECIPES.length);
@@ -111,9 +111,9 @@ test('craftNeeds scales with the count and craftBlock says why a craft cannot be
 
 test('maxCraftable is the scarcest input, capped per request, and 0 while locked', () => {
 	const minor = RECIPE_BY_ID.potion_minor;
-	const rich = { craftLevel: 1, resources: { food: 1e6 }, stock: { glass_vial: 500 } };
-	assert.equal(maxCraftable(minor, rich), 500);
-	assert.equal(maxCraftable(minor, { craftLevel: 1, resources: { food: 1e15 }, stock: { glass_vial: 5e9 } }), craftLimit('craftBatchCap'));
+	const rich = { craftLevel: 1, resources: { food: 1e6 }, stock: { glass_vial: 20 } };
+	assert.equal(maxCraftable(minor, rich), 20);
+	assert.equal(maxCraftable(minor, { craftLevel: 1, resources: { food: 1e15 }, stock: { glass_vial: 5e9 } }), craftBatchLimit(minor));
 	assert.equal(maxCraftable(minor, { ...rich, resources: { food: 119 } }), 2);
 	assert.equal(maxCraftable(minor, { ...rich, stock: { glass_vial: 1 } }), 1);
 	assert.equal(maxCraftable(minor, { ...rich, stock: {} }), 0);
