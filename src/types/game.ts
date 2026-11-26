@@ -444,7 +444,12 @@ export interface GameState {
 	buyResource: (resource: keyof Resources, amount: number) => boolean;
 	clickForGold: (input: ClickInput) => number;
 	resetGame: () => void;
-	rebirth: (serverGain?: number, kept?: readonly ItemInstance[]) => boolean;
+	/** `choice`: what the player chose on the rebirth screen (the server's answer): keep the attribute points, and the paragon record when the points were taken back */
+	rebirth: (
+		serverGain?: number,
+		kept?: readonly ItemInstance[],
+		choice?: { keepAttrs?: boolean; paragon?: import('@/lib/offline/paragon').Paragon },
+	) => boolean;
 	buyEmberUpgrade: (id: EmberUpgradeId) => boolean;
 	upgradeCastle: () => boolean;
 	/** The building system (flag-gated, config/buildings.ts): build, start the next level of, or move the building of the given tile */

@@ -201,7 +201,9 @@ export const createGuestTransport = (getGame: () => GameState): GuestTransport =
 				return k && withdraw ? answered(await craftStep(deps, userId, k, { action: 'withdraw', id: withdraw.id, qty: withdraw.qty }, nowMs)) : bad();
 			}
 			case '/api/rebirth':
-				return k ? answered(await rebirthStep(deps, userId, k, nowMs)) : bad();
+				return k
+					? answered(await rebirthStep(deps, userId, k, nowMs, [], { keepAttrs: body.keepAttrs === true, resetParagon: body.resetParagon === true }))
+					: bad();
 			case '/api/gems': {
 				const parsed = parseGemsBody(body);
 				return parsed ? answered(await runGems(deps, identity, userId, parsed.key, parsed.request, nowMs)) : bad();

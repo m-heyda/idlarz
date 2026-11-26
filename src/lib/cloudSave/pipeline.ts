@@ -300,7 +300,9 @@ export const acceptSave = async (
 	let attrsOut: Attrs | null = ledgerUsable ? (ledger?.attrs ?? null) : null;
 	// the paragon points (docs/plan/paragon.md) are the ledger's as well: a New Game starts the record again, a rebirth keeps it, one above what the XP has earned goes back to unspent
 	let paragonOut: Paragon | null = ledgerUsable && !newGame ? (ledger?.paragon ?? null) : null;
-	if (ledgerUsable && attrsOut && (newGame || rebirthed)) attrsOut = clearedAttrs(attrsOut);
+	// ... unless the player kept them through this very rebirth (the rebirth screen's choice, recorded when the server ran it): the allocation stays and the extra points are free
+	const keptAttrs = rebirthed && !newGame && ledger?.inv?.rebirth?.to === state.prestige.rebirths && ledger.inv.rebirth.keepAttrs === true;
+	if (ledgerUsable && attrsOut && (newGame || rebirthed) && !keptAttrs) attrsOut = clearedAttrs(attrsOut);
 	if (ledgerUsable && attrsOut) state = stateWithAttrs(state, attrsOut, levelOfXp(state.resources.xp), state.prestige.rebirths);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
 	/**

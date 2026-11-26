@@ -8,6 +8,7 @@ import { calculateTileCost } from '../../src/utils/game/costs';
 import { castleUpgradeDuration } from '../../src/utils/game/castle';
 import { effectiveTileDiscount, tileDiscountCap, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
+import { INITIAL_CHARACTER_STATS } from '../../src/config/character';
 import { sanitizeSave } from '../../src/lib/sanitizeSave';
 import { patchTile } from '../../src/utils/world';
 import { plainItem } from '../../src/lib/itemInstance';
@@ -328,4 +329,35 @@ test('Treasury Charter raises the tile-discount cap 3 points a level to 75 at le
 		prestige: { rebirths: 1, legacyPoints: 0, legacyEarned: 100, upgrades: { thrift: 10, charter: 10 } },
 	}));
 	assert.equal(effectiveTileDiscount(api().characterStats, api().prestige, { bulk: 8 }, 'warrior', undefined, 10), 66);
+});
+
+test("a rebirth hands the attribute points back by default; with the player's choice to keep them they stay and only the extra points are free", () => {
+	for (const keepAttrs of [false, true]) {
+		readyToRebirth();
+		store.setState((s) => ({ characterStats: { ...s.characterStats, availablePoints: 30 } }));
+		for (let i = 0; i < 5; i++) assert.ok(api().addStatPoint('strength'));
+		const level = calculateLevel(api().resources.xp).level;
+		const spent = 5;
+		assert.equal(api().rebirth(undefined, [], { keepAttrs }), true);
+		const after = api().characterStats;
+		const budget = totalStatPoints(level) + 20; // the level's points plus the rebirth's 20
+		if (keepAttrs) {
+			assert.equal(after.strength, INITIAL_CHARACTER_STATS.strength + spent, 'the allocation stays');
+			assert.equal(after.availablePoints, budget - spent, 'only the points above it are free');
+		} else {
+			assert.equal(after.strength, INITIAL_CHARACTER_STATS.strength, 'every point went back');
+			assert.equal(after.availablePoints, budget);
+		}
+	}
+});
+
+test("a rebirth keeps the paragon points unless the server's answer took them back", () => {
+	readyToRebirth();
+	store.setState({ paragonSpent: { damage: 4 } } as never);
+	assert.equal(api().rebirth(), true);
+	assert.deepEqual(api().paragonSpent, { damage: 4 });
+	readyToRebirth();
+	store.setState({ paragonSpent: { damage: 4 } } as never);
+	assert.equal(api().rebirth(undefined, [], { paragon: { ver: 3, spent: {}, freeUsed: false } }), true);
+	assert.deepEqual(api().paragonSpent, {});
 });
