@@ -265,3 +265,79 @@ test('the browser rebirths locally when the server cannot be asked today, and re
 	assert.equal(blocksLocalRebirth({ status: 'ok', gain: 5, kept: [] }, true), false);
 	assert.equal(blocksLocalRebirth({ status: 'refused' }, true), false, 'a refusal has its own notice');
 });
+
+// ------------------------------------------------------------------------------ the rebirth screen's two free respecs
+
+test('by default a rebirth hands every attribute point back and leaves the paragon points alone', async () => {
+	const { m } = await ready();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, {
+		...ledger,
+		attrs: { ver: 3, alloc: { strength: 12, dexterity: 0, intelligence: 0, vitality: 4, charisma: 0 }, freeUsed: false },
+		paragon: { ver: 2, spent: { damage: 5 }, freeUsed: false },
+	});
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000));
+	assert.equal(reply.ok, true);
+	assert.equal(reply.keepAttrs, undefined);
+	assert.equal(reply.paragon?.spent.damage, 5);
+	const after = m.ledgers.get(ID)!;
+	assert.deepEqual(after.attrs?.alloc, { strength: 0, dexterity: 0, intelligence: 0, vitality: 0, charisma: 0 });
+	assert.deepEqual(after.paragon?.spent, { damage: 5 });
+	assert.equal(after.inv!.rebirth?.keepAttrs, undefined);
+});
+
+test('keepAttrs: the allocation stays through the rebirth and the choice is recorded for the save that follows', async () => {
+	const { m } = await ready();
+	const ledger = m.ledgers.get(ID)!;
+	const alloc = { strength: 12, dexterity: 0, intelligence: 0, vitality: 4, charisma: 0 };
+	m.ledgers.set(ID, { ...ledger, attrs: { ver: 3, alloc, freeUsed: true } });
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [], { keepAttrs: true, resetParagon: false }));
+	assert.equal(reply.ok, true);
+	assert.equal(reply.keepAttrs, true);
+	const after = m.ledgers.get(ID)!;
+	assert.deepEqual(after.attrs?.alloc, alloc, 'the attribute points were not taken back');
+	assert.equal(after.attrs?.freeUsed, true);
+	assert.equal(after.inv!.rebirth?.keepAttrs, true);
+	// another key for the same rebirth replays what was chosen, never wipes or changes anything
+	const again = ok(await rebirthStep(m.deps, ID, key(), T0 + 31_000, [], { keepAttrs: false, resetParagon: true }));
+	assert.equal(again.keepAttrs, true);
+	assert.deepEqual(m.ledgers.get(ID)!.attrs?.alloc, alloc);
+});
+
+test('resetParagon gives the paragon points back for free and leaves the one free paid respec as it was', async () => {
+	const { m } = await ready();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, { ...ledger, paragon: { ver: 2, spent: { damage: 5, luck: 3 }, freeUsed: false } });
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [], { keepAttrs: false, resetParagon: true }));
+	assert.equal(reply.ok, true);
+	assert.deepEqual(reply.paragon?.spent, {});
+	const after = m.ledgers.get(ID)!.paragon!;
+	assert.deepEqual(after.spent, {});
+	assert.equal(after.freeUsed, false, 'the first paid respec is still free');
+	assert.equal(after.ver, 3);
+});
+
+test('resetParagon with nothing spent changes nothing, and an account without a paragon record never gets one made by a rebirth', async () => {
+	const { m } = await ready();
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [], { keepAttrs: false, resetParagon: true }));
+	assert.equal(reply.ok, true);
+	assert.equal(reply.paragon, undefined);
+	assert.equal(m.ledgers.get(ID)!.paragon, null);
+});
+
+test('the save that carries a rebirth keeps the attribute points when the player chose to, and clears them otherwise', async () => {
+	for (const keepAttrs of [true, false]) {
+		const { m, state } = await ready();
+		const ledger = m.ledgers.get(ID)!;
+		const alloc = { strength: 7, dexterity: 0, intelligence: 0, vitality: 0, charisma: 0 };
+		m.ledgers.set(ID, { ...ledger, attrs: { ver: 2, alloc, freeUsed: false } });
+		ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [], { keepAttrs, resetParagon: false }));
+		const gain = m.ledgers.get(ID)!.inv!.rebirth!.gain;
+		const next = rebirthed(state, 1, gain);
+		const stored = m.rows.get(ID)!;
+		const out = await save(m, next, stored.rev, T0 + 30_000 + STEP);
+		assert.equal(out.kind, 'ok', JSON.stringify(out));
+		const after = m.ledgers.get(ID)!.attrs!;
+		assert.equal(after.alloc.strength, keepAttrs ? 7 : 0, keepAttrs ? 'the points stayed' : 'the points went back');
+	}
+});

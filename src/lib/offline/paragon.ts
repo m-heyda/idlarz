@@ -70,6 +70,9 @@ export const allocateParagon = (paragon: Paragon, add: unknown, budget: number):
 /** Gives every point back (the price is the caller's: free the first time, see `GEM_SHOP`). */
 export const respecParagon = (paragon: Paragon): Paragon => ({ ver: paragon.ver + 1, spent: {}, freeUsed: true });
 
+/** A rebirth's free respec of the paragon points (the player ticked it): every point goes back and the account's one free paid respec is left as it was. */
+export const rebirthRespecParagon = (paragon: Paragon): Paragon => ({ ver: paragon.ver + 1, spent: {}, freeUsed: paragon.freeUsed });
+
 /** Cuts a record that holds more than the XP has earned (the XP was clamped lower): every point goes back. Returns the same object when it is within the budget. */
 export const fitParagon = (paragon: Paragon, xp: number): Paragon =>
 	paragonSpent(paragon.spent) <= paragonBudget(xp) ? paragon : { ver: paragon.ver + 1, spent: {}, freeUsed: paragon.freeUsed };

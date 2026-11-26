@@ -3,6 +3,9 @@
 
 import { EMBER_DISABLED, EMBER_UPGRADES, type EmberUpgradeId } from '@/config/rebirth';
 import { PACKRAT_IDS } from '@/config/merchant';
+import { INITIAL_CHARACTER_STATS } from '@/config/character';
+import { ATTR_KEYS, attributeBudget } from '@/lib/offline/attrs';
+import type { Paragon } from '@/lib/offline/paragon';
 import { calculateCombatStats, calculateLevel, rebirthPoints, totalStatPoints } from '@/utils/game/character';
 import { calculateResourceRates } from '@/utils/game/income';
 import { rebirthStatus, emberUpgradeCost } from '@/utils/game/rebirth';
@@ -32,7 +35,8 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 	// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
 	// `serverGain`: the Embers the server computed (POST /api/rebirth); the game never takes more than it works out itself
 	// `kept`: the legendary pieces the server carried over (`lib/rebirthKeep.ts`); they go into the new bag
-	rebirth: (serverGain?: number, kept: readonly ItemInstance[] = []) => {
+	// `choice.keepAttrs`: the player kept their attribute points through it (only the extra points the rebirth gives are free); `choice.paragon`: the paragon record the server holds after a free paragon respec
+	rebirth: (serverGain?: number, kept: readonly ItemInstance[] = [], choice: { keepAttrs?: boolean; paragon?: Paragon } = {}) => {
 		const state = get();
 		const status = rebirthStatus(state);
 		if (!status.canRebirth) return false;
@@ -54,9 +58,20 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 		// the other merchant bonuses start again; Pack Rat stays, so the starter bag is as big as the player bought it
 		const merchantUpgrades: Record<string, number> = {};
 		for (const id of PACKRAT_IDS) if (state.merchantUpgrades[id]) merchantUpgrades[id] = state.merchantUpgrades[id] as number;
-		// respec: every attribute goes back to its start and all the points the level has earned are free to spend again
-		const characterStats = { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) + rebirthPoints(prestige.rebirths) };
+		// respec: every attribute goes back to its start and all the points the level has earned are free to spend again; kept: the allocation stays and only what is above it is free
+		const characterStats = choice.keepAttrs
+			? {
+					...state.characterStats,
+					availablePoints: Math.max(
+						0,
+						attributeBudget(settled.level, prestige.rebirths) -
+							ATTR_KEYS.reduce((sum, key) => sum + (state.characterStats[key] - INITIAL_CHARACTER_STATS[key]), 0),
+					),
+				}
+			: { ...fresh.characterStats, availablePoints: totalStatPoints(settled.level) + rebirthPoints(prestige.rebirths) };
 		Object.assign(characterStats, calculateCombatStats(characterStats));
+		// the paragon points stay with the account (the server keeps them) unless the player took them back
+		const paragonSpent = choice.paragon ? choice.paragon.spent : state.paragonSpent;
 		// gear is wiped: the starter kit on, the starter bag, no pity (the server does the same to its inventory when the rebirth reaches it)
 		const kit = rebirthKit(merchantUpgrades, prestige, 0, state.playerClass); // Deep Pockets is an Ember upgrade: it survives too
 		set({
@@ -74,7 +89,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				fresh.farmUpgrades,
 				merchantUpgrades,
-				gearIncome(kit.equipment, state.paragonSpent),
+				gearIncome(kit.equipment, paragonSpent),
 			),
 			equipment: kit.equipment,
 			bag: placeKept(kit.bag, kept),
@@ -82,7 +97,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			gems: state.gems, // the premium currency survives a rebirth
 			gemBuilders: state.gemBuilders, // so does the Gem shop's Additional builder
 			gemCraft: state.gemCraft, // and its crafting items
-			paragonSpent: state.paragonSpent, // the paragon points are the account's too (the server keeps them across a rebirth)
+			paragonSpent, // the paragon points are the account's too (the server keeps them across a rebirth, unless the player took them back)
 			idolLevels: state.idolLevels, // the Idols' levels are the account's: only the buildings go with the map, they are placed again for free
 			autoSellUpTo: state.autoSellUpTo, // a setting, not gear
 			merchantUpgrades,

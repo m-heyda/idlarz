@@ -334,6 +334,8 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 	// the quest upgrades are disabled until quests exist
 	assert.deepEqual([...EMBER_DISABLED].sort(), ['questrarity', 'questslots']);
 	assert.equal(REBIRTH.discountCapPercent, 45);
+	assert.equal(REBIRTH.discountMaxPercent, 80);
+	assert.equal(EMBER_UPGRADES.charter.effectPerLevel, 3);
 });
 
 // ---------------------------------------------------------------------------

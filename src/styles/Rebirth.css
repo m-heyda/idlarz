@@ -266,3 +266,20 @@
 .rb-root .ds-ups-grid {
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 }
+
+/* the two free respec tick boxes of the rebirth confirmation */
+.rb-check {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 4px 0;
+	font-size: 14px;
+	color: #f1e6c8;
+	cursor: pointer;
+}
+.rb-check input {
+	width: 16px;
+	height: 16px;
+	accent-color: #f0c84a;
+	cursor: pointer;
+}

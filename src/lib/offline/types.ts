@@ -21,7 +21,12 @@ export interface Inventory {
 	lootPity: Record<string, number>;
 	autoSellUpTo: string | null;
 	/** Set by POST /api/rebirth: the server ran the rebirth to this count and computed its Embers. The save that carries the rebirth is capped at exactly this gain, and the bag is not wiped a second time. */
-	rebirth?: { to: number; gain: number; /** How many legendary pieces the player carried into the new run (absent: none) */ kept?: number };
+	rebirth?: {
+		to: number;
+		gain: number;
+		/** How many legendary pieces the player carried into the new run (absent: none) */ kept?: number;
+		/** The player chose to keep the attribute points through this rebirth (the extra points are added on top; absent: every point went back) */ keepAttrs?: true;
+	};
 }
 
 /** One of the player's own changes to what they carry: what the browser previews at once and asks the server (`/api/inventory`) to do. */
@@ -285,6 +290,10 @@ export interface RebirthReply {
 	inv: Inventory;
 	/** The legendary pieces the server carried into the new bag (the browser builds the same bag from them) */
 	kept?: import('@/types/game').ItemInstance[];
+	/** The attribute points stayed as they were (the player chose so); absent: every point went back to spend again */
+	keepAttrs?: boolean;
+	/** The paragon record after the rebirth, when the player chose to take the paragon points back (the browser puts it right); absent: the paragon points are untouched */
+	paragon?: import('@/lib/offline/paragon').Paragon;
 	serverNowSec: number;
 }
 

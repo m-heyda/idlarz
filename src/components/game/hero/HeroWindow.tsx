@@ -20,6 +20,7 @@ import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/des
 import { xpBarOf } from '@/lib/xpBar';
 import { paragonFree } from '@/lib/offline/paragon';
 import HeroParagon from './HeroParagon';
+import HeroPets from './HeroPets';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
@@ -44,7 +45,7 @@ import { healAmount } from '@/lib/skills';
 import { useGameStore } from '@/stores/gameStore';
 import { selectStock, useCraftStore } from '@/stores/craftStore';
 import { useUiStore } from '@/stores/uiStore';
-import type { BagSlot, EquipmentSlot, ItemInstance } from '@/types/game';
+import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber, formatPct } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/game/merchant';
 import { useBadgeChoice } from '../BadgeDialog';
@@ -287,11 +288,11 @@ const HeroLeft: React.FC = () => {
 };
 
 /** One slot of the bag: the item with its hover card (compared with what is worn), double-click, shift-click, right-click and drag, or an empty slot that takes drops. */
-const BagCell: React.FC<{ slot: BagSlot; index: number; wornLevel: number }> = ({ slot, index, wornLevel }) => {
+const BagCell: React.FC<{ slot: BagSlot; index: number; equipment: Equipment }> = ({ slot, index, equipment }) => {
 	const look = slotLook(slot);
 	const props = slotProps(slot);
 	if (!look) return <Slot onDragOver={(e) => e.preventDefault()} onDrop={(e) => (e.preventDefault(), dropOnBagSlot(index))} />;
-	const junk = !!props.item && isJunk(props.item, { wornLevel });
+	const junk = !!props.item && isJunk(props.item, { equipment });
 	return (
 		<HoverTip interactive closeDelayMs={100} tip={<GameItemTip item={props.item} itemId={props.itemId} compare hints='bag' />}>
 			<Slot
@@ -505,7 +506,6 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 	const sellJunk = useGameStore((state) => state.sellJunk);
 	const showToast = useUiStore((state) => state.showToast);
 	const [view, setView] = useState<'bag' | 'craft'>('bag');
-	const wornLevel = wornLevelOf(equipment);
 	const junkCount = countJunk(bag, junkFor(equipment));
 	const junkWorth = junkGold(bag, sellCtx, junkFor(equipment)); // the gold the button pays, shown on it
 	const used = bag.filter(Boolean).length;
@@ -528,7 +528,7 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 					<BuffRow />
 					<Inset className='ds-baggrid'>
 						{bag.map((slot, i) => (
-							<BagCell key={i} slot={slot} index={i} wornLevel={wornLevel} />
+							<BagCell key={i} slot={slot} index={i} equipment={equipment} />
 						))}
 						<MoreSpace />
 					</Inset>
@@ -583,15 +583,6 @@ const SkillsSoon: React.FC = () => (
 	/>
 );
 
-/** The Pets tab for now: a coming-soon screen (the pet system itself is not built yet). */
-const PetsSoon: React.FC = () => (
-	<ComingSoon
-		title='Pets'
-		icon={pixelIconSrc('eggs')}
-		text='Hatch a companion and let it walk beside your hero. Pets are on the way: eggs, companions and what they can do.'
-	/>
-);
-
 /**
  * The Hero window (design system `WindowShell`, window id `equipment`): Bag, Stats, Pets, Skills and Crafting tabs. The hero card and the worn gear are always on the left; the Bag tab is the full new bag. Stats and Crafting are the new tabs. A click on the avatar in the dock opens it on the Bag tab.
  */
@@ -636,7 +627,7 @@ const HeroWindow: React.FC = () => {
 					) : tab === 'paragon' ? (
 						<HeroParagon />
 					) : tab === 'pets' ? (
-						<PetsSoon />
+						<HeroPets />
 					) : tab === 'skills' ? (
 						<SkillsSoon />
 					) : (

@@ -200,14 +200,21 @@ test('epic and better gear is never junk and never auto-sold by default (IDL-382
 	const { isAutoSold } = await import('@/lib/loot/autoSell');
 	for (const rarity of ['epic', 'legendary']) {
 		const piece = { base: 'iron_sword', level: 1, rarity, quality: 50, affixes: [] };
-		assert.equal(isJunk(piece, { wornLevel: 80 }), false, `${rarity} far below the worn level is not junk`);
+		assert.equal(
+			isJunk(piece, { equipment: { mainHand: { base: 'iron_sword', level: 80, rarity: 'legendary', quality: 50, affixes: [] } } }),
+			false,
+			`${rarity} far below the worn level is not junk`,
+		);
 		assert.equal(isAutoSold(piece, null), false, 'the default filter (off) keeps everything');
 	}
 	// the Goods tab offers common to rare only (its choices drop the last two enabled rarities)
 	const { RARITIES, RARITY_ORDER } = await import('@/catalog');
 	assert.deepEqual(RARITY_ORDER.filter((id) => RARITIES[id].enabled).slice(0, -2), ['common', 'uncommon', 'rare']);
 	assert.equal(
-		isJunk({ base: 'iron_sword', level: 1, rarity: 'rare', quality: 50, affixes: [], junk: true }, { wornLevel: 80 }),
+		isJunk(
+			{ base: 'iron_sword', level: 1, rarity: 'rare', quality: 50, affixes: [], junk: true },
+			{ equipment: { mainHand: { base: 'iron_sword', level: 80, rarity: 'legendary', quality: 50, affixes: [] } } },
+		),
 		true,
 		"only the player's own mark overrides",
 	);

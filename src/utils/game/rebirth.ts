@@ -60,13 +60,13 @@ export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): numb
 /**
  * Percent off tile cost: Charisma plus Thrift, capped.
  *
- * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points) + the worn gear's Tile Discount (cape and neck of G4 and up, at most 10 points, IDL-176), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
+ * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points) + the worn gear's Tile Discount (cape and neck of G4 and up, at most 10 points, IDL-176), capped at 45% (`REBIRTH.discountCapPercent`) plus 3 points per Treasury Charter level (Ember shop, 75% at level 10) and never above 80% (`REBIRTH.discountMaxPercent`).
  * The Paragon upgrade Tile discount (up to 10 points) is in the same sum and under the same cap. Buildings take Thrift only.
  *
  * @category Economy/Tiles
  * @order 4
  * @formula
- * discount% = min(45 + 5 x Treasury Charter level, min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount + min(10, gear Tile Discount))
+ * discount% = min(min(80, 45 + 3 x Treasury Charter level), min(25, 0.5 x Charisma) + 2 x Thrift level + 1 x Bulk Discount level + class tile discount + min(10, gear Tile Discount))
  */
 export const effectiveTileDiscount = (
 	stats: Pick<CharacterStats, 'tileCostDiscount'>,
@@ -87,8 +87,9 @@ export const effectiveTileDiscount = (
 		tileDiscountCap(prestige),
 	);
 
-/** The most percent a tile can be cheaper: 45 plus 5 per Treasury Charter level (Ember shop). */
-export const tileDiscountCap = (prestige: PrestigeState | undefined): number => REBIRTH.discountCapPercent + emberEffect(prestige, 'charter');
+/** The most percent a tile can be cheaper: 45 plus 3 per Treasury Charter level (Ember shop, 75 at level 10), never above `REBIRTH.discountMaxPercent` (80). */
+export const tileDiscountCap = (prestige: PrestigeState | undefined): number =>
+	Math.min(REBIRTH.discountMaxPercent, REBIRTH.discountCapPercent + emberEffect(prestige, 'charter'));
 
 /** Resources a new run starts with: the usual start plus the Provisions bundles. */
 export const startingResources = (prestige: PrestigeState | undefined): Resources => {

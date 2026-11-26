@@ -99,15 +99,37 @@ test('gear is junk when the player marked it, or when its level is far below the
 	const worn = { head: piece(30), chest: piece(40) };
 	assert.equal(wornLevelOf(worn), 35);
 	assert.equal(wornLevelOf({}), 0);
-	const ctx = { wornLevel: 35 };
-	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN - 1), ctx), true, 'well below what is worn');
-	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN), ctx), false, 'inside the margin');
-	assert.equal(isJunk(piece(1)), false, 'no worn level, no level rule');
+	const ctx = { equipment: worn };
+	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN - 1), { equipment: { head: piece(35) } }), true, 'well below what is worn in its own slot');
+	assert.equal(isJunk(piece(35 - JUNK_LEVEL_MARGIN), { equipment: { head: piece(35) } }), false, 'inside the margin');
+	assert.equal(isJunk(piece(1)), false, 'nothing worn, no rule');
 	assert.equal(isJunk(piece(1, { junk: true })), true, 'the player flag always counts');
 	assert.equal(isJunk(piece(1, { crafted: true }), ctx), false, 'crafted gear is protected from the level rule');
 	assert.equal(isJunk(piece(1, { rarity: 'epic' }), ctx), false, 'so is epic and above');
 	assert.equal(isJunk(piece(1, { rarity: 'epic', junk: true }), ctx), true, 'but the player decides');
-	assert.equal(junkFor(worn)(piece(10)), true);
+	assert.equal(junkFor({ head: piece(30) })(piece(10)), true);
+});
+
+// IDL-395: the rule compares a piece with what is worn in its own slot, never with the average of everything worn
+
+test('a piece for a slot that is empty is never junk, whatever else is worn (it may be the next upgrade)', () => {
+	assert.equal(isJunk(piece(1), { equipment: { chest: piece(60), mainHand: piece(60) } }), false, 'a helm with no helm worn');
+});
+
+test('a low-level piece that is better in rarity or affixes than the worn one is kept', () => {
+	const worn = { head: piece(40) };
+	const rare = piece(20, { rarity: 'rare' });
+	assert.equal(isJunk(piece(20), { equipment: worn }), true, 'plain and lower: junk');
+	assert.equal(isJunk(rare, { equipment: worn }), false, 'a rare is not worse than a common');
+	const rolled = piece(20, { affixes: [{ id: 'x', roll: 50 }] });
+	assert.equal(isJunk(rolled, { equipment: worn }), false, 'more affixes than the worn piece');
+});
+
+test('a ring is junk only when it is worse than both worn rings, and never with a ring slot empty', () => {
+	const ring = (level: number) => ({ ...plainItem('cloth_ring'), level });
+	assert.equal(isJunk(ring(5), { equipment: { ring1: ring(40), ring2: ring(40) } }), true);
+	assert.equal(isJunk(ring(5), { equipment: { ring1: ring(40), ring2: ring(3) } }), false, 'better than the weaker ring');
+	assert.equal(isJunk(ring(5), { equipment: { ring1: ring(40) } }), false, 'the second ring slot is empty');
 });
 
 test('markJunk sets and clears the flag on a bag piece, refuses anything else, and Sell junk then sells it', () => {

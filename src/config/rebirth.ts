@@ -34,7 +34,9 @@ export const REBIRTH = {
 	incomePerPoint: 0.12,
 	incomeExponent: 0.6,
 	keepSlotsMax: 15, // the most legendary pieces one rebirth can carry over (rebirth number N keeps min(N, this); see lib/rebirthKeep.ts)
-	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile
+	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile (Treasury Charter raises it, up to `discountMaxPercent`)
+	/** The most any tile discount can reach, whatever raises the cap: 45 + 10 Treasury Charter levels x 3 = 75, with 5 points of room. Tiles stay a real cost late in a run (Charisma 25 + Thrift 20 + Bulk 8 + class 3 + gear 10 + Paragon 10 = 76 is the most the sources can add up to). */
+	discountMaxPercent: 80,
 	// Embers granted for a rebirth with this castle level and territory
 	gain: (castleLevel: number, tiles: number, rebirths = 0) => {
 		const surplus = Math.max(0, tiles - REBIRTH.tilesNeeded(rebirths));
@@ -53,7 +55,7 @@ export const REBIRTH = {
  * The save is valid only if `unspent + spent = earned` and `rebirths = 0` implies `earned = 0` (checked in `src/lib/sanitizeSave.ts`).
  *
  * - **Permanent twins of the merchant's gold upgrades** (about 3 x the step, kept through every rebirth): Master Haggler, Fortune, Overseer, Master Skinner, Click Mastery, the seven battle upgrades and Eternal Tithe (+50% Embers per level, 5 levels).
- * - **Caps**: Treasury Charter (+5 points on the 45% tile-discount cap per level), Castle Expansion (castle level 10 to 15), Master Masonry (building level 5 to 10) and Idol Mastery (Idol level 5 up to 15, priced as an end-game goal). They read through `limitOf` (`castleMaxLevel`, `buildingMaxLevel`, `idolMaxLevel`).
+ * - **Caps**: Treasury Charter (+3 points on the 45% tile-discount cap per level, 75% at level 10, never above 80%), Castle Expansion (castle level 10 to 15), Master Masonry (building level 5 to 10) and Idol Mastery (Idol level 5 up to 15, priced as an end-game goal). They read through `limitOf` (`castleMaxLevel`, `buildingMaxLevel`, `idolMaxLevel`).
  * - **Build time**: Master Builders (castle), Mason's Guild (buildings) and Shrine Keepers (Idols), each -5% per level; together with the Dwarf Statue the cut never passes 60%.
  * - **One-time purchases** (one level): Potion Reflex (auto-potion, was a free unlock after the first rebirth; players who already rebirthed keep it), Eternal Vigil (away income 100% and 72 h away time) and Imperial Decree (the castle bonus counts double).
  * - **Start of a run**: Starting Treasury (base gold per second at the start of every run: 1, 5, 10, 20, 35) and Provisions (a starting bundle per level).
@@ -76,7 +78,7 @@ export const EMBER_UPGRADES = {
 		maxLevel: 10,
 		baseCost: 3,
 		costGrowth: 1.4,
-		effectPerLevel: 5, // +5 points on the tile-discount cap per level (base 45%), so Charisma, Thrift and Bulk Discount are never wasted
+		effectPerLevel: 3, // +3 points on the tile-discount cap per level (base 45%, 75% at level 10; it was +5, 95%, which no combination of discount sources could ever reach), so Charisma, Thrift and Bulk Discount are never wasted
 	},
 	builders: {
 		label: 'Master Builders',
