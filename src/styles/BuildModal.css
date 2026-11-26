@@ -241,7 +241,7 @@
 	background: linear-gradient(#5ee07a, #2a9a4a);
 }
 
-/* the Build and Move here buttons: bigger */
+/* the Build here Buy button: bigger */
 .build-action {
 	min-width: 120px;
 	min-height: 40px;
@@ -356,7 +356,7 @@
 	gap: 6px;
 }
 
-/* narrow windows: the info column goes on top, the Build and Move buttons go under their card, and nothing is wider than the window */
+/* narrow windows: the info column goes on top, the Buy buttons go under their card, and nothing is wider than the window */
 @media (max-width: 760px) {
 	.bw {
 		grid-template-columns: minmax(0, 1fr);
@@ -477,7 +477,7 @@
 	white-space: nowrap;
 }
 
-/* Build here, compact (the window lists many buildings now): small art, one line of text, small chips and a small Buy / Move button */
+/* Build here, compact (the window lists many buildings now): small art, one line of text, small chips and a small Buy button */
 .bh-grid {
 	column-gap: 20px;
 }
@@ -530,4 +530,41 @@
 	min-height: 30px;
 	padding: 0 12px;
 	font-size: 0.78rem;
+}
+
+/* Build here: two groups you can fold ("Build new", "Already owned"), a header line with an arrow, the name and the count */
+.bh-group + .bh-group {
+	margin-top: 14px;
+}
+.bh-group-head {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	width: 100%;
+	padding: 6px 4px;
+	background: none;
+	border: 0;
+	border-bottom: 1px solid rgba(240, 210, 122, 0.3);
+	color: var(--ds-gold, #e0a93a);
+	font: inherit;
+	font-size: 0.8rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	cursor: pointer;
+	text-align: left;
+}
+.bh-group-head:hover .bh-group-title {
+	color: var(--ds-gold-lt, #f4d57e);
+}
+.bh-group-arrow {
+	display: inline-block;
+	transition: transform 0.12s;
+}
+.bh-group-arrow[data-open='true'] {
+	transform: rotate(90deg);
+}
+.bh-group-count {
+	margin-left: auto;
+	color: #9aa4bd;
+	letter-spacing: 0;
 }
