@@ -45,7 +45,7 @@ import { healAmount } from '@/lib/skills';
 import { useGameStore } from '@/stores/gameStore';
 import { selectStock, useCraftStore } from '@/stores/craftStore';
 import { useUiStore } from '@/stores/uiStore';
-import type { BagSlot, EquipmentSlot, ItemInstance } from '@/types/game';
+import type { BagSlot, Equipment, EquipmentSlot, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber, formatPct } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/game/merchant';
 import { useBadgeChoice } from '../BadgeDialog';
@@ -288,11 +288,11 @@ const HeroLeft: React.FC = () => {
 };
 
 /** One slot of the bag: the item with its hover card (compared with what is worn), double-click, shift-click, right-click and drag, or an empty slot that takes drops. */
-const BagCell: React.FC<{ slot: BagSlot; index: number; wornLevel: number }> = ({ slot, index, wornLevel }) => {
+const BagCell: React.FC<{ slot: BagSlot; index: number; equipment: Equipment }> = ({ slot, index, equipment }) => {
 	const look = slotLook(slot);
 	const props = slotProps(slot);
 	if (!look) return <Slot onDragOver={(e) => e.preventDefault()} onDrop={(e) => (e.preventDefault(), dropOnBagSlot(index))} />;
-	const junk = !!props.item && isJunk(props.item, { wornLevel });
+	const junk = !!props.item && isJunk(props.item, { equipment });
 	return (
 		<HoverTip interactive closeDelayMs={100} tip={<GameItemTip item={props.item} itemId={props.itemId} compare hints='bag' />}>
 			<Slot
@@ -506,7 +506,6 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 	const sellJunk = useGameStore((state) => state.sellJunk);
 	const showToast = useUiStore((state) => state.showToast);
 	const [view, setView] = useState<'bag' | 'craft'>('bag');
-	const wornLevel = wornLevelOf(equipment);
 	const junkCount = countJunk(bag, junkFor(equipment));
 	const junkWorth = junkGold(bag, sellCtx, junkFor(equipment)); // the gold the button pays, shown on it
 	const used = bag.filter(Boolean).length;
@@ -529,7 +528,7 @@ const BagTab: React.FC<{ onCraftWith: (query: string) => void }> = ({ onCraftWit
 					<BuffRow />
 					<Inset className='ds-baggrid'>
 						{bag.map((slot, i) => (
-							<BagCell key={i} slot={slot} index={i} wornLevel={wornLevel} />
+							<BagCell key={i} slot={slot} index={i} equipment={equipment} />
 						))}
 						<MoreSpace />
 					</Inset>
