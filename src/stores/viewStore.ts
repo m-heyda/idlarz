@@ -25,11 +25,17 @@ interface ViewState {
 	/** Puts the world point (wx, wy) (px) in the middle of the screen. */
 	centerOn: (wx: number, wy: number) => void;
 	centerOnCastle: () => void;
+	/** The tile the map is pointing out (a pulsing frame), or null: set by `focusTile`, cleared after a few seconds. Never saved. */
+	found: { x: number; y: number } | null;
+	/** Centres the map on a tile and frames it for a few seconds (the Kingdom overview's building names use it). */
+	focusTile: (x: number, y: number) => void;
 	/** Applies the clamp again (the explored area, the window or the zoom changed). */
 	reclamp: () => void;
 }
 
 const DEFAULT_ZOOM = 1;
+/** How long a pointed-out tile keeps its frame */
+const FOUND_MS = 7000;
 
 /**
  * A view store clamped to the land of `getTiles()`. The game has one (`useViewStore`); the map lab makes its own over its
@@ -38,7 +44,15 @@ const DEFAULT_ZOOM = 1;
 export const createViewStore = (getTiles: () => World) => {
 	const clampNow = (pos: Point, zoom: number, w: number, h: number): Point => clampPosition(pos, zoom, { w, h }, ownedBounds(getTiles()));
 
+	let foundTimer: ReturnType<typeof setTimeout> | undefined;
 	return create<ViewState>((set, get) => ({
+		found: null,
+		focusTile: (x, y) => {
+			get().centerOn((x + 0.5) * TILE_SIZE, (y + 0.5) * TILE_SIZE);
+			clearTimeout(foundTimer);
+			set({ found: { x, y } });
+			foundTimer = setTimeout(() => set({ found: null }), FOUND_MS);
+		},
 		x: 0,
 		y: 0,
 		zoom: DEFAULT_ZOOM,

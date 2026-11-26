@@ -15,8 +15,9 @@ export const useIncomeBreakdown = (): ReturnType<typeof calculateResourceBreakdo
 	const farmUpgrades = useGameStore((state) => state.farmUpgrades);
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const equipment = useGameStore((state) => state.equipment);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	return useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment)),
-		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment, paragonSpent)),
+		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment, paragonSpent],
 	);
 };

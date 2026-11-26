@@ -423,6 +423,8 @@ export interface GameState {
 	gemCraft: GemCraft;
 	/** The level of each Idol the account has reached, by biome (kept across rebirths; the server's ledger holds the trusted copy, `legacy.idols`). A standing Idol works at the lower of this and its tile's level; placing a learned Idol again is free at this level. */
 	idolLevels: Record<string, number>;
+	/** The paragon points in each upgrade: the server's record (ledger `paragon`), never part of the save. Empty until the server has answered. */
+	paragonSpent: Partial<Record<import('@/config/paragon').ParagonId, number>>;
 	playSeconds: number; // accumulated game time (tick deltas); kept for save plausibility checks
 	activeChests: number;
 	/** Gems: the premium currency (starts at STARTING_GEMS, survives a rebirth). Separate from the Embers of `prestige`. */
@@ -489,6 +491,12 @@ export interface GameState {
 	applyServerAttrs: (attrs: import('@/lib/offline/attrs').Attrs) => void;
 	/** Reads the server's attribute allocation and takes it (when the game starts) */
 	syncServerAttrs: () => Promise<void>;
+	/** Takes the server's paragon record (the points are the ledger's, see `lib/offline/paragon.ts`) */
+	applyServerParagon: (paragon: import('@/lib/offline/paragon').Paragon) => void;
+	/** Reads the server's paragon record and takes it (when the game starts) */
+	syncServerParagon: () => Promise<void>;
+	/** Puts `n` free paragon points into an upgrade (a preview at once, then the server is asked); returns how many were taken */
+	spendParagon: (id: import('@/config/paragon').ParagonId, n?: number) => number;
 	/** The server kept fewer Embers or rebirths than the save held (a rebirth could not have paid them): the game takes its numbers */
 	applyServerPrestige: (prestige: PrestigeState) => void;
 	applyFightReply: (reply: FightReply) => void;

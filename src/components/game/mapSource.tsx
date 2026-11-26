@@ -23,7 +23,12 @@ export type MapGameState = Pick<
 	| 'collectChest'
 	| 'startFight'
 > &
-	Partial<Pick<GameState, 'playerClass' | 'equipment' | 'buildingUpgrades' | 'gemBuilders' | 'gemCraft' | 'idolLevels' | 'buildBuilding' | 'upgradeBuilding'>>;
+	Partial<
+		Pick<
+			GameState,
+			'playerClass' | 'equipment' | 'buildingUpgrades' | 'gemBuilders' | 'gemCraft' | 'idolLevels' | 'paragonSpent' | 'buildBuilding' | 'upgradeBuilding'
+		>
+	>;
 
 export type MapGameStore = UseBoundStore<StoreApi<MapGameState>>;
 

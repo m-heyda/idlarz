@@ -1,4 +1,5 @@
 import React, { memo, useMemo } from 'react';
+import { paragonBonuses } from '@/lib/offline/paragon';
 import { BiomeType } from '@/types/game';
 import { formatNumber, tidy } from '@/utils/formatters';
 import { BIOMES } from '@/config/biomes';
@@ -39,7 +40,8 @@ export const TileStatus = memo(
 		const playerClass = game((state) => state.playerClass);
 		const equipment = game((state) => state.equipment);
 		const freeTiles = game((state) => state.freeTiles);
-		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment);
+		const paragonSpent = game((state) => state.paragonSpent);
+		const discount = effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment, paragonBonuses(paragonSpent).tileDiscount);
 
 		const cost = useMemo(() => calculateTileCost(economyTiles(tiles, freeTiles), discount), [tiles, discount, freeTiles]);
 

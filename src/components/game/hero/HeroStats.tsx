@@ -149,16 +149,17 @@ const HeroStats: React.FC = () => {
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const playerClass = useGameStore((state) => state.playerClass);
 	const idolLevels = useGameStore((state) => state.idolLevels);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const [sort, setSort] = useState<{ col: IncomeCol; dir: 1 | -1 } | null>(null);
 
-	const idol = idolEconomy(tiles, idolLevels);
+	const idol = idolEconomy(tiles, idolLevels, paragonSpent);
 	const classLines = describeClassPassives(playerClass);
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 	const points = characterStats.availablePoints;
 	const breakdown = useMemo(
-		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment)),
-		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment],
+		() => calculateResourceBreakdown(tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, gearIncome(equipment, paragonSpent)),
+		[tiles, characterStats, farmLevels, prestige, farmUpgrades, merchantUpgrades, equipment, paragonSpent],
 	);
 
 	const gearAttrs = gearAttributes(equipment);

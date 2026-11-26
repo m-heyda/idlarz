@@ -21,7 +21,7 @@ type Applied = Pick<
 >;
 
 export type OfflineStateIn = Applied &
-	Partial<Pick<GameState, 'buildingUpgrades' | 'idolLevels'>> &
+	Partial<Pick<GameState, 'buildingUpgrades' | 'idolLevels' | 'paragonSpent'>> &
 	Pick<GameState, 'equipment' | 'farmLevels' | 'farmUpgrades' | 'prestige' | 'merchantUpgrades'> &
 	Partial<Pick<GameState, 'merchantStock' | 'merchantRefresh' | 'playSeconds' | 'playerClass'>>;
 
@@ -82,7 +82,7 @@ export const applyOfflineGrant = (
 					state.prestige,
 					state.farmUpgrades,
 					state.merchantUpgrades,
-					gearIncome(state.equipment),
+					gearIncome(state.equipment, state.paragonSpent),
 				);
 				castleReached = castleUpgrade.toLevel;
 			}
@@ -123,7 +123,7 @@ export const applyOfflineGrant = (
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncome(state.equipment),
+			gearIncome(state.equipment, state.paragonSpent),
 		);
 	}
 

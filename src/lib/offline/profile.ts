@@ -85,24 +85,27 @@ export const playerProfile = (core: Core): PlayerProfile => {
 	const gear = aggregateStats(equipment);
 	// the Idols' combat bonuses (Maw Idol: damage, War Memorial: max HP and armor), stamped into the stored save by the save pipeline from the standing Idols (`idolFx`)
 	const fx = isRecord(core.idolFx) ? core.idolFx : {};
-	const pct = (key: string) => 1 + (typeof fx[key] === 'number' && Number.isFinite(fx[key]) ? Math.max(0, fx[key] as number) : 0) / 100;
+	const raw = (key: string) => (typeof fx[key] === 'number' && Number.isFinite(fx[key]) ? Math.max(0, fx[key] as number) : 0);
+	const pct = (key: string) => 1 + raw(key) / 100;
+	// the Paragon upgrades (docs/plan/paragon.md) ride in the same record: max life, critical damage, life leech, the boss clock and potion power
+	const bossTimerSec = gearBossTimerSec(equipment) + raw('bossTimerSec');
 	return {
 		level: characterLevelOf(core),
-		maxHp: Math.round(maxHp(stats, equipment) * pct('hpArmorPct')),
+		maxHp: Math.round(maxHp(stats, equipment) * pct('hpArmorPct') * pct('maxHpPct')),
 		maxMp: maxMana(stats, equipment, playerClass),
 		hit: damagePerHit(equipment, stats, bonus) * pct('damagePct'),
 		crit: odds.crit,
 		superCrit: odds.superCrit,
-		critExtra: critExtraOf(stats, equipment),
+		critExtra: critExtraOf(stats, equipment) * pct('critDamagePct'),
 		attacksPerSec: attacksPerSecond(equipment, stats, bonus),
 		armor: armorOf(equipment, stats, playerClass) * pct('hpArmorPct'),
 		dodge: dodgeChance(equipment),
-		leechPct: lifeLeechPercent(equipment, bonus),
+		leechPct: lifeLeechPercent(equipment, bonus) + raw('lifeLeechPct'),
 		hpRegen: gear.regen + bonus.regen,
 		mpRegen: manaRegenPerSec(stats, equipment),
 		heal: healAmount(stats, equipment, undefined, playerClass),
 		potionCooldownSec: potionCooldownSec(gear),
-		potionPower: potionPower(gear),
+		potionPower: potionPower(gear) + raw('potionPowerPct') / 100,
 		potionSlots: potionSlotCount(gear),
 		// a legendary's handlers (IDL-46): only present when worn, so a profile without them is exactly the one there was before
 		...(gear.burnPct > 0 ? { burnPct: gear.burnPct } : {}),
@@ -111,7 +114,7 @@ export const playerProfile = (core: Core): PlayerProfile => {
 		...(armorPenPercent(equipment) > 0 ? { armorPenPct: armorPenPercent(equipment) } : {}),
 		...(thornsPercent(equipment) > 0 ? { thornsPct: thornsPercent(equipment) } : {}),
 		...(healOnKillPercent(equipment) > 0 ? { healOnKillPct: healOnKillPercent(equipment) } : {}),
-		...(gearBossTimerSec(equipment) > 0 ? { bossTimerSec: gearBossTimerSec(equipment) } : {}),
+		...(bossTimerSec > 0 ? { bossTimerSec } : {}),
 	};
 };
 

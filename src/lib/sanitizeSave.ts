@@ -97,6 +97,8 @@ export const PERSISTED_KEYS = [
 export type PersistedGame = Pick<GameState, (typeof PERSISTED_KEYS)[number]> & {
 	buildingUpgrades?: GameState['buildingUpgrades'];
 	idolLevels?: GameState['idolLevels'];
+	/** The paragon points the server holds (never part of a save: the pipeline sets it from the ledger before the numbers are derived) */
+	paragonSpent?: GameState['paragonSpent'];
 };
 
 export const pickPersisted = (state: GameState): PersistedGame => {

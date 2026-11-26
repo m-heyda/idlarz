@@ -1,7 +1,8 @@
 import { BIOMES } from '@/config/biomes';
 import { BIOME_RULES } from '@/config/biomeRules';
 import { BUILDINGS, GENERAL_BIOME } from '@/catalog/buildings';
-import { builderCount, builtBuildings, maxLevelOf } from '@/lib/buildings';
+import { builderCount, builtBuildings, maxLevelOf, ownedOfBiome } from '@/lib/buildings';
+import { buildingEffect, type BuildingEffect } from '@/lib/buildingEffect';
 import { busyBuilders } from '@/lib/builders';
 import { castleLevelOf } from '@/lib/castleWard';
 import { limitOf } from '@/lib/limits';
@@ -31,6 +32,8 @@ export interface KingdomBuildingRow {
 	upgrading: boolean;
 	/** Its biome is not open to the account yet: the rebirths it needs (0 = open). A locked building is not a missing one */
 	lockedUntilRebirth: number;
+	/** What it gives now (or, when not built, what level 1 would give), for the hover text */
+	effect: BuildingEffect;
 }
 
 /** The buildings of one biome (or the general buildings), in the fixed order Producer, Extractor, Idol, then general */
@@ -87,6 +90,7 @@ export const kingdomSummary = (state: KingdomInput, rocks = 0): KingdomSummary =
 		cap: maxLevelOf(def, idolMax, buildingMax),
 		upgrading: upgrading.has(def.id),
 		lockedUntilRebirth: def.kind === 'general' ? 0 : lockedUntil(def.biome, state.prestige.rebirths),
+		effect: buildingEffect(def.id, built.get(def.id) ?? 0, def.kind === 'general' ? 0 : ownedOfBiome(state.tiles, def.biome)),
 	}));
 
 	const order: Record<KingdomBuildingRow['kind'], number> = { producer: 0, extractor: 1, idol: 2, general: 3 };

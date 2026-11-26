@@ -41,6 +41,7 @@ const applyReply = (reply: GemsReply) => {
 	if (reply.playerClass) game.setPlayerClass(reply.playerClass as Parameters<typeof game.setPlayerClass>[0]);
 	if (reply.characterName) useGameStore.setState({ playerName: reply.characterName });
 	if (reply.attrs) game.applyServerAttrs(reply.attrs);
+	if (reply.paragon) game.applyServerParagon(reply.paragon);
 	if (reply.bought) {
 		useGameStore.setState({ gemBuilders: gemBuildersOf(reply.bought), gemCraft: gemCraftOf(reply.bought) }); // Additional builder and the crafting items are the ledger's record
 		useUiStore.getState().setOwnedSkins(ownedSkinsOf(reply.bought)); // and so are the castle skins

@@ -2,6 +2,7 @@ import { DAILY_BONUS_GEMS, DAILY_CHEST, DAY_SEC, gemItemById, gemMaxedOf, gemNex
 import { GEMS_CAP } from '@/config/economy';
 import { PLAYER_CLASSES } from '@/config/playerClasses';
 import { respecAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
+import { paragonSpent, respecParagon, type Paragon } from '@/lib/offline/paragon';
 import { recordRespec } from '@/lib/offline/stats';
 import { addTotals, type Ledger } from '@/lib/offline/ledger';
 import type { DailyChestItem, DailyInfo, GemShop, GemsRefusal, PendingIdentity } from '@/lib/offline/gemTypes';
@@ -65,8 +66,10 @@ export const claimDaily = (ledger: Ledger, nowSec: number, chest: readonly Daily
 };
 
 /** What a purchase costs this account now: the first attribute respec is free. */
-export const priceFor = (item: GemItem, attrs: Attrs | null, bought?: Record<string, number>): number =>
-	item.id === 'attr_respec' && !(attrs?.freeUsed ?? false) ? 0 : gemNextPrice(item, bought);
+export const priceFor = (item: GemItem, attrs: Attrs | null, bought?: Record<string, number>, paragon?: Paragon | null): number =>
+	(item.id === 'attr_respec' && !(attrs?.freeUsed ?? false)) || (item.id === 'paragon_respec' && !(paragon?.freeUsed ?? false))
+		? 0
+		: gemNextPrice(item, bought);
 
 export interface SpendFacts {
 	nowSec: number;
@@ -101,11 +104,12 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 	const last = ledger.gemShop.lastAt[item.id] ?? 0;
 	if (item.cooldownSec > 0 && last > 0 && facts.nowSec - last < item.cooldownSec) return refuse('cooldown', 'You have to wait before buying that again.');
 	if (gemMaxedOf(item, ledger.gemShop.bought)) return refuse('already_owned', 'You already own that.');
-	const price = priceFor(item, ledger.attrs, ledger.gemShop.bought);
+	const price = priceFor(item, ledger.attrs, ledger.gemShop.bought, ledger.paragon);
 	if (ledger.gems < price) return refuse('short_balance', `You need ${price - ledger.gems} more gems.`);
 
 	let pending: PendingIdentity | null = null;
 	let attrs = ledger.attrs;
+	let paragon = ledger.paragon;
 	if (item.id === 'class_change') {
 		if (facts.inFight) return refuse('in_fight', 'Finish the fight first.');
 		if (!value || !PLAYER_CLASSES[value as keyof typeof PLAYER_CLASSES]) return refuse('bad_value', 'Pick one of the four heroes.');
@@ -114,6 +118,10 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 	} else if (item.id === 'name_change') {
 		if (!value) return refuse('bad_value', 'Enter a name.');
 		pending = { kind: 'name', value, price };
+	} else if (item.id === 'paragon_respec') {
+		if (facts.inFight) return refuse('in_fight', 'Finish the fight first.');
+		if (!paragon || paragonSpent(paragon.spent) === 0) return refuse('nothing_to_respec', 'You have no paragon points to take back.');
+		paragon = respecParagon(paragon);
 	} else if (item.kind !== 'once') {
 		if (facts.inFight) return refuse('in_fight', 'Finish the fight first.');
 		if (spentOf(facts.attrs.alloc) === 0) return refuse('nothing_to_respec', 'You have no attribute points to take back.');
@@ -126,6 +134,7 @@ export const applySpend = (ledger: Ledger, itemId: string, value: string | undef
 			...ledger,
 			gems: ledger.gems - price,
 			attrs,
+			paragon,
 			stats: item.id === 'attr_respec' ? recordRespec(ledger.stats) : ledger.stats,
 			gemShop: {
 				...ledger.gemShop,

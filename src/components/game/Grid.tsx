@@ -21,6 +21,7 @@
  * @category Architecture/Rendering
  * @order 1
  */
+import { paragonBonuses } from '@/lib/offline/paragon';
 import React, { useRef, useEffect, useState, useCallback, useMemo, JSX } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
 import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
@@ -82,7 +83,14 @@ const Grid: React.FC = () => {
 			tileCostAsResources(
 				calculateTileCost(
 					economyTiles(state.tiles, state.freeTiles),
-					effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+					effectiveTileDiscount(
+						state.characterStats,
+						state.prestige,
+						state.merchantUpgrades,
+						state.playerClass,
+						state.equipment,
+						paragonBonuses(state.paragonSpent).tileDiscount,
+					),
 				),
 			),
 		),

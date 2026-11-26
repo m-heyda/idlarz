@@ -305,9 +305,16 @@ export const BadgeTitlePicker: React.FC<{
 	</div>
 );
 
-/** The XP bar as in the game: a purple level box, then a segmented green bar with `label` over it. `compact` drops the level box (crafting level bar). */
-export const XpBar: React.FC<{ level: number; value: number; max: number; label?: string; compact?: boolean }> = ({ level, value, max, label, compact }) => (
-	<div className={cx('ds-xp', compact && 'ds-xp-compact')}>
+/** The XP bar as in the game: a purple level box, then a segmented green bar with `label` over it. `compact` drops the level box (crafting level bar). `paragon` is the track past level 100: the level box and the bar turn gold, like a new level. */
+export const XpBar: React.FC<{ level: number; value: number; max: number; label?: string; compact?: boolean; paragon?: boolean }> = ({
+	level,
+	value,
+	max,
+	label,
+	compact,
+	paragon,
+}) => (
+	<div className={cx('ds-xp', compact && 'ds-xp-compact', paragon && 'ds-xp-paragon')}>
 		{compact ? null : <span className='ds-xp-level'>{level}</span>}
 		<div className='ds-xp-track'>
 			<div className='ds-xp-fill' style={{ width: `${Math.max(0, Math.min(1, value / (max || 1))) * 100}%` }} />

@@ -76,7 +76,7 @@ test('the paragon level is read from the lifetime XP, and only for a character a
 
 test('a level-100 row on the Level board carries its paragon level', () => {
 	const rows = buildRankingRows([entry({ value: MAX_LEVEL, xp: 6.5e10 })], new Map([['u1', profile()]]), new Map([['u1', []]]), null);
-	assert.ok(rows[0].paragon > 150 && rows[0].paragon < 220, `paragon ${rows[0].paragon}`);
+	assert.ok(rows[0].paragon > 55 && rows[0].paragon < 70, `paragon ${rows[0].paragon}`);
 	const other = buildRankingRows([entry({ value: 12, xp: 0 })], new Map([['u1', profile()]]), new Map([['u1', []]]), null);
 	assert.equal(other[0].paragon, 0);
 });

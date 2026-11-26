@@ -1,0 +1,143 @@
+/* The Paragon tab of the Hero window (docs/plan/paragon.md): four columns of upgrades, gold like the paragon bar. */
+.px-paragon {
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	padding: 12px 14px;
+	min-height: 0;
+	overflow: auto;
+}
+
+.px-paragon-head {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	padding-bottom: 8px;
+	border-bottom: 2px solid var(--ds-gold-dk, #7a5a14);
+}
+
+.px-paragon-level {
+	font-size: 22px;
+	color: #f0c84a;
+	text-shadow: 0 2px 0 #3a2606;
+}
+
+.px-paragon-free,
+.px-paragon-used {
+	font-size: 13px;
+	color: var(--ds-dim, #9a8f78);
+}
+
+.px-paragon-free {
+	font-size: 14px;
+}
+
+.px-paragon-free[data-has='true'] {
+	color: #f0c84a;
+}
+
+.px-paragon-respec {
+	margin-left: auto;
+	padding: 4px 12px;
+	font: inherit;
+	font-size: 13px;
+	color: #fff;
+	background: linear-gradient(#b8332a, #7e1f19);
+	border: 2px solid #2a0a08;
+	cursor: pointer;
+}
+
+.px-paragon-respec:disabled {
+	opacity: 0.45;
+	cursor: default;
+}
+
+.px-paragon-grid {
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: 12px;
+	align-items: start;
+}
+
+.px-paragon-col {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	min-width: 0;
+}
+
+.px-paragon-cat {
+	margin: 0 0 2px;
+	font-size: 14px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: #f0c84a;
+}
+
+.px-paragon-row {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 6px 8px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 2px solid var(--ds-gold-dk, #7a5a14);
+}
+
+.px-paragon-row[data-capped='false'] {
+	border-color: #b8860b;
+	background: rgba(240, 200, 74, 0.08);
+}
+
+.px-paragon-row[data-full='true'] {
+	opacity: 0.7;
+}
+
+.px-paragon-row-text {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+	flex: 1;
+}
+
+.px-paragon-name {
+	font-size: 13px;
+	color: #fff;
+}
+
+.px-paragon-points {
+	margin-left: 4px;
+	color: #f0c84a;
+}
+
+.px-paragon-effect {
+	font-size: 12px;
+	color: var(--ds-dim, #9a8f78);
+	white-space: pre-wrap;
+}
+
+.px-paragon-plus {
+	flex: none;
+	width: 28px;
+	height: 28px;
+	font: inherit;
+	font-size: 18px;
+	line-height: 1;
+	color: #2a1a02;
+	background: linear-gradient(#f0c84a, #b8860b);
+	border: 2px solid #3a2606;
+	cursor: pointer;
+}
+
+.px-paragon-plus:disabled {
+	opacity: 0.35;
+	cursor: default;
+}
+
+.px-paragon-empty {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	padding: 24px;
+	color: var(--ds-dim, #9a8f78);
+}

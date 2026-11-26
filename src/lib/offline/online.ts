@@ -2,7 +2,18 @@ import { GEMS_CAP } from '@/config/economy';
 import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
-import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest, PendingIdentity } from '@/lib/offline/gemTypes';
+import { allocateParagon, fitParagon, newParagon, paragonBudget, paragonFree, type Paragon } from '@/lib/offline/paragon';
+import type {
+	CharacterReply,
+	CharacterRequest,
+	ParagonReply,
+	ParagonRequest,
+	GemsReply,
+	GemsRequest,
+	MasteryReply,
+	MasteryRequest,
+	PendingIdentity,
+} from '@/lib/offline/gemTypes';
 import { claimAllMastery, claimBiomeGoal, claimMastery } from '@/lib/offline/mastery';
 import { recordCuriosity } from '@/lib/offline/curiosity';
 import type { IdentityInfo, IdentityRepo } from '@/lib/offline/identity';
@@ -508,6 +519,7 @@ const gemsView = (ledger: Ledger, nowSec: number, identity: IdentityInfo | null)
 	gems: ledger.gems,
 	daily: dailyInfo(ledger.gemShop, nowSec),
 	freeRespec: !(ledger.attrs?.freeUsed ?? false),
+	freeParagonRespec: !(ledger.paragon?.freeUsed ?? false),
 	lastAt: ledger.gemShop.lastAt,
 	bought: ledger.gemShop.bought,
 	nameChangedAt: identity?.nameChangedAtSec ?? null,
@@ -599,7 +611,12 @@ export const gemsStep = (
 		if (!spent.ok) return refused(spent.reason, spent.message);
 		return {
 			ledger: spent.ledger,
-			value: { ...gemsView(spent.ledger, ctx.nowSec, identity), paid: spent.paid, ...(request.itemId === 'attr_respec' ? { attrs: spent.ledger.attrs! } : {}) },
+			value: {
+				...gemsView(spent.ledger, ctx.nowSec, identity),
+				paid: spent.paid,
+				...(request.itemId === 'attr_respec' ? { attrs: spent.ledger.attrs! } : {}),
+				...(request.itemId === 'paragon_respec' && spent.ledger.paragon ? { paragon: spent.ledger.paragon } : {}),
+			},
 		};
 	});
 
@@ -662,6 +679,32 @@ export const characterStep = (
 		const result = allocatePoints(attrs, request.add, budget);
 		if (!result.ok) return { ledger: { ...ledger, attrs }, value: view(attrs, false, result.reason) };
 		return { ledger: { ...ledger, attrs: result.attrs }, value: view(result.attrs, true) };
+	});
+
+/**
+ * Paragon points (docs/plan/paragon.md): `allocate` puts points into upgrades up to what the paragon level has earned (worked out from the stored XP plus the XP the server paid since that save, as `characterStep` does), `sync` only reads.
+ * The answer always carries the record as it stands, so a browser whose preview was refused puts it right. Free points are never stored: they are the budget minus what is spent. Giving the points back is a gem shop purchase (`paragon_respec`).
+ */
+export const paragonStep = (deps: ServiceDeps, userId: string, key: string | null, request: ParagonRequest, nowMs: number): Promise<Online<ParagonReply>> =>
+	onlineStep(deps, userId, request.action === 'sync' ? null : key, nowMs, (ctx): { ledger: Ledger; value: ParagonReply } => {
+		const ledger = ctx.ledger;
+		const xpStored = (ctx.stored.core.resources as { xp?: unknown } | undefined)?.xp;
+		const unseenXp = Math.max(0, (ledger.granted.xp ?? 0) - (ledger.grantedSeen.xp ?? 0));
+		const xp = (typeof xpStored === 'number' ? xpStored : 0) + unseenXp;
+		// a record that holds more than the XP has earned (the XP was clamped lower) gives every point back
+		const paragon: Paragon = fitParagon(ledger.paragon ?? newParagon(), xp);
+		const view = (p: Paragon, ok: boolean, reason?: ParagonReply['reason']): ParagonReply => ({
+			ok,
+			...(reason ? { reason } : {}),
+			paragon: p,
+			available: paragonFree(xp, p.spent),
+			level: paragonBudget(xp),
+			serverNowSec: ctx.nowSec,
+		});
+		if (request.action === 'sync') return { ledger: { ...ledger, paragon }, value: view(paragon, true) };
+		const result = allocateParagon(paragon, request.add, paragonBudget(xp));
+		if (!result.ok) return { ledger: { ...ledger, paragon }, value: view(paragon, false, result.reason) };
+		return { ledger: { ...ledger, paragon: result.paragon }, value: view(result.paragon, true) };
 	});
 
 /**

@@ -2,6 +2,7 @@
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
 import { LIMITS } from '@/config/limits';
+import type { ParagonId } from '@/config/paragon';
 import { DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import { STARTING_GEMS } from '@/config/economy';
 import { NO_GEM_CRAFT } from '@/config/gemShop';
@@ -27,7 +28,8 @@ export type GameGet = () => GameState;
 
 /** The income rates for the state with this gear on (a set bonus can add income). */
 export const ratesWithGear = (
-	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'>,
+	state: Pick<GameState, 'tiles' | 'characterStats' | 'farmLevels' | 'prestige' | 'farmUpgrades' | 'merchantUpgrades'> &
+		Partial<Pick<GameState, 'paragonSpent'>>,
 	equipment: Equipment,
 ) =>
 	calculateResourceRates(
@@ -37,7 +39,7 @@ export const ratesWithGear = (
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncome(equipment),
+		gearIncome(equipment, state.paragonSpent),
 	);
 
 /** What can raise a limit (see config/limits.ts): the merchant bonuses and the rebirth state. */
@@ -116,6 +118,7 @@ export const createInitialData = (prestige: PrestigeState = EMPTY_PRESTIGE, rand
 		gemBuilders: 0,
 		gemCraft: NO_GEM_CRAFT,
 		idolLevels: {} as Record<string, number>,
+		paragonSpent: {} as Partial<Record<ParagonId, number>>,
 		playSeconds: 0,
 		activeChests: 0,
 		gems: STARTING_GEMS, // a new game's gift; once the account has a ledger the server's balance replaces it on every answer

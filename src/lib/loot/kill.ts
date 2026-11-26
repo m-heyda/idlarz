@@ -30,6 +30,9 @@ export interface KillContext {
 	/** The deed bonuses (`deedBonuses`, claimed point milestones), in %: extra kill gold and kill XP, on every monster */
 	deedGoldPct?: number;
 	deedXpPct?: number;
+	/** The Paragon upgrades (docs/plan/paragon.md): percentage points more chance that a normal monster drops its chest, and a relative boost to the odds of rare-and-better gear */
+	chestDropPts?: number;
+	epicFindPct?: number;
 }
 
 export interface KillLoot {
@@ -87,13 +90,13 @@ export const killIncome = (monster: Pick<Monster, 'type' | 'level'>, ctx: KillCo
  * @category Loot/Monster chests
  * @order 2
  */
-export const rollChestDrops = (monster: Pick<Monster, 'type'>, ctx: Pick<KillContext, 'lucky'>, rng: Rng): Drop[] => {
+export const rollChestDrops = (monster: Pick<Monster, 'type'>, ctx: Pick<KillContext, 'lucky' | 'chestDropPts'>, rng: Rng): Drop[] => {
 	const chest = (tier: MonsterChestTier): Drop => ({ kind: 'consumable', id: monsterChestItemId(tier), qty: 1 });
 	const drops: Drop[] = [];
 	if (isBoss(monster.type)) drops.push(chest('royal'));
 	else {
 		const tier = MONSTER_CHEST.tierOfBiome[monsterDef(monster.type).spawn.biomes[0]];
-		if (tier && rng() >= 1 - MONSTER_CHEST.dropChance) drops.push(chest(tier));
+		if (tier && rng() >= 1 - (MONSTER_CHEST.dropChance + (ctx.chestDropPts ?? 0) / 100)) drops.push(chest(tier));
 	}
 	if (ctx.lucky) drops.push(chest('arcane'));
 	return drops;
@@ -110,6 +113,7 @@ export const rollKillLoot = (monster: Pick<Monster, 'type' | 'level'>, ctx: Kill
 			pity: ctx.pity,
 			luck: ctx.luck,
 			dropChancePct: ctx.masteryLootPct,
+			epicFindPct: ctx.epicFindPct,
 			extraGearRolls: ctx.lucky ? LUCK.goldenMonster.extraGearRolls : 0,
 		},
 		rng,

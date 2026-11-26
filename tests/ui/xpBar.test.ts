@@ -32,7 +32,7 @@ test('at level 100 the bar is the paragon track', () => {
 	const xp = base + 1.1e8;
 	const bar = xpBarOf(calculateLevel(xp), xp);
 	assert.equal(bar.track, 'paragon');
-	assert.match(bar.label, /^Paragon 0 · 52% · /);
+	assert.match(bar.label, /^Paragon 0 · 15% · /);
 	assert.equal(bar.max, paragonStepXp(0));
 	assert.ok(Math.abs(bar.into - 1.1e8) <= 1, `inside the level: ${bar.into}`);
 	assert.equal(bar.next, 'paragon level');
