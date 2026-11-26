@@ -76,7 +76,7 @@ Rules: the **merchant trades T0 and T1 only** (your instruction); T2-T4 are craf
 - **Save**: today a tile with a building "never has a level" (`sanitizeSave`). Buildings need `level` (and `upgradeEndsAt`/remaining seconds) as **optional** tile fields in `extra`. No `SAVE_SCHEMA` bump: absent means level 1.
 
 ### 5.1 Castle timers (built, and changed)
-Built in the balancing pass, with other numbers than this section proposed: all nine timers were halved (30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d; `CASTLE_UPGRADE.durationsSec`, pinned in `tests/economy/castle.test.ts`). Levels 2-6 take 1 d 20 h 30 min, level 10 comes after 11 d 8 h 30 min. Still open: the first five castle costs x0.75 (see [19](19-first-build-steps.md)) and a combined cap on Master Builders (-5 %/level) plus the Dwarf Statue (proposal 60 %).
+Built in the balancing pass, with other numbers than this section proposed: all nine timers were halved (30 min, 2 h, 6 h, 12 h, 24 h, 1.5 d, 2 d, 2.5 d, 3.5 d; `CASTLE_UPGRADE.durationsSec`, pinned in `tests/economy/castle.test.ts`). Levels 2-6 take 1 d 20 h 30 min, level 10 comes after 11 d 8 h 30 min. Still open: a combined cap on Master Builders (-5 %/level) plus the Dwarf Statue (proposal 60 %).
 
 ## 6. Idols survive rebirth (decided), soft caps and legacy points
 

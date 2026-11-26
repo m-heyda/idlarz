@@ -13,7 +13,7 @@ import { WOODEN_ITEMS } from './starter';
 import { STEEL_ITEMS } from './steel';
 
 // The grade ladder (IDL-37, 38, 39, 142): 9 normal grades G1-G9 and three special
-// sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (docs/plan/26-next-updates-plan.md). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
+// sets S1-S3 for every slot, as data. Only the live grades (G1-G3, grades.ts) are enabled and drop; the rest drops, is sold or crafted nowhere yet (the measured table of which grade drops where is docs/plan/31-grade-by-biome-and-source.md). The grade is a tag (`grade:G3`), never an id, so pools and recipes select by it.
 //
 // Where a ladder cell already exists as a live item (Iron Sword, the Steel pieces, the Obsidian family, Emberbrand) the live item
 // stays and fills that cell; `LADDER` says which id sits in which cell. Everything else is generated from the tables in this file,

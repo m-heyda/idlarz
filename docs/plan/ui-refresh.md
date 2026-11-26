@@ -1,6 +1,6 @@
 # UI refresh: layout and UX reference
 
-**Status: reference, not built.** [design/idle-realm-ui-refresh.html](design/idle-realm-ui-refresh.html) is a Claude Design export (open it in a browser; it needs JavaScript). It holds seven static boards, each in its own frame.
+**Status: reference.** The design system this export led to is built and used by the game (`packages/design-system`, `packages/design-system/INTEGRATION.md` maps each game component to its design-system one). [design/idle-realm-ui-refresh.html](design/idle-realm-ui-refresh.html) is a Claude Design export (open it in a browser; it needs JavaScript). It holds seven static boards, each in its own frame.
 
 **Treat it as a reference for layouts and UX, not as an art or asset refresh.** The boards already solve many UX problems; pictures, colours and art in them are not the target, and assets keep following the Sprite Fusion rule in [CLAUDE.md](../../CLAUDE.md). Where the boards and the code disagree once the design system exists, the code is the source of truth.
 

@@ -1,12 +1,12 @@
 # Release plan: what is left on the way to the rebirth world
 
-Status: **cleaned on 2026-11-19 against the code, the closed Linear tickets and the git history: everything that is built was removed.** What is built is described by the JSDoc in the code (`grep -rn "@category" src scripts`) and, per version, in `content/changelog/`. Linear (team IDL, projects R0-R12) is the truth for status; this file keeps the **order and the product brief** of what is still open. The phase numbers (P3, P11 ...) and gem slices (G1-G5) stay as names other documents point to. Drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) and [26](26-next-updates-plan.md) hold the detail; [ROADMAP](ROADMAP.md) holds the long lists.
+Status: **cleaned on 2026-11-26 (earlier 2026-11-19) against the code, the closed Linear tickets and the git history: everything that is built was removed.** What is built is described by the JSDoc in the code (`grep -rn "@category" src scripts`) and, per version, in `content/changelog/`. Linear (team IDL, projects R0-R12) is the truth for status; this file keeps the **order and the product brief** of what is still open. The phase numbers (P3, P11 ...) and gem slices (G1-G5) stay as names other documents point to. Drafts [12](12-rebirth-biomes.md)-[22](22-glossary-and-mastery.md) hold the detail; [ROADMAP](ROADMAP.md) holds the long lists.
 
 Legend: **S** half a day, **M** 1-2 days, **L** about a week. 🎨 = needs art. 🧱 = ships with a placeholder asset first. Every step is its own pull request to `m-heyda/idlarz` and must leave `tsc`, `lint`, `npm test` and the pacing guard green. The game is desktop only (screens 1240 px and wider); mobile and phone layouts are dropped.
 
 ## Already shipped (not repeated below)
 
-P0 foundation, **P1 front door** (landing, `/play`, offline bar, password reset), **P2 New chapter** (the one reset, `GAME_EPOCH` 2, classes, avatars, achievements, tutorial, gem shop, early testers), the monster engine (generic ticket bank, placeholder art mechanism, reward model, monster roster v2), monster discovery and the **Bestiary** with its mastery tiers and claims, the **Hall of Deeds** (grind ladders included), the home-biome buildings with levels, one shared builder queue, **Idols and Extractors with T3 materials**, the Ember-shop caps (Idol Mastery, building and castle caps, Extra Builder, build-time cuts), live biomes at rebirth 1-5 (the unlock rule and a stand-in roster), the server-run rebirth with its preview and result, server-held attribute points with paid respec, crafting v0 (recipes G1-G4, odds panel, queue, XP), rankings and `verify.ts` enforcement, the Playwright smoke test, the farm and castle rework, rocks and ores, the UI revamp onto the design system. Gem slice **G1** (spend engine, class and name change, respec, cosmetics, daily bonus, Builder #2) is shipped too.
+P0 foundation, **P1 front door** (landing, `/play`, offline bar, password reset), **P2 New chapter** (the one reset, `GAME_EPOCH` 2, classes, avatars, achievements, tutorial, gem shop, early testers), the monster engine (generic ticket bank, placeholder art mechanism, reward model, monster roster v2), monster discovery and the **Bestiary** with its mastery tiers and claims, the **Hall of Deeds** (grind ladders included), the home-biome buildings with levels, one shared builder queue, **Idols and Extractors with T3 materials**, the Ember-shop caps (Idol Mastery, building and castle caps, Extra Builder, build-time cuts), live biomes at rebirth 1-5 (the unlock rule and a stand-in roster), the server-run rebirth with its preview and result, server-held attribute points with paid respec, crafting v0 (recipes G1-G4, odds panel, queue, XP), rankings and `verify.ts` enforcement, the Playwright smoke test, the farm and castle rework, rocks and ores, the UI revamp onto the design system. Gem slice **G1** (spend engine, class and name change, respec, cosmetics, daily bonus, Builder #2) is shipped too. Since then (0.9.x): **P7 rebirth respec** (+20 attribute points per rebirth, the server sum check), **P11 crafting** (v1 recipes G5-G9, the enchanted craft behind Ichor, workbench upgrades), monster chests, the legendary roster with perks and the eight new item stats, biome tile milestones, the Kingdom overview map finder and the paragon curve (in review).
 
 ## 1. Rules every step follows
 
@@ -26,11 +26,9 @@ P0 foundation, **P1 front door** (landing, `/play`, offline bar, password reset)
 | **P4** | Glossary and mastery, finish | glossary for resources, biomes, items, buildings; resource mastery | M | none |
 | **P5** | Biome engine, finish | nothing (rules and checks) | M | none |
 | **P6** | Buildings, finish | position bonus; real building art | M + L (art) | 🎨 |
-| **P7** | Rebirth respec, finish | +20 attribute points per rebirth | S | none |
 | **P8** | Jungle (rebirth 1) | the first new biome with its own material, buildings, art | L | 🎨 |
-| **P9** | Rankings, finish | paragon level display, preview of another player's map | M | small |
+| **P9** | Rankings, finish | the preview of another player's map (the paragon mark is part of [paragon.md](paragon.md)) | M | small |
 | **P10** | Fields + Orchard (rebirth 2, 3) | two biomes with their buildings and extracts; art | L | 🎨 |
-| **P11** | Crafting, finish | enchanted craft button, then the rest of crafting v1 | S then L | small |
 | **P12** | Blight + Battlefield (rebirth 4, 5) | the two **special** biomes, Ichor, War Medals, bosses | L | 🎨 fancy |
 | **P13** | **MVP: landing v2** | new landing with all biomes; public-release checklist | M | 🎨 |
 
@@ -72,13 +70,6 @@ Clarify: the ladder above 1 trillion.
 
 Open numbers: whether the frontier bonus counts the +12 offset; the combined build-time cut stays at 60 % (see [18](18-biome-buildings-and-material-tiers.md) and [perk-caps](perk-caps.md)).
 
-### P7 · Rebirth respec: finish
-
-| Step | What | Size |
-|---|---|---|
-| 7.1 | **+20 attribute points per rebirth** (`totalStatPoints(level) + 20 x rebirths`); today there are none per rebirth. IDL-100 | S |
-| 7.2 | Server sum check: `reconcileCharacter` gets the `20 x rebirths` term; a save above the maximum is clamped, not refused. IDL-101 | S |
-
 ### P8 · Jungle (rebirth 1)
 
 The unlock rule, the roster (placeholder art) and the intro screen are live; Jungle is still data and art. The pattern for every biome release: **rules exist, so a biome release is art + catalog data + its three buildings + Guide text.**
@@ -94,23 +85,13 @@ The unlock rule, the roster (placeholder art) and the intro screen are live; Jun
 
 | Step | What | Size |
 |---|---|---|
-| 9.2 | **Paragon display only**: level past 100 derived from clamped XP; no bonuses yet. IDL-114 | S |
 | 9.3 | Preview map: `GET /api/world/<token>` returns `land` only, rate-limited, a separate `previewStore` with **no path to the save**; banner and close button. IDL-115 | M |
 
-Paragon **bonuses** (points to spend) wait for their own design after P9 (IDL-104, IDL-186, IDL-187).
+Paragon (the levels past 100, the points to spend, the milestones) is its own plan, all before 1.0: [paragon.md](paragon.md) (IDL-114, IDL-186, IDL-187, IDL-394).
 
 ### P10 · Fields and Blossom Orchard (rebirth 2 and 3)
 
 Same pattern as P8, twice: art 🎨 and Guide entries. Built in 0.9.0: the Producer and Extractor of both biomes (Windmill Farmstead and Dye Works, Blossom Yard and Royal Apiary) with the Dye and Royal Jelly extracts; Cloth and Honey as T2 materials are dropped (decided 2026-11-24, IDL-109 closed), and crafting makes Cloth Bolts from wool. The mild, pastoral biomes, closest to the current look, so the cheapest art. IDL-108, IDL-109.
-
-### P11 · Crafting: finish
-
-Crafting v0 is built (recipes G1-G4, odds panel, queue, XP, sealed rolls, pity) and a rebirth wipes bag and gear.
-
-| Step | What | Size |
-|---|---|---|
-| 11.5 | Enchanted craft button present but disabled ("Needs Ichor from the Blight"); the feature itself waits for P12. IDL-120 | S |
-| 11.x | Crafting v1: G5-G9 recipes with T2/T3 materials, item classes, workbench upgrades. IDL-152, IDL-226, IDL-235 | L |
 
 ### P12 · Blight and Battlefield (the two special biomes)
 
@@ -132,7 +113,7 @@ Linear: IDL-110. The Lava biome after Battlefield is IDL-371.
 |---|---|
 | 13.1 🎨 | Landing v2: all twelve biomes and the new buildings in view, a new Open Graph image. IDL-122. Landing v1 and its refresh are built; the baked-strip tooling was removed, so v2 is a new background image plus a copy edit, with no change to the route or the login flow |
 | 13.3 | Framework upgrades one at a time (Next 16, TypeScript 7, ESLint 10, `@types/node` 26). IDL-125 |
-| 13.4 | Public checklist: email confirmation on (IDL-65), rotated secrets, rate limits, free-plan load check, the real flagged saves reviewed (IDL-208). IDL-126 |
+| 13.4 | Public checklist: email confirmation turned on (password reset is already on), rotated secrets, rate limits, free-plan load check, the real flagged saves reviewed (IDL-208). IDL-126 |
 | 13.5 | Drop `BIOME_DISTANCE_OFFSET` to the calibrated value if the 5.5 sim says so. IDL-127 |
 
 ### Gem track (G2-G5): the remaining gem sinks ride on the phases above
@@ -142,8 +123,8 @@ G1 is shipped. Full design, prices and tasks: [30](30-gem-sinks.md). Every spend
 | Slice | Ships with | What the player gets | Linear | Size |
 |---|---|---|---|---|
 | **G2** | any time | bigger bag (+4 slots, max 3), longer battle queue, longer away time, auto-sell slots; Hourglass, Chest Beacon and timed boosts (Builder #2 is built) | IDL-191, 234, 192, 193 | M |
-| **G3** | before P10 | **Cap Breaks**: +1 max level (at most 3) on merchant economy ladders, then farm and Ember shop. Decided: economy only, counted in rankings, gate `rebirths >= 2`; waits for the gem sim IDL-229 | IDL-231, 232 | M-L |
-| **G4** | after P11 | re-roll one affix of a piece of gear for gems | IDL-236 | M |
+| **G3** | before P10 | **Cap Breaks**: +1 max level (at most 3) on merchant economy ladders, then farm and Ember shop. Decided: economy only, counted in rankings, gate `rebirths >= 2`; the gem sim (`npm run gem-sim`) exists | IDL-231, 232 | M-L |
+| **G4** | any time (crafting is built) | re-roll one affix of a piece of gear for gems | IDL-236 | M |
 | **G5** | with P9 | patron titles on the board, the Monument (castle and name effects are built) | IDL-237, 184 | S-M |
 
 Why these slots: G3 needs the server-run rebirth to enforce "kept through a rebirth" (built) and a ledger `rebirths` count for its gate; G4 needs the crafting sealed-roll hooks (built); G5 needs the rankings board to show titles.

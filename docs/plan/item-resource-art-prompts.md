@@ -1,6 +1,6 @@
 # Resource, potion and item icon prompts (Sprite Fusion)
 
-**This is art pass 3** (the Sprite Fusion regeneration, later releases). Pass 1 uses the icons already in `public/pixel/items/`, pass 2 generates Python placeholders for the rest: see the ROADMAP section "Item art in three passes". Same idea as [monster-art-prompts](monster-art-prompts.md): short prompts to paste into Sprite Fusion, plus the list of what we might replace. Finished icons are hand-supplied like the enemies; nothing reads them until they are wired into `src/config/pixelIcons.ts` (icons are 40 x 40 today, see section 4).
+**This is art pass 3** (the Sprite Fusion regeneration, later releases). Passes 1 and 2 (the supplied icons and the Python placeholders) are done: see the ROADMAP section "Item art: what is left". Same idea as [monster-art-prompts](monster-art-prompts.md): short prompts to paste into Sprite Fusion, plus the list of what we might replace. Finished icons are hand-supplied like the enemies; nothing reads them until they are wired into `src/config/pixelIcons.ts` (icons are 40 x 40 today, see section 4).
 
 ## 1. How the generator behaves (from the Sprite Fusion API docs)
 
