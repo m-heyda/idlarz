@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { RECIPE_BY_ID } from '../../src/catalog/recipes';
+import { RECIPE_BY_ID, RECIPES } from '../../src/catalog/recipes';
 import { CRAFTING } from '../../src/config/crafting';
 import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
-import { craftLimit, craftTimeSec, craftXpOf, emptyCraft, finishedOf, nextDoneAt } from '../../src/lib/crafting';
+import { craftBatchLimit, craftLimit, craftTimeSec, craftXpOf, emptyCraft, finishedOf, nextDoneAt } from '../../src/lib/crafting';
 import { applyCancel, applyClaim, applyClaimAll, applyCraft, applyWithdraw } from '../../src/lib/offline/craft';
 import { bagCountOf } from '../../src/lib/offline/inventory';
 import { addDrop } from '../../src/lib/inventory';
@@ -110,12 +110,24 @@ test('the queue holds three batches side by side; a fourth is refused', () => {
 	assert.equal(applyCraft(inv(), c, 'potion_minor', 1, 5_100_000).reason, 'queue_full');
 });
 
-test('a batch is not limited to a handful: a million crafts queue in one request', () => {
+test('a batch is capped: 25 gear, potions and goods, 1,000 of a component, and never longer than the longest batch', () => {
 	const c: CraftState = { ...emptyCraft(), stock: { glass_vial: 2_000_000 } };
-	const q = applyCraft(inv(), c, 'potion_minor', 1_000_000, 5_000_000);
+	assert.equal(craftLimit('craftBatchCap'), 25);
+	const q = applyCraft(inv(), c, 'potion_minor', 25, 5_000_000);
 	assert.equal(q.ok, true);
-	assert.equal(q.craft.queue[0].count, 1_000_000);
+	assert.equal(q.craft.queue[0].count, 25);
+	assert.equal(applyCraft(inv(), c, 'potion_minor', 26, 5_000_000).reason, 'bad_request');
 	assert.equal(applyCraft(inv(), c, 'potion_minor', HARD_LIMITS.craftBatchCap + 1, 5_000_000).reason, 'bad_request');
+	// a component is quick material work: 1,000 at a time, at most 10 s a piece
+	const vial = RECIPE_BY_ID.glass_vial;
+	assert.equal(craftBatchLimit(vial), 1_000);
+	assert.ok(craftTimeSec(RECIPE_BY_ID.ichor_component ?? RECIPE_BY_ID.ichor ?? vial) <= CRAFTING.componentMaxSec);
+	// the longest batch (12 h) holds the slow recipes below the cap: a G8 piece takes 30 minutes, so 24 fit
+	const g8 = RECIPES.find((r) => r.kind === 'gear' && !r.legacy && r.unlock === 80)!;
+	assert.equal(craftTimeSec(g8), 1800);
+	assert.equal(craftBatchLimit(g8), 24);
+	assert.ok(craftBatchLimit(g8) * craftTimeSec(g8) <= LIMITS.craftMaxBatchHours * 3600);
+	for (const r of RECIPES) assert.ok(craftBatchLimit(r) * craftTimeSec(r) <= LIMITS.craftMaxBatchHours * 3600, r.id);
 });
 
 test('Collect all delivers every finished batch in one request and keeps the unfinished ones', () => {
@@ -197,9 +209,9 @@ test('speed shortens a craft; the time is fixed into the entry when queued', () 
 });
 
 test('every crafting limit is data with a hard ceiling: bonuses raise it, never past the ceiling', () => {
-	assert.equal(LIMITS.craftBatchCap, 1_000_000_000);
+	assert.equal(LIMITS.craftBatchCap, 25);
 	assert.equal(HARD_LIMITS.craftBatchCap, 1_000_000_000);
-	for (const key of ['craftBatchCap', 'craftQueueSlots', 'craftOfflineHours', 'craftSpeed'] as const) {
+	for (const key of ['craftBatchCap', 'craftComponentBatchCap', 'craftMaxBatchHours', 'craftQueueSlots', 'craftOfflineHours', 'craftSpeed'] as const) {
 		assert.ok(LIMITS[key] <= HARD_LIMITS[key], key);
 		const saved = LIMIT_BONUSES[key];
 		LIMIT_BONUSES[key] = () => 1e9;

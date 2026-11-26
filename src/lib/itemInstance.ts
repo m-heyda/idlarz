@@ -14,6 +14,7 @@ import {
 	scaleStats,
 	type ItemStats,
 } from '@/catalog/stats';
+import { CRAFTED_SELL_FACTOR } from '@/config/crafting';
 import { LOOT_DATA, type LootData } from '@/lib/loot/data';
 import { lerp } from '@/lib/rng';
 import type { ItemDef, ItemInstance } from '@/types/game';
@@ -112,20 +113,20 @@ export const resolveItem = (instance: ItemInstance, data: LootData = LOOT_DATA):
 
 /**
  * What a merchant pays for an instance: the rarity's value at level 1, grown with the item level (`valueCurve`), then by the
- * quality roll and by every affix, so a well rolled rare is worth clearly more than a plain one. Always at least 1.
+ * quality roll and by every affix, so a well rolled rare is worth clearly more than a plain one. A piece the player crafted is worth `CRAFTED_SELL_FACTOR` of that. Always at least 1.
  *
  * The merchant buys at this value (times the Haggler bonus, {@link sellPayout}) and sells at 5 times it ({@link shopPriceOf}).
  *
  * @category Loot/Items
  * @order 4
  * @formula
- * sellValue = max(1, round(rarity.sellValue x valueCurve(item level) x qualityValue(quality) x affixesValue(rolls)))
+ * sellValue = max(1, round(rarity.sellValue x valueCurve(item level) x qualityValue(quality) x affixesValue(rolls) x (crafted ? CRAFTED_SELL_FACTOR : 1)))
  */
 export const sellValueOf = (instance: ItemInstance, data: LootData = LOOT_DATA): number => {
 	const rarity = data.rarities[instance.rarity];
 	if (!rarity) return 0;
 	const value = rarity.sellValue * valueCurve(instance.level) * qualityValue(instance.quality) * affixesValue(instance.affixes.map((a) => a.roll));
-	return Math.max(1, Math.round(value));
+	return Math.max(1, Math.round(value * (instance.crafted ? CRAFTED_SELL_FACTOR : 1)));
 };
 
 /** A base item as a plain instance: its authored level, neutral quality, no affixes. Common unless it is a named item. For starter kits, shop stock, tools and tests. */

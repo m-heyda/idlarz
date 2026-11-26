@@ -15,11 +15,12 @@ export const CRAFTING = {
 	maxLevel: 80,
 	firstStepXp: 20,
 	/**
-	 * Multiplier on every recipe's `xp` when a craft is paid out (owner 2026-11-11, cut again 2026-11-17 from 0.02): crafting is a long-term goal, so it levels very slowly: a Minor Healing Potion (recipe xp 6)
-	 * gives 0.03 XP, level 10 takes about a hundred thousand potions. Raise it when legendaries and other big sources of crafting XP exist, or flip the whole thing again (IDL-274); the recipe values and
-	 * the level curve stay as designed.
+	 * Multiplier on every recipe's `xp` when a craft is paid out. 0.2 since the crafting rebalance (IDL-396, the "Days per level" table of docs/generated/craft-sim.md; it was 0.005 after two cuts, which with the gold cost of the late recipes put level 60 out of reach): with the batch cap of 25, the
+	 * gear times of `CRAFT_GEAR.timeSec` and the lower cost of G4+ gear, a player who crafts every day reaches level 60 in about six weeks, one who visits once a day in about the same, level 80 stays a months-long goal. The recipe values and the level curve stay as designed.
 	 */
-	xpScale: 0.005,
+	xpScale: 0.2,
+	/** The most seconds one craft of a component takes (planks, ingots, nails, extracts, cut gems): material work is quick, only gear and the rare goods are slow (`craftTimeSec`) */
+	componentMaxSec: 10,
 	/** [level, total crafting XP needed to reach it], increasing, ending at maxLevel. Level 10 is ~1,250 minor potions' worth of XP (the curve was 5x faster in the first draft). */
 	anchors: [
 		[10, 7_500],
@@ -32,8 +33,17 @@ export const CRAFTING = {
 	/** One craft request per second per player */
 	minGapMs: 1000,
 	/** Most of one thing (a component, a potion or a trade good) the crafting stash holds; the stash is counters, not bag slots, and a rebirth keeps it */
-	componentCap: 1_000_000,
+	componentCap: 10_000_000,
 };
+
+/**
+ * What a merchant pays for a piece the player crafted, as a share of its normal sell value (`sellValueOf`, `instance.crafted`). Crafting is for gear and levels, never a gold source: since the rebalance the late recipes cost a twentieth of what they did, so the pieces
+ * are worth a twentieth to the merchant too and the gate "a craft costs more than its piece sells for" (tests/crafting/gearRecipes.test.ts) keeps its margin. Drops and shop pieces are unaffected.
+ *
+ * @category Economy/Crafting
+ * @order 11
+ */
+export const CRAFTED_SELL_FACTOR = 0.05;
 
 /**
  * The enchant craft (IDL-120): at the workbench a piece of gear in the bag gets one affix **rerolled** (a new affix of another group, a fresh roll) or **added** (up to the most its rarity carries). It takes Ichor from the crafting stash
@@ -91,6 +101,6 @@ export const CRAFT_GEAR = {
 	qualityBiasCap: 1,
 	/** Intelligence of a new character: the points above it count */
 	baseIntelligence: 5,
-	/** Seconds one craft takes, by grade */
-	timeSec: { G1: 20, G2: 30, G3: 45, G4: 60, G5: 75, G6: 90, G7: 105, G8: 120 },
+	/** Seconds one craft takes, by grade: 2, 5, 10, 15, 20, 25, 30 and 30 minutes (a regular piece of top gear is about half an hour; a batch of 25 is at most 12 hours, `LIMITS.craftMaxBatchHours`) */
+	timeSec: { G1: 120, G2: 300, G3: 600, G4: 900, G5: 1200, G6: 1500, G7: 1800, G8: 1800 },
 } as const;
