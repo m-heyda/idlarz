@@ -15,8 +15,6 @@
  * uncapped: effect = k x sqrt(points)
  */
 
-import type { PixelIconName } from '@/config/pixelIcons';
-
 export const PARAGON_CATEGORIES = ['combat', 'economy', 'fortune', 'realm'] as const;
 export type ParagonCategory = (typeof PARAGON_CATEGORIES)[number];
 
@@ -120,34 +118,34 @@ export const paragonEffectText = (u: ParagonUpgrade, value: number): string => {
 	return `+${n}${u.unit === '%' ? ' %' : u.unit === 's' ? ' s' : ''}`;
 };
 
-/** How a category is drawn in the Paragon window: its colour (a CSS colour the whole column is tinted with) and the emblem in its heading. Display data only: existing icons, no new art (docs/plan/paragon.md). */
-export const PARAGON_CATEGORY_STYLE: Record<ParagonCategory, { color: string; icon: PixelIconName }> = {
-	combat: { color: '#d8483c', icon: 'equip_offHand' },
-	economy: { color: '#f0c84a', icon: 'gold' },
-	fortune: { color: '#3fb673', icon: 'item_rabbit_foot' },
-	realm: { color: '#9a6be0', icon: 'legacy' },
+/** How a category is drawn in the Paragon window: its colour (a CSS colour the whole column is tinted with) and the symbol in its heading (plain text characters, no picture files). */
+export const PARAGON_CATEGORY_STYLE: Record<ParagonCategory, { color: string; glyph: string }> = {
+	combat: { color: '#d8483c', glyph: '⚔' },
+	economy: { color: '#f0c84a', glyph: '¤' },
+	fortune: { color: '#3fb673', glyph: '♣' },
+	realm: { color: '#9a6be0', glyph: '✧' },
 };
 
-/** The picture of each upgrade in the Paragon window: an existing icon, drawn at `scale` (the 64 px menu icons at 0.5), twinkling when `shine` is set and the icon has a shine strip. */
-export const PARAGON_ICON: Record<ParagonId, { name: PixelIconName; scale?: number; shine?: boolean }> = {
-	critDamage: { name: 'equip_mainHand' },
-	bossTimer: { name: 'menu_boss', scale: 0.5 },
-	lifeLeech: { name: 'item_potion_hp' },
-	damage: { name: 'item_titan_maul' },
-	maxLife: { name: 'item_steel_cuirass' },
-	income: { name: 'gold' },
-	xpGain: { name: 'xp' },
-	tileDiscount: { name: 'stone' },
-	clickGold: { name: 'res_iron' },
-	killRewards: { name: 'rank_trophy', scale: 0.5 },
-	luck: { name: 'item_rabbit_foot' },
-	goldFind: { name: 'gold', shine: true },
-	goldenChance: { name: 'res_crystal' },
-	chestDrop: { name: 'bonus_chest' },
-	epicFind: { name: 'diamond' },
-	offlineEff: { name: 'res_mana' },
-	buildSpeed: { name: 'menu_farm', scale: 0.5 },
-	potionPower: { name: 'item_potion_greater' },
-	paragonXp: { name: 'legacy', shine: true },
-	craftXp: { name: 'menu_crafting', scale: 0.5 },
+/** The symbol of each upgrade in its medallion: one plain text character (no picture files, so it takes the category colour and stays crisp at any size). */
+export const PARAGON_GLYPH: Record<ParagonId, string> = {
+	critDamage: '✶',
+	bossTimer: '◔',
+	lifeLeech: '♥',
+	damage: '▲',
+	maxLife: '✚',
+	income: '¤',
+	xpGain: '✦',
+	tileDiscount: '▦',
+	clickGold: '◉',
+	killRewards: '☠',
+	luck: '♣',
+	goldFind: '$',
+	goldenChance: '★',
+	chestDrop: '▣',
+	epicFind: '◆',
+	offlineEff: '☾',
+	buildSpeed: '⚒',
+	potionPower: '⚗',
+	paragonXp: '✧',
+	craftXp: '✎',
 };
