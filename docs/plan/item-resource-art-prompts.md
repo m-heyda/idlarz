@@ -309,7 +309,7 @@ Budget realistically 1.5 times that (some calls will need a re-roll). Cheapest u
 
 ### 3.8 Avatar portraits (IDL-72)
 
-Avatars are **separate from classes** ([21](21-classes-avatars-achievements-offline-report.md) section 2): purely visual, shown in the header, rankings and map preview, so they must read at **20 px** in a ranking row. The references are the removed art reference folder (`2r0s3O.jpg` human and dwarf faces for the starters; `RagiwH.jpg`, `JnC0G_.jpg`, `XxPWs5.jpg`, `amYqsq.jpg` for the unlockables); the house look is `scripts/pixel/sprites_characters.py` and `STYLE.md` (**People**: big friendly heads, readable eyes with white and pupil, flat brows, hair with streak texture, one signature prop each, no ground shadow). Total needed: 8 starters + the unlockables + 2 frame pieces. At launch only 4 unlockables are needed (Architect, Reborn, Boss slayer, Early tester); the other 3 come with biomes and crafting, so their batch can wait.
+Avatars are **separate from classes** (`catalog/avatars.ts`): purely visual, shown in the header, rankings and map preview, so they must read at **20 px** in a ranking row. The references are the removed art reference folder (`2r0s3O.jpg` human and dwarf faces for the starters; `RagiwH.jpg`, `JnC0G_.jpg`, `XxPWs5.jpg`, `amYqsq.jpg` for the unlockables); the house look is `scripts/pixel/sprites_characters.py` and `STYLE.md` (**People**: big friendly heads, readable eyes with white and pupil, flat brows, hair with streak texture, one signature prop each, no ground shadow). Total needed: 8 starters + the unlockables + 2 frame pieces. At launch only 4 unlockables are needed (Architect, Reborn, Boss slayer, Early tester); the other 3 come with biomes and crafting, so their batch can wait.
 
 **Size and fitting.** Our busts are 40 x 40, but Sprite Fusion makes only 16, 32 or 64. Generate at **64**. A face does not shrink from 64 to 40 without smoothing (art README rule 3 forbids it), so the generated bust is a **reference to redraw** (the ui-and-portraits README, section 3 point 1, says portraits usually need a redraw anyway: the references are more realistic than our heads), or it is kept native at 64 x 64 if the owner prefers; decide when the first batch is in, before cutting 15 of them. Ask for a **head-and-shoulders bust, front or slight 3/4 view, face filling the frame**, so it survives a crop to the middle 40 px.
 
@@ -341,7 +341,7 @@ One batch of the whole category first, then single prompts for the ones that are
 
 #### A2. The unlockable avatars (7: 4 at launch, 3 with biomes and crafting)
 
-Tied to server achievements (docs/plan/21-classes-avatars-achievements-offline-report.md section 3, `catalog/achievements.ts`). Looks should feel "earned": rarer materials, more ornament, a touch of glow in the eyes is fine, no baked halo.
+Tied to server achievements (`catalog/achievements.ts`). Looks should feel "earned": rarer materials, more ornament, a touch of glow in the eyes is fine, no baked halo.
 
 | Avatar | Unlock | Prompt (then the tail) | Cue |
 |---|---|---|---|

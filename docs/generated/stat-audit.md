@@ -175,7 +175,7 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 - **FLAGGED**: accepted and stored as claimed; the flag removes ranking eligibility for good. Shadow mode: `ENFORCEMENT.enabled` would refuse the two flags on its allowlist (gold_jump, gems_increase) once switched on; every other flag, playtime_fast included, only records.
 - **SILENT**: accepted with no flag at all.
 
-### Who computes what (from the code, `@category Saves & Server` and `docs/plan/14-server-audit-and-data-plan.md`)
+### Who computes what (from the code, `@category Saves & Server`)
 
 | Action | Cost / payout computed by | Server check |
 | --- | --- | --- |

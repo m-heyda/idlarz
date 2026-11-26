@@ -1,6 +1,6 @@
 # Paragon: what is left (the curve, the points and the 20 upgrades are built; milestones, deeds and cosmetics are open)
 
-Written 2026-11-26 after a design talk with the owner. It **replaces section 5 of [13](13-rebirth-reset-and-paragon.md)** and the numbers of IDL-104, IDL-186, IDL-187 and IDL-114 (paragon cap 400, growth 1.06, all bonuses capped). Hand-written plan like the other files here: it lists what is **not built**. Linear holds the tickets.
+Written 2026-11-26 after a design talk with the owner. It replaces the old paragon draft (cap 400, growth 1.06, all bonuses capped) and the numbers of IDL-104, IDL-186, IDL-187 and IDL-114 . Hand-written plan like the other files here: it lists what is **not built**. Linear holds the tickets.
 
 ## Why
 
