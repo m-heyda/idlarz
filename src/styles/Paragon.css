@@ -1,39 +1,115 @@
-/* The Paragon tab of the Hero window (docs/plan/paragon.md): four columns of upgrades, gold like the paragon bar. */
+/*
+ * The Paragon tab of the Hero window (docs/plan/paragon.md): a board of four coloured categories. Each column is tinted with its own colour (`--cat`, from PARAGON_CATEGORY_STYLE), every upgrade is a medallion
+ * (a ring that fills with the points for a capped upgrade, a diamond with an infinity mark for an uncapped one). Colours, gradients and CSS rings only: no new art, existing icons.
+ */
 .px-paragon {
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
+	gap: 14px;
 	padding: 12px 14px;
 	min-height: 0;
 	overflow: auto;
+	background: radial-gradient(ellipse at 50% -10%, rgba(240, 200, 74, 0.1), transparent 60%);
 }
 
+/* ---- the header: the level in a ring, the bar to the next level, the free points as a gem ---------------------------------------------------- */
 .px-paragon-head {
 	display: flex;
 	align-items: center;
 	gap: 16px;
-	padding-bottom: 8px;
-	border-bottom: 2px solid var(--ds-gold-dk, #7a5a14);
+	padding: 8px 12px 10px;
+	background: linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.25));
+	border: 2px solid var(--ds-gold-dk, #7a5a14);
+	box-shadow:
+		inset 0 0 0 2px rgba(0, 0, 0, 0.5),
+		0 0 18px rgba(240, 200, 74, 0.12);
+}
+
+.px-paragon-ring {
+	display: grid;
+	place-items: center;
+	flex: none;
+	min-width: 72px;
+	height: 72px;
+	padding: 0 8px;
+	border-radius: 50%;
+	background: radial-gradient(circle, #2a1c06 58%, transparent 60%), conic-gradient(from 0deg, #f0c84a, #7a5a14, #f0c84a, #7a5a14, #f0c84a);
+	box-shadow: 0 0 14px rgba(240, 200, 74, 0.35);
 }
 
 .px-paragon-level {
-	font-size: 22px;
+	font-size: 20px;
 	color: #f0c84a;
 	text-shadow: 0 2px 0 #3a2606;
+	white-space: nowrap;
+}
+
+.px-paragon-next {
+	display: flex;
+	flex: 1;
+	flex-direction: column;
+	gap: 4px;
+	min-width: 120px;
+}
+
+.px-paragon-next-label {
+	font-size: 11px;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ds-dim, #9a8f78);
+}
+
+.px-paragon-next-bar {
+	display: block;
+	height: 10px;
+	background: rgba(0, 0, 0, 0.55);
+	border: 2px solid var(--ds-gold-dk, #7a5a14);
+}
+
+.px-paragon-next-fill {
+	display: block;
+	height: 100%;
+	background: linear-gradient(#ffe38a, #d9a21c);
+	box-shadow: 0 0 8px rgba(240, 200, 74, 0.6);
 }
 
 .px-paragon-free,
 .px-paragon-used {
 	font-size: 13px;
 	color: var(--ds-dim, #9a8f78);
+	white-space: nowrap;
 }
 
 .px-paragon-free {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
 	font-size: 14px;
+}
+
+.px-paragon-free strong {
+	display: inline-grid;
+	place-items: center;
+	min-width: 30px;
+	height: 30px;
+	padding: 0 6px;
+	font-size: 16px;
+	color: #3a2606;
+	background: radial-gradient(circle at 35% 30%, #fff1b0, #d9a21c 60%, #8a5f08);
+	border: 2px solid #3a2606;
+	border-radius: 50%;
 }
 
 .px-paragon-free[data-has='true'] {
 	color: #f0c84a;
+}
+
+.px-paragon-free[data-has='true'] strong {
+	animation: px-paragon-gem 1.8s ease-in-out infinite;
+}
+
+.px-paragon-free[data-has='false'] strong {
+	filter: grayscale(1) brightness(0.55);
 }
 
 .px-paragon-respec {
@@ -52,6 +128,7 @@
 	cursor: default;
 }
 
+/* ---- the four columns ------------------------------------------------------------------------------------------------------------------------- */
 .px-paragon-grid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -60,36 +137,80 @@
 }
 
 .px-paragon-col {
+	--cat: #f0c84a;
 	display: flex;
 	flex-direction: column;
-	gap: 6px;
+	gap: 8px;
 	min-width: 0;
+	padding: 0 8px 10px;
+	background: linear-gradient(color-mix(in srgb, var(--cat) 14%, transparent), transparent 140px), rgba(0, 0, 0, 0.32);
+	border: 2px solid color-mix(in srgb, var(--cat) 45%, #000);
+	border-top: 4px solid var(--cat);
+	box-shadow: 0 -6px 16px -8px var(--cat);
 }
 
 .px-paragon-cat {
-	margin: 0 0 2px;
-	font-size: 14px;
-	letter-spacing: 0.08em;
-	text-transform: uppercase;
-	color: #f0c84a;
-}
-
-.px-paragon-row {
 	display: flex;
 	align-items: center;
 	gap: 8px;
-	padding: 6px 8px;
-	background: rgba(0, 0, 0, 0.35);
-	border: 2px solid var(--ds-gold-dk, #7a5a14);
+	margin: 0;
+	padding: 8px 0 6px;
+	border-bottom: 1px solid color-mix(in srgb, var(--cat) 40%, transparent);
+	font-weight: normal;
 }
 
-.px-paragon-row[data-capped='false'] {
-	border-color: #b8860b;
-	background: rgba(240, 200, 74, 0.08);
+.px-paragon-emblem {
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 44px;
+	height: 44px;
+	background: radial-gradient(circle, color-mix(in srgb, var(--cat) 40%, #000), rgba(0, 0, 0, 0.6));
+	border: 2px solid var(--cat);
+	border-radius: 50%;
+	box-shadow: 0 0 12px color-mix(in srgb, var(--cat) 60%, transparent);
+}
+
+.px-paragon-cat-name {
+	font-size: 15px;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--cat);
+	text-shadow: 0 2px 0 rgba(0, 0, 0, 0.6);
+}
+
+.px-paragon-cat-pts {
+	margin-left: auto;
+	font-size: 12px;
+	color: var(--ds-dim, #9a8f78);
+	white-space: nowrap;
+}
+
+/* ---- one upgrade ------------------------------------------------------------------------------------------------------------------------------ */
+.px-paragon-row {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	padding: 6px 8px 6px 6px;
+	background: rgba(0, 0, 0, 0.35);
+	border: 2px solid color-mix(in srgb, var(--cat) 28%, #000);
+	transition:
+		border-color 0.15s,
+		background 0.15s;
+}
+
+.px-paragon-row:hover {
+	border-color: var(--cat);
+	background: color-mix(in srgb, var(--cat) 10%, rgba(0, 0, 0, 0.4));
+}
+
+.px-paragon-row[data-spent='true'] {
+	border-color: color-mix(in srgb, var(--cat) 60%, #000);
 }
 
 .px-paragon-row[data-full='true'] {
-	opacity: 0.7;
+	border-color: var(--cat);
+	background: color-mix(in srgb, var(--cat) 14%, rgba(0, 0, 0, 0.35));
 }
 
 .px-paragon-row-text {
@@ -107,13 +228,88 @@
 
 .px-paragon-points {
 	margin-left: 4px;
-	color: #f0c84a;
+	white-space: nowrap;
+	color: var(--cat);
 }
 
 .px-paragon-effect {
 	font-size: 12px;
 	color: var(--ds-dim, #9a8f78);
 	white-space: pre-wrap;
+}
+
+/* the medallion: a capped upgrade is a ring that fills clockwise with the points, an uncapped one a diamond */
+.px-paragon-medal {
+	position: relative;
+	display: grid;
+	place-items: center;
+	flex: none;
+	width: 52px;
+	height: 52px;
+	border-radius: 50%;
+	background: conic-gradient(var(--cat) var(--fill, 0deg), color-mix(in srgb, var(--cat) 22%, #222) 0);
+}
+
+.px-paragon-medal-in {
+	display: grid;
+	place-items: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	background: radial-gradient(circle at 50% 35%, color-mix(in srgb, var(--cat) 28%, #1a1208), #0d0904);
+}
+
+.px-paragon-medal[data-spent='false'] .px-paragon-medal-in > * {
+	filter: grayscale(0.5) brightness(0.85);
+}
+
+.px-paragon-medal[data-full='true'] {
+	box-shadow: 0 0 12px var(--cat);
+}
+
+/* uncapped: an octagon with a gold rim instead of the round ring, so the two kinds read at a glance */
+.px-paragon-medal[data-capped='false'] {
+	border-radius: 0;
+	background: linear-gradient(135deg, #f0c84a, #7a5a14 50%, #f0c84a);
+	clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+.px-paragon-medal[data-capped='false'][data-spent='true'] {
+	background: linear-gradient(135deg, #ffe38a, color-mix(in srgb, var(--cat) 70%, #7a5a14) 50%, #ffe38a);
+}
+
+.px-paragon-medal[data-capped='false'] .px-paragon-medal-in {
+	width: 46px;
+	height: 46px;
+	border-radius: 0;
+	clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
+}
+
+.px-paragon-inf {
+	position: absolute;
+	right: 1px;
+	bottom: -1px;
+	font-size: 15px;
+	line-height: 1;
+	color: #f0c84a;
+	text-shadow:
+		0 1px 0 #000,
+		0 0 4px #000;
+}
+
+.px-paragon-check {
+	position: absolute;
+	right: -3px;
+	bottom: -3px;
+	display: grid;
+	place-items: center;
+	width: 16px;
+	height: 16px;
+	font-size: 11px;
+	color: #102010;
+	background: var(--cat);
+	border: 2px solid #000;
+	border-radius: 50%;
 }
 
 .px-paragon-plus {
@@ -126,7 +322,16 @@
 	color: #2a1a02;
 	background: linear-gradient(#f0c84a, #b8860b);
 	border: 2px solid #3a2606;
+	border-radius: 50%;
 	cursor: pointer;
+}
+
+.px-paragon-row[data-can='true'] .px-paragon-plus {
+	animation: px-paragon-pulse 1.6s ease-in-out infinite;
+}
+
+.px-paragon-plus:active:not(:disabled) {
+	transform: scale(0.9);
 }
 
 .px-paragon-plus:disabled {
@@ -140,4 +345,31 @@
 	gap: 6px;
 	padding: 24px;
 	color: var(--ds-dim, #9a8f78);
+}
+
+@keyframes px-paragon-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 0 0 rgba(240, 200, 74, 0.55);
+	}
+	50% {
+		box-shadow: 0 0 0 5px rgba(240, 200, 74, 0);
+	}
+}
+
+@keyframes px-paragon-gem {
+	0%,
+	100% {
+		box-shadow: 0 0 4px rgba(240, 200, 74, 0.4);
+	}
+	50% {
+		box-shadow: 0 0 14px rgba(255, 227, 138, 0.9);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.px-paragon-free[data-has='true'] strong,
+	.px-paragon-row[data-can='true'] .px-paragon-plus {
+		animation: none;
+	}
 }
