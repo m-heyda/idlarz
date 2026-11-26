@@ -279,11 +279,11 @@ test('a trade good is level-gated, takes its components when queued, and goes st
 	const rich: CraftState = { ...emptyCraft(), xp: craftCumulativeXp(satchel.unlock), stock: { cured_leather: 7 } };
 
 	assert.equal(applyCraft(inv, { ...rich, xp: 0 }, 'leather_satchel', 1, T0).reason, 'locked');
-	assert.equal(applyCraft(inv, { ...rich, stock: { cured_leather: 2 } }, 'leather_satchel', 1, T0).reason, 'no_components');
+	assert.equal(applyCraft(inv, { ...rich, stock: { cured_leather: 1 } }, 'leather_satchel', 2, T0).reason, 'no_components');
 
 	const queued = applyCraft(inv, rich, 'leather_satchel', 2, T0);
 	assert.equal(queued.ok, true);
-	assert.equal(queued.craft.stock.cured_leather, 1, '2 satchels take 6 of 7 pieces of cured leather');
+	assert.equal(queued.craft.stock.cured_leather, 5, '2 satchels take 2 of 7 pieces of cured leather');
 	assert.equal(queued.craft.stock.leather_satchel, undefined, 'nothing in the stash before the claim');
 
 	const claimed = applyClaim(queued.inv, queued.craft, 0, T0 + 2 * satchel.timeSec! * SEC + SEC);
