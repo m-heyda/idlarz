@@ -71,7 +71,16 @@ export const publicTickets = (bank: TicketBank, opened?: number): PublicTickets 
 function publicBoss(bank: TicketBank): PublicTickets['boss'] {
 	const boss = bossOf(bank);
 	return boss && isPlaced(boss)
-		? { n: boss.n, at: boss.at, x: boss.x!, y: boss.y!, spawnLevel: boss.spawnLevel!, ...(boss.type ? { type: boss.type } : {}) }
+		? {
+				n: boss.n,
+				at: boss.at,
+				x: boss.x!,
+				y: boss.y!,
+				spawnLevel: boss.spawnLevel!,
+				...(boss.type ? { type: boss.type } : {}),
+				// the growth cap the server fights it with: without it the map grew the boss to the full +10 while the fight used the capped level (a boss on the map at level 76 fought at 67)
+				...(boss.growCap !== undefined ? { growCap: boss.growCap } : {}),
+			}
 		: null;
 }
 
