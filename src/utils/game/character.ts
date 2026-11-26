@@ -226,7 +226,7 @@ export const calculateLevel = (xp: number): { level: number; progress: number } 
  * @category Progression/Levels
  * @order 6
  * @formula
- * paragonStepXp(p) = 2.1e8 x 1.002^p            p from 0 (paragon 0 to 1); 0 from p = 5000
+ * paragonStepXp(p) = 7e8 x 1.002^p            p from 0 (paragon 0 to 1); 0 from p = 5000
  */
 export const paragonStepXp = (paragon: number): number => {
 	const p = Math.floor(paragon);
@@ -240,7 +240,7 @@ export const paragonStepXp = (paragon: number): number => {
  * @category Progression/Levels
  * @order 7
  * @formula
- * cumulativeParagonXp(n) = 2.1e8 x (1.002^n - 1) / 0.002          paragon 100 = 2.3e10, 500 = 1.8e11, 1,000 = 6.7e11, 5,000 = 2.3e15
+ * cumulativeParagonXp(n) = 7e8 x (1.002^n - 1) / 0.002          paragon 100 = 7.7e10, 500 = 6.0e11, 1,000 = 2.2e12, 5,000 = 7.6e15
  */
 export const cumulativeParagonXp = (paragon: number): number => {
 	const n = Math.min(Math.max(0, Math.floor(paragon)), LEVELING.paragonCap);

@@ -15,7 +15,7 @@ import { gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import { aggregateStats, averageItemLevel } from '@/lib/inventory';
 import { castleLevelOf } from '@/lib/castleWard';
 import { completeUpgrade } from '@/lib/buildings';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { hpMultOf, idolEconomy, xpPctAt } from '@/lib/idolEconomy';
 import { advanceMonsters } from '@/lib/monsters';
 import { planPictureAt } from '@/lib/planPicture';
 import type { Resources } from '@/types/game';
@@ -38,7 +38,10 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		});
 		const xpGain =
 			state.resourceRates.total.xp *
-			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + idolEconomy(state.tiles, state.idolLevels).xpPct) / 100);
+			(1 +
+				(xpGainPct(state.characterStats, state.equipment, state.playerClass) +
+					xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) /
+					100);
 		newResources.xp = Math.min(newResources.xp + xpGain * secondsElapsed, XP_CAP);
 
 		let newTiles = state.tiles;
@@ -63,7 +66,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 						state.prestige,
 						state.farmUpgrades,
 						state.merchantUpgrades,
-						gearIncome(state.equipment),
+						gearIncome(state.equipment, state.paragonSpent),
 					);
 				}
 				newCastleUpgrade = null;
@@ -93,7 +96,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 					state.prestige,
 					state.farmUpgrades,
 					state.merchantUpgrades,
-					gearIncome(state.equipment),
+					gearIncome(state.equipment, state.paragonSpent),
 				);
 			}
 			buildingFinished = true;
@@ -105,7 +108,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 		// HP and mana: the server's numbers arrive with every answer; in between they keep filling the way the server will count them
 		// (in a fight the server's picture is the only one, so HP is left alone and only the cooldowns and the stun run down)
 		// the War Memorial raises the pool the hero refills to (the server's profile has the same number)
-		const playerMaxHp = Math.round(maxHp(state.characterStats, state.equipment) * (1 + idolEconomy(state.tiles, state.idolLevels).hpArmorPct / 100));
+		const playerMaxHp = Math.round(maxHp(state.characterStats, state.equipment) * hpMultOf(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent)));
 		const inFight = state.combat.fight !== null;
 		// a fight the server ran to its end: the HP of both sides follow its plan (the next answer, at the end, is the truth)
 		const plan = inFight ? state.combat.plan : null;

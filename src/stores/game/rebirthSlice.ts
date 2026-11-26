@@ -74,7 +74,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				fresh.farmUpgrades,
 				merchantUpgrades,
-				gearIncome(kit.equipment),
+				gearIncome(kit.equipment, state.paragonSpent),
 			),
 			equipment: kit.equipment,
 			bag: placeKept(kit.bag, kept),
@@ -82,6 +82,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 			gems: state.gems, // the premium currency survives a rebirth
 			gemBuilders: state.gemBuilders, // so does the Gem shop's Additional builder
 			gemCraft: state.gemCraft, // and its crafting items
+			paragonSpent: state.paragonSpent, // the paragon points are the account's too (the server keeps them across a rebirth)
 			idolLevels: state.idolLevels, // the Idols' levels are the account's: only the buildings go with the map, they are placed again for free
 			autoSellUpTo: state.autoSellUpTo, // a setting, not gear
 			merchantUpgrades,
@@ -128,7 +129,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 							prestige,
 							state.farmUpgrades,
 							state.merchantUpgrades,
-							gearIncome(state.equipment),
+							gearIncome(state.equipment, state.paragonSpent),
 						),
 					}
 				: {}),
@@ -150,7 +151,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 				prestige,
 				state.farmUpgrades,
 				state.merchantUpgrades,
-				gearIncome(state.equipment),
+				gearIncome(state.equipment, state.paragonSpent),
 			),
 		});
 	},

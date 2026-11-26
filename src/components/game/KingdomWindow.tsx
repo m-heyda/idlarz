@@ -1,11 +1,14 @@
 import React, { useMemo } from 'react';
 import { useShallow } from 'zustand/react/shallow';
 import { DiamondLevel, HoverTip, Inset, Panel, ProgressBar, SectionLabel } from '../../../packages/design-system/src/components/primitives';
-import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
+import { HintTooltip, TipLine } from '../../../packages/design-system/src/components/tooltips';
 import { biomeColor } from '@/config/biomePalette';
 import { MARK_BUTTONS, MONSTER_MARK_TILES, type MarkPref } from '@/config/mapMarks';
 import { castleIconName, pixelIconSrc } from '@/config/pixelIcons';
-import { kingdomSummary } from '@/lib/kingdomSummary';
+import { kingdomSummary, type KingdomBuildingRow } from '@/lib/kingdomSummary';
+import { nextBuildingTile, tilesWithBuilding } from '@/lib/buildingEffect';
+import { useViewStore } from '@/stores/viewStore';
+import { useWindowStore } from '@/stores/windowStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useRockStore } from '@/stores/rockStore';
 import { formatNumber } from '@/utils/formatters';
@@ -15,10 +18,27 @@ import '@/styles/Kingdom.css';
 
 /**
  * The Kingdom overview window (the crown icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome (a heatmap of one square per tile, coloured by biome, with the count per biome under it), every building with its level
- * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many chests, ore nodes and monsters stand on the map. The last panel, "Find on the map", is one grid of equal tiles, all pressable: Chests, Ore nodes and Monsters, then Bosses, Strongest, Golden, Fully grown and Still growing with their counts. A press rings just those on the map and lights the tile (one mark at a time, the same marks as the buttons under the minimap, `useMapMarks` and `MARK_TARGETS`). No income or resources: the resource windows have them. A first version, meant to grow.
+ * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many chests, ore nodes and monsters stand on the map. The last panel, "Find on the map", is one grid of equal tiles, all pressable: Chests, Ore nodes and Monsters, then Bosses, Strongest, Golden, Fully grown and Still growing with their counts. A press rings just those on the map and lights the tile (one mark at a time, the same marks as the buttons under the minimap, `useMapMarks` and `MARK_TARGETS`). No income or resources: the resource windows have them. Pointing at a building's name shows what it gives now (or what level 1 would give), and pressing the name of a standing building closes the window, centres the map on it and frames it for a few seconds (`focusTile`; pressing again shows the next copy). A first version, meant to grow.
  */
 /** The most squares the land heatmap draws; above it each square stands for several tiles */
 const HEAT_MAX_CELLS = 400;
+
+/** The copy of each building shown last, so pressing the same name again walks through its copies */
+const lastFound: Record<string, { x: number; y: number }> = {};
+
+/** The hover text of a building name: what it gives now, or what level 1 would give when it is not built yet */
+const effectTip = (row: KingdomBuildingRow) => (
+	<div className='ds-root ds-tip ds-tip-hint' role='tooltip'>
+		<div style={{ fontSize: 14, color: '#fff' }}>{row.label}</div>
+		<TipLine>{row.effect.built ? `Gives now (level ${row.level}):` : 'Not built. At level 1 it would give:'}</TipLine>
+		{row.effect.lines.map((line) => (
+			<TipLine key={line} tone='green'>
+				{line}
+			</TipLine>
+		))}
+		{row.level > 0 && <TipLine>Click to find it on the map.</TipLine>}
+	</div>
+);
 
 const KingdomWindow: React.FC = () => {
 	const input = useGameStore(
@@ -35,6 +55,14 @@ const KingdomWindow: React.FC = () => {
 	const summary = useMemo(() => kingdomSummary(input, rockCount), [input, rockCount]);
 	const { castle, builders, land, buildings, monsters } = summary;
 	const { on: marked, choose } = useMapMarks();
+	/** Closes the window and centres the map on a standing building (the next copy when it was pressed before), framing it for a few seconds */
+	const findBuilding = (id: string) => {
+		const tile = nextBuildingTile(tilesWithBuilding(input.tiles, id), lastFound[id] ?? null);
+		if (!tile) return;
+		lastFound[id] = tile;
+		useWindowStore.getState().closeWindow('kingdom');
+		useViewStore.getState().focusTile(tile.x, tile.y);
+	};
 	/** How many of each kind stand on the map, for the "Find on the map" tiles (the Strongest tile counts the monsters at the highest level) */
 	const markCount: Record<MarkPref, number> = {
 		markChests: monsters.chests,
@@ -127,9 +155,16 @@ const KingdomWindow: React.FC = () => {
 								<div className='kd-rows kd-rows-wide'>
 									{group.rows.map((row) => (
 										<div key={row.id} className='kd-building' data-built={row.level > 0} data-locked={row.lockedUntilRebirth > 0}>
-											<span>
-												{row.label} <span className='kd-sub'>{row.kind}</span>
-											</span>
+											<HoverTip placement='above' align='start' tip={effectTip(row)}>
+												<button
+													type='button'
+													className='kd-building-name'
+													aria-disabled={row.level === 0}
+													onClick={() => row.level > 0 && findBuilding(row.id)}
+												>
+													{row.label} <span className='kd-sub'>{row.kind}</span>
+												</button>
+											</HoverTip>
 											{row.level > 0 ? (
 												<DiamondLevel level={row.level} max={Math.max(row.cap, row.level)} small />
 											) : row.lockedUntilRebirth > 0 ? (

@@ -106,6 +106,8 @@ export interface BankContext {
 	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
 	lakesOwned: number;
 	castleLevel: number;
+	/** Percentage points more chance that a new monster is golden (the Paragon upgrade; absent = none) */
+	goldenChancePts?: number;
 }
 
 export const emptyBank = (nowSec: number): TicketBank => ({
@@ -227,7 +229,7 @@ export const advanceBank = (
 		}
 		if (monstersAllowed && next.monsterAcc >= monsterThreshold(next, ctx.luck) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const n = next.nextN++;
-			const lucky = rollFor('monster', n)() < goldenMonsterChance(ctx.luck);
+			const lucky = rollFor('monster', n)() < goldenMonsterChance(ctx.luck) + (ctx.goldenChancePts ?? 0) / 100;
 			const ticket: MonsterTicket = { n, at, kind: 'normal', lucky };
 			next.monsterAcc = 0;
 			next.monstersMinted++;

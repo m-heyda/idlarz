@@ -5,7 +5,8 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import GameWindow from '../../src/components/game/GameWindow';
 import { DEFAULT_WINDOW_POS, useWindowStore } from '../../src/stores/windowStore';
 
-// IDL-324: the adapter that draws a game window with the design system's WindowShell, driven by the window store.
+// IDL-324: the adapter that draws a game window with the design system's WindowShell, driven by the window store. (node has no CSS loader: the imports are made no-ops before the component loads.)
+(require as unknown as { extensions: Record<string, () => void> }).extensions['.css'] = () => undefined;
 
 const h = React.createElement;
 // a server render reads zustand's initial state, not the live one, so the tests write the state to both
@@ -52,7 +53,7 @@ test('the Hero window draws the new bag with the hero card, gear, skills, footer
 	put({ order: ['equipment'] });
 	const out = renderToStaticMarkup(h(HeroWindow));
 	assert.match(out, /aria-label="Hero"/);
-	for (const word of ['Bag', 'Stats', 'Crafting', 'Crafting bag', 'Armor', 'Jewelry', 'Hands', 'Skills', 'slots used', 'Organise', 'Sell junk']) {
+	for (const word of ['Bag', 'Stats', 'Paragon', 'Crafting', 'Crafting bag', 'Armor', 'Jewelry', 'Hands', 'Skills', 'slots used', 'Organise', 'Sell junk']) {
 		assert.ok(out.includes(word), `the window shows "${word}"`);
 	}
 	assert.match(out, /ds-baggrid/);

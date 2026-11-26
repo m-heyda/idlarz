@@ -108,9 +108,10 @@ const BuildBody: React.FC<{ x: number; y: number }> = ({ x, y }) => {
 	useGameStore((state) => state.resources);
 	const monsters = useGameStore((state) => state.monsters);
 	const idolLevels = useGameStore((state) => state.idolLevels);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	const prestige = useGameStore((state) => state.prestige);
 	const equipment = useGameStore((state) => state.equipment);
-	const buildTimePct = buildTimeCutPct(tiles, idolLevels, equipment);
+	const buildTimePct = buildTimeCutPct(tiles, idolLevels, equipment, paragonSpent);
 	const tile = getTile(tiles, x, y);
 	const free = !!tile && !tile.building;
 	const { builds, maxed } = buildOptions(useGameStore, x, y);

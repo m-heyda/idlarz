@@ -44,7 +44,15 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 
 	const ratesOf = (tiles: ReturnType<GameGet>['tiles']) => {
 		const s = get();
-		return calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncome(s.equipment));
+		return calculateResourceRates(
+			tiles,
+			s.characterStats,
+			s.farmLevels,
+			s.prestige,
+			s.farmUpgrades,
+			s.merchantUpgrades,
+			gearIncome(s.equipment, s.paragonSpent),
+		);
 	};
 
 	return {
@@ -71,7 +79,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 							x,
 							y,
 							toLevel: 1,
-							remainingSec: buildingUpgradeDuration(0, s.prestige, buildTimeCutPct(s.tiles, s.idolLevels, s.equipment), 'idol'),
+							remainingSec: buildingUpgradeDuration(0, s.prestige, buildTimeCutPct(s.tiles, s.idolLevels, s.equipment, s.paragonSpent), 'idol'),
 							building: id,
 						},
 					],
@@ -110,7 +118,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 						remainingSec: buildingUpgradeDuration(
 							level,
 							s.prestige,
-							buildTimeCutPct(s.tiles, s.idolLevels, s.equipment),
+							buildTimeCutPct(s.tiles, s.idolLevels, s.equipment, s.paragonSpent),
 							buildingDef(tile?.building)?.kind === 'idol' ? 'idol' : 'building',
 						),
 					},

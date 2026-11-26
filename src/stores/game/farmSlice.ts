@@ -31,7 +31,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncome(state.equipment),
+			gearIncome(state.equipment, state.paragonSpent),
 		);
 
 		set({
@@ -61,7 +61,7 @@ export const createFarmSlice = (set: GameSet, get: GameGet) => ({
 			state.prestige,
 			farmUpgrades,
 			state.merchantUpgrades,
-			gearIncome(state.equipment),
+			gearIncome(state.equipment, state.paragonSpent),
 		);
 		set({ farmUpgrades, resources: subtractBundle(state.resources, cost), resourceRates: newRates });
 		audioManager.playSound('buysell');

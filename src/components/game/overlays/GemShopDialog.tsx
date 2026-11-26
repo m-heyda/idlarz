@@ -83,7 +83,8 @@ const GemShopDialog: React.FC = () => {
 
 	/** The state of an item for the row: its price now, and why it cannot be bought (null = it can). */
 	const stateOf = (item: GemItem): { price: number; blocked: string | null } => {
-		const price = item.id === 'attr_respec' && info?.freeRespec ? 0 : gemNextPrice(item, info?.bought);
+		const price =
+			(item.id === 'attr_respec' && info?.freeRespec) || (item.id === 'paragon_respec' && info?.freeParagonRespec) ? 0 : gemNextPrice(item, info?.bought);
 		if (item.id === 'name_change' && info?.nameChangedAt) {
 			const left = info.nameChangedAt + item.cooldownSec - nowSec;
 			if (left > 0) return { price, blocked: `Again in ${waitText(left)}` };

@@ -11,6 +11,7 @@ export type GemItemId =
 	| 'class_change'
 	| 'name_change'
 	| 'attr_respec'
+	| 'paragon_respec'
 	| 'name_colors'
 	| 'name_rainbow'
 	| 'name_aurora'
@@ -53,6 +54,8 @@ export const DAY_SEC = 86_400;
  * - **Name change** (200): once per 30 days, counted on the profile (it survives a game reset); a name another account holds, or one that breaks the name rules, is refused and costs nothing.
  * - **Attribute respec** (300): gives back every attribute point outside a rebirth (a rebirth does it free). **The first respec of an account is free** (a mistake with the new server-held allocation is forgiven once).
  *
+ * - **Paragon respec** (500): gives back every paragon point (docs/plan/paragon.md); the first one of an account is free. Not during a fight, refused when nothing is spent. A rebirth does not do it.
+ *
  * - **Name colours** (750, once; lowered from 1000 so no single item takes the whole 1,000-gem start purse, IDL-229): unlocks the nickname colour picker (twelve colours, `config/nickColors.ts`) for the account for good; an admin account has it without buying. Bought once, a second purchase is refused and costs nothing.
  *
  * - **Name effects** (500 each, once; One-time tab): Rainbow, Aurora, Ember, Frost, Void and Galaxy, the animated nicknames (`NICK_EFFECTS`). Each is its own purchase, separate from the plain colours; they are also bought from the name window.
@@ -84,6 +87,14 @@ export const GEM_SHOP: readonly GemItem[] = [
 		name: 'Respec attributes',
 		blurb: 'Get every attribute point back to spend again. The first one is free.',
 		price: 300,
+		cooldownSec: 0,
+	},
+	{
+		id: 'paragon_respec',
+		tab: 'identity',
+		name: 'Respec paragon',
+		blurb: 'Get every paragon point back to spend again. The first one is free.',
+		price: 500,
 		cooldownSec: 0,
 	},
 	{

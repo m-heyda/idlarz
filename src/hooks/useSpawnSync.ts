@@ -56,6 +56,7 @@ export const useSpawnSync = (userId: string, active: boolean) => {
 					if (!attrsSynced) {
 						attrsSynced = true;
 						void useGameStore.getState().syncServerAttrs();
+						void useGameStore.getState().syncServerParagon();
 					}
 					const { combat, nextInSec } = reply.value;
 					const spawnWait = Math.min(MAX_WAIT_SEC, Math.max(MIN_WAIT_SEC, (nextInSec ?? MAX_WAIT_SEC) + 2));

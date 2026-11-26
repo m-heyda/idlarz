@@ -1,6 +1,15 @@
 import type { CombatCommand } from '@/lib/offline/fightTypes';
 import type { ChestReward, RockReply, CraftReply, FightReply, InventoryOp, InventoryReply, RebirthReply, SyncResult } from '@/lib/offline/types';
-import type { CharacterReply, CharacterRequest, GemsReply, GemsRequest, MasteryReply, MasteryRequest } from '@/lib/offline/gemTypes';
+import type {
+	CharacterReply,
+	CharacterRequest,
+	ParagonReply,
+	ParagonRequest,
+	GemsReply,
+	GemsRequest,
+	MasteryReply,
+	MasteryRequest,
+} from '@/lib/offline/gemTypes';
 import type { TutorialReply, TutorialRequest } from '@/lib/offline/tutorial';
 import type { PetsReply, PetsRequest } from '@/lib/offline/pets';
 import type { AchievementReport } from '@/lib/offline/achievements';
@@ -122,6 +131,10 @@ export const requestMastery = (key: string, request: MasteryRequest): Promise<Re
 /** The attribute points: `allocate` puts points into attributes (the server holds the allocation), `sync` only reads it. */
 export const requestCharacter = (key: string | null, request: CharacterRequest): Promise<Reply<CharacterReply>> =>
 	post<CharacterReply>('/api/character', key === null ? request : { key, ...request });
+
+/** The paragon points: `allocate` puts points into upgrades (the server holds the record), `sync` only reads it. */
+export const requestParagon = (key: string | null, request: ParagonRequest): Promise<Reply<ParagonReply>> =>
+	post<ParagonReply>('/api/paragon', key === null ? request : { key, ...request });
 
 /** The guided tutorial: `sync` reads the account's progress; `done`, `lesson` and `skip` record it (one key per request) and a finished step may pay its starter bundle. */
 export const requestTutorial = (key: string, request: TutorialRequest): Promise<Reply<TutorialReply>> =>

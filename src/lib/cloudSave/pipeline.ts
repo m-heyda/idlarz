@@ -49,6 +49,7 @@ import { grantedSeenAfterSave, settleTrades } from '@/lib/offline/trade';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
+import { fitParagon, paragonSpent, type Paragon } from '@/lib/offline/paragon';
 import { ATTR_KEYS, attrsFromCore, clearedAttrs, fitAttrs, levelOfXp, stateWithAttrs, type Attrs } from '@/lib/offline/attrs';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { clampIdolTiles, settleIdols, sameIdols } from './idolTrust';
@@ -297,6 +298,8 @@ export const acceptSave = async (
 	 * allocation starts again). An account without a record yet is seeded from this save below (`attrsOut`), which keeps what it has.
 	 */
 	let attrsOut: Attrs | null = ledgerUsable ? (ledger?.attrs ?? null) : null;
+	// the paragon points (docs/plan/paragon.md) are the ledger's as well: a New Game starts the record again, a rebirth keeps it, one above what the XP has earned goes back to unspent
+	let paragonOut: Paragon | null = ledgerUsable && !newGame ? (ledger?.paragon ?? null) : null;
 	if (ledgerUsable && attrsOut && (newGame || rebirthed)) attrsOut = clearedAttrs(attrsOut);
 	if (ledgerUsable && attrsOut) state = stateWithAttrs(state, attrsOut, levelOfXp(state.resources.xp), state.prestige.rebirths);
 	const grants = ledger ? subtractTotals(ledger.granted, ledger.grantedSeen) : undefined;
@@ -346,6 +349,14 @@ export const acceptSave = async (
 		state = stateWithAttrs(state, attrsOut, level, rebirths);
 		if (state.characterStats.availablePoints !== before.availablePoints || ATTR_KEYS.some((key) => before[key] !== state.characterStats[key]))
 			summary = summarize(state);
+		if (paragonOut) {
+			paragonOut = fitParagon(paragonOut, state.resources.xp);
+			// the points the server holds are worked out into every number it derives (Luck, kill rewards, rates, the fight profile), never taken from the upload
+			if (paragonSpent(paragonOut.spent) > 0) {
+				state = { ...state, paragonSpent: paragonOut.spent };
+				summary = summarize(state);
+			}
+		}
 	}
 	summary.derived.xpBase = xpVerdict.base;
 	const flags = verifyTransition(
@@ -416,11 +427,25 @@ export const acceptSave = async (
 	const core = {
 		...(ledgerUsable ? { ...split.core, gems } : split.core),
 		// the Idols' combat bonuses ride in the stored save for the fight profile (profile.ts reads `idolFx`); absent with none
-		...(summary.derived.idol && (summary.derived.idol.damagePct || summary.derived.idol.hpArmorPct || summary.derived.idol.merchantSellPct)
+		...(summary.derived.idol &&
+		(summary.derived.idol.damagePct ||
+			summary.derived.idol.hpArmorPct ||
+			summary.derived.idol.merchantSellPct ||
+			summary.derived.idol.maxHpPct ||
+			summary.derived.idol.critDamagePct ||
+			summary.derived.idol.lifeLeechPct ||
+			summary.derived.idol.bossTimerSec ||
+			summary.derived.idol.potionPowerPct)
 			? {
 					idolFx: {
 						damagePct: summary.derived.idol.damagePct,
 						hpArmorPct: summary.derived.idol.hpArmorPct,
+						// the Paragon upgrades the fight profile reads (docs/plan/paragon.md), absent with none
+						...(summary.derived.idol.maxHpPct ? { maxHpPct: summary.derived.idol.maxHpPct } : {}),
+						...(summary.derived.idol.critDamagePct ? { critDamagePct: summary.derived.idol.critDamagePct } : {}),
+						...(summary.derived.idol.lifeLeechPct ? { lifeLeechPct: summary.derived.idol.lifeLeechPct } : {}),
+						...(summary.derived.idol.bossTimerSec ? { bossTimerSec: summary.derived.idol.bossTimerSec } : {}),
+						...(summary.derived.idol.potionPowerPct ? { potionPowerPct: summary.derived.idol.potionPowerPct } : {}),
 						...(summary.derived.idol.merchantSellPct ? { merchantSellPct: summary.derived.idol.merchantSellPct } : {}),
 					},
 				}
@@ -484,6 +509,7 @@ export const acceptSave = async (
 			// the attribute record, and the gem shop's allowance for a save that was on its way when something was bought (this save has been accepted: it is used up)
 			const settledShop = { ...ledger?.gemShop, spentSinceSave: 0 } as Ledger['gemShop'];
 			const attrsChanged = !!ledger && JSON.stringify(ledger.attrs) !== JSON.stringify(attrsOut);
+			const paragonChanged = !!ledger && JSON.stringify(ledger.paragon ?? null) !== JSON.stringify(paragonOut);
 			if (!ledger) {
 				await ledgers.commit(userId, 0, { ...seedLedger(save, nowMs), ver: 1, stats: counted, legacy: { idols: legacyIdols } });
 			} else if (!current) {
@@ -504,6 +530,7 @@ export const acceptSave = async (
 					stats: counted,
 					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
+					paragon: paragonOut,
 					gemShop: settledShop,
 				});
 			} else if (newRun) {
@@ -530,6 +557,7 @@ export const acceptSave = async (
 					stats: counted,
 					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
+					paragon: paragonOut,
 					gemShop: settledShop,
 				};
 				await ledgers.commit(userId, ledger.ver, next);
@@ -538,6 +566,7 @@ export const acceptSave = async (
 				!ledger.inv ||
 				legacyChanged ||
 				attrsChanged ||
+				paragonChanged ||
 				ledger.rebirths < summary.rebirths ||
 				ledger.gemShop.spentSinceSave > 0 ||
 				JSON.stringify(counted.tradeSince) !== JSON.stringify(ledger.stats.tradeSince) ||
@@ -554,6 +583,7 @@ export const acceptSave = async (
 					stats: counted,
 					legacy: { ...ledger.legacy, idols: legacyIdols },
 					attrs: attrsOut,
+					paragon: paragonOut,
 					gemShop: settledShop,
 				});
 			} else if (statsDue(ledger.stats, nowMs)) {

@@ -41,6 +41,7 @@ The day a player has earned the price (alone, with nothing else bought first). *
 | Change class | identity | 500 | 2 | 2 | 1 |
 | Change name | identity | 200 | 1 | 1 | 1 |
 | Respec attributes | identity | 300 | 2 | 1 | 1 |
+| Respec paragon | identity | 500 | 2 | 2 | 1 |
 | Name colours | identity | 750 | 3 | 2 | 1 |
 | Rainbow name | once | 500 | 2 | 2 | 1 |
 | Aurora name | once | 500 | 2 | 2 | 1 |
@@ -72,7 +73,7 @@ The day a player has earned the price (alone, with nothing else bought first). *
 | Cap Break 2 (per ladder, x5 ladders) (planned) | planned | 750 | 3 | 2 | 1 |
 | Cap Break 3 (per ladder, x5 ladders) (planned) | planned | 1,875 | 8 | 5 | 2 |
 
-**Whole shop today: 67,000 gems** = day 1000 (Casual), 222 (Regular), 74 (Dedicated). Planned Cap Breaks on every ladder add 14,625 gems.
+**Whole shop today: 67,500 gems** = day 1011 (Casual), 224 (Regular), 75 (Dedicated). Planned Cap Breaks on every ladder add 14,625 gems.
 
 ## Targets (docs/plan/30 section 9)
 
@@ -81,6 +82,6 @@ The day a player has earned the price (alone, with nothing else bought first). *
 | An identity item is affordable in the first week (earnings only, Regular) | ok | Change name (200 gems) on day 1 |
 | The first upgrade (QoL) is affordable in week 2 (Regular) | ok | Overnight Orders (750 gems) on day 2 |
 | A first Cap Break is not out of reach before week 8 (the rebirth gate decides the day; planned, Regular) | ok | 300 gems on day 1 |
-| The whole shop is a multi-month goal for Regular (90+ days) and still finite for Dedicated | ok | 67,000 gems: Regular day 222, Dedicated day 74 |
+| The whole shop is a multi-month goal for Regular (90+ days) and still finite for Dedicated | ok | 67,500 gems: Regular day 224, Dedicated day 75 |
 | No item takes the whole 1000-gem start purse on day 1 (price within 80-100% of it) | ok | none |
 

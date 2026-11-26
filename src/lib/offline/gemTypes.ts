@@ -1,6 +1,7 @@
 import type { BestiaryReport } from '@/lib/offline/stats';
 import type { AchievementReport } from '@/lib/offline/achievements';
 import type { Attrs } from '@/lib/offline/attrs';
+import type { Paragon } from '@/lib/offline/paragon';
 
 // What goes over the wire for /api/gems and /api/character. Kept apart from the server logic so the browser can import it (no node:crypto, no database).
 
@@ -69,6 +70,8 @@ export interface GemsReply {
 	daily: DailyInfo;
 	/** Whether the account's one free attribute respec is still there */
 	freeRespec: boolean;
+	/** Whether the account's one free paragon respec is still there */
+	freeParagonRespec: boolean;
 	/** Epoch seconds of the last purchase by item id (the ledger's) */
 	lastAt: Record<string, number>;
 	/** Purchases by item id (the ledger's): a `once` item is owned when its count is above 0 */
@@ -85,6 +88,8 @@ export interface GemsReply {
 	/** The achievement ids a `claimAll` paid, in the order they were claimed */
 	claimedIds?: string[];
 	attrs?: Attrs;
+	/** The paragon record after a paragon respec */
+	paragon?: Paragon;
 	/** The achievements as they stand after a claim (every online answer may carry it: the achievement store takes it) */
 	achievements?: AchievementReport;
 	serverNowSec: number;
@@ -97,6 +102,21 @@ export interface CharacterReply {
 	attrs: Attrs;
 	/** Points still free at the server's idea of the level */
 	available: number;
+	serverNowSec: number;
+}
+
+/** The paragon points: `allocate` puts points into upgrades (the server holds the record), `sync` only reads it. */
+export type ParagonRequest = { action: 'allocate'; add: Record<string, number> } | { action: 'sync' };
+
+/** What /api/paragon answers: the record as it stands (an `add` that was refused says so and carries the true record, so the browser puts its preview right). */
+export interface ParagonReply {
+	ok: boolean;
+	reason?: 'no_points' | 'bad_request' | 'capped';
+	paragon: Paragon;
+	/** Points still free at the server's idea of the paragon level */
+	available: number;
+	/** The paragon level the server counts */
+	level: number;
 	serverNowSec: number;
 }
 

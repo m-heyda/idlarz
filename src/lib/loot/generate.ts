@@ -34,6 +34,8 @@ export interface LootRequest {
 	luck?: number;
 	/** Percent more chance on the general gear roll (Bestiary mastery against the monster); 0 or absent changes nothing */
 	dropChancePct?: number;
+	/** Percent more weight for the rarities Luck favours (the Paragon Epic find upgrade, relative, on top of Luck); 0 or absent changes nothing */
+	epicFindPct?: number;
 	/** Extra guaranteed rolls on the general pool (a lucky monster) */
 	extraGearRolls?: number;
 	/** Only items of this slot are eligible (a crafting recipe picks the slot, not the item) */
@@ -236,7 +238,7 @@ const rollRarityGear = (ctx: Ctx, table: string, poolId: string, itemLevel: numb
 		const ceiling = ctx.req.maxRarity ? data.rarities[ctx.req.maxRarity] : undefined;
 		if (ceiling && rarity.order > ceiling.order) continue;
 		// Luck moves the odds toward rare and better; the weights are normalised after, so the other rarities lose share, not weight
-		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) : 1;
+		const lucky = rarity.order >= LUCK.rarityFromOrder ? rarityLuckMultiplier(ctx.req.luck ?? 0) * (1 + (ctx.req.epicFindPct ?? 0) / 100) : 1;
 		const candidates = all.filter(
 			(c) =>
 				c.def.generation === 'base' &&

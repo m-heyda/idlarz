@@ -81,8 +81,8 @@ test('the price book lists every shop item (a tiered one per level) and the plan
 
 test('the whole shop and the target checks, pinned', () => {
 	const r = runGemSim();
-	assert.equal(r.wholeList.total, 67_000);
-	assert.deepEqual(r.wholeList.days, { casual: 1000, regular: 222, dedicated: 74 });
+	assert.equal(r.wholeList.total, 67_500);
+	assert.deepEqual(r.wholeList.days, { casual: 1011, regular: 224, dedicated: 75 });
 	assert.equal(r.capBreaksAll, 14_625);
 	assert.deepEqual(
 		r.checks.map((c) => [c.id, c.ok]),
