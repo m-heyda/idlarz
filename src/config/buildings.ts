@@ -24,7 +24,6 @@ export const BUILDINGS_FLAG = { enabled: true };
  * - `producer`: a level 1 Producer makes `tileEquivalents` (15) tiles' worth of its main materials; each level above 1 adds `levelStep` (+50 %) of that; each owned tile of the Producer's biome adds `perOwnedTile` (+2 %) up to `bonusCap` (+100 %).
  * - `extractor`: a level 1 Extractor makes `baseRate` (0.3) of its T3 material per second, before the global modifiers; each level above 1 adds `levelStep` (+40 %) of that; it grows with the size of its biome like the Producer (same `perOwnedTile` and `bonusCap`). It has no gold or wood side effects: the material is for crafting and later building upgrades, and the merchant never trades it.
  * - `cost`: level 1 costs `tilePrices` (14) tile prices at the current tile count (counted to at most `priceTileCap`, 300); every level above multiplies by `levelGrowth` (2). The price is gold, wood and stone like a tile's ({@link calculateTileCost}).
- * - `relocateShare`: moving a building costs this share (50 %) of what its current level cost to reach, at today's prices; it is instant and keeps the level.
  *
  * @category Economy/Buildings
  * @order 2
@@ -38,7 +37,6 @@ export const BUILDING_RULES = {
 	/** From level 3 a Producer or an Extractor upgrade also eats the biome's T3 extract (the same one the Idol takes, owner 2026-11-24, docs/plan/18): levels 3 / 4 / 5 cost 1,000 / 5,000 / 25,000, then x`t3Growth` per level above 5 */
 	t3Costs: [1000, 5000, 25000],
 	t3Growth: 5,
-	relocateShare: 0.5,
 };
 
 /**

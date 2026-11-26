@@ -172,23 +172,6 @@ const levelCost = (level: number, ownedTiles: number, def?: BuildingDef): Partia
 	return out;
 };
 
-/** What a building of `level` has cost in all (level 1 up to `level`) at today's prices. */
-export const buildingTotalCost = (level: number, ownedTiles: number): Partial<Resources> => {
-	const out: Partial<Resources> = {};
-	for (let l = 1; l <= level; l++)
-		for (const [key, amount] of Object.entries(buildingLevelCost(l, ownedTiles)))
-			out[key as keyof Resources] = (out[key as keyof Resources] ?? 0) + (amount ?? 0);
-	return out;
-};
-
-/** The price of moving a building of `level`: `relocateShare` of {@link buildingTotalCost}. */
-export const relocationCost = (level: number, ownedTiles: number): Partial<Resources> => {
-	const out: Partial<Resources> = {};
-	for (const [key, amount] of Object.entries(buildingTotalCost(level, ownedTiles)))
-		out[key as keyof Resources] = Math.floor((amount ?? 0) * BUILDING_RULES.relocateShare);
-	return out;
-};
-
 /** The level of the building on a tile (1 when the field is absent), or 0 when there is none. */
 export const levelOfTile = (tile: { building?: string; buildingLevel?: number } | undefined): number =>
 	tile?.building ? Math.max(1, Math.min(HARD_LIMITS.idolMaxLevel, Math.floor(tile.buildingLevel ?? 1))) : 0;
@@ -305,18 +288,6 @@ export const upgradeProblem = (ctx: BuildingContext, x: number, y: number): stri
 	if (level >= upgradeCapOf(def, ctx.castleLevel, ctx.idolMax, buildingMax)) return `Needs castle level ${level + 1}`;
 	if (upgradeAt(ctx, x, y)) return 'It is being upgraded';
 	return builderBusy(ctx);
-};
-
-/** Why the building on (fromX, fromY) cannot move to (toX, toY), or null. Paying is the caller's check. */
-export const moveProblem = (ctx: BuildingContext, fromX: number, fromY: number, toX: number, toY: number): string | null => {
-	if (!buildingsEnabled()) return 'Buildings are not available yet';
-	const from = getTile(ctx.tiles, fromX, fromY);
-	const def = buildingDef(from?.building);
-	if (!from || !def) return 'No building here';
-	if (fromX === toX && fromY === toY) return 'Already here';
-	if (monsterAt(ctx.monsters as Monster[], fromX, fromY)) return 'Defeat the monster on the building first';
-	if (upgradeAt(ctx, fromX, fromY)) return 'It is being upgraded';
-	return tileProblem(ctx, toX, toY, def);
 };
 
 /** Owned tiles of the Producer's biome: the size its output grows with. */
