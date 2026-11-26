@@ -16,8 +16,8 @@ import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import type { Equipment, ItemInstance } from '../src/types/game';
 import { RESOURCES } from '../src/catalog/resources';
 import { CRAFTING } from '../src/config/crafting';
-import { HARD_LIMITS } from '../src/config/limits';
-import { craftCumulativeXp, craftLimit, craftTimeSec, recipeCostGold } from '../src/lib/crafting';
+import { HARD_LIMITS, LIMITS } from '../src/config/limits';
+import { craftBatchLimit, craftCumulativeXp, craftLevelOf, craftLimit, craftTimeSec, recipeCostGold } from '../src/lib/crafting';
 
 // the gear recipes get their own section (one row per grade); the other tables are about potions, components and trade goods
 const RECIPES = ALL_RECIPES.filter((r) => r.kind !== 'gear');
@@ -68,7 +68,9 @@ for (const level of [2, 5, 10, 20, 30, 45, 60, 80, 100]) {
 	);
 }
 out();
-out(`Maximum level ${CRAFTING.maxLevel}; at most ${craftLimit('craftBatchCap')} crafts per batch (hard ceiling ${HARD_LIMITS.craftBatchCap}).`);
+out(
+	`Maximum level ${CRAFTING.maxLevel}; XP per craft is the recipe's XP times ${CRAFTING.xpScale} (so the crafts above are x${1 / CRAFTING.xpScale} when the XP scale is counted). At most ${craftLimit('craftBatchCap')} crafts of gear, a potion or a good and ${craftLimit('craftComponentBatchCap')} of a component per batch, and no batch longer than ${LIMITS.craftMaxBatchHours} hours.`,
+);
 
 out();
 out('## Timed batches');
@@ -77,14 +79,14 @@ out(
 	'Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-v0.md, Timed batch queue). Per hour of a batch running without a pause. Gold burned is the gold value of the whole input chain (a potion includes its vial) at merchant prices.',
 );
 out();
-out('| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |');
+out('| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch limit | A full batch takes (hours) |');
 out('|---|---:|---:|---:|---:|---:|---:|');
 const timed = RECIPES.filter((r) => r.timeSec);
 for (const r of timed) {
 	const sec = craftTimeSec(r);
 	const crafts = 3600 / sec;
 	out(
-		`| ${r.name} | ${g(sec)} | ${Math.round(crafts * r.output.qty).toLocaleString('en')} | ${Math.round(crafts * r.xp).toLocaleString('en')} | ${Math.round(crafts * recipeCostGold(r)).toLocaleString('en')} | ${g((craftLimit('craftBatchCap') * sec) / 60)} | ${g((HARD_LIMITS.craftBatchCap * sec) / 3600)} |`,
+		`| ${r.name} | ${g(sec)} | ${Math.round(crafts * r.output.qty).toLocaleString('en')} | ${Math.round(crafts * r.xp * CRAFTING.xpScale).toLocaleString('en')} | ${Math.round(crafts * recipeCostGold(r)).toLocaleString('en')} | ${craftBatchLimit(r)} | ${g(Math.round(((craftBatchLimit(r) * sec) / 3600) * 100) / 100)} |`,
 	);
 }
 out();
@@ -250,13 +252,13 @@ out();
 out('## Hours per level');
 out();
 out(
-	'Crafting nonstop, always the recipe with the most XP per hour among those unlocked. A level also needs the materials; the gold burned is what that costs at merchant prices.',
+	'Crafting nonstop, always the recipe with the most XP per hour among those unlocked (the XP scale counted). A level also needs the materials; the gold burned is what that costs at merchant prices.',
 );
 out();
 out('| Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |');
 out('|---:|---:|---:|---:|---|');
 const leveling = ALL_RECIPES.filter((r) => r.timeSec);
-const xph = (r: (typeof leveling)[number]) => (3600 / craftTimeSec(r)) * r.xp;
+const xph = (r: (typeof leveling)[number]) => (3600 / craftTimeSec(r)) * r.xp * CRAFTING.xpScale;
 let totalHours = 0;
 let totalGold = 0;
 for (let level = 1; level < CRAFTING.maxLevel; level++) {
@@ -265,7 +267,7 @@ for (let level = 1; level < CRAFTING.maxLevel; level++) {
 	const pick = open.reduce((a, b) => (xph(a) >= xph(b) ? a : b));
 	const step = craftCumulativeXp(level + 1) - craftCumulativeXp(level);
 	totalHours += step / xph(pick);
-	totalGold += (step / pick.xp) * recipeCostGold(pick);
+	totalGold += (step / (pick.xp * CRAFTING.xpScale)) * recipeCostGold(pick);
 	if ([2, 5, 10, 20, 30, 45, 60, 80].includes(level + 1))
 		out(
 			`| ${level + 1} | ${g(Math.round((step / xph(pick)) * 100) / 100)} | ${g(Math.round(totalHours * 10) / 10)} | ${Math.round(totalGold).toLocaleString('en')} | ${pick.name} |`,
@@ -275,6 +277,47 @@ out();
 out(
 	`Crafting nonstop, level ${CRAFTING.maxLevel} would take about ${Math.round(totalHours).toLocaleString('en')} hours of batches; the materials, not the clock, are the limit long before that.`,
 );
+
+out();
+out('## Days per level');
+out();
+out(
+	'A player who visits a few times a day, refilling every queue slot with a full batch of the best gear recipe they have unlocked (the highest grade, so the most XP per hour). A batch runs at most the offline hours (`LIMITS.craftOfflineHours`) without a visit. The gold budget is what the player is willing to spend on crafting each day; a day with too little gold crafts what it can pay for. Level 60 in about six weeks is the target for a player who crafts every day (IDL-396).',
+);
+out();
+const gearOnly = GEAR_RECIPES.filter((r) => !r.legacy).map((r) => ({ unlock: r.unlock, xp: r.xp, cost: recipeCostGold(r), recipe: r }));
+const daysTo = (visitsPerDay: number, budget: number, maxDays = 730) => {
+	const slots = LIMITS.craftQueueSlots;
+	let xp = 0;
+	const hit: Record<number, number> = {};
+	for (let day = 1; day <= maxDays; day++) {
+		const level = craftLevelOf(xp).level;
+		const top = Math.max(...gearOnly.filter((r) => r.unlock <= level).map((r) => r.unlock));
+		const pool = gearOnly.filter((r) => r.unlock === top);
+		const xpAvg = pool.reduce((a, r) => a + r.xp, 0) / pool.length;
+		const costAvg = pool.reduce((a, r) => a + r.cost, 0) / pool.length;
+		const sec = craftTimeSec(pool[0].recipe);
+		const runH = Math.min((craftBatchLimit(pool[0].recipe) * sec) / 3600, LIMITS.craftOfflineHours, 24 / visitsPerDay);
+		const perSlot = visitsPerDay * Math.floor((runH * 3600) / sec);
+		const crafts = Math.min(perSlot * slots, budget / costAvg);
+		xp += crafts * xpAvg * CRAFTING.xpScale;
+		const reached = craftLevelOf(xp).level;
+		for (const m of [10, 20, 30, 40, 50, 60, 70, 80]) if (hit[m] === undefined && reached >= m) hit[m] = day;
+	}
+	return hit;
+};
+const scenarios: [string, number, number][] = [
+	['3 visits a day, 100 M gold a day', 3, 100e6],
+	['1 visit a day, 100 M gold a day', 1, 100e6],
+	['3 visits a day, 30 M gold a day', 3, 30e6],
+	['1 visit a day, 30 M gold a day', 1, 30e6],
+];
+out('| Player | Level 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 |');
+out('|---|---:|---:|---:|---:|---:|---:|---:|---:|');
+for (const [name, visits, budget] of scenarios) {
+	const hit = daysTo(visits, budget);
+	out(`| ${name} | ${[10, 20, 30, 40, 50, 60, 70, 80].map((m) => (hit[m] === undefined ? 'over 2 years' : `${hit[m]} d`)).join(' | ')} |`);
+}
 
 console.log(lines.join('\n'));
 if (gateFailed) {
