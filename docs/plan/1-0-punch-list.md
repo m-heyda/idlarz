@@ -10,7 +10,7 @@ Written 2026-11-26 from the Linear backlog (about 60 open tickets, all read), th
 
 | # | Item | Linear | Size | Why |
 |---|---|---|---|---|
-| 1 | **Crafting rebalance** (batch cap 25, times, XP, cost curve, Ichor earlier) | new, [crafting-rebalance](crafting-rebalance.md); IDL-349, IDL-379 | M-L | Level 60 is out of reach today; queues can run for months |
+| 1 | **Crafting rebalance** (batch cap 25, times, XP, cost curve, Ichor earlier): built in PR 319 (IDL-396); IDL-349 and IDL-379 remain for the end-game recipe costs and G7/G8 tuning | IDL-396, IDL-349, IDL-379 | done | Level 60 was out of reach; queues could run for months |
 | 2 | **Paragon: balance sims and tuning** (fight-sim at cap and 500 uncapped, pace profile, stat-audit pins) | IDL-187 | M | Needs the owner's production feedback first |
 | 3 | **Paragon 3/3: milestones every 100 levels, deeds, titles, name frames** | IDL-394 | M-L | Owner's calls on the title names first; part of the approved paragon design |
 | 4 | **Delete my account** (authenticated server op and confirm dialog) | IDL-392 | M | Required before a public launch |
@@ -47,7 +47,7 @@ The question was whether we already have what is needed to support crafting skil
 - **new effects in the fight engine**: damage over time (Flame Hand, Poison), a curse (Evil Eye), a delayed hit (Void Meteor), a crit boost (Starburst), each tested against the damage cap;
 - the Skills tab, hotbar levels and a tutorial step per unlock.
 
-**Proposal for 1.0 (L, after the crafting rebalance, because the core recipes use its batch and time rules):** ship *Skills v2 light*: the third slot, the loadout choice, skill XP and levels 1-10 for Heal and Stun, and **two** new skills with simple server effects (Flame Hand, Poison, both damage over time), unlocked by a fragment-to-core recipe. Breakthroughs (IDL-353), the class skills and the remaining skills follow after 1.0. If the month is tight this is the first thing to cut; nothing else depends on it.
+**Proposal for 1.0 (L, after the crafting rebalance (built, PR 319), because the core recipes use its batch and time rules):** ship *Skills v2 light*: the third slot, the loadout choice, skill XP and levels 1-10 for Heal and Stun, and **two** new skills with simple server effects (Flame Hand, Poison, both damage over time), unlocked by a fragment-to-core recipe. Breakthroughs (IDL-353), the class skills and the remaining skills follow after 1.0. If the month is tight this is the first thing to cut; nothing else depends on it.
 
 ## 4. After 1.0 (not in this plan)
 
@@ -57,7 +57,7 @@ World boss (IDL-345), the Second Realm (IDL-302), quests and daily quests (IDL-2
 
 ## 5. Proposed order for the month
 
-1. Week 1: crafting rebalance (sim first, owner approves the questions in that file), framework upgrades, the small safety items (IDL-392, IDL-391, IDL-126 checklist), paragon feedback in.
+1. Week 1: the remaining crafting work (end-game recipe costs, IDL-349), framework upgrades, the small safety items (IDL-392, IDL-391, IDL-126 checklist), paragon feedback in.
 2. Week 2: paragon sims and tuning (IDL-187), paragon milestones (IDL-394), glossary overlay and resource mastery, spawn tables.
 3. Week 3: Skills v2 light (if kept), chest leftovers, stat-audit cleanups, QA passes, position bonus.
 4. Week 4: art lands (biomes, buildings, landing v2), enforcement switches after the final `check-live-saves`, release notes, tag 1.0.

@@ -6,7 +6,7 @@ The one place to look when planning the next step. It lists only what is **still
 
 > **Status 2026-11-11:** the **New chapter shipped** (release 0.3.0, `GAME_EPOCH` 2: classes with passives, class-locked avatars, achievements, guided tutorial, full reset, landing and `/play`, buildings with Idols, live biomes at rebirth 1-5, farm and castle rework, potion belt, bigger bags, discovery). Sections below that call it "the next update" or "not built" are partly history; check Linear for the live state. **The game is desktop only (screens 1240 px and wider): there is no mobile or phone layout and none is planned** (IDL-123 canceled).
 
-**Proposals waiting for the owner (2026-11-26): [1-0-punch-list](1-0-punch-list.md) (what to finish before 1.0) and [crafting-rebalance](crafting-rebalance.md) (batch cap, times, XP, costs, with sim results).**
+**Proposal waiting for the owner (2026-11-26): [1-0-punch-list](1-0-punch-list.md), what to finish before 1.0.** The crafting rebalance (IDL-396) is built in PR 319; its numbers are in the code and in `docs/generated/craft-sim.md`.
 
 **UI refresh (layout and UX reference, not an asset refresh; Linear IDL-289, design system in code IDL-290):** [ui-refresh.md](ui-refresh.md) and the board file it describes. Settle these layouts before new mechanics are wired.
 
