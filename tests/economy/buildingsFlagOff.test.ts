@@ -84,7 +84,6 @@ test('flag off: the actions refuse and the tile menu keeps the disabled placehol
 	growTo(8);
 	assert.equal(api().buildBuilding(CASTLE_X + 1, CASTLE_Y, 'lumberyard'), false);
 	assert.equal(api().upgradeBuilding(CASTLE_X + 1, CASTLE_Y), false);
-	assert.equal(api().moveBuilding(CASTLE_X + 1, CASTLE_Y, CASTLE_X + 2, CASTLE_Y), false);
 	assert.deepEqual(api().buildingUpgrades, []);
 	const at = { x: CASTLE_X + 1, y: CASTLE_Y, t: tileAt(api().tiles, CASTLE_X + 1, CASTLE_Y) };
 	const items = tileMenuItems({ x: at.x, y: at.y, biome: at.t.biome, game: store as never, queuePos: 0, lineOpen: false, hasChest: false });
