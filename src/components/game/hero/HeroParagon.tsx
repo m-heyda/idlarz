@@ -6,7 +6,7 @@ import {
 	PARAGON_CATEGORIES,
 	PARAGON_CATEGORY_LABEL,
 	PARAGON_CATEGORY_STYLE,
-	PARAGON_ICON,
+	PARAGON_GLYPH,
 	PARAGON_UPGRADES,
 	paragonEffect,
 	paragonEffectText,
@@ -17,12 +17,10 @@ import { paragonFree, paragonSpent as spentTotal } from '@/lib/offline/paragon';
 import { calculateParagon } from '@/utils/game/character';
 import audioManager from '@/utils/audioManager';
 import { formatCompact } from '@/utils/formatters';
-import PixelIcon from '@/components/game/PixelIcon';
 import '@/styles/Paragon.css';
 
 /** The medallion of one upgrade: its icon in a ring that fills with the points (a capped upgrade, round) or in a diamond with an infinity mark (an uncapped one). */
 const Medallion: React.FC<{ u: ParagonUpgrade; points: number; full: boolean }> = ({ u, points, full }) => {
-	const icon = PARAGON_ICON[u.id];
 	const fill = u.capped ? Math.min(1, points / PARAGON_CAP_POINTS) : points > 0 ? 1 : 0;
 	return (
 		<span
@@ -33,7 +31,9 @@ const Medallion: React.FC<{ u: ParagonUpgrade; points: number; full: boolean }> 
 			style={{ '--fill': `${fill * 360}deg` } as React.CSSProperties}
 		>
 			<span className='px-paragon-medal-in'>
-				<PixelIcon name={icon.name} scale={icon.scale ?? 1} shine={icon.shine} />
+				<span className='px-paragon-glyph' aria-hidden='true'>
+					{PARAGON_GLYPH[u.id]}
+				</span>
 			</span>
 			{!u.capped && <span className='px-paragon-inf'>∞</span>}
 			{full && <span className='px-paragon-check'>✓</span>}
@@ -75,7 +75,7 @@ const Node: React.FC<{ u: ParagonUpgrade; points: number; free: number; onSpend:
 
 /**
  * The Paragon tab of the Hero window (docs/plan/paragon.md): one point per paragon level, spent in four coloured categories of five upgrades (three capped at 25 points, two uncapped and growing with a square root). Each upgrade is a medallion with an existing
- * icon (`PARAGON_ICON`), a progress ring for the capped ones and a diamond for the uncapped ones; no new art. A click previews the point at once and the server is asked for it (`spendParagon`); Respec opens the Gem shop (the first one is free).
+ * symbol (`PARAGON_GLYPH`, a text character), a progress ring for the capped ones and a diamond for the uncapped ones; no pictures. A click previews the point at once and the server is asked for it (`spendParagon`); Respec opens the Gem shop (the first one is free).
  */
 const HeroParagon: React.FC = () => {
 	const xp = useGameStore((state) => state.resources.xp);
@@ -109,7 +109,7 @@ const HeroParagon: React.FC = () => {
 					</span>
 				</div>
 				<span className='px-paragon-free' data-has={free > 0}>
-					<strong>{free}</strong> free point{free === 1 ? '' : 's'}
+					<strong>{formatCompact(free)}</strong> free point{free === 1 ? '' : 's'}
 				</span>
 				<span className='px-paragon-used'>{used} spent</span>
 				<button
@@ -131,7 +131,7 @@ const HeroParagon: React.FC = () => {
 						<section key={cat} className='px-paragon-col' data-cat={cat} style={{ '--cat': style.color } as React.CSSProperties}>
 							<h3 className='px-paragon-cat'>
 								<span className='px-paragon-emblem'>
-									<PixelIcon name={style.icon} />
+									<span className='px-paragon-glyph'>{style.glyph}</span>
 								</span>
 								<span className='px-paragon-cat-name'>{PARAGON_CATEGORY_LABEL[cat]}</span>
 								<span className='px-paragon-cat-pts'>{inCat} points</span>

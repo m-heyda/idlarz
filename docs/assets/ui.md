@@ -45,7 +45,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 | --- | --- | --- | --- | --- | --- |
 | `bonus_bee` | <img src="../../public/pixel/icons/bonus_bee.png" width="96" alt="bonus_bee"> | 56x26 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_bee.png` |
 | `bonus_butterfly` | <img src="../../public/pixel/icons/bonus_butterfly.png" width="96" alt="bonus_butterfly"> | 56x28 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_butterfly.png` |
-| `bonus_chest` | <img src="../../public/pixel/icons/bonus_chest.png" width="64" alt="bonus_chest"> | 32x32 | used | src/catalog/items/chests.ts, src/config/mapMarks.ts, src/config/paragon.ts | `pixel/icons/bonus_chest.png` |
+| `bonus_chest` | <img src="../../public/pixel/icons/bonus_chest.png" width="64" alt="bonus_chest"> | 32x32 | used | src/catalog/items/chests.ts, src/config/mapMarks.ts | `pixel/icons/bonus_chest.png` |
 | `bonus_crab` | <img src="../../public/pixel/icons/bonus_crab.png" width="96" alt="bonus_crab"> | 60x20 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_crab.png` |
 | `bonus_fish` | <img src="../../public/pixel/icons/bonus_fish.png" width="96" alt="bonus_fish"> | 64x22 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_fish.png` |
 | `bonus_frog` | <img src="../../public/pixel/icons/bonus_frog.png" width="96" alt="bonus_frog"> | 52x22 | used | src/components/game/AmbientLife.tsx | `pixel/icons/bonus_frog.png` |
@@ -162,7 +162,7 @@ Menu icons, equipment slot icons, banners, bars, frames, effects.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx, src/config/paragon.ts, src/lib/offline/curiosity.ts | `pixel/icons/rank_trophy.png` |
+| `rank_trophy` | <img src="../../public/pixel/icons/rank_trophy.png" width="96" alt="rank_trophy"> | 64x64 | used | src/components/game/RankingsWindow.tsx, src/lib/offline/curiosity.ts | `pixel/icons/rank_trophy.png` |
 
 ## skill
 
