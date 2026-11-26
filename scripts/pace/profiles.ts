@@ -16,6 +16,7 @@
  * @category Pacing/The sim
  * @order 3
  */
+import type { ParagonId } from '../../src/config/paragon';
 import type { EmberUpgradeId } from '../../src/config/rebirth';
 
 /**
@@ -115,6 +116,8 @@ export interface Profile {
 	 * and the player buys nothing. The reference bots leave it off (the game is open all day, as when the baseline was set); the `human*` profiles turn it on.
 	 */
 	away?: boolean;
+	/** Paragon points spent from the first second, by upgrade id (the economy ones reach the store as `paragonSpent`; the ledger keeps them across rebirths, so they are set again after each one). A probe: no reference profile has any */
+	paragon?: Partial<Record<ParagonId, number>>;
 	/** Hour of the day the game starts at (a new player starts playing at once; the bots start at midnight) */
 	startHour?: number;
 }
@@ -141,6 +144,10 @@ const HUMAN_PLAYER = { cps: 1, windows: HUMAN_WINDOWS, human: HUMAN, combat: tru
 /** The super-hardcore optimiser every `max-*` profile starts from: the hardcore schedule, merchant gold upgrades, the time-first Ember plan and the last run played on to castle 10 */
 const MAX_PLAYER = { cps: 4, windows: HARDCORE_WINDOWS, buyMerchant: true, emberPlan: 'time', endAtCastle10: true, localOnly: true } satisfies Profile;
 
+/** The economy Paragon upgrades at their cap (25 points each) and 100 points in each uncapped one: a player at about paragon 400 who spent only on the economy (`human-rebirth6-paragon`) */
+const PARAGON_ECONOMY_CAPS = { income: 25, xpGain: 25, tileDiscount: 25, goldFind: 25, offlineEff: 25, buildSpeed: 25 } as const;
+const PARAGON_ECONOMY = { ...PARAGON_ECONOMY_CAPS, clickGold: 100, killRewards: 100, craftXp: 100 } as const;
+
 export const PROFILES: Record<string, Profile> = {
 	idle: { cps: 0, windows: [] },
 	casual: { cps: 1, windows: [[19, 22]] },
@@ -155,6 +162,18 @@ export const PROFILES: Record<string, Profile> = {
 	human: { ...HUMAN_PLAYER },
 	'human-rebirth6': { ...HUMAN_PLAYER, rebirthAtCastle: 6, rebirths: 5 },
 	'human-rebirth8': { ...HUMAN_PLAYER, rebirthAtCastle: 8, rebirths: 4 },
+	// the Paragon probes (IDL-187, `npm run pace:local -- hardcore-rebirth6 hardcore-rebirth6-paragon hardcore-rebirth6-paragon-max`): the same person with the economy upgrades of the grid bought; the run-2 ratio and the milestones against the profile without
+	'human-rebirth6-paragon': { ...HUMAN_PLAYER, rebirthAtCastle: 6, rebirths: 5, paragon: PARAGON_ECONOMY, localOnly: true },
+	// the hardcore bot is limited by its resources, not by the castle timers, so it shows what the economy upgrades are worth: the capped ones plus 100 points (-paragon) and 1,000 (-paragon-max) in the uncapped ones
+	'hardcore-rebirth6-paragon': { cps: 4, windows: HARDCORE_WINDOWS, rebirthAtCastle: 6, rebirths: 3, paragon: PARAGON_ECONOMY, localOnly: true },
+	'hardcore-rebirth6-paragon-max': {
+		cps: 4,
+		windows: HARDCORE_WINDOWS,
+		rebirthAtCastle: 6,
+		rebirths: 3,
+		paragon: { ...PARAGON_ECONOMY, clickGold: 1000, killRewards: 1000, craftXp: 1000 },
+		localOnly: true,
+	},
 	// the clicker: 300 clicks a minute (the limiter's sustained maximum, 5 a second) for 10 h a day, click power and Click Mastery first, gold traded for every missing resource to buy tiles ahead of the castle, rebirth at castle 6
 	'hardcore-clicker': {
 		cps: 5,

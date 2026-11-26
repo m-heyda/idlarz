@@ -1,4 +1,7 @@
 import { INITIAL_CHARACTER_STATS } from '@/config/character';
+import type { ParagonId } from '@/config/paragon';
+import { idolEconomy } from '@/lib/idolEconomy';
+import { createWorld } from '@/utils/world';
 import { ITEM_CATALOG, familyPieces } from '@/catalog';
 import { GRADE_INFO } from '@/catalog/items/grades';
 import { ARMOUR_SLOTS, LADDER, type Grade, type LadderCell } from '@/catalog/items/ladder';
@@ -89,6 +92,8 @@ export interface SimInput {
 	potions?: { id: string; qty: number }[];
 	/** The character level: skills unlock with it (the default 1 has neither Heal nor Stun) */
 	level?: number;
+	/** Paragon points spent (see `SimSetup`) */
+	paragon?: SimSetup['paragon'];
 	/** Auto-use switched on (the default): potions, Heal and Stun by the fixed rules */
 	autoUse?: boolean;
 	/** Picks the sealed random stream, so a table is reproducible */
@@ -112,16 +117,35 @@ export interface SimSetup {
 	character?: CharacterStats;
 	potions?: { id: string; qty: number }[];
 	level?: number;
+	/** Paragon points spent, by upgrade id (`PARAGON_UPGRADES`): the combat ones reach the fight profile through the same `idolFx` record the save pipeline stamps; absent = none, the fight is exactly the one without */
+	paragon?: Partial<Record<ParagonId, number>>;
 	/** The monsters waiting on the map, placed (ticket numbers count up from 1) */
 	monsters: { type: MonsterType; level: number; lucky?: boolean }[];
 	seed: string;
 }
 
+/** The `idolFx` the save pipeline stamps for the combat bonuses of the Paragon points (nothing with none, so a fight without paragon is unchanged) */
+const paragonFx = (paragon: SimSetup['paragon']) => {
+	if (!paragon) return {};
+	const idol = idolEconomy(createWorld([]), {}, paragon);
+	return {
+		idolFx: {
+			damagePct: idol.damagePct,
+			hpArmorPct: idol.hpArmorPct,
+			maxHpPct: idol.maxHpPct,
+			critDamagePct: idol.critDamagePct,
+			lifeLeechPct: idol.lifeLeechPct,
+			bossTimerSec: idol.bossTimerSec,
+			potionPowerPct: idol.potionPowerPct,
+		},
+	};
+};
+
 /** A player, a map with monsters on it and the server clock at `START`: what the fight engine runs on (for the sim and for engine tests). */
-export const simSetup = ({ equipment = {}, character = freshCharacter(), potions = [], level = 1, monsters, seed }: SimSetup) => {
+export const simSetup = ({ equipment = {}, character = freshCharacter(), potions = [], level = 1, paragon, monsters, seed }: SimSetup) => {
 	const characterStats: Record<string, number> = { availablePoints: 0 };
 	for (const key of BASE_KEYS) characterStats[key] = character[key];
-	const core = { equipment, characterStats, level: { level, progress: 0 }, bag: potions.map((p) => ({ id: p.id, qty: p.qty })) };
+	const core = { equipment, characterStats, level: { level, progress: 0 }, bag: potions.map((p) => ({ id: p.id, qty: p.qty })), ...paragonFx(paragon) };
 	const stored = { core, summary: { derived: { luck: 0, goldFind: 0 }, rates: { gold: 1, xp: 1 }, xpGainPct: 0 } } as unknown as StoredSave;
 	const base = newLedger(START * 1000, COMBAT.auto.minRebirths);
 	let n = 0;
@@ -145,8 +169,8 @@ export const simSetup = ({ equipment = {}, character = freshCharacter(), potions
 	return { ledger, env, start: START, stored };
 };
 
-const simulateFight = ({ equipment, monster, character, potions, level, autoUse = true, seed }: SimInput): SimResult => {
-	const { ledger, env } = simSetup({ equipment, character, potions, level, monsters: [monster], seed });
+const simulateFight = ({ equipment, monster, character, potions, level, paragon, autoUse = true, seed }: SimInput): SimResult => {
+	const { ledger, env } = simSetup({ equipment, character, potions, level, paragon, monsters: [monster], seed });
 
 	// the first request fights the monster (a click on it, so auto-battle's win-chance gate does not decide); then the clock runs on one second at a time until the fight is decided
 	let state = runCombat(ledger, env(START), { autoUse, commands: [{ kind: 'fight', n: 1 }] }).ledger;
@@ -186,3 +210,24 @@ export const simulateMany = (input: Omit<SimInput, 'seed'>, runs: number, seedBa
 	}
 	return { winRate: wins / runs, meanTimeSec: wins ? time / wins : NaN, meanHpLeft: wins ? hpLeft / wins : NaN };
 };
+
+/**
+ * The Paragon combat gate (docs/plan/paragon.md, IDL-187): what the combat upgrades may and may not do to a fight. Paragon is for long play after level 100, so it must make fights faster and safer, never take the place of gear: a kit two grades
+ * behind a boss loses at paragon 0, and has to keep losing with every capped combat upgrade full and 100 points in each of Damage and Maximum life (275 points, a realistic spend by paragon 300); the very top of the curve (4,075 points) must still leave a
+ * boss fight lasting several seconds, never a one-shot. `scripts/fight-sim.ts` prints the table and `tests/combat/paragonFight.test.ts` runs the gate.
+ */
+export const PARAGON_COMBAT_CAPS = { critDamage: 25, bossTimer: 25, lifeLeech: 25 } as const;
+
+/** The spends the combat table shows: name, and the points by upgrade (the capped three are always full except in the first row) */
+export const PARAGON_COMBAT_SPENDS: { name: string; paragon: Partial<Record<ParagonId, number>> | undefined }[] = [
+	{ name: 'no paragon', paragon: undefined },
+	{ name: 'capped three (75 points)', paragon: { ...PARAGON_COMBAT_CAPS } },
+	{ name: '+100 Damage, +100 Max life (275)', paragon: { ...PARAGON_COMBAT_CAPS, damage: 100, maxLife: 100 } },
+	{ name: '+500 / +500 (1,075)', paragon: { ...PARAGON_COMBAT_CAPS, damage: 500, maxLife: 500 } },
+	{ name: '+2,000 / +2,000 (4,075)', paragon: { ...PARAGON_COMBAT_CAPS, damage: 2000, maxLife: 2000 } },
+];
+
+/** The most a kit two grades behind may win at the realistic spend (the third row above): a nudge on a close fight, never a way to win most of them */
+export const PARAGON_BEHIND_WIN_MAX = 0.25;
+/** The least a boss fight lasts, in seconds, with the biggest spend (the last row): paragon may speed fights up, not remove them */
+export const PARAGON_FIGHT_MIN_SEC = 15;

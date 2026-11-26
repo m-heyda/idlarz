@@ -16,6 +16,9 @@ import { plainItem, resolveItem } from '../src/lib/itemInstance';
 import { armorOf, armorReduction, attacksPerSecond, critOdds, damagePerHit, damagePerSecond, maxHp } from '../src/lib/combat';
 import { calculateResourceBreakdown } from '../src/utils/game/income';
 import { COMBAT } from '../src/config/combatConfig';
+import { PARAGON_CAP_POINTS, PARAGON_UPGRADES, paragonEffect, paragonEffectText } from '../src/config/paragon';
+import { PARAGON_IDOL_FIELD, idolEconomy } from '../src/lib/idolEconomy';
+import { createWorld } from '../src/utils/world';
 import type { Equipment } from '../src/types/game';
 
 const out: string[] = [];
@@ -226,6 +229,46 @@ const main = async () => {
 			['Gems', 'server ledger', "replaced by the ledger's"],
 		],
 	);
+
+	// ---------------------------------------------------------------------------------------------------------------
+	line('## 6. Paragon: the 20 upgrades at 0, 1, the cap, over the cap and far beyond');
+	line();
+	line(
+		`Each cell is the effect of that many points in one upgrade (\`paragonEffect\`: capped = rate x min(points, ${PARAGON_CAP_POINTS}), uncapped = k x sqrt(points)); the last column is the number of the economy the upgrade is folded into (\`PARAGON_IDOL_FIELD\`), and the audit stops with an error when that number differs from the effect at any of these points.`,
+	);
+	line();
+	const pointsAt = [0, 1, PARAGON_CAP_POINTS, PARAGON_CAP_POINTS + 5, 100, 500, 5000];
+	table(
+		['Upgrade', 'Kind', ...pointsAt.map((p) => `${p} pts`), 'Folded into'],
+		PARAGON_UPGRADES.map((u) => {
+			for (const p of pointsAt) {
+				const folded = idolEconomy(createWorld([]), {}, { [u.id]: p })[PARAGON_IDOL_FIELD[u.id]] as number;
+				if (Math.abs(folded - paragonEffect(u, p)) > 1e-9) throw new Error(`paragon ${u.id} at ${p}: folded ${folded}, effect ${paragonEffect(u, p)}`);
+			}
+			return [
+				u.name,
+				u.capped ? `capped ${PARAGON_CAP_POINTS}` : 'uncapped',
+				...pointsAt.map((p) => paragonEffectText(u, paragonEffect(u, p))),
+				PARAGON_IDOL_FIELD[u.id],
+			];
+		}),
+	);
+	line(
+		`With every capped upgrade full (${PARAGON_UPGRADES.filter((u) => u.capped).length * PARAGON_CAP_POINTS} points) the economy upgrades give: ${[
+			'income',
+			'xpGain',
+			'tileDiscount',
+			'goldFind',
+			'offlineEff',
+			'buildSpeed',
+		]
+			.map((id) => {
+				const u = PARAGON_UPGRADES.find((x) => x.id === id)!;
+				return `${u.name} ${paragonEffectText(u, paragonEffect(u, PARAGON_CAP_POINTS))}`;
+			})
+			.join(', ')}.`,
+	);
+	line();
 
 	const target = resolve(dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1')), '../docs/generated/stat-audit.md');
 	mkdirSync(dirname(target), { recursive: true });
