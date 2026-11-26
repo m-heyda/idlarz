@@ -123,7 +123,7 @@ const ratesAfterBuildingUpgrade = (state: PersistedGame, job: BuildingUpgradeSta
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncome(state.equipment),
+		gearIncome(state.equipment, state.paragonSpent),
 	).total;
 };
 
@@ -144,7 +144,7 @@ const ratesAfterUpgrade = (state: PersistedGame): Resources | null => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncome(state.equipment),
+		gearIncome(state.equipment, state.paragonSpent),
 	).total;
 };
 
@@ -156,7 +156,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		state.prestige,
 		state.farmUpgrades,
 		state.merchantUpgrades,
-		gearIncome(state.equipment),
+		gearIncome(state.equipment, state.paragonSpent),
 	).total;
 	const idol = idolEconomy(state.tiles, state.idolLevels);
 	const fx = effectiveStats({

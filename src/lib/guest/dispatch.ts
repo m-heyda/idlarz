@@ -11,6 +11,7 @@ import {
 	fightStep,
 	inventoryStep,
 	masteryStep,
+	paragonStep,
 	petsStep,
 	rebirthStep,
 	redeemChest,
@@ -20,7 +21,7 @@ import {
 	type FightRequest,
 	type Online,
 } from '@/lib/offline/online';
-import type { CharacterRequest, MasteryRequest } from '@/lib/offline/gemTypes';
+import type { CharacterRequest, MasteryRequest, ParagonRequest } from '@/lib/offline/gemTypes';
 import type { TutorialRequest } from '@/lib/offline/tutorial';
 import type { PetsRequest } from '@/lib/offline/pets';
 import { isSkillId } from '@/lib/skills';
@@ -56,7 +57,7 @@ import {
 const REBUILD_MS = 1500;
 
 /** The routes the engine answers (the ones that need the guest's saved game prepared first). */
-const ENGINE_ROUTES = ['offline', 'spawn', 'chest', 'rock', 'fight', 'inventory', 'craft', 'rebirth', 'gems', 'mastery', 'character', 'tutorial', 'pets'];
+const ENGINE_ROUTES = ['offline', 'spawn', 'chest', 'rock', 'fight', 'inventory', 'craft', 'rebirth', 'gems', 'mastery', 'character', 'paragon', 'tutorial', 'pets'];
 
 const intOrUndefined = (value: unknown): number | undefined => (Number.isInteger(value) && (value as number) >= 0 ? (value as number) : undefined);
 const key = (value: unknown): string | null => (typeof value === 'string' && KEY.test(value) ? value : null);
@@ -211,6 +212,12 @@ export const createGuestTransport = (getGame: () => GameState): GuestTransport =
 				if (body.action !== 'allocate' || !k || typeof body.add !== 'object' || body.add === null || Array.isArray(body.add)) return bad();
 				const request: CharacterRequest = { action: 'allocate', add: body.add as Record<string, number> };
 				return answered(await characterStep(deps, userId, k, request, nowMs));
+			}
+			case '/api/paragon': {
+				if (body.action === 'sync') return answered(await paragonStep(deps, userId, null, { action: 'sync' }, nowMs));
+				if (body.action !== 'allocate' || !k || typeof body.add !== 'object' || body.add === null || Array.isArray(body.add)) return bad();
+				const request: ParagonRequest = { action: 'allocate', add: body.add as Record<string, number> };
+				return answered(await paragonStep(deps, userId, k, request, nowMs));
 			}
 			case '/api/tutorial': {
 				if (body.action === 'sync') return answered(await tutorialStep(deps, userId, null, { action: 'sync' }, nowMs, invVer));

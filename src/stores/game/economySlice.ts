@@ -40,7 +40,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncome(state.equipment),
+			gearIncome(state.equipment, state.paragonSpent),
 		);
 
 		const xpGain =

@@ -4,6 +4,7 @@ import { STARTING_GEMS } from '@/config/economy';
 import type { ActiveBuff } from '@/lib/buffs';
 import { isRecord } from '@/lib/isRecord';
 import { attrsFromCore, type Attrs } from '@/lib/offline/attrs';
+import type { Paragon } from '@/lib/offline/paragon';
 import type { GemShop } from '@/lib/offline/gemTypes';
 import type { CombatState } from '@/lib/offline/fightTypes';
 import { inventoryFromCore } from '@/lib/offline/inventory';
@@ -221,6 +222,8 @@ export interface Ledger {
 	legacy: Legacy;
 	/** The attribute points the player put into each attribute: the server's record (migration gems_attrs_ledger). Null in the column until the first request after the deploy seeds it from the stored save. */
 	attrs: Attrs | null;
+	/** The paragon points the player put into each upgrade (migration paragon_ledger, docs/plan/paragon.md): the server's record; null in the column until the first request. Not wiped by a rebirth. */
+	paragon: Paragon | null;
 	/** What the gem shop has sold and the daily bonus (migration gems_attrs_ledger); an empty record is stored as null. See `GemShop`. */
 	gemShop: GemShop;
 }
@@ -246,6 +249,7 @@ export const newLedger = (nowMs: number, rebirths = 0): Ledger => ({
 	stats: emptyStats(),
 	legacy: emptyLegacy(),
 	attrs: null,
+	paragon: null,
 	gemShop: emptyGemShop(),
 });
 

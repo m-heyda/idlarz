@@ -63,7 +63,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 						state.prestige,
 						state.farmUpgrades,
 						state.merchantUpgrades,
-						gearIncome(state.equipment),
+						gearIncome(state.equipment, state.paragonSpent),
 					);
 				}
 				newCastleUpgrade = null;
@@ -93,7 +93,7 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 					state.prestige,
 					state.farmUpgrades,
 					state.merchantUpgrades,
-					gearIncome(state.equipment),
+					gearIncome(state.equipment, state.paragonSpent),
 				);
 			}
 			buildingFinished = true;

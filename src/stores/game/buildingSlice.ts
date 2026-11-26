@@ -44,7 +44,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 
 	const ratesOf = (tiles: ReturnType<GameGet>['tiles']) => {
 		const s = get();
-		return calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncome(s.equipment));
+		return calculateResourceRates(tiles, s.characterStats, s.farmLevels, s.prestige, s.farmUpgrades, s.merchantUpgrades, gearIncome(s.equipment, s.paragonSpent));
 	};
 
 	return {

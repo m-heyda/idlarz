@@ -10,6 +10,8 @@ import { pickPersisted, type PersistedGame } from '@/lib/sanitizeSave';
 import type { GameState } from '@/types/game';
 import { createCharacterSlice } from './game/characterSlice';
 import { createCharacterSync } from './game/characterSync';
+import { createParagonSlice } from './game/paragonSlice';
+import { createParagonSync } from './game/paragonSync';
 import { createChestSync } from './game/chestSync';
 import { createBuildingSlice } from './game/buildingSlice';
 import { createClockSlice } from './game/clockSlice';
@@ -30,6 +32,7 @@ const createGameSlice = (set: GameSet, get: GameGet) => {
 	const chests = createChestSync(set, get, inv);
 	const combat = createCombatSync(set, get, inv, chests);
 	const character = createCharacterSync(set, get);
+	const paragon = createParagonSync(set, get);
 
 	const slice = {
 		// A fixed placeholder world: it is rendered on the server and before the save is read, so it must not be
@@ -41,6 +44,7 @@ const createGameSlice = (set: GameSet, get: GameGet) => {
 		...createClockSlice(set, get),
 		...createFarmSlice(set, get),
 		...createCharacterSlice(set, get, character),
+		...createParagonSlice(paragon),
 		...createInventorySlice(set, get, inv),
 		...createMerchantSlice(set, get, inv),
 		...createCombatSlice(set, get, inv, chests, combat),

@@ -3,6 +3,8 @@ import { CHARACTER_STAT_CONFIG } from '@/config/character';
 import { STAT_RULES } from '@/config/combatConfig';
 import { classXpBucket } from '@/lib/classPassives';
 import type { CharacterStats, Equipment } from '@/types/game';
+import type { ParagonId } from '@/config/paragon';
+import { paragonBonuses } from '@/lib/offline/paragon';
 
 /**
  * The economy effects of the worn gear (the set bonuses of catalog/sets.ts). One pure function of the equipment, used by the
@@ -48,9 +50,11 @@ export interface GearIncome {
 }
 
 /** The gear's contribution to the income, for the browser and the server alike (`summarize`, the offline grant and every store slice read it through here). */
-export const gearIncome = (equipment: Equipment): GearIncome => {
+export const gearIncome = (equipment: Equipment, paragon?: Partial<Record<ParagonId, number>>): GearIncome => {
 	const gear = aggregateStats(equipment);
-	return { incomePct: gear.incomePct, farmYieldPct: Math.min(STAT_RULES.farmYieldCap, Math.max(0, gear.farmYield)) };
+	// the Paragon Income upgrade is its own multiplicative bucket on top of the gear's (docs/plan/paragon.md): (1 + gear) x (1 + paragon) - 1
+	const bucket = paragon ? paragonBonuses(paragon).income : 0;
+	return { incomePct: bucket > 0 ? ((1 + gear.incomePct / 100) * (1 + bucket / 100) - 1) * 100 : gear.incomePct, farmYieldPct: Math.min(STAT_RULES.farmYieldCap, Math.max(0, gear.farmYield)) };
 };
 
 /** The XP bonus in % that the worn gear's Intelligence and Charisma add, at the same rate as the points the player spends. */

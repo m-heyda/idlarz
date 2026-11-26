@@ -184,7 +184,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 								state.prestige,
 								state.farmUpgrades,
 								merchantUpgrades,
-								gearIncome(state.equipment),
+								gearIncome(state.equipment, state.paragonSpent),
 							),
 						}
 					: {}),

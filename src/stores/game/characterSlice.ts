@@ -36,7 +36,7 @@ export const createCharacterSlice = (set: GameSet, get: GameGet, character: Char
 			state.prestige,
 			state.farmUpgrades,
 			state.merchantUpgrades,
-			gearIncome(state.equipment),
+			gearIncome(state.equipment, state.paragonSpent),
 		);
 
 		set({
@@ -65,7 +65,7 @@ export const createCharacterSlice = (set: GameSet, get: GameGet, character: Char
 				state.prestige,
 				state.farmUpgrades,
 				state.merchantUpgrades,
-				gearIncome(state.equipment),
+				gearIncome(state.equipment, state.paragonSpent),
 			),
 		});
 	},

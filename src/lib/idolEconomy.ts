@@ -2,6 +2,8 @@ import { buildingDef } from '@/catalog/buildings';
 import { idolDef, type IdolDef } from '@/catalog/idols';
 import { GENERAL_RULES, IDOL_RULES } from '@/config/buildings';
 import { HARD_LIMITS } from '@/config/limits';
+import type { ParagonId } from '@/config/paragon';
+import { paragonBonuses } from '@/lib/offline/paragon';
 import { forEachOwned, type World } from '@/utils/world';
 
 /**
@@ -33,6 +35,31 @@ export interface IdolEconomy {
 	clickGoldPct: number;
 	/** % more gold from everything sold to the merchant (Lighthouse) */
 	merchantSellPct: number;
+	/** The Paragon upgrades that have no Idol counterpart (docs/plan/paragon.md); the Paragon points that do (XP, kill rewards, damage, Luck, away income, crafting XP, click gold, build time) are added to the fields above. */
+	/** % more max HP (Paragon: Maximum life), life only, not armor */
+	maxHpPct: number;
+	/** % more damage from a critical hit (Paragon) */
+	critDamagePct: number;
+	/** % of the damage dealt healed (Paragon: Life leech) */
+	lifeLeechPct: number;
+	/** Seconds added to a boss fight's clock (Paragon) */
+	bossTimerSec: number;
+	/** % more of every resource but XP (Paragon: Income, its own multiplicative bucket) */
+	incomePct: number;
+	/** % off the gold price of tiles (Paragon) */
+	tileDiscountPct: number;
+	/** % more gold from drops and sales (Paragon: Gold find) */
+	goldFindPct: number;
+	/** Percentage points more chance that a new monster is golden (Paragon) */
+	goldenChancePts: number;
+	/** Percentage points more chance that a monster drops a chest (Paragon) */
+	chestDropPts: number;
+	/** % more chance of epic and better items (Paragon, relative) */
+	epicFindPct: number;
+	/** % more healing and buff power from potions (Paragon) */
+	potionPowerPct: number;
+	/** % more XP past level 100 (Paragon) */
+	paragonXpPct: number;
 }
 
 export const NO_IDOL_ECONOMY: IdolEconomy = {
@@ -48,6 +75,18 @@ export const NO_IDOL_ECONOMY: IdolEconomy = {
 	farmOutputPct: 0,
 	clickGoldPct: 0,
 	merchantSellPct: 0,
+	maxHpPct: 0,
+	critDamagePct: 0,
+	lifeLeechPct: 0,
+	bossTimerSec: 0,
+	incomePct: 0,
+	tileDiscountPct: 0,
+	goldFindPct: 0,
+	goldenChancePts: 0,
+	chestDropPts: 0,
+	epicFindPct: 0,
+	potionPowerPct: 0,
+	paragonXpPct: 0,
 };
 
 /** The Idols standing on a map: biome -> the level on its tile (1 when the field is absent). Cached per World, so the per-tick callers do not scan the map. */
@@ -78,7 +117,7 @@ export const effectiveIdolLevel = (tileLevel: number, remembered: number | undef
  * effect = IDOL_RULES.perLevel x level  (percent)          Luck: luckPerLevel x level points
  * level = min(level on the tile, level the account remembers for the biome)
  */
-export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>): IdolEconomy => {
+export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>, paragon?: Partial<Record<ParagonId, number>>): IdolEconomy => {
 	const standing = standingIdols(tiles);
 	const out = { ...NO_IDOL_ECONOMY };
 	for (const [biome, tileLevel] of Object.entries(standing)) {
@@ -151,7 +190,36 @@ export const idolEconomy = (tiles: World, idolLevels?: Record<string, number>): 
 				break;
 		}
 	});
+	if (paragon) addParagon(out, paragon);
 	return out;
+};
+
+/**
+ * The Paragon points spent (the ledger's record, docs/plan/paragon.md) added to the same numbers the Idols fill, so every place that already applies an Idol's bonus applies the paragon's too, in the browser and on the server (`summarize`). Each
+ * upgrade is worth `paragonBonuses` in its own unit; the ones with an Idol counterpart add to that field, the others fill their own.
+ */
+const addParagon = (out: IdolEconomy, spent: Partial<Record<ParagonId, number>>): void => {
+	const b = paragonBonuses(spent);
+	out.damagePct += b.damage;
+	out.maxHpPct += b.maxLife;
+	out.critDamagePct += b.critDamage;
+	out.lifeLeechPct += b.lifeLeech;
+	out.bossTimerSec += b.bossTimer;
+	out.incomePct += b.income;
+	out.xpPct += b.xpGain;
+	out.tileDiscountPct += b.tileDiscount;
+	out.clickGoldPct += b.clickGold;
+	out.killRewardPct += b.killRewards;
+	out.luck += b.luck;
+	out.goldFindPct += b.goldFind;
+	out.goldenChancePts += b.goldenChance;
+	out.chestDropPts += b.chestDrop;
+	out.epicFindPct += b.epicFind;
+	out.offlineEffPts += b.offlineEff;
+	out.buildTimePct += b.buildSpeed;
+	out.potionPowerPct += b.potionPower;
+	out.paragonXpPct += b.paragonXp;
+	out.craftXpPct += b.craftXp;
 };
 
 /** True when no Idol effect is on (so a caller can leave its numbers untouched). */
