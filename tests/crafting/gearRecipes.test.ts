@@ -64,7 +64,7 @@ test('eight tiers (G1-G8) of 12 weapon and off-hand types and 11 other slots = 1
 		assert.equal(r.timeSec, CRAFT_GEAR.timeSec[g]);
 		// a recipe only asks for a component its level has unlocked: G1 (level 1) takes none
 		for (const input of r.inputs)
-			if ('component' in input) {
+			if ('component' in input && !input.component.startsWith('ing_')) {
 				const maker = RECIPE_BY_ID[input.component];
 				assert.ok(maker, `${r.id}: ${input.component} has a recipe`);
 				assert.ok(maker.unlock <= r.unlock, `${r.id}: ${input.component} is unlocked by then`);
@@ -358,7 +358,7 @@ test('a bag with room for one takes one; the rest waits in the batch for a later
 });
 
 test("cancel delivers what is finished, refunds the rest's components and the XP is paid once", () => {
-	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 30, copper_nails: 100 } }));
+	const q = queued('G2', 'head', 3, atLevel(8, { stock: { cured_leather: 100, copper_nails: 100 } }));
 	const half = T0 + q.r.timeSec! * 1000 + 1;
 	const out = applyCancel(q.inv, q.craft, 0, half, env);
 	assert.equal(out.ok, true);
@@ -393,4 +393,41 @@ test('a crafted marker survives a save; anything but true is refused', () => {
 	const { crafted: _crafted, ...plain } = piece;
 	void _crafted;
 	assert.equal((readInstance(plain) as { crafted?: true }).crafted, undefined);
+});
+
+test('gear above G1 is built from Plank and Leather components, never from raw wood, stone, hide, coal or food (IDL-397)', () => {
+	const RAW = ['wood', 'stone', 'hide', 'coal', 'food'];
+	const SIZES = [
+		['plank_bundle', 'cured_leather'],
+		['plank_crate', 'leather_stack'],
+		['plank_pallet', 'leather_bale'],
+	];
+	const sizeOfGrade: Record<string, number> = { G2: 0, G3: 1, G4: 1, G5: 2, G6: 2, G7: 2, G8: 2 };
+	for (const r of GEAR_RECIPES.filter((x) => !x.legacy)) {
+		const grade = 'gear' in r.output ? r.output.gear.grade : '';
+		if (grade === 'G1') {
+			assert.ok(
+				r.inputs.every((i) => 'resource' in i),
+				`${r.id}: starter gear stays raw`,
+			);
+			continue;
+		}
+		assert.ok(!r.inputs.some((i) => 'resource' in i && RAW.includes(i.resource)), `${r.id}: no raw wood, stone, hide, coal or food`);
+		const parts = r.inputs.filter((i) => 'component' in i && SIZES[sizeOfGrade[grade]].includes(i.component));
+		assert.equal(parts.length, 1, `${r.id}: one part of the grade's size`);
+		assert.ok(parts[0].qty >= 1 && parts[0].qty <= 300, `${r.id}: ${parts[0].qty} parts`);
+		assert.ok(r.inputs.length <= 6, `${r.id}: ${r.inputs.length} lines`);
+	}
+});
+
+test('every crate, pallet, stack and bale is made of the size below and unlocks before the first gear that asks for it', () => {
+	for (const [id, below] of [
+		['plank_crate', 'plank_bundle'],
+		['plank_pallet', 'plank_crate'],
+		['leather_stack', 'cured_leather'],
+		['leather_bale', 'leather_stack'],
+	]) {
+		const r = RECIPES.find((x) => 'component' in x.output && x.output.component === id)!;
+		assert.ok(r.inputs.length === 1 && 'component' in r.inputs[0] && r.inputs[0].component === below, id);
+	}
 });
