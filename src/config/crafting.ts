@@ -64,7 +64,7 @@ export const CRAFT_DISCOUNT_MAX = 0.25;
 export const CRAFT_COST_HEADROOM = 1 / (1 - CRAFT_DISCOUNT_MAX);
 
 /**
- * Gear crafting (IDL-241, docs/plan/17-crafting.md sections 2 and 7): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
+ * Gear crafting (IDL-241, docs/plan/17-crafting.md): the knobs of the `craft` loot source. A gear recipe is a grade and a slot; the server rolls the result at claim time through
  * the loot pipeline (`LOOT_SOURCES.craft`, profile `craft`, pool `equipment_craft`), sealed on the lifetime craft counter `craft.ord`.
  *
  * - **Grades**: G1-G8 (`ceilingGrade`): eight tiers of every item type; a recipe unlocks at the crafting level of its grade (`unlock` in `src/catalog/recipes.ts`: G1 1, G2 8, G3 15, G4 25, G5 35, G6 50, G7 65, G8 80, owner 2026-11-07). G1-G6 are live grades (they drop); G7 and G8 are craft-only (`CRAFT_ONLY_GRADES`: nothing drops them). G9 comes through the legendary recipes.

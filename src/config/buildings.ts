@@ -77,7 +77,7 @@ export const BIOME_MILESTONES = {
 export const GENERAL_RULES = { perLevel: 1 };
 
 /**
- * The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
+ * The Idols (IDL-96, docs/plan/18): a permanent bonus per biome.
  *
  * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
  * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).

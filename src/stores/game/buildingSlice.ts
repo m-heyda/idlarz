@@ -57,7 +57,7 @@ export const createBuildingSlice = (set: GameSet, get: GameGet) => {
 			if (buildProblem(ctx, x, y, id)) return false;
 			const s = get();
 			const def = buildingDef(id);
-			// an Idol the account has learned is placed again for free, at the level it remembers (docs/plan/18 section 6); the first one costs level 1
+			// an Idol the account has learned is placed again for free, at the level it remembers (docs/plan/18); the first one costs level 1
 			const remembered = def?.kind === 'idol' ? rememberedIdolLevel(s.idolLevels, def.biome) : 0;
 			const cost = remembered > 0 ? {} : buildingLevelCost(1, ctx.ownedTiles, def);
 			if (!canAffordBundle(s.resources, cost)) return false;

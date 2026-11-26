@@ -13,14 +13,14 @@ The one place to look when planning the next step. It lists only what is **still
 | Topic | Spec | Linear |
 | --- | --- | --- |
 | Magnitude targets (gold/s, income multiplier, Embers, stocks) | pacing targets | IDL-128 |
-| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | loot, [28](28-reuse-items-and-stats.md) section 6, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
+| Perk families, caps and the legendary roster (11, two pools, Vault, relics) | loot, [28](28-reuse-items-and-stats.md) section 2, [20](20-monster-families-and-rewards.md) | IDL-143..149, 111 |
 | Monster chests (no keys, 2 % per kill) | loot | IDL-163 |
 | Spawn tables per distance band, boss rules, rosters for hills, coast and lake | [20](20-monster-families-and-rewards.md), [12](12-rebirth-biomes.md) | IDL-53, 55, 201 |
 | Five rebirth biomes (names, rosters, tile output rule) | [12](12-rebirth-biomes.md) | IDL-105, 199 |
 | Set bonuses, palettes, accessory themes, new stats, affix tier labels | [28](28-reuse-items-and-stats.md), art README (removed 2026-11-16) | IDL-39, 23, 164, 176, 45 |
 | Rebirth salvage | [17](17-crafting.md) | IDL-151 |
-| Ember price book, cosmetics, Monument, autobuyers | [18](18-biome-buildings-and-material-tiers.md) section 6 | IDL-97, 184, 185, 195 |
-| Hero customisation: click name or badge, nickname glow, name colour, frames (gem One-time tab) | [30](30-gem-sinks.md) section 5 | IDL-296 |
+| Ember price book, cosmetics, Monument, autobuyers | [18](18-biome-buildings-and-material-tiers.md) section 3 | IDL-97, 184, 185, 195 |
+| Hero customisation: click name or badge, nickname glow, name colour, frames (gem One-time tab) | [30](30-gem-sinks.md) section 3 | IDL-296 |
 | Map size, milestones (the tile price tail is built, IDL-79/181) | [18](18-biome-buildings-and-material-tiers.md) | IDL-131, 198 |
 | Preview map of another player's world | [15](15-leaderboard-and-world-preview.md) | IDL-115 |
 | Paragon (levels past 100, points, upgrades, milestones) | [paragon](paragon.md) | IDL-114, 186, 187, 394 |
@@ -151,7 +151,7 @@ Loose ideas, not scheduled and not sized; each needs a design pass before it ent
 - **Hide is the template for a second-tier material**: three sources (the farm, kills via `COMBAT.rewards.hideShare`, later buildings). A material needed in a large amount must have more than one scalable source.
 - XP is slow on purpose (tile XP 45 per base unit, the anchored level curve).
 
-**Order of work:** see [18](18-biome-buildings-and-material-tiers.md) section 10 and the Linear project R7 (the old six-step list was replaced by it).
+**Order of work:** see [18](18-biome-buildings-and-material-tiers.md) and the Linear project R7 (the old six-step list was replaced by it).
 
 Things the rework must keep: monsters not standing on buildings; `netWorth.ts` plausibility must price the new levels; the sim bot's `BUILD_ORDER` has to learn the new choices; **acceptance:** with `human-rebirth6` / `-rebirth8`, run 2 reaches the same point in at most about 65-70 % of run 1, and the first rebirth stays available around day 7.
 

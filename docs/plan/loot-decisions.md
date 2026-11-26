@@ -19,7 +19,7 @@ Legendary perks and set bonuses use the same families. Each percent family is it
 | Building time | 8 % | 15 % | 25 % | -60 % combined | Embers (Builders, max -50 %) and Idols; tooltip shows the capped total |
 | Chest interval | 8 % | 15 % | 25 % | -40 %, floor 8 min | chest Idol, Beacon potion |
 
-Which items carry what: see [28](28-reuse-items-and-stats.md) section 6 (11 legendaries, one headline family each, two launch handlers). The Rattatui set is removed (IDL-55); sets S1-S3 carry the set bonuses of [28](28-reuse-items-and-stats.md) section 10.
+Which items carry what: see the legendary perk roster in `src/catalog/items/reuse.ts` (11 legendaries, one headline family each, two launch handlers; the Vault in [28](28-reuse-items-and-stats.md)). The Rattatui set is removed (IDL-55); sets S1-S3 carry the set bonuses of [28](28-reuse-items-and-stats.md) section 1.
 
 ## Monster chests (decided 2026-11-07, IDL-163; not built)
 
@@ -28,7 +28,7 @@ A kill sometimes drops a **chest item** into the bag, opened later from the inve
 - **No keys in v1.** A chest opens free; keys can return later for locked Royal chests.
 - **Drop chance:** 2 % per normal kill, a boss always drops its Royal chest, a golden monster drops an Arcane chest. Always `placement: 'extra'`, never `replace`.
 - **Tiers by biome:** Wooden (home), Iron Strongbox, Mossy, Coral, Frost, Magma as the biomes arrive; Royal (boss) and Arcane (golden) on top. Chest level = the dropping monster's level, capped.
-- **Contents:** gear, potions (including buffs), materials, XP orbs and gold, from the existing loot pipeline. **No permanent stat gifts. No gems** (gem sources stay achievements and the daily bonus, IDL-188/194). Legendary rolls stay inside the legendary rules ([28](28-reuse-items-and-stats.md) section 6).
+- **Contents:** gear, potions (including buffs), materials, XP orbs and gold, from the existing loot pipeline. **No permanent stat gifts. No gems** (gem sources stay achievements and the daily bonus, IDL-188/194). Legendary rolls stay inside the legendary rules ([28](28-reuse-items-and-stats.md) section 2).
 - **Safety:** the roll is sealed on a counter (a reload cannot reroll); gold is recorded as `granted`; a full bag converts the chest to its sell value; "Sell common" never sweeps chests.
 - **Budget:** the expected value of chests must stay at 10 % of hourly income or less at every tier; `loot-sim` gets a chest-tier table and fails the check above that.
 

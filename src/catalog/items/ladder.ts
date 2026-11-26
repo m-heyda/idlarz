@@ -190,7 +190,7 @@ const ARMOUR_NAMES: Record<ArmourSlot, string[]> = {
 	charm: list(
 		'Acorn Charm, Rabbit Foot, Bone Token, Bronze Medal, Lucky Coin, Obsidian Idol, Runed Totem, Ancient Relic, Heartstone, Hive Charm, War Medal Charm, Core Charm',
 	),
-	// docs/plan/28-reuse-items-and-stats.md section 3 names the belt art; the sets take the Sunhoney, Warlord and hunter belts
+	// the belt art is in `public/pixel/items/belt/`; the sets (docs/plan/28) take the Sunhoney, Warlord and hunter belts
 	belt: list(
 		"Worn Leather Belt, Tanned Sash, Ironbuckle Belt, Chain Girdle, Knight's Girdle, Obsidian Belt, Runebound Girdle, Ancient Cincture, Alchemist Bandolier, Sunforged Cincture, Warden Plate Belt, Hunter Trophy Belt",
 	),
