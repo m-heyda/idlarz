@@ -72,6 +72,8 @@ export const payKill = (
 	const ordKill = ledger.ordKill + 1;
 	const rng = sealedRng(secret, userId, ledger.runId, 'kill', ordKill);
 	const { luck, goldFind, killRewardPct } = stored.summary.derived;
+	// the Paragon upgrades the save's summary carries (absent with none)
+	const paragonFx = stored.summary.derived.idol;
 	const inv = ledger.inv!;
 	const mastery = masteryBonusesFor(type, ledger.stats.masteryClaimed, ledger.stats.biomeClaimed);
 	const deed = deedBonuses(ledger.stats.milestonesClaimed);
@@ -92,6 +94,8 @@ export const payKill = (
 			masteryLootPct: mastery.loot,
 			deedGoldPct: deed.gold,
 			deedXpPct: deed.xp,
+			chestDropPts: paragonFx?.chestDropPts,
+			epicFindPct: paragonFx?.epicFindPct,
 		},
 		rng,
 	);

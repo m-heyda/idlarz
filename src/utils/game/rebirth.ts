@@ -61,7 +61,7 @@ export const emberIncomeMultiplier = (prestige: PrestigeState | undefined): numb
  * Percent off tile cost: Charisma plus Thrift, capped.
  *
  * The tile discount in percent: Charisma (0.5% per point, at most 25%) + Thrift (2% per level, Ember shop) + Bulk Discount (1% per level, merchant) + the Warrior's class passive (3 points) + the worn gear's Tile Discount (cape and neck of G4 and up, at most 10 points, IDL-176), capped at 45% (`REBIRTH.discountCapPercent`) plus 5 points per Treasury Charter level (Ember shop).
- * Buildings take Thrift only.
+ * The Paragon upgrade Tile discount (up to 10 points) is in the same sum and under the same cap. Buildings take Thrift only.
  *
  * @category Economy/Tiles
  * @order 4
@@ -74,13 +74,16 @@ export const effectiveTileDiscount = (
 	merchant?: MerchantUpgrades,
 	playerClass?: unknown,
 	equipment?: Equipment,
+	/** The Paragon Tile discount upgrade's points (`paragonBonuses(spent).tileDiscount`): added under the same cap */
+	paragonPct = 0,
 ): number =>
 	Math.min(
 		stats.tileCostDiscount +
 			emberEffect(prestige, 'thrift') * 100 +
 			merchantEffect(merchant, 'bulk') +
 			classPassives(playerClass).tileDiscountPct +
-			gearTileDiscountPct(equipment),
+			gearTileDiscountPct(equipment) +
+			paragonPct,
 		tileDiscountCap(prestige),
 	);
 

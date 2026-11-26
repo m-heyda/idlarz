@@ -1,6 +1,7 @@
 // economySlice.ts
 // Split out of gameStore.ts (IDL-14); the actions and their behaviour are unchanged.
 
+import { paragonBonuses } from '@/lib/offline/paragon';
 import { CLICK_LADDER, clickGold, RESOURCE_CAP, XP_CAP } from '@/config/economy';
 import { calculateTileCost, canAffordBundle, subtractBundle, tileCostAsResources } from '@/utils/game/costs';
 import { calculateResourceRates } from '@/utils/game/income';
@@ -10,7 +11,7 @@ import { economyTiles } from '@/utils/game/tiles';
 import { effectiveTileDiscount, emberEffect } from '@/utils/game/rebirth';
 import { rollBiome } from '@/utils/biomeRules';
 import { builderBusy, builderCount } from '@/lib/buildings';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { idolEconomy, xpPctAt } from '@/lib/idolEconomy';
 import { buildTimeCutPct } from '@/lib/buildTimeCut';
 import { limitOf } from '@/lib/limits';
 import { gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
@@ -26,7 +27,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 		const owned = economyTiles(state.tiles, state.freeTiles);
 		const cost = calculateTileCost(
 			owned,
-			effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+			effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment, paragonBonuses(state.paragonSpent).tileDiscount),
 		);
 		const bundle = tileCostAsResources(cost);
 		if (!canAffordBundle(state.resources, bundle)) return false;
@@ -45,7 +46,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 
 		const xpGain =
 			calculateXpGain(owned + 1) *
-			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + idolEconomy(state.tiles, state.idolLevels).xpPct) / 100);
+			(1 + (xpGainPct(state.characterStats, state.equipment, state.playerClass) + xpPctAt(idolEconomy(state.tiles, state.idolLevels, state.paragonSpent), state.level.level)) / 100);
 		const resources = subtractBundle(state.resources, bundle);
 		resources.xp = Math.min(resources.xp + xpGain, XP_CAP);
 
@@ -68,7 +69,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			const purchased = owned - 1;
 			const cost = calculateTileCost(
 				owned,
-				effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment),
+				effectiveTileDiscount(state.characterStats, state.prestige, state.merchantUpgrades, state.playerClass, state.equipment, paragonBonuses(state.paragonSpent).tileDiscount),
 			);
 			if (!canAffordBundle(state.resources, tileCostAsResources(cost))) return false;
 
@@ -91,7 +92,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 				resources: subtractBundle(state.resources, castle.tile.upgradeCost),
 				castleUpgrade: {
 					toLevel: castle.tile.level + 1,
-					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, buildTimeCutPct(state.tiles, state.idolLevels, state.equipment)),
+					remainingSec: castleUpgradeDuration(castle.tile.level, state.prestige, buildTimeCutPct(state.tiles, state.idolLevels, state.equipment, state.paragonSpent)),
 				},
 			});
 			return true;
@@ -104,7 +105,7 @@ export const createEconomySlice = (set: GameSet, get: GameGet) => {
 			const multiplier =
 				(1 + emberEffect(state.prestige, 'mastery')) *
 				(1 + gearEconomy(state.equipment).clickPct / 100) *
-				(1 + idolEconomy(state.tiles, state.idolLevels).clickGoldPct / 100);
+				(1 + idolEconomy(state.tiles, state.idolLevels, state.paragonSpent).clickGoldPct / 100);
 			const gold = clickGold(state.resourceRates.total.gold, state.clickLevel, multiplier);
 			if (!(gold > 0)) return 0;
 			set({

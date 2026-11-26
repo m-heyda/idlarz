@@ -6,7 +6,7 @@ import { castleLevelOf } from '@/lib/castleWard';
 import { effectiveStats } from '@/lib/effectiveStats';
 import { gearBuildTimePct, gearChestSpeedPct, gearEconomy, gearIncome, xpGainPct } from '@/lib/gearEconomy';
 import { attributesWithGear } from '@/lib/gearAttributes';
-import { idolEconomy } from '@/lib/idolEconomy';
+import { idolEconomy, xpPctAt } from '@/lib/idolEconomy';
 import { offlineCapSec, offlineEfficiency } from '@/lib/offline/limits';
 import { calculateResourceRates } from '@/utils/game/income';
 import { countOwnedTiles, economyTiles } from '@/utils/game/tiles';
@@ -65,7 +65,22 @@ export interface SaveDerived {
 	/** The character's Intelligence attribute: it leans the quality of crafted gear (src/lib/craftGear.ts). Absent on rows from before (read as 0). */
 	intelligence?: number;
 	/** What the standing Idols add that the server applies beyond the numbers above (absent with none): chest speed, crafting XP, damage and max HP and armor, in % */
-	idol?: { chestSpeedPct: number; craftXpPct: number; damagePct: number; hpArmorPct: number; merchantSellPct?: number };
+	idol?: {
+		chestSpeedPct: number;
+		craftXpPct: number;
+		damagePct: number;
+		hpArmorPct: number;
+		merchantSellPct?: number;
+		/** The Paragon upgrades the fight profile and the loot rolls read (absent with none) */
+		maxHpPct?: number;
+		critDamagePct?: number;
+		lifeLeechPct?: number;
+		bossTimerSec?: number;
+		potionPowerPct?: number;
+		goldenChancePts?: number;
+		chestDropPts?: number;
+		epicFindPct?: number;
+	};
 	/** The share of a castle or building timer the player's cuts take off (Master Builders plus the Dwarf Statue, at most 0.6): `verify.ts` refuses a new upgrade shorter than that allows. Absent with none. */
 	buildTimeReduction?: number;
 	/** Set only while the server pays this save from an older one (`trustedEconomy`): the server time (ms) of the last save it believed. `verify.ts` judges a claim against the real time since then (the self-heal rule), so a frozen account whose claim the clock has caught up with is believed again. Absent on every believed save. */
@@ -158,7 +173,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		state.merchantUpgrades,
 		gearIncome(state.equipment, state.paragonSpent),
 	).total;
-	const idol = idolEconomy(state.tiles, state.idolLevels);
+	const idol = idolEconomy(state.tiles, state.idolLevels, state.paragonSpent);
 	const fx = effectiveStats({
 		idol,
 		characterStats: state.characterStats,
@@ -190,7 +205,7 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 		rebirths: state.prestige.rebirths,
 		legacyPoints: state.prestige.legacyPoints,
 		legacyEarned: state.prestige.legacyEarned,
-		xpGainPct: xpGainPct(state.characterStats, state.equipment, state.playerClass) + idol.xpPct,
+		xpGainPct: xpGainPct(state.characterStats, state.equipment, state.playerClass) + xpPctAt(idol, state.level.level),
 		playSeconds: state.playSeconds,
 		derived: {
 			lakesOwned: biomeCount(state.tiles, 'lake'),
@@ -213,7 +228,20 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 			...(maxBuildTimeReduction(state.prestige, idol.buildTimePct + gearBuildTime) > 0
 				? { buildTimeReduction: maxBuildTimeReduction(state.prestige, idol.buildTimePct + gearBuildTime) }
 				: {}),
-			...(idol.chestSpeedPct || gearChestSpeed || idol.craftXpPct || idol.damagePct || idol.hpArmorPct || idol.merchantSellPct
+			...(idol.chestSpeedPct ||
+			gearChestSpeed ||
+			idol.craftXpPct ||
+			idol.damagePct ||
+			idol.hpArmorPct ||
+			idol.merchantSellPct ||
+			idol.maxHpPct ||
+			idol.critDamagePct ||
+			idol.lifeLeechPct ||
+			idol.bossTimerSec ||
+			idol.potionPowerPct ||
+			idol.goldenChancePts ||
+			idol.chestDropPts ||
+			idol.epicFindPct
 				? {
 						idol: {
 							// the Idols' and the worn gear's chest speed together (the class's is added where the interval is read, `bankContext`)
@@ -222,6 +250,14 @@ export const summarize = (state: PersistedGame): SaveSummary => {
 							damagePct: idol.damagePct,
 							hpArmorPct: idol.hpArmorPct,
 							...(idol.merchantSellPct ? { merchantSellPct: idol.merchantSellPct } : {}),
+							...(idol.maxHpPct ? { maxHpPct: idol.maxHpPct } : {}),
+							...(idol.critDamagePct ? { critDamagePct: idol.critDamagePct } : {}),
+							...(idol.lifeLeechPct ? { lifeLeechPct: idol.lifeLeechPct } : {}),
+							...(idol.bossTimerSec ? { bossTimerSec: idol.bossTimerSec } : {}),
+							...(idol.potionPowerPct ? { potionPowerPct: idol.potionPowerPct } : {}),
+							...(idol.goldenChancePts ? { goldenChancePts: idol.goldenChancePts } : {}),
+							...(idol.chestDropPts ? { chestDropPts: idol.chestDropPts } : {}),
+							...(idol.epicFindPct ? { epicFindPct: idol.epicFindPct } : {}),
 						},
 					}
 				: {}),

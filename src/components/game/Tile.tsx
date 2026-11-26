@@ -84,7 +84,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 		const total = buildingUpgradeDuration(
 			job.toLevel - 1,
 			state.prestige,
-			buildTimeCutPct(state.tiles, state.idolLevels, state.equipment ?? {}),
+			buildTimeCutPct(state.tiles, state.idolLevels, state.equipment ?? {}, state.paragonSpent),
 			def?.kind === 'idol' ? 'idol' : 'building',
 		);
 		const done = total > 0 ? Math.min(1, Math.max(0, 1 - job.remainingSec / total)) : 0;

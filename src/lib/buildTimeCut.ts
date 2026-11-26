@@ -1,3 +1,4 @@
+import type { ParagonId } from '@/config/paragon';
 import { gearBuildTimePct } from '@/lib/gearEconomy';
 import { idolEconomy } from '@/lib/idolEconomy';
 import type { Equipment } from '@/types/game';
@@ -11,7 +12,7 @@ import type { World } from '@/utils/world';
  * @category Economy/Buildings
  * @order 7
  * @formula
- * extra = Dwarf Statue % + worn gear build time %        reduction = min(60 %, Ember upgrade of the kind + extra)
+ * extra = Dwarf Statue % + worn gear build time % + Paragon Build speed %        reduction = min(60 %, Ember upgrade of the kind + extra)
  */
-export const buildTimeCutPct = (tiles: World, idolLevels: Record<string, number> | undefined, equipment: Equipment): number =>
-	idolEconomy(tiles, idolLevels ?? {}).buildTimePct + gearBuildTimePct(equipment);
+export const buildTimeCutPct = (tiles: World, idolLevels: Record<string, number> | undefined, equipment: Equipment, paragon?: Partial<Record<ParagonId, number>>): number =>
+	idolEconomy(tiles, idolLevels ?? {}, paragon).buildTimePct + gearBuildTimePct(equipment);

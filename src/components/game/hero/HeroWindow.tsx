@@ -149,6 +149,7 @@ const HeroLeft: React.FC = () => {
 	const merchantUpgrades = useGameStore((state) => state.merchantUpgrades);
 	const tiles = useGameStore((state) => state.tiles);
 	const idolLevels = useGameStore((state) => state.idolLevels);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	const playerHp = useGameStore((state) => state.playerHp);
 	const playerMp = useGameStore((state) => state.playerMp);
 	const avatarId = useUiStore((state) => state.avatarId);
@@ -163,7 +164,7 @@ const HeroLeft: React.FC = () => {
 	const title = shownTitle(choice.titleId, choice.earned);
 	const passives = describeClassPassives(playerClass);
 
-	const idol = idolEconomy(tiles, idolLevels);
+	const idol = idolEconomy(tiles, idolLevels, paragonSpent);
 	const fx = effectiveStats({ characterStats, equipment, prestige, merchantUpgrades, playerClass, idol });
 	const gear = aggregateStats(equipment);
 	const hpMax = maxHp(characterStats, equipment);

@@ -174,6 +174,7 @@ export const bankContext = (stored: StoredSave): BankContext => ({
 	tilesOwned: stored.summary.tilesOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,
+	...(stored.summary.derived.idol?.goldenChancePts ? { goldenChancePts: stored.summary.derived.idol.goldenChancePts } : {}),
 });
 
 /** Mirrors newly paid achievements into `player_achievements` after the ledger write landed. Best effort: the ledger is the record of payment, so a failed mirror never blocks or repeats a payout. */

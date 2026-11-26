@@ -1,6 +1,7 @@
 import { buildingDef } from '@/catalog/buildings';
 import { idolDef, type IdolDef } from '@/catalog/idols';
 import { GENERAL_RULES, IDOL_RULES } from '@/config/buildings';
+import { LEVELING } from '@/config/character';
 import { HARD_LIMITS } from '@/config/limits';
 import type { ParagonId } from '@/config/paragon';
 import { paragonBonuses } from '@/lib/offline/paragon';
@@ -221,6 +222,12 @@ const addParagon = (out: IdolEconomy, spent: Partial<Record<ParagonId, number>>)
 	out.paragonXpPct += b.paragonXp;
 	out.craftXpPct += b.craftXp;
 };
+
+/** The multiplier on max HP the Idols (War Memorial) and the Paragon Maximum life upgrade give. */
+export const hpMultOf = (idol: IdolEconomy): number => (1 + idol.hpArmorPct / 100) * (1 + idol.maxHpPct / 100);
+
+/** The XP % the economy applies: the Idols' (and the Paragon XP gain upgrade's) plus, from level 100 on, the Paragon XP upgrade (which counts only past level 100). */
+export const xpPctAt = (idol: IdolEconomy, level: number): number => idol.xpPct + (level >= LEVELING.maxLevel ? idol.paragonXpPct : 0);
 
 /** True when no Idol effect is on (so a caller can leave its numbers untouched). */
 export const noIdolEffect = (e: IdolEconomy): boolean => Object.values(e).every((v) => v === 0);

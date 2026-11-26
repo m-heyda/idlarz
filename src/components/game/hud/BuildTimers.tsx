@@ -21,9 +21,10 @@ const BuildTimers: React.FC = () => {
 	const tiles = useGameStore((state) => state.tiles);
 	const prestige = useGameStore((state) => state.prestige);
 	const idolLevels = useGameStore((state) => state.idolLevels);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	const centerOn = useViewStore((state) => state.centerOn);
 	const equipment = useGameStore((state) => state.equipment);
-	const buildTimePct = useMemo(() => buildTimeCutPct(tiles, idolLevels, equipment), [tiles, idolLevels, equipment]);
+	const buildTimePct = useMemo(() => buildTimeCutPct(tiles, idolLevels, equipment, paragonSpent), [tiles, idolLevels, equipment, paragonSpent]);
 
 	const timers = activeBuildTimers({
 		castleUpgrade,

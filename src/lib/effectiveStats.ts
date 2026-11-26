@@ -57,7 +57,7 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 	const economy = gearEconomy(equipment);
 	const limits = { prestige, merchantUpgrades, gear: { ...economy, offlineEff: economy.offlineEff + idol.offlineEffPts }, playerClass };
 	return {
-		maxHp: Math.round(maxHp(characterStats, equipment) * idolPct(idol.hpArmorPct)),
+		maxHp: Math.round(maxHp(characterStats, equipment) * idolPct(idol.hpArmorPct) * idolPct(idol.maxHpPct)),
 		maxMana: maxMana(characterStats, equipment, playerClass),
 		hpRegen: COMBAT.regenPerSec + gear.regen + bonus.regen,
 		manaRegen: manaRegenPerSec(characterStats, equipment),
@@ -67,23 +67,23 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % of the damage of a monster's hit the armor takes away */
 		armorReduction: armorReductionOf(armor) * 100,
 		dodge: dodgeChance(equipment) * 100,
-		lifeLeech: lifeLeechPercent(equipment, bonus),
+		lifeLeech: lifeLeechPercent(equipment, bonus) + idol.lifeLeechPct,
 		/** The gear's combat stats of IDL-176 (%, each capped by `STAT_RULES`) */
 		armorPen: armorPenPercent(equipment),
 		thorns: thornsPercent(equipment),
 		healOnKill: healOnKillPercent(equipment),
 		/** Seconds the gear's Boss Timer adds to a boss fight's clock (IDL-176) */
-		bossTimer: gearBossTimerSec(equipment),
+		bossTimer: gearBossTimerSec(equipment) + idol.bossTimerSec,
 		/** % chance that a click crits */
 		critChance: odds.crit * 100,
 		/** What a crit multiplies the click by */
-		critMultiplier: COMBAT.crit.mult * critExtra,
+		critMultiplier: COMBAT.crit.mult * critExtra * idolPct(idol.critDamagePct),
 		/** % chance that a crit becomes a super crit */
 		superCritChance: odds.superCrit * 100,
-		superCritMultiplier: COMBAT.crit.superMult * critExtra,
+		superCritMultiplier: COMBAT.crit.superMult * critExtra * idolPct(idol.critDamagePct),
 		/** The belt's numbers: the shared potion cooldown in seconds, % more healing from a potion and the potion stacks on the hotkey bar (lib/potionBelt.ts) */
 		potionCooldownSec: potionCooldownSec(gear),
-		potionPower: (potionPower(gear) - 1) * 100,
+		potionPower: (potionPower(gear) - 1) * 100 + idol.potionPowerPct,
 		potionSlots: potionSlotCount(gear),
 		luck,
 		/** % more chests than without Luck */
@@ -93,15 +93,15 @@ export const effectiveStats = ({ characterStats, equipment, prestige, merchantUp
 		/** % chance that a chest also holds 5-50 gems */
 		gemChance: gemChance(luck) * 100,
 		/** % chance that a newly arrived rat is a lucky one */
-		goldenMonsterChance: goldenMonsterChance(luck) * 100,
+		goldenMonsterChance: goldenMonsterChance(luck) * 100 + idol.goldenChancePts,
 		/** Hours of away time the kingdom works for you (base + Night Watch) and the % of the normal income it pays (base + Steward) */
 		offlineCapHours: offlineCapHours(limits),
 		offlineEfficiency: offlineEfficiency(limits) * 100,
-		goldFind: gear.goldFind,
+		goldFind: gear.goldFind + idol.goldFindPct,
 		spellPower: gear.spellPower + passives.spellPowerPct,
 		xpGain: xpGainPct(characterStats, equipment, playerClass) + idol.xpPct,
 		/** % off TILES (not buildings): Charisma, the rebirth Thrift and the merchant's Bulk Discount, capped. Building cost takes the Ember Thrift only (calculateBuildingCost) */
-		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment),
+		tileDiscount: effectiveTileDiscount(characterStats, prestige, merchantUpgrades, playerClass, equipment, idol.tileDiscountPct),
 		/** % more gold per click from rebirth (Click Mastery) and % faster castle builds (Master Builders) */
 		clickMastery: emberEffect(prestige, 'mastery') * 100,
 		buildTimeReduction: buildTimeReduction(prestige, idol.buildTimePct + gear.buildTimePct) * 100,
