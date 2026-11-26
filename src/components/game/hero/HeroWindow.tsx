@@ -200,7 +200,7 @@ const HeroLeft: React.FC = () => {
 						</Tooltip>
 					}
 				>
-					<XpBar level={level.level} value={bar.into} max={bar.max} label={bar.label} />
+					<XpBar level={level.level} value={bar.into} max={bar.max} label={bar.label} paragon={bar.track === 'paragon'} />
 				</HoverTip>
 				<HoverTip
 					fill
