@@ -12029,7 +12029,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/paragon.ts"
+		],
 		"name": "res_crystal",
 		"category": "resources",
 		"subcategory": "res",
@@ -12130,7 +12132,9 @@
 		]
 	},
 	{
-		"usedBy": [],
+		"usedBy": [
+			"src/config/paragon.ts"
+		],
 		"name": "res_mana",
 		"category": "resources",
 		"subcategory": "res",
@@ -17883,7 +17887,8 @@
 	{
 		"usedBy": [
 			"src/catalog/items/chests.ts",
-			"src/config/mapMarks.ts"
+			"src/config/mapMarks.ts",
+			"src/config/paragon.ts"
 		],
 		"name": "bonus_chest",
 		"category": "ui",
@@ -18986,6 +18991,7 @@
 	{
 		"usedBy": [
 			"src/components/game/RankingsWindow.tsx",
+			"src/config/paragon.ts",
 			"src/lib/offline/curiosity.ts"
 		],
 		"name": "rank_trophy",
