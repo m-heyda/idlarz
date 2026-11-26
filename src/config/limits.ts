@@ -39,7 +39,7 @@ export const LIMITS = {
 	craftOfflineHours: 8,
 	/** Speed multiplier on the seconds one craft takes (2 = twice as fast) */
 	craftSpeed: 1,
-	/** The level an Idol can be taken to (docs/plan/18 section 6): the Ember shop's Idol Mastery will raise it, up to the hard limit */
+	/** The level an Idol can be taken to (docs/plan/18): the Ember shop's Idol Mastery will raise it, up to the hard limit */
 	idolMaxLevel: 5,
 	/** The level a Producer or Extractor can be taken to (the Master Masonry Ember upgrade raises it; the castle level still gates every level) */
 	buildingMaxLevel: 5,

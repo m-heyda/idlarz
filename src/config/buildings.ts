@@ -4,7 +4,7 @@
  *
  * What is built (Producers and Extractors, the seven home biomes): the build menu of a tile shows the Producer of its biome; **one of each type per map**; a Producer makes `tileEquivalents` tiles' worth of its biome's main materials, grown by
  * the share of the biome the player owns; **levels 1-5**, a level above 1 gated by the castle level and bought with resources plus a **timer** counted by the tick loop; the castle and the buildings share the **builders** (1 for everyone, +1 per level of the Gem shop's Additional builder (3 levels), +1 with the Ember shop's Extra Builder, 5 at most: one timer each, see `builderCount`);
- * a building can be **moved** for half its cost. Idols (IDL-96), the position bonus and the Ember-shop caps come in later slices (`docs/plan/18-biome-buildings-and-material-tiers.md`).
+ * a building can be **moved** for half its cost. Idols and the Ember-shop caps are built since; the position bonus comes in a later slice (IDL-95, `docs/plan/18-biome-buildings-and-material-tiers.md`).
  *
  * **Save and server.** A building is two optional fields of a tile's `extra` entry (`building` = catalog id, `bl` = level) and the running upgrades are the optional top-level list `buildingUpgrades` (`{ x, y, toLevel, remainingSec }` each, like `castleUpgrade`; a first Idol build adds `building`, the Idol's id, and `toLevel` 1). A save from before several builders holds one `buildingUpgrade`, which is read as a list of one. They are
  * written and read only while the flag is on; with it off an incoming save that carries them is accepted and they are dropped, so a rollback of the flag never invalidates a save. No `SAVE_SCHEMA` bump. The server derives income from the saved map
@@ -75,7 +75,7 @@ export const BIOME_MILESTONES = {
 export const GENERAL_RULES = { perLevel: 1 };
 
 /**
- * The Idols (IDL-96, docs/plan/18 section 6): a permanent bonus per biome.
+ * The Idols (IDL-96, docs/plan/18): a permanent bonus per biome.
  *
  * - `perLevel`: each level adds +2 % of its effect (level 5 = +10 %); `luckPerLevel`: the Bog Witch Totem adds 4 Luck points per level instead (Luck is in points).
  * - `buildTimeCap`: the most the Dwarf Statue and the Ember shop's Master Builders can shorten a timer together (60 %).

@@ -31,7 +31,7 @@ export interface IdolDef {
 }
 
 /**
- * The twelve Idols, one per biome (docs/plan/18-biome-buildings-and-material-tiers.md section 3): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
+ * The twelve Idols, one per biome (`src/catalog/buildings.ts` has the buildings they belong to): a permanent bonus of +2 % per level (Luck in points), one effect each, so nothing is stacked twice.
  * An Idol's level is kept across rebirths (the building is not): see {@link IDOL_RULES}. All twelve effects are applied end to end: the server derives XP gain, kill rewards, offline efficiency, Luck, chest speed, crafting XP, damage, max HP and armor, farm output (in the income rates), the merchant's sell price (inventory sales and drops) and judges the shortened build timers; click gold is paid by the browser like the gear's Click % (bounded by the server's gold plausibility check).
  *
  * @category Economy/Buildings

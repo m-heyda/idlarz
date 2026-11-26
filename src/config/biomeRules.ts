@@ -25,7 +25,7 @@ export const BIOME_RULES = {
 
 	/**
 	 * How far from the castle (Chebyshev, `castleDistance`) a swamp, tundra or rebirth biome may first turn up; nearer tiles are never that biome (not rolled, not copied from a neighbour).
-	 * Not listed = no distance rule. Numbers from docs/plan/12-rebirth-biomes.md section 3.
+	 * Not listed = no distance rule. Numbers decided with the owner (docs/plan/12-rebirth-biomes.md); the base minimums are what is live.
 	 */
 	minCastleDistance: { swamp: 6, tundra: 10, jungle: 10, fields: 14, orchard: 18, blight: 22, battlefield: 22 } as Record<string, number>,
 
@@ -45,7 +45,7 @@ export const BIOME_RULES = {
 		['tundra', 'swamp'],
 		['tundra', 'coast'],
 		['hills', 'coast'],
-		// docs/plan/12-rebirth-biomes.md section 9 (decided): the rebirth biomes keep away from the neighbours they clash with
+		// decided with the owner (docs/plan/12-rebirth-biomes.md): the rebirth biomes keep away from the neighbours they clash with
 		['blight', 'lake'],
 		['blight', 'coast'],
 		['blight', 'orchard'],

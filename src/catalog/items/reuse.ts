@@ -323,7 +323,7 @@ export const LEGENDARY_TOP: readonly string[] = ['dawnbringer_trident', 'reapers
 const MID_PERK = LEGENDARY_PERK_TIERS.xpPct.rare;
 
 /**
- * The perks of the legendary roster (IDL-143, IDL-144; decided by the owner 2026-11-07, docs/plan/28 section 6): one headline family each, fixed numbers by tier from `LEGENDARY_PERK_TIERS`, summed with the set bonuses before the
+ * The perks of the legendary roster (IDL-143, IDL-144; decided by the owner 2026-11-07, the Vault and the relic exchange are in docs/plan/28): one headline family each, fixed numbers by tier from `LEGENDARY_PERK_TIERS`, summed with the set bonuses before the
  * family caps. Runeforged Titanhammer (build time -25 %, `buildTimePct`, IDL-145) and Tidecaller Axe (chest speed +15 %, `chestSpeedPct`) have their stats now. The two handlers of IDL-46 are stats too: Cindercrescent Glaive's Burn (`burnPct`, 30) and Amethyst Spire's Potion refund (`potionRefundPct`, 15), applied in `fightStep` and `drink` (offline/fightSteps.ts).
  *
  * @category Loot/Items

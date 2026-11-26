@@ -53,7 +53,7 @@ export const BIOME_CODES: Readonly<Record<string, string>> = {
 	tundra: 't',
 	lake: 'l',
 	coast: 'c',
-	// the rebirth biomes (docs/plan/12-rebirth-biomes.md section 6); dev-only for now (config/biomeStage.ts), the letters are frozen from here on
+	// the rebirth biomes (`BIOME_CODES`); all live since IDL-258 (config/biomeStage.ts), the letters are frozen
 	jungle: 'j',
 	fields: 'd',
 	orchard: 'o',
