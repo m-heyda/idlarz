@@ -35,11 +35,11 @@ Paragon level `n` costs `paragonFirstStepXp x paragonGrowth^(n-1)`; the total to
 - **Uncapped**: bonus = `k x sqrt(points)`. Example `Damage = 2 x sqrt(p) %`: 100 points +20 %, 500 +45 %, 1,000 +63 %, 5,000 +141 %.
 - Respec: refunds every point, costs gems (500, confirm like the attribute respec); the first one of an account is free. Points are not wiped by a rebirth.
 
-The grid (all numbers are placeholders until the sims; ids are append-only):
+The grid (the numbers are tuned by the sims, see the JSDoc of `src/config/paragon.ts`; ids are append-only):
 
 | | Capped (25 points each, effect per point) | Uncapped (k x sqrt(p)) |
 |---|---|---|
-| **Combat** | Crit damage +2 % (max +50 %), Boss timer +0.6 s (max +15 s), Life leech +0.2 % (max +5 %) | Damage % (k 2), Max life % (k 2) |
+| **Combat** | Crit damage +2 % (max +50 %), Boss timer +0.6 s (max +15 s), Life leech +0.12 % (max +3 %) | Damage % (k 2), Max life % (k 2) |
 | **Economy** | Income +0.8 % (max +20 %), XP gain +0.8 % (max +20 %), Tile discount +0.4 (max +10) | Click gold % (k 3), Kill rewards % (gold and XP, k 1.5) |
 | **Fortune** | Luck +1.2 (max +30), Gold find +0.4 % (max +10 %), Golden-monster chance +0.1 pt (max +2.5 pt) | Monster-chest drop chance (+0.2 x sqrt(p) points), Epic-find chance (k 1 %, relative) |
 | **Realm** | Offline efficiency +0.8 pt (max +20 pt, under the 100 % `HARD_LIMITS`), Build speed +0.4 % (max +10 %, inside the 60 % build-time cap), Potion power +0.6 % (max +15 %) | Paragon XP gain % (counts only past level 100, k 2), Crafting XP % (k 2) |
@@ -68,7 +68,7 @@ For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (p
 ## Order of work (three projects, each its own plan and PRs)
 
 1. **Curve, display and ranking** (IDL-114, the display half of IDL-186): the paragon functions, the server recompute, the paragon bar, `100 + P37` on tags and rankings, the Paragon column. No bonuses; safe to ship on its own.
-2. **Points and the 20 upgrades** (IDL-186, IDL-187): **built** (the code and its JSDoc are the record: `src/config/paragon.ts`, `src/lib/offline/paragon.ts`, `paragonStep` in `src/lib/offline/online.ts`, the Paragon tab `HeroParagon.tsx`). The ledger column `paragon` (migration `paragon_ledger.sql`, SQL first), `/api/paragon`, the gem shop's `paragon_respec`, and every bonus folded into `idolEconomy` (the one function the browser and the server both read), the fight profile (`idolFx`), the kill and loot rolls, tile discount and build timers. Still open: the sims (`fight-sim` with the combat upgrades at the cap and at 500 uncapped points, a pace profile with paragon points) and the coefficient tuning they decide; all numbers in the grid are placeholders until then.
+2. **Points and the 20 upgrades** (IDL-186, IDL-187): **built** (the code and its JSDoc are the record: `src/config/paragon.ts`, `src/lib/offline/paragon.ts`, `paragonStep` in `src/lib/offline/online.ts`, the Paragon tab `HeroParagon.tsx`). The ledger column `paragon` (migration `paragon_ledger.sql`, SQL first), `/api/paragon`, the gem shop's `paragon_respec`, and every bonus folded into `idolEconomy` (the one function the browser and the server both read), the fight profile (`idolFx`), the kill and loot rolls, tile discount and build timers. The sims have run (`fight-sim`, `stat-audit` section 6, the `hardcore-rebirth6-paragon` pace probes; results in the JSDoc of `src/config/paragon.ts`).
 3. **Milestones, deeds and cosmetics**: the `paragon` deed condition and tiers, the milestone rewards, titles and frames.
 
 ## Owner calls
@@ -79,4 +79,4 @@ For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (p
 
 ## Left to the builder
 
-Exact coefficients (all are placeholders), the names and look of the titles and frames, the layout of the Paragon window, and where the bar sits in the Hero window.
+The names and look of the titles and frames, the layout of the Paragon window, and where the bar sits in the Hero window.

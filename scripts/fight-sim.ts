@@ -6,7 +6,16 @@ import { resolve } from 'node:path';
 import { STARTER_EQUIPMENT } from '../src/config/itemCatalog';
 import { COMBAT, MONSTERS } from '../src/config/combatConfig';
 import { GRADE_INFO, type Grade } from '../src/catalog/items/grades';
-import { atItemLevel, freshCharacter, kit, simulateMany, spentCharacter } from '../src/lib/fightSim';
+import {
+	PARAGON_BEHIND_WIN_MAX,
+	PARAGON_COMBAT_SPENDS,
+	PARAGON_FIGHT_MIN_SEC,
+	atItemLevel,
+	freshCharacter,
+	kit,
+	simulateMany,
+	spentCharacter,
+} from '../src/lib/fightSim';
 import { monsterStats } from '../src/lib/monsters';
 import { armorOf, attacksPerSecond, damagePerHit, damagePerSecond, maxHp } from '../src/lib/combat';
 import { aggregateStats } from '../src/lib/inventory';
@@ -166,6 +175,41 @@ for (const { level, grade, behind } of BOSS_ROWS) {
 			`boss-${kitGrade}-${level}`,
 		);
 		out(`| ${level} (${stats.maxHp} HP, armor ${Math.round(stats.armor)}) | ${kitGrade} kit + mace | ${label} | ${cell(r)} |`);
+	}
+}
+
+// ---- the Paragon combat upgrades (IDL-187) -----------------------------------------------------------------------------------------------
+out();
+out('# Paragon: the combat upgrades');
+out();
+out(
+	`The combat upgrades of the Paragon grid (docs/plan/paragon.md) run through the same engine: Crit damage, Boss timer and Life leech at their cap of 25 points, and Damage and Maximum life (uncapped, k x sqrt(points)) at the points shown. They are meant to make fights faster and safer after level 100, never to take the place of gear. Gates: **a kit two grades behind a boss must still lose at the realistic spend** (275 points, win rate at most ${PARAGON_BEHIND_WIN_MAX * 100} %), and **the biggest spend must leave a boss fight of at least ${PARAGON_FIGHT_MIN_SEC} seconds**. Win % (mean seconds, mean HP left). No skills, no potions.`,
+);
+const PARAGON_ROWS = [
+	{ level: 15, grade: 'G2', behind: 'G1' },
+	{ level: 35, grade: 'G4', behind: 'G2' },
+	{ level: 45, grade: 'G5', behind: 'G3' },
+] as const;
+for (const gear of ['at the level', 'two grades behind'] as const) {
+	out();
+	out(`## Great Auroch, kit ${gear}`);
+	out();
+	out(`| Boss | Kit | ${PARAGON_COMBAT_SPENDS.map((p) => p.name).join(' | ')} |`);
+	out(`|---|---|${PARAGON_COMBAT_SPENDS.map(() => '---').join('|')}|`);
+	for (const { level, grade, behind } of PARAGON_ROWS) {
+		const kitGrade = gear === 'at the level' ? grade : behind;
+		const itemLevel = gear === 'at the level' ? Math.max(level, GRADE_INFO[kitGrade].levels[0]) : GRADE_INFO[kitGrade].levels[0];
+		const cells = PARAGON_COMBAT_SPENDS.map(({ name, paragon }) =>
+			cell(
+				simulateMany(
+					{ equipment: atItemLevel(gradeKit(kitGrade), itemLevel), monster: { type: 'bossGreatAuroch', level }, autoUse: false, paragon },
+					RUNS,
+					`pg-${kitGrade}-${level}-${name}`,
+				),
+				true,
+			),
+		);
+		out(`| level ${level} | ${kitGrade} kit + mace | ${cells.join(' | ')} |`);
 	}
 }
 

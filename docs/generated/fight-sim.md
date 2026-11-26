@@ -87,3 +87,23 @@ A boss: level 15 to 25 when he appears (higher with the castle), up to +10 as he
 | 35 (1707 HP, armor 25) | G2 kit + mace | behind | 0% |
 | 45 (2061 HP, armor 30) | G5 kit + mace | at the level | 100% (52s) |
 | 45 (2061 HP, armor 30) | G3 kit + mace | behind | 0% |
+
+# Paragon: the combat upgrades
+
+The combat upgrades of the Paragon grid (docs/plan/paragon.md) run through the same engine: Crit damage, Boss timer and Life leech at their cap of 25 points, and Damage and Maximum life (uncapped, k x sqrt(points)) at the points shown. They are meant to make fights faster and safer after level 100, never to take the place of gear. Gates: **a kit two grades behind a boss must still lose at the realistic spend** (275 points, win rate at most 25 %), and **the biggest spend must leave a boss fight of at least 15 seconds**. Win % (mean seconds, mean HP left). No skills, no potions.
+
+## Great Auroch, kit at the level
+
+| Boss | Kit | no paragon | capped three (75 points) | +100 Damage, +100 Max life (275) | +500 / +500 (1,075) | +2,000 / +2,000 (4,075) |
+|---|---|---|---|---|---|---|
+| level 15 | G2 kit + mace | 100% (65s, 40% HP) | 100% (61s, 60% HP) | 100% (50s, 75% HP) | 100% (42s, 85% HP) | 100% (34s, 92% HP) |
+| level 35 | G4 kit + mace | 100% (60s, 41% HP) | 100% (54s, 68% HP) | 100% (45s, 80% HP) | 100% (37s, 89% HP) | 100% (29s, 96% HP) |
+| level 45 | G5 kit + mace | 100% (54s, 45% HP) | 100% (46s, 74% HP) | 100% (40s, 84% HP) | 100% (33s, 91% HP) | 100% (25s, 97% HP) |
+
+## Great Auroch, kit two grades behind
+
+| Boss | Kit | no paragon | capped three (75 points) | +100 Damage, +100 Max life (275) | +500 / +500 (1,075) | +2,000 / +2,000 (4,075) |
+|---|---|---|---|---|---|---|
+| level 15 | G1 kit + mace | 0% | 0% | 0% | 0% | 50% (86s, 36% HP) |
+| level 35 | G2 kit + mace | 0% | 0% | 0% | 0% | 100% (82s, 27% HP) |
+| level 45 | G3 kit + mace | 0% | 0% | 7% (82s, 7% HP) | 100% (78s, 26% HP) | 100% (60s, 61% HP) |

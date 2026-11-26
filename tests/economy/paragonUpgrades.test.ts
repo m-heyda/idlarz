@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 import { PARAGON_CAP_POINTS, PARAGON_IDS, PARAGON_UPGRADES, paragonEffect, paragonRoom, paragonUpgrade } from '../../src/config/paragon';
 import { gearIncome } from '../../src/lib/gearEconomy';
-import { NO_IDOL_ECONOMY, idolEconomy, xpPctAt } from '../../src/lib/idolEconomy';
+import { NO_IDOL_ECONOMY, PARAGON_IDOL_FIELD, idolEconomy, xpPctAt } from '../../src/lib/idolEconomy';
 import {
 	allocateParagon,
 	fitParagon,
@@ -170,4 +170,18 @@ test('the fight profile reads the Paragon combat upgrades the save pipeline stam
 	assert.ok(Math.abs((fx.potionPower ?? 1) - (plain.potionPower ?? 1) - 0.15) < 1e-9);
 	// no points = the profile there was before
 	assert.deepEqual(playerProfile({ idolFx: {} }), plain);
+});
+
+test('every upgrade is folded into one number of the economy, and that number is the effect at 0, 1, the cap and over it', () => {
+	const fields = new Set<string>();
+	for (const u of PARAGON_UPGRADES) {
+		const field = PARAGON_IDOL_FIELD[u.id];
+		assert.ok(field, `${u.id} has a field`);
+		assert.ok(!fields.has(field), `${u.id}: ${field} is shared with another upgrade`);
+		fields.add(field);
+		for (const points of [0, 1, PARAGON_CAP_POINTS, PARAGON_CAP_POINTS + 5, 500]) {
+			const folded = idolEconomy(createWorld([]), {}, { [u.id]: points })[field] as number;
+			assert.ok(Math.abs(folded - paragonEffect(u, points)) < 1e-9, `${u.id} at ${points}`);
+		}
+	}
 });

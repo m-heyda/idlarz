@@ -130,14 +130,14 @@ Currencies, materials, farm goods, planned T2/T3 goods and spare resource art.
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
 | `res_corrupted_core` | <img src="../../public/pixel/icons/res_corrupted_core.png" width="80" alt="res_corrupted_core"> | 40x40 | used | resource:corruptedCore | `pixel/icons/res_corrupted_core.png` |
-| `res_crystal` | <img src="../../public/pixel/icons/res_crystal.png" width="80" alt="res_crystal"> | 40x40 | planned |  | `pixel/icons/res_crystal.png` |
+| `res_crystal` | <img src="../../public/pixel/icons/res_crystal.png" width="80" alt="res_crystal"> | 40x40 | planned | src/config/paragon.ts | `pixel/icons/res_crystal.png` |
 | `res_crystal_shine` | <img src="../../public/pixel/icons/res_crystal_shine.png" width="96" alt="res_crystal_shine"> | 240x40 | used | shine:res_crystal | `pixel/icons/res_crystal_shine.png` |
 | `res_dye` | <img src="../../public/pixel/icons/res_dye.png" width="80" alt="res_dye"> | 40x40 | used | resource:dye | `pixel/icons/res_dye.png` |
 | `res_fish` | <img src="../../public/pixel/icons/res_fish.png" width="80" alt="res_fish"> | 40x40 | planned |  | `pixel/icons/res_fish.png` |
 | `res_frostshard` | <img src="../../public/pixel/icons/res_frostshard.png" width="80" alt="res_frostshard"> | 40x40 | used | resource:frostshard | `pixel/icons/res_frostshard.png` |
 | `res_herbs` | <img src="../../public/pixel/icons/res_herbs.png" width="80" alt="res_herbs"> | 40x40 | used | resource:herbs | `pixel/icons/res_herbs.png` |
 | `res_iron` | <img src="../../public/pixel/icons/res_iron.png" width="80" alt="res_iron"> | 40x40 | planned | resource:ironOre | `pixel/icons/res_iron.png` |
-| `res_mana` | <img src="../../public/pixel/icons/res_mana.png" width="80" alt="res_mana"> | 40x40 | planned |  | `pixel/icons/res_mana.png` |
+| `res_mana` | <img src="../../public/pixel/icons/res_mana.png" width="80" alt="res_mana"> | 40x40 | planned | src/config/paragon.ts | `pixel/icons/res_mana.png` |
 | `res_mana_shine` | <img src="../../public/pixel/icons/res_mana_shine.png" width="96" alt="res_mana_shine"> | 240x40 | used | shine:res_mana | `pixel/icons/res_mana_shine.png` |
 | `res_mystery` | <img src="../../public/pixel/icons/res_mystery.png" width="80" alt="res_mystery"> | 40x40 | planned |  | `pixel/icons/res_mystery.png` |
 | `res_mystery_shine` | <img src="../../public/pixel/icons/res_mystery_shine.png" width="96" alt="res_mystery_shine"> | 240x40 | used | shine:res_mystery | `pixel/icons/res_mystery_shine.png` |

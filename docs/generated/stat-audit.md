@@ -193,3 +193,32 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 | Offline claim | server (from the stored save's rates) | server clock, cap, efficiency |
 | XP | client, bounded by server | clamped |
 | Gems | server ledger | replaced by the ledger's |
+
+## 6. Paragon: the 20 upgrades at 0, 1, the cap, over the cap and far beyond
+
+Each cell is the effect of that many points in one upgrade (`paragonEffect`: capped = rate x min(points, 25), uncapped = k x sqrt(points)); the last column is the number of the economy the upgrade is folded into (`PARAGON_IDOL_FIELD`), and the audit stops with an error when that number differs from the effect at any of these points.
+
+| Upgrade | Kind | 0 pts | 1 pts | 25 pts | 30 pts | 100 pts | 500 pts | 5000 pts | Folded into |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Critical damage | capped 25 | +0 % | +2 % | +50 % | +50 % | +50 % | +50 % | +50 % | critDamagePct |
+| Boss timer | capped 25 | +0 s | +0.6 s | +15 s | +15 s | +15 s | +15 s | +15 s | bossTimerSec |
+| Life leech | capped 25 | +0 % | +0.12 % | +3 % | +3 % | +3 % | +3 % | +3 % | lifeLeechPct |
+| Damage | uncapped | +0 % | +2 % | +10 % | +10.95 % | +20 % | +44.72 % | +141.42 % | damagePct |
+| Maximum life | uncapped | +0 % | +2 % | +10 % | +10.95 % | +20 % | +44.72 % | +141.42 % | maxHpPct |
+| Income | capped 25 | +0 % | +0.8 % | +20 % | +20 % | +20 % | +20 % | +20 % | incomePct |
+| XP gain | capped 25 | +0 % | +0.8 % | +20 % | +20 % | +20 % | +20 % | +20 % | xpPct |
+| Tile discount | capped 25 | +0 % | +0.4 % | +10 % | +10 % | +10 % | +10 % | +10 % | tileDiscountPct |
+| Click gold | uncapped | +0 % | +3 % | +15 % | +16.43 % | +30 % | +67.08 % | +212.13 % | clickGoldPct |
+| Kill rewards | uncapped | +0 % | +1.5 % | +7.5 % | +8.22 % | +15 % | +33.54 % | +106.07 % | killRewardPct |
+| Luck | capped 25 | +0 | +1.2 | +30 | +30 | +30 | +30 | +30 | luck |
+| Gold find | capped 25 | +0 % | +0.4 % | +10 % | +10 % | +10 % | +10 % | +10 % | goldFindPct |
+| Golden monsters | capped 25 | +0 | +0.1 | +2.5 | +2.5 | +2.5 | +2.5 | +2.5 | goldenChancePts |
+| Monster chests | uncapped | +0 | +0.2 | +1 | +1.1 | +2 | +4.47 | +14.14 | chestDropPts |
+| Epic find | uncapped | +0 % | +1 % | +5 % | +5.48 % | +10 % | +22.36 % | +70.71 % | epicFindPct |
+| Offline efficiency | capped 25 | +0 | +0.8 | +20 | +20 | +20 | +20 | +20 | offlineEffPts |
+| Build speed | capped 25 | +0 % | +0.4 % | +10 % | +10 % | +10 % | +10 % | +10 % | buildTimePct |
+| Potion power | capped 25 | +0 % | +0.6 % | +15 % | +15 % | +15 % | +15 % | +15 % | potionPowerPct |
+| Paragon XP | uncapped | +0 % | +2 % | +10 % | +10.95 % | +20 % | +44.72 % | +141.42 % | paragonXpPct |
+| Crafting XP | uncapped | +0 % | +2 % | +10 % | +10.95 % | +20 % | +44.72 % | +141.42 % | craftXpPct |
+
+With every capped upgrade full (300 points) the economy upgrades give: Income +20 %, XP gain +20 %, Tile discount +10 %, Gold find +10 %, Offline efficiency +20, Build speed +10 %.

@@ -210,6 +210,8 @@ const play = (name: string, profile: Profile, ctx: Ctx, { cfg, utils, store, mon
 		bot.builder2 = true;
 		store.setState({ gemBuilders: 1 });
 	}
+	// the Paragon points are the ledger's record: set from the start, and again after every rebirth
+	if (profile.paragon) store.setState({ paragonSpent: { ...profile.paragon } });
 
 	// ---- the player's day --------------------------------------------------------------------------------
 	const hourOf = (sec: number) => ((sec + (profile.startHour ?? 0) * 3600) % 86400) / 3600;
@@ -427,6 +429,7 @@ const play = (name: string, profile: Profile, ctx: Ctx, { cfg, utils, store, mon
 		bot.frontierDirty = true;
 		// Builder #2 is the ledger's record: it survives the reset
 		if (bot.builder2) store.setState({ gemBuilders: 1 });
+		if (profile.paragon) store.setState({ paragonSpent: { ...profile.paragon } });
 		if (profile.combat) resetCombat();
 		if (profile.rocks) resetRocks();
 		return true;

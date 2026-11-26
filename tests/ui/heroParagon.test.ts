@@ -33,10 +33,23 @@ test('with paragon levels it shows the level, the free points and all 20 upgrade
 	put({ resources: { ...useGameStore.getInitialState().resources, xp }, paragonSpent: { damage: 4, luck: 25 } });
 	const out = await draw();
 	assert.match(out, /✦ 30/);
-	assert.match(out, />1 free point</);
+	assert.ok(out.includes('<strong>1</strong> free point</span>'));
 	assert.match(out, /29 spent/);
 	for (const name of ['Combat', 'Economy', 'Fortune', 'Realm']) assert.ok(out.includes(name), name);
 	for (const u of PARAGON_UPGRADES) assert.ok(out.includes(u.name), u.name);
 	assert.match(out, /25 \/ 25/, 'a full capped upgrade shows its cap');
 	assert.match(out, /\(full\)/);
+});
+
+test('every upgrade has a medallion with its icon, the columns carry their category, and capped and uncapped upgrades look different', async () => {
+	const xp = cumulativeXp(LEVELING.maxLevel) + cumulativeParagonXp(30) + 1;
+	put({ resources: { ...useGameStore.getInitialState().resources, xp }, paragonSpent: { damage: 4, luck: 25 } });
+	const out = await draw();
+	for (const cat of ['combat', 'economy', 'fortune', 'realm']) assert.ok(out.includes(`data-cat="${cat}"`), cat);
+	assert.equal((out.match(/class="px-paragon-medal"/g) ?? []).length, 20, 'one medallion per upgrade');
+	assert.equal((out.match(/class="px-paragon-medal" data-capped="true"/g) ?? []).length, 12, 'twelve capped medallions (rings)');
+	assert.match(out, /px-paragon-inf/, 'an uncapped upgrade carries the infinity mark');
+	assert.match(out, /px-paragon-check/, 'a full capped upgrade carries the check');
+	assert.match(out, /Next paragon level/);
+	assert.ok(out.includes(' points</span>'), 'a category shows its points');
 });
