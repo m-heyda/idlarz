@@ -6,7 +6,7 @@ import { CLICK_LADDER, INITIAL_RESOURCES, STARTING_GEMS } from '../../src/config
 import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
 import { calculateTileCost } from '../../src/utils/game/costs';
 import { castleUpgradeDuration } from '../../src/utils/game/castle';
-import { effectiveTileDiscount, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
+import { effectiveTileDiscount, tileDiscountCap, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
 import { sanitizeSave } from '../../src/lib/sanitizeSave';
 import { patchTile } from '../../src/utils/world';
@@ -312,4 +312,20 @@ test('the browser puts the pieces the server kept into the new bag, and nothing 
 	assert.equal(api().rebirth(undefined, [kept]), true);
 	const gear = api().bag.filter((slot) => slot && 'item' in slot);
 	assert.deepEqual(gear, [{ item: kept }]);
+});
+
+test('Treasury Charter raises the tile-discount cap 3 points a level to 75 at level 10, and nothing can take it past 80', () => {
+	const at = (charter: number) => tileDiscountCap({ rebirths: 1, legacyPoints: 0, legacyEarned: 100, upgrades: { charter } });
+	assert.equal(at(0), 45);
+	assert.equal(at(1), 48);
+	assert.equal(at(10), 75);
+	assert.ok(at(10) <= REBIRTH.discountMaxPercent);
+	assert.equal(tileDiscountCap(undefined), 45);
+	// the sources add up to 76 at most (Charisma 25 + Thrift 20 + Bulk 8 + Warrior 3 + gear 10 + Paragon 10): here without the gear's 10, so 66, under the Charter cap of 75
+	freshGame();
+	store.setState((s) => ({
+		characterStats: { ...s.characterStats, tileCostDiscount: 25 },
+		prestige: { rebirths: 1, legacyPoints: 0, legacyEarned: 100, upgrades: { thrift: 10, charter: 10 } },
+	}));
+	assert.equal(effectiveTileDiscount(api().characterStats, api().prestige, { bulk: 8 }, 'warrior', undefined, 10), 66);
 });
