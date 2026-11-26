@@ -17,6 +17,7 @@ import {
 } from '../../../../packages/design-system/src/components/primitives';
 import { ComingSoon, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
 import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
+import { xpBarOf } from '@/lib/xpBar';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
 import { EQUIPMENT_LAYOUT, EQUIPMENT_SLOT_LABEL, ITEM_CATALOG } from '@/catalog';
 import { avatarArtUrl, resolveAvatar } from '@/catalog/avatars';
@@ -26,7 +27,6 @@ import { COMPONENTS } from '@/catalog/recipes';
 import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { COMBAT } from '@/config/combatConfig';
 import { MERCHANT_GOODS, MERCHANT_UPGRADES } from '@/config/merchant';
-import { MAX_LEVEL } from '@/config/character';
 import { EQUIPMENT_PIXEL_ICONS, pixelIconSrc } from '@/config/pixelIcons';
 import { PLAYER_CLASSES, DEFAULT_PLAYER_CLASS } from '@/config/playerClasses';
 import { armorReduction, maxHp, maxMana } from '@/lib/combat';
@@ -45,7 +45,6 @@ import { useUiStore } from '@/stores/uiStore';
 import type { BagSlot, EquipmentSlot, ItemInstance } from '@/types/game';
 import { formatCompact, formatNumber, formatPct } from '@/utils/formatters';
 import { merchantLevel, merchantUpgradeCost } from '@/utils/game/merchant';
-import { xpToNextLevel } from '@/utils/game/character';
 import { useBadgeChoice } from '../BadgeDialog';
 import BuffRow from '../BuffRow';
 import { itemIconName, slotProps } from '../itemUi';
@@ -174,10 +173,7 @@ const HeroLeft: React.FC = () => {
 	const itemLevel = Math.round(averageItemLevel(equipment) * 10) / 10;
 	const wornLevel = wornLevelOf(equipment);
 
-	const needed = level.level >= MAX_LEVEL ? 0 : xpToNextLevel(level.level);
-	const into = Math.floor(level.progress * needed);
-	const xpText =
-		needed > 0 ? `Level ${level.level} · ${Math.floor(level.progress * 100)}% · ${compact(into)} / ${compact(needed)}` : `Level ${level.level} · MAX`;
+	const bar = xpBarOf(level, resources.xp);
 
 	return (
 		<Panel className='ds-hero-left'>
@@ -204,7 +200,7 @@ const HeroLeft: React.FC = () => {
 						</Tooltip>
 					}
 				>
-					<XpBar level={level.level} value={needed > 0 ? into : 1} max={needed > 0 ? needed : 1} label={xpText} />
+					<XpBar level={level.level} value={bar.into} max={bar.max} label={bar.label} />
 				</HoverTip>
 				<HoverTip
 					fill

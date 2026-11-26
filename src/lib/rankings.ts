@@ -5,6 +5,7 @@ import { CRAFTING } from '@/config/crafting';
 import { MAX_LEVEL } from '@/config/character';
 import { DEFAULT_PLAYER_CLASS, PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { craftCumulativeXp, craftLevelOf } from '@/lib/crafting';
+import { calculateParagon } from '@/utils/game/character';
 
 // Pure rules of the Rankings (no store, no server): the boards, the 24-hour movement arrows and how a stored row becomes what the window shows. The database side is
 // `refresh_rankings()` (supabase/migrations/player_rankings.sql); the route is /api/rankings.
@@ -68,14 +69,10 @@ export const refreshArgs = () => ({
 });
 
 /**
- * The paragon level of a character: 0 until paragon exists (the maximum level is 100 and nothing goes past it yet, docs/plan/13). The window already shows a paragon mark for a value above 0, so
- * shipping paragon only changes this function and `refresh_rankings()` (which already stores the lifetime XP that will order it).
+ * The paragon level of a character for the Level board's mark: read from the lifetime XP the rebuild stores (`calculateParagon`, docs/plan/paragon.md), and only for a character at the maximum level (a level below it never has paragon, whatever the stored XP says; the other
+ * boards carry no XP and read 0). Nothing about paragon is stored: the Level board already orders by `level desc, xp desc` (`refresh_rankings()`), so the order of two paragon players is the order of their XP, and ties at the cap keep the "first to the cap" tie-break.
  */
-export const paragonOf = (xp: number, level: number): number => {
-	void xp;
-	void level;
-	return 0;
-};
+export const paragonOf = (xp: number, level: number): number => (level >= MAX_LEVEL ? calculateParagon(xp).paragon : 0);
 
 export interface RankingMovement {
 	/** `new`: no earlier place (joined since the last refresh) */

@@ -220,6 +220,57 @@ export const calculateLevel = (xp: number): { level: number; progress: number } 
 	return { level, progress: step > 0 ? remainingXp / step : 0 };
 };
 
+/**
+ * The XP of the step from paragon level `paragon` to the next (`LEVELING.paragonFirstStepXp x paragonGrowth^paragon`); 0 at or above `paragonCap`, where there is no next level.
+ *
+ * @category Progression/Levels
+ * @order 6
+ * @formula
+ * paragonStepXp(p) = 2.1e8 x 1.002^p            p from 0 (paragon 0 to 1); 0 from p = 5000
+ */
+export const paragonStepXp = (paragon: number): number => {
+	const p = Math.floor(paragon);
+	if (!(p >= 0) || p >= LEVELING.paragonCap) return 0;
+	return LEVELING.paragonFirstStepXp * LEVELING.paragonGrowth ** p;
+};
+
+/**
+ * The paragon XP (lifetime XP past the level-100 total) at which paragon level `paragon` is reached (0 for 0, capped at `paragonCap`).
+ *
+ * @category Progression/Levels
+ * @order 7
+ * @formula
+ * cumulativeParagonXp(n) = 2.1e8 x (1.002^n - 1) / 0.002          paragon 100 = 2.3e10, 500 = 1.8e11, 1,000 = 6.7e11, 5,000 = 2.3e15
+ */
+export const cumulativeParagonXp = (paragon: number): number => {
+	const n = Math.min(Math.max(0, Math.floor(paragon)), LEVELING.paragonCap);
+	if (!(n > 0)) return 0;
+	return (LEVELING.paragonFirstStepXp * (LEVELING.paragonGrowth ** n - 1)) / (LEVELING.paragonGrowth - 1);
+};
+
+/**
+ * The paragon level from lifetime XP: 0 until the level-100 total, then one level per {@link paragonStepXp}, up to `paragonCap`. `into` is the XP inside the current level, `needed` the step it takes (0 at the cap, where `progress` is 1). Banked XP counts: the paragon XP
+ * is everything past `cumulativeXp(MAX_LEVEL)`. Garbage XP (NaN, negative, above `XP_CAP`) is clamped like {@link calculateLevel} does. The plain character level is never changed by this.
+ *
+ * @category Progression/Levels
+ * @order 8
+ */
+export const calculateParagon = (xp: number): { paragon: number; progress: number; into: number; needed: number } => {
+	const total = Number.isFinite(xp) ? Math.max(0, Math.min(xp, XP_CAP)) : XP_CAP;
+	const base = cumulativeXp(MAX_LEVEL);
+	if (total < base) return { paragon: 0, progress: 0, into: 0, needed: paragonStepXp(0) };
+	// the thresholds are compared in the same arithmetic that builds them (base + total of the level), so a boundary is exact at any size
+	const reached = (n: number) => total >= base + cumulativeParagonXp(n);
+	const { paragonFirstStepXp: first, paragonGrowth: growth, paragonCap: cap } = LEVELING;
+	let n = Math.min(cap, Math.max(0, Math.floor(Math.log1p(((total - base) * (growth - 1)) / first) / Math.log(growth))));
+	while (n < cap && reached(n + 1)) n++;
+	while (n > 0 && !reached(n)) n--;
+	if (n >= cap) return { paragon: cap, progress: 1, into: 0, needed: 0 };
+	const needed = paragonStepXp(n);
+	const into = Math.max(0, total - (base + cumulativeParagonXp(n)));
+	return { paragon: n, progress: Math.min(1, into / needed), into, needed };
+};
+
 // Resource Management
 // Calculate stat-based resource modifiers
 /**
