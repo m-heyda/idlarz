@@ -50,3 +50,29 @@ export const petById = (id: string): PetDef | undefined => PETS.find((pet) => pe
 
 /** Whether `id` names a pet of the catalog. */
 export const isPetId = (id: unknown): id is string => typeof id === 'string' && PETS.some((pet) => pet.id === id);
+
+/**
+ * A pet players will be able to unlock with achievements later: for now the Pets tab only shows that it exists (greyed, "coming soon"). Not a pet of the catalog: no id of it can be owned, granted or saved, and there is no way to get one yet. When one becomes real
+ * it is added to {@link PETS} with its own id and this entry goes. `sheet` is a walking sprite sheet; the card shows its first frame (`frameW` x `frameH` px, the top left of the sheet).
+ *
+ * @category Progression/Pets
+ * @order 2
+ */
+export interface LockedPet {
+	id: string;
+	name: string;
+	/** Path of the sprite sheet under `public/` (`public/pixel/pets/`) */
+	sheet: string;
+	frameW: number;
+	frameH: number;
+	/** The whole sheet's size in px, so the first frame can be cut out with CSS */
+	sheetW: number;
+	sheetH: number;
+}
+
+export const LOCKED_PETS: readonly LockedPet[] = [
+	{ id: 'cat', name: 'Cat', sheet: '/pixel/pets/cat_walk.png', frameW: 64, frameH: 64, sheetW: 512, sheetH: 64 },
+	{ id: 'hamster', name: 'Hamster', sheet: '/pixel/pets/hamster_walk.png', frameW: 64, frameH: 64, sheetW: 512, sheetH: 64 },
+	{ id: 'dachshund', name: 'Dachshund', sheet: '/pixel/pets/dachshund_walk.png', frameW: 64, frameH: 64, sheetW: 512, sheetH: 64 },
+	{ id: 'rabbit', name: 'Rabbit', sheet: '/pixel/pets/rabbit_sheet.png', frameW: 32, frameH: 32, sheetW: 96, sheetH: 64 },
+];

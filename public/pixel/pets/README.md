@@ -2,15 +2,13 @@
 
 - `kaczkawu_dog.png` (in this folder): **Yuki, special pet, reserved.** A one-off gift to the user **KaczkaWu** (the owner's girlfriend). Do not put it in any drop table, shop or random reward. Wired: `src/catalog/pets.ts` (the pet), `src/lib/offline/pets.ts` (the server grants it to the account in `YUKI_GRANT_USER_ID`, once), `src/components/game/pets/PetSprite.tsx` (walks around the castle and talks).
 
-## New drops, not sorted yet
+## Pets to unlock later (shown greyed in the Pets tab)
 
-Sprite sheets the owner dropped here, none named by the code yet. Decide for each: wire it (a pet in `src/catalog/pets.ts`), move it to `reuse/pets/` (kept for later) or delete it.
+Walking sprite sheets of the pets players will unlock with achievements. For now they are only pictures: the Pets tab shows the first frame of each, greyed with "Coming soon" (`LOCKED_PETS` in `src/catalog/pets.ts`, not pets of the catalog: nothing can own or grant them). When one becomes real, add it to `PETS` with its own id and remove it from `LOCKED_PETS`.
 
-| File | What |
-| ---- | ---- |
-| `brown-cute-pet-cat-walking-6a21-spritesheet.png` | a brown cat, walking |
-| `cute-pet-hamster-walking-bb8b-spritesheet.png` | a hamster, walking |
-| `dachshund-jumping-and-walking-running-forward-620e-spritesheet.png` | a dachshund, jumping, walking and running |
-| `sprite-32x32px-6f-sheet.png` | a 6 frame 32x32 sheet (96x64) |
-
-Rename the files to `<animal>_<what>.png` when you pick them.
+| File | What | Frames |
+| ---- | ---- | ------ |
+| `cat_walk.png` | a brown cat, walking | 8 of 64x64 in a row |
+| `hamster_walk.png` | a hamster, walking | 8 of 64x64 in a row |
+| `dachshund_walk.png` | a dachshund, jumping, walking and running | 8 of 64x64 in a row |
+| `rabbit_sheet.png` | a white rabbit | 6 of 32x32 (3 x 2) |

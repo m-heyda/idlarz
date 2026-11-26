@@ -107,7 +107,12 @@ export const requestCraftEnchant = (key: string, index: number, mode: 'reroll' |
 export const requestCraftCancel = (key: string, slot = 0): Promise<Reply<CraftReply>> => post<CraftReply>('/api/craft/cancel', { key, slot });
 
 /** Asks the server to run the rebirth (it judges the last stored save, computes the Embers and wipes its bag and gear). One key per rebirth attempt. */
-export const requestRebirth = (key: string, keep: readonly KeepRef[] = []): Promise<Reply<RebirthReply>> => post<RebirthReply>('/api/rebirth', { key, keep });
+export const requestRebirth = (
+	key: string,
+	keep: readonly KeepRef[] = [],
+	options: { keepAttrs?: boolean; resetParagon?: boolean } = {},
+): Promise<Reply<RebirthReply>> =>
+	post<RebirthReply>('/api/rebirth', { key, keep, ...(options.keepAttrs ? { keepAttrs: true } : {}), ...(options.resetParagon ? { resetParagon: true } : {}) });
 
 /** A hotkey: drink a potion or cast a skill. One key per press: the server replays the answer if it is sent twice. */
 export const requestUse = (key: string, command: CombatCommand, since: number | undefined): Promise<Reply<FightReply>> =>

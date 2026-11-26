@@ -6,8 +6,9 @@ import { CLICK_LADDER, INITIAL_RESOURCES, STARTING_GEMS } from '../../src/config
 import { EMBER_DISABLED, EMBER_UPGRADES, REBIRTH, type EmberUpgradeId } from '../../src/config/rebirth';
 import { calculateTileCost } from '../../src/utils/game/costs';
 import { castleUpgradeDuration } from '../../src/utils/game/castle';
-import { effectiveTileDiscount, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
+import { effectiveTileDiscount, tileDiscountCap, emberGain, rebirthStatus, emberSpent, emberUpgradeCost, emberIncomeBonus } from '../../src/utils/game/rebirth';
 import { calculateLevel, totalStatPoints } from '../../src/utils/game/character';
+import { INITIAL_CHARACTER_STATS } from '../../src/config/character';
 import { sanitizeSave } from '../../src/lib/sanitizeSave';
 import { patchTile } from '../../src/utils/world';
 import { plainItem } from '../../src/lib/itemInstance';
@@ -312,4 +313,51 @@ test('the browser puts the pieces the server kept into the new bag, and nothing 
 	assert.equal(api().rebirth(undefined, [kept]), true);
 	const gear = api().bag.filter((slot) => slot && 'item' in slot);
 	assert.deepEqual(gear, [{ item: kept }]);
+});
+
+test('Treasury Charter raises the tile-discount cap 3 points a level to 75 at level 10, and nothing can take it past 80', () => {
+	const at = (charter: number) => tileDiscountCap({ rebirths: 1, legacyPoints: 0, legacyEarned: 100, upgrades: { charter } });
+	assert.equal(at(0), 45);
+	assert.equal(at(1), 48);
+	assert.equal(at(10), 75);
+	assert.ok(at(10) <= REBIRTH.discountMaxPercent);
+	assert.equal(tileDiscountCap(undefined), 45);
+	// the sources add up to 76 at most (Charisma 25 + Thrift 20 + Bulk 8 + Warrior 3 + gear 10 + Paragon 10): here without the gear's 10, so 66, under the Charter cap of 75
+	freshGame();
+	store.setState((s) => ({
+		characterStats: { ...s.characterStats, tileCostDiscount: 25 },
+		prestige: { rebirths: 1, legacyPoints: 0, legacyEarned: 100, upgrades: { thrift: 10, charter: 10 } },
+	}));
+	assert.equal(effectiveTileDiscount(api().characterStats, api().prestige, { bulk: 8 }, 'warrior', undefined, 10), 66);
+});
+
+test("a rebirth hands the attribute points back by default; with the player's choice to keep them they stay and only the extra points are free", () => {
+	for (const keepAttrs of [false, true]) {
+		readyToRebirth();
+		store.setState((s) => ({ characterStats: { ...s.characterStats, availablePoints: 30 } }));
+		for (let i = 0; i < 5; i++) assert.ok(api().addStatPoint('strength'));
+		const level = calculateLevel(api().resources.xp).level;
+		const spent = 5;
+		assert.equal(api().rebirth(undefined, [], { keepAttrs }), true);
+		const after = api().characterStats;
+		const budget = totalStatPoints(level) + 20; // the level's points plus the rebirth's 20
+		if (keepAttrs) {
+			assert.equal(after.strength, INITIAL_CHARACTER_STATS.strength + spent, 'the allocation stays');
+			assert.equal(after.availablePoints, budget - spent, 'only the points above it are free');
+		} else {
+			assert.equal(after.strength, INITIAL_CHARACTER_STATS.strength, 'every point went back');
+			assert.equal(after.availablePoints, budget);
+		}
+	}
+});
+
+test("a rebirth keeps the paragon points unless the server's answer took them back", () => {
+	readyToRebirth();
+	store.setState({ paragonSpent: { damage: 4 } } as never);
+	assert.equal(api().rebirth(), true);
+	assert.deepEqual(api().paragonSpent, { damage: 4 });
+	readyToRebirth();
+	store.setState({ paragonSpent: { damage: 4 } } as never);
+	assert.equal(api().rebirth(undefined, [], { paragon: { ver: 3, spent: {}, freeUsed: false } }), true);
+	assert.deepEqual(api().paragonSpent, {});
 });

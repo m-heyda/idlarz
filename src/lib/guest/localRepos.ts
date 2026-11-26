@@ -188,7 +188,11 @@ export const landSave = (ledger: Ledger | null, stored: StoredSave, nowMs: numbe
 				lastKey: null,
 				lastResult: null,
 				combat: null,
-				attrs: ledger.attrs ? clearedAttrs(ledger.attrs) : ledger.attrs,
+				// a rebirth the player chose to keep their attribute points through leaves the allocation as it is
+				attrs:
+					ledger.attrs && !(ledger.inv?.rebirth?.to === stored.summary.rebirths && ledger.inv.rebirth.keepAttrs && stored.summary.rebirths > ledger.rebirths)
+						? clearedAttrs(ledger.attrs)
+						: ledger.attrs,
 			}
 		: base;
 	previous = stored;

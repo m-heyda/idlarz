@@ -4,6 +4,7 @@ import { refKey, type KeepRef } from '@/lib/rebirthKeep';
 import { formatHeaderAmount } from '@/utils/formatters';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { notify } from '@/lib/notices';
+import type { RebirthChoice } from '@/lib/serverRebirth';
 import GameModal from '../GameModal';
 import { Button, HoverTip, SectionLabel, Slot } from '../../../../packages/design-system/src/components/primitives';
 import { HintTooltip } from '../../../../packages/design-system/src/components/tooltips';
@@ -66,7 +67,7 @@ const LOSE = [
 	'Merchant upgrades (Pack Rat stays), buffs and loot pity',
 ];
 const KEEP = [
-	'Name, hero, level, XP and attributes (every point is handed back to spend again)',
+	'Name, hero, level and XP, and your paragon level',
 	'All Embers and Ember shop upgrades',
 	'Gems and Idol levels',
 	'Pack Rat and Deep Pockets bag size, the auto-sell setting',
@@ -82,8 +83,12 @@ export interface RebirthConfirmProps {
 	slots: number;
 	candidates: KeepCandidate[];
 	asking: boolean;
+	/** Paragon points the player has spent (the second tick box only shows when there are some) */
+	paragonPoints?: number;
+	/** The extra attribute points this rebirth gives (shown next to the first tick box) */
+	extraPoints?: number;
 	onCancel: () => void;
-	onConfirm: (keep: KeepCandidate[]) => void;
+	onConfirm: (keep: KeepCandidate[], choice: RebirthChoice) => void;
 }
 
 /**
@@ -91,7 +96,22 @@ export interface RebirthConfirmProps {
  * carry over (`keepSlots`): an empty slot is a [+] that opens the minibag of owned legendaries, a filled slot shows the piece (click to put it back). Rebirth or Keep playing ends it. Leaving every
  * slot empty while owning legendaries asks once more ("are you sure?"). With no legendary owned, step 2 is skipped.
  */
-const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({ gain, incomeText, unlockLabel, slots, candidates, asking, onCancel, onConfirm }) => {
+const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
+	gain,
+	incomeText,
+	unlockLabel,
+	slots,
+	candidates,
+	asking,
+	paragonPoints = 0,
+	extraPoints = 20,
+	onCancel,
+	onConfirm,
+}) => {
+	// the two free respecs of a rebirth: the attribute points go back by default (as they always did); unticked, they stay and only the extra points are added. The paragon points stay by default; ticked, they go back for free.
+	const [takeAttrsBack, setTakeAttrsBack] = useState(true);
+	const [takeParagonBack, setTakeParagonBack] = useState(false);
+	const choice: RebirthChoice = { keepAttrs: !takeAttrsBack, resetParagon: takeParagonBack && paragonPoints > 0 };
 	const [step, setStep] = useState<'confirm' | 'keep'>('confirm');
 	const [chosen, setChosen] = useState<KeepCandidate[]>([]);
 	const [picking, setPicking] = useState(false);
@@ -127,6 +147,24 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({ gain, incomeText, 
 							</ul>
 						</div>
 					</div>
+					<div className='rb-card' data-testid='rebirth-respec'>
+						<SectionLabel>Free respec</SectionLabel>
+						<label className='rb-check'>
+							<input type='checkbox' checked={takeAttrsBack} onChange={(e) => setTakeAttrsBack(e.target.checked)} data-testid='respec-attrs' />
+							<span>Take back my attribute points to spend again (free respec)</span>
+						</label>
+						<p className='rb-note'>
+							{takeAttrsBack
+								? 'Every attribute point goes back and you spend them all again.'
+								: `Your attributes stay as they are and you only get the ${extraPoints} extra points to spend.`}
+						</p>
+						{paragonPoints > 0 && (
+							<label className='rb-check'>
+								<input type='checkbox' checked={takeParagonBack} onChange={(e) => setTakeParagonBack(e.target.checked)} data-testid='respec-paragon' />
+								<span>Take back my {paragonPoints} paragon points to spend again (free respec)</span>
+							</label>
+						)}
+					</div>
 					{unlockLabel && (
 						<p className='rb-text' style={{ color: '#f0d27a' }}>
 							This rebirth unlocks a new land: <b>{unlockLabel}</b>.
@@ -139,7 +177,7 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({ gain, incomeText, 
 								Continue
 							</Button>
 						) : (
-							<Button tone='danger' onClick={() => onConfirm([])} disabled={asking}>
+							<Button tone='danger' onClick={() => onConfirm([], choice)} disabled={asking}>
 								{asking ? 'Asking the server...' : 'Rebirth'}
 							</Button>
 						)}
@@ -153,7 +191,7 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({ gain, incomeText, 
 			setSure(true);
 			return;
 		}
-		onConfirm(chosen);
+		onConfirm(chosen, choice);
 	};
 
 	return (

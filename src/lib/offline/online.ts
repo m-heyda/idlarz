@@ -2,7 +2,7 @@ import { GEMS_CAP } from '@/config/economy';
 import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
-import { allocateParagon, fitParagon, newParagon, paragonBudget, paragonFree, type Paragon } from '@/lib/offline/paragon';
+import { allocateParagon, fitParagon, newParagon, paragonBudget, paragonFree, paragonSpent, rebirthRespecParagon, type Paragon } from '@/lib/offline/paragon';
 import type {
 	CharacterReply,
 	CharacterRequest,
@@ -483,7 +483,20 @@ export const craftStep = (deps: ServiceDeps, userId: string, key: string, reques
  * rebirth (another key) neither wipes again nor pays again, it answers with what the first one recorded in `inv.rebirth`.
  * The browser uploads its save first, so the stored save the server judges is the one the player is looking at.
  */
-export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowMs: number, keep: readonly KeepRef[] = []): Promise<Online<RebirthReply>> =>
+/** What the player chose on the rebirth screen: keep the attribute points as they are (the rebirth's extra points are added on top) instead of handing them all back, and take the paragon points back for free. Both off is the rebirth there always was except that the paragon points stay. */
+export interface RebirthOptions {
+	keepAttrs: boolean;
+	resetParagon: boolean;
+}
+
+export const rebirthStep = (
+	deps: ServiceDeps,
+	userId: string,
+	key: string,
+	nowMs: number,
+	keep: readonly KeepRef[] = [],
+	options: RebirthOptions = { keepAttrs: false, resetParagon: false },
+): Promise<Online<RebirthReply>> =>
 	onlineStep(deps, userId, key, nowMs, (ctx): { ledger: Ledger; value: RebirthReply } => {
 		const inv = ctx.ledger.inv!;
 		const judged = judgeRebirth(
@@ -496,7 +509,19 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 			const kept = keepCandidates(inv.bag, {})
 				.slice(0, inv.rebirth.kept ?? 0)
 				.map((c) => c.item);
-			return { ledger: ctx.ledger, value: { ok: true, to: inv.rebirth.to, gain: inv.rebirth.gain, inv, kept, serverNowSec: ctx.nowSec } };
+			return {
+				ledger: ctx.ledger,
+				value: {
+					ok: true,
+					to: inv.rebirth.to,
+					gain: inv.rebirth.gain,
+					inv,
+					kept,
+					...(inv.rebirth.keepAttrs ? { keepAttrs: true } : {}),
+					...(ctx.ledger.paragon ? { paragon: ctx.ledger.paragon } : {}),
+					serverNowSec: ctx.nowSec,
+				},
+			};
 		}
 		if (!judged.ok) return { ledger: ctx.ledger, value: { ok: false, reason: judged.reason, to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		// the pieces the player carries over are read from the LEDGER's own bag and gear: the request only names places
@@ -504,12 +529,35 @@ export const rebirthStep = (deps: ServiceDeps, userId: string, key: string, nowM
 		if (!picked.ok) return { ledger: ctx.ledger, value: { ok: false, reason: 'bad_keep', to: 0, gain: 0, inv, serverNowSec: ctx.nowSec } };
 		const wiped: Inventory = {
 			...rebirthInventory(inv, ctx.stored.core.merchantUpgrades, ctx.stored.core.prestige, ctx.stored.core.playerClass, picked.items),
-			rebirth: { to: judged.to, gain: judged.gain, ...(picked.items.length ? { kept: picked.items.length } : {}) },
+			rebirth: {
+				to: judged.to,
+				gain: judged.gain,
+				...(picked.items.length ? { kept: picked.items.length } : {}),
+				...(options.keepAttrs ? { keepAttrs: true as const } : {}),
+			},
 		};
+		// the paragon points go back only when the player ticked it (a rebirth keeps them otherwise); an empty record has nothing to give back
+		const paragon =
+			options.resetParagon && ctx.ledger.paragon && paragonSpent(ctx.ledger.paragon.spent) > 0 ? rebirthRespecParagon(ctx.ledger.paragon) : ctx.ledger.paragon;
 		return {
-			// a rebirth gives every attribute point back (the free respec of a rebirth): the allocation starts again, the account's one free paid respec stays as it was
-			ledger: { ...ctx.ledger, inv: wiped, buffs: clearBuffsOnRebirth(), attrs: clearedAttrs(ctx.ledger.attrs) },
-			value: { ok: true, to: judged.to, gain: judged.gain, inv: wiped, kept: picked.items, serverNowSec: ctx.nowSec },
+			// a rebirth gives every attribute point back (the free respec of a rebirth): the allocation starts again, the account's one free paid respec stays as it was. The player may choose to keep them: then the allocation stays and the rebirth's extra points are simply free to spend
+			ledger: {
+				...ctx.ledger,
+				inv: wiped,
+				buffs: clearBuffsOnRebirth(),
+				attrs: options.keepAttrs ? ctx.ledger.attrs : clearedAttrs(ctx.ledger.attrs),
+				paragon,
+			},
+			value: {
+				ok: true,
+				to: judged.to,
+				gain: judged.gain,
+				inv: wiped,
+				kept: picked.items,
+				...(options.keepAttrs ? { keepAttrs: true } : {}),
+				...(paragon ? { paragon } : {}),
+				serverNowSec: ctx.nowSec,
+			},
 		};
 	});
 

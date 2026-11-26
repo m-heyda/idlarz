@@ -36818,12 +36818,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "loose_pets_brown_cute_pet_cat",
+		"usedBy": [
+			"code"
+		],
+		"name": "loose_pets_cat_walk",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
-		"src": "/pixel/pets/brown-cute-pet-cat-walking-6a21-spritesheet.png",
-		"status": "unused",
+		"src": "/pixel/pets/cat_walk.png",
+		"status": "used",
 		"source": "pixel/pets",
 		"size": [
 			512,
@@ -36831,12 +36833,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "loose_pets_cute_pet_hamster_w",
+		"usedBy": [
+			"code"
+		],
+		"name": "loose_pets_dachshund_walk",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
-		"src": "/pixel/pets/cute-pet-hamster-walking-bb8b-spritesheet.png",
-		"status": "unused",
+		"src": "/pixel/pets/dachshund_walk.png",
+		"status": "used",
 		"source": "pixel/pets",
 		"size": [
 			512,
@@ -36844,12 +36848,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "loose_pets_dachshund_jumping_",
+		"usedBy": [
+			"code"
+		],
+		"name": "loose_pets_hamster_walk",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
-		"src": "/pixel/pets/dachshund-jumping-and-walking-running-forward-620e-spritesheet.png",
-		"status": "unused",
+		"src": "/pixel/pets/hamster_walk.png",
+		"status": "used",
 		"source": "pixel/pets",
 		"size": [
 			512,
@@ -36857,12 +36863,14 @@
 		]
 	},
 	{
-		"usedBy": [],
-		"name": "loose_pets_sprite_32x32px_6f_",
+		"usedBy": [
+			"code"
+		],
+		"name": "loose_pets_rabbit_sheet",
 		"category": "unsorted",
 		"subcategory": "pixel/pets (not named by the code)",
-		"src": "/pixel/pets/sprite-32x32px-6f-sheet.png",
-		"status": "unused",
+		"src": "/pixel/pets/rabbit_sheet.png",
+		"status": "used",
 		"source": "pixel/pets",
 		"size": [
 			96,

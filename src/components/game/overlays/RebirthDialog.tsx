@@ -12,7 +12,9 @@ import { biomeArtUrl } from '@/config/biomeArt';
 import { castleLevelOf } from '@/lib/castleWard';
 import { formatHeaderAmount, formatNumber, formatPercent, tidy } from '@/utils/formatters';
 import audioManager from '@/utils/audioManager';
-import { askServerRebirth, blocksLocalRebirth } from '@/lib/serverRebirth';
+import { LEVELING } from '@/config/character';
+import { askServerRebirth, blocksLocalRebirth, type RebirthChoice } from '@/lib/serverRebirth';
+import { paragonSpent as paragonPointsOf } from '@/lib/offline/paragon';
 import { rebirthRunSummary, rebirthUnlockIntro, rebirthUnlockList, type RebirthRunSummary, type RebirthUnlockIntro } from '@/utils/game/rebirthUnlocks';
 import { useBestiaryStore } from '@/stores/bestiaryStore';
 import GameWindow from '../GameWindow';
@@ -31,7 +33,7 @@ const pct = (n: number, digits = 0) => (Math.abs(n * 100) >= 5000 ? formatPercen
 const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 	thrift: (n) => `-${pct(n * EMBER_UPGRADES.thrift.effectPerLevel)} tile and building cost (with Charisma at most -${REBIRTH.discountCapPercent}%)`,
 	charter: (n) =>
-		`The tile discount can go up to ${REBIRTH.discountCapPercent + n * EMBER_UPGRADES.charter.effectPerLevel}% (Charisma, Thrift and Bulk Discount add up)`,
+		`The tile discount can go up to ${Math.min(REBIRTH.discountMaxPercent, REBIRTH.discountCapPercent + n * EMBER_UPGRADES.charter.effectPerLevel)}% (Charisma, Thrift and Bulk Discount add up)`,
 	builders: (n) => `-${pct(n * EMBER_UPGRADES.builders.effectPerLevel)} castle build time`,
 	buildtime: (n) => `-${pct(n * EMBER_UPGRADES.buildtime.effectPerLevel)} build time of Producers and Extractors`,
 	idoltime: (n) => `-${pct(n * EMBER_UPGRADES.idoltime.effectPerLevel)} build time of Idols`,
@@ -115,6 +117,7 @@ const RebirthDialog: React.FC = () => {
 	// what the rebirth just did (the Embers, the run's numbers and anything it unlocked), shown on the result screen before the dialog closes
 	const [result, setResult] = useState<{ run: RebirthRunSummary; intro: RebirthUnlockIntro | null } | null>(null);
 	const bag = useGameStore((state) => state.bag);
+	const paragonSpent = useGameStore((state) => state.paragonSpent);
 	const equipment = useGameStore((state) => state.equipment);
 
 	if (!open) return null;
@@ -135,11 +138,14 @@ const RebirthDialog: React.FC = () => {
 
 	// The server runs the rebirth first (it uploads the game, judges it, computes the Embers and wipes its bag and gear); the browser then starts
 	// the new run with the Embers the server named. Without a cloud save this session the browser rebirths on its own, as before.
-	const doRebirth = async (keep: KeepCandidate[] = []) => {
+	const doRebirth = async (keep: KeepCandidate[] = [], choice: RebirthChoice = { keepAttrs: false, resetParagon: false }) => {
 		if (asking) return;
 		setAsking(true);
 		try {
-			const answer = await askServerRebirth(keep.map((c) => c.ref));
+			const answer = await askServerRebirth(
+				keep.map((c) => c.ref),
+				choice,
+			);
 			if (answer.status === 'refused') {
 				notify(
 					answer.badKeep
@@ -164,7 +170,13 @@ const RebirthDialog: React.FC = () => {
 				kills: Object.values(useBestiaryStore.getState().kills).reduce((sum, n) => sum + n, 0),
 				before: before.prestige,
 			};
-			if (rebirth(answer.status === 'ok' ? answer.gain : undefined, answer.status === 'ok' ? answer.kept : [])) {
+			if (
+				rebirth(
+					answer.status === 'ok' ? answer.gain : undefined,
+					answer.status === 'ok' ? answer.kept : [],
+					answer.status === 'ok' ? { keepAttrs: answer.keepAttrs, paragon: answer.paragon } : {},
+				)
+			) {
 				audioManager.playSound('fanfare');
 				const after = useGameStore.getState().prestige;
 				setConfirming(false);
@@ -186,7 +198,9 @@ const RebirthDialog: React.FC = () => {
 			candidates={keepCandidates(bag, equipment)}
 			asking={asking}
 			onCancel={() => setConfirming(false)}
-			onConfirm={(keep) => void doRebirth(keep)}
+			paragonPoints={paragonPointsOf(paragonSpent)}
+			extraPoints={LEVELING.attributePointsPerRebirth}
+			onConfirm={(keep, choice) => void doRebirth(keep, choice)}
 		/>
 	) : null;
 
