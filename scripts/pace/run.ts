@@ -123,6 +123,9 @@ const AWAY_STEP_SEC = 300;
 const LEVEL_MARKS = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
 // Level and lifetime XP at fixed game times (hours): `lvl@4.5h`, `xp@4.5h` ...
 const SNAPSHOTS_H = [1, 4.5, 24, 72, 168, 336, 576];
+/** The income of the base resources (per second) at these days of the first run, kept as magnitudes `early.d3.gold` ...: what a new player can spend on crafting in the first weeks (`scripts/craft-sim.ts`, IDL-397). Not in the docs. */
+const EARLY_DAYS = [1, 2, 3, 7, 14];
+const EARLY_RESOURCES = ['gold', 'wood', 'stone', 'coal', 'food', 'hide', 'wool'] as const;
 const FIRST_FINISH_CASTLE = 6; // the first finish line (castle 6 + best click + the rebirth territory) is unchanged by castle levels 7-10
 
 /** Plays one profile for one seed and returns what it measured. */
@@ -515,6 +518,12 @@ const play = (name: string, profile: Profile, ctx: Ctx, { cfg, utils, store, mon
 					milestones[`xp@${h}h`] = api().resources.xp;
 				}
 			});
+			for (const day of EARLY_DAYS) {
+				if (run === 1 && t >= day * 86400 && !(`early.d${day}.gold` in mag)) {
+					const total = api().resourceRates.total as unknown as Record<string, number>;
+					for (const r of EARLY_RESOURCES) mag[`early.d${day}.${r}`] = total[r] ?? 0;
+				}
+			}
 			if (finished()) bot.mark('finished', t);
 			const castleNow = castleLevelNow();
 			maybeRebirth(castleNow);

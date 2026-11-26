@@ -319,6 +319,62 @@ for (const [name, visits, budget] of scenarios) {
 	out(`| ${name} | ${[10, 20, 30, 40, 50, 60, 70, 80].map((m) => (hit[m] === undefined ? 'over 2 years' : `${hit[m]} d`)).join(' | ')} |`);
 }
 
+out();
+out('## Early days per level');
+out();
+out(
+	"The first weeks of a casual player (`casual` of the pace sim: one click a second, three hours a day), with the gold their kingdom really makes on days 1, 2, 3, 7 and 14 of the first run (measured with `scripts/pace/run.ts`, `early.d<N>.gold`; in between the line is straight on a log scale, after day 14 it stays at day 14). Each day the player spends `EARLY_SHARE` of that day's income on crafting and fills every queue slot on every visit with the best piece of the highest unlocked gear grade. The clock, the visits and the XP per piece decide the pace here, not the gold: a day of income is worth thousands of starter pieces.",
+);
+out();
+const EARLY_SHARE = 0.3;
+const EARLY_GOLD_PER_DAY: [number, number][] = [
+	[1, 7.34e6],
+	[2, 13.43e6],
+	[3, 22.97e6],
+	[7, 45.69e6],
+	[14, 111.7e6],
+];
+const incomeOnDay = (day: number): number => {
+	const first = EARLY_GOLD_PER_DAY[0];
+	const last = EARLY_GOLD_PER_DAY[EARLY_GOLD_PER_DAY.length - 1];
+	if (day <= first[0]) return first[1];
+	if (day >= last[0]) return last[1];
+	const i = EARLY_GOLD_PER_DAY.findIndex(([d]) => d >= day);
+	const [d0, g0] = EARLY_GOLD_PER_DAY[i - 1];
+	const [d1, g1] = EARLY_GOLD_PER_DAY[i];
+	return Math.exp(Math.log(g0) + ((Math.log(g1) - Math.log(g0)) * (day - d0)) / (d1 - d0));
+};
+const earlyDays = (visitsPerDay: number, marks: number[], maxDays = 120) => {
+	const slots = LIMITS.craftQueueSlots;
+	let xp = 0;
+	const hit: Record<number, number> = {};
+	for (let day = 1; day <= maxDays; day++) {
+		const level = craftLevelOf(xp).level;
+		const top = Math.max(...gearOnly.filter((r) => r.unlock <= level).map((r) => r.unlock));
+		const pool = gearOnly.filter((r) => r.unlock === top);
+		const xpAvg = pool.reduce((a, r) => a + r.xp, 0) / pool.length;
+		const costAvg = pool.reduce((a, r) => a + r.cost, 0) / pool.length;
+		const sec = craftTimeSec(pool[0].recipe);
+		const runH = Math.min((craftBatchLimit(pool[0].recipe) * sec) / 3600, LIMITS.craftOfflineHours, 24 / visitsPerDay);
+		const perSlot = visitsPerDay * Math.floor((runH * 3600) / sec);
+		const crafts = Math.min(perSlot * slots, (incomeOnDay(day) * EARLY_SHARE) / costAvg);
+		xp += crafts * xpAvg * CRAFTING.xpScale;
+		const reached = craftLevelOf(xp).level;
+		for (const m of marks) if (hit[m] === undefined && reached >= m) hit[m] = day;
+	}
+	return hit;
+};
+const EARLY_MARKS = [8, 10, 15, 20, 25, 30, 40];
+out(`| Player | ${EARLY_MARKS.map((m) => `Level ${m}`).join(' | ')} |`);
+out(`|---|${EARLY_MARKS.map(() => '---:').join('|')}|`);
+for (const [name, visits] of [
+	['3 visits a day', 3],
+	['1 visit a day', 1],
+] as const) {
+	const hit = earlyDays(visits, EARLY_MARKS);
+	out(`| ${name} | ${EARLY_MARKS.map((m) => (hit[m] === undefined ? 'over 120 d' : `${hit[m]} d`)).join(' | ')} |`);
+}
+
 console.log(lines.join('\n'));
 if (gateFailed) {
 	console.error('craft-sim: a gate failed (see the lines marked below, over or FAIL above)');

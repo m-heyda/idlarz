@@ -12,11 +12,15 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Arcane Essence | component | 3 | 1 Glass Vial + 3 Glowberry + 2 Dried Herb Bundle | 82.5 | - | - | - | 4 | 20.6 |
 | Minor Healing Potion | potion | 1 | 40 Food + 1 Glass Vial | 30.5 | 20 | 80 | 38% | 6 | 5.1 |
 | Greater Healing Potion | potion | 5 | 150 Food + 60 Coal + 1 Glass Vial | 140.5 | 90 | 360 | 39% | 25 | 5.6 |
-| Cured Leather | component | 3 | 5 Hide + 3 Coal | 13.3 | - | - | - | 3 | 4.4 |
-| Plank Bundle | component | 4 | 12 Wood + 6 Stone | 14.4 | - | - | - | 3 | 4.8 |
+| Cured Leather | component | 3 | 800 Hide + 500 Coal | 2150 | - | - | - | 3 | 716.7 |
+| Plank Bundle | component | 4 | 2000 Wood + 1000 Stone | 2400 | - | - | - | 3 | 800 |
+| Plank Crate | component | 12 | 10 Plank Bundle | 24000 | - | - | - | 25 | 960 |
+| Plank Pallet | component | 30 | 20 Plank Crate | 480000 | - | - | - | 100 | 4800 |
+| Leather Stack | component | 12 | 10 Cured Leather | 21500 | - | - | - | 25 | 860 |
+| Leather Bale | component | 30 | 20 Leather Stack | 430000 | - | - | - | 100 | 4300 |
 | Preserved Rations | good | 2 | 20 Meat + 40 Food | 36 | 46 | - | - | 5 | 7.2 |
 | Honey Cake | good | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | - | - | 7 | 5.1 |
-| Leather Satchel | good | 6 | 3 Cured Leather | 39.9 | 52 | - | - | 12 | 3.3 |
+| Leather Satchel | good | 6 | 1 Cured Leather | 2150 | 2800 | - | - | 12 | 179.2 |
 | Carved Trinket | good | 8 | 40 Wood + 20 Stone | 48 | 62 | - | - | 18 | 2.7 |
 | Herb Crate | good | 20 | 100 Herbs + 50 Sap | 7500 | 9800 | - | - | 40 | 187.5 |
 | Trade Pack | good | 32 | 60 Iron Ore + 60 Salt + 60 Pearls | 9000 | 11800 | - | - | 60 | 150 |
@@ -32,40 +36,41 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Silver Rivets | component | 30 | 1 Silver Ingot + 30 Coal | 327.4 | - | - | - | 20 | 16.4 |
 | Gold Studs | component | 40 | 1 Gold Ingot + 60 Coal | 1312.3 | - | - | - | 35 | 37.5 |
 | Gem Grit | component | 5 | 2 Flint + 30 Stone | 15 | - | - | - | 4 | 3.8 |
-| Polishing Cloth | component | 12 | 1 Cured Leather + 1 Gem Grit | 28.3 | - | - | - | 8 | 3.5 |
+| Polishing Cloth | component | 12 | 1 Cured Leather + 1 Gem Grit | 2165 | - | - | - | 8 | 270.6 |
 | Stone Block | component | 6 | 100 Stone + 10 Coal | 101 | - | - | - | 4 | 25.3 |
-| Cloth Bolt | component | 7 | 60 Wool | 120 | - | - | - | 5 | 24 |
+| Cloth Bolt | component | 7 | 1000 Wool | 2000 | - | - | - | 5 | 400 |
 | Herb Extract | component | 4 | 3 Dried Herb Bundle + 1 Glass Vial + 60 Herbs + 10 Coal | 3046.5 | - | - | - | 6 | 507.8 |
 | Fungal Extract | component | 8 | 3 Orange Caps + 1 Glass Vial + 60 Spores | 3053.5 | - | - | - | 8 | 381.7 |
 | Vital Extract | component | 6 | 2 Vial of Blood + 1 Glass Vial + 30 Herbs + 20 Food | 1550.5 | - | - | - | 7 | 221.5 |
-| Distilled Ichor | component | 35 | 1 Glass Vial + 1000 Corrupted Core | 50014.5 | - | - | - | 40 | 1250.4 |
+| Dark Powder | component | 30 | 2 Dark Horn + 1 Dark Shard | 274 | - | - | - | 20 | 13.7 |
+| Distilled Ichor | component | 35 | 1 Glass Vial + 1 Dark Powder + 1000 Corrupted Core | 50288.5 | - | - | - | 40 | 1257.2 |
 | Forged War Medal | component | 70 | 1 Gold Ingot + 1500 Scrap Steel | 90682 | - | - | - | 50 | 1813.6 |
 | Cut Jasper | component | 8 | 2 Striped Jasper + 1 Gem Grit | 125 | - | - | - | 18 | 6.9 |
 | Cut Malachite | component | 9 | 2 Raw Malachite + 1 Gem Grit | 135 | - | - | - | 18 | 7.5 |
 | Cut Turquoise | component | 10 | 2 Raw Turquoise + 1 Gem Grit | 165 | - | - | - | 18 | 9.2 |
 | Cut Geode Stone | component | 10 | 2 Geode + 1 Gem Grit | 191 | - | - | - | 18 | 10.6 |
 | Cut Amethyst | component | 12 | 2 Void Amethyst Shard + 1 Gem Grit | 4815 | - | - | - | 12 | 401.3 |
-| Cut Lapis | component | 22 | 2 Lapis Lazuli + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 5658.3 | - | - | - | 24 | 235.8 |
-| Cut Garnet | component | 24 | 2 Dark Garnet + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 5738.3 | - | - | - | 24 | 239.1 |
-| Cut Moonstone | component | 26 | 2 Moonstone Sliver + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 5898.3 | - | - | - | 24 | 245.8 |
-| Cut Crystal | component | 28 | 2 Raw Crystal + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 6098.3 | - | - | - | 24 | 254.1 |
-| Cut Emerald | component | 30 | 2 Emerald Star + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 6758.3 | - | - | - | 24 | 281.6 |
-| Cut Ruby | component | 42 | 1 Rough Ruby + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 31916.1 | - | - | - | 30 | 1063.9 |
-| Cut Sapphire | component | 44 | 1 Rough Sapphire + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 32216.1 | - | - | - | 30 | 1073.9 |
-| Cut Heart Gem | component | 48 | 1 Heart Gem + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 33316.1 | - | - | - | 30 | 1110.5 |
+| Cut Lapis | component | 22 | 2 Lapis Lazuli + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 7795 | - | - | - | 24 | 324.8 |
+| Cut Garnet | component | 24 | 2 Dark Garnet + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 7875 | - | - | - | 24 | 328.1 |
+| Cut Moonstone | component | 26 | 2 Moonstone Sliver + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 8035 | - | - | - | 24 | 334.8 |
+| Cut Crystal | component | 28 | 2 Raw Crystal + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 8235 | - | - | - | 24 | 343.1 |
+| Cut Emerald | component | 30 | 2 Emerald Star + 2 Gem Grit + 1 Polishing Cloth + 100 Pearls | 8895 | - | - | - | 24 | 370.6 |
+| Cut Ruby | component | 42 | 1 Rough Ruby + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 36189.5 | - | - | - | 30 | 1206.3 |
+| Cut Sapphire | component | 44 | 1 Rough Sapphire + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 36489.5 | - | - | - | 30 | 1216.3 |
+| Cut Heart Gem | component | 48 | 1 Heart Gem + 3 Gem Grit + 2 Polishing Cloth + 1 Glass Vial + 300 Pearls + 300 Frostshard | 37589.5 | - | - | - | 30 | 1253.0 |
 | Mana Potion | potion | 6 | 1 Glass Vial + 1 Arcane Essence + 60 Food | 121 | 30 | - | - | 20 | 6.0 |
 | Vitality Tonic | potion | 10 | 1 Vital Extract + 100 Herbs + 120 Food + 40 Coal | 6642.5 | 90 | - | - | 30 | 221.4 |
 | Elixir of Might | potion | 16 | 2 Herb Extract + 3 Cracked Beast Claw + 1 Glass Vial + 100 Herbs | 11242.5 | 150 | - | - | 60 | 187.4 |
 | Elixir of Haste | potion | 18 | 1 Fungal Extract + 3 Glowberry + 1 Glass Vial + 100 Spores | 8122 | 75 | - | - | 70 | 116.0 |
 | Elixir of Ironskin | potion | 20 | 1 Herb Extract + 1 Iron Ingot + 3 Wet Clay + 1 Glass Vial + 100 Iron Ore | 10659 | 100 | - | - | 80 | 133.2 |
-| Elixir of Fortitude | potion | 22 | 2 Vital Extract + 4 Wild Grapes + 1 Glass Vial + 100 Herbs | 8147.5 | 95 | - | - | 90 | 90.5 |
+| Elixir of Fortitude | potion | 22 | 2 Vital Extract + 4 Wild Grapes + 1 Murky Phial + 1 Glass Vial + 100 Herbs | 8272.5 | 95 | - | - | 90 | 91.9 |
 | Elixir of the Keen Eye | potion | 24 | 1 Fungal Extract + 1 Cut Jasper + 2 Glowberry + 1 Glass Vial + 100 Sap | 8229 | 145 | - | - | 100 | 82.3 |
 | Elixir of Arcana | potion | 26 | 2 Arcane Essence + 3 Glowberry + 1 Glass Vial + 100 Herbs | 5233.5 | 110 | - | - | 110 | 47.6 |
-| Elixir of Time Shift | potion | 70 | 5 Hourglass Sand + 5 Gold Ingot + 3 Cut Crystal + 1 Glass Vial + 8000000 Wood + 6000000 Stone + 6000000 Coal + 10000000 Food | 22116719.4 | 1000 | - | - | 500 | 44233.4 |
-| Elixir of Warding | potion | 30 | 1 Arcane Essence + 1 Cut Moonstone + 1 Vital Extract + 1 Glass Vial + 100 Frostshard | 12545.8 | 650 | - | - | 140 | 89.6 |
-| Dawnsplitter | legendary | 80 | 2000000000 Wood + 1500000000 Stone + 500 Plank Bundle + 50 War Medal | 2854541300 | 45000 | - | - | 100000 | 28545.4 |
-| Stormstring | legendary | 80 | 2000000000 Wood + 1000000000 Hide + 500 Cured Leather + 50 War Medal | 3504540750 | 45000 | - | - | 100000 | 35045.4 |
-| Starlight Wand | legendary | 80 | 2000000000 Stone + 1500000000 Coal + 500 Plank Bundle + 50 War Medal | 3454541300 | 45000 | - | - | 100000 | 34545.4 |
+| Elixir of Time Shift | potion | 70 | 5 Hourglass Sand + 5 Gold Ingot + 3 Cut Crystal + 1 Glass Vial + 8000000 Wood + 6000000 Stone + 6000000 Coal + 10000000 Food | 22123129.5 | 1000 | - | - | 500 | 44246.3 |
+| Elixir of Warding | potion | 30 | 1 Arcane Essence + 1 Cut Moonstone + 1 Vital Extract + 1 Murky Phial + 1 Glass Vial + 100 Frostshard | 14807.5 | 650 | - | - | 140 | 105.8 |
+| Dawnsplitter | legendary | 80 | 2000000000 Wood + 1500000000 Stone + 500 Plank Bundle + 5 Dark Powder + 50 War Medal | 2855735470 | 45000 | - | - | 100000 | 28557.4 |
+| Stormstring | legendary | 80 | 2000000000 Wood + 1000000000 Hide + 500 Cured Leather + 10 Hollow Log + 50 War Medal | 3505609200 | 45000 | - | - | 100000 | 35056.1 |
+| Starlight Wand | legendary | 80 | 2000000000 Stone + 1500000000 Coal + 500 Plank Bundle + 10 Hollow Log + 50 War Medal | 3455734200 | 45000 | - | - | 100000 | 34557.3 |
 
 ## Crafting level
 
@@ -97,11 +102,15 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Arcane Essence | 10 | 360 | 288 | 29,700 | 1000 | 2.8 |
 | Minor Healing Potion | 14 | 257 | 309 | 7,843 | 25 | 0.1 |
 | Greater Healing Potion | 30 | 120 | 600 | 16,860 | 25 | 0.2 |
-| Cured Leather | 10 | 360 | 216 | 4,788 | 1000 | 2.8 |
-| Plank Bundle | 10 | 360 | 216 | 5,184 | 1000 | 2.8 |
+| Cured Leather | 10 | 360 | 216 | 774,000 | 1000 | 2.8 |
+| Plank Bundle | 10 | 360 | 216 | 864,000 | 1000 | 2.8 |
+| Plank Crate | 10 | 360 | 1,800 | 8,640,000 | 1000 | 2.8 |
+| Plank Pallet | 10 | 360 | 7,200 | 172,800,000 | 1000 | 2.8 |
+| Leather Stack | 10 | 360 | 1,800 | 7,740,000 | 1000 | 2.8 |
+| Leather Bale | 10 | 360 | 7,200 | 154,800,000 | 1000 | 2.8 |
 | Preserved Rations | 15 | 240 | 240 | 8,640 | 25 | 0.1 |
 | Honey Cake | 20 | 180 | 252 | 6,480 | 25 | 0.1 |
-| Leather Satchel | 30 | 120 | 288 | 4,788 | 25 | 0.2 |
+| Leather Satchel | 600 | 6 | 14 | 12,900 | 25 | 4.2 |
 | Carved Trinket | 30 | 120 | 432 | 5,760 | 25 | 0.2 |
 | Herb Crate | 900 | 4 | 32 | 30,000 | 25 | 6.3 |
 | Trade Pack | 1200 | 3 | 36 | 27,000 | 25 | 8.3 |
@@ -117,40 +126,41 @@ Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-
 | Silver Rivets | 10 | 5,760 | 1,440 | 1,886,040 | 1000 | 2.8 |
 | Gold Studs | 10 | 4,320 | 2,520 | 5,669,280 | 1000 | 2.8 |
 | Gem Grit | 10 | 1,080 | 288 | 16,200 | 1000 | 2.8 |
-| Polishing Cloth | 10 | 360 | 576 | 10,188 | 1000 | 2.8 |
+| Polishing Cloth | 10 | 360 | 576 | 779,400 | 1000 | 2.8 |
 | Stone Block | 10 | 360 | 288 | 36,360 | 1000 | 2.8 |
-| Cloth Bolt | 10 | 360 | 360 | 43,200 | 1000 | 2.8 |
+| Cloth Bolt | 10 | 360 | 360 | 720,000 | 1000 | 2.8 |
 | Herb Extract | 10 | 360 | 432 | 1,096,740 | 1000 | 2.8 |
 | Fungal Extract | 10 | 360 | 576 | 1,099,260 | 1000 | 2.8 |
 | Vital Extract | 10 | 360 | 504 | 558,180 | 1000 | 2.8 |
-| Distilled Ichor | 10 | 360 | 2,880 | 18,005,220 | 1000 | 2.8 |
+| Dark Powder | 10 | 360 | 1,440 | 98,640 | 1000 | 2.8 |
+| Distilled Ichor | 10 | 360 | 2,880 | 18,103,860 | 1000 | 2.8 |
 | Forged War Medal | 10 | 360 | 3,600 | 32,645,520 | 1000 | 2.8 |
 | Cut Jasper | 10 | 360 | 1,296 | 45,000 | 1000 | 2.8 |
 | Cut Malachite | 10 | 360 | 1,296 | 48,600 | 1000 | 2.8 |
 | Cut Turquoise | 10 | 360 | 1,296 | 59,400 | 1000 | 2.8 |
 | Cut Geode Stone | 10 | 360 | 1,296 | 68,760 | 1000 | 2.8 |
 | Cut Amethyst | 10 | 360 | 864 | 1,733,400 | 1000 | 2.8 |
-| Cut Lapis | 10 | 360 | 1,728 | 2,036,988 | 1000 | 2.8 |
-| Cut Garnet | 10 | 360 | 1,728 | 2,065,788 | 1000 | 2.8 |
-| Cut Moonstone | 10 | 360 | 1,728 | 2,123,388 | 1000 | 2.8 |
-| Cut Crystal | 10 | 360 | 1,728 | 2,195,388 | 1000 | 2.8 |
-| Cut Emerald | 10 | 360 | 1,728 | 2,432,988 | 1000 | 2.8 |
-| Cut Ruby | 10 | 360 | 2,160 | 11,489,796 | 1000 | 2.8 |
-| Cut Sapphire | 10 | 360 | 2,160 | 11,597,796 | 1000 | 2.8 |
-| Cut Heart Gem | 10 | 360 | 2,160 | 11,993,796 | 1000 | 2.8 |
+| Cut Lapis | 10 | 360 | 1,728 | 2,806,200 | 1000 | 2.8 |
+| Cut Garnet | 10 | 360 | 1,728 | 2,835,000 | 1000 | 2.8 |
+| Cut Moonstone | 10 | 360 | 1,728 | 2,892,600 | 1000 | 2.8 |
+| Cut Crystal | 10 | 360 | 1,728 | 2,964,600 | 1000 | 2.8 |
+| Cut Emerald | 10 | 360 | 1,728 | 3,202,200 | 1000 | 2.8 |
+| Cut Ruby | 10 | 360 | 2,160 | 13,028,220 | 1000 | 2.8 |
+| Cut Sapphire | 10 | 360 | 2,160 | 13,136,220 | 1000 | 2.8 |
+| Cut Heart Gem | 10 | 360 | 2,160 | 13,532,220 | 1000 | 2.8 |
 | Mana Potion | 25 | 144 | 576 | 17,424 | 25 | 0.2 |
 | Vitality Tonic | 30 | 120 | 720 | 797,100 | 25 | 0.2 |
 | Elixir of Might | 45 | 80 | 960 | 899,400 | 25 | 0.3 |
 | Elixir of Haste | 45 | 80 | 1,120 | 649,760 | 25 | 0.3 |
 | Elixir of Ironskin | 50 | 72 | 1,152 | 767,448 | 25 | 0.3 |
-| Elixir of Fortitude | 50 | 72 | 1,296 | 586,620 | 25 | 0.3 |
+| Elixir of Fortitude | 50 | 72 | 1,296 | 595,620 | 25 | 0.3 |
 | Elixir of the Keen Eye | 55 | 65 | 1,309 | 538,625 | 25 | 0.4 |
 | Elixir of Arcana | 55 | 65 | 1,440 | 342,556 | 25 | 0.4 |
-| Elixir of Time Shift | 600 | 6 | 600 | 132,700,316 | 25 | 4.2 |
-| Elixir of Warding | 60 | 60 | 1,680 | 752,748 | 25 | 0.4 |
-| Dawnsplitter | 10800 | 0 | 6,667 | 951,513,767 | 1 | 3 |
-| Stormstring | 10800 | 0 | 6,667 | 1,168,180,250 | 1 | 3 |
-| Starlight Wand | 10800 | 0 | 6,667 | 1,151,513,767 | 1 | 3 |
+| Elixir of Time Shift | 600 | 6 | 600 | 132,738,777 | 25 | 4.2 |
+| Elixir of Warding | 60 | 60 | 1,680 | 888,450 | 25 | 0.4 |
+| Dawnsplitter | 10800 | 0 | 6,667 | 951,911,823 | 1 | 3 |
+| Stormstring | 10800 | 0 | 6,667 | 1,168,536,400 | 1 | 3 |
+| Starlight Wand | 10800 | 0 | 6,667 | 1,151,911,400 | 1 | 3 |
 
 ## Trade goods income
 
@@ -160,7 +170,7 @@ Gold from selling crafted trade goods (IDL-227) against the gold per second of t
 |---|---:|---|---:|---:|---:|---:|
 | Preserved Rations | 2 | 20 Meat + 40 Food | 36 | 46 | 1.28 | 11,040 |
 | Honey Cake | 4 | 6 Eggs + 4 Milk + 30 Food | 36 | 46 | 1.28 | 8,280 |
-| Leather Satchel | 6 | 3 Cured Leather | 39.9 | 52 | 1.30 | 6,240 |
+| Leather Satchel | 6 | 1 Cured Leather | 2150 | 2800 | 1.30 | 16,800 |
 | Carved Trinket | 8 | 40 Wood + 20 Stone | 48 | 62 | 1.29 | 7,440 |
 | Herb Crate | 20 | 100 Herbs + 50 Sap | 7500 | 9800 | 1.31 | 39,200 |
 | Trade Pack | 32 | 60 Iron Ore + 60 Salt + 60 Pearls | 9000 | 11800 | 1.31 | 35,400 |
@@ -179,13 +189,13 @@ Gate 1:
 | Grade | Unlock | Seconds each | Item level (unlock / top) | Cheapest cost | Mean sell at unlock | Mean sell at top | Worst mean sell (Int 105, Luck cap) | Cost / worst sell | XP (chest) | Pieces to the next unlock | Gate 1 |
 |---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|
 | G1 Starter | 1 | 120 | 1-2 / 7-8 | 3,192 | 18 | 87 | 95 | 33.76 | 78 | 26 | ok |
-| G2 Hide | 8 | 300 | 9-10 / 17-18 | 28,698 | 301 | 727 | 860 | 33.37 | 1040 | 28 | ok |
-| G3 Iron | 15 | 600 | 19-20 / 29-30 | 305,540 | 2,519 | 7,810 | 8,875 | 34.43 | 3250 | 27 | ok |
-| G4 Steel | 25 | 900 | 31-32 / 41-42 | 158,346 | 17,164 | 50,433 | 67,449 | 2.35 | 7800 | 27 | ok |
-| G5 Knight | 35 | 1200 | 43-44 / 53-54 | 1,127,451 | 157,542 | 488,754 | 574,283 | 1.96 | 18200 | 73 | ok |
-| G6 Obsidian | 50 | 1500 | 55-56 / 65-66 | 6,182,856 | 856,766 | 2,657,374 | 3,176,442 | 1.95 | 41600 | 159 | ok |
-| G7 Runed | 65 | 1800 | 67-68 / 77-78 | 57,893,716 | 9,391,579 | 29,268,665 | 34,496,574 | 1.68 | 91000 | 239 | ok |
-| G8 Ancient | 80 | 1800 | 79-80 / 79-80 | 84,265,445 | 36,473,766 | 36,702,119 | 43,384,369 | 1.94 | 195000 | 0 | ok |
+| G2 Hide | 8 | 300 | 9-10 / 17-18 | 28,925 | 301 | 727 | 860 | 33.63 | 1040 | 28 | ok |
+| G3 Iron | 15 | 600 | 19-20 / 29-30 | 317,000 | 2,519 | 7,810 | 8,875 | 35.72 | 3250 | 27 | ok |
+| G4 Steel | 25 | 900 | 31-32 / 41-42 | 175,227 | 17,164 | 50,433 | 67,449 | 2.60 | 7800 | 27 | ok |
+| G5 Knight | 35 | 1200 | 43-44 / 53-54 | 1,462,412 | 157,542 | 488,754 | 574,283 | 2.55 | 18200 | 73 | ok |
+| G6 Obsidian | 50 | 1500 | 55-56 / 65-66 | 6,364,123 | 856,766 | 2,657,374 | 3,176,442 | 2.00 | 41600 | 159 | ok |
+| G7 Runed | 65 | 1800 | 67-68 / 77-78 | 58,327,046 | 9,391,579 | 29,268,665 | 34,496,574 | 1.69 | 91000 | 239 | ok |
+| G8 Ancient | 80 | 1800 | 79-80 / 79-80 | 84,335,497 | 36,473,766 | 36,702,119 | 43,384,369 | 1.94 | 195000 | 0 | ok |
 
 Gate 2: mean sell value of one piece near the top item level of each grade (Luck 0, Intelligence 5), crafted against drops at the same item level.
 
@@ -216,12 +226,12 @@ Gate 4, what income can pay for: gold income per second at castle 10 (the two en
 |---|---|---:|---:|---:|
 | G1 | 0.0 / 0.0 | 30 | 30 | 30 |
 | G2 | 0.2 / 0.1 | 12 | 12 | 12 |
-| G3 | 1.7 / 0.8 | 6 | 6 | 6 |
-| G4 | 0.9 / 0.4 | 4 | 4 | 4 |
-| G5 | 6.3 / 3.1 | 3 | 3 | 3 |
-| G6 | 34.3 / 17.2 | 2.4 | 1.7 | 2.4 |
-| G7 | 321.6 / 160.8 | 2 | 0.2 | 0.4 |
-| G8 | 468.1 / 234.1 | 2 | 0.1 | 0.3 |
+| G3 | 1.8 / 0.9 | 6 | 6 | 6 |
+| G4 | 1.0 / 0.5 | 4 | 4 | 4 |
+| G5 | 8.1 / 4.1 | 3 | 3 | 3 |
+| G6 | 35.4 / 17.7 | 2.4 | 1.7 | 2.4 |
+| G7 | 324.0 / 162.0 | 2 | 0.2 | 0.4 |
+| G8 | 468.5 / 234.3 | 2 | 0.1 | 0.3 |
 
 ## Hours per level
 
@@ -231,12 +241,12 @@ Crafting nonstop, always the recipe with the most XP per hour among those unlock
 |---:|---:|---:|---:|---|
 | 2 | 0.0 | 0 | 5,317 | Starter Maul |
 | 5 | 0.3 | 0.5 | 72,041 | Starter Maul |
-| 10 | 1.3 | 5.3 | 1,087,561 | Hide Maul |
-| 20 | 1.8 | 21.3 | 26,751,535 | Iron Maul |
-| 30 | 2.6 | 44.4 | 71,031,169 | Steel Maul |
-| 45 | 7.9 | 113.6 | 355,004,985 | Knight Maul |
-| 60 | 22.7 | 314.4 | 3,869,617,536 | Obsidian Maul |
-| 80 | 55.4 | 976.1 | 96,901,619,152 | Runed Maul |
+| 10 | 1.3 | 5.3 | 1,110,239 | Hide Maul |
+| 20 | 1.8 | 21.3 | 27,711,308 | Iron Maul |
+| 30 | 2.6 | 44.4 | 74,402,592 | Steel Maul |
+| 45 | 7.9 | 113.6 | 3,614,268,062 | Knight Maul |
+| 60 | 22.7 | 314.4 | 7,276,391,403 | Obsidian Maul |
+| 80 | 55.4 | 976 | 101,063,595,830 | Runed Maul |
 
 Crafting nonstop, level 80 would take about 976 hours of batches; the materials, not the clock, are the limit long before that.
 
@@ -246,7 +256,16 @@ A player who visits a few times a day, refilling every queue slot with a full ba
 
 | Player | Level 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 |
 |---|---:|---:|---:|---:|---:|---:|---:|---:|
-| 3 visits a day, 100 M gold a day | 2 d | 3 d | 4 d | 5 d | 9 d | 42 d | 268 d | over 2 years |
-| 1 visit a day, 100 M gold a day | 3 d | 6 d | 8 d | 10 d | 15 d | 47 d | 275 d | over 2 years |
-| 3 visits a day, 30 M gold a day | 2 d | 3 d | 5 d | 9 d | 24 d | 131 d | over 2 years | over 2 years |
-| 1 visit a day, 30 M gold a day | 3 d | 6 d | 8 d | 13 d | 28 d | 135 d | over 2 years | over 2 years |
+| 3 visits a day, 100 M gold a day | 2 d | 3 d | 4 d | 5 d | 10 d | 44 d | 273 d | over 2 years |
+| 1 visit a day, 100 M gold a day | 3 d | 6 d | 8 d | 11 d | 16 d | 49 d | 280 d | over 2 years |
+| 3 visits a day, 30 M gold a day | 2 d | 3 d | 5 d | 7 d | 26 d | 137 d | over 2 years | over 2 years |
+| 1 visit a day, 30 M gold a day | 3 d | 6 d | 8 d | 13 d | 31 d | 143 d | over 2 years | over 2 years |
+
+## Early days per level
+
+The first weeks of a casual player (`casual` of the pace sim: one click a second, three hours a day), with the gold their kingdom really makes on days 1, 2, 3, 7 and 14 of the first run (measured with `scripts/pace/run.ts`, `early.d<N>.gold`; in between the line is straight on a log scale, after day 14 it stays at day 14). Each day the player spends `EARLY_SHARE` of that day's income on crafting and fills every queue slot on every visit with the best piece of the highest unlocked gear grade. The clock, the visits and the XP per piece decide the pace here, not the gold: a day of income is worth thousands of starter pieces.
+
+| Player | Level 8 | Level 10 | Level 15 | Level 20 | Level 25 | Level 30 | Level 40 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| 3 visits a day | 1 d | 2 d | 3 d | 4 d | 7 d | 8 d | 14 d |
+| 1 visit a day | 2 d | 3 d | 5 d | 7 d | 9 d | 10 d | 15 d |

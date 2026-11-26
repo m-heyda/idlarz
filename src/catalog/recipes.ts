@@ -29,13 +29,37 @@ const BASE_COMPONENTS: Record<string, ComponentDef> = {
 		id: 'cured_leather',
 		name: 'Cured Leather',
 		group: 'material',
-		description: 'Hide cured over coal until it is supple. The base of every leather good.',
+		description: 'Hide cured over coal until it is supple. The base of every leather good and of the armor of the Hide grade.',
 	},
 	plank_bundle: {
 		id: 'plank_bundle',
 		name: 'Plank Bundle',
 		group: 'material',
-		description: 'Sawn, stone-planed boards tied in a bundle. Gear recipes will use them.',
+		description: 'Sawn, stone-planed boards tied in a heavy bundle. The wood of every Hide-grade weapon, shield and trinket starts here.',
+	},
+	plank_crate: {
+		id: 'plank_crate',
+		name: 'Plank Crate',
+		group: 'material',
+		description: 'Ten Plank Bundles nailed into a crate. The wood of the Iron and Steel grades.',
+	},
+	plank_pallet: {
+		id: 'plank_pallet',
+		name: 'Plank Pallet',
+		group: 'material',
+		description: 'Twenty Plank Crates strapped on a pallet. The wood of the Knight grade and above.',
+	},
+	leather_stack: {
+		id: 'leather_stack',
+		name: 'Leather Stack',
+		group: 'material',
+		description: 'Ten pieces of Cured Leather pressed into a stack. The leather of the Iron and Steel grades.',
+	},
+	leather_bale: {
+		id: 'leather_bale',
+		name: 'Leather Bale',
+		group: 'material',
+		description: 'Twenty Leather Stacks baled and roped. The leather of the Knight grade and above.',
 	},
 	arcane_essence: {
 		id: 'arcane_essence',
@@ -91,7 +115,7 @@ export const TRADE_GOODS: ItemDef[] = [
 		tier: 0,
 		stackMax: 100,
 		icon: 'food',
-		sellValue: 52,
+		sellValue: 2_800,
 		description: 'A stitched shoulder bag. Sold, not worn.',
 	},
 	{
@@ -214,8 +238,8 @@ export const RECIPES: Recipe[] = [
 		kind: 'component',
 		name: 'Cured Leather',
 		inputs: [
-			{ resource: 'hide', qty: 5 },
-			{ resource: 'coal', qty: 3 },
+			{ resource: 'hide', qty: 800 },
+			{ resource: 'coal', qty: 500 },
 		],
 		output: { component: 'cured_leather', qty: 1 },
 		unlock: 3,
@@ -227,13 +251,54 @@ export const RECIPES: Recipe[] = [
 		kind: 'component',
 		name: 'Plank Bundle',
 		inputs: [
-			{ resource: 'wood', qty: 12 },
-			{ resource: 'stone', qty: 6 },
+			{ resource: 'wood', qty: 2000 },
+			{ resource: 'stone', qty: 1000 },
 		],
 		output: { component: 'plank_bundle', qty: 1 },
 		unlock: 4,
 		xp: 3,
 		timeSec: 12,
+	},
+	// the bigger sizes of the same boards and leather (IDL-397): a craft takes the size below, so gear asks for a few dozen of one size and never for thousands of raw wood
+	{
+		id: 'plank_crate',
+		kind: 'component',
+		name: 'Plank Crate',
+		inputs: [{ component: 'plank_bundle', qty: 10 }],
+		output: { component: 'plank_crate', qty: 1 },
+		unlock: 12,
+		xp: 25,
+		timeSec: 10,
+	},
+	{
+		id: 'plank_pallet',
+		kind: 'component',
+		name: 'Plank Pallet',
+		inputs: [{ component: 'plank_crate', qty: 20 }],
+		output: { component: 'plank_pallet', qty: 1 },
+		unlock: 30,
+		xp: 100,
+		timeSec: 10,
+	},
+	{
+		id: 'leather_stack',
+		kind: 'component',
+		name: 'Leather Stack',
+		inputs: [{ component: 'cured_leather', qty: 10 }],
+		output: { component: 'leather_stack', qty: 1 },
+		unlock: 12,
+		xp: 25,
+		timeSec: 10,
+	},
+	{
+		id: 'leather_bale',
+		kind: 'component',
+		name: 'Leather Bale',
+		inputs: [{ component: 'leather_stack', qty: 20 }],
+		output: { component: 'leather_bale', qty: 1 },
+		unlock: 30,
+		xp: 100,
+		timeSec: 10,
 	},
 	{
 		id: 'preserved_rations',
@@ -266,11 +331,11 @@ export const RECIPES: Recipe[] = [
 		id: 'leather_satchel',
 		kind: 'good',
 		name: 'Leather Satchel',
-		inputs: [{ component: 'cured_leather', qty: 3 }],
+		inputs: [{ component: 'cured_leather', qty: 1 }],
 		output: { item: 'leather_satchel', qty: 1 },
 		unlock: 6,
 		xp: 12,
-		timeSec: 30,
+		timeSec: 600, // slow on purpose: a satchel is worth thousands now (goods gate)
 	},
 	{
 		id: 'carved_trinket',
@@ -368,11 +433,11 @@ export type CraftGrade = keyof typeof GEAR_UNLOCK;
 export const CRAFT_GRADES = Object.keys(GEAR_UNLOCK) as CraftGrade[];
 
 /**
- * What a gear recipe takes. A grade has a **value** (the gold worth, at merchant prices, of a recipe of weight 1) and a number of **parts** (Plank Bundles or Cured Leather; none at G1, where no component is unlocked yet);
- * a slot's weight scales both. The rest of the value is merchant resources by the slot's family: weapons and shields wood and stone (and Plank Bundles), armour hide, coal and food (and Cured Leather), trinkets stone, coal and wood
- * (and a Plank Bundle). On top of that come the **refined components** of the grade (`GEAR_REFINED`): ingots for weapons and armor (copper, iron, steel, silver, gold, the Obsidian Edge), Cloth Bolts for cloaks, cut gems and a precious
- * ingot for jewelry. They only add to the cost. The value is **1.25 x the mean sell value of what the grade makes at the top of its item level window** (measured by `npm run craft-sim`, gated there and in tests/crafting/gearRecipes.test.ts),
- * so a craft always costs more than the piece sells for, whatever the crafting level, Luck or Intelligence: crafting is a resource sink and never a gold printer. The XP is sized so a grade takes about 35 pieces to climb to the next grade's unlock.
+ * What a gear recipe takes. A grade has a **value** (the gold worth, at merchant prices, of a recipe of weight 1); a slot's weight scales it. The G1 starter gear is raw merchant resources by the slot's family (weapons and shields wood and stone, armour hide, coal and
+ * food, trinkets stone, coal and wood). **From G2 up the value is carried by components** (IDL-397): Plank Bundles for weapons and trinkets, Cured Leather for armour and cloaks, as the bundle (Hide), the crate of ten (Iron, Steel) or the pallet of twenty crates (Knight and above),
+ * `GEAR_PART_SIZE`, so a piece asks for 6 to 300 of one size and never for thousands of raw wood. On top of that come the extracts of the Extractors (Gear tier Iron up, `GEAR_EXTRACTS`) and the **refined components** of the grade (`GEAR_REFINED`): ingots for weapons and armor (copper, iron,
+ * steel, silver, gold, the Obsidian Edge), Cloth Bolts for cloaks, cut gems and a precious ingot for jewelry, and one fire drop in a G6+ ring or amulet. The value is **1.25 x the mean sell value of what the grade makes at the top of its item level window** (measured by `npm run craft-sim`,
+ * gated there and in tests/crafting/gearRecipes.test.ts), so a craft always costs more than the piece sells for, whatever the crafting level, Luck or Intelligence: crafting is a resource sink and never a gold printer. The XP is sized so a grade takes about 35 pieces to climb to the next grade's unlock.
  */
 type Family = 'weapon' | 'armour' | 'trinket';
 const FAMILY: Record<CraftSlot, Family> = {
@@ -408,16 +473,26 @@ const SLOT_WEIGHT: Record<CraftSlot, number> = {
 };
 /** The two-handed and ranged pieces cost a little more than a one-handed sword: a type's weight multiplies its slot's */
 const TYPE_WEIGHT: Partial<Record<CraftType, number>> = { maul: 1.15, crossbow: 1.1, staff: 1.05 };
-/** Per grade: the gold value of a weight-1 recipe, the components in it, and the crafting XP of a weight-1 craft */
-const GEAR_GRADE_COST: Record<CraftGrade, { value: number; parts: number; xp: number }> = {
-	G1: { value: 2_400, parts: 0, xp: 60 },
-	G2: { value: 21_500, parts: 3, xp: 800 },
-	G3: { value: 222_000, parts: 6, xp: 2_500 },
-	G4: { value: 85_000, parts: 12, xp: 6_000 },
-	G5: { value: 725_000, parts: 24, xp: 14_000 },
-	G6: { value: 4_250_000, parts: 40, xp: 32_000 },
-	G7: { value: 42_500_000, parts: 64, xp: 70_000 },
-	G8: { value: 60_000_000, parts: 96, xp: 150_000 },
+/** Per grade: the gold value of a weight-1 recipe, and the crafting XP of a weight-1 craft */
+const GEAR_GRADE_COST: Record<CraftGrade, { value: number; xp: number }> = {
+	G1: { value: 2_400, xp: 60 },
+	G2: { value: 21_500, xp: 800 },
+	G3: { value: 222_000, xp: 2_500 },
+	G4: { value: 85_000, xp: 6_000 },
+	G5: { value: 725_000, xp: 14_000 },
+	G6: { value: 4_250_000, xp: 32_000 },
+	G7: { value: 42_500_000, xp: 70_000 },
+	G8: { value: 60_000_000, xp: 150_000 },
+};
+/**
+ * The size of Plank Bundle / Cured Leather a grade's gear is built from (IDL-397): 0 the bundle (Hide), 1 the crate of ten (Iron, Steel), 2 the pallet of twenty crates (Knight and above), so a piece asks for 6 to 300 of one size and never for
+ * thousands of raw wood. The G1 starter gear is the only gear made of raw resources.
+ */
+const GEAR_PART_SIZE: Partial<Record<CraftGrade, 0 | 1 | 2>> = { G2: 0, G3: 1, G4: 1, G5: 2, G6: 2, G7: 2, G8: 2 };
+const FAMILY_PART_SIZES: Record<Family, readonly [string, string, string]> = {
+	weapon: ['plank_bundle', 'plank_crate', 'plank_pallet'],
+	armour: ['cured_leather', 'leather_stack', 'leather_bale'],
+	trinket: ['plank_bundle', 'plank_crate', 'plank_pallet'],
 };
 /** How the resource part of the value splits over the resources of a family (shares add up to 1) */
 const FAMILY_SPLIT: Record<Family, Partial<Record<MerchantResourceKey, number>>> = {
@@ -425,7 +500,6 @@ const FAMILY_SPLIT: Record<Family, Partial<Record<MerchantResourceKey, number>>>
 	armour: { hide: 0.45, coal: 0.3, food: 0.25 },
 	trinket: { stone: 0.4, coal: 0.3, wood: 0.3 },
 };
-const FAMILY_PART: Record<Family, string> = { weapon: 'plank_bundle', armour: 'cured_leather', trinket: 'plank_bundle' };
 
 const refined = (component: string, qty: number): RecipeInput => ({ component, qty });
 
@@ -497,10 +571,10 @@ const nice = (n: number): number => {
 	return Math.max(1, Math.round(n / scale) * scale);
 };
 
-/** The gold value of the resources a component's own recipe takes (a component is made once and counted at what it cost) */
+/** The gold value of a component: what the resources of its own recipe cost, and the components it is made of (a bigger size counts what the smaller sizes inside it cost) */
 const componentValue = (id: string): number => {
 	const maker = RECIPES.find((r) => 'component' in r.output && r.output.component === id);
-	return (maker?.inputs ?? []).reduce((sum, i) => ('resource' in i ? sum + i.qty * craftValueOf(i.resource) : sum), 0);
+	return (maker?.inputs ?? []).reduce((sum, i) => sum + ('resource' in i ? i.qty * craftValueOf(i.resource) : i.qty * componentValue(i.component)), 0);
 };
 
 /** The refined components a gear recipe of this grade and slot adds (see {@link GEAR_REFINED}) */
@@ -513,18 +587,25 @@ export const gearRefined = (grade: CraftGrade, slot: CraftSlot): RecipeInput[] =
 	return [...metals, refined(gem, grade === 'G7' || grade === 'G8' ? 3 : grade === 'G5' || grade === 'G6' ? 2 : 1)];
 };
 
-const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): RecipeInput[] => {
-	const { value, parts } = GEAR_GRADE_COST[grade];
+/**
+ * What a gear recipe takes. The G1 starter gear (and the hidden legacy recipes) is raw resources by the family split. From G2 up the value is carried by the **parts** of the family (Plank Bundles, Crates or Pallets; Cured Leather, Stacks or Bales, `GEAR_PART_SIZE`), counted
+ * up so the recipe is never worth less than the grade's value (rounded up), then the extracts and the refined components of the grade. The gold value is what it was when the same value was raw wood and stone, so the "no gold printer" gate does not move.
+ */
+const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType, raw = false): RecipeInput[] => {
+	const { value } = GEAR_GRADE_COST[grade];
 	const weight = SLOT_WEIGHT[slot] * (type ? (TYPE_WEIGHT[type] ?? 1) : 1);
 	const family = FAMILY[slot];
-	const count = parts > 0 ? Math.max(1, Math.round(parts * weight)) : 0;
 	// the headroom keeps a craft above the sell value even with every crafting discount (CRAFT_COST_HEADROOM)
-	const raw = Math.max(0, value * weight * CRAFT_COST_HEADROOM - count * componentValue(FAMILY_PART[family]));
-	const inputs: RecipeInput[] = (Object.entries(FAMILY_SPLIT[family]) as [MerchantResourceKey, number][]).map(([resource, share]) => ({
-		resource,
-		qty: nice((raw * share) / RESOURCES[resource].merchant.price),
-	}));
-	if (count > 0) inputs.push({ component: FAMILY_PART[family], qty: count });
+	const target = value * weight * CRAFT_COST_HEADROOM;
+	const size = GEAR_PART_SIZE[grade];
+	const inputs: RecipeInput[] = [];
+	if (raw || size === undefined) {
+		for (const [resource, share] of Object.entries(FAMILY_SPLIT[family]) as [MerchantResourceKey, number][])
+			inputs.push({ resource, qty: nice((target * share) / RESOURCES[resource].merchant.price) });
+	} else {
+		const part = FAMILY_PART_SIZES[family][size];
+		inputs.push({ component: part, qty: Math.max(1, Math.ceil(target / componentValue(part))) });
+	}
 	const extractQty = GEAR_EXTRACT_QTY[grade];
 	const extracts: RecipeInput[] = extractQty
 		? GEAR_EXTRACTS[slot === 'cape' ? 'cloak' : family === 'weapon' ? 'weapon' : family === 'armour' ? 'armour' : 'trinket'].map((resource) => ({
@@ -532,7 +613,10 @@ const gearInputs = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): Recip
 				qty: nice(extractQty * weight),
 			}))
 		: [];
-	return [...inputs, ...extracts, ...gearRefined(grade, slot)];
+	// the fire drop of the Elemental and Dragon monsters has a use: one in every G6+ ring and amulet (fire-ward jewelry)
+	const fire: RecipeInput[] =
+		(slot === 'ring' || slot === 'neck') && (grade === 'G6' || grade === 'G7' || grade === 'G8') ? [{ component: 'ing_fire_drop', qty: 1 }] : [];
+	return [...inputs, ...extracts, ...gearRefined(grade, slot), ...fire];
 };
 
 const gearRecipe = (grade: CraftGrade, slot: CraftSlot, type?: CraftType): Recipe => {
@@ -576,7 +660,7 @@ export const LEGACY_GEAR_RECIPES: Recipe[] = (['G1', 'G2', 'G3', 'G4'] as const)
 		(slot): Recipe => ({
 			...gearRecipe(grade, slot),
 			legacy: true,
-			inputs: gearInputs(grade, slot).filter((i) => 'resource' in i || i.component === FAMILY_PART.weapon),
+			inputs: gearInputs(grade, slot, undefined, true).filter((i) => 'resource' in i),
 		}),
 	),
 );
@@ -601,6 +685,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'wood', qty: 2_000_000_000 },
 			{ resource: 'stone', qty: 1_500_000_000 },
 			{ component: 'plank_bundle', qty: 500 },
+			{ component: 'dark_powder', qty: 5 },
 			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'dawnsplitter', qty: 1 },
@@ -616,6 +701,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'wood', qty: 2_000_000_000 },
 			{ resource: 'hide', qty: 1_000_000_000 },
 			{ component: 'cured_leather', qty: 500 },
+			{ component: 'ing_hollow_log', qty: 10 },
 			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'stormstring', qty: 1 },
@@ -631,6 +717,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 			{ resource: 'stone', qty: 2_000_000_000 },
 			{ resource: 'coal', qty: 1_500_000_000 },
 			{ component: 'plank_bundle', qty: 500 },
+			{ component: 'ing_hollow_log', qty: 10 },
 			{ component: 'ing_war_medals', qty: 50 },
 		],
 		output: { item: 'starlight_wand', qty: 1 },

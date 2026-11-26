@@ -131,6 +131,7 @@ const FASTENER_RECIPES = [
 ];
 
 const PART_COMPONENTS = [
+	comp('dark_powder', 'Dark Powder', 'extract', 'Dark horn ground with a splinter of shard into a grey-violet dust. Enchanters stir it into every Ichor.'),
 	comp('gem_grit', 'Gem Grit', 'tool', 'Flint ground to a gritty powder. Every cut gem is polished with it, and the better the stone the more it takes.'),
 	comp('polish_cloth', 'Polishing Cloth', 'tool', 'Cured leather charged with grit. It gives a gem its final shine, so the blue and finer stones need one.'),
 	comp('stone_block', 'Stone Block', 'part', 'A stone cut square. Builders will ask for them, and so will the heavier crafts to come.'),
@@ -148,12 +149,13 @@ const PART_RECIPES = [
 	recipe('gem_grit', 'Gem Grit', [ing('flint', 2), res('stone', 30)], 'gem_grit', 5, 4, 12, 3),
 	recipe('polish_cloth', 'Polishing Cloth', [part('cured_leather', 1), part('gem_grit', 1)], 'polish_cloth', 12, 8, 20),
 	recipe('stone_block', 'Stone Block', [res('stone', 100), res('coal', 10)], 'stone_block', 6, 4, 15),
-	recipe('cloth_bolt', 'Cloth Bolt', [res('wool', 60)], 'cloth_bolt', 7, 5, 15),
+	recipe('cloth_bolt', 'Cloth Bolt', [res('wool', 1000)], 'cloth_bolt', 7, 5, 15),
 	recipe('herb_extract', 'Herb Extract', [ing('dried_herbs', 3), part('glass_vial', 1), res('herbs', 60), res('coal', 10)], 'herb_extract', 4, 6, 18),
 	recipe('fungal_extract', 'Fungal Extract', [ing('orange_mushrooms', 3), part('glass_vial', 1), res('spores', 60)], 'fungal_extract', 8, 8, 20),
 	recipe('vital_extract', 'Vital Extract', [ing('blood', 2), part('glass_vial', 1), res('herbs', 30), res('food', 20)], 'vital_extract', 6, 7, 18),
 	// the two reagents of the late crafts come from the Blight and Battlefield Extractors (IDL-120): their extracts are distilled and forged into them
-	recipe('ichor', 'Distilled Ichor', [part('glass_vial', 1), res('corruptedCore', 1000)], 'ing_ichor', 35, 40, 60),
+	recipe('dark_powder', 'Dark Powder', [ing('horn_dark', 2), ing('dark_shard', 1)], 'dark_powder', 30, 20, 15),
+	recipe('ichor', 'Distilled Ichor', [part('glass_vial', 1), part('dark_powder', 1), res('corruptedCore', 1000)], 'ing_ichor', 35, 40, 60),
 	recipe('war_medals', 'Forged War Medal', [part('gold_ingot', 1), res('scrapSteel', 1500)], 'ing_war_medals', 70, 50, 90),
 ];
 
@@ -216,7 +218,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_fortitude',
 		kind: 'potion',
 		name: 'Elixir of Fortitude',
-		inputs: [part('vital_extract', 2), ing('grapes', 4), part('glass_vial', 1), res('herbs', 100)],
+		inputs: [part('vital_extract', 2), ing('grapes', 4), ing('dark_potion', 1), part('glass_vial', 1), res('herbs', 100)],
 		output: { item: 'elixir_fortitude', qty: 1 },
 		unlock: 22,
 		xp: 90,
@@ -266,7 +268,7 @@ const POTION_RECIPES: Recipe[] = [
 		id: 'elixir_warding',
 		kind: 'potion',
 		name: 'Elixir of Warding',
-		inputs: [part('arcane_essence', 1), part('cut_moon', 1), part('vital_extract', 1), part('glass_vial', 1), res('frostshard', 100)],
+		inputs: [part('arcane_essence', 1), part('cut_moon', 1), part('vital_extract', 1), ing('dark_potion', 1), part('glass_vial', 1), res('frostshard', 100)],
 		output: { item: 'elixir_warding', qty: 1 },
 		unlock: 30,
 		xp: 140,
