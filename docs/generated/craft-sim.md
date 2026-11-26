@@ -38,7 +38,7 @@ Cost is the gold value of the inputs at the merchant prices (a Glass Vial counts
 | Herb Extract | component | 4 | 3 Dried Herb Bundle + 1 Glass Vial + 60 Herbs + 10 Coal | 3046.5 | - | - | - | 6 | 507.8 |
 | Fungal Extract | component | 8 | 3 Orange Caps + 1 Glass Vial + 60 Spores | 3053.5 | - | - | - | 8 | 381.7 |
 | Vital Extract | component | 6 | 2 Vial of Blood + 1 Glass Vial + 30 Herbs + 20 Food | 1550.5 | - | - | - | 7 | 221.5 |
-| Distilled Ichor | component | 60 | 1 Glass Vial + 1000 Corrupted Core | 50014.5 | - | - | - | 40 | 1250.4 |
+| Distilled Ichor | component | 35 | 1 Glass Vial + 1000 Corrupted Core | 50014.5 | - | - | - | 40 | 1250.4 |
 | Forged War Medal | component | 70 | 1 Gold Ingot + 1500 Scrap Steel | 90682 | - | - | - | 50 | 1813.6 |
 | Cut Jasper | component | 8 | 2 Striped Jasper + 1 Gem Grit | 125 | - | - | - | 18 | 6.9 |
 | Cut Malachite | component | 9 | 2 Raw Malachite + 1 Gem Grit | 135 | - | - | - | 18 | 7.5 |
@@ -85,72 +85,72 @@ Reference recipe: Carved Trinket (2.7 gold per XP).
 | 80 | 29,999,957 | 1,666,665 | 79,999,920 |
 | 100 | 29,999,957 | 1,666,665 | 79,999,920 |
 
-Maximum level 80; at most 1000000000 crafts per batch (hard ceiling 1000000000).
+Maximum level 80; XP per craft is the recipe's XP times 0.2 (so the crafts above are x5 when the XP scale is counted). At most 25 crafts of gear, a potion or a good and 1000 of a component per batch, and no batch longer than 12 hours.
 
 ## Timed batches
 
 Every recipe with a `timeSec` runs in the server-side queue (docs/plan/crafting-v0.md, Timed batch queue). Per hour of a batch running without a pause. Gold burned is the gold value of the whole input chain (a potion includes its vial) at merchant prices.
 
-| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch of the cap (minutes) | Batch of the hard ceiling (hours) |
+| Recipe | Seconds each | Items / hour | XP / hour | Gold burned / hour | Batch limit | A full batch takes (hours) |
 |---|---:|---:|---:|---:|---:|---:|
-| Glass Vial | 10 | 360 | 720 | 5,220 | 166666666.7 | 2777777.8 |
-| Arcane Essence | 20 | 180 | 720 | 14,850 | 333333333.3 | 5555555.6 |
-| Minor Healing Potion | 14 | 257 | 1,543 | 7,843 | 233333333.3 | 3888888.9 |
-| Greater Healing Potion | 30 | 120 | 3,000 | 16,860 | 500000000 | 8333333.3 |
-| Cured Leather | 12 | 300 | 900 | 3,990 | 200000000 | 3333333.3 |
-| Plank Bundle | 12 | 300 | 900 | 4,320 | 200000000 | 3333333.3 |
-| Preserved Rations | 15 | 240 | 1,200 | 8,640 | 250000000 | 4166666.7 |
-| Honey Cake | 20 | 180 | 1,260 | 6,480 | 333333333.3 | 5555555.6 |
-| Leather Satchel | 30 | 120 | 1,440 | 4,788 | 500000000 | 8333333.3 |
-| Carved Trinket | 30 | 120 | 2,160 | 5,760 | 500000000 | 8333333.3 |
-| Herb Crate | 900 | 4 | 160 | 30,000 | 15000000000 | 250000000 |
-| Trade Pack | 1200 | 3 | 180 | 27,000 | 20000000000 | 333333333.3 |
-| Copper Ingot | 15 | 240 | 1,200 | 16,800 | 250000000 | 4166666.7 |
-| Iron Ingot | 20 | 180 | 1,440 | 464,400 | 333333333.3 | 5555555.6 |
-| Steel Ingot | 30 | 120 | 1,680 | 1,833,360 | 500000000 | 8333333.3 |
-| Silver Ingot | 30 | 120 | 1,680 | 624,720 | 500000000 | 8333333.3 |
-| Gold Ingot | 45 | 80 | 2,400 | 1,254,560 | 750000000 | 12500000 |
-| Obsidian Edge | 60 | 60 | 3,600 | 938,100 | 1000000000 | 16666666.7 |
-| Copper Nails | 12 | 3,600 | 1,200 | 24,300 | 200000000 | 3333333.3 |
-| Iron Nails | 15 | 3,840 | 1,680 | 624,480 | 250000000 | 4166666.7 |
-| Steel Rivets | 20 | 2,880 | 2,160 | 2,757,960 | 333333333.3 | 5555555.6 |
-| Silver Rivets | 25 | 2,304 | 2,880 | 754,416 | 416666666.7 | 6944444.4 |
-| Gold Studs | 30 | 1,440 | 4,200 | 1,889,760 | 500000000 | 8333333.3 |
-| Gem Grit | 12 | 900 | 1,200 | 13,500 | 200000000 | 3333333.3 |
-| Polishing Cloth | 20 | 180 | 1,440 | 5,094 | 333333333.3 | 5555555.6 |
-| Stone Block | 15 | 240 | 960 | 24,240 | 250000000 | 4166666.7 |
-| Cloth Bolt | 15 | 240 | 1,200 | 28,800 | 250000000 | 4166666.7 |
-| Herb Extract | 18 | 200 | 1,200 | 609,300 | 300000000 | 5000000 |
-| Fungal Extract | 20 | 180 | 1,440 | 549,630 | 333333333.3 | 5555555.6 |
-| Vital Extract | 18 | 200 | 1,400 | 310,100 | 300000000 | 5000000 |
-| Distilled Ichor | 60 | 60 | 2,400 | 3,000,870 | 1000000000 | 16666666.7 |
-| Forged War Medal | 90 | 40 | 2,000 | 3,627,280 | 1500000000 | 25000000 |
-| Cut Jasper | 40 | 90 | 1,620 | 11,250 | 666666666.7 | 11111111.1 |
-| Cut Malachite | 40 | 90 | 1,620 | 12,150 | 666666666.7 | 11111111.1 |
-| Cut Turquoise | 40 | 90 | 1,620 | 14,850 | 666666666.7 | 11111111.1 |
-| Cut Geode Stone | 40 | 90 | 1,620 | 17,190 | 666666666.7 | 11111111.1 |
-| Cut Amethyst | 30 | 120 | 1,440 | 577,800 | 500000000 | 8333333.3 |
-| Cut Lapis | 50 | 72 | 1,728 | 407,398 | 833333333.3 | 13888888.9 |
-| Cut Garnet | 50 | 72 | 1,728 | 413,158 | 833333333.3 | 13888888.9 |
-| Cut Moonstone | 50 | 72 | 1,728 | 424,678 | 833333333.3 | 13888888.9 |
-| Cut Crystal | 50 | 72 | 1,728 | 439,078 | 833333333.3 | 13888888.9 |
-| Cut Emerald | 50 | 72 | 1,728 | 486,598 | 833333333.3 | 13888888.9 |
-| Cut Ruby | 60 | 60 | 1,800 | 1,914,966 | 1000000000 | 16666666.7 |
-| Cut Sapphire | 60 | 60 | 1,800 | 1,932,966 | 1000000000 | 16666666.7 |
-| Cut Heart Gem | 60 | 60 | 1,800 | 1,998,966 | 1000000000 | 16666666.7 |
-| Mana Potion | 25 | 144 | 2,880 | 17,424 | 416666666.7 | 6944444.4 |
-| Vitality Tonic | 30 | 120 | 3,600 | 797,100 | 500000000 | 8333333.3 |
-| Elixir of Might | 45 | 80 | 4,800 | 899,400 | 750000000 | 12500000 |
-| Elixir of Haste | 45 | 80 | 5,600 | 649,760 | 750000000 | 12500000 |
-| Elixir of Ironskin | 50 | 72 | 5,760 | 767,448 | 833333333.3 | 13888888.9 |
-| Elixir of Fortitude | 50 | 72 | 6,480 | 586,620 | 833333333.3 | 13888888.9 |
-| Elixir of the Keen Eye | 55 | 65 | 6,545 | 538,625 | 916666666.7 | 15277777.8 |
-| Elixir of Arcana | 55 | 65 | 7,200 | 342,556 | 916666666.7 | 15277777.8 |
-| Elixir of Time Shift | 600 | 6 | 3,000 | 132,700,316 | 10000000000 | 166666666.7 |
-| Elixir of Warding | 60 | 60 | 8,400 | 752,748 | 1000000000 | 16666666.7 |
-| Dawnsplitter | 28800 | 0 | 12,500 | 356,817,663 | 480000000000 | 8000000000 |
-| Stormstring | 28800 | 0 | 12,500 | 438,067,594 | 480000000000 | 8000000000 |
-| Starlight Wand | 28800 | 0 | 12,500 | 431,817,663 | 480000000000 | 8000000000 |
+| Glass Vial | 10 | 360 | 144 | 5,220 | 1000 | 2.8 |
+| Arcane Essence | 10 | 360 | 288 | 29,700 | 1000 | 2.8 |
+| Minor Healing Potion | 14 | 257 | 309 | 7,843 | 25 | 0.1 |
+| Greater Healing Potion | 30 | 120 | 600 | 16,860 | 25 | 0.2 |
+| Cured Leather | 10 | 360 | 216 | 4,788 | 1000 | 2.8 |
+| Plank Bundle | 10 | 360 | 216 | 5,184 | 1000 | 2.8 |
+| Preserved Rations | 15 | 240 | 240 | 8,640 | 25 | 0.1 |
+| Honey Cake | 20 | 180 | 252 | 6,480 | 25 | 0.1 |
+| Leather Satchel | 30 | 120 | 288 | 4,788 | 25 | 0.2 |
+| Carved Trinket | 30 | 120 | 432 | 5,760 | 25 | 0.2 |
+| Herb Crate | 900 | 4 | 32 | 30,000 | 25 | 6.3 |
+| Trade Pack | 1200 | 3 | 36 | 27,000 | 25 | 8.3 |
+| Copper Ingot | 10 | 360 | 360 | 25,200 | 1000 | 2.8 |
+| Iron Ingot | 10 | 360 | 576 | 928,800 | 1000 | 2.8 |
+| Steel Ingot | 10 | 360 | 1,008 | 5,500,080 | 1000 | 2.8 |
+| Silver Ingot | 10 | 360 | 1,008 | 1,874,160 | 1000 | 2.8 |
+| Gold Ingot | 10 | 360 | 2,160 | 5,645,520 | 1000 | 2.8 |
+| Obsidian Edge | 10 | 360 | 4,320 | 5,628,600 | 1000 | 2.8 |
+| Copper Nails | 10 | 4,320 | 288 | 29,160 | 1000 | 2.8 |
+| Iron Nails | 10 | 5,760 | 504 | 936,720 | 1000 | 2.8 |
+| Steel Rivets | 10 | 5,760 | 864 | 5,515,920 | 1000 | 2.8 |
+| Silver Rivets | 10 | 5,760 | 1,440 | 1,886,040 | 1000 | 2.8 |
+| Gold Studs | 10 | 4,320 | 2,520 | 5,669,280 | 1000 | 2.8 |
+| Gem Grit | 10 | 1,080 | 288 | 16,200 | 1000 | 2.8 |
+| Polishing Cloth | 10 | 360 | 576 | 10,188 | 1000 | 2.8 |
+| Stone Block | 10 | 360 | 288 | 36,360 | 1000 | 2.8 |
+| Cloth Bolt | 10 | 360 | 360 | 43,200 | 1000 | 2.8 |
+| Herb Extract | 10 | 360 | 432 | 1,096,740 | 1000 | 2.8 |
+| Fungal Extract | 10 | 360 | 576 | 1,099,260 | 1000 | 2.8 |
+| Vital Extract | 10 | 360 | 504 | 558,180 | 1000 | 2.8 |
+| Distilled Ichor | 10 | 360 | 2,880 | 18,005,220 | 1000 | 2.8 |
+| Forged War Medal | 10 | 360 | 3,600 | 32,645,520 | 1000 | 2.8 |
+| Cut Jasper | 10 | 360 | 1,296 | 45,000 | 1000 | 2.8 |
+| Cut Malachite | 10 | 360 | 1,296 | 48,600 | 1000 | 2.8 |
+| Cut Turquoise | 10 | 360 | 1,296 | 59,400 | 1000 | 2.8 |
+| Cut Geode Stone | 10 | 360 | 1,296 | 68,760 | 1000 | 2.8 |
+| Cut Amethyst | 10 | 360 | 864 | 1,733,400 | 1000 | 2.8 |
+| Cut Lapis | 10 | 360 | 1,728 | 2,036,988 | 1000 | 2.8 |
+| Cut Garnet | 10 | 360 | 1,728 | 2,065,788 | 1000 | 2.8 |
+| Cut Moonstone | 10 | 360 | 1,728 | 2,123,388 | 1000 | 2.8 |
+| Cut Crystal | 10 | 360 | 1,728 | 2,195,388 | 1000 | 2.8 |
+| Cut Emerald | 10 | 360 | 1,728 | 2,432,988 | 1000 | 2.8 |
+| Cut Ruby | 10 | 360 | 2,160 | 11,489,796 | 1000 | 2.8 |
+| Cut Sapphire | 10 | 360 | 2,160 | 11,597,796 | 1000 | 2.8 |
+| Cut Heart Gem | 10 | 360 | 2,160 | 11,993,796 | 1000 | 2.8 |
+| Mana Potion | 25 | 144 | 576 | 17,424 | 25 | 0.2 |
+| Vitality Tonic | 30 | 120 | 720 | 797,100 | 25 | 0.2 |
+| Elixir of Might | 45 | 80 | 960 | 899,400 | 25 | 0.3 |
+| Elixir of Haste | 45 | 80 | 1,120 | 649,760 | 25 | 0.3 |
+| Elixir of Ironskin | 50 | 72 | 1,152 | 767,448 | 25 | 0.3 |
+| Elixir of Fortitude | 50 | 72 | 1,296 | 586,620 | 25 | 0.3 |
+| Elixir of the Keen Eye | 55 | 65 | 1,309 | 538,625 | 25 | 0.4 |
+| Elixir of Arcana | 55 | 65 | 1,440 | 342,556 | 25 | 0.4 |
+| Elixir of Time Shift | 600 | 6 | 600 | 132,700,316 | 25 | 4.2 |
+| Elixir of Warding | 60 | 60 | 1,680 | 752,748 | 25 | 0.4 |
+| Dawnsplitter | 10800 | 0 | 6,667 | 951,513,767 | 1 | 3 |
+| Stormstring | 10800 | 0 | 6,667 | 1,168,180,250 | 1 | 3 |
+| Starlight Wand | 10800 | 0 | 6,667 | 1,151,513,767 | 1 | 3 |
 
 ## Trade goods income
 
@@ -178,27 +178,27 @@ Gate 1:
 
 | Grade | Unlock | Seconds each | Item level (unlock / top) | Cheapest cost | Mean sell at unlock | Mean sell at top | Worst mean sell (Int 105, Luck cap) | Cost / worst sell | XP (chest) | Pieces to the next unlock | Gate 1 |
 |---|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---|
-| G1 Starter | 1 | 20 | 1-2 / 7-8 | 3,192 | 357 | 1,732 | 1,891 | 1.69 | 78 | 26 | ok |
-| G2 Hide | 8 | 30 | 9-10 / 17-18 | 28,698 | 6,029 | 14,550 | 17,201 | 1.67 | 1040 | 28 | ok |
-| G3 Iron | 15 | 45 | 19-20 / 29-30 | 305,540 | 50,378 | 156,209 | 177,502 | 1.72 | 3250 | 27 | ok |
-| G4 Steel | 25 | 60 | 31-32 / 41-42 | 2,307,846 | 343,282 | 1,008,652 | 1,348,973 | 1.71 | 7800 | 27 | ok |
-| G5 Knight | 35 | 75 | 43-44 / 53-54 | 19,391,451 | 3,150,844 | 9,775,081 | 11,485,651 | 1.69 | 18200 | 73 | ok |
-| G6 Obsidian | 50 | 90 | 55-56 / 65-66 | 113,032,856 | 17,135,319 | 53,147,477 | 63,528,850 | 1.78 | 41600 | 159 | ok |
-| G7 Runed | 65 | 105 | 67-68 / 77-78 | 1,126,549,097 | 187,831,573 | 585,373,290 | 689,931,475 | 1.63 | 91000 | 239 | ok |
-| G8 Ancient | 80 | 120 | 79-80 / 79-80 | 1,607,164,059 | 729,475,321 | 734,042,385 | 867,687,383 | 1.85 | 195000 | 0 | ok |
+| G1 Starter | 1 | 120 | 1-2 / 7-8 | 3,192 | 18 | 87 | 95 | 33.76 | 78 | 26 | ok |
+| G2 Hide | 8 | 300 | 9-10 / 17-18 | 28,698 | 301 | 727 | 860 | 33.37 | 1040 | 28 | ok |
+| G3 Iron | 15 | 600 | 19-20 / 29-30 | 305,540 | 2,519 | 7,810 | 8,875 | 34.43 | 3250 | 27 | ok |
+| G4 Steel | 25 | 900 | 31-32 / 41-42 | 158,346 | 17,164 | 50,433 | 67,449 | 2.35 | 7800 | 27 | ok |
+| G5 Knight | 35 | 1200 | 43-44 / 53-54 | 1,127,451 | 157,542 | 488,754 | 574,283 | 1.96 | 18200 | 73 | ok |
+| G6 Obsidian | 50 | 1500 | 55-56 / 65-66 | 6,182,856 | 856,766 | 2,657,374 | 3,176,442 | 1.95 | 41600 | 159 | ok |
+| G7 Runed | 65 | 1800 | 67-68 / 77-78 | 57,893,716 | 9,391,579 | 29,268,665 | 34,496,574 | 1.68 | 91000 | 239 | ok |
+| G8 Ancient | 80 | 1800 | 79-80 / 79-80 | 84,265,445 | 36,473,766 | 36,702,119 | 43,384,369 | 1.94 | 195000 | 0 | ok |
 
 Gate 2: mean sell value of one piece near the top item level of each grade (Luck 0, Intelligence 5), crafted against drops at the same item level.
 
 | Grade | Item level | Crafted | Chest | Boss | Monster | Crafted / chest | Gate 2 |
 |---|---:|---:|---:|---:|---:|---:|---|
-| G1 | 7 | 1,746 | 5,186 | 1,445 | 1,483 | 0.34 | ok |
-| G2 | 17 | 15,483 | 53,879 | 70,670 | 34,210 | 0.29 | ok |
-| G3 | 29 | 158,147 | 576,736 | 732,439 | 344,898 | 0.27 | ok |
-| G4 | 41 | 1,013,337 | 2,246,948 | 2,853,565 | 1,377,205 | 0.45 | ok |
-| G5 | 53 | 9,822,121 | 18,627,837 | 17,612,624 | 11,738,388 | 0.53 | ok |
-| G6 | 99 | 52,852,440 | 1,068,650,696 | 2,656,486,222 | 510,393,657 | 0.05 | ok |
-| G7 | 77 | 582,816,254 | 88,315,976 | 219,538,690 | 45,164,407 | 6.60 | craft-only (exempt) |
-| G8 | 89 | 732,322,026 | 344,076,923 | 855,317,467 | 164,333,098 | 2.13 | craft-only (exempt) |
+| G1 | 7 | 87 | 5,186 | 1,445 | 1,483 | 0.02 | ok |
+| G2 | 17 | 774 | 53,879 | 70,670 | 34,210 | 0.01 | ok |
+| G3 | 29 | 7,907 | 576,736 | 732,439 | 344,898 | 0.01 | ok |
+| G4 | 41 | 50,667 | 2,246,948 | 2,853,565 | 1,377,205 | 0.02 | ok |
+| G5 | 53 | 491,106 | 18,627,837 | 17,612,624 | 11,738,388 | 0.03 | ok |
+| G6 | 99 | 2,642,622 | 1,068,650,696 | 2,656,486,222 | 510,393,657 | 0.00 | ok |
+| G7 | 77 | 29,140,813 | 88,315,976 | 219,538,690 | 45,164,407 | 0.33 | craft-only (exempt) |
+| G8 | 89 | 36,616,101 | 344,076,923 | 855,317,467 | 164,333,098 | 0.11 | craft-only (exempt) |
 
 Gate 3: a full kit of crafted pieces (13 slots, a random weapon type, rolled at the crafting level that unlocks the grade) in the server's fight engine, 8 kits x 6 fights per cell, no potions, plains boars.
 
@@ -214,28 +214,39 @@ Gate 4, what income can pay for: gold income per second at castle 10 (the two en
 
 | Grade | Cost in minutes of income (3,000 / 6,000 gold/s) | Pieces / hour one queue makes | Pieces / hour paid at 3,000 gold/s | at 6,000 gold/s |
 |---|---|---:|---:|---:|
-| G1 | 0.0 / 0.0 | 180 | 180 | 180 |
-| G2 | 0.2 / 0.1 | 120 | 120 | 120 |
-| G3 | 1.7 / 0.8 | 80 | 35.3 | 70.7 |
-| G4 | 12.8 / 6.4 | 60 | 4.7 | 9.4 |
-| G5 | 107.7 / 53.9 | 48 | 0.6 | 1.1 |
-| G6 | 628.0 / 314.0 | 40 | 0.1 | 0.2 |
-| G7 | 6258.6 / 3129.3 | 34.3 | 0.0 | 0.0 |
-| G8 | 8928.7 / 4464.3 | 30 | 0.0 | 0.0 |
+| G1 | 0.0 / 0.0 | 30 | 30 | 30 |
+| G2 | 0.2 / 0.1 | 12 | 12 | 12 |
+| G3 | 1.7 / 0.8 | 6 | 6 | 6 |
+| G4 | 0.9 / 0.4 | 4 | 4 | 4 |
+| G5 | 6.3 / 3.1 | 3 | 3 | 3 |
+| G6 | 34.3 / 17.2 | 2.4 | 1.7 | 2.4 |
+| G7 | 321.6 / 160.8 | 2 | 0.2 | 0.4 |
+| G8 | 468.1 / 234.1 | 2 | 0.1 | 0.3 |
 
 ## Hours per level
 
-Crafting nonstop, always the recipe with the most XP per hour among those unlocked. A level also needs the materials; the gold burned is what that costs at merchant prices.
+Crafting nonstop, always the recipe with the most XP per hour among those unlocked (the XP scale counted). A level also needs the materials; the gold burned is what that costs at merchant prices.
 
 | Reached level | Hours for this level | Hours in total | Gold burned in total | Recipe used |
 |---:|---:|---:|---:|---|
-| 2 | 0 | 0 | 1,063 | Starter Maul |
-| 5 | 0.0 | 0 | 14,408 | Starter Maul |
-| 10 | 0.0 | 0.2 | 301,147 | Hide Maul |
-| 20 | 0.0 | 0.4 | 5,433,942 | Iron Maul |
-| 30 | 0.0 | 0.8 | 43,466,334 | Steel Maul |
-| 45 | 0.1 | 1.7 | 964,439,730 | Knight Maul |
-| 60 | 0.3 | 4.1 | 13,571,221,280 | Obsidian Maul |
-| 80 | 0.7 | 11.9 | 371,127,412,423 | Runed Maul |
+| 2 | 0.0 | 0 | 5,317 | Starter Maul |
+| 5 | 0.3 | 0.5 | 72,041 | Starter Maul |
+| 10 | 1.3 | 5.3 | 1,087,561 | Hide Maul |
+| 20 | 1.8 | 21.3 | 26,751,535 | Iron Maul |
+| 30 | 2.6 | 44.4 | 71,031,169 | Steel Maul |
+| 45 | 7.9 | 113.6 | 355,004,985 | Knight Maul |
+| 60 | 22.7 | 314.4 | 3,869,617,536 | Obsidian Maul |
+| 80 | 55.4 | 976.1 | 96,901,619,152 | Runed Maul |
 
-Crafting nonstop, level 80 would take about 12 hours of batches; the materials, not the clock, are the limit long before that.
+Crafting nonstop, level 80 would take about 976 hours of batches; the materials, not the clock, are the limit long before that.
+
+## Days per level
+
+A player who visits a few times a day, refilling every queue slot with a full batch of the best gear recipe they have unlocked (the highest grade, so the most XP per hour). A batch runs at most the offline hours (`LIMITS.craftOfflineHours`) without a visit. The gold budget is what the player is willing to spend on crafting each day; a day with too little gold crafts what it can pay for. Level 60 in about six weeks is the target for a player who crafts every day (IDL-396).
+
+| Player | Level 10 | 20 | 30 | 40 | 50 | 60 | 70 | 80 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| 3 visits a day, 100 M gold a day | 2 d | 3 d | 4 d | 5 d | 9 d | 42 d | 268 d | over 2 years |
+| 1 visit a day, 100 M gold a day | 3 d | 6 d | 8 d | 10 d | 15 d | 47 d | 275 d | over 2 years |
+| 3 visits a day, 30 M gold a day | 2 d | 3 d | 5 d | 9 d | 24 d | 131 d | over 2 years | over 2 years |
+| 1 visit a day, 30 M gold a day | 3 d | 6 d | 8 d | 13 d | 28 d | 135 d | over 2 years | over 2 years |

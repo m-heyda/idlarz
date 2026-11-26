@@ -413,11 +413,11 @@ const GEAR_GRADE_COST: Record<CraftGrade, { value: number; parts: number; xp: nu
 	G1: { value: 2_400, parts: 0, xp: 60 },
 	G2: { value: 21_500, parts: 3, xp: 800 },
 	G3: { value: 222_000, parts: 6, xp: 2_500 },
-	G4: { value: 1_700_000, parts: 12, xp: 6_000 },
-	G5: { value: 14_500_000, parts: 24, xp: 14_000 },
-	G6: { value: 85_000_000, parts: 40, xp: 32_000 },
-	G7: { value: 850_000_000, parts: 64, xp: 70_000 },
-	G8: { value: 1_200_000_000, parts: 96, xp: 150_000 },
+	G4: { value: 85_000, parts: 12, xp: 6_000 },
+	G5: { value: 725_000, parts: 24, xp: 14_000 },
+	G6: { value: 4_250_000, parts: 40, xp: 32_000 },
+	G7: { value: 42_500_000, parts: 64, xp: 70_000 },
+	G8: { value: 60_000_000, parts: 96, xp: 150_000 },
 };
 /** How the resource part of the value splits over the resources of a family (shares add up to 1) */
 const FAMILY_SPLIT: Record<Family, Partial<Record<MerchantResourceKey, number>>> = {
@@ -606,7 +606,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 		output: { item: 'dawnsplitter', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 28_800,
+		timeSec: 10_800,
 	},
 	{
 		id: 'legendary_stormstring',
@@ -621,7 +621,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 		output: { item: 'stormstring', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 28_800,
+		timeSec: 10_800,
 	},
 	{
 		id: 'legendary_starlight_wand',
@@ -636,7 +636,7 @@ export const LEGENDARY_RECIPES: Recipe[] = [
 		output: { item: 'starlight_wand', qty: 1 },
 		unlock: LEGENDARY_UNLOCK,
 		xp: 100_000,
-		timeSec: 28_800,
+		timeSec: 10_800,
 	},
 ];
 

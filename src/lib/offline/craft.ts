@@ -5,7 +5,18 @@ import { CRAFTING } from '@/config/crafting';
 import { addDrop } from '@/lib/inventory';
 import { rollGear } from '@/lib/craftGear';
 import { sealedRng } from '@/lib/offline/seal';
-import { craftCostFactor, craftLevelOf, craftLimit, craftNeeds, craftTimeSec, craftXpOf, finishedOf, recipeResourceGold, stashKeyOf } from '@/lib/crafting';
+import {
+	craftBatchLimit,
+	craftCostFactor,
+	craftLevelOf,
+	craftLimit,
+	craftNeeds,
+	craftTimeSec,
+	craftXpOf,
+	finishedOf,
+	recipeResourceGold,
+	stashKeyOf,
+} from '@/lib/crafting';
 import type { LimitContext } from '@/lib/limits';
 import { ENCHANT } from '@/config/crafting';
 import { LOOT_DATA } from '@/lib/loot/data';
@@ -98,8 +109,9 @@ export const applyCraft = (
 	limits: LimitContext = {},
 ): CraftResult => {
 	const recipe = recipeOf(recipeId);
-	if (!Number.isInteger(count) || count < 1 || count > craftLimit('craftBatchCap')) return refuse('bad_request', inv, craft);
+	if (!Number.isInteger(count) || count < 1) return refuse('bad_request', inv, craft);
 	if (!recipe) return refuse('unknown_recipe', inv, craft);
+	if (count > craftBatchLimit(recipe, limits)) return refuse('bad_request', inv, craft);
 	if (recipe.kind === 'gear' && !recipe.timeSec) return refuse('not_craftable', inv, craft);
 	if (craftLevelOf(craft.xp).level < recipe.unlock) return refuse('locked', inv, craft);
 	if (nowMs - craft.last < CRAFTING.minGapMs) return refuse('too_fast', inv, craft);
