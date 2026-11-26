@@ -158,10 +158,10 @@ Loose cuts in public/pixel/__reuse, not classified yet.
 
 | Name | Picture | Size | Status | Used by | Source file |
 | --- | --- | --- | --- | --- | --- |
-| `loose_pets_brown_cute_pet_cat` | <img src="../../public/pixel/pets/brown-cute-pet-cat-walking-6a21-spritesheet.png" width="96" alt="loose_pets_brown_cute_pet_cat"> | 512x64 | unused |  | `pixel/pets/brown-cute-pet-cat-walking-6a21-spritesheet.png` |
-| `loose_pets_cute_pet_hamster_w` | <img src="../../public/pixel/pets/cute-pet-hamster-walking-bb8b-spritesheet.png" width="96" alt="loose_pets_cute_pet_hamster_w"> | 512x64 | unused |  | `pixel/pets/cute-pet-hamster-walking-bb8b-spritesheet.png` |
-| `loose_pets_dachshund_jumping_` | <img src="../../public/pixel/pets/dachshund-jumping-and-walking-running-forward-620e-spritesheet.png" width="96" alt="loose_pets_dachshund_jumping_"> | 512x64 | unused |  | `pixel/pets/dachshund-jumping-and-walking-running-forward-620e-spritesheet.png` |
-| `loose_pets_sprite_32x32px_6f_` | <img src="../../public/pixel/pets/sprite-32x32px-6f-sheet.png" width="96" alt="loose_pets_sprite_32x32px_6f_"> | 96x64 | unused |  | `pixel/pets/sprite-32x32px-6f-sheet.png` |
+| `loose_pets_cat_walk` | <img src="../../public/pixel/pets/cat_walk.png" width="96" alt="loose_pets_cat_walk"> | 512x64 | used | code | `pixel/pets/cat_walk.png` |
+| `loose_pets_dachshund_walk` | <img src="../../public/pixel/pets/dachshund_walk.png" width="96" alt="loose_pets_dachshund_walk"> | 512x64 | used | code | `pixel/pets/dachshund_walk.png` |
+| `loose_pets_hamster_walk` | <img src="../../public/pixel/pets/hamster_walk.png" width="96" alt="loose_pets_hamster_walk"> | 512x64 | used | code | `pixel/pets/hamster_walk.png` |
+| `loose_pets_rabbit_sheet` | <img src="../../public/pixel/pets/rabbit_sheet.png" width="96" alt="loose_pets_rabbit_sheet"> | 96x64 | used | code | `pixel/pets/rabbit_sheet.png` |
 | `pet_special_kaczkawu_dog_reserved` | <img src="../../public/pixel/pets/kaczkawu_dog.png" width="96" alt="pet_special_kaczkawu_dog_reserved"> | 84x84 | used | code | `pixel/pets/kaczkawu_dog.png` |
 
 ## rocks_32

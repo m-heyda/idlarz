@@ -4,6 +4,13 @@ import { newClaimId } from '@/lib/offlineClient';
 import { requestRebirth } from '@/lib/rewardsClient';
 import type { KeepRef } from '@/lib/rebirthKeep';
 import type { ItemInstance } from '@/types/game';
+import type { Paragon } from '@/lib/offline/paragon';
+
+/** What the player chose on the rebirth screen: keep the attribute points (the rebirth's extra points come on top) and/or take the paragon points back for free */
+export interface RebirthChoice {
+	keepAttrs: boolean;
+	resetParagon: boolean;
+}
 
 /**
  * The browser's side of the server-run rebirth (IDL-102, `POST /api/rebirth`). The rebirth is asked of the server FIRST: the game uploads its
@@ -15,17 +22,30 @@ import type { ItemInstance } from '@/types/game';
  *  - `unavailable`: no cloud save this session, or the server could not be reached. The browser rebirths on its own, as before, and keeps nothing (the server wipes its inventory
  *    when that save lands); the server still bounds the Embers of that save (`settleEmbers`).
  */
-export type ServerRebirthResult = { status: 'ok'; gain: number; kept: ItemInstance[] } | { status: 'refused'; badKeep?: boolean } | { status: 'unavailable' };
+export type ServerRebirthResult =
+	| { status: 'ok'; gain: number; kept: ItemInstance[]; keepAttrs?: boolean; paragon?: Paragon }
+	| { status: 'refused'; badKeep?: boolean }
+	| { status: 'unavailable' };
 
-export const askServerRebirth = async (keep: readonly KeepRef[] = []): Promise<ServerRebirthResult> => {
+export const askServerRebirth = async (
+	keep: readonly KeepRef[] = [],
+	options: RebirthChoice = { keepAttrs: false, resetParagon: false },
+): Promise<ServerRebirthResult> => {
 	const saver = currentCloudSaver();
 	if (!saver) return { status: 'unavailable' };
 	await saver.run(); // 'busy' / 'retry' / 'stopped': the request below still judges whatever is stored
 	const key = newClaimId();
-	let reply = await requestRebirth(key, keep);
-	if (reply.status === 'unavailable') reply = await requestRebirth(key, keep); // the same key: a lost answer is replayed, not paid twice
+	let reply = await requestRebirth(key, keep, options);
+	if (reply.status === 'unavailable') reply = await requestRebirth(key, keep, options); // the same key: a lost answer is replayed, not paid twice
 	if (reply.status !== 'ok') return { status: 'unavailable' };
-	if (reply.value.ok) return { status: 'ok', gain: reply.value.gain, kept: reply.value.kept ?? [] };
+	if (reply.value.ok)
+		return {
+			status: 'ok',
+			gain: reply.value.gain,
+			kept: reply.value.kept ?? [],
+			keepAttrs: reply.value.keepAttrs === true,
+			...(reply.value.paragon ? { paragon: reply.value.paragon } : {}),
+		};
 	return { status: 'refused', ...(reply.value.reason === 'bad_keep' ? { badKeep: true } : {}) };
 };
 

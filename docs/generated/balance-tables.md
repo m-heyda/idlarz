@@ -424,7 +424,7 @@ Shop (cost in points of the next level, by current level):
 | upgrade | effect per level | max | cost at level 0 | cost at level 1 | cost at level 2 | cost at level 3 | cost at level 5 | cost at level 9 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Thrift | 0.02 | 10 | 2 | 3 | 4 | 6 | 11 | 42 |
-| Treasury Charter | 5 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
+| Treasury Charter | 3 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Master Builders | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Mason's Guild | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
 | Shrine Keepers | 0.05 | 10 | 3 | 5 | 6 | 9 | 17 | 62 |
