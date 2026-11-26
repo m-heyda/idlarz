@@ -18,6 +18,7 @@ import { maxLevelOf, monsterAt } from '@/lib/monsters';
 import { useWindowStore } from '@/stores/windowStore';
 import { useUiStore } from '@/stores/uiStore';
 import { useGameStore } from '@/stores/gameStore';
+import { useViewStore } from '@/stores/viewStore';
 import { useTipDismiss } from '@/hooks/useTipDismiss';
 import TileMonster from './TileMonster';
 import TileTooltip from './TileTooltip';
@@ -64,6 +65,9 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 
 	// A rock the server put on this tile (never on the map lab, which has no server): the store view is replaced on every click, so the tile redraws for its own rock only
 	const rock = useRockStore((state) => (isOwned && !onTile ? state.rocks[rockKey(x, y)] : undefined));
+
+	// the tile the map is pointing out (a Kingdom overview building name was pressed): a pulsing frame for a few seconds
+	const found = useViewStore((state) => state.found?.x === x && state.found.y === y);
 
 	// Check if this tile has a chest
 	const hasChest = game((state) => isOwned && !!getTile(state.tiles, x, y)?.hasChest);
@@ -211,6 +215,7 @@ const Tile: React.FC<TileProps> = ({ biome, isOwned, x, y, level, canAfford = fa
 					'group hover:z-20': true,
 					'opacity-75 border-2 border-red-500': isShaking,
 					'cursor-pointer': isOwned && (biome === 'castle' || hasChest || !!monsterKey || !!building),
+					'tile-found': found,
 					'tile-has-monster': isOwned && !!monsterKey,
 					'tile-has-rock': isOwned && !!rock,
 					'castle-tile': isOwned && biome === 'castle',
