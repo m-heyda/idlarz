@@ -43,7 +43,7 @@ export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): Achieve
 		streak: ledger.gemShop.daily.streak,
 		craftLevel: craftLevelOf(ledger.craft.xp).level,
 		embers: summary.legacyEarned,
-		paragon: calculateParagon(summary.xp).paragon,
+		paragon: Number.isFinite(summary.xp) ? calculateParagon(summary.xp).paragon : 0,
 		...wornOf(ledger.inv?.equipment),
 	};
 };
