@@ -24,7 +24,7 @@ export interface Inventory {
 	rebirth?: {
 		to: number;
 		gain: number;
-		/** How many legendary pieces the player carried into the new run (absent: none) */ kept?: number;
+		/** How many epic or legendary pieces the player carried into the new run (absent: none) */ kept?: number;
 		/** The player chose to keep the attribute points through this rebirth (the extra points are added on top; absent: every point went back) */ keepAttrs?: true;
 	};
 }
@@ -288,7 +288,7 @@ export interface RebirthReply {
 	to: number;
 	gain: number;
 	inv: Inventory;
-	/** The legendary pieces the server carried into the new bag (the browser builds the same bag from them) */
+	/** The epic and legendary pieces the server carried into the new bag (the browser builds the same bag from them) */
 	kept?: import('@/types/game').ItemInstance[];
 	/** The attribute points stayed as they were (the player chose so); absent: every point went back to spend again */
 	keepAttrs?: boolean;

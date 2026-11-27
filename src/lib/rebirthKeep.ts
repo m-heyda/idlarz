@@ -4,11 +4,11 @@ import { REBIRTH } from '@/config/rebirth';
 import { gearOf } from '@/lib/inventory';
 
 /**
- * Carrying legendary gear through a rebirth. Pure rules shared by the server (`rebirthStep` picks from the LEDGER's inventory, never from items the browser sends)
+ * Carrying epic and legendary gear through a rebirth. Pure rules shared by the server (`rebirthStep` picks from the LEDGER's inventory, never from items the browser sends)
  * and the browser (which builds the same new bag from the same picks).
  *
  * - **Slots**: the rebirth being done is number N (`prestige.rebirths + 1`); it lets the player keep `min(N, REBIRTH.keepSlotsMax)` pieces (1 on the first, 2 on the second, up to 15).
- * - **Eligible**: a piece of gear whose rarity ranks at least Legendary (Legendary, or the disabled-for-now Unique), from the bag or worn.
+ * - **Eligible**: a piece of gear whose rarity ranks at least `REBIRTH.keepMinRarity` (Epic: so Epic, Legendary, or the disabled-for-now Unique), from the bag or worn. Epic and legendary pieces share the same slots. Until the epic rule it was Legendary and up.
  * - **Where it lands**: in the new run's bag (the first free slots); the player equips it again.
  * - A pick names a place (`{ from: 'bag', index }` or `{ from: 'equip', slot }`), never an item: instances have no ids.
  *
@@ -25,11 +25,11 @@ export const KEEP_SLOTS_MAX = REBIRTH.keepSlotsMax;
 /** How many pieces the rebirth numbered `rebirthNumber` (1 = the first) may carry over. */
 export const keepSlots = (rebirthNumber: number): number => Math.max(0, Math.min(KEEP_SLOTS_MAX, Math.floor(rebirthNumber)));
 
-/** True for a piece of gear at Legendary rarity or above. */
+/** True for a piece of gear at `REBIRTH.keepMinRarity` (Epic) or above. */
 export const isKeepable = (item: ItemInstance | null | undefined): boolean => {
 	if (!item) return false;
 	const rarity = RARITIES[item.rarity as keyof typeof RARITIES];
-	return !!rarity && rarity.order >= RARITIES.legendary.order;
+	return !!rarity && rarity.order >= RARITIES[REBIRTH.keepMinRarity].order;
 };
 
 /** Same place, same pick (the key the picker compares picks by). */

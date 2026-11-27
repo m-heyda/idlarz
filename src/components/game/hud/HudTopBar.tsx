@@ -91,17 +91,19 @@ const ResourceTrays: React.FC = () => {
 };
 
 /**
- * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
+ * The top bar of the game screen drawn with the design system: the resource trays in the middle and on the right the Kingdom overview, the Changelog and the game menu (settings, save, export). The hero's portrait, the Gem shop and the windows are in the dock.
  */
 const HudTopBar: React.FC = () => {
 	const settingsOpen = useUiStore((state) => state.settingsOpen);
 	const kingdomOpen = useWindowStore((state) => state.order.includes('kingdom'));
+	const changelogOpen = useWindowStore((state) => state.order.includes('changelog'));
 
 	return (
 		<TopBar
 			right={
 				<>
 					<GlyphButton glyph='♛' label='Kingdom overview' active={kingdomOpen} onClick={() => useWindowStore.getState().toggleWindow('kingdom')} />
+					<GlyphButton glyph='✎' label='Changelog: what is new' active={changelogOpen} onClick={() => useWindowStore.getState().toggleWindow('changelog')} />
 					<GlyphButton
 						glyph='⚙'
 						label='Game menu: settings, save, export'

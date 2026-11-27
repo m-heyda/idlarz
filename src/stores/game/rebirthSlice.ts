@@ -34,7 +34,7 @@ export const createRebirthSlice = (set: GameSet, get: GameGet, inv: InventorySyn
 
 	// Rebirth: restart with the Ember bonus. Keeps name, class, play time, all Embers and the character (XP, level, attributes).
 	// `serverGain`: the Embers the server computed (POST /api/rebirth); the game never takes more than it works out itself
-	// `kept`: the legendary pieces the server carried over (`lib/rebirthKeep.ts`); they go into the new bag
+	// `kept`: the epic and legendary pieces the server carried over (`lib/rebirthKeep.ts`); they go into the new bag
 	// `choice.keepAttrs`: the player kept their attribute points through it (only the extra points the rebirth gives are free); `choice.paragon`: the paragon record the server holds after a free paragon respec
 	rebirth: (serverGain?: number, kept: readonly ItemInstance[] = [], choice: { keepAttrs?: boolean; paragon?: Paragon } = {}) => {
 		const state = get();
