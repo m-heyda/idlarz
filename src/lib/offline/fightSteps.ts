@@ -174,6 +174,11 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 	const p = f.profile;
 	f.elapsed += dt;
 	const monster = monsterStats(f.type, f.level, f.elapsed);
+	// A fight opened before a balance change keeps its old max HP in the ledger: follow the monster's current max, keeping the share of HP left
+	if (monster.maxHp > 0 && f.monsterMaxHp !== monster.maxHp) {
+		if (f.monsterMaxHp > 0) f.monsterHp = Math.min(monster.maxHp, (f.monsterHp * monster.maxHp) / f.monsterMaxHp);
+		f.monsterMaxHp = monster.maxHp;
+	}
 	const venom = modifiersOf(f.type).venom;
 	// Venom cuts the regeneration for the part of the tick the poison is on, before the HP cap, so a hero at full HP loses nothing to the cut
 	const cut = venom && f.poison ? (venom.regenCutPct / 100) * (Math.min(dt, f.poison.leftSec) / dt) : 0;
