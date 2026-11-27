@@ -32,7 +32,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Bramble Imp | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
 | Rotcap Stag | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Rotcap Stag | 13 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Rotcap Stag | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Rotcap Stag | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 8% |
 | Ember Squirrel | 4 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Ember Squirrel | 13 (castle 8) | 0% | 0% | 93% | 100% | 100% | 100% |
 | Ember Squirrel | 23 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
@@ -119,19 +119,19 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 100% |
+| Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 18% | 100% |
 | Net Gull | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Net Gull | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 5% |
+| Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 25% |
 | Drowned Sailor | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Drowned Sailor | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 30% |
+| Drowned Sailor | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 95% |
 | Tideglass Jelly | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Tideglass Jelly | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 33% |
+| Tideglass Jelly | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 75% |
 | Barnacle Brute | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Barnacle Brute | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 0% |
+| Barnacle Brute | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 85% |
 | The Reef Leviathan | 17 (castle 1) | 0% | 0% | 100% | 100% | 100% | 100% |
 | The Reef Leviathan | 25 (castle 8) | 0% | 0% | 70% | 100% | 100% | 100% |
 | The Reef Leviathan | 35 (grown) | 0% | 0% | 23% | 100% | 100% | 100% |
