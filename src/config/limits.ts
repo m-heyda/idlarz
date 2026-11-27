@@ -15,7 +15,7 @@ export const LIMITS = {
 	monsterGrowthLevels: 10,
 	/** Seconds of map time per level of growth (900: twice as fast as the first 1,800, owner 2026-11-24, so a monster reaches its growth cap in 2.5 hours) */
 	monsterGrowthIntervalSec: 900,
-	/** Monsters that can wait in the battle queue while a fight is open (@category Combat) */
+	/** Monsters that can wait in the battle queue while a fight is open (@category Combat); every completed rebirth adds `BATTLE_QUEUE_PER_REBIRTH` more (2, 4, 6, 8, 10 ...), up to the hard limit */
 	battleQueue: 10,
 	/** Pieces of gear on the merchant's shelf */
 	merchantOffers: 6,
@@ -55,6 +55,9 @@ export const LIMITS = {
 	buildingCopies: 1,
 } as const;
 
+/** Battle queue slots each completed rebirth adds (owner 2026-11-27: +2 / +4 / +6 / +8 / +10 ...) */
+export const BATTLE_QUEUE_PER_REBIRTH = 2;
+
 export type LimitKey = keyof typeof LIMITS;
 
 /**
@@ -64,7 +67,7 @@ export type LimitKey = keyof typeof LIMITS;
 export const HARD_LIMITS = {
 	monsterGrowthLevels: 40,
 	merchantOffers: 12,
-	battleQueue: 16,
+	battleQueue: 40,
 	/** The most bag slots a save may hold: base 60 + Pack Rat 48 + Deep Pockets 12 + belt up to 3 = 123 today, the rest is room to grow; `limitOf('bagSize')` never goes past it */
 	bagSize: 200,
 	offlineCapHours: 72,

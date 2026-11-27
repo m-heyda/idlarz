@@ -3,11 +3,11 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT, MONSTERS, NORMAL_MAX_DISTANCE } from '../../src/config/combatConfig';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
-import { LIMITS } from '../../src/config/limits';
+import { BATTLE_QUEUE_PER_REBIRTH, HARD_LIMITS, LIMITS } from '../../src/config/limits';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { limitOf } from '../../src/lib/limits';
 import { canSpawnOn, levelAtAge, rebirthLevelBonus, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
-import { bossIntervalSec } from '../../src/lib/offline/tickets';
+import { bossIntervalSec, ticketCap, ticketCapMax } from '../../src/lib/offline/tickets';
 import type { PrestigeState } from '../../src/types/game';
 
 const prestige = (wildgrowth: number): PrestigeState => ({ rebirths: 1, legacyPoints: 0, legacyEarned: 0, upgrades: { wildgrowth } });
@@ -69,4 +69,27 @@ test('Wild Growth: -60 s per level on the 15 minutes a monster needs to grow, 5 
 	assert.equal(limitOf('monsterGrowthIntervalSec', { prestige: prestige(99) }), 300, 'never below five minutes');
 	assert.equal(levelAtAge(10, 3000, {}), 13);
 	assert.equal(levelAtAge(10, 3000, { prestige: prestige(10) }), 20, 'the same age gives +10 (the growth cap) at level 10');
+});
+
+test('more monsters and chests can wait after rebirths: 40 in a first run, 10 more per rebirth, 100 at most', () => {
+	assert.equal(ticketCapMax(0), 40);
+	assert.equal(ticketCapMax(1), 50);
+	assert.equal(ticketCapMax(4), 80);
+	assert.equal(ticketCapMax(6), 100);
+	assert.equal(ticketCapMax(50), 100);
+	assert.equal(ticketCapMax(NaN), 40);
+	const wide = { luck: 0, tilesOwned: 20_000, lakesOwned: 0, castleLevel: 10 };
+	assert.equal(ticketCap(wide), 40, 'a first run keeps the old cap');
+	assert.equal(ticketCap({ ...wide, rebirths: 4 }), 80);
+	const small = { luck: 0, tilesOwned: 60, lakesOwned: 0, castleLevel: 1, rebirths: 5 };
+	assert.ok(ticketCap(small) < 40, 'a small map is still limited by its share of the free land');
+});
+
+test('the battle queue grows 2 slots per completed rebirth (2, 4, 6, 8, 10 ...) up to the hard limit', () => {
+	assert.equal(limitOf('battleQueue'), 10);
+	assert.equal(limitOf('battleQueue', { rebirths: 1 }), 12);
+	assert.equal(limitOf('battleQueue', { rebirths: 5 }), 20);
+	assert.equal(limitOf('battleQueue', { prestige: { rebirths: 3, legacyPoints: 0, legacyEarned: 0, upgrades: {} } }), 16);
+	assert.equal(limitOf('battleQueue', { rebirths: 500 }), HARD_LIMITS.battleQueue, 'never past the hard limit');
+	assert.equal(BATTLE_QUEUE_PER_REBIRTH, 2);
 });
