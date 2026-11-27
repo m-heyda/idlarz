@@ -111,7 +111,7 @@ export const oracle = {
 		const n = Math.min(owned, 300);
 		let price = 55 * 1.13 ** Math.min(n, 15) * 1.07 ** Math.max(Math.min(n, 100) - 15, 0) * 1.007 ** Math.max(n - 100, 0);
 		if (owned > 300) price *= (owned / 300) ** 3.5;
-		return Math.floor(Math.min(price, 1e21 / 100));
+		return Math.floor(Math.min(price, 1e63 / 100));
 	},
 	/** Extra resource costs of a tile: [from tile, resource, share of the gold price] */
 	tileResourceCost: [
