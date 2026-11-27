@@ -35,11 +35,14 @@ export const MAX_CATCHUP_SEC = 300; // one tick never advances the game by more 
 // Every stockpile, XP included, stops here; a save above it is considered tampered. Raised from 1e15 so a map of tens of
 // thousands of tiles stays buyable (see TILE_PRICE).
 /**
- * The most any stockpile (XP included) can hold; a save above it is refused by `sanitizeSave`. Raised to 1e21 so a map of tens of thousands of tiles stays buyable.
+ * The most any stockpile (XP included) can hold; a save above it is refused by `sanitizeSave`. Raised from 1e21 to 1e63 (IDL-129): no database change is needed
+ * (`gold` and `xp` are `numeric`, everything else is jsonb), and a larger cap only loosens validation, so every older save stays valid. Doubles overflow at
+ * 1.8e308 and the code multiplies stock by merchant prices and sums six resources, so keep the cap far below that (about 1e250 at the very most);
+ * past 2^53 (9e15) balances are no longer exact, so server checks compare with a relative tolerance (see `VERIFY.relativeTolerance`).
  *
  * @category Economy/Basics
  */
-export const RESOURCE_CAP = 1e21;
+export const RESOURCE_CAP = 1e63;
 export const XP_CAP = RESOURCE_CAP;
 
 /**

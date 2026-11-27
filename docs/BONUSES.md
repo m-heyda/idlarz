@@ -71,7 +71,7 @@ total[r]    = base[r] x (1 + modifier[r])         then clamp to RESOURCE_CAP at 
 | General buildings | ADD% per field | `GENERAL_RULES.perLevel` <!-- cap:general.perLevel=1 --> % per level per copy | `src/config/buildings.ts`, `src/catalog/buildings.ts` | copies (hard 4), level 5 |
 | Offline efficiency | ADD% sum, clamp | 50 % + Steward 5 %/lvl + gear + class + Tundra Idol + Paragon offlineEff (0.8 pt/pt) | `src/lib/offline/limits.ts` | hard 100 % |
 | Offline cap hours | FLAT sum, clamp | 8 h + Night Watch + gear | `src/lib/offline/limits.ts` | hard 72 h |
-| Stockpile ceiling | CAP | `RESOURCE_CAP` <!-- cap:resource.cap=1e21 --> | `src/config/economy.ts` | |
+| Stockpile ceiling | CAP | `RESOURCE_CAP` <!-- cap:resource.cap=1e63 --> | `src/config/economy.ts` | |
 | Gem store | none on production | builders (max 3), crafting speed/slots/discount, cosmetics, respecs | `src/config/gemShop.ts` | `GEM_BUILDERS_MAX` 3 |
 | Avatars, pets, achievements | none | cosmetic or one-off gem rewards | `src/catalog/avatars.ts`, `pets.ts`, `achievements.ts` | |
 
@@ -155,7 +155,7 @@ Every hard clamp, one row each. Value markers are test-checked.
 
 | Cap | Value | Constant | Applies to |
 |---|---|---|---|
-| Stockpile / XP | 1e21 | `RESOURCE_CAP` | all resources |
+| Stockpile / XP | 1e63 | `RESOURCE_CAP` | all resources |
 | Gear income / XP / kill / click / damage | 50 / 50 / 60 / 40 / 50 | `PERK_CAPS` | gear bucket only |
 | Tile discount total | 45 + 3 x Charter, hard 80 | `REBIRTH.discountCapPercent`, `discountMaxPercent` | all sources summed |
 | Build time cut | 60 | `IDOL_RULES.buildTimeCap` | all sources summed |

@@ -41,7 +41,7 @@ Anything else (a renamed, moved or reinterpreted field, an id that must become a
 | Ember balance (`legacyPoints + spent = earned`) when an upgrade is gone or its price changed | **strict** (every rebirthed player refused) | **tolerant**: unspent = earned - spent; still refused only when the shop costs MORE than all Embers ever earned |
 | Value above a (later raised) limit | n/a (raising never breaks) | n/a. `HARD_LIMITS` must only grow: guarded |
 | Value above a (later **lowered**) limit | strict | cut (above); the guard forbids lowering `HARD_LIMITS` anyway |
-| Number outside 0..1e21, NaN, wrong type, `land` not a list, castle missing, second castle, disconnected land | strict | strict (this is damage, not change) |
+| Number outside 0..`RESOURCE_CAP` (1e63; it was 1e21, and a raised cap keeps older saves valid), NaN, wrong type, `land` not a list, castle missing, second castle, disconnected land | strict | strict (this is damage, not change) |
 | Castle level above `CASTLE_UPGRADE.maxLevel`, castle upgrade to a level that is not next | strict | strict (castle levels only ever grow; guarded) |
 
 **Positional things (dangerous to extend or reorder):**
