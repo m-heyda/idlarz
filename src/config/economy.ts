@@ -157,7 +157,7 @@ export const BASE_GENERATION_RATES = amounts({ gold: 0.1, xp: 0.25 });
 // Gold per click = total gold/s x click power, but never less than the level's `floor` (so a click always feels like something, even in
 // the first minutes when the income is tiny). Four upgrade levels, bought from the merchant.
 /**
- * Clicking: a trusted click on the map pays `max(gold/s x power, floor) x multiplier` ({@link clickGold}). The multiplier is Click Mastery (+25% gold per Ember shop level) and the set's Click Gold %.
+ * Clicking: a trusted click on the map pays `max(gold/s x power, floor) x multiplier` ({@link clickGold}). The multiplier is Click Mastery (+50% gold per Ember shop level, `EMBER_UPGRADES.mastery.effectPerLevel`) and the set's Click Gold %.
  * The ladder is bought from the merchant. Clicking a tile or building pays nothing else.
  *
  * @category Economy/Clicks
