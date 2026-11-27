@@ -89,26 +89,50 @@
 	pointer-events: none;
 }
 
-/* + and - at the top right, one under the other: grow or shrink the overview one step (the grip does the same by dragging) */
+/* + and - at the top right, one under the other: grow or shrink the overview one step (the grip does the same by dragging).
+   Small dark plates with the gold rim of the other HUD plates; the signs are drawn with bars so they stay crisp and centred */
 .minimap-zoom {
 	position: absolute;
-	top: 3px;
-	right: 3px;
+	top: 4px;
+	right: 4px;
 	z-index: 2;
 	display: flex;
 	flex-direction: column;
-	gap: 2px;
+	gap: 3px;
 }
 
 .minimap-zoom button {
-	width: 16px;
-	height: 16px;
+	position: relative;
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
 	padding: 0;
-	font: bold 12px/14px inherit;
-	color: #f0d27a;
 	cursor: pointer;
-	background: rgba(12, 9, 6, 0.8);
+	background: rgba(12, 9, 6, 0.85);
 	border: 1px solid var(--ds-gold-dk, #7a5a1c);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+	--sign: #f0d27a;
+}
+
+.minimap-zoom button::before,
+.minimap-zoom button::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background: var(--sign);
+	transform: translate(-50%, -50%);
+}
+
+/* the horizontal bar of both signs, the vertical bar only of the plus */
+.minimap-zoom button::before {
+	width: 8px;
+	height: 2px;
+}
+
+.minimap-zoom button[data-glyph='plus']::after {
+	width: 2px;
+	height: 8px;
 }
 
 .minimap-zoom button:hover:not(:disabled) {
@@ -117,6 +141,7 @@
 }
 
 .minimap-zoom button:disabled {
-	color: #5a4a2a;
+	--sign: #5a4a2a;
 	cursor: default;
+	opacity: 0.7;
 }

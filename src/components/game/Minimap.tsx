@@ -3,6 +3,7 @@ import { TILE_SIZE } from '@/config/biomes';
 import {
 	CHEST_COLOR,
 	MINIMAP_BOX_DEFAULT,
+	MINIMAP_BOX_MAX,
 	MONSTER_COLOR,
 	ORE_COLOR,
 	clampMinimapBox,
@@ -122,6 +123,7 @@ const MinimapBody: React.FC = () => {
 		return () => window.removeEventListener('resize', fitToWindow);
 	}, []);
 
+	const biggest = clampMinimapBox(MINIMAP_BOX_MAX, room());
 	const step = (dir: 1 | -1) => {
 		const next = clampMinimapBox({ w: box.w + dir * BOX_STEP.w, h: box.h + dir * BOX_STEP.h }, room());
 		setBox(next);
@@ -167,21 +169,19 @@ const MinimapBody: React.FC = () => {
 				<button
 					type='button'
 					aria-label='Make the map overview bigger'
+					data-glyph='plus'
 					title='Bigger'
-					disabled={box.w >= clampMinimapBox({ w: 1e5, h: 1e5 }, room()).w && box.h >= clampMinimapBox({ w: 1e5, h: 1e5 }, room()).h}
+					disabled={box.w >= biggest.w && box.h >= biggest.h}
 					onClick={() => step(1)}
-				>
-					+
-				</button>
+				></button>
 				<button
 					type='button'
 					aria-label='Make the map overview smaller'
+					data-glyph='minus'
 					title='Smaller'
 					disabled={box.w <= MINIMAP_BOX_DEFAULT.w && box.h <= MINIMAP_BOX_DEFAULT.h}
 					onClick={() => step(-1)}
-				>
-					-
-				</button>
+				></button>
 			</div>
 			{/* The grip: the overview hangs from the top right corner, so dragging its free bottom left corner out (left and down) makes it bigger, in (right and up) smaller */}
 			<div
