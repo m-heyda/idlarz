@@ -1,4 +1,5 @@
 import { PARAGON_ADD_MAX, PARAGON_IDS, PARAGON_UPGRADES, paragonEffect, paragonRoom, paragonUpgrade, type ParagonId } from '@/config/paragon';
+import { PARAGON_MILESTONE_IDS } from '@/catalog/achievementsParagon';
 import { isRecord } from '@/lib/isRecord';
 import { calculateParagon } from '@/utils/game/character';
 
@@ -22,11 +23,24 @@ export const newParagon = (): Paragon => ({ ver: 1, spent: {}, freeUsed: false }
 /** The points in all upgrades together */
 export const paragonSpent = (spent: Partial<Record<ParagonId, number>>): number => PARAGON_IDS.reduce((sum, id) => sum + (spent[id] ?? 0), 0);
 
-/** The points a character holds in all: one per paragon level worked out from the lifetime XP (the server's clamped XP, never an upload's) */
-export const paragonBudget = (xp: number): number => calculateParagon(xp).paragon;
+/** Bonus paragon points of each claimed milestone tier (paragon 100, 200, ... see `PARAGON_MILESTONE_IDS`) */
+export const PARAGON_MILESTONE_BONUS = 1;
+
+/**
+ * The bonus points the claimed paragon milestones give: {@link PARAGON_MILESTONE_BONUS} per claimed milestone tier. Derived from the claimed deed ids (`stats.claimed`), never stored, so a claim replay cannot pay twice.
+ *
+ * @category Progression/Paragon
+ * @order 5
+ */
+export const paragonBonusPoints = (claimed: readonly string[]): number =>
+	PARAGON_MILESTONE_IDS.filter((id) => claimed.includes(id)).length * PARAGON_MILESTONE_BONUS;
+
+/** The points a character holds in all: one per paragon level worked out from the lifetime XP (the server's clamped XP, never an upload's), plus the `bonus` of the claimed milestones */
+export const paragonBudget = (xp: number, bonus = 0): number => calculateParagon(xp).paragon + bonus;
 
 /** Points still free */
-export const paragonFree = (xp: number, spent: Partial<Record<ParagonId, number>>): number => Math.max(0, paragonBudget(xp) - paragonSpent(spent));
+export const paragonFree = (xp: number, spent: Partial<Record<ParagonId, number>>, bonus = 0): number =>
+	Math.max(0, paragonBudget(xp, bonus) - paragonSpent(spent));
 
 /** Reads the stored column back: null for a missing column or anything that is not a record, otherwise a clean value (unknown ids dropped, negative or fractional points read as zero, a capped upgrade clamped to its cap). */
 export const readParagon = (raw: unknown): Paragon | null => {
@@ -74,8 +88,8 @@ export const respecParagon = (paragon: Paragon): Paragon => ({ ver: paragon.ver 
 export const rebirthRespecParagon = (paragon: Paragon): Paragon => ({ ver: paragon.ver + 1, spent: {}, freeUsed: paragon.freeUsed });
 
 /** Cuts a record that holds more than the XP has earned (the XP was clamped lower): every point goes back. Returns the same object when it is within the budget. */
-export const fitParagon = (paragon: Paragon, xp: number): Paragon =>
-	paragonSpent(paragon.spent) <= paragonBudget(xp) ? paragon : { ver: paragon.ver + 1, spent: {}, freeUsed: paragon.freeUsed };
+export const fitParagon = (paragon: Paragon, xp: number, bonus = 0): Paragon =>
+	paragonSpent(paragon.spent) <= paragonBudget(xp, bonus) ? paragon : { ver: paragon.ver + 1, spent: {}, freeUsed: paragon.freeUsed };
 
 /** The numbers every consumer reads: each upgrade's effect for the points spent, in the upgrade's unit (0 when nothing is spent). */
 export type ParagonBonuses = Record<ParagonId, number>;

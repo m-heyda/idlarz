@@ -2,7 +2,17 @@ import { GEMS_CAP } from '@/config/economy';
 import { DAILY_BONUS_GEMS, gemItemById } from '@/config/gemShop';
 import { allocatePoints, attributeBudget, clearedAttrs, levelOfXp, newAttrs, spentOf, type Attrs } from '@/lib/offline/attrs';
 import { applySpend, claimDaily, clearPending, dailyInfo, refundPending, rollDailyChest, serverDay } from '@/lib/offline/gems';
-import { allocateParagon, fitParagon, newParagon, paragonBudget, paragonFree, paragonSpent, rebirthRespecParagon, type Paragon } from '@/lib/offline/paragon';
+import {
+	allocateParagon,
+	fitParagon,
+	newParagon,
+	paragonBonusPoints,
+	paragonBudget,
+	paragonFree,
+	paragonSpent,
+	rebirthRespecParagon,
+	type Paragon,
+} from '@/lib/offline/paragon';
 import type {
 	CharacterReply,
 	CharacterRequest,
@@ -740,17 +750,19 @@ export const paragonStep = (deps: ServiceDeps, userId: string, key: string | nul
 		const unseenXp = Math.max(0, (ledger.granted.xp ?? 0) - (ledger.grantedSeen.xp ?? 0));
 		const xp = (typeof xpStored === 'number' ? xpStored : 0) + unseenXp;
 		// a record that holds more than the XP has earned (the XP was clamped lower) gives every point back
-		const paragon: Paragon = fitParagon(ledger.paragon ?? newParagon(), xp);
+		const bonus = paragonBonusPoints(ledger.stats.claimed ?? ledger.stats.achievements);
+		const paragon: Paragon = fitParagon(ledger.paragon ?? newParagon(), xp, bonus);
 		const view = (p: Paragon, ok: boolean, reason?: ParagonReply['reason']): ParagonReply => ({
 			ok,
 			...(reason ? { reason } : {}),
 			paragon: p,
-			available: paragonFree(xp, p.spent),
+			available: paragonFree(xp, p.spent, bonus),
 			level: paragonBudget(xp),
+			bonus,
 			serverNowSec: ctx.nowSec,
 		});
 		if (request.action === 'sync') return { ledger: { ...ledger, paragon }, value: view(paragon, true) };
-		const result = allocateParagon(paragon, request.add, paragonBudget(xp));
+		const result = allocateParagon(paragon, request.add, paragonBudget(xp, bonus));
 		if (!result.ok) return { ledger: { ...ledger, paragon }, value: view(paragon, false, result.reason) };
 		return { ledger: { ...ledger, paragon: result.paragon }, value: view(result.paragon, true) };
 	});

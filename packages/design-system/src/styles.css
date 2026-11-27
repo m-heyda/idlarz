@@ -5229,6 +5229,11 @@ button.ds-income-head:hover {
 	color: #c58bff;
 }
 
+.ds-rank-paragon[data-frame] {
+	font-weight: bold;
+	text-shadow: 0 0 6px currentColor;
+}
+
 .ds-rank-move {
 	font-size: 12px;
 	text-align: center;

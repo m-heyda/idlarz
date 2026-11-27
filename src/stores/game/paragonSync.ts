@@ -2,7 +2,8 @@
 // The paragon points are the server's (ledger `paragon`, @category Saves & Server, docs/plan/paragon.md): the browser previews a point at once (`spendParagon`) and asks the server for it here, like the attribute points (characterSync.ts).
 
 import { paragonRoom, paragonUpgrade, type ParagonId } from '@/config/paragon';
-import { paragonFree, type Paragon } from '@/lib/offline/paragon';
+import { paragonBonusPoints, paragonFree, type Paragon } from '@/lib/offline/paragon';
+import { useAchievementStore } from '@/stores/achievementStore';
 import { newClaimId } from '@/lib/offlineClient';
 import { currentCloudSaver } from '@/lib/manualCloudSave';
 import { requestParagon } from '@/lib/rewardsClient';
@@ -85,7 +86,7 @@ export const createParagonSync = (set: GameSet, get: GameGet) => {
 		if (!u) return 0;
 		const state = get();
 		const have = state.paragonSpent[id] ?? 0;
-		const free = paragonFree(state.resources.xp, state.paragonSpent);
+		const free = paragonFree(state.resources.xp, state.paragonSpent, paragonBonusPoints(useAchievementStore.getState().claimed));
 		const take = Math.min(n, free, paragonRoom(u, have));
 		if (take <= 0) return 0;
 		const spent = { ...state.paragonSpent, [id]: have + take };

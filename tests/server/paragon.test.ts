@@ -151,3 +151,29 @@ test('an upload cannot claim paragon points, and a record above what the saved X
 	assert.deepEqual(m.ledgers.get(ID)!.paragon?.spent, {});
 	assert.equal(m.rows.get(ID)!.summary.derived.luck, summarize(state).derived.luck);
 });
+
+test('each claimed paragon milestone adds one bonus point to the budget (derived from the claimed ids, never stored), and an unclaimed one adds nothing', async () => {
+	const { m } = await started();
+	const none = ok(await step(m, null, T0 + STEP)) as ParagonReply;
+	assert.equal(none.available, LEVELS);
+	assert.equal(none.bonus, 0);
+	const ledger = m.ledgers.get(ID)!;
+	// paragon_50 is a tier but not a milestone (the milestones start at paragon 100); paragon_100 and paragon_200 are claimed
+	m.ledgers.set(ID, { ...ledger, stats: { ...ledger.stats, claimed: ['paragon_50', 'paragon_100', 'paragon_200', 'paragon_300x'] } });
+	const read = ok(await step(m, null, T0 + 2 * STEP)) as ParagonReply;
+	assert.equal(read.bonus, 2);
+	assert.equal(read.available, LEVELS + 2);
+	const tooMany = ok(await step(m, { damage: LEVELS + 3 }, T0 + 3 * STEP)) as ParagonReply;
+	assert.equal(tooMany.reason, 'no_points', 'one point more than the level and the bonus have earned is refused');
+	const fits = ok(await step(m, { damage: LEVELS + 2 }, T0 + 4 * STEP)) as ParagonReply;
+	assert.equal(fits.ok, true);
+	assert.equal(fits.available, 0, 'the bonus points are spendable like the earned ones');
+});
+
+test('a claim replay pays nothing more: the bonus stays at one point per milestone', async () => {
+	const { m } = await started();
+	const ledger = m.ledgers.get(ID)!;
+	m.ledgers.set(ID, { ...ledger, stats: { ...ledger.stats, claimed: ['paragon_100', 'paragon_100'] } });
+	const read = ok(await step(m, null, T0 + STEP)) as ParagonReply;
+	assert.equal(read.bonus, 1);
+});
