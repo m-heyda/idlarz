@@ -1,6 +1,7 @@
 import { createSupabaseServer } from '@/lib/supabase/server';
 import { adminConfigured } from '@/lib/supabase/admin';
 import { EPOCH_HEADER, epochFromHeader, isStaleEpoch } from '@/config/epoch';
+import { PLAYER_TOO_MANY, takePlayerRequest } from '@/lib/playerRate';
 import { fail, guardConfigured, isOutage, json, unavailable } from '@/lib/authRoute';
 
 /** The answer to a browser that belongs to an older data epoch (a tab left open across the new chapter flip): 412, and the browser reloads into the epoch guard. */
@@ -18,5 +19,6 @@ export const requirePlayer = async (request?: Request) => {
 	const { data, error } = await supabase.auth.getUser();
 	if (isOutage(error)) return { response: unavailable() };
 	if (error || !data.user) return { response: fail('Not signed in.', 401) };
+	if (!takePlayerRequest(data.user.id)) return { response: fail(PLAYER_TOO_MANY, 429) };
 	return { userId: data.user.id, supabase };
 };
