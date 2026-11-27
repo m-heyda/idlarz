@@ -327,6 +327,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.8, // 10 / 18 / 33 / 59 / 105 Embers
 		effectPerLevel: 3, // -3% of the resources a craft takes, per level (15% at most; with the Gem shop's Bulk Discount at most `CRAFT_DISCOUNT_MAX`)
 	},
+	battlequeue: {
+		label: 'Battle Queue',
+		maxLevel: 5,
+		baseCost: 15,
+		costGrowth: 2, // 15 / 30 / 60 / 120 / 240 Embers
+		effectPerLevel: 2, // +2 places in the battle queue per level: 12, 14, 16, 18, 20 (base `LIMITS.battleQueue` 10)
+	},
 	wildgrowth: {
 		label: 'Wild Growth',
 		maxLevel: 10,

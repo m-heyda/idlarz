@@ -1,4 +1,4 @@
-import { BATTLE_QUEUE_PER_REBIRTH, HARD_LIMITS, LIMITS, type LimitKey } from '@/config/limits';
+import { HARD_LIMITS, LIMITS, type LimitKey } from '@/config/limits';
 import { classPassives } from '@/lib/classPassives';
 import { emberEffect, emberOwned } from '@/utils/game/emberEffects';
 import { merchantEffect, type MerchantUpgrades } from '@/utils/game/merchant';
@@ -19,8 +19,6 @@ export interface LimitContext {
 	gemBuilders?: number;
 	/** What the Gem shop's crafting items gave (Master Workbench, Overnight Orders, Bulk Discount; see `gemCraftOf`) */
 	gemCraft?: GemCraft;
-	/** Completed rebirths when there is no `prestige` at hand (the server reads them from the save's summary): the battle queue grows with them */
-	rebirths?: number;
 	/** Validation only: use the hard ceilings (`HARD_LIMITS`) where there are any instead of the current value */
 	hardCap?: boolean;
 }
@@ -54,8 +52,8 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 	castleMaxLevel: (ctx) => emberEffect(ctx.prestige, 'castlecap'),
 	// Wild Growth (Ember shop): -60 s per level on the 900 s a monster needs to grow one level, 300 s at level 10
 	monsterGrowthIntervalSec: (ctx) => -emberEffect(ctx.prestige, 'wildgrowth'),
-	// the battle queue grows 2 slots per completed rebirth (2 / 4 / 6 / 8 / 10 ...)
-	battleQueue: (ctx) => BATTLE_QUEUE_PER_REBIRTH * Math.max(0, Math.floor(ctx.rebirths ?? ctx.prestige?.rebirths ?? 0)),
+	// Battle Queue (Ember shop): +2 slots per level, 2 / 4 / 6 / 8 / 10
+	battleQueue: (ctx) => emberEffect(ctx.prestige, 'battlequeue'),
 	buildingCopies: (ctx) => emberEffect(ctx.prestige, 'buildslots') + (ctx.gemCraft?.slots ?? 0),
 };
 

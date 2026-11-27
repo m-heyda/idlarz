@@ -5,6 +5,7 @@ import { EPS, type FightCtx } from '@/lib/offline/fightContext';
 import { resumeHpOf, startFight, winnable } from '@/lib/offline/fightProfile';
 import type { CombatState, QueueResult } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
+import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { isPlaced } from '@/lib/offline/placement';
 import { bossOf, monsterTypeOf, normalsOf, type MonsterTicket } from '@/lib/offline/tickets';
 import type { MonsterType } from '@/types/game';
@@ -75,7 +76,7 @@ export const queueHasTarget = (ctx: FightCtx): boolean => {
 /**
  * A click while a fight is open: the monster joins the queue, or leaves it when it was already there.
  *
- * The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10, plus 2 per completed rebirth (hard 40).
+ * The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10, plus 2 per level of the Ember shop's Battle Queue upgrade (hard 40).
  * The queue's head starts as soon as HP is back at 80%, ignoring retry time and win estimate; it works before the first rebirth; it is cleared by a defeat, timeout, retreat, rebirth or an absence, kept by a win.
  *
  * @category Combat/A fight
@@ -89,7 +90,7 @@ export const queueTicket = (ctx: FightCtx, n: number): QueueResult => {
 		return 'removed';
 	}
 	if (!placedTarget(ctx.ledger, n) || c.fight?.n === n) return 'refused';
-	if (c.queue.length >= limitOf('battleQueue', { rebirths: ctx.env.stored.summary.rebirths })) return 'full';
+	if (c.queue.length >= limitOf('battleQueue', { prestige: prestigeOfCore(ctx.env.stored.core) })) return 'full';
 	c.queue.push(n);
 	return 'queued';
 };

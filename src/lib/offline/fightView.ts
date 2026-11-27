@@ -77,7 +77,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 			: null,
 		...(plan ? { plan } : {}),
 		queue: queueView(ledger, c, winPctBy(p, c.hp, potions, masteryOfLedger(ledger))),
-		queueMax: limitOf('battleQueue', { rebirths: env.stored.summary.rebirths }),
+		queueMax: limitOf('battleQueue', { prestige: prestigeOfCore(env.stored.core) }),
 		autoBattle: c.autoBattle,
 		autoUse: c.autoUse,
 		retrySec: Number.isFinite(nextRetry(ledger, c, c.at)) ? Math.max(0, Math.ceil(nextRetry(ledger, c, c.at) - c.at)) : 0,

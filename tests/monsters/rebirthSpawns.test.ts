@@ -3,7 +3,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { COMBAT, MONSTERS, NORMAL_MAX_DISTANCE } from '../../src/config/combatConfig';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
-import { BATTLE_QUEUE_PER_REBIRTH, HARD_LIMITS, LIMITS } from '../../src/config/limits';
+import { HARD_LIMITS, LIMITS } from '../../src/config/limits';
 import { EMBER_UPGRADES } from '../../src/config/rebirth';
 import { limitOf } from '../../src/lib/limits';
 import { canSpawnOn, levelAtAge, rebirthLevelBonus, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
@@ -85,11 +85,13 @@ test('more monsters and chests can wait after rebirths: 40 in a first run, 10 mo
 	assert.ok(ticketCap(small) < 40, 'a small map is still limited by its share of the free land');
 });
 
-test('the battle queue grows 2 slots per completed rebirth (2, 4, 6, 8, 10 ...) up to the hard limit', () => {
+test('the Ember shop Battle Queue adds 2 places per level (2, 4, 6, 8, 10) up to the hard limit, and a first run keeps 10', () => {
+	const owned = (level: number): PrestigeState => ({ rebirths: 1, legacyPoints: 0, legacyEarned: 0, upgrades: { battlequeue: level } });
 	assert.equal(limitOf('battleQueue'), 10);
-	assert.equal(limitOf('battleQueue', { rebirths: 1 }), 12);
-	assert.equal(limitOf('battleQueue', { rebirths: 5 }), 20);
-	assert.equal(limitOf('battleQueue', { prestige: { rebirths: 3, legacyPoints: 0, legacyEarned: 0, upgrades: {} } }), 16);
-	assert.equal(limitOf('battleQueue', { rebirths: 500 }), HARD_LIMITS.battleQueue, 'never past the hard limit');
-	assert.equal(BATTLE_QUEUE_PER_REBIRTH, 2);
+	assert.equal(limitOf('battleQueue', { prestige: owned(1) }), 12);
+	assert.equal(limitOf('battleQueue', { prestige: owned(3) }), 16);
+	assert.equal(limitOf('battleQueue', { prestige: owned(5) }), 20);
+	assert.equal(limitOf('battleQueue', { prestige: owned(99) }), 20, 'five levels at most');
+	assert.equal(EMBER_UPGRADES.battlequeue.maxLevel, 5);
+	assert.ok(limitOf('battleQueue', { hardCap: true }) >= 20 && HARD_LIMITS.battleQueue >= 20);
 });
