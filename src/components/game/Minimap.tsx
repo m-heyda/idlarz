@@ -24,6 +24,9 @@ const SIZE_PREF = 'minimapSize';
 /** Window space the overview must leave free: the header above it, the combat panel below and a gutter at the sides (css px) */
 const RESERVED = { w: 48, h: 240 };
 
+/** One press of + or - (css px) */
+const BOX_STEP = { w: 48, h: 36 };
+
 const room = (): { w: number; h: number } => ({ w: window.innerWidth - RESERVED.w, h: window.innerHeight - RESERVED.h });
 
 /** The remembered size (or the default), held to the limits again in case the window got smaller since */
@@ -119,6 +122,12 @@ const MinimapBody: React.FC = () => {
 		return () => window.removeEventListener('resize', fitToWindow);
 	}, []);
 
+	const step = (dir: 1 | -1) => {
+		const next = clampMinimapBox({ w: box.w + dir * BOX_STEP.w, h: box.h + dir * BOX_STEP.h }, room());
+		setBox(next);
+		writeJsonPref(SIZE_PREF, next);
+	};
+
 	const moveTo = useCallback(
 		(e: React.PointerEvent<HTMLDivElement>) => {
 			const box = canvasRef.current?.getBoundingClientRect();
@@ -154,6 +163,26 @@ const MinimapBody: React.FC = () => {
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
 			<div ref={viewRef} className='minimap-view' />
+			<div className='minimap-zoom' onPointerDown={(e) => e.stopPropagation()}>
+				<button
+					type='button'
+					aria-label='Make the map overview bigger'
+					title='Bigger'
+					disabled={box.w >= clampMinimapBox({ w: 1e5, h: 1e5 }, room()).w && box.h >= clampMinimapBox({ w: 1e5, h: 1e5 }, room()).h}
+					onClick={() => step(1)}
+				>
+					+
+				</button>
+				<button
+					type='button'
+					aria-label='Make the map overview smaller'
+					title='Smaller'
+					disabled={box.w <= MINIMAP_BOX_DEFAULT.w && box.h <= MINIMAP_BOX_DEFAULT.h}
+					onClick={() => step(-1)}
+				>
+					-
+				</button>
+			</div>
 			{/* The grip: the overview hangs from the top right corner, so dragging its free bottom left corner out (left and down) makes it bigger, in (right and up) smaller */}
 			<div
 				className='minimap-grip'
