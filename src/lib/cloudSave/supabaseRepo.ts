@@ -64,6 +64,8 @@ const toRow = (save: StoredSave) => ({
 	derived: save.summary.derived,
 	gold_per_min: save.summary.rates.gold * 60,
 	flags: save.flags,
+	// the column is unused since the penalty layer went (IDL-89) but NOT NULL, and `save_player_state` copies it from this row: a missing key would insert null and fail every save
+	ever_flagged: false,
 	audit_ratio: save.auditRatio,
 	fresh_start: save.freshStart,
 	test_account: save.testAccount,
