@@ -72,7 +72,7 @@ Anything else (a renamed, moved or reinterpreted field, an id that must become a
 
 | Table | Read how | Risk |
 | --- | --- | --- |
-| `profiles` | `character_name`, `player_class`, `avatar_id`, `epoch`. An unknown avatar falls back to the class default (`fitAvatar`) | **`player_class_known` is a CHECK constraint** (`warrior, paladin, ranger, mage`): a new hero class needs a SQL migration first. Not fixed here (see backlog) |
+| `profiles` | `character_name`, `player_class`, `avatar_id`, `epoch`. An unknown avatar falls back to the class default (`fitAvatar`) | none: the DB only checks the shape of `player_class` (`player_class_shape`, migration `player_class_open`, applied 2026-11-27); which classes exist is decided in code (`PLAYER_CLASSES`) |
 | `player_achievements` | insert-only mirror, ids as text | none: an id the catalog lacks pays nothing (`payAchievements`) and is kept |
 | `save_history` | full body copy with `schema`; read by the restore tools and the chapter archive | rows keep their own `schema`; restoring an old row runs the same `decodeSave` chain. Pinned copies: never trimmed (chapter archive, `migration_backup`) |
 | `player_stats`, `rebirth_history` | typed columns | additive columns only |
@@ -131,10 +131,10 @@ Order: **SQL before code** (an old build ignores a column it does not select; a 
 
 ## 7. Risks found and not fixed here (Linear backlog)
 
-1. `profiles.player_class_known` CHECK constraint hard-codes the four classes: a fifth class needs a SQL migration first (and the same list is in `PLAYER_CLASSES`). Priority: Medium.
+1. ~~`profiles.player_class_known` CHECK hard-coded the four classes~~ Fixed (IDL-280): replaced by `player_class_shape`, applied to the live DB.
 2. Biomes cannot be dropped tolerantly (a tile has to stay for the map to stay connected): the append-only guard is the only protection. A "retired biome renders as plains" fallback would remove the constraint. Priority: Low.
 3. `clickLevel` is an index into a ladder with no ids: reordering is not detectable by a test (only the length is). Give tiers ids if the ladder is ever reworked. Priority: Low.
-4. `acceptSave` / `restoreTrust` read `save_history` and `player_saves.core` through the same `decodeSave`; a **derived column** that changes meaning (`rates`, `derived.*`) is rebuilt on the next save but is stale for a player who does not come back. `migrate-saves` does not recompute derived columns yet. Priority: Low (add a `--recompute` when a release changes a derived value).
+4. `acceptSave` reads `save_history` and `player_saves.core` through the same `decodeSave`; a **derived column** that changes meaning (`rates`, `derived.*`) is rebuilt on the next save but is stale for a player who does not come back. `migrate-saves` does not recompute derived columns yet. Priority: Low (add a `--recompute` when a release changes a derived value).
 5. The Ember conservation check can still refuse a save when an upgrade's price rises above everything a player ever earned (needs a very high price jump). Priority: Low.
 6. `upgradeStoredBank` stays until the reset has run (IDL-253); delete it then (separate task, not before launch).
 

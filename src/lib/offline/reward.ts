@@ -1,4 +1,5 @@
 import type { StoredSave } from '@/lib/cloudSave/pipeline';
+import { growthLimits } from '@/lib/offline/prestigeOfCore';
 import { CRAFTING } from '@/config/crafting';
 import { rollKillLoot } from '@/lib/loot';
 import { deedBonuses } from '@/lib/deeds';
@@ -68,7 +69,7 @@ export const payKill = (
 	if (!taken) return null;
 	const ticket: MonsterTicket = taken.ticket;
 	const type = monsterTypeOf(ticket);
-	const level = levelAtAge(ticket.spawnLevel ?? 1, nowSec - ticket.at, {}, ticket.growCap);
+	const level = levelAtAge(ticket.spawnLevel ?? 1, nowSec - ticket.at, growthLimits(stored), ticket.growCap);
 	const ordKill = ledger.ordKill + 1;
 	const rng = sealedRng(secret, userId, ledger.runId, 'kill', ordKill);
 	const { luck, goldFind, killRewardPct } = stored.summary.derived;

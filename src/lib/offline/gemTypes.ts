@@ -117,6 +117,8 @@ export interface ParagonReply {
 	available: number;
 	/** The paragon level the server counts */
 	level: number;
+	/** Bonus points the claimed paragon milestones add to the budget (absent from an older server: 0) */
+	bonus?: number;
 	serverNowSec: number;
 }
 

@@ -2,6 +2,7 @@
 
 **The JSDoc in the code is the single source of truth for how the game works.** Find a rule before you change it: `grep -rn "@category" src scripts` (or `@category Economy/Tiles`, `Combat`, `Monsters`, `Loot`, `Progression`, `Saves & Server`, `Architecture`, `Pacing`, `Ops`), then read the block above the function or constant. Nothing is generated from the JSDoc (no reference site, no symbol index): the blocks are read where they sit.
 
+- **Bonuses and caps have one index: `docs/BONUSES.md`** (agents) with the visual twin `docs/bonuses.html` (humans). It says which bracket each bonus lands in (BASE / ADD% / MULT), the order they combine, and every cap. It is the one hand-written reference page besides `docs/plan/`, kept honest by `tests/docs/bonuses.test.ts`: changing a bonus, a multiplier, a cap or the order things combine means updating both files (and the test's key mapping) in the same change. It only indexes; the formulas stay in the JSDoc.
 - Changing a formula, constant or rule? Edit its JSDoc block in the same change (`@category Top/Section`, `@formula` for a multi-line rule). Name the config constant a number comes from instead of copying long lists of numbers into prose.
 - `docs/plan/` (ROADMAP, RELEASE-PLAN, drafts) are the only hand-written docs: they describe what is **not built**. Do not rewrite them when documenting code.
 - `docs/generated/` is measured output of `npm run docs:gen` (sim, balance tables, ...); never edit it by hand.

@@ -3,7 +3,7 @@ import { COMBAT } from '@/config/combatConfig';
 import { limitOf } from '@/lib/limits';
 import { combatOf, type CombatEnv } from '@/lib/offline/fightContext';
 import { autoUseUnlocked } from '@/lib/combat';
-import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { growthLimits, prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { masteryOfLedger, potionsForEstimate, resumeHpOf, winnableBy, winPctBy } from '@/lib/offline/fightProfile';
 import { nextRetry, pickTarget, placedTarget, queueView } from '@/lib/offline/fightTargets';
 import { projectFight } from '@/lib/offline/fightProject';
@@ -37,7 +37,7 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 			potionsForEstimate(ledger.inv ?? inventoryFromCore(env.stored.core), c, autoUseUnlocked(ledger.rebirths, prestigeOfCore(env.stored.core))),
 			masteryOfLedger(ledger),
 		);
-		waiting = pickTarget(ledger, c, c.at, winnable) !== null;
+		waiting = pickTarget(ledger, c, c.at, winnable, growthLimits(env.stored)) !== null;
 		const resume = resumeHpOf(p);
 		const retry = nextRetry(ledger, c, c.at);
 		// a queued monster starts by itself once the hero is back above the resume line, with auto-battle on or off: ask again when that is
@@ -76,8 +76,8 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 				}
 			: null,
 		...(plan ? { plan } : {}),
-		queue: queueView(ledger, c, winPctBy(p, c.hp, potions, masteryOfLedger(ledger))),
-		queueMax: limitOf('battleQueue'),
+		queue: queueView(ledger, c, winPctBy(p, c.hp, potions, masteryOfLedger(ledger)), growthLimits(env.stored)),
+		queueMax: limitOf('battleQueue', { prestige: prestigeOfCore(env.stored.core) }),
 		autoBattle: c.autoBattle,
 		autoUse: c.autoUse,
 		retrySec: Number.isFinite(nextRetry(ledger, c, c.at)) ? Math.max(0, Math.ceil(nextRetry(ledger, c, c.at) - c.at)) : 0,
@@ -90,6 +90,6 @@ export const combatView = (ledger: Ledger, env: CombatEnv, since: number, behind
 		...(resting ? { restSec } : {}),
 		// auto-battle is idle with monsters standing around: they are all beyond the player (or still waiting out a retry, which has its own line)
 		...(runningBuffs.length > 0 ? { buffs: runningBuffs } : {}),
-		autoNote: c.autoBattle && !f && !waiting && pickTarget(ledger, c, c.at) !== null ? 'no_winnable' : null,
+		autoNote: c.autoBattle && !f && !waiting && pickTarget(ledger, c, c.at, undefined, growthLimits(env.stored)) !== null ? 'no_winnable' : null,
 	};
 };

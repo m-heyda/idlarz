@@ -84,7 +84,6 @@ export async function POST(request: Request) {
 			Date.now(),
 			isNonProduction(),
 			supabaseLedgerRepo(createSupabaseAdmin()),
-			undefined,
 			profile?.playerClass,
 		);
 		switch (outcome.kind) {
@@ -110,10 +109,6 @@ export async function POST(request: Request) {
 				return json({ error: 'Your account has a newer save.', conflict: true, rev: outcome.rev, serverSavedAt: outcome.serverSavedAt }, 409);
 			case 'too_soon':
 				return json({ error: 'Saving too often.', retryAfterMs: outcome.retryAfterMs }, 429);
-			case 'rejected':
-				// the decision is recorded in the server log (no table for it yet); the account keeps its last accepted save
-				console.warn(JSON.stringify({ event: 'save_rejected', userId: player.userId, flags: outcome.flags }));
-				return json({ error: 'This save was refused.', rejected: true, flags: outcome.flags }, 422);
 			case 'invalid':
 				return fail(outcome.reason, 422);
 		}

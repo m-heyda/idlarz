@@ -162,7 +162,7 @@ test('the caps hold for every class: tile discount, XP bucket and offline effici
 test("the class is the profile row's: the save route stamps it over whatever the upload claimed", async () => {
 	const { repo, rows } = memoryRepo();
 	const claimed: PersistedGame = { ...honestGame(), playerClass: 'mage' };
-	const outcome = await acceptSave(repo, 'u', 'Z', encodeSave(claimed), 0, T0, false, null, undefined, 'warrior');
+	const outcome = await acceptSave(repo, 'u', 'Z', encodeSave(claimed), 0, T0, false, null, 'warrior');
 	assert.equal(outcome.kind, 'ok');
 	const stored = rows.get('u')!;
 	assert.equal(stored.core.playerClass, 'warrior', "the stored copy carries the profile row's class");

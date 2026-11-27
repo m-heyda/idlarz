@@ -106,9 +106,9 @@ export interface PublicTickets {
 }
 
 export interface ClaimResult {
-	/** What the absence paid; null when nothing is due (too short, or the account is under review) */
+	/** What the absence paid; null when nothing is due (too short) */
 	grant: OfflineGrant | null;
-	reason: 'paid' | 'short' | 'flagged';
+	reason: 'paid' | 'short';
 	tickets: PublicTickets;
 	/** The server clock (epoch seconds) the tickets' ages are measured against */
 	serverNowSec: number;

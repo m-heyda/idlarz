@@ -26,7 +26,7 @@ export const CASTLE_RANGE = { radius: 1, growFromLevel: 8, growPerLevel: 1 };
 // it, produces `earlyBonus` extra (+50%, x1.5). From `fromLevel` it produces `perRadiusTile` times its output extra for every
 // tile the range reaches out: +100% at radius 1 (level 7) up to +400% at radius 4 (level 10).
 /**
- * Area bonus: tiles in range (and their buildings) make extra output, +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
+ * Area bonus: tiles in range make extra output (their tile output only, buildings are not counted), +50% below level 7; from level 7 it is +100% per tile of range radius: +100% (7), +200% (8), +300% (9), +400% (10)
  * ({@link castleAreaBonus}). It is part of the base income, so the modifiers apply on top.
  *
  * @category Economy/Castle

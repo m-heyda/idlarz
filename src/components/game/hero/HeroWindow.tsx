@@ -18,7 +18,8 @@ import {
 import { ComingSoon, EquipGroup, HeroIdentity, XpBar, type StashEntry } from '../../../../packages/design-system/src/components/composites';
 import { HintTooltip, TipLine, TipRows, Tooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { xpBarOf } from '@/lib/xpBar';
-import { paragonFree } from '@/lib/offline/paragon';
+import { useAchievementStore } from '@/stores/achievementStore';
+import { paragonBonusPoints, paragonFree } from '@/lib/offline/paragon';
 import HeroParagon from './HeroParagon';
 import HeroPets from './HeroPets';
 import { compact, toRarity } from '../../../../packages/design-system/src/logic';
@@ -590,7 +591,8 @@ const HeroWindow: React.FC = () => {
 	const [tab, setTab] = useState<HeroTab>('bag');
 	const [craftQuery, setCraftQuery] = useState('');
 	const points = useGameStore((state) => state.characterStats.availablePoints);
-	const free = useGameStore((state) => paragonFree(state.resources.xp, state.paragonSpent));
+	const claimed = useAchievementStore((state) => state.claimed);
+	const free = useGameStore((state) => paragonFree(state.resources.xp, state.paragonSpent, paragonBonusPoints(claimed)));
 	return (
 		<GameWindow
 			id='equipment'

@@ -224,12 +224,15 @@ test('never more than the ticket cap, even on a huge map', () => {
 	assert.ok(bank.chests.length + bank.monsters.length <= TICKET_CAP);
 });
 
-test('one boss at a time, after three hours', () => {
+test('one boss at a time, after an hour and a half (an hour from the third rebirth)', () => {
 	const wide = ctx({ tilesOwned: 10000 });
-	const early = advanceBank(openBank(), 3 * 3600 - 1, wide, NO_LUCKY);
+	const early = advanceBank(openBank(), 5400 - 1, wide, NO_LUCKY);
 	assert.equal(bossOf(early.bank), null);
-	const later = advanceBank(openBank(), 3 * 3600 + 1, wide, NO_LUCKY);
+	const later = advanceBank(openBank(), 5400 + 1, wide, NO_LUCKY);
 	assert.ok(bossOf(later.bank));
+	const fast = ctx({ tilesOwned: 10000, rebirths: 3 });
+	assert.equal(bossOf(advanceBank(openBank(), 3600 - 1, fast, NO_LUCKY).bank), null);
+	assert.ok(bossOf(advanceBank(openBank(), 3600 + 1, fast, NO_LUCKY).bank), 'from the third rebirth a boss comes after an hour');
 	const again = advanceBank(later.bank, 9 * 3600, wide, NO_LUCKY);
 	assert.equal(again.minted.boss, null, 'the boss is still waiting, so no second one');
 });

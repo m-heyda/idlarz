@@ -10,7 +10,7 @@ import { biomeCount, forEachOwned, getTile, setTile, type World } from '@/utils/
 import { monsterAt } from '@/lib/monsters';
 import type { BuildingUpgradeState, CastleUpgradeState, Monster, PrestigeState, Resources } from '@/types/game';
 
-/** Whether the building system is switched on (`BUILDINGS_FLAG`, off by default). Every entry point of the system asks this first. */
+/** Whether the building system is switched on (`BUILDINGS_FLAG`, currently on). Every entry point of the system asks this first. */
 export const buildingsEnabled = (): boolean => BUILDINGS_FLAG.enabled;
 
 export {

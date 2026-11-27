@@ -50,7 +50,7 @@ export const askServerRebirth = async (
 };
 
 /**
- * Whether the browser must NOT rebirth on its own after this answer: only when the server demands to run every rebirth (`EMBER_MODEL.requireServerRebirth`, switched on with enforcement) and it could not be asked (`unavailable`). A rebirth the server
+ * Whether the browser must NOT rebirth on its own after this answer: only when the server demands to run every rebirth (`EMBER_MODEL.requireServerRebirth`) and it could not be asked (`unavailable`). A rebirth the server
  * never recorded is reverted by the next save, so starting it locally would lose the run; the dialog says "try again" instead. With the switch off (today) this is always false and the browser rebirths locally as before.
  */
 export const blocksLocalRebirth = (answer: ServerRebirthResult, requireServer: boolean = EMBER_MODEL.requireServerRebirth): boolean =>

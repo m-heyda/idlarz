@@ -1,10 +1,11 @@
 import { COMBAT } from '@/config/combatConfig';
-import { limitOf } from '@/lib/limits';
+import { limitOf, type LimitContext } from '@/lib/limits';
 import { levelAtAge } from '@/lib/monsters';
 import { EPS, type FightCtx } from '@/lib/offline/fightContext';
 import { resumeHpOf, startFight, winnable } from '@/lib/offline/fightProfile';
 import type { CombatState, QueueResult } from '@/lib/offline/fightTypes';
 import type { Ledger } from '@/lib/offline/ledger';
+import { growthLimits, prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { isPlaced } from '@/lib/offline/placement';
 import { bossOf, monsterTypeOf, normalsOf, type MonsterTicket } from '@/lib/offline/tickets';
 import type { MonsterType } from '@/types/game';
@@ -42,8 +43,10 @@ export const pickTarget = (
 	tSec: number,
 	/** Auto-battle only: whether the player is expected to win against this monster (left out: no check) */
 	winnable?: (type: MonsterType, level: number) => boolean,
+	/** What the growth interval reads (the Ember shop's Wild Growth): `{ prestige }` of the stored save. Left out: the base interval */
+	limits: LimitContext = {},
 ): Target | null => {
-	const levelOf = (ticket: MonsterTicket) => levelAtAge(ticket.spawnLevel ?? 1, tSec - ticket.at, {}, ticket.growCap);
+	const levelOf = (ticket: MonsterTicket) => levelAtAge(ticket.spawnLevel ?? 1, tSec - ticket.at, limits, ticket.growCap);
 	const ready = (ticket: MonsterTicket) =>
 		isPlaced(ticket) && tSec >= (combat.retryAt[ticket.n] ?? 0) && (!winnable || winnable(monsterTypeOf(ticket), levelOf(ticket)));
 	const normals = normalsOf(ledger.bank)
@@ -75,7 +78,7 @@ export const queueHasTarget = (ctx: FightCtx): boolean => {
 /**
  * A click while a fight is open: the monster joins the queue, or leaves it when it was already there.
  *
- * The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10 (hard 16).
+ * The battle queue: a click on another monster while a fight is open (or while resting for the next queued one) queues it; clicking it again removes it. Size `LIMITS.battleQueue` = 10, plus 2 per level of the Ember shop's Battle Queue upgrade (hard 40).
  * The queue's head starts as soon as HP is back at 80%, ignoring retry time and win estimate; it works before the first rebirth; it is cleared by a defeat, timeout, retreat, rebirth or an absence, kept by a win.
  *
  * @category Combat/A fight
@@ -89,7 +92,7 @@ export const queueTicket = (ctx: FightCtx, n: number): QueueResult => {
 		return 'removed';
 	}
 	if (!placedTarget(ctx.ledger, n) || c.fight?.n === n) return 'refused';
-	if (c.queue.length >= limitOf('battleQueue')) return 'full';
+	if (c.queue.length >= limitOf('battleQueue', { prestige: prestigeOfCore(ctx.env.stored.core) })) return 'full';
 	c.queue.push(n);
 	return 'queued';
 };
@@ -115,7 +118,7 @@ export const engage = (ctx: FightCtx, t: number): boolean => {
 		return startFight(ctx, t, next);
 	}
 	if (!c.autoBattle || c.hp < resumeHpOf(ctx.profileNow)) return false;
-	const target = pickTarget(ctx.ledger, c, t, winnable(ctx));
+	const target = pickTarget(ctx.ledger, c, t, winnable(ctx), growthLimits(ctx.env.stored));
 	return target ? startFight(ctx, t, target) : false;
 };
 
@@ -137,7 +140,7 @@ export const restFor = (ctx: FightCtx, t: number, now: number): number => {
 	const c = ctx.c;
 	const idleRegen = COMBAT.regenPerSec + ctx.profileNow.hpRegen;
 	let until = now;
-	if (queueHasTarget(ctx) || (c.autoBattle && pickTarget(ctx.ledger, c, t, winnable(ctx)))) {
+	if (queueHasTarget(ctx) || (c.autoBattle && pickTarget(ctx.ledger, c, t, winnable(ctx), growthLimits(ctx.env.stored)))) {
 		const need = resumeHpOf(ctx.profileNow) - c.hp;
 		if (need > 0 && idleRegen > 0) until = Math.min(until, t + need / idleRegen + EPS);
 	} else if (c.autoBattle) {
@@ -152,10 +155,12 @@ export const queueView = (
 	c: CombatState,
 	/** The win estimate for a monster, as a whole percent (the server's own, offline/winChance.ts) */
 	winPctOf: (type: MonsterType, level: number) => number,
+	/** What the growth interval reads (the Ember shop's Wild Growth): `{ prestige }` of the stored save */
+	limits: LimitContext = {},
 ): { n: number; type: MonsterType; level: number; lucky: boolean; winPct: number }[] =>
 	(c.queue ?? []).flatMap((n) => {
 		const target = placedTarget(ledger, n);
 		if (!target) return [];
-		const level = levelAtAge(target.ticket.spawnLevel ?? 1, c.at - target.ticket.at, {}, target.ticket.growCap);
+		const level = levelAtAge(target.ticket.spawnLevel ?? 1, c.at - target.ticket.at, limits, target.ticket.growCap);
 		return [{ n, type: target.type, level, lucky: !!target.ticket.lucky, winPct: winPctOf(target.type, level) }];
 	});

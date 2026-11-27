@@ -206,19 +206,7 @@ test('history is sparse: first save, one copy per 30 minutes of the clock, and t
 	const cheat = { ...state, gems: state.gems + 1 };
 	const flagged = await save(cheat, 60_000);
 	assert.ok(flagged.kind === 'ok' && flagged.flags.includes('gems_increase'));
-	assert.ok(
-		history.some((h) => h.flags.includes('gems_increase')),
-		'a flagged save is archived at once',
-	);
-
-	// the same flag on the next saves does not fill the history again
-	const before = history.length;
-	let again = cheat;
-	for (let i = 1; i <= 4; i++) {
-		again = { ...again, playSeconds: again.playSeconds + 11 };
-		await save(again, 11_000);
-	}
-	assert.equal(history.length, before, 'a flag that was already there is not archived again');
+	assert.ok(!history.some((h) => h.flags.includes('gems_increase')), 'a flag is no reason for an extra history copy: copies follow the clock only');
 });
 
 test('starting over (a much younger game) pins the replaced game so history never drops it', async () => {
@@ -291,33 +279,15 @@ test('an existing player whose first save already has a long history is not rank
 	assert.equal(stats.get('u1')?.trusted, false);
 });
 
-test('one poisonous flag keeps an account out of rankings for good, even after honest saves', async () => {
-	const { repo, stats, rows } = memoryRepo();
-	let state = { ...game(), playSeconds: 120 };
-	let now = T0;
-	await accept(repo, 'u1', state, 0, now);
-	assert.equal(stats.get('u1')?.trusted, true);
-	now += MIN_SAVE_INTERVAL_MS + 1000;
-	state = { ...state, gems: state.gems + 100, playSeconds: state.playSeconds + 12 };
-	await accept(repo, 'u1', state, 1, now);
-	assert.equal(stats.get('u1')?.trusted, false);
-	now += MIN_SAVE_INTERVAL_MS + 1000;
-	state = { ...state, gems: state.gems - 100, playSeconds: state.playSeconds + 12 };
-	await accept(repo, 'u1', state, 2, now);
-	assert.equal(rows.get('u1')?.everFlagged, true);
-	assert.equal(stats.get('u1')?.trusted, false);
-});
-
 test('a balance the game could never have paid is flagged by the spending check and recorded with its ratio', async () => {
 	const { repo, rows } = memoryRepo();
 	const forged = withResources({ ...game(), playSeconds: 700 }, { gold: 1e15 });
 	const out = await accept(repo, 'u1', forged, 0, T0);
 	assert.ok(out.kind === 'ok' && out.flags.includes('networth_exceeds'), out.kind === 'ok' ? out.flags.join() : out.kind);
 	assert.ok((rows.get('u1')?.auditRatio ?? 0) > 1);
-	assert.equal(rows.get('u1')?.everFlagged, true);
 });
 
-// ---- the verifier (shadow mode: flags only), from summaries -------------------------------------------------------
+// ---- the verifier (flags only), from summaries -------------------------------------------------------
 
 const snap = (state: PersistedGame, at = T0) => ({ summary: summarize(state), serverSavedAt: at });
 const flagsOf = (prev: PersistedGame | null, next: PersistedGame, at: number) => verifyTransition(prev ? snap(prev) : null, summarize(next), at);
@@ -377,13 +347,12 @@ test('only a developer machine or a Vercel preview counts as non-production; a m
 	assert.equal(isNonProduction({}), true, 'no NODE_ENV at all is not a production server');
 });
 
-test('a save through a non-production server makes a test account: flags recorded, never poisonous, never ranked, sticky', async () => {
+test('a save through a non-production server makes a test account: flags recorded, never ranked, sticky', async () => {
 	const { repo, rows, stats, history } = memoryRepo();
 	const forged = withResources({ ...game(), playSeconds: 120 }, { gold: 1e15 });
 	const out = await acceptSave(repo, 'dev', 'Insane', encodeSave(forged), 0, T0, true);
 	assert.ok(out.kind === 'ok' && out.flags.includes('networth_exceeds'), 'the checks still run, so a tester can see them work');
 	assert.equal(rows.get('dev')?.testAccount, true);
-	assert.equal(rows.get('dev')?.everFlagged, false, 'the finding does not count against the account');
 	assert.equal(stats.get('dev')?.trusted, false, 'a test account is never ranked');
 
 	// later saves through the production server do not turn it into a ranked account
@@ -391,17 +360,16 @@ test('a save through a non-production server makes a test account: flags recorde
 	assert.equal((await acceptSave(repo, 'dev', 'Insane', encodeSave(honest), 1, T0 + 60_000, false)).kind, 'ok');
 	assert.equal(rows.get('dev')?.testAccount, true, 'sticky');
 	assert.equal(stats.get('dev')?.trusted, false);
-	assert.equal(history.filter((h) => h.rev > 1).length, 0, 'no history churn from flags on a test account');
+	assert.equal(history.filter((h) => h.rev > 1).length, 0, 'no history churn on a test account');
 });
 
-test('the same forged save through the production server poisons the account and keeps it out of rankings', async () => {
+test('the same forged save through the production server is flagged, and the flag costs the account nothing', async () => {
 	const { repo, rows, stats } = memoryRepo();
 	const forged = withResources({ ...game(), playSeconds: 120 }, { gold: 1e15 });
 	const out = await acceptSave(repo, 'player', 'Cheater', encodeSave(forged), 0, T0, false);
 	assert.ok(out.kind === 'ok' && out.flags.includes('networth_exceeds'));
 	assert.equal(rows.get('player')?.testAccount, false);
-	assert.equal(rows.get('player')?.everFlagged, true);
-	assert.equal(stats.get('player')?.trusted, false);
+	assert.equal(stats.get('player')?.trusted, true, 'a flag never changes the stats row');
 });
 
 // ---- the castle timer is checked on the server's clock ---------------------------------------------------------
@@ -459,7 +427,6 @@ test('a castle level that came before its timer ran out raises castle_jump, whic
 	assert.deepEqual(first.kind === 'ok' && first.flags.includes('castle_jump'), true, 'the flag is recorded');
 	assert.equal(rows.get('u1')?.summary.castleLevel, 2, 'the claimed castle is paid');
 	assert.equal(rows.get('u1')?.summary.derived.trustedAt, undefined, 'the account is not frozen');
-	assert.equal(rows.get('u1')?.everFlagged, false, 'and not taken out of the rankings');
 });
 
 test('a frozen baseline (the net-worth check froze it) is believed again once the real time since its last trusted save covers every castle level the claim holds', () => {

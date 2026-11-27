@@ -1,7 +1,7 @@
 import { COMBAT, MONSTERS, type BossModifiers, type MonsterDef } from '@/config/combatConfig';
 import { levelScale, levelTail } from '@/catalog/stats';
 import { castleLevelOf, isInWard } from '@/lib/castleWard';
-import { castleDistance } from '@/lib/distance';
+import { bandOf, castleDistance } from '@/lib/distance';
 import { limitOf, type LimitContext } from '@/lib/limits';
 import { mulberry32, randomInt } from '@/lib/rng';
 import type { Monster, MonsterType } from '@/types/game';
@@ -48,11 +48,22 @@ export const enrageSteps = (type: MonsterType, elapsedSec: number): number => {
  * min = max(1, min(cap - spread, base + floor(perCastleLevel x (castle level - 1))))
  * max = min(cap, min + spread)
  */
-export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: number; max: number } => {
+export const spawnLevelRange = (type: MonsterType, castleLevel = 1, rebirths = 0): { min: number; max: number } => {
 	const { base, perCastleLevel, spread, cap } = MONSTERS[type].spawnWindow;
 	const min = Math.max(1, Math.min(cap - spread, base + Math.floor(perCastleLevel * (Math.max(1, castleLevel) - 1))));
-	return { min, max: Math.min(cap, min + spread) };
+	const lift = rebirthLevelBonus(rebirths);
+	return { min: min + lift, max: Math.min(cap, min + spread) + lift };
 };
+
+/**
+ * Levels every spawn window and cap rises by after completed rebirths (owner 2026-11-27: a level 100 hero after four rebirths met level ~20 monsters): `COMBAT.spawn.levelsPerRebirth` (4) per rebirth, so a plains monster of castle level 5 is level 5-7 at rebirth 0 and 21-23 at rebirth 4. 0 for a first run.
+ *
+ * @category Monsters/Level scaling
+ * @order 1
+ * @formula
+ * bonus = 4 x rebirths      (added to the window's min, max and to the type's cap)
+ */
+export const rebirthLevelBonus = (rebirths = 0): number => COMBAT.spawn.levelsPerRebirth * Math.max(0, Math.floor(Number.isFinite(rebirths) ? rebirths : 0));
 
 /**
  * The level a new monster starts at. Rolled from a generator seeded by its id and nothing else, so it takes no number from
@@ -60,15 +71,15 @@ export const spawnLevelRange = (type: MonsterType, castleLevel = 1): { min: numb
  * `levelCap` (optional) is the highest level the player can still beat (see offline/spawnWeights.ts): a roll above it comes down to it, never below `min`.
  *
  * The level is rolled from a generator seeded by the monster's ticket number only, plus a **danger bonus** of 1 level per 8 tiles of Chebyshev distance from the castle ({@link dangerBonus}, `COMBAT.spawn.dangerStep`).
- * The per-band `dangerOffset` in `DISTANCE_BANDS` is 0 everywhere and unused.
+ * The per-band `dangerOffset` of `DISTANCE_BANDS` is added to it (frontier +1, wilds +2), and every completed rebirth lifts the window and the cap by {@link rebirthLevelBonus} levels.
  *
  * @category Monsters/Level scaling
  * @order 3
  */
-export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number, distance = 0, levelCap?: number): number => {
-	const { min, max } = spawnLevelRange(type, castleLevel);
-	const bonus = dangerBonus(distance);
-	const cap = MONSTERS[type].spawnWindow.cap;
+export const rollSpawnLevel = (type: MonsterType, castleLevel: number, monsterId: number, distance = 0, levelCap?: number, rebirths = 0): number => {
+	const { min, max } = spawnLevelRange(type, castleLevel, rebirths);
+	const bonus = dangerBonus(distance) + bandOf(distance).dangerOffset;
+	const cap = MONSTERS[type].spawnWindow.cap + rebirthLevelBonus(rebirths);
 	const lo = Math.min(cap, min + bonus);
 	const rolled = randomInt(mulberry32(monsterId * 2654435761 + 17), lo, Math.min(cap, max + bonus));
 	// a weak player's cap pulls the roll down, but never below the bottom of the window (the roll itself is the same with or without a cap)
