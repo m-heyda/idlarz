@@ -190,7 +190,7 @@ test('rebirth and reset bring the map back to the starting ring, wherever the la
 test('every stockpile at the cap stays finite and survives a JSON round trip (IDL-129)', () => {
 	freshGame();
 	setResources({ gold: RESOURCE_CAP, wood: RESOURCE_CAP, stone: RESOURCE_CAP, coal: RESOURCE_CAP, food: RESOURCE_CAP, hide: RESOURCE_CAP });
-	api().tick?.();
+	api().tick(1);
 	for (const [key, value] of Object.entries(api().resources)) {
 		assert.ok(Number.isFinite(value) && value <= RESOURCE_CAP, `${key}: ${value}`);
 	}

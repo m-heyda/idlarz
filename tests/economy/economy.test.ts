@@ -316,9 +316,9 @@ test('a Max over the limit is cut to it, and a purchase only buys what the stock
 		assert.equal(api().sellResources('wood', MERCHANT_MAX_TRADE_QTY * 3), true);
 		assert.equal(api().resources.wood, MERCHANT_MAX_TRADE_QTY * 2, 'only the limit was sold');
 		// at the 1e63 cap a gap of a few million units is below what a double can tell apart (IDL-129), so only the full stock is tested
-			freshGame({ gold: 1e15, wood: RESOURCE_CAP });
-			assert.equal(api().buyResource('wood', 5), false, 'a full stock buys nothing');
-			assert.equal(api().resources.gold, 1e15, 'and nothing was charged');
+		freshGame({ gold: 1e15, wood: RESOURCE_CAP });
+		assert.equal(api().buyResource('wood', 5), false, 'a full stock buys nothing');
+		assert.equal(api().resources.gold, 1e15, 'and nothing was charged');
 	} finally {
 		globalThis.fetch = realFetch;
 	}
