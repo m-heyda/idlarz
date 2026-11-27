@@ -88,6 +88,23 @@ export const minimapLayout = (bounds: Bounds | null, box: Size, margin = MINIMAP
 	};
 };
 
+/**
+ * The zoom steps of the + and - buttons: 1 shows the whole explored map ("fit entire map"), every step doubles the pixels per tile.
+ * @category Pacing/Minimap
+ */
+export const MINIMAP_ZOOMS = [1, 2, 4, 8, 16] as const;
+
+/**
+ * The layout zoomed in `zoom` times (a `MINIMAP_ZOOMS` step) on the tile `focus`, which sits in the middle of the box; the rest of the map lies outside the box and is clipped.
+ * Zoom 1 is `fit` itself. Everything that reads a layout (painting, markers, the view outline, a click to a tile) works on the zoomed one unchanged.
+ * @category Pacing/Minimap
+ */
+export const zoomedLayout = (fit: MinimapLayout, zoom: number, focus: { x: number; y: number }): MinimapLayout => {
+	if (zoom <= 1) return fit;
+	const scale = fit.scale * zoom;
+	return { ...fit, scale, offsetX: 0, offsetY: 0, x0: focus.x - fit.width / (2 * scale), y0: focus.y - fit.height / (2 * scale) };
+};
+
 /** Box position (px) of the top left corner of tile (tx, ty). */
 export const tileToMinimap = (l: MinimapLayout, tx: number, ty: number): { x: number; y: number } => ({
 	x: l.offsetX + (tx - l.x0) * l.scale,

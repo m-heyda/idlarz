@@ -3,13 +3,14 @@ import { TILE_SIZE } from '@/config/biomes';
 import {
 	CHEST_COLOR,
 	MINIMAP_BOX_DEFAULT,
-	MINIMAP_BOX_MAX,
+	MINIMAP_ZOOMS,
 	MONSTER_COLOR,
 	ORE_COLOR,
 	clampMinimapBox,
 	minimapLayout,
 	minimapMarkers,
 	minimapToTile,
+	zoomedLayout,
 	paintChestGlow,
 	paintMinimap,
 	viewRectangle,
@@ -24,9 +25,6 @@ import { useMapGame, useMapView } from './mapSource';
 const SIZE_PREF = 'minimapSize';
 /** Window space the overview must leave free: the header above it, the combat panel below and a gutter at the sides (css px) */
 const RESERVED = { w: 48, h: 240 };
-
-/** One press of + or - (css px) */
-const BOX_STEP = { w: 48, h: 36 };
 
 const room = (): { w: number; h: number } => ({ w: window.innerWidth - RESERVED.w, h: window.innerHeight - RESERVED.h });
 
@@ -61,7 +59,13 @@ const MinimapBody: React.FC = () => {
 	const [box, setBox] = useState(readBox);
 	const resize = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 
-	const layout = useMemo(() => minimapLayout(tiles.bounds, box), [tiles.bounds, box]);
+	// Zoom (the + and - buttons): 1 shows the whole map, more zooms in on `focus` (a tile), which follows the screen when it leaves the zoomed part and can be dragged with the right mouse button
+	const [zoom, setZoom] = useState(1);
+	const [focus, setFocus] = useState({ x: 0, y: 0 });
+	const panning = useRef<{ x: number; y: number; fx: number; fy: number } | null>(null);
+
+	const fitLayout = useMemo(() => minimapLayout(tiles.bounds, box), [tiles.bounds, box]);
+	const layout = useMemo(() => zoomedLayout(fitLayout, zoom, focus), [fitLayout, zoom, focus]);
 	const monsters = useMemo(
 		() => (monsterPlaces ? monsterPlaces.split(';').map((p) => ({ x: Number(p.split(',')[0]), y: Number(p.split(',')[1]) })) : []),
 		[monsterPlaces],
@@ -103,6 +107,14 @@ const MinimapBody: React.FC = () => {
 			const { x, y, zoom, w, h } = view.getState();
 			const tilePx = TILE_SIZE * zoom;
 			const rect = viewRectangle(layout, { minX: -x / tilePx, maxX: (w - x) / tilePx, minY: -y / tilePx, maxY: (h - y) / tilePx });
+			if (layout.scale > fitLayout.scale) {
+				// zoomed in: when the middle of the screen leaves the zoomed part, it moves along
+				const cx = (w / 2 - x) / tilePx;
+				const cy = (h / 2 - y) / tilePx;
+				const px = (cx - layout.x0) * layout.scale;
+				const py = (cy - layout.y0) * layout.scale;
+				if (px < 0 || py < 0 || px > layout.width || py > layout.height) setFocus({ x: cx, y: cy });
+			}
 			el.style.left = `${rect.left}px`;
 			el.style.top = `${rect.top}px`;
 			el.style.width = `${Math.max(2, rect.width)}px`;
@@ -110,7 +122,7 @@ const MinimapBody: React.FC = () => {
 		};
 		place();
 		return view.subscribe(place);
-	}, [layout, view]);
+	}, [layout, fitLayout, view]);
 
 	// A smaller window shrinks an overview that no longer fits
 	useEffect(() => {
@@ -123,11 +135,16 @@ const MinimapBody: React.FC = () => {
 		return () => window.removeEventListener('resize', fitToWindow);
 	}, []);
 
-	const biggest = clampMinimapBox(MINIMAP_BOX_MAX, room());
-	const step = (dir: 1 | -1) => {
-		const next = clampMinimapBox({ w: box.w + dir * BOX_STEP.w, h: box.h + dir * BOX_STEP.h }, room());
-		setBox(next);
-		writeJsonPref(SIZE_PREF, next);
+	const zoomBy = (dir: 1 | -1, toFit = false) => {
+		const at = MINIMAP_ZOOMS.indexOf(zoom as (typeof MINIMAP_ZOOMS)[number]);
+		const next = toFit ? 1 : MINIMAP_ZOOMS[Math.min(MINIMAP_ZOOMS.length - 1, Math.max(0, at + dir))];
+		if (zoom === 1 && next > 1) {
+			// zooming in from the whole map: on the part of the map that is on screen now
+			const { x, y, zoom: z, w, h } = view.getState();
+			const tilePx = TILE_SIZE * z;
+			setFocus({ x: (w / 2 - x) / tilePx, y: (h / 2 - y) / tilePx });
+		}
+		setZoom(next);
 	};
 
 	const moveTo = useCallback(
@@ -150,17 +167,34 @@ const MinimapBody: React.FC = () => {
 		<div
 			className='minimap ds-root ds-minimap'
 			style={{ width: box.w, height: box.h }}
-			title={`Map overview: click or drag to move the view${summary.length ? ` (${summary.join(', ')})` : ''}`}
+			title={`Map overview: click or drag to move the view, right-drag to pan when zoomed in${summary.length ? ` (${summary.join(', ')})` : ''}`}
 			aria-label={`Map overview${summary.length ? `, ${summary.join(', ')}` : ''}`}
 			onPointerDown={(e) => {
+				if (e.button === 2 || e.button === 1) {
+					// the right or middle button drags the zoomed part of the overview around (the screen stays where it is)
+					panning.current = { x: e.clientX, y: e.clientY, fx: focus.x, fy: focus.y };
+					e.currentTarget.setPointerCapture(e.pointerId);
+					return;
+				}
 				if (e.button !== 0) return;
 				dragging.current = true;
 				e.currentTarget.setPointerCapture(e.pointerId);
 				moveTo(e);
 			}}
-			onPointerMove={(e) => dragging.current && moveTo(e)}
-			onPointerUp={() => (dragging.current = false)}
-			onPointerCancel={() => (dragging.current = false)}
+			onPointerMove={(e) => {
+				const pan = panning.current;
+				if (pan && zoom > 1) setFocus({ x: pan.fx - (e.clientX - pan.x) / layout.scale, y: pan.fy - (e.clientY - pan.y) / layout.scale });
+				else if (dragging.current) moveTo(e);
+			}}
+			onPointerUp={() => {
+				dragging.current = false;
+				panning.current = null;
+			}}
+			onPointerCancel={() => {
+				dragging.current = false;
+				panning.current = null;
+			}}
+			onContextMenu={(e) => e.preventDefault()}
 		>
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
@@ -168,19 +202,19 @@ const MinimapBody: React.FC = () => {
 			<div className='minimap-zoom' onPointerDown={(e) => e.stopPropagation()}>
 				<button
 					type='button'
-					aria-label='Make the map overview bigger'
+					aria-label='Zoom the map overview in'
 					data-glyph='plus'
-					title='Bigger'
-					disabled={box.w >= biggest.w && box.h >= biggest.h}
-					onClick={() => step(1)}
+					title='Zoom in'
+					disabled={zoom >= MINIMAP_ZOOMS[MINIMAP_ZOOMS.length - 1]}
+					onClick={() => zoomBy(1)}
 				></button>
 				<button
 					type='button'
-					aria-label='Make the map overview smaller'
+					aria-label='Zoom the map overview out'
 					data-glyph='minus'
-					title='Smaller'
-					disabled={box.w <= MINIMAP_BOX_DEFAULT.w && box.h <= MINIMAP_BOX_DEFAULT.h}
-					onClick={() => step(-1)}
+					title='Zoom out (Shift: fit the entire map)'
+					disabled={zoom <= 1}
+					onClick={(e) => zoomBy(-1, e.shiftKey)}
 				></button>
 			</div>
 			{/* The grip: the overview hangs from the top right corner, so dragging its free bottom left corner out (left and down) makes it bigger, in (right and up) smaller */}
