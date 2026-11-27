@@ -247,3 +247,15 @@ test('growthInfo says how far a monster has grown: the top level, the time to th
 	assert.equal(aged[0].level, top);
 	assert.equal(growthInfo(aged[0]).maxed, true);
 });
+
+test('normal monsters grow gently past the soft knee (level 20) and are unchanged below it', () => {
+	const knee = COMBAT.softKnee.fromLevel;
+	const d = MONSTERS.frostHare;
+	assert.equal(monsterStats('frostHare', knee).maxHp, Math.round(d.hp * Math.pow(d.hpPerLevel, knee - 1)), 'up to the knee: the old exponential');
+	const hp = (level: number) => monsterStats('frostHare', level).maxHp;
+	const atk = (level: number) => monsterStats('frostHare', level).attack;
+	assert.ok(Math.abs(hp(knee + 10) / hp(knee) - Math.pow(COMBAT.softKnee.hpPerLevel, 10)) < 0.01, 'past the knee: the gentle rate');
+	assert.ok(hp(41) < 100_000 && atk(41) < 200, `a level 41 Frost Hare: ${hp(41)} HP, ${atk(41)} attack`);
+	for (let level = 2; level <= 80; level++)
+		assert.ok(hp(level) > hp(level - 1) && atk(level) >= atk(level - 1), `level ${level} is stronger than ${level - 1}`);
+});
