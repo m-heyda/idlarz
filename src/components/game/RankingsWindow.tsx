@@ -3,6 +3,7 @@ import { BadgePic, ComingSoon, NickName } from '../../../packages/design-system/
 import { Tabs } from '../../../packages/design-system/src/components/primitives';
 import { badgePicSrc } from '@/catalog/badges';
 import { nickColorValue } from '@/config/nickColors';
+import { paragonFrame } from '@/config/paragon';
 import { pixelIconSrc } from '@/config/pixelIcons';
 import { notify } from '@/lib/notices';
 import { RANKING_BOARDS, type RankingBoardId, type RankingRow } from '@/lib/rankings';
@@ -40,6 +41,22 @@ const Move: React.FC<{ row: RankingRow }> = ({ row }) => {
 	);
 };
 
+/** The paragon mark beside a score: `✦ 142`, in the frame colour and between its brackets from paragon 100 (`PARAGON_FRAMES`) */
+const ParagonMark: React.FC<{ paragon: number }> = ({ paragon }) => {
+	const frame = paragonFrame(paragon);
+	return (
+		<span
+			className='ds-rank-paragon'
+			data-frame={frame?.name.toLowerCase()}
+			style={frame ? { color: frame.color } : undefined}
+			title={frame ? `Paragon ${paragon} (${frame.name} frame)` : `Paragon ${paragon}`}
+		>
+			{frame?.open}✦ {paragon}
+			{frame?.close}
+		</span>
+	);
+};
+
 const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board }) => (
 	<li className='ds-listrow ds-listrow-line ds-rank-row' data-me={row.me} data-top={row.rank <= 3 ? row.rank : undefined}>
 		<span className='ds-rank-pos'>{row.rank}</span>
@@ -53,11 +70,7 @@ const Row: React.FC<{ row: RankingRow; board: RankingBoardId }> = ({ row, board 
 		</span>
 		<span className='ds-rank-value'>
 			{valueText(board, row.value)}
-			{row.paragon > 0 && (
-				<span className='ds-rank-paragon' title={`Paragon ${row.paragon}`}>
-					✦ {row.paragon}
-				</span>
-			)}
+			{row.paragon > 0 && <ParagonMark paragon={row.paragon} />}
 		</span>
 		<span className='ds-rank-podium'>
 			{row.rank <= 3 && (

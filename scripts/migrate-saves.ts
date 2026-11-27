@@ -10,7 +10,7 @@
  *
  * **Safe to repeat (idempotent):** a row already in the current shape is `current` and is not touched, so a second run (or a run that stopped half way) finishes the job and then reports zero writes.
  * **Backups:** before a save row is rewritten its OLD body goes into `save_history` as a pinned copy flagged `migration_backup` (never trimmed; the same table and mechanism as the chapter archive), and everything that will be
- * rewritten is also dumped to `backups/migrate-<time>.json` (gitignored: it holds player data). To undo a row, put the history copy's `state` back (`schema`, `core`, and the map) by hand or with `restore-trust`'s approach.
+ * rewritten is also dumped to `backups/migrate-<time>.json` (gitignored: it holds player data). To undo a row, put the history copy's `state` back (`schema`, `core`, and the map) by hand.
  * **Writes are compare-and-swap:** a save row is updated only `where rev` is still the rev that was read, a ledger row only `where ver` is; a player who saved in between is skipped (and picked up by the next run). The map and the core are two tables,
  * so run this while few people are online; only a step that changes `land`/`extra` touches the map at all.
  * **Prints counts only**, never a name, an id or a number out of a game; a database error text is not printed either (it could name a row).

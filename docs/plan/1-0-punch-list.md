@@ -16,7 +16,7 @@ Written 2026-11-26 from the Linear backlog (about 60 open tickets, all read), th
 | 4 | **Delete my account** (authenticated server op and confirm dialog) | IDL-392 | M | Required before a public launch |
 | 5 | **Privacy policy and Terms page**, footer link | IDL-391 | S | Same (the owner skipped it so far; decide: write it or accept the risk) |
 | 6 | **Public readiness checklist**: email confirmation on, rotated secrets, rate limits, free-plan load check | IDL-126 | S-M, mostly dashboard work | Owner and dashboard work, listed in [0-9-2-fixes](0-9-2-fixes.md) |
-| 7 | **Turn on the enforcement switches** (`ENFORCEMENT`, `EMBER_MODEL.requireServerRebirth`) after `restore-trust` and `check-live-saves` | IDL-208, IDL-211 | S + checks | Today the server only flags; a public game needs it to refuse |
+| 7 | **Turn on `EMBER_MODEL.requireServerRebirth`** after `check-live-saves` | IDL-211 | S + checks | Today a client can still rebirth through a plain save; the Ember bound clamps it |
 | 8 | **Walk-through of the unchecked cases** (3-defeats auto-battle pause, stale second tab, second browser, `/reset` from an emailed link) | IDL-300, IDL-384 item 1 | S | Owner testing, no code unless a bug shows |
 | 9 | **Landing v2** with the new art and the Open Graph image | IDL-122 | M | Ships with the art |
 | 10 | **New art in the game**: biome art for jungle, fields, orchard, blight, battlefield; the building sprites; item pass 3; stand-in monsters; castle 11-15 | IDL-106, 108, 110, 99, 245, 218, 373, 362 | L (art) | The reason for the 1.0 date; placeholders are catalog keys, so art swaps in without code |
@@ -60,4 +60,4 @@ World boss (IDL-345), the Second Realm (IDL-302), quests and daily quests (IDL-2
 1. Week 1: the remaining crafting work (end-game recipe costs, IDL-349), framework upgrades, the small safety items (IDL-392, IDL-391, IDL-126 checklist), paragon feedback in.
 2. Week 2: paragon sims and tuning (IDL-187), paragon milestones (IDL-394), glossary overlay and resource mastery, spawn tables.
 3. Week 3: Skills v2 light (if kept), chest leftovers, stat-audit cleanups, QA passes, position bonus.
-4. Week 4: art lands (biomes, buildings, landing v2), enforcement switches after the final `check-live-saves`, release notes, tag 1.0.
+4. Week 4: art lands (biomes, buildings, landing v2), the server-run rebirth switch after the final `check-live-saves`, release notes, tag 1.0.

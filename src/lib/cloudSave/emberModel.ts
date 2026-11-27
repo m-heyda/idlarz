@@ -21,7 +21,7 @@ import type { Snapshot } from './verify';
  *    best rebirth the game can pay.
  *
  * In short: Embers only rise with the rebirth count; one rebirth fits between two saves and it must be believable from the previous castle and land; a first save is bounded by 4 hours of play per rebirth and a 1,000-tile best case.
- * `requireServerRebirth` is off; it is turned on together with `ENFORCEMENT.enabled`, after the new chapter flip (checklist: "Turning enforcement and the server-run rebirth on together", Ops/Operator guides).
+ * `requireServerRebirth` is off; turn it on after the new chapter flip, once no client that does not ask the server to rebirth (`askServerRebirth`) can still be open (a deploy plus a grace period) and the real flow was walked in a browser (Rebirth dialog "Asking the server...", refused toast, retry with the same key). Rollback: `false`, no data migration. `tests/server/serverRebirth.test.ts` pins the default.
  *
  * @category Saves & Server/Accepting a save
  * @order 5

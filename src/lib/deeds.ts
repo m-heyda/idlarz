@@ -29,6 +29,8 @@ export interface DeedFacts {
 	/** The crafting level and the Embers earned over all rebirths (absent on a row from before: 0) */
 	craftLevel?: number;
 	embers?: number;
+	/** The paragon level (absent on a row from before: 0) */
+	paragon?: number;
 	/** Buildings built, lifetime. The building system has no counter yet, so this is 0 until it reports one. */
 	buildings: number;
 }
@@ -123,6 +125,8 @@ export const conditionProgress = (when: AchievementCondition, f: DeedFacts): { c
 		}
 		case 'wornRarity':
 			return { cur: f.kit?.[when.rarity] ?? 0, goal: when.min };
+		case 'paragon':
+			return { cur: f.paragon ?? 0, goal: when.min };
 		case 'embers':
 			return { cur: f.embers ?? 0, goal: when.min };
 		case 'income':

@@ -17,7 +17,7 @@ import {
 	spawnLevelRange,
 	spawnTiles,
 } from '../../src/lib/monsters';
-import { COMBAT, MONSTERS } from '../../src/config/combatConfig';
+import { COMBAT, MONSTERS, NORMAL_MAX_DISTANCE } from '../../src/config/combatConfig';
 import { LIMITS } from '../../src/config/limits';
 import { limitOf, LIMIT_BONUSES } from '../../src/lib/limits';
 import { armorReduction } from '../../src/lib/combat';
@@ -55,17 +55,17 @@ test('monsterAt finds a monster by tile', () => {
 	assert.equal(monsterAt(list, 5, 4), undefined);
 });
 
-test('a monster may stand on land of its allowlist 2 to 9 tiles from the castle: never beside it, never beyond 9, never on water or the castle', () => {
+test('a monster may stand on land of its allowlist 2 to 40 tiles from the castle: never beside it, never beyond 40, never on water or the castle', () => {
 	const rule = MONSTERS.thistleBoar.spawn;
 	assert.equal(rule.minCastleDistance, 2);
-	assert.equal(rule.maxCastleDistance, 9);
+	assert.equal(rule.maxCastleDistance, NORMAL_MAX_DISTANCE);
 	const land = (dx: number, dy = 0, biome = 'plains') => canSpawnOn('thistleBoar', CASTLE_X + dx, CASTLE_Y + dy, { biome }, 1);
 	assert.equal(land(1), false, 'adjacent to the castle');
 	assert.equal(land(1, 1), false, 'diagonal neighbour');
 	assert.equal(land(2), true);
-	assert.equal(land(-9, 9), true, 'Chebyshev: 9 each way is 9');
-	assert.equal(land(10), false);
-	assert.equal(land(0, -10), false);
+	assert.equal(land(-40, 40), true, 'Chebyshev: 40 each way is 40');
+	assert.equal(land(41), false);
+	assert.equal(land(0, -41), false);
 	for (const water of ['lake', 'coast', 'castle', 'empty']) assert.equal(land(4, 0, water), false, water);
 	for (const ground of rule.biomes) assert.equal(land(4, 0, ground), true, ground);
 	assert.equal(canSpawnOn('thistleBoar', CASTLE_X + 4, CASTLE_Y, { biome: 'plains', hasChest: true }, 1), false, 'not on a chest');

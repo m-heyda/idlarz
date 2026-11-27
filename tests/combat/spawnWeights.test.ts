@@ -5,7 +5,7 @@ import { STARTER_EQUIPMENT } from '../../src/config/itemCatalog';
 import { MONSTERS } from '../../src/config/combatConfig';
 import { atItemLevel, simSetup, spentCharacter } from '../../src/lib/fightSim';
 import { STRONG_KIT } from '../builders';
-import { castleDistance } from '../../src/lib/distance';
+import { bandOf, castleDistance } from '../../src/lib/distance';
 import { dangerBonus, levelAtAge, maxLevelOf, rollSpawnLevel, spawnLevelRange } from '../../src/lib/monsters';
 import { placeTickets } from '../../src/lib/offline/placement';
 import { playerProfile } from '../../src/lib/offline/profile';
@@ -160,7 +160,8 @@ test('IDL-222: bosses are weighted by win chance and level-capped like normal mo
 	for (let n = 1; n <= 40; n++) {
 		const boss = placeBoss(n, weak);
 		const { min, max } = spawnLevelRange(boss.type!, castle);
-		const bonus = dangerBonus(castleDistance({ x: boss.x!, y: boss.y! }));
+		const distance = castleDistance({ x: boss.x!, y: boss.y! });
+		const bonus = dangerBonus(distance) + bandOf(distance).dangerOffset;
 		assert.ok(boss.spawnLevel! >= min && boss.spawnLevel! <= max + bonus);
 		assert.ok(
 			boss.spawnLevel! <= Math.max(min + bonus, spawnLevelCap(weak, boss.type!, castle)),

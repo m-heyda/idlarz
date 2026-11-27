@@ -39,6 +39,15 @@
 	box-shadow: 0 0 14px rgba(240, 200, 74, 0.35);
 }
 
+/* a frame (paragon 100 and up, PARAGON_FRAMES) tints the ring's glow and the level text with its colour */
+.px-paragon-ring[data-frame] {
+	box-shadow: 0 0 16px var(--frame);
+}
+
+.px-paragon-ring[data-frame] .px-paragon-level {
+	color: var(--frame);
+}
+
 .px-paragon-level {
 	font-size: 17px;
 	color: #f0c84a;

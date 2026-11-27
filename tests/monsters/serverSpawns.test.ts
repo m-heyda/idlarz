@@ -193,7 +193,11 @@ test('monsters spawn a level higher for every 8 tiles from the castle, never abo
 	assert.equal(dangerBonus(NaN), 0);
 	const near = rollSpawnLevel('thistleBoar', 1, 11, 0);
 	const far = rollSpawnLevel('thistleBoar', 1, 11, 24);
-	assert.equal(far, Math.min(MONSTERS.thistleBoar.spawnWindow.cap, near + 3), 'the same id rolls the same offset into a window three levels higher');
+	assert.equal(
+		far,
+		Math.min(MONSTERS.thistleBoar.spawnWindow.cap, near + 3 + 2),
+		'the same id rolls the same offset into a window three levels higher (danger) and two more for the wilds band',
+	);
 	assert.equal(rollSpawnLevel('thistleBoar', 10, 11, 10_000), MONSTERS.thistleBoar.spawnWindow.cap);
 	assert.equal(castleDistance({ x: CASTLE_X + 16, y: CASTLE_Y }), 16);
 	assert.ok(spawnLevelRange('thistleBoar', 1).min <= rollSpawnLevel('thistleBoar', 1, 5, 16));

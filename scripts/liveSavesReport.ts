@@ -4,7 +4,7 @@
  * the script feeds it rows, the tests feed it fixtures.
  */
 import { acceptSave, storedToText, type SaveRepo, type StoredSave } from '../src/lib/cloudSave/pipeline';
-import { ENFORCEMENT, FLAG_POLICY, rejectedFlags, verifyTransition, type SaveFlag, type Snapshot } from '../src/lib/cloudSave/verify';
+import { FLAG_POLICY, verifyTransition, type SaveFlag, type Snapshot } from '../src/lib/cloudSave/verify';
 import type { Ledger, LedgerRepo } from '../src/lib/offline/ledger';
 import { GAME_EPOCH, needsResetFor } from '../src/config/epoch';
 
@@ -79,7 +79,7 @@ export const judgeSave = async (stored: StoredSave, ledger: Ledger | null): Prom
 
 /**
  * Flags whose verdict depends on what the SERVER granted since the last save (kill and chest XP, gems, gold from chests and kills). A history
- * copy has no ledger, so on a pair of copies these look like jumps for an honest account: the report counts them apart and never as "would be refused".
+ * copy has no ledger, so on a pair of copies these look like jumps for an honest account: the report counts them apart and never as evidence.
  */
 export const GRANT_DEPENDENT: ReadonlySet<SaveFlag> = new Set<SaveFlag>(['xp_jump', 'gems_increase', 'gold_jump']);
 
@@ -93,8 +93,6 @@ export interface LiveReport {
 	unreadable: Record<string, number>;
 	/** Saves that raise this flag (each flag once per save) */
 	flagged: Partial<Record<SaveFlag, number>>;
-	/** Saves that enforcement would refuse (invalid saves are counted apart) given the flags in `ENFORCEMENT.reject` */
-	wouldReject: number;
 	xpClamped: number;
 	embersClamped: number;
 	economyTrusted: number;
@@ -106,8 +104,6 @@ export interface LiveReport {
 	transitionFlagged: Partial<Record<SaveFlag, number>>;
 	/** Flags that need the ledger's grants (see GRANT_DEPENDENT): expected on history copies, not evidence of anything */
 	transitionUnjudged: Partial<Record<SaveFlag, number>>;
-	/** Pairs enforcement would refuse, judged on the flags that do not depend on grants only */
-	transitionWouldReject: number;
 	ledgers: number;
 	ledgersWithoutSave: number;
 	ledgersWithoutInventory: number;
@@ -119,7 +115,6 @@ export const newReport = (): LiveReport => ({
 	invalid: {},
 	unreadable: {},
 	flagged: {},
-	wouldReject: 0,
 	xpClamped: 0,
 	embersClamped: 0,
 	economyTrusted: 0,
@@ -129,7 +124,6 @@ export const newReport = (): LiveReport => ({
 	transitions: 0,
 	transitionFlagged: {},
 	transitionUnjudged: {},
-	transitionWouldReject: 0,
 	ledgers: 0,
 	ledgersWithoutSave: 0,
 	ledgersWithoutInventory: 0,
@@ -138,9 +132,6 @@ export const newReport = (): LiveReport => ({
 const bump = <K extends string>(counts: Partial<Record<K, number>>, key: K) => {
 	counts[key] = (counts[key] ?? 0) + 1;
 };
-
-/** What the enforcement would refuse if it were switched on today with its current allowlist. */
-const enforced = { enabled: true, reject: ENFORCEMENT.reject } as const;
 
 export const addSave = (report: LiveReport, verdict: SaveVerdict): void => {
 	report.saves++;
@@ -151,7 +142,6 @@ export const addSave = (report: LiveReport, verdict: SaveVerdict): void => {
 	if (verdict.outcome === 'unreadable') return bump(report.unreadable, verdict.reason ?? 'no reason given');
 	report.accepted++;
 	for (const flag of new Set(verdict.flags)) bump(report.flagged, flag);
-	if (rejectedFlags(verdict.flags, enforced).length) report.wouldReject++;
 	if (verdict.xpClamped) report.xpClamped++;
 	if (verdict.embersClamped) report.embersClamped++;
 	if (verdict.economyTrusted) report.economyTrusted++;
@@ -159,9 +149,7 @@ export const addSave = (report: LiveReport, verdict: SaveVerdict): void => {
 
 export const addTransition = (report: LiveReport, flags: readonly SaveFlag[]): void => {
 	report.transitions++;
-	const judgeable = flags.filter((flag) => !GRANT_DEPENDENT.has(flag));
 	for (const flag of new Set(flags)) bump(GRANT_DEPENDENT.has(flag) ? report.transitionUnjudged : report.transitionFlagged, flag);
-	if (rejectedFlags(judgeable, enforced).length) report.transitionWouldReject++;
 };
 
 /** One ledger row: `hasSave` says whether the same account has a save, `hasInventory` whether the ledger already holds the bag and gear. */
@@ -174,9 +162,7 @@ export const addLedger = (report: LiveReport, hasSave: boolean, hasInventory: bo
 const flagLines = (counts: Partial<Record<SaveFlag, number>>): string[] => {
 	const entries = Object.entries(counts) as [SaveFlag, number][];
 	if (!entries.length) return ['    none'];
-	return entries
-		.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
-		.map(([flag, n]) => `    ${flag}: ${n}  (policy: ${FLAG_POLICY[flag]}${ENFORCEMENT.reject.has(flag) ? ', on the enforcement allowlist' : ''})`);
+	return entries.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0])).map(([flag, n]) => `    ${flag}: ${n}  (policy: ${FLAG_POLICY[flag]})`);
 };
 
 const reasonLines = (counts: Record<string, number>): string[] =>
@@ -195,7 +181,6 @@ export const formatReport = (report: LiveReport): string => {
 		...reasonLines(report.invalid),
 		`  unreadable rows: ${unreadable}`,
 		...reasonLines(report.unreadable),
-		`  would be refused if enforcement were on (flags ${[...ENFORCEMENT.reject].join(', ')}): ${report.wouldReject}`,
 		`  clamped by the server: XP ${report.xpClamped}, Embers ${report.embersClamped}, economy paid from the last trusted save ${report.economyTrusted}`,
 		`  flagged (first-save check, one count per save):`,
 		...flagLines(report.flagged),
@@ -204,7 +189,6 @@ export const formatReport = (report: LiveReport): string => {
 		``,
 		`Consecutive history copies compared: ${report.transitions}`,
 		`  (a history copy has no ledger: flags that need what the server granted are listed apart and are NOT evidence of cheating)`,
-		`  would be refused if enforcement were on (flags that do not need the grants): ${report.transitionWouldReject}`,
 		`  flagged:`,
 		...flagLines(report.transitionFlagged),
 		`  flagged, not judgeable without the ledger (${[...GRANT_DEPENDENT].join(', ')}):`,

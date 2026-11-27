@@ -27,11 +27,11 @@
  * | XP and level | save floor (XP the owned tiles must have produced) | `xpModel.ts` clamps a save's XP to what bought tiles, play time and server payouts can explain; the browser takes the lower number (`applyServerXp`) |
  * | Chests, kills, gems | none: a chest opens only against a server ticket | sealed rolls, the ledger holds the gem balance, a save can never raise it |
  * | Monsters and fights | none: the browser only displays and asks | the server places monsters, runs every fight and pays the win; HP, mana and potions are the ledger's |
- * | Gold jumps / forged land | none | the flags of {@link FLAG_POLICY}, in **shadow mode**: stored, the save is accepted; accounts with a poison flag ({@link POISON_FLAGS}) are never ranked (castle, timer and play-time flags only record) |
+ * | Gold jumps / forged land | none | the flags of {@link FLAG_POLICY}: stored and the save is accepted; a flag only records, or clamps a number the server can explain, and never costs the account its ranking |
  * | Rebirth | needs castle >= 6 and 400 tiles (+50 per rebirth); points computed in the store; shop spending is checked by the point-conservation rule on every load | the ledger starts a new run (sealed rolls never repeat) |
  * | Settings in `localStorage` | cosmetic only | not stored |
  *
- * **Honest limits.** A cheater who stays inside the spending bound (about 3x honest progress) is not caught; flags only un-rank because enforcement is off. The save text is not signed; editing localStorage is easy and the server is what is trusted.
+ * **Honest limits.** A cheater who stays inside the spending bound (about 3x honest progress) is not caught; flags only record. The save text is not signed; editing localStorage is easy and the server is what is trusted.
  * Gear and bag contents cannot be verified from a save, which is why the server owns them. Gems cannot be raised by a save; the first save of an existing player cannot be delta-checked.
  * Tile purchases, building costs, farm and castle upgrades are paid in the browser, not by the server. Monsters and chests are placed by the server ({@link placeTickets}). The level a kill is paid at is not claimed by the client:
  * it comes from the ticket's spawn level and age ({@link levelAtAge}). Enforcing the checks and server-run economy actions are planned (`docs/plan/ROADMAP.md`); the inventory is already the server's.
@@ -39,7 +39,7 @@
  * @title The server's rule and the threat model
  * @category Saves & Server/Threat model
  * @order 1
- * @see acceptSave, FLAG_POLICY, ENFORCEMENT
+ * @see acceptSave, FLAG_POLICY
  */
 import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { sha256Hex } from '@/lib/sha256';
@@ -49,7 +49,7 @@ import { grantedSeenAfterSave, settleTrades } from '@/lib/offline/trade';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
-import { fitParagon, paragonSpent, type Paragon } from '@/lib/offline/paragon';
+import { fitParagon, paragonBonusPoints, paragonSpent, type Paragon } from '@/lib/offline/paragon';
 import { ATTR_KEYS, attrsFromCore, clearedAttrs, fitAttrs, levelOfXp, stateWithAttrs, type Attrs } from '@/lib/offline/attrs';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { clampIdolTiles, settleIdols, sameIdols } from './idolTrust';
@@ -65,20 +65,9 @@ import { gemBuildersOf, gemCraftOf } from '@/config/gemShop';
 import type { PrestigeState } from '@/types/game';
 import { calculateLevel, reconcileCharacter } from '@/utils/game/character';
 import { restoreMerchantLevels, sameRunAs, trustedEconomy } from './trustedEconomy';
-import {
-	ENFORCEMENT,
-	FORGED_GOLD_FLAGS,
-	FORGED_LAND_FLAGS,
-	POISON_FLAGS,
-	VERIFY,
-	rejectedFlags,
-	verifyTransition,
-	type Enforcement,
-	type SaveFlag,
-	type Snapshot,
-} from './verify';
+import { FORGED_GOLD_FLAGS, FORGED_LAND_FLAGS, VERIFY, verifyTransition, type SaveFlag, type Snapshot } from './verify';
 
-/** Accepted saves are copied into the history when this long passed since the last copy (not every N revisions: event saves make the revision count race ahead of the clock), and when a flag appears that the previous save did not have. */
+/** Accepted saves are copied into the history when this long passed since the last copy (not every N revisions: event saves make the revision count race ahead of the clock). */
 export const HISTORY_EVERY_MS = 30 * 60_000;
 /** How many history copies are kept per player, and how many extra pinned ones. */
 export const HISTORY_KEEP = 6;
@@ -125,8 +114,7 @@ export interface StoredSave {
 	flags: SaveFlag[];
 	auditRatio: number;
 	freshStart: boolean;
-	everFlagged: boolean;
-	/** Saved through a non-production server (local dev, preview): never ranked, flags never count against the account. Sticky. */
+	/** Saved through a non-production server (local dev, preview): never ranked. Sticky. */
 	testAccount: boolean;
 	serverSavedAt: number;
 	createdAt: number;
@@ -178,8 +166,6 @@ export type SaveOutcome =
 			replaced?: { fromRev: number; level: number; tilesOwned: number; playSeconds: number };
 	  }
 	| { kind: 'conflict'; rev: number; serverSavedAt: number }
-	/** Enforcement is on and the save raised a flag that refuses it: nothing was stored (the account keeps its last accepted save) */
-	| { kind: 'rejected'; flags: SaveFlag[] }
 	| { kind: 'invalid'; reason: string }
 	| { kind: 'too_soon'; retryAfterMs: number };
 
@@ -202,8 +188,8 @@ export const storedToText = (stored: StoredSave): string => {
  *   - the text must decode (checksum, schema, `sanitizeSave`), otherwise `invalid`
  *   - a stale `baseRev` is a `conflict`: the player picks a side in the hub, nothing is overwritten silently
  *   - the stored copy is rebuilt from the sanitized state, and rates and headline numbers are computed here
- *   - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag, clamp or reject; reject only while `ENFORCEMENT.enabled`, shadow mode otherwise)
- *   - the map is only written when it changed; every ~30 min (by the clock) and when a new flag appears a full copy goes to the history
+ *   - the spending check and the transition from the previous save are verified; each flag has a decision in `FLAG_POLICY` (flag or clamp; no flag refuses a save)
+ *   - the map is only written when it changed; every ~30 min (by the clock) a full copy goes to the history
  *
  * Accepting a save (`POST /api/save`):
  *
@@ -213,9 +199,9 @@ export const storedToText = (stored: StoredSave): string => {
  * 4. The server's inventory (bag, gear, pity, auto-sell) is stamped over the upload before anything is derived (a rebirth wipes it once, a New Game takes the new game's).
  * 5. The checks of {@link verifyTransition} run, each producing a flag with a policy in {@link FLAG_POLICY}.
  *
- * History: a full copy goes to `save_history` every 30 minutes of the clock and when a new flag appears; 6 newest + 3 pinned per player (`HISTORY_EVERY_MS`, `HISTORY_KEEP`, `PINNED_KEEP`).
- * Test accounts: a save through a non-production server marks the account `test_account` (sticky); its flags never count and it is never ranked ({@link isNonProduction}).
- * Ranking eligibility (`trusted`): the first save was a young game (<= 900 s of play) and no poison flag was ever raised ({@link POISON_FLAGS}).
+ * History: a full copy goes to `save_history` every 30 minutes of the clock; 6 newest + 3 pinned per player (`HISTORY_EVERY_MS`, `HISTORY_KEEP`, `PINNED_KEEP`).
+ * Test accounts: a save through a non-production server marks the account `test_account` (sticky); it is never ranked ({@link isNonProduction}).
+ * The `trusted` stats row: the first save was a young game (<= 900 s of play) on a non-test account. A flag never changes it.
  *
  * @category Saves & Server/Accepting a save
  * @order 1
@@ -231,8 +217,6 @@ export const acceptSave = async (
 	nonProduction = false,
 	/** The server's own record of the player (gems, spawn tickets, what it granted). Without it saves are checked as before; a ledger that cannot be read never blocks a save. */
 	ledgers: LedgerRepo | null = null,
-	/** Which flags refuse a save. Shadow mode (nothing refused) unless `ENFORCEMENT.enabled` is switched on; a parameter so tests can run both. */
-	enforcement: Enforcement = ENFORCEMENT,
 	/** The hero class of the account's profile row (the route reads it): it is stamped over the upload, because class passives pay on the server (IDL-70). Absent = the upload's own, as before. */
 	playerClass?: PlayerClassId,
 ): Promise<SaveOutcome> => {
@@ -352,7 +336,7 @@ export const acceptSave = async (
 		if (state.characterStats.availablePoints !== before.availablePoints || ATTR_KEYS.some((key) => before[key] !== state.characterStats[key]))
 			summary = summarize(state);
 		if (paragonOut) {
-			paragonOut = fitParagon(paragonOut, state.resources.xp);
+			paragonOut = fitParagon(paragonOut, state.resources.xp, paragonBonusPoints(ledger?.stats.claimed ?? ledger?.stats.achievements ?? []));
 			// the points the server holds are worked out into every number it derives (Luck, kill rewards, rates, the fight profile), never taken from the upload
 			if (paragonSpent(paragonOut.spent) > 0) {
 				state = { ...state, paragonSpent: paragonOut.spent };
@@ -375,13 +359,6 @@ export const acceptSave = async (
 	if (emberVerdict.clamped) flags.push('ember_jump');
 	const worth = checkNetWorth(state, summary, ledger?.granted);
 	if (worth.exceeds) flags.push('networth_exceeds');
-
-	/**
-	 * Enforcement (IDL-112): while it is on, a save that raised a `reject` flag is refused whole, before anything is stored, pinned or granted.
-	 * Off by default (shadow mode); the decision per flag is `FLAG_POLICY`.
-	 */
-	const refused = rejectedFlags(flags, enforcement);
-	if (refused.length) return { kind: 'rejected', flags: refused };
 
 	const legacyIdols = BUILDINGS_FLAG.enabled && ledgerUsable ? settledIdols : (ledger?.legacy.idols ?? {});
 	const legacyChanged = !!ledger && !sameIdols(legacyIdols, ledger.legacy.idols);
@@ -454,14 +431,11 @@ export const acceptSave = async (
 			: {}),
 	};
 	const world = split.world;
-	// A test account's findings are still recorded (they show the checks working) but never count against it, and it is never ranked
+	// A test account's findings are still recorded (they show the checks working); it is never ranked
 	const testAccount = (current?.testAccount ?? false) || nonProduction;
-	const everFlagged = !testAccount && ((current?.everFlagged ?? false) || flags.some((flag) => POISON_FLAGS.has(flag)));
 	const freshStart = current ? current.freshStart : summary.playSeconds <= VERIFY.freshStartSec;
 
-	// A flag already on the previous save is not archived again: an account that stays flagged must not make us store a full copy every upload (test accounts only get the regular copies)
-	const newFlag = !testAccount && flags.some((flag) => !(current?.flags ?? []).includes(flag));
-	const archive = !current || nowMs - current.lastArchiveAt >= HISTORY_EVERY_MS || newFlag;
+	const archive = !current || nowMs - current.lastArchiveAt >= HISTORY_EVERY_MS;
 
 	const save: StoredSave = {
 		rev: (current?.rev ?? 0) + 1,
@@ -472,14 +446,13 @@ export const acceptSave = async (
 		flags,
 		auditRatio: Number.isFinite(worth.ratio) ? worth.ratio : 1e9,
 		freshStart,
-		everFlagged,
 		testAccount,
 		serverSavedAt: nowMs,
 		createdAt: current?.createdAt ?? nowMs,
 		lastArchiveAt: archive ? nowMs : (current?.lastArchiveAt ?? nowMs),
 	};
 	const worldChanged = !current || current.worldHash !== world.hash;
-	const written = await repo.commit(userId, baseRev, save, worldChanged ? world : null, { displayName, trusted: !testAccount && freshStart && !everFlagged });
+	const written = await repo.commit(userId, baseRev, save, worldChanged ? world : null, { displayName, trusted: !testAccount && freshStart });
 	if (!written) {
 		const latest = await repo.load(userId);
 		return { kind: 'conflict', rev: latest?.rev ?? 0, serverSavedAt: latest?.serverSavedAt ?? 0 };
@@ -503,7 +476,7 @@ export const acceptSave = async (
 				tilesOwned: summary.tilesOwned,
 				rates: previous ? (previous.summary.rates as unknown as Record<string, number>) : null,
 				newRun: newRun || !current,
-				// only believable gold counts towards Hoarder: a save flagged for forged gold or land (shadow mode) may claim gold nothing paid for
+				// only believable gold counts towards Hoarder: a save flagged for forged gold or land may claim gold nothing paid for
 				gold: flags.some((flag) => FORGED_GOLD_FLAGS.has(flag)) ? undefined : summary.gold,
 			});
 			// trades the server made since the last save stay on the record until this save's stock accounts for them (an older browser's picture does not)

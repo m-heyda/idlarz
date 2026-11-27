@@ -6,7 +6,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { runCheats, type CheatRow } from './cheats';
 import { near, oracle } from './helpers';
-import { ENFORCEMENT, FLAG_POLICY, VERIFY } from '../../src/lib/cloudSave/verify';
+import { FLAG_POLICY, VERIFY } from '../../src/lib/cloudSave/verify';
 
 let rows: Record<string, CheatRow>;
 test('setup: run every cheating save through acceptSave', async () => {
@@ -32,7 +32,7 @@ test("XP is the server's to bound: a save with more XP than the game could have 
 	assert.ok(row.flags.includes('xp_jump'));
 });
 
-test('FLAGGED ONLY (shadow mode): the flag costs the account its ranking; enforcement (IDL-112) refuses these only once ENFORCEMENT.enabled is switched on', () => {
+test('FLAGGED ONLY: the save is accepted and the flag is only recorded', () => {
 	const expected: Record<string, 'gold_jump' | 'playtime_fast'> = {
 		'gold-over-allowance': 'gold_jump',
 		'playtime-fast': 'playtime_fast',
@@ -40,11 +40,8 @@ test('FLAGGED ONLY (shadow mode): the flag costs the account its ranking; enforc
 	for (const [id, flag] of Object.entries(expected)) {
 		assert.equal(get(id).verdict, 'flagged', id);
 		assert.ok(get(id).flags.includes(flag), `${id} should raise ${flag}, raised ${get(id).flags}`);
-		// play time is recorded only (a browser left open or asleep is normal play); gold is the one that refuses the save once enforcement is on
-		assert.equal(FLAG_POLICY[flag], flag === 'gold_jump' ? 'reject' : 'flag', `${flag}: what the server does with it`);
-		assert.equal(ENFORCEMENT.reject.has(flag), flag === 'gold_jump', `${flag} is on the enforcement list only when it refuses`);
+		assert.equal(FLAG_POLICY[flag], 'flag', `${flag}: what the server does with it`);
 	}
-	assert.equal(ENFORCEMENT.enabled, false, 'shadow mode is the default until the live flags have been reviewed');
 });
 
 test('CLOSED (IDL-167): a save whose economy cannot be believed is stored flagged, but the server pays it from the last trusted economy (rate factor ~1)', () => {

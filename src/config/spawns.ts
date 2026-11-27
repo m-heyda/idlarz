@@ -16,7 +16,7 @@ export const SPAWN_LIMIT = {
  * Chests. The server mints and places them (see {@link ticketCap} and {@link advanceBank}); data is `CHEST`, `LUCK` and `SPAWN_LIMIT` in `src/config/spawns.ts`, rolls are in `src/lib/chests.ts` and `src/lib/luck.ts`.
  *
  * - **Timer**: one chest ticket every 720 s of server time, faster with Luck ({@link chestIntervalSec}).
- * - **Room**: monsters and chests together never exceed 30% of the free tiles (minimum 2), and at most 40 tickets wait in all, chests, monsters and the boss counted together
+ * - **Room**: monsters and chests together never exceed 30% of the free tiles (minimum 2), and at most 40 tickets wait in all in a first run (10 more per completed rebirth, 100 at most: `ticketCapMax`), chests, monsters and the boss counted together
  *   (`ticketCap` on the server, which estimates free land from the owned-tile count; `spawnCap` in the browser, which counts it from the map).
  * - **Where** (`CHEST.placement`, {@link chestSpots}): every eligible owned tile weighs 1, +3 if it touches unowned land, +1 per 4 tiles of Chebyshev distance from the castle, x0.3 if another chest is within 2 tiles.
  * - **What is inside** ({@link rewardWeights}, {@link rollChestLoot}): relative weights gold 50, bundle 40, xp 12, boost 10, item 8 (`CHEST.rewards`). Each Luck point moves 1% of the gold weight (at most 60%) into boost (80%) and item (20%).

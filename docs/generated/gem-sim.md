@@ -22,15 +22,15 @@ Chests: a chest ticket every 720 s at Luck 0 (faster with Luck, never below half
 
 ## One-off pools
 
-Achievement and deed tiers: **27,600** gems (the manual tester marks excluded). Deed milestones: **2,800**. Bestiary mastery (monster and boss ladders plus biome goals): **1,380**, but each tier needs hundreds to thousands of kills of one type, so it is left out of the horizons below. The share of the first two a player has claimed by a day is a guess (`CLAIMED_SHARE`): day 7: 5%, day 30: 20%, day 90: 45%, day 180: 70%.
+Achievement and deed tiers: **29,525** gems (the manual tester marks excluded). Deed milestones: **2,800**. Bestiary mastery (monster and boss ladders plus biome goals): **1,380**, but each tier needs hundreds to thousands of kills of one type, so it is left out of the horizons below. The share of the first two a player has claimed by a day is a guess (`CLAIMED_SHARE`): day 7: 5%, day 30: 20%, day 90: 45%, day 180: 70%.
 
 ## Gems earned by day
 
 | Profile | Day 7 | Day 30 | Day 90 | Day 180 |
 |---|---:|---:|---:|---:|
-| Casual | 1,840 | 7,453 | 17,798 | 29,516 |
-| Regular | 2,966 | 12,279 | 32,276 | 58,471 |
-| Dedicated | 6,770 | 28,582 | 81,186 | 156,293 |
+| Casual | 1,937 | 7,838 | 18,664 | 30,863 |
+| Regular | 3,063 | 12,664 | 33,142 | 59,819 |
+| Dedicated | 6,867 | 28,967 | 82,053 | 157,640 |
 
 ## The price book against the faucets
 
@@ -63,17 +63,17 @@ The day a player has earned the price (alone, with nothing else bought first). *
 | Tidal Keep | once | 2,500 | 10 | 6 | 3 |
 | Moonlit Cathedral | once | 2,500 | 10 | 6 | 3 |
 | Additional builder 1 | upgrades | 2,000 | 8 | 5 | 3 |
-| Additional builder 2 | upgrades | 6,000 | 25 | 15 | 7 |
-| Additional builder 3 | upgrades | 12,000 | 57 | 30 | 13 |
+| Additional builder 2 | upgrades | 6,000 | 23 | 15 | 7 |
+| Additional builder 3 | upgrades | 12,000 | 54 | 29 | 13 |
 | Master Workbench | upgrades | 1,500 | 6 | 4 | 2 |
 | Overnight Orders | upgrades | 750 | 3 | 2 | 1 |
-| Building Slot | upgrades | 6,000 | 25 | 15 | 7 |
+| Building Slot | upgrades | 6,000 | 23 | 15 | 7 |
 | Bulk Discount | upgrades | 1,500 | 6 | 4 | 2 |
 | Cap Break 1 (per ladder, x5 ladders) (planned) | planned | 300 | 2 | 1 | 1 |
 | Cap Break 2 (per ladder, x5 ladders) (planned) | planned | 750 | 3 | 2 | 1 |
-| Cap Break 3 (per ladder, x5 ladders) (planned) | planned | 1,875 | 8 | 5 | 2 |
+| Cap Break 3 (per ladder, x5 ladders) (planned) | planned | 1,875 | 7 | 5 | 2 |
 
-**Whole shop today: 67,500 gems** = day 1011 (Casual), 224 (Regular), 75 (Dedicated). Planned Cap Breaks on every ladder add 14,625 gems.
+**Whole shop today: 67,500 gems** = day 981 (Casual), 218 (Regular), 74 (Dedicated). Planned Cap Breaks on every ladder add 14,625 gems.
 
 ## Targets (docs/plan/30 section 9)
 
@@ -82,6 +82,6 @@ The day a player has earned the price (alone, with nothing else bought first). *
 | An identity item is affordable in the first week (earnings only, Regular) | ok | Change name (200 gems) on day 1 |
 | The first upgrade (QoL) is affordable in week 2 (Regular) | ok | Overnight Orders (750 gems) on day 2 |
 | A first Cap Break is not out of reach before week 8 (the rebirth gate decides the day; planned, Regular) | ok | 300 gems on day 1 |
-| The whole shop is a multi-month goal for Regular (90+ days) and still finite for Dedicated | ok | 67,500 gems: Regular day 224, Dedicated day 75 |
+| The whole shop is a multi-month goal for Regular (90+ days) and still finite for Dedicated | ok | 67,500 gems: Regular day 218, Dedicated day 74 |
 | No item takes the whole 1000-gem start purse on day 1 (price within 80-100% of it) | ok | none |
 

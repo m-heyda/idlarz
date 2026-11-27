@@ -1,3 +1,4 @@
+import { setClaimedDeedsSource } from '@/lib/claimedDeeds';
 import { create } from 'zustand';
 import { achievementById } from '@/catalog/achievements';
 import type { AchievementReport } from '@/lib/offline/achievements';
@@ -140,3 +141,5 @@ export const useAchievementStore = create<AchievementState>((set, get) => ({
 }));
 
 provideAchievementSink((report) => useAchievementStore.getState().apply(report));
+
+setClaimedDeedsSource(() => useAchievementStore.getState().claimed);

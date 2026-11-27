@@ -14,8 +14,16 @@ import { freeLand } from '@/lib/spawnLimits';
 // Everything here is pure and works in seconds, so the same maths runs for a few seconds of play and for eight hours away, and is
 // unit-tested without a database.
 
-/** Chests and monsters together that can wait at once, whatever the size of the map (keeps the stored row tiny). */
+/** Chests and monsters together that can wait at once in a first run, whatever the size of the map (keeps the stored row tiny). */
 export const TICKET_CAP = 40;
+
+/** More tickets that can wait per completed rebirth (owner 2026-11-27: more to do late in the game), and the most in all (the stored row stays small) */
+export const TICKET_CAP_PER_REBIRTH = 10;
+export const TICKET_CAP_MAX = 100;
+
+/** The most tickets that can wait at once for a player with this many completed rebirths: 40, 10 more per rebirth, 100 at most. */
+export const ticketCapMax = (rebirths = 0): number =>
+	Math.min(TICKET_CAP_MAX, TICKET_CAP + TICKET_CAP_PER_REBIRTH * Math.max(0, Math.floor(Number.isFinite(rebirths) ? rebirths : 0)));
 
 /** What `kind` of ticket: a chest, a normal monster or a boss (one at a time). Also the name that seals the ticket's random rolls. */
 export type TicketKind = 'chest' | 'monster' | 'boss' | 'rock';
@@ -106,6 +114,8 @@ export interface BankContext {
 	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
 	lakesOwned: number;
 	castleLevel: number;
+	/** Completed rebirths (the boss comes faster from `COMBAT.spawn.bossFastFromRebirths`; absent = 0) */
+	rebirths?: number;
 	/** Percentage points more chance that a new monster is golden (the Paragon upgrade; absent = none) */
 	goldenChancePts?: number;
 }
@@ -134,16 +144,16 @@ const ticketCount = (bank: TicketBank): number => bank.chests.length + bank.mons
 
 /**
  * How many more tickets may wait: the same share of the free land as the client's own spawn limit (monsters and chests together),
- * (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `TICKET_CAP` per kind.
+ * (`freeLand`, the client's own formula) estimated from the save's counts because the server never opens the map, and never more than `ticketCapMax` per kind.
  *
- * The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all.
+ * The room for new tickets: monsters and chests together hold at most 30% of the free land, at least 2, at most 40 tickets in all in a first run, 10 more per completed rebirth, 100 at most ({@link ticketCapMax}).
  *
  * @category Monsters/Spawning
  * @order 5
  */
 export const ticketCap = (ctx: BankContext): number => {
 	const free = freeLand(ctx.tilesOwned, 1, ctx.lakesOwned, ctx.castleLevel);
-	return Math.min(TICKET_CAP, Math.max(SPAWN_LIMIT.minAllowed, Math.floor(free * SPAWN_LIMIT.maxFraction)));
+	return Math.min(ticketCapMax(ctx.rebirths), Math.max(SPAWN_LIMIT.minAllowed, Math.floor(free * SPAWN_LIMIT.maxFraction)));
 };
 
 const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, ticketCap(ctx) - ticketCount(bank));
@@ -151,7 +161,9 @@ const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, t
 /** Seconds between two monsters at this Luck (the base interval times the shared Luck factor). */
 export const monsterIntervalSec = (luck: number): number => COMBAT.spawn.intervalSec * spawnIntervalFactor(luck);
 /** Seconds a boss needs to appear after the last one left, at this Luck. */
-export const bossIntervalSec = (luck: number): number => COMBAT.spawn.bossIntervalSec * spawnIntervalFactor(luck);
+/** The seconds between two bosses: 1.5 h, 1 h from the third rebirth (`COMBAT.spawn`), shortened by Luck like every spawn timer (down to half). */
+export const bossIntervalSec = (luck: number, rebirths = 0): number =>
+	(rebirths >= COMBAT.spawn.bossFastFromRebirths ? COMBAT.spawn.bossFastIntervalSec : COMBAT.spawn.bossIntervalSec) * spawnIntervalFactor(luck);
 
 const monsterThreshold = (bank: TicketBank, luck: number): number => (bank.monstersMinted === 0 ? COMBAT.spawn.firstSec : monsterIntervalSec(luck));
 
@@ -180,7 +192,7 @@ export interface Minted {
  * Where and when monsters appear (server only).
  *
  * - **Timers** (`COMBAT.spawn`): the first normal monster 120 s after the run starts, then one per 600 s; one boss at a time, 10,800 s after the last one left (or after the start). The timers pause when the map has no room or no free tile for it.
- * - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets ({@link ticketCap}, `SPAWN_LIMIT`, `TICKET_CAP`).
+ * - **Room**: monsters and chests together hold at most 30% of the free tiles, at least 2, at most 40 tickets in a first run, 10 more per rebirth up to 100 ({@link ticketCap}, `SPAWN_LIMIT`, `ticketCapMax`).
  * - **Golden (lucky) monsters**: chance `min(10%, 2% + 0.05% x Luck)` per new normal monster; a kill pays x3 gold, XP and hide and adds one guaranteed gear roll (`LUCK.goldenMonster`). Bosses are never golden.
  *
  * @category Monsters/Spawning
@@ -212,7 +224,7 @@ export const advanceBank = (
 		}
 		const chestLeft = Math.max(0, chestEvery - next.chestAcc);
 		const monsterLeft = monstersAllowed ? Math.max(0, monsterThreshold(next, ctx.luck) - next.monsterAcc) : Infinity;
-		const bossLeft = bossAllowed ? Math.max(0, bossIntervalSec(ctx.luck) - next.bossAcc) : Infinity;
+		const bossLeft = bossAllowed ? Math.max(0, bossIntervalSec(ctx.luck, ctx.rebirths) - next.bossAcc) : Infinity;
 		const step = Math.min(chestLeft, monsterLeft, bossLeft, dt - used);
 		next.chestAcc += step;
 		if (monstersAllowed) next.monsterAcc += step;
@@ -236,7 +248,7 @@ export const advanceBank = (
 			next.monsters.push(ticket);
 			minted.monsters.push(ticket);
 		}
-		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= bossIntervalSec(ctx.luck) - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= bossIntervalSec(ctx.luck, ctx.rebirths) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const ticket: MonsterTicket = { n: next.nextN++, at, kind: 'boss', lucky: false };
 			next.bossAcc = 0;
 			next.monsters.push(ticket);
@@ -315,7 +327,7 @@ export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null
 	if (ticketRoom(bank, ctx) <= 0) return rockLeft(bank, ctx)[0] ?? null;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck, ctx.chestSpeedPct) - bank.chestAcc)];
 	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank, ctx.luck) - bank.monsterAcc));
-	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, bossIntervalSec(ctx.luck) - bank.bossAcc));
+	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, bossIntervalSec(ctx.luck, ctx.rebirths) - bank.bossAcc));
 	return Math.min(...left, ...rockLeft(bank, ctx));
 };
 

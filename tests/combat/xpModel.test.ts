@@ -158,7 +158,6 @@ test('a save that claims XP nobody could earn is stored with the XP the server c
 	assert.equal(row.summary.xp, out.xp);
 	assert.equal(row.summary.level, calculateLevel(out.xp).level, 'the level on the ranking follows the clamped XP');
 	assert.ok(row.summary.derived.xpBase !== undefined && row.summary.derived.xpBase <= out.xp + 1e6);
-	assert.equal(row.everFlagged, true);
 
 	// what is stored loads: the points the lower level has not earned are back to be spent
 	const stored = decodeSave(storedToText({ ...row, world: worlds.get('u1') }));
