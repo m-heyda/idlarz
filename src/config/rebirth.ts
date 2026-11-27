@@ -9,7 +9,7 @@ import { Resources } from '@/types/game';
  * - **Requirements**: castle level >= 6 (`minCastleLevel`), economy tile count >= `400 + 50 x rebirths already done` (`minTiles`, `tilesPerRebirth`), no castle upgrade running, and at least 1 Ember of gain.
  * - **Embers gained**: see {@link emberGain}. **Income bonus**: see {@link emberIncomeBonus}.
  * - **What resets** (`rebirth` in `src/stores/game/rebirthSlice.ts`): map (new start ring), resources, castle, animals, buildings, chests, monsters and any open fight, click level, farm upgrades, all merchant upgrades except Pack Rat,
- *   the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) except the legendary pieces the player chooses to keep (`keepSlots`: rebirth N keeps up to min(N, 15), they land in the new bag), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
+ *   the bag and worn gear (back to the starter kit; the Pack Rat bag size is kept) except the epic and legendary pieces the player chooses to keep (`keepSlots`: rebirth N keeps up to min(N, 15) of them, `keepMinRarity` is the lowest rarity that may be kept, they land in the new bag), loot pity, attributes (all points are handed back to spend again), HP and mana refilled.
  * - **What is kept**: name, class, play time, gems, all Embers and shop levels, lifetime XP and level, the auto-sell setting, the merchant's shelf with its rotation clock and the refresh count (a rebirth is no free reshuffle).
  * - The server runs the rebirth first (`POST /api/rebirth`): it checks the stored save, wipes the ledger's inventory to the starter kit and pays at most its own computed gain; the browser takes the lower number.
  * - Auto-battle unlocks after the first rebirth (`COMBAT.auto.minRebirths`).
@@ -33,7 +33,8 @@ export const REBIRTH = {
 	// +160 % after 76, +264 % after 170 (a +20 % raise of the old curve; tests/economy/rebirth.test.ts pins it)
 	incomePerPoint: 0.12,
 	incomeExponent: 0.6,
-	keepSlotsMax: 15, // the most legendary pieces one rebirth can carry over (rebirth number N keeps min(N, this); see lib/rebirthKeep.ts)
+	keepSlotsMax: 15, // the most pieces one rebirth can carry over (rebirth number N keeps min(N, this); see lib/rebirthKeep.ts)
+	keepMinRarity: 'epic' as const, // the lowest rarity a piece must have to be carried over: epic, legendary (and unique) can be kept; it was legendary and up
 	discountCapPercent: 45, // Charisma + Thrift together can never take more than this off a tile (Treasury Charter raises it, up to `discountMaxPercent`)
 	/** The most any tile discount can reach, whatever raises the cap: 45 + 10 Treasury Charter levels x 3 = 75, with 5 points of room. Tiles stay a real cost late in a run (Charisma 25 + Thrift 20 + Bulk 8 + class 3 + gear 10 + Paragon 10 = 76 is the most the sources can add up to). */
 	discountMaxPercent: 80,

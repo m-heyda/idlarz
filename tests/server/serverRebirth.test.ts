@@ -229,6 +229,22 @@ test('a legendary the player chose to keep survives the rebirth, in the new bag;
 	assert.deepEqual(inv.rebirth, { to: 1, gain: reply.gain, kept: 1 });
 });
 
+test('an epic piece can be kept too, a rare one is refused', async () => {
+	const { m } = await readyWithLegends();
+	const ledger = m.ledgers.get(ID)!;
+	const bag = ledger.inv!.bag.map((slot) => slot);
+	const epic = { ...plainItem('emberbrand'), rarity: 'epic' };
+	bag[0] = { item: epic };
+	bag[1] = { item: { ...plainItem('emberbrand'), rarity: 'rare' } };
+	m.ledgers.set(ID, { ...ledger, inv: { ...ledger.inv!, bag } });
+	const refused = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [{ from: 'bag', index: 1 }]));
+	assert.equal(refused.reason, 'bad_keep');
+	const reply = ok(await rebirthStep(m.deps, ID, key(), T0 + 30_000, [{ from: 'bag', index: 0 }]));
+	assert.equal(reply.ok, true);
+	assert.deepEqual(reply.kept, [epic]);
+	assert.equal(m.ledgers.get(ID)!.inv!.bag.filter((s) => s && 'item' in s).length, 1, 'only the epic piece came along');
+});
+
 test('the first rebirth has one slot: more picks, a common piece or an empty place are refused and nothing is wiped', async () => {
 	const { m } = await readyWithLegends();
 	const before = m.ledgers.get(ID)!.inv;
