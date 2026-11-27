@@ -120,7 +120,6 @@ export const buildStored = (game: GameState, gems: number | null, serverSavedAt:
 		flags: [],
 		auditRatio: 1,
 		freshStart: true,
-		everFlagged: false,
 		testAccount: true,
 		serverSavedAt,
 		createdAt,

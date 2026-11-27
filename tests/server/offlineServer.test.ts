@@ -144,7 +144,7 @@ test('an account with no cloud save has nothing to claim', async () => {
 	assert.equal((await claimOffline(m.deps, 'nobody', 'claim-0001', T0)).kind, 'no_save');
 });
 
-test('a poison flag on its latest save does not stop the away pay (flags only cost the ranking)', async () => {
+test('a flag on its latest save does not stop the away pay', async () => {
 	const m = memory();
 	const state = game();
 	// a first save with far more gold than the income could ever explain is flagged baseline_rich

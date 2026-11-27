@@ -1,4 +1,4 @@
-// Server trust: enforcement (IDL-112), the trusted economy (IDL-167) and paid merchant levels (IDL-168).
+// Server trust: the flag policy, the trusted economy (IDL-167) and paid merchant levels (IDL-168).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { honestGame, memoryRepo, T0 } from '../audit/cheats';
@@ -7,22 +7,20 @@ import { acceptSave } from '../../src/lib/cloudSave/pipeline';
 import { summarize } from '../../src/lib/cloudSave/summary';
 import { merchantGoldSpent } from '../../src/lib/cloudSave/netWorth';
 import { restoreMerchantLevels } from '../../src/lib/cloudSave/trustedEconomy';
-import { ENFORCEMENT, FLAG_POLICY, POISON_FLAGS, rejectedFlags, verifyTransition, type SaveFlag } from '../../src/lib/cloudSave/verify';
+import { FLAG_POLICY, verifyTransition, type SaveFlag } from '../../src/lib/cloudSave/verify';
 import { MERCHANT_UPGRADES } from '../../src/config/merchant';
 import { merchantUpgradeCost } from '../../src/utils/game/merchant';
 import type { PersistedGame } from '../../src/lib/sanitizeSave';
 
-const accept = (repo: ReturnType<typeof memoryRepo>['repo'], state: PersistedGame, baseRev: number, at: number, enforcement = ENFORCEMENT) =>
-	acceptSave(repo, 'u', 'Z', encodeSave(state), baseRev, at, false, null, enforcement);
+const accept = (repo: ReturnType<typeof memoryRepo>['repo'], state: PersistedGame, baseRev: number, at: number) =>
+	acceptSave(repo, 'u', 'Z', encodeSave(state), baseRev, at, false, null);
 const withGold = (state: PersistedGame, gold: number, playSeconds = state.playSeconds): PersistedGame => ({
 	...state,
 	playSeconds,
 	resources: { ...state.resources, gold },
 });
 
-const ON = { enabled: true, reject: ENFORCEMENT.reject };
-
-test('every flag has a decision, and the ones enforcement can refuse are exactly the reject flags on the list', () => {
+test('every flag has a decision, and none of them refuses a save', () => {
 	const flags: SaveFlag[] = [
 		'baseline_rich',
 		'networth_exceeds',
@@ -36,49 +34,29 @@ test('every flag has a decision, and the ones enforcement can refuse are exactly
 		'timer_jump',
 		'ember_jump',
 	];
-	for (const flag of flags) assert.ok(['flag', 'clamp', 'reject'].includes(FLAG_POLICY[flag]), flag);
-	assert.deepEqual(rejectedFlags(flags, ON).sort(), ['gems_increase', 'gold_jump']);
-	assert.deepEqual(rejectedFlags(flags, { enabled: false, reject: ENFORCEMENT.reject }), [], 'the kill switch turns every refusal off');
-	assert.deepEqual(rejectedFlags(flags, { enabled: true, reject: new Set<SaveFlag>(['gold_jump']) }), ['gold_jump'], 'a flag off the list is not enforced');
-	assert.deepEqual(rejectedFlags(['castle_jump', 'xp_jump'], ON), [], 'clamp and flag decisions never refuse a save');
+	for (const flag of flags) assert.ok(['flag', 'clamp'].includes(FLAG_POLICY[flag]), flag);
 });
 
-test('normal play never costs an account its ranking or its away pay: a browser left open, an auto-clicker or a late save only leave a recorded flag', () => {
-	for (const flag of ['playtime_fast', 'castle_jump', 'timer_jump'] as SaveFlag[]) {
-		assert.equal(POISON_FLAGS.has(flag), false, `${flag} is not a poison flag`);
-		assert.equal(FLAG_POLICY[flag], 'flag', `${flag} only records`);
-	}
-	assert.equal(POISON_FLAGS.has('networth_exceeds'), true, 'what the game could not have paid still does');
+test('normal play only leaves a recorded flag: a browser left open, an auto-clicker or a late save', () => {
+	for (const flag of ['playtime_fast', 'castle_jump', 'timer_jump'] as SaveFlag[]) assert.equal(FLAG_POLICY[flag], 'flag', `${flag} only records`);
 });
 
-test('shadow mode stores a gold jump flagged; enforcement refuses it and the account keeps its last accepted save', async () => {
+test('a gold jump is stored flagged and the save is accepted: no flag refuses a save', async () => {
 	const { repo, rows } = memoryRepo();
 	const base = honestGame();
 	assert.equal((await accept(repo, base, 0, T0)).kind, 'ok');
 	const cheat = withGold(base, 1e9, base.playSeconds + 60);
-
-	const shadow = await accept(repo, cheat, 1, T0 + 60_000, { enabled: false, reject: ENFORCEMENT.reject });
-	assert.equal(shadow.kind, 'ok');
-	assert.ok(shadow.kind === 'ok' && shadow.flags.includes('gold_jump'));
+	const outcome = await accept(repo, cheat, 1, T0 + 60_000);
+	assert.equal(outcome.kind, 'ok');
+	assert.ok(outcome.kind === 'ok' && outcome.flags.includes('gold_jump'));
 	assert.equal(rows.get('u')!.rev, 2);
-
-	// the same cheat from a fresh account with enforcement on
-	const fresh = memoryRepo();
-	await accept(fresh.repo, base, 0, T0);
-	const refused = await accept(fresh.repo, cheat, 1, T0 + 60_000, ON);
-	assert.equal(refused.kind, 'rejected');
-	assert.ok(refused.kind === 'rejected' && refused.flags.includes('gold_jump'));
-	assert.equal(fresh.rows.get('u')!.rev, 1, 'nothing was stored');
-	assert.equal(fresh.rows.get('u')!.summary.gold, 100, 'the balance is still the last accepted one');
-	// an honest follow-up from the same base is still accepted (the refusal burned nothing)
-	assert.equal((await accept(fresh.repo, withGold(base, 100, base.playSeconds + 60), 1, T0 + 60_000, ON)).kind, 'ok');
 });
 
-test('an honest save raises no flag with enforcement on, and a stock sold at the merchant is no gold jump', async () => {
+test('an honest save raises no flag, and a stock sold at the merchant is no gold jump', async () => {
 	const { repo } = memoryRepo();
 	const base = honestGame();
 	const stocked: PersistedGame = { ...base, resources: { ...base.resources, wood: 400, stone: 300, coal: 200, food: 300 } };
-	assert.equal((await accept(repo, stocked, 0, T0, ON)).kind, 'ok');
+	assert.equal((await accept(repo, stocked, 0, T0)).kind, 'ok');
 	const before = summarize(stocked);
 	assert.ok((before.derived.stockWorth ?? 0) > 0, 'the stock is recorded in gold');
 	// the stock is sold: the gold rises by its worth, the stock is gone
@@ -87,7 +65,7 @@ test('an honest save raises no flag with enforcement on, and a stock sold at the
 		100 + before.derived.stockWorth!,
 		stocked.playSeconds + 30,
 	);
-	const outcome = await accept(repo, sold, 1, T0 + 30_000, ON);
+	const outcome = await accept(repo, sold, 1, T0 + 30_000);
 	assert.equal(outcome.kind, 'ok');
 	assert.deepEqual(outcome.kind === 'ok' ? outcome.flags : null, []);
 });
@@ -127,9 +105,9 @@ test('an honest merchant purchase passes: the gold was earned, the level is paid
 	const base = honestGame();
 	// a long honest game: the income of 12 tiles over a million seconds pays for Foreman level 1
 	const aged = withGold(base, 0, 1_000_000);
-	assert.equal((await accept(repo, aged, 0, T0, ON)).kind, 'ok');
+	assert.equal((await accept(repo, aged, 0, T0)).kind, 'ok');
 	const bought: PersistedGame = { ...aged, playSeconds: aged.playSeconds + 60, merchantUpgrades: { foreman: 1 } };
-	const outcome = await accept(repo, bought, 1, T0 + 60_000, ON);
+	const outcome = await accept(repo, bought, 1, T0 + 60_000);
 	assert.equal(outcome.kind, 'ok');
 	assert.ok(outcome.kind === 'ok' && !outcome.flags.includes('networth_exceeds'), `flags: ${outcome.kind === 'ok' ? outcome.flags : ''}`);
 	assert.equal(outcome.kind === 'ok' ? outcome.economy : 'x', undefined, 'an honest save is paid from its own economy');
