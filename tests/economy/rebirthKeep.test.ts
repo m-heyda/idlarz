@@ -1,4 +1,4 @@
-// Carrying legendary gear through a rebirth: the pure rules (lib/rebirthKeep.ts).
+// Carrying epic and legendary gear through a rebirth: the pure rules (lib/rebirthKeep.ts).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { isKeepable, keepCandidates, keepSlots, parseKeep, placeKept, resolveKeep, refKey } from '../../src/lib/rebirthKeep';
@@ -15,20 +15,22 @@ test('rebirth number N keeps min(N, 15) pieces', () => {
 	assert.equal(keepSlots(0), 0);
 });
 
-test('only Legendary and above can be kept', () => {
+test('only Epic and above can be kept', () => {
 	assert.equal(isKeepable(legend()), true);
 	assert.equal(isKeepable(legend('unique')), true);
-	assert.equal(isKeepable(legend('epic')), false);
+	assert.equal(isKeepable(legend('epic')), true);
+	assert.equal(isKeepable(legend('rare')), false);
+	assert.equal(isKeepable(legend('uncommon')), false);
 	assert.equal(isKeepable(common()), false);
 	assert.equal(isKeepable(null), false);
 });
 
-test('candidates list the bag first, then the worn gear', () => {
-	const bag: BagSlot[] = [null, { item: common() }, { item: legend() }, { id: 'potion_minor', qty: 2 }];
-	const found = keepCandidates(bag, { mainHand: legend(), head: common() });
+test('candidates list the bag first, then the worn gear (epic pieces too, rare ones not)', () => {
+	const bag: BagSlot[] = [null, { item: common() }, { item: legend() }, { id: 'potion_minor', qty: 2 }, { item: legend('epic') }, { item: legend('rare') }];
+	const found = keepCandidates(bag, { mainHand: legend(), head: common(), ring1: legend('epic') });
 	assert.deepEqual(
 		found.map((c) => refKey(c.ref)),
-		['bag:2', 'equip:mainHand'],
+		['bag:2', 'bag:4', 'equip:mainHand', 'equip:ring1'],
 	);
 });
 
@@ -55,6 +57,9 @@ test('resolveKeep checks the places, the count and duplicates', () => {
 		{ ok: false, reason: 'too_many' },
 	);
 	assert.deepEqual(resolveKeep(inv, [{ from: 'bag', index: 1 }], 1), { ok: false, reason: 'not_keepable' });
+	const epicInv = { bag: [{ item: legend('epic') }, { item: legend('rare') }] as BagSlot[], equipment: {} };
+	assert.ok(resolveKeep(epicInv, [{ from: 'bag', index: 0 }], 1).ok, 'an epic piece can be picked');
+	assert.deepEqual(resolveKeep(epicInv, [{ from: 'bag', index: 1 }], 1), { ok: false, reason: 'not_keepable' });
 	assert.deepEqual(resolveKeep(inv, [{ from: 'bag', index: 9 }], 1), { ok: false, reason: 'not_keepable' });
 	assert.deepEqual(resolveKeep(inv, [{ from: 'equip', slot: 'head' }], 1), { ok: false, reason: 'not_keepable' });
 	assert.deepEqual(

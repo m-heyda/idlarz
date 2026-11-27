@@ -36,17 +36,17 @@ const PickCell: React.FC<{ candidate: KeepCandidate; onPick: () => void }> = ({ 
 	);
 };
 
-/** The minibag: every legendary the player owns (in the bag or worn) that is not chosen yet. A click chooses it and closes the list. */
-export const LegendaryPicker: React.FC<{ candidates: KeepCandidate[]; onPick: (candidate: KeepCandidate) => void; onClose: () => void }> = ({
+/** The minibag: every epic or legendary piece the player owns (in the bag or worn) that is not chosen yet. A click chooses it and closes the list. */
+export const KeepPicker: React.FC<{ candidates: KeepCandidate[]; onPick: (candidate: KeepCandidate) => void; onClose: () => void }> = ({
 	candidates,
 	onPick,
 	onClose,
 }) => (
-	<GameModal title='Choose a legendary' size='sm' onClose={onClose}>
-		<div className='rb-stack' data-testid='legendary-picker'>
+	<GameModal title='Choose a piece to keep' size='sm' onClose={onClose}>
+		<div className='rb-stack' data-testid='keep-picker'>
 			<p className='rb-note'>Click a piece to carry it into your next run. Worn pieces have a gold corner.</p>
 			{candidates.length === 0 ? (
-				<p className='rb-note'>Every legendary you own is already chosen.</p>
+				<p className='rb-note'>Every epic and legendary piece you own is already chosen.</p>
 			) : (
 				<div className='rb-pick-grid'>
 					{candidates.map((c) => (
@@ -92,9 +92,9 @@ export interface RebirthConfirmProps {
 }
 
 /**
- * The rebirth confirmation, in two steps. Step 1 lists, as bullets, what is lost and what is kept. Step 2 ("Select legendary to keep") shows one slot for each piece this rebirth lets the player
- * carry over (`keepSlots`): an empty slot is a [+] that opens the minibag of owned legendaries, a filled slot shows the piece (click to put it back). Rebirth or Keep playing ends it. Leaving every
- * slot empty while owning legendaries asks once more ("are you sure?"). With no legendary owned, step 2 is skipped.
+ * The rebirth confirmation, in two steps. Step 1 lists, as bullets, what is lost and what is kept. Step 2 ("Select gear to keep") shows one slot for each piece this rebirth lets the player
+ * carry over (`keepSlots`): an empty slot is a [+] that opens the minibag of owned epic and legendary pieces, a filled slot shows the piece (click to put it back). Rebirth or Keep playing ends it. Leaving every
+ * slot empty while owning keepable pieces asks once more ("are you sure?"). With none owned, step 2 is skipped.
  */
 const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 	gain,
@@ -142,7 +142,7 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 									<li key={line}>{line}</li>
 								))}
 								<li>
-									Up to <b>{slots}</b> legendary {slots === 1 ? 'piece' : 'pieces'} of your choice
+									Up to <b>{slots}</b> epic or legendary {slots === 1 ? 'piece' : 'pieces'} of your choice
 								</li>
 							</ul>
 						</div>
@@ -196,10 +196,10 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 
 	return (
 		<>
-			<GameModal title='Select legendary to keep' size='md' width={760} onClose={onCancel}>
+			<GameModal title='Select gear to keep' size='md' width={760} onClose={onCancel}>
 				<div className='rb-stack' data-testid='rebirth-keep'>
 					<p className='rb-text'>
-						Carry up to <b>{slots}</b> legendary {slots === 1 ? 'piece' : 'pieces'} into your next run. They arrive in your bag. You own{' '}
+						Carry up to <b>{slots}</b> epic or legendary {slots === 1 ? 'piece' : 'pieces'} into your next run. They arrive in your bag. You own{' '}
 						<b>{candidates.length}</b>.
 					</p>
 					<div className='rb-card'>
@@ -231,21 +231,18 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 									<HoverTip
 										key={`free-${i}`}
 										tip={
-											<HintTooltip
-												title='Keep a legendary'
-												text={next ? 'Choose a piece to carry into your next run' : 'Fill the slot before this one first'}
-											/>
+											<HintTooltip title='Keep a piece' text={next ? 'Choose a piece to carry into your next run' : 'Fill the slot before this one first'} />
 										}
 									>
 										<button
 											type='button'
 											className='ds-slot ds-slot-add'
-											aria-label='Add a legendary to keep'
+											aria-label='Add a piece to keep'
 											data-testid='keep-add'
 											style={next ? undefined : { opacity: 0.45 }}
 											onClick={() => {
 												if (!next) return notify('Fill the earlier slot first', 'error');
-												if (free.length === 0) return notify('You have no more legendaries to keep', 'error');
+												if (free.length === 0) return notify('You have no more epic or legendary pieces to keep', 'error');
 												setPicking(true);
 											}}
 										>
@@ -259,8 +256,8 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 					{sure && (
 						<div className='rb-card rb-warn' data-testid='keep-none-warning'>
 							<p className='rb-warn-text'>
-								You own <b>{candidates.length}</b> {candidates.length === 1 ? 'legendary' : 'legendaries'}. Are you sure you do not want to keep any of them?
-								Everything in your bag and worn will be lost.
+								You own <b>{candidates.length}</b> epic or legendary {candidates.length === 1 ? 'piece' : 'pieces'}. Are you sure you do not want to keep any of
+								them? Everything in your bag and worn will be lost.
 							</p>
 						</div>
 					)}
@@ -273,7 +270,7 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 				</div>
 			</GameModal>
 			{picking && (
-				<LegendaryPicker
+				<KeepPicker
 					candidates={free}
 					onClose={() => setPicking(false)}
 					onPick={(c) => {

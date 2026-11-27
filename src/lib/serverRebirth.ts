@@ -17,7 +17,7 @@ export interface RebirthChoice {
  * save (so the server judges the game the player is looking at), the server checks the requirements, computes the Embers and wipes its bag and
  * gear, and only then does the browser start the new run with the Embers the server named. The save that follows is capped at that number.
  *
- *  - `ok`: the server ran it; `gain` is what it pays and `kept` the legendary pieces it carried into the new bag (the places the player picked, read from the server's own inventory).
+ *  - `ok`: the server ran it; `gain` is what it pays and `kept` the epic and legendary pieces it carried into the new bag (the places the player picked, read from the server's own inventory).
  *  - `refused`: the server does not see a rebirth in the stored save (not ready yet, or it would pay nothing): the browser must not start one. `badKeep`: the picks did not stand (the bag changed since).
  *  - `unavailable`: no cloud save this session, or the server could not be reached. The browser rebirths on its own, as before, and keeps nothing (the server wipes its inventory
  *    when that save lands); the server still bounds the Embers of that save (`settleEmbers`).
