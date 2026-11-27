@@ -145,3 +145,20 @@
 	cursor: default;
 	opacity: 0.7;
 }
+
+/* the castle's crown while zoomed in */
+.minimap-crown {
+	position: absolute;
+	z-index: 1;
+	font-size: 18px;
+	line-height: 1;
+	color: #ffd860;
+	text-shadow:
+		0 0 2px #15091f,
+		0 1px 0 #15091f,
+		1px 0 0 #15091f,
+		-1px 0 0 #15091f,
+		0 -1px 0 #15091f;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}

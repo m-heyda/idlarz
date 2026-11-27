@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
+import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import {
 	CHEST_COLOR,
 	MINIMAP_BOX_DEFAULT,
@@ -10,6 +11,8 @@ import {
 	minimapLayout,
 	minimapMarkers,
 	minimapToTile,
+	tileToMinimap,
+	type MinimapLayout,
 	zoomedLayout,
 	paintChestGlow,
 	paintMinimap,
@@ -24,6 +27,8 @@ import { useMapGame, useMapView } from './mapSource';
 /** Where the dragged size is remembered (localStorage, see lib/uiPrefs) */
 const SIZE_PREF = 'minimapSize';
 /** Window space the overview must leave free: the header above it, the combat panel below and a gutter at the sides (css px) */
+/** A press that moves less than this (px) is a click, not a drag */
+const DRAG_PX = 4;
 const RESERVED = { w: 48, h: 240 };
 
 const room = (): { w: number; h: number } => ({ w: window.innerWidth - RESERVED.w, h: window.innerHeight - RESERVED.h });
@@ -37,6 +42,17 @@ const readBox = () => {
 
 /** The picture is repainted at most this often while the map changes (a purchase repaints one frame later, a flood of them is batched) */
 const REPAINT_MS = 200;
+
+/** The castle while zoomed in: a gold crown over its tile (the tile itself is just a yellow square at that size), hidden when the castle is outside the zoomed part */
+const Crown: React.FC<{ layout: MinimapLayout }> = ({ layout }) => {
+	const c = tileToMinimap(layout, CASTLE_X + 0.5, CASTLE_Y + 0.5);
+	if (c.x < 0 || c.y < 0 || c.x > layout.width || c.y > layout.height) return null;
+	return (
+		<span className='minimap-crown' style={{ left: c.x, top: c.y }} title='Your castle' aria-hidden>
+			♛
+		</span>
+	);
+};
 
 const MinimapBody: React.FC = () => {
 	const game = useMapGame();
@@ -62,7 +78,7 @@ const MinimapBody: React.FC = () => {
 	// Zoom (the + and - buttons): 1 shows the whole map, more zooms in on `focus` (a tile), which follows the screen when it leaves the zoomed part and can be dragged with the right mouse button
 	const [zoom, setZoom] = useState(1);
 	const [focus, setFocus] = useState({ x: 0, y: 0 });
-	const panning = useRef<{ x: number; y: number; fx: number; fy: number } | null>(null);
+	const panning = useRef<{ x: number; y: number; fx: number; fy: number; moved: boolean; click: boolean } | null>(null);
 
 	const fitLayout = useMemo(() => minimapLayout(tiles.bounds, box), [tiles.bounds, box]);
 	const layout = useMemo(() => zoomedLayout(fitLayout, zoom, focus), [fitLayout, zoom, focus]);
@@ -101,13 +117,13 @@ const MinimapBody: React.FC = () => {
 
 	// The outline of the part of the map on screen follows every pan frame, so it is moved straight in the DOM (no React render per frame)
 	useLayoutEffect(() => {
-		const place = () => {
+		const place = (follow = false) => {
 			const el = viewRef.current;
 			if (!el) return;
 			const { x, y, zoom, w, h } = view.getState();
 			const tilePx = TILE_SIZE * zoom;
 			const rect = viewRectangle(layout, { minX: -x / tilePx, maxX: (w - x) / tilePx, minY: -y / tilePx, maxY: (h - y) / tilePx });
-			if (layout.scale > fitLayout.scale) {
+			if (follow && layout.scale > fitLayout.scale) {
 				// zoomed in: when the middle of the screen leaves the zoomed part, it moves along
 				const cx = (w / 2 - x) / tilePx;
 				const cy = (h / 2 - y) / tilePx;
@@ -121,7 +137,7 @@ const MinimapBody: React.FC = () => {
 			el.style.height = `${Math.max(2, rect.height)}px`;
 		};
 		place();
-		return view.subscribe(place);
+		return view.subscribe(() => place(true));
 	}, [layout, fitLayout, view]);
 
 	// A smaller window shrinks an overview that no longer fits
@@ -135,6 +151,12 @@ const MinimapBody: React.FC = () => {
 		return () => window.removeEventListener('resize', fitToWindow);
 	}, []);
 
+	// The zoomed part never leaves the explored map, so the overview cannot be dragged into empty space
+	const keepOnMap = (f: { x: number; y: number }) => {
+		const a = minimapToTile(fitLayout, 0, 0);
+		const z = minimapToTile(fitLayout, fitLayout.width, fitLayout.height);
+		return { x: Math.min(z.x, Math.max(a.x, f.x)), y: Math.min(z.y, Math.max(a.y, f.y)) };
+	};
 	const zoomBy = (dir: 1 | -1, toFit = false) => {
 		const at = MINIMAP_ZOOMS.indexOf(zoom as (typeof MINIMAP_ZOOMS)[number]);
 		const next = toFit ? 1 : MINIMAP_ZOOMS[Math.min(MINIMAP_ZOOMS.length - 1, Math.max(0, at + dir))];
@@ -167,26 +189,30 @@ const MinimapBody: React.FC = () => {
 		<div
 			className='minimap ds-root ds-minimap'
 			style={{ width: box.w, height: box.h }}
-			title={`Map overview: click or drag to move the view, right-drag to pan when zoomed in${summary.length ? ` (${summary.join(', ')})` : ''}`}
+			title={`Map overview: click or drag to move the view, when zoomed in hold and drag to pan the overview${summary.length ? ` (${summary.join(', ')})` : ''}`}
 			aria-label={`Map overview${summary.length ? `, ${summary.join(', ')}` : ''}`}
 			onPointerDown={(e) => {
-				if (e.button === 2 || e.button === 1) {
-					// the right or middle button drags the zoomed part of the overview around (the screen stays where it is)
-					panning.current = { x: e.clientX, y: e.clientY, fx: focus.x, fy: focus.y };
-					e.currentTarget.setPointerCapture(e.pointerId);
+				if (e.button !== 0 && e.button !== 1 && e.button !== 2) return;
+				e.currentTarget.setPointerCapture(e.pointerId);
+				if (zoom > 1) {
+					// zoomed in, holding a button and dragging moves the overview itself (the screen stays where it is); a click without a drag still goes there
+					panning.current = { x: e.clientX, y: e.clientY, fx: focus.x, fy: focus.y, moved: false, click: e.button === 0 };
 					return;
 				}
 				if (e.button !== 0) return;
 				dragging.current = true;
-				e.currentTarget.setPointerCapture(e.pointerId);
 				moveTo(e);
 			}}
 			onPointerMove={(e) => {
 				const pan = panning.current;
-				if (pan && zoom > 1) setFocus({ x: pan.fx - (e.clientX - pan.x) / layout.scale, y: pan.fy - (e.clientY - pan.y) / layout.scale });
-				else if (dragging.current) moveTo(e);
+				if (pan) {
+					if (!pan.moved && Math.hypot(e.clientX - pan.x, e.clientY - pan.y) < DRAG_PX) return;
+					pan.moved = true;
+					setFocus(keepOnMap({ x: pan.fx - (e.clientX - pan.x) / layout.scale, y: pan.fy - (e.clientY - pan.y) / layout.scale }));
+				} else if (dragging.current) moveTo(e);
 			}}
-			onPointerUp={() => {
+			onPointerUp={(e) => {
+				if (panning.current?.click && !panning.current.moved) moveTo(e);
 				dragging.current = false;
 				panning.current = null;
 			}}
@@ -199,6 +225,7 @@ const MinimapBody: React.FC = () => {
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
 			<div ref={viewRef} className='minimap-view' />
+			{zoom > 1 && <Crown layout={layout} />}
 			<div className='minimap-zoom' onPointerDown={(e) => e.stopPropagation()}>
 				<button
 					type='button'
