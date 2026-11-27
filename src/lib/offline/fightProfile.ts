@@ -2,7 +2,7 @@ import { ITEM_CATALOG } from '@/catalog';
 import { quickHealOf } from '@/catalog/buffs';
 import { COMBAT } from '@/config/combatConfig';
 import { autoUseUnlocked } from '@/lib/combat';
-import { prestigeOfCore } from '@/lib/offline/prestigeOfCore';
+import { growthLimits, prestigeOfCore } from '@/lib/offline/prestigeOfCore';
 import { levelAtAge, monsterStats } from '@/lib/monsters';
 import { pushEvent, type FightCtx } from '@/lib/offline/fightContext';
 import type { CombatState, PlayerProfile } from '@/lib/offline/fightTypes';
@@ -72,7 +72,7 @@ export const startFight = (ctx: FightCtx, t: number, target: { ticket: MonsterTi
 	const c = ctx.c;
 	// the first fight with a type discovers it (stats.seen): the "?" on the map and in the combat window turns into the monster
 	ctx.ledger = { ...ctx.ledger, stats: recordEncounter(ctx.ledger.stats, target.type, ctx.env.nowSec * 1000) };
-	const level = levelAtAge(target.ticket.spawnLevel ?? 1, t - target.ticket.at, {}, target.ticket.growCap);
+	const level = levelAtAge(target.ticket.spawnLevel ?? 1, t - target.ticket.at, growthLimits(ctx.env.stored), target.ticket.growCap);
 	const stats = monsterStats(target.type, level);
 	const profile: PlayerProfile = ctx.profileNow;
 	c.hp = Math.min(c.hp, profile.maxHp);
