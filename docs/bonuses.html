@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Idle Realm: bonus system map</title>
+<!-- Companion of docs/BONUSES.md. Cap values carry test-checked comment markers (tests/docs/bonuses.test.ts); keep both files in sync. -->
+<style>
+:root{--bg:#f7f6f2;--card:#fff;--ink:#1d1d1b;--mute:#6b6a64;--line:#e2e0d8;--add:#2a7d4f;--addbg:#e3f3ea;--mult:#b4531a;--multbg:#fbe9dc;--base:#2d5fa8;--basebg:#e2ecfa;--cap:#a1203a;--capbg:#fbe3e8;--flat:#6a4aa8;--flatbg:#ece6f8}
+@media (prefers-color-scheme:dark){:root{--bg:#161614;--card:#201f1c;--ink:#ecebe5;--mute:#9b9a92;--line:#34332e;--add:#6cc796;--addbg:#173326;--mult:#f0a06a;--multbg:#3a2417;--base:#7fabf0;--basebg:#172a47;--cap:#f08a9f;--capbg:#3d1a23;--flat:#b79df0;--flatbg:#2b2147}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 system-ui,Segoe UI,sans-serif}
+header{padding:28px 32px 8px;max-width:1240px;margin:auto}
+h1{margin:0 0 4px;font-size:26px}
+h2{font-size:19px;margin:34px 0 10px}
+h3{font-size:15px;margin:0 0 6px}
+p.lead{color:var(--mute);margin:0 0 12px;max-width:80ch}
+main{max-width:1240px;margin:auto;padding:0 32px 60px}
+nav{position:sticky;top:0;background:var(--bg);border-bottom:1px solid var(--line);z-index:5}
+nav div{max-width:1240px;margin:auto;padding:8px 32px;display:flex;gap:6px;flex-wrap:wrap}
+nav a{color:var(--ink);text-decoration:none;padding:4px 10px;border-radius:999px;border:1px solid var(--line);font-size:13px}
+nav a:hover{background:var(--card)}
+.legend{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0}
+.pill{padding:2px 10px;border-radius:999px;font-size:12px;font-weight:600;white-space:nowrap}
+.BASE{background:var(--basebg);color:var(--base)}.ADD{background:var(--addbg);color:var(--add)}.MULT{background:var(--multbg);color:var(--mult)}.CAP{background:var(--capbg);color:var(--cap)}.FLAT{background:var(--flatbg);color:var(--flat)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:14px}
+code{font:12.5px ui-monospace,Consolas,monospace;background:var(--bg);padding:1px 5px;border-radius:4px}
+/* pipelines */
+.pipe{display:flex;align-items:stretch;flex-wrap:wrap;gap:8px;margin:8px 0}
+.stage{flex:1 1 200px;border-radius:10px;padding:10px 12px;border:1px solid var(--line);background:var(--card);position:relative}
+.stage .k{font-size:11px;font-weight:700;letter-spacing:.04em}
+.stage ul{margin:6px 0 0;padding-left:16px;font-size:13px}
+.stage.BASE{border-color:var(--base)}.stage.ADD{border-color:var(--add)}.stage.MULT{border-color:var(--mult)}.stage.CAP{border-color:var(--cap)}
+.op{align-self:center;font-weight:700;font-size:20px;color:var(--mute)}
+.note{font-size:13px;color:var(--mute);margin:6px 0}
+.example{font-size:13px;background:var(--card);border:1px dashed var(--line);border-radius:8px;padding:8px 12px;margin:8px 0}
+/* tables */
+table{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--line);border-radius:10px;overflow:hidden;font-size:13.5px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{background:var(--bg);font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mute)}
+td.num{font-weight:700;font-variant-numeric:tabular-nums;white-space:nowrap}
+.tag{font-size:11px;padding:1px 8px;border-radius:999px;background:var(--bg);border:1px solid var(--line)}
+.tools{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+input[type=search]{padding:7px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);min-width:260px}
+button.f{padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:var(--card);color:var(--ink);cursor:pointer;font-size:13px}
+button.f.on{background:var(--ink);color:var(--bg)}
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.calc label{font-size:12px;color:var(--mute);display:block}
+.calc input{width:100%;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink)}
+.out{font-size:20px;font-weight:700;margin-top:8px}
+.warn li{margin:4px 0}
+</style>
+</head>
+<body>
+<header>
+  <h1>Bonus system map</h1>
+  <p class="lead">Every bonus the game applies, which bracket it lands in, and the cap that stops it. Companion of <code>docs/BONUSES.md</code> (the agent-readable version). Constants named here are the source of truth; change them in code, then update this page and the test mapping.</p>
+  <div class="legend">
+    <span class="pill BASE">BASE: a starting amount everything multiplies</span>
+    <span class="pill ADD">ADD%: summed inside one bracket</span>
+    <span class="pill MULT">MULT: its own bracket, multiplied</span>
+    <span class="pill FLAT">FLAT: added to a total</span>
+    <span class="pill CAP">CAP: a clamp</span>
+  </div>
+</header>
+<nav><div><a href="#economy">Economy</a><a href="#combat">Combat</a><a href="#loot">Loot and rewards</a><a href="#sources">Sources</a><a href="#caps">Cap register</a><a href="#calc">Stack calculator</a><a href="#drift">Known drift</a><a href="#change">When you change a bonus</a></div></nav>
+<main>
+
+<h2 id="economy">1. Economy: resources per second</h2>
+<p class="note">One function combines it all: <code>calculateResourceBreakdown</code> in <code>src/utils/game/income.ts</code>. Tick, offline grant and server summary all call it.</p>
+<div class="pipe">
+  <div class="stage BASE"><div class="k">BASE (summed)</div><ul>
+    <li>Realm base (gold 0.1, xp 0.25)</li>
+    <li>Farm output x (1 + Scarecrow% + gear Farm Yield%)</li>
+    <li>Tiles: rate x 1.3 x <b>(1 + 0.25 x same-biome neighbours)</b></li>
+    <li>Producers + Extractors</li>
+    <li><b>Castle area bonus</b>: each tile in range adds its output x bonus</li>
+    <li>Castle flat XP: 0.5 x (level - 1)</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage ADD"><div class="k">1 + ADD% bracket</div><ul>
+    <li><b>Castle level</b> (20% doubling to L6, then +320%/lvl; L10 = +1920%)</li>
+    <li>Imperial Decree doubles the castle term</li>
+    <li>Plains meat +5% per plains tile (meat)</li>
+    <li>Attributes 2.5% per point</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage MULT"><div class="k">MULT buckets</div><ul>
+    <li><b>Ember</b>: 1 + 0.12 x earned^0.6</li>
+    <li><b>Foreman</b>: 1 + 1%/lvl + Overseer 3%/lvl (not XP)</li>
+    <li><b>Gear income</b> (cap 50) x <b>Paragon income</b> (0.8%/pt, 25 pts) (not XP)</li></ul></div>
+  <div class="op">&rarr;</div>
+  <div class="stage CAP"><div class="k">CAP</div><ul><li>Stockpile 1e21</li><li>Offline: 72 h, 100% efficiency</li></ul></div>
+</div>
+<div class="example">Example: base 100/s, castle L10 (+1920%), Ember x2.0, gear +50%, no other bonus &rarr; 100 x (1 + 19.2) x 2.0 x 1.5 = <b>6,060/s</b>. The castle term is <i>added</i> to other additive bonuses; Ember and gear are <i>multiplied</i>.</div>
+
+<h2 id="combat">2. Combat: one frozen fight profile</h2>
+<p class="note">Built once per fight by <code>playerProfile()</code> (<code>src/lib/offline/profile.ts</code>); the character window mirrors it in <code>effectiveStats()</code>.</p>
+<div class="pipe">
+  <div class="stage BASE"><div class="k">BASE</div><ul><li>Weapon / gear damage (level scale x quality x rarity)</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage ADD"><div class="k">ADD% bracket</div><ul><li>STR 2%/pt (INT 2.4%/pt for staff/wand), above 5</li><li>Merchant: Might / Arcana</li><li>Ember: Brawn / Sorcery</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage MULT"><div class="k">gear damage %</div><ul><li>Sets + legendary perks, summed then <b>capped 50</b></li></ul></div>
+  <div class="op">x</div>
+  <div class="stage MULT"><div class="k">Idol / Watchtower / Paragon</div><ul><li>Blight Idol 2%/lvl, Paragon 2 x sqrt(pts)</li><li><b>uncapped</b></li></ul></div>
+  <div class="op">x</div>
+  <div class="stage MULT"><div class="k">Mastery</div><ul><li>vs that monster type, cap 20</li></ul></div>
+  <div class="op">&rarr;</div>
+  <div class="stage CAP"><div class="k">monster armor</div><ul><li>x (1 - armorReduction)</li></ul></div>
+</div>
+<div class="grid">
+  <div class="card"><h3>Offence</h3><ul class="note"><li>Crit chance clamp 75, super crit 50</li><li>Crit damage: x2 / x5 times (1 + attr% + min(gear,50)%), then x Paragon crit</li><li>Attack speed: additive bracket, gear share cap 25</li><li>Armor pen cap 30</li></ul></div>
+  <div class="card"><h3>Defence</h3><ul class="note"><li>Armor = a / (a + 40), halved past 0.5, ceiling 75%</li><li>Dodge cap 40 (gear only)</li><li>Max HP uncapped: (85 + 3 VIT + 0.25 CHA + gear) x gear% x Idol</li><li>Leech cap 15 (Paragon/Idol after), thorns 25, heal on kill 8</li></ul></div>
+  <div class="card"><h3>Potions</h3><ul class="note"><li>Power cap 50 (Paragon after)</li><li>Slots max 5, cooldown floor 4 s</li><li>Max 5 buffs at once</li></ul></div>
+</div>
+
+<h2 id="loot">3. Kill rewards and loot</h2>
+<div class="pipe">
+  <div class="stage BASE"><div class="k">BASE</div><ul><li>min(income/s x rewardSec, monster cap) x levelMult^(L-ref)</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage ADD"><div class="k">gold only</div><ul><li>(1 + 0.005 x <b>Luck</b>)</li><li>(1 + <b>Gold Find</b>%) uncapped gear part</li></ul></div>
+  <div class="op">x</div>
+  <div class="stage MULT"><div class="k">MULT buckets</div><ul><li>Golden x3</li><li>(1 + Kill Rewards%): gear cap 60 + Idol + Paragon 1.5 x sqrt</li><li>(1 + mastery gold/xp, cap 25)</li><li>(1 + deed, cap 5)</li></ul></div>
+</div>
+<p class="note">Gear drops: rolls x (1 + 0.002 x Luck) x (1 + mastery loot); rarity weights of rare+ x min(1.6, 1 + 0.004 x Luck) x (1 + Epic Find%), epic pity +5% per miss up to x3. XP is not touched by Luck or Gold Find.</p>
+
+<h2 id="sources">4. Sources by system</h2>
+<div class="grid">
+  <div class="card"><h3>Castle</h3><p class="note"><code>src/config/castle.ts</code>, <code>src/lib/castleWard.ts</code></p><ul class="note"><li><span class="pill ADD">ADD%</span> level modifier, L10 = +1920%</li><li><span class="pill BASE">BASE</span> area bonus +50% below L7, then radius x 100% (+400% at L10, radius 4 = 9x9)</li><li>Ward from L7: no monsters or chests in range</li><li>L11-15 only with Castle Expansion; range and area do not grow past L10</li></ul></div>
+  <div class="card"><h3>Adjacent tiles</h3><p class="note"><code>SCALING_CONFIG.adjacencyBonus</code> in <code>src/config/economy.ts</code></p><ul class="note"><li>+25% per same-biome 4-neighbour: x1.0 to x2.0 per tile</li><li>Castle tile gets none; Producers/Extractors are not neighbour based</li><li>Producer size bonus: +2% per owned tile of its biome, cap +100%, plus biome milestones +25%</li></ul></div>
+  <div class="card"><h3>Buildings and Idols</h3><p class="note"><code>src/config/buildings.ts</code>, <code>src/lib/idolEconomy.ts</code></p><ul class="note"><li>Producer/Extractor: <span class="pill BASE">BASE</span> into income</li><li>Idols 2%/level, general buildings 1%/level/copy: fields of <code>IdolEconomy</code> (XP, damage, HP/armor, kill rewards, offline, click, sell, luck, chest speed, build time)</li><li>Build time total cap 60%</li></ul></div>
+  <div class="card"><h3>Paragon</h3><p class="note"><code>src/config/paragon.ts</code></p><ul class="note"><li>Capped: rate x min(points, 25)</li><li>Uncapped: rate x sqrt(points) (100 pts at k=2: +20%, 1000 pts: +63%)</li><li>Combat: critDamage, bossTimer, lifeLeech (capped), damage, maxLife</li><li>Economy: income, xpGain, tileDiscount (capped), clickGold, killRewards</li><li>Fortune: luck, goldFind, goldenChance (capped), chestDrop, epicFind</li><li>Realm: offlineEff, buildSpeed, potionPower (capped), paragonXp, craftXp</li></ul></div>
+  <div class="card"><h3>Merchant (gold shop)</h3><p class="note"><code>src/config/merchant.ts</code></p><ul class="note"><li>Economy: Haggler 3% sell, Foreman 1% income, Skinner 5% meat/hide, Charm 2 luck, Bulk 1pt tile discount</li><li>Combat: Quick Hands, Keen Eye, Deadly Aim, Might, Arcana, Vampiric Fang, Second Wind</li><li>Costs: ceil(base x growth^level); levels 6-10</li></ul></div>
+  <div class="card"><h3>Ember shop (rebirth)</h3><p class="note"><code>src/config/rebirth.ts</code></p><ul class="note"><li>Permanent twins of merchant upgrades plus cap-raisers: Castle Expansion (10 to 15), Treasury Charter (+3 discount cap/lvl), Imperial Decree (castle x2), Master Masonry, Idol Mastery</li><li>Ember income multiplier is global and never lowered by spending</li></ul></div>
+  <div class="card"><h3>Gem store</h3><p class="note"><code>src/config/gemShop.ts</code></p><ul class="note"><li>No production or combat stat</li><li>Additional Builder (max 3), Master Workbench +0.5 craft speed, Overnight Orders +24 h, Bulk Discount -10% craft cost, Building Slot +1 copy</li><li>Cosmetics and respecs only otherwise</li></ul></div>
+  <div class="card"><h3>Gear, sets, attributes</h3><p class="note"><code>src/catalog/perkCaps.ts</code>, <code>src/lib/inventory.ts</code></p><ul class="note"><li>Items + affixes + legendary perks + set bonuses summed, then <code>capPerks</code></li><li>Attributes: base 5, bonuses above it; budget per level + 20 per rebirth</li><li>Classes: small flat passives</li></ul></div>
+</div>
+
+<h2 id="caps">5. Cap register</h2>
+<p class="note">Search or filter. Values are checked against the code by <code>tests/docs/bonuses.test.ts</code>.</p>
+<div class="tools">
+  <input id="q" type="search" placeholder="Search cap, constant, or text...">
+  <button class="f on" data-g="">All</button><button class="f" data-g="Economy">Economy</button><button class="f" data-g="Perk caps">Perk caps</button><button class="f" data-g="Combat">Combat</button><button class="f" data-g="Progression">Progression</button>
+</div>
+<table id="captable"><thead><tr><th>Cap</th><th>Value</th><th>Constant</th><th>Applies to</th><th>Group</th></tr></thead><tbody>
+<tr data-g="Economy"><td>Stockpile / XP ceiling</td><td class="num">1e21 <!-- cap:resource.cap=1e21 --></td><td><code>RESOURCE_CAP</code></td><td>all resources</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Tile yield scale</td><td class="num">1.3 <!-- cap:biome.yieldScale=1.3 --></td><td><code>BIOME_YIELD.scale</code></td><td>every tile output (BASE)</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Same-biome neighbour bonus</td><td class="num">0.25 <!-- cap:tile.adjacencyBonus=0.25 --></td><td><code>SCALING_CONFIG.adjacencyBonus</code></td><td>per same-biome 4-neighbour, max 4 = +100%</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Castle max level</td><td class="num">10 <!-- cap:castle.maxLevel=10 --></td><td><code>CASTLE_UPGRADE.maxLevel</code></td><td>15 with Castle Expansion (Ember)</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Castle late step</td><td class="num">3.2 <!-- cap:castle.lateLevelStep=3.2 --></td><td><code>CASTLE_UPGRADE.lateLevelStep</code></td><td>+320% per level after L6 (L10 = +1920%)</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Castle area bonus below L7</td><td class="num">0.5 <!-- cap:castle.areaEarlyBonus=0.5 --></td><td><code>CASTLE_AREA_BONUS.earlyBonus</code></td><td>+50% of in-range tile output</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Ember income factor</td><td class="num">0.12 <!-- cap:ember.incomePerPoint=0.12 --></td><td><code>REBIRTH.incomePerPoint</code></td><td>1 + 0.12 x earned^0.6 (MULT)</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Ember income exponent</td><td class="num">0.6 <!-- cap:ember.incomeExponent=0.6 --></td><td><code>REBIRTH.incomeExponent</code></td><td>diminishing returns</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Producer size bonus</td><td class="num">1 <!-- cap:producer.bonusCap=1 --></td><td><code>BUILDING_RULES.producer.bonusCap</code></td><td>+100% max (0.02 per owned tile of biome)</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Building level</td><td class="num">5 <!-- cap:building.maxLevel=5 --></td><td><code>BUILDING_RULES.maxLevel</code></td><td>hard 15 in HARD_LIMITS</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Idol bonus per level</td><td class="num">2 <!-- cap:idol.perLevel=2 --></td><td><code>IDOL_RULES.perLevel</code></td><td>% per level, level 5 = 10%</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>General building per level</td><td class="num">1 <!-- cap:general.perLevel=1 --></td><td><code>GENERAL_RULES.perLevel</code></td><td>% per level per copy</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Gear Farm Yield</td><td class="num">25 <!-- cap:gear.farmYield=25 --></td><td><code>STAT_RULES.farmYieldCap</code></td><td>% more farm products</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Gear tile discount</td><td class="num">10 <!-- cap:gear.tileDiscount=10 --></td><td><code>STAT_RULES.tileDiscountGearCap</code></td><td>percentage points</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Charisma tile discount</td><td class="num">25 <!-- cap:tile.charismaDiscountCap=25 --></td><td><code>CHARACTER_STAT_CONFIG.tileDiscountCapPercent</code></td><td>0.5 per point</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Tile discount base cap (total)</td><td class="num">45 <!-- cap:tile.discountBaseCap=45 --></td><td><code>REBIRTH.discountCapPercent</code></td><td>+3 per Treasury Charter level, all sources summed</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Tile discount hard max</td><td class="num">80 <!-- cap:tile.discountMax=80 --></td><td><code>REBIRTH.discountMaxPercent</code></td><td>whatever raises the cap</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Gear Build Speed</td><td class="num">15 <!-- cap:gear.buildSpeed=15 --></td><td><code>STAT_RULES.buildSpeedCap</code></td><td>% off build timers</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Total build time cut</td><td class="num">60 <!-- cap:build.timeCap=60 --></td><td><code>IDOL_RULES.buildTimeCap</code></td><td>all sources summed</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Economy"><td>Crafting discount</td><td class="num">0.25 <!-- cap:craft.discountMax=0.25 --></td><td><code>CRAFT_DISCOUNT_MAX</code></td><td>share of craft resources</td><td><span class="tag">Economy</span></td></tr>
+<tr data-g="Perk caps"><td>Gear income %</td><td class="num">50 <!-- cap:perk.incomePct=50 --></td><td><code>PERK_CAPS.incomePct</code></td><td>gear bucket only; Paragon income is its own bucket</td><td><span class="tag">Perk caps</span></td></tr>
+<tr data-g="Perk caps"><td>Gear + class XP %</td><td class="num">50 <!-- cap:perk.xpPct=50 --></td><td><code>PERK_CAPS.xpPct</code></td><td>Idol and Paragon XP added after</td><td><span class="tag">Perk caps</span></td></tr>
+<tr data-g="Perk caps"><td>Gear kill reward %</td><td class="num">60 <!-- cap:perk.killRewardPct=60 --></td><td><code>PERK_CAPS.killRewardPct</code></td><td>Idol and Paragon part uncapped</td><td><span class="tag">Perk caps</span></td></tr>
+<tr data-g="Perk caps"><td>Gear click %</td><td class="num">40 <!-- cap:perk.clickPct=40 --></td><td><code>PERK_CAPS.clickPct</code></td><td>gear bucket only</td><td><span class="tag">Perk caps</span></td></tr>
+<tr data-g="Perk caps"><td>Gear damage %</td><td class="num">50 <!-- cap:perk.damagePct=50 --></td><td><code>PERK_CAPS.damagePct</code></td><td>Idol / Paragon damage uncapped on top</td><td><span class="tag">Perk caps</span></td></tr>
+<tr data-g="Combat"><td>Gear life leech</td><td class="num">15 <!-- cap:gear.lifeLeech=15 --></td><td><code>STAT_RULES.lifeLeechCap</code></td><td>gear + merchant + Ember; Paragon/Idol added after</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Gear attack speed</td><td class="num">25 <!-- cap:gear.atkSpeed=25 --></td><td><code>STAT_RULES.atkSpeedGearCap</code></td><td>% more attacks</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Gear crit damage</td><td class="num">50 <!-- cap:gear.critDamage=50 --></td><td><code>STAT_RULES.critDamageGearCap</code></td><td>Paragon crit damage multiplies on top</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Armor penetration</td><td class="num">30 <!-- cap:gear.armorPen=30 --></td><td><code>STAT_RULES.armorPenCap</code></td><td>% of monster armor ignored</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Thorns</td><td class="num">25 <!-- cap:gear.thorns=25 --></td><td><code>STAT_RULES.thornsCap</code></td><td>% of monster hit returned</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Heal on kill</td><td class="num">8 <!-- cap:gear.healOnKill=8 --></td><td><code>STAT_RULES.healOnKillCap</code></td><td>% of max HP per kill</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Gear boss timer (s)</td><td class="num">30 <!-- cap:gear.bossTimerSec=30 --></td><td><code>STAT_RULES.bossTimerCapSec</code></td><td>Paragon adds more</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Crit chance</td><td class="num">75 <!-- cap:crit.maxChance=75 --></td><td><code>COMBAT.crit.maxCritChance</code></td><td>final stat</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Super crit chance</td><td class="num">50 <!-- cap:crit.maxSuperChance=50 --></td><td><code>COMBAT.crit.maxSuperChance</code></td><td>final stat</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Dodge</td><td class="num">40 <!-- cap:dodge.max=40 --></td><td><code>COMBAT.maxDodge</code></td><td>gear only</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Potion power (gear)</td><td class="num">50 <!-- cap:potion.powerMaxPct=50 --></td><td><code>COMBAT.potionPowerMaxPct</code></td><td>Paragon adds after</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Potion slots</td><td class="num">5 <!-- cap:potion.maxSlots=5 --></td><td><code>COMBAT.potionMaxSlots</code></td><td>base 3 + belt</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Potion cooldown floor (s)</td><td class="num">4 <!-- cap:potion.cooldownMinSec=4 --></td><td><code>COMBAT.potionCooldownMinSec</code></td><td>base 8 s</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Combat"><td>Mastery damage / defense / loot</td><td class="num">20 <!-- cap:mastery.damage=20 --></td><td><code>MASTERY_CAPS.damage</code></td><td>gold and xp are 25</td><td><span class="tag">Combat</span></td></tr>
+<tr data-g="Progression"><td>Paragon capped upgrades</td><td class="num">25 <!-- cap:paragon.capPoints=25 --></td><td><code>PARAGON_CAP_POINTS</code></td><td>points; uncapped ones use sqrt</td><td><span class="tag">Progression</span></td></tr>
+<tr data-g="Progression"><td>Deed milestone bonus</td><td class="num">5 <!-- cap:deed.capPct=5 --></td><td><code>DEED_BONUS_CAP_PCT</code></td><td>% per stat (kill gold / xp)</td><td><span class="tag">Progression</span></td></tr>
+<tr data-g="Progression"><td>Luck spawn interval floor</td><td class="num">0.5 <!-- cap:luck.spawnFloor=0.5 --></td><td><code>LUCK.spawnIntervalFloor</code></td><td>x base interval</td><td><span class="tag">Progression</span></td></tr>
+<tr data-g="Progression"><td>Luck rarity multiplier</td><td class="num">1.6 <!-- cap:luck.rarityCap=1.6 --></td><td><code>LUCK.rarityCap</code></td><td>x on rare+ weights</td><td><span class="tag">Progression</span></td></tr>
+<tr data-g="Progression"><td>Chest gem chance</td><td class="num">0.15 <!-- cap:luck.gemCap=0.15 --></td><td><code>LUCK.gem.cap</code></td><td>15%</td><td><span class="tag">Progression</span></td></tr>
+<tr data-g="Progression"><td>Golden monster chance</td><td class="num">0.1 <!-- cap:luck.goldenCap=0.1 --></td><td><code>LUCK.goldenMonster.cap</code></td><td>10% before Paragon points</td><td><span class="tag">Progression</span></td></tr>
+</tbody></table>
+
+<h2 id="calc">6. Stack calculator: add vs multiply</h2>
+<div class="card">
+<p class="note">Why bracket matters: the same +% from two sources.</p>
+<div class="calc">
+  <div><label>Bonus A (%)</label><input id="a" type="number" value="50"></div>
+  <div><label>Bonus B (%)</label><input id="b" type="number" value="50"></div>
+</div>
+<div class="out">Same bracket (ADD%): x<span id="o1">2.00</span> &nbsp; Separate buckets (MULT): x<span id="o2">2.25</span></div>
+</div>
+
+<h2 id="drift">7. Known drift and loose ends</h2>
+<div class="card"><ul class="warn">
+  <li>Uncapped stacking bypasses the gear caps: Idol/Building damage, Paragon crit damage and life leech, Idol/Paragon kill rewards and XP, gear Gold Find. Owner decision needed.</li>
+  <li>Guest saves stamp only damage, HP/armor and sell into <code>idolFx</code>; guest fights skip Paragon maxHp, critDamage, lifeLeech, bossTimer and potionPower.</li>
+  <li>Epic Find also lifts rare weights (text says "epic and better").</li>
+  <li>Paragon Gold Find does not affect sell prices (blurb says "drops and sales").</li>
+  <li>Idle HP regen display includes the base 1 HP/s; the in-fight profile does not.</li>
+</ul></div>
+
+<h2 id="change">8. When you change a bonus</h2>
+<div class="card"><ol>
+  <li>Edit the constant and its JSDoc (<code>@category</code>, <code>@formula</code>).</li>
+  <li>Update the row in <code>docs/BONUSES.md</code> and here, including the cap comment marker and its mapping in <code>tests/docs/bonuses.test.ts</code>.</li>
+  <li>Say which bracket a new source lands in (BASE / ADD% / MULT) and which cap stops it.</li>
+  <li>Run <code>npx tsx --test tests/docs/bonuses.test.ts</code>, then <code>npm run verify</code>.</li>
+</ol></div>
+
+</main>
+<script>
+(function(){
+  var rows=[].slice.call(document.querySelectorAll('#captable tbody tr')),g='',q=document.getElementById('q');
+  function apply(){var t=q.value.toLowerCase();rows.forEach(function(r){r.style.display=((!g||r.dataset.g===g)&&(!t||r.textContent.toLowerCase().indexOf(t)>-1))?'':'none'})}
+  q.addEventListener('input',apply);
+  [].forEach.call(document.querySelectorAll('button.f'),function(b){b.addEventListener('click',function(){g=b.dataset.g;[].forEach.call(document.querySelectorAll('button.f'),function(x){x.classList.toggle('on',x===b)});apply()})});
+  var a=document.getElementById('a'),b=document.getElementById('b');
+  function calc(){var x=+a.value||0,y=+b.value||0;document.getElementById('o1').textContent=(1+(x+y)/100).toFixed(2);document.getElementById('o2').textContent=((1+x/100)*(1+y/100)).toFixed(2)}
+  a.addEventListener('input',calc);b.addEventListener('input',calc);
+})();
+</script>
+</body>
+</html>
