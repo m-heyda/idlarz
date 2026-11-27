@@ -1,0 +1,92 @@
+/* The release notes list (one collapsible row per version), shared by the landing page's Changelog window and the game's Changelog window (`ChangelogList`). */
+.cl-paper {
+	flex: 1;
+	min-height: 0;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	padding: 12px 14px;
+	color: var(--ds-parch-ink, #4a3516);
+}
+
+.cl-entry + .cl-entry {
+	margin-top: 8px;
+}
+
+.cl-head {
+	display: flex;
+	align-items: baseline;
+	gap: 8px;
+	width: 100%;
+	padding: 8px 6px;
+	font-family: inherit;
+	text-align: left;
+	color: inherit;
+	background: rgba(106, 63, 0, 0.08);
+	border-bottom: 2px solid #a9894f;
+	cursor: pointer;
+}
+
+.cl-head:hover {
+	background: rgba(106, 63, 0, 0.14);
+}
+
+.cl-head[aria-expanded='true'] {
+	border-bottom-color: #6a3f00;
+}
+
+.cl-head:focus-visible {
+	outline: 2px solid #6a3f00;
+	outline-offset: 1px;
+}
+
+.cl-caret {
+	color: #8a6a30;
+}
+
+.cl-version {
+	color: #6a3f00;
+	font-weight: 700;
+}
+
+.cl-title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.cl-date {
+	font-size: 0.75rem;
+	color: #8a6a30;
+}
+
+.cl-body {
+	padding: 8px 8px 4px 24px;
+	font-size: 0.92rem;
+	line-height: 1.45;
+	color: #3a2a10;
+}
+
+.cl-body[hidden] {
+	display: none;
+}
+
+.cl-body p + p,
+.cl-body p + ul,
+.cl-body ul + p {
+	margin-top: 8px;
+}
+
+.cl-body ul {
+	padding-left: 18px;
+	list-style: square;
+}
+
+.cl-body li + li {
+	margin-top: 4px;
+}
+
+.cl-body strong {
+	color: #6a3f00;
+}

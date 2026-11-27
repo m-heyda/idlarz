@@ -13,10 +13,11 @@ import BestiaryWindow from '../BestiaryWindow';
 import BossWindow from '../BossWindow';
 import RankingsWindow from '../RankingsWindow';
 import KingdomWindow from '../KingdomWindow';
+import ChangelogWindow from '../ChangelogWindow';
 import WindowErrorBoundary from '../WindowErrorBoundary';
 
 /**
- * Every game window, each open or not on its own: Hero, Merchant, Farm, Bestiary, Boss, Deeds and the castle upgrade. They sit side by side,
+ * Every game window, each open or not on its own: Hero, Merchant, Farm, Bestiary, Boss, Deeds, Rankings, the Kingdom overview, the Changelog and the castle upgrade. They sit side by side,
  * can be dragged and resized from the bottom right corner, and the one you click comes to the front (see GameWindow and the window store; every window is a GameWindow now). A closed window is not mounted, so
  * the farm scene measures its real body and its critters only roam while the Farm is open.
  */
@@ -73,6 +74,11 @@ const GameWindows: React.FC = () => {
 			{open.includes('kingdom') && (
 				<WindowErrorBoundary name='Kingdom overview'>
 					<KingdomWindow />
+				</WindowErrorBoundary>
+			)}
+			{open.includes('changelog') && (
+				<WindowErrorBoundary name='Changelog'>
+					<ChangelogWindow />
 				</WindowErrorBoundary>
 			)}
 			{open.includes('castle') && <CastleUpgradeDialog />}

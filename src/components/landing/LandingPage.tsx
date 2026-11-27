@@ -29,6 +29,7 @@ import '@idlarz/design-system';
 import { Button, Frame, HoverTip, Panel, Tabs } from '../../../packages/design-system/src/components/primitives';
 import { HintTooltip } from '../../../packages/design-system/src/components/tooltips';
 import { BadgePic, NickName } from '../../../packages/design-system/src/components/composites';
+import ChangelogList from '@/components/ChangelogList';
 import '@/styles/Landing.css';
 
 type Visitor =
@@ -85,42 +86,6 @@ const Skeleton: React.FC = () => (
 	</div>
 );
 
-/** Renders `**bold**` as <strong>; everything else is plain text (no html is ever injected). */
-const Inline: React.FC<{ text: string }> = ({ text }) => <>{text.split('**').map((part, i) => (i % 2 === 1 ? <strong key={i}>{part}</strong> : part))}</>;
-
-const ChangelogRow: React.FC<{ entry: ChangelogEntry; open: boolean; onToggle: () => void }> = ({ entry, open, onToggle }) => {
-	const panelId = `ld-log-${entry.version}`;
-	return (
-		<article className='ld-log-entry'>
-			<button type='button' className='ld-log-head' aria-expanded={open} aria-controls={panelId} onClick={onToggle}>
-				<span className='ld-log-caret' aria-hidden='true'>
-					{open ? '▾' : '▸'}
-				</span>
-				<span className='ld-log-version'>{entry.version}</span>
-				<span className='ld-log-title'>{entry.title}</span>
-				<span className='ld-log-date'>{entry.date}</span>
-			</button>
-			<div id={panelId} className='ld-log-body' hidden={!open}>
-				{entry.body.map((block, i) =>
-					block.kind === 'p' ? (
-						<p key={i}>
-							<Inline text={block.text} />
-						</p>
-					) : (
-						<ul key={i}>
-							{block.items.map((item) => (
-								<li key={item}>
-									<Inline text={item} />
-								</li>
-							))}
-						</ul>
-					),
-				)}
-			</div>
-		</article>
-	);
-};
-
 /** The release notes on a parchment sheet: one collapsible row per version in a scroll area that fills the frame (the newest starts open). */
 const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[]; collapsed: boolean; canCollapse: boolean; onToggle: () => void }> = ({
 	entries,
@@ -128,13 +93,6 @@ const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[]; collapsed:
 	canCollapse,
 	onToggle,
 }) => {
-	const [open, setOpen] = useState<ReadonlySet<string>>(() => new Set(entries.slice(0, 1).map((e) => e.version)));
-	const toggle = (version: string) =>
-		setOpen((prev) => {
-			const next = new Set(prev);
-			if (!next.delete(version)) next.add(version);
-			return next;
-		});
 	return (
 		<div className='ld-col ld-col-log' data-collapsed={collapsed}>
 			<Critter id='forest/mossback-wolf' className='ld-critter-tl' />
@@ -149,10 +107,8 @@ const ChangelogWindow: React.FC<{ entries: readonly ChangelogEntry[]; collapsed:
 							</button>
 						)}
 					</div>
-					<Panel parchment className='ld-paper'>
-						{entries.map((entry) => (
-							<ChangelogRow key={entry.version} entry={entry} open={open.has(entry.version)} onToggle={() => toggle(entry.version)} />
-						))}
+					<Panel parchment className='cl-paper'>
+						<ChangelogList entries={entries} />
 					</Panel>
 				</div>
 				{/* folded away while the hero is being made: a thin strip that opens it again */}
