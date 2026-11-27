@@ -49,7 +49,7 @@ import { grantedSeenAfterSave, settleTrades } from '@/lib/offline/trade';
 import { emptyBank } from '@/lib/offline/tickets';
 import { inventoryFromCore, rebirthInventory, stampInventory } from '@/lib/offline/inventory';
 import { seedLedger, subtractTotals, type Ledger, type LedgerRepo } from '@/lib/offline/ledger';
-import { fitParagon, paragonSpent, type Paragon } from '@/lib/offline/paragon';
+import { fitParagon, paragonBonusPoints, paragonSpent, type Paragon } from '@/lib/offline/paragon';
 import { ATTR_KEYS, attrsFromCore, clearedAttrs, fitAttrs, levelOfXp, stateWithAttrs, type Attrs } from '@/lib/offline/attrs';
 import { SAVE_SCHEMA, decodeSave, packBody, sealWire, type SaveBody } from '@/lib/saveFormat';
 import { clampIdolTiles, settleIdols, sameIdols } from './idolTrust';
@@ -336,7 +336,7 @@ export const acceptSave = async (
 		if (state.characterStats.availablePoints !== before.availablePoints || ATTR_KEYS.some((key) => before[key] !== state.characterStats[key]))
 			summary = summarize(state);
 		if (paragonOut) {
-			paragonOut = fitParagon(paragonOut, state.resources.xp);
+			paragonOut = fitParagon(paragonOut, state.resources.xp, paragonBonusPoints(ledger?.stats.claimed ?? ledger?.stats.achievements ?? []));
 			// the points the server holds are worked out into every number it derives (Luck, kill rewards, rates, the fight profile), never taken from the upload
 			if (paragonSpent(paragonOut.spent) > 0) {
 				state = { ...state, paragonSpent: paragonOut.spent };

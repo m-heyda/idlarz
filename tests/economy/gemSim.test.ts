@@ -43,7 +43,7 @@ test('the daily bonus pays 35 a day on a full streak and only day 1 when claimed
 });
 
 test("the one-off pools are the catalogs' totals", () => {
-	assert.deepEqual(gemPools(), { achievements: 27_600, milestones: 2_800, mastery: 1_380 });
+	assert.deepEqual(gemPools(), { achievements: 29_525, milestones: 2_800, mastery: 1_380 });
 });
 
 test('the claimed share rises in a straight line between the listed days and stops at the last', () => {
@@ -56,7 +56,7 @@ test('the claimed share rises in a straight line between the listed days and sto
 
 test('gems earned by day, pinned per profile', () => {
 	const earned = Object.fromEntries(GEM_PROFILES.map((p) => [p.id, [7, 30, 90, 180].map((d) => Math.round(earnedBy(p, d)))]));
-	assert.deepEqual(earned, { casual: [1840, 7453, 17798, 29516], regular: [2966, 12279, 32276, 58471], dedicated: [6770, 28582, 81186, 156293] });
+	assert.deepEqual(earned, { casual: [1937, 7838, 18664, 30863], regular: [3063, 12664, 33142, 59819], dedicated: [6867, 28967, 82053, 157640] });
 });
 
 test('days to earn: the first whole day, and null when it never happens', () => {
@@ -82,7 +82,7 @@ test('the price book lists every shop item (a tiered one per level) and the plan
 test('the whole shop and the target checks, pinned', () => {
 	const r = runGemSim();
 	assert.equal(r.wholeList.total, 67_500);
-	assert.deepEqual(r.wholeList.days, { casual: 1011, regular: 224, dedicated: 75 });
+	assert.deepEqual(r.wholeList.days, { casual: 981, regular: 218, dedicated: 74 });
 	assert.equal(r.capBreaksAll, 14_625);
 	assert.deepEqual(
 		r.checks.map((c) => [c.id, c.ok]),

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { BOSS_MIN_DISTANCE, COMBAT, MONSTERS } from '../../src/config/combatConfig';
+import { BOSS_MIN_DISTANCE, COMBAT, MONSTERS, NORMAL_MAX_DISTANCE } from '../../src/config/combatConfig';
 import { BIOME_RULES } from '../../src/config/biomeRules';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
 import { MONSTER_CATALOG } from '../../src/catalog/monsters';
@@ -65,7 +65,8 @@ test('a hills monster stands on hills only, a coast monster on coast and a lake 
 	assert.deepEqual(spots('bossIronhorn'), []);
 	assert.equal(canSpawnOn('bossIronhorn', CASTLE_X + 8, CASTLE_Y, { biome: 'hills' }, 1), true);
 	assert.equal(canSpawnOn('bossIronhorn', CASTLE_X + 7, CASTLE_Y, { biome: 'hills' }, 1), false);
-	assert.equal(canSpawnOn('mawhornBrute', CASTLE_X + 10, CASTLE_Y, { biome: 'hills' }, 1), false, 'normal monsters stay within 9');
+	assert.equal(canSpawnOn('mawhornBrute', CASTLE_X + 10, CASTLE_Y, { biome: 'hills' }, 1), true, 'normal monsters stand up to 40 tiles out');
+	assert.equal(canSpawnOn('mawhornBrute', CASTLE_X + NORMAL_MAX_DISTANCE + 1, CASTLE_Y, { biome: 'hills' }, 1), false);
 	assert.equal(BOSS_MIN_DISTANCE, 8);
 });
 

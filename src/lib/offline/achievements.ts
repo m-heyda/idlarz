@@ -6,6 +6,7 @@ import { isMilestoneId, milestoneById } from '@/catalog/deedMilestones';
 import { claimableMilestones, conditionHolds, conditionProgress, deedBonuses, deedBonusText, deedPoints, type DeedBonuses, type DeedFacts } from '@/lib/deeds';
 import { RARITIES } from '@/catalog';
 import { craftLevelOf } from '@/lib/crafting';
+import { calculateParagon } from '@/utils/game/character';
 import { wornLevelOf } from '@/lib/loot/junk';
 import { readWorldFacts } from '@/lib/worldFacts';
 import type { ItemInstance } from '@/types/game';
@@ -42,6 +43,7 @@ export const factsOf = (ledger: Ledger, summary: StoredSave['summary']): Achieve
 		streak: ledger.gemShop.daily.streak,
 		craftLevel: craftLevelOf(ledger.craft.xp).level,
 		embers: summary.legacyEarned,
+		paragon: Number.isFinite(summary.xp) ? calculateParagon(summary.xp).paragon : 0,
 		...wornOf(ledger.inv?.equipment),
 	};
 };

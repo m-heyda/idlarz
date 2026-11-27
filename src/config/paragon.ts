@@ -149,3 +149,32 @@ export const PARAGON_GLYPH: Record<ParagonId, string> = {
 	paragonXp: '✧',
 	craftXp: '✎',
 };
+
+/** One name frame: the paragon level it starts at, its name, its colour and the two brackets drawn round the paragon mark (plain text, no picture) */
+export interface ParagonFrame {
+	from: number;
+	name: string;
+	color: string;
+	open: string;
+	close: string;
+}
+
+/**
+ * The name frames (docs/plan/paragon.md, IDL-394): the mark `✦ 142` beside a name in the Rankings (and the ring of the Paragon window) wears a coloured frame that follows the paragon level: bronze from 100, silver 200, gold 300, ruby 400, emerald 500, amethyst 750 and
+ * diamond from 1,000 (the milestone levels of the Paragon deed, `PARAGON_TIER_GOALS`). Nothing is stored or bought: the frame is worked out from the level, so it is always right and can never be claimed twice.
+ *
+ * @category Progression/Paragon
+ * @order 6
+ */
+export const PARAGON_FRAMES: readonly ParagonFrame[] = [
+	{ from: 100, name: 'Bronze', color: '#cd7f32', open: '❨', close: '❩' },
+	{ from: 200, name: 'Silver', color: '#d5dde6', open: '❮', close: '❯' },
+	{ from: 300, name: 'Gold', color: '#f0c84a', open: '❰', close: '❱' },
+	{ from: 400, name: 'Ruby', color: '#e5534b', open: '❲', close: '❳' },
+	{ from: 500, name: 'Emerald', color: '#3fb950', open: '⟪', close: '⟫' },
+	{ from: 750, name: 'Amethyst', color: '#a371f7', open: '⟬', close: '⟭' },
+	{ from: 1000, name: 'Diamond', color: '#9fe8ff', open: '⦃', close: '⦄' },
+];
+
+/** The frame of a paragon level (the highest one whose level is reached), or null below paragon 100 */
+export const paragonFrame = (paragon: number): ParagonFrame | null => [...PARAGON_FRAMES].reverse().find((f) => paragon >= f.from) ?? null;

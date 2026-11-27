@@ -31,8 +31,12 @@ test('bandOf falls back to the first band for NaN and negative distances', () =>
 	assert.equal(bandOf(-4).id, 'home');
 });
 
-test('the bands are listed in ascending order and carry no danger offset yet', () => {
+test('the bands are listed in ascending order; the danger offset rises toward the wilds (0, 0, +1, +2)', () => {
 	for (let i = 1; i < DISTANCE_BANDS.length; i++) assert.ok(DISTANCE_BANDS[i].from > DISTANCE_BANDS[i - 1].from);
-	for (const band of DISTANCE_BANDS) assert.equal(band.dangerOffset, 0, band.id);
-	for (let distance = 0; distance <= 60; distance++) assert.equal(bandOf(distance).dangerOffset, 0);
+	assert.deepEqual(
+		DISTANCE_BANDS.map((band) => band.dangerOffset),
+		[0, 0, 1, 2],
+	);
+	for (let distance = 1; distance <= 60; distance++)
+		assert.ok(bandOf(distance).dangerOffset >= bandOf(distance - 1).dangerOffset, 'never falls with the distance');
 });

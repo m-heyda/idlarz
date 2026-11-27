@@ -1,5 +1,6 @@
 import React from 'react';
 import { useGameStore } from '@/stores/gameStore';
+import { useAchievementStore } from '@/stores/achievementStore';
 import { useUiStore } from '@/stores/uiStore';
 import {
 	PARAGON_CAP_POINTS,
@@ -8,12 +9,13 @@ import {
 	PARAGON_CATEGORY_STYLE,
 	PARAGON_GLYPH,
 	PARAGON_UPGRADES,
+	paragonFrame,
 	paragonEffect,
 	paragonEffectText,
 	paragonRoom,
 	type ParagonUpgrade,
 } from '@/config/paragon';
-import { paragonFree, paragonSpent as spentTotal } from '@/lib/offline/paragon';
+import { paragonBonusPoints, paragonFree, paragonSpent as spentTotal } from '@/lib/offline/paragon';
 import { calculateParagon } from '@/utils/game/character';
 import audioManager from '@/utils/audioManager';
 import { formatCompact } from '@/utils/formatters';
@@ -83,8 +85,10 @@ const HeroParagon: React.FC = () => {
 	const spend = useGameStore((state) => state.spendParagon);
 	const toggleGemShop = useUiStore((state) => state.toggleGemShop);
 	const { paragon: level, progress } = calculateParagon(xp);
-	const free = paragonFree(xp, spent);
+	const claimed = useAchievementStore((state) => state.claimed);
+	const free = paragonFree(xp, spent, paragonBonusPoints(claimed));
 	const used = spentTotal(spent);
+	const frame = paragonFrame(level);
 
 	if (level <= 0)
 		return (
@@ -99,8 +103,16 @@ const HeroParagon: React.FC = () => {
 	return (
 		<div className='px-paragon'>
 			<div className='px-paragon-head'>
-				<span className='px-paragon-ring'>
-					<span className='px-paragon-level'>✦ {formatCompact(level)}</span>
+				<span
+					className='px-paragon-ring'
+					data-frame={frame?.name.toLowerCase()}
+					style={frame ? ({ '--frame': frame.color } as React.CSSProperties) : undefined}
+					title={frame ? `${frame.name} frame` : undefined}
+				>
+					<span className='px-paragon-level'>
+						{frame?.open}✦ {formatCompact(level)}
+						{frame?.close}
+					</span>
 				</span>
 				<div className='px-paragon-next' title='Progress to the next paragon level'>
 					<span className='px-paragon-next-label'>Next paragon level</span>

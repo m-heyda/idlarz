@@ -136,14 +136,15 @@ export const placeTickets = (
 						hero,
 						open.map((entry) => entry.type),
 						castleLevel,
+						rebirths,
 					)
 				: null;
 		const roll = open.length === 1 ? 0 : rollFor('spawntype', ticket.n)();
 		const { type, free } = open[weights ? pickWeighted(weights, roll) : Math.floor(roll * open.length) % open.length];
 		const spot = free[Math.floor(rollFor('spawnpos', ticket.n)() * free.length) % free.length];
 		taken.add(`${spot.x},${spot.y}`);
-		const cap = informed ? spawnLevelCap(hero, type, castleLevel) : Infinity;
-		const spawnLevel = rollSpawnLevel(type, castleLevel, ticket.n, castleDistance(spot), Number.isFinite(cap) ? cap : undefined);
+		const cap = informed ? spawnLevelCap(hero, type, castleLevel, rebirths) : Infinity;
+		const spawnLevel = rollSpawnLevel(type, castleLevel, ticket.n, castleDistance(spot), Number.isFinite(cap) ? cap : undefined, rebirths);
 		const grow = informed ? growthCap(hero, type, spawnLevel) : undefined;
 		return { ...ticket, type, x: spot.x, y: spot.y, spawnLevel, ...(grow !== undefined ? { growCap: grow } : {}) };
 	};

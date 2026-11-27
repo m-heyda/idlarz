@@ -1,6 +1,7 @@
 import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2';
 import { BATCH3_TIERS, buildBatch3 } from '@/catalog/achievementsBatch3';
 import { BATCH4_ACHIEVEMENTS, BATCH4_DEEDS } from '@/catalog/achievementsBatch4';
+import { PARAGON_ACHIEVEMENTS, PARAGON_DEEDS } from '@/catalog/achievementsParagon';
 import { MASTERY_ENTRY_KILLS, TOTAL_MASTERY_TIERS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
@@ -74,6 +75,8 @@ export type AchievementCondition =
 	| { kind: 'craftedRarity'; rarity: 'epic' | 'legendary'; min: number }
 	/** Pieces of this rarity or better worn at once (of the 14 slots) */
 	| { kind: 'wornRarity'; rarity: 'epic' | 'legendary'; min: number }
+	/** The paragon level (worked out from the XP: 0 below level 100) */
+	| { kind: 'paragon'; min: number }
 	/** Embers earned over all rebirths (`prestige.legacyEarned`) */
 	| { kind: 'embers'; min: number }
 	/** Lifetime income of one resource while playing (`LifetimeStats.income`) */
@@ -538,6 +541,7 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 	...BATCH2_ACHIEVEMENTS,
 	...buildBatch3(),
 	...BATCH4_ACHIEVEMENTS,
+	...PARAGON_ACHIEVEMENTS,
 	{
 		id: 'castle_15',
 		title: 'Grand Architect',
@@ -806,6 +810,7 @@ export const DEEDS: readonly DeedDef[] = [
 	// the tiers batch 3 appends to the deeds of batch 2
 	...BATCH2_DEEDS.map((d) => ({ ...d, tiers: [...d.tiers, ...(BATCH3_TIERS[d.id] ?? [])] })),
 	...BATCH4_DEEDS,
+	...PARAGON_DEEDS,
 ];
 
 export const deedById = (id: string): DeedDef | undefined => DEEDS.find((d) => d.id === id);
