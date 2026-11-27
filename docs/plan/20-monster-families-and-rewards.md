@@ -35,5 +35,3 @@ A family entry needs: biome allowlist, distance band, `minRebirths`, level windo
 - **Biome boss rules (defaults, tuned by sim):** the one-boss-at-a-time timer stays 3 h; a new biome's boss spawns only on that biome's tiles at least 10 tiles beyond the biome's minimum distance; the time limit grows with the tier (75 s plains to 90 s tundra today, then hills 90, coast 95, lake 95, jungle 100, fields 100, orchard 105, blight 110, battlefield 120); HP and attack follow `BIOME_TIER` steps. Set pieces S2 and S3 drop from their biome bosses (IDL-44).
 
 **Still open:** the numbers for goods chance, amount and cap and the relevance floor per band (gold and XP are measured with `kill-sim`).
-
-> **Update 2026-11-27 (first slice of IDL-53, built):** spawn levels rise 4 per rebirth (`rebirthLevelBonus`), normals stand 2 to 40 tiles out (`NORMAL_MAX_DISTANCE`), the frontier and wilds bands add +1 / +2 levels (`DISTANCE_BANDS`), bosses come every 1.5 h (1 h from rebirth 3), and the Ember upgrade Wild Growth shortens the growth interval. Spawn tables with different weights per band are still open.
