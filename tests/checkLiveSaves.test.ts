@@ -114,15 +114,13 @@ test('the report counts reasons and flags and holds no row data', async () => {
 		1,
 	);
 	assert.deepEqual(report.flagged, { gold_jump: 1, xp_jump: 1 });
-	assert.equal(report.wouldReject, 1); // gold_jump is on the enforcement allowlist, xp_jump is only clamped
 	assert.equal(report.xpClamped, 1);
 	assert.equal(report.midCastleUpgrade, 1);
 	assert.equal(report.withoutLedger, 1);
 	assert.equal(report.transitions, 3);
-	// grant-dependent flags (gold, XP, gems) are expected on history copies: counted apart, never as "would be refused"
+	// grant-dependent flags (gold, XP, gems) are expected on history copies: counted apart, never as evidence
 	assert.deepEqual(report.transitionFlagged, { castle_jump: 1, playtime_fast: 1 });
 	assert.deepEqual(report.transitionUnjudged, { gold_jump: 1, xp_jump: 1, gems_increase: 1 });
-	assert.equal(report.transitionWouldReject, 0); // playtime_fast only records now, and the grant-dependent flags are counted apart
 	assert.equal(report.ledgers, 2);
 	assert.equal(report.ledgersWithoutSave, 1);
 	assert.equal(report.ledgersWithoutInventory, 1);

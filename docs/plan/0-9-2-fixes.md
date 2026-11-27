@@ -13,7 +13,7 @@ Nothing of PR #295 was seen with a login. Walk through with a real account; any 
 - Gem shop: Name colours and Overnight Orders at 750.
 - Start hub and castle compass buttons, `/reset` from a real emailed link (recovery cookie, IDL-384).
 
-Owner and dashboard work (no code): Supabase Confirm email, SMTP and redirect URLs, and `supabase/migrations/player_class_open.sql` on a branch first (required before a fifth hero class, IDL-280); Vercel `LOOT_SECRET` per deployment, optional firewall rate rules, the free-plan load check (IDL-126); the two enforcement switches (`ENFORCEMENT`, `EMBER_MODEL.requireServerRebirth`, IDL-208, IDL-211) after `restore-trust` and `check-live-saves`; a raised `GAME_EPOCH` (IDL-300) only when a later chapter is wanted.
+Owner and dashboard work (no code): Supabase Confirm email, SMTP and redirect URLs, and `supabase/migrations/player_class_open.sql` on a branch first (required before a fifth hero class, IDL-280); Vercel `LOOT_SECRET` per deployment, optional firewall rate rules, the free-plan load check (IDL-126); the server-run rebirth switch (`EMBER_MODEL.requireServerRebirth`, IDL-211) after `check-live-saves`; a raised `GAME_EPOCH` (IDL-300) only when a later chapter is wanted.
 
 ## Left over from batch 1 (the rest shipped)
 
@@ -30,7 +30,7 @@ IDL-174, the set-weapon note of IDL-172 and the per-tier chest art of IDL-163 sh
 - IDL-163 gear and bag-expansion tokens in chest contents; a loot-sim Monte Carlo in place of the config-derived table.
 - Pace: the pace sim no longer models chests, so chest balance is by config budget only; teach the bot to open monster chests if chest value should be tuned.
 - IDL-172 affix level scaling (design first).
-- IDL-384 item 2: offline bar and save flags, needs a decision on what a flagged save does to the bar.
+- IDL-384 item 2: offline bar and save flags: a flagged save changes nothing (the flag layer was removed, IDL-89), so only the bar itself is left.
 
 ## Later (each needs its own plan)
 

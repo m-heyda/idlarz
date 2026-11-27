@@ -31,13 +31,12 @@ interface Row {
 	flags: SaveFlag[];
 	audit_ratio: number;
 	fresh_start: boolean;
-	ever_flagged: boolean;
 	test_account: boolean;
 	last_archive_at: string;
 }
 
 const COLUMNS =
-	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, derived, flags, audit_ratio, fresh_start, ever_flagged, test_account, last_archive_at';
+	'rev, schema, server_saved_at, created_at, core, world_hash, play_seconds, level, xp, gold, gems, click_level, castle_level, tiles_owned, buildings_owned, rebirths, legacy_points, legacy_earned, xp_gain_pct, rates, derived, flags, audit_ratio, fresh_start, test_account, last_archive_at';
 
 const iso = (ms: number) => new Date(ms).toISOString();
 
@@ -67,7 +66,6 @@ const toRow = (save: StoredSave) => ({
 	flags: save.flags,
 	audit_ratio: save.auditRatio,
 	fresh_start: save.freshStart,
-	ever_flagged: save.everFlagged,
 	test_account: save.testAccount,
 	last_archive_at: iso(save.lastArchiveAt),
 });
@@ -96,7 +94,6 @@ const fromRow = (row: Row): StoredSave => ({
 	flags: row.flags ?? [],
 	auditRatio: Number(row.audit_ratio),
 	freshStart: row.fresh_start,
-	everFlagged: row.ever_flagged,
 	testAccount: row.test_account,
 	serverSavedAt: Date.parse(row.server_saved_at),
 	createdAt: Date.parse(row.created_at),

@@ -19,7 +19,6 @@
 		"stat-audit": "tsx scripts/stat-audit.ts",
 		"reset-players": "tsx scripts/reset-players.ts",
 		"check-live-saves": "tsx scripts/check-live-saves.ts",
-		"restore-trust": "tsx scripts/restore-trust.ts",
 		"migrate-saves": "tsx scripts/migrate-saves.ts",
 		"seed-rehearsal": "tsx scripts/seed-rehearsal-account.ts",
 		"seed-dev-world": "tsx scripts/seed-dev-world.ts",

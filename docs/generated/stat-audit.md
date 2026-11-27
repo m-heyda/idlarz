@@ -172,7 +172,7 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 
 - **REJECTED**: the save is refused (`sanitizeSave`).
 - **CLAMPED**: accepted, but the server replaces the number with the one it can explain (XP, Embers) or pays the save from the last trusted economy (castle level, rates, merchant levels).
-- **FLAGGED**: accepted and stored as claimed; the flag removes ranking eligibility for good. Shadow mode: `ENFORCEMENT.enabled` would refuse the two flags on its allowlist (gold_jump, gems_increase) once switched on; every other flag, playtime_fast included, only records.
+- **FLAGGED**: accepted and stored as claimed; the flag is only recorded (it costs the account nothing: no refusal, no ranking loss).
 - **SILENT**: accepted with no flag at all.
 
 ### Who computes what (from the code, `@category Saves & Server`)
@@ -187,7 +187,7 @@ Each row is a second save sent through the real `acceptSave` against an honest f
 | Ember shop | client | conservation: unspent + spent = earned (**REJECTED** if not) |
 | Rebirth Ember gain | server (`POST /api/rebirth`, IDL-102), the browser as a fallback | the route judges the stored save and records the gain: the rebirth save is capped at exactly it; without the route, bounded by the castle and territory of the previous save, one rebirth per save (**CLAMPED**, flag `ember_jump`, IDL-166) |
 | Click gold | client (rate-limited in the browser) | none: no click endpoint |
-| Sell resources | client | `gold_jump` (stock held + income + grants; refused once enforcement is on, IDL-112) / net worth |
+| Sell resources | client | `gold_jump` (stock held + income + grants; recorded only) / net worth |
 | Sell / buy gear | server (`/api/inventory`) | server inventory |
 | Chest, kill, fight | server | sealed server rolls |
 | Offline claim | server (from the stored save's rates) | server clock, cap, efficiency |

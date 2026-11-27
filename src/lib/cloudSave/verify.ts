@@ -17,8 +17,8 @@ const IDOL_SELL_CHECK_LEVEL = 10;
  * summaries alone (no state is opened). Structural forgery (impossible items, points, tiles) is refused earlier by
  * `sanitizeSave`; "the land and balance are worth more than the game could have paid" is `netWorth.ts`.
  *
- * Shadow mode: nothing here rejects a save. Every finding becomes a flag stored next to the save, so the thresholds
- * can be tuned on real play before anything is enforced. Legitimate bursts exist (chests, kills, merchant sales,
+ * Nothing here refuses a save or penalises an account. Every finding becomes a flag stored next to the save (read by `check-live-saves`), and a few
+ * make the server clamp a number or pay from the last trusted economy (see {@link FLAG_POLICY}). Legitimate bursts exist (chests, kills, merchant sales,
  * rebirth), so gains get a generous allowance on top of what the income rates explain.
  */
 export const VERIFY = {
@@ -68,13 +68,12 @@ export type SaveFlag =
 	| 'ember_jump';
 
 /**
- * What the server does when a flag fires (IDL-167, IDL-112), recorded in one place instead of scattered through the pipeline:
- *  - `flag`: accepted as sent and recorded; the account loses its ranking only for a flag in `POISON_FLAGS` (`castle_jump`, `timer_jump` and `playtime_fast` are recorded only); nothing the server pays out depends on the claim being right (away pay included: a flag never stops a claim).
- *  - `clamp`: accepted, but the server replaces the claimed number with the one it can explain (XP, Embers), or pays from the last trusted
+ * What the server does when a flag fires, recorded in one place instead of scattered through the pipeline:
+ *  - `flag`: accepted as sent and recorded; nothing the server pays out depends on the claim being right (away pay included: a flag never stops a claim). A flag costs the account nothing: no ranking loss, no refusal.
+ *  - `clamp`: accepted, but the server replaces the claimed number with the one it can explain (XP, Embers, gems), or pays from the last trusted
  *    economy (`trustedEconomy.ts`: castle level, rates, merchant levels); the flag stays.
- *  - `reject`: the save is refused, but only while `ENFORCEMENT.enabled` is on (until then it behaves as `flag`).
  */
-export type FlagDecision = 'flag' | 'clamp' | 'reject';
+export type FlagDecision = 'flag' | 'clamp';
 
 /**
  * The flags and what the server does with each. Meaning of each flag:
@@ -88,8 +87,7 @@ export type FlagDecision = 'flag' | 'clamp' | 'reject';
  * - `timer_jump`: a building level or timer faster than real time (the building system, off unless `BUILDINGS_FLAG` is on): the same rule as `castle_jump`, with the buildings sharing the castle's builder. A new building is level 1; every later level needs a running upgrade whose timer the real time between the saves covers.
  * - `castle_jump`: castle level or timer faster than real time. It only records: a browser left open or asleep, an auto-clicker or a late save trips it in normal play, and a forged level's cost is what `networth_exceeds` clamps. A baseline frozen by the net-worth check keeps its timer running on the server clock ({@link trustedEconomy}) and is believed again once the real time covers the claim (`believableAfterFreeze`). `ember_jump`: Embers above what the last save's castle and land can pay ({@link EMBER_MODEL}).
  *
- * **Rejection is switched off**: `ENFORCEMENT.enabled = false`. In this shadow mode flagged saves are stored and only the account's ranking eligibility suffers ({@link POISON_FLAGS}).
- * With it on, only `gold_jump` and `gems_increase` refuse a save (HTTP 422).
+ * No flag refuses a save, and none takes an account out of the rankings. A structurally invalid save is refused earlier, by `sanitizeSave`.
  *
  * @category Saves & Server/Accepting a save
  * @order 2
@@ -99,71 +97,15 @@ export const FLAG_POLICY: Readonly<Record<SaveFlag, FlagDecision>> = {
 	networth_exceeds: 'clamp', // land, buildings, castle and merchant levels are paid from the last trusted rates, not the claimed ones
 	playtime_regress: 'flag', // going back to an older save is the player's choice
 	playtime_fast: 'flag', // more play time than real time passed: recorded only (a browser left open or put to sleep, an auto-clicker, a clock change are normal play); the XP check bounds what play time can pay
-	gold_jump: 'reject', // more gold than income, stock and the server's grants explain
+	gold_jump: 'flag', // more gold than income, stock and the server's grants explain: recorded, and the gold stays out of the deeds ({@link FORGED_GOLD_FLAGS})
 	xp_jump: 'clamp',
-	gems_increase: 'reject', // gems are the ledger's; a save that claims more is forged
+	gems_increase: 'clamp', // gems are the ledger's: with a ledger the server pays its own balance, never the claimed one
 	prestige_regress: 'flag', // a New Game or an older save
 	castle_jump: 'flag', // recorded only: a castle or building level is paid as claimed, what it cost is judged by `networth_exceeds` (a browser left open or put to sleep, an auto-clicker or a save that came late are normal play)
 	timer_jump: 'flag',
 	building_copies: 'flag', // more copies of a Producer or Extractor than the account can own: recorded only
 	ember_jump: 'clamp',
 };
-
-export interface Enforcement {
-	enabled: boolean;
-	reject: ReadonlySet<SaveFlag>;
-}
-
-/**
- * **Turning enforcement on: `ENFORCEMENT.enabled` and `EMBER_MODEL.requireServerRebirth` together (IDL-208, IDL-211, IDL-209).**
- * Owner decision (IDL-254, item 10): both are OFF at the new chapter flip and turned on together some time after it. Do it in this order, one release, and tick every line:
- *
- * 1. The way back exists in production: `restoreTrust` / `npm run restore-trust` (IDL-209) is merged and you have run its dry run once against a real account. Enforcement is never on without it.
- * 2. The flip has happened and has settled: `npm run check-live-saves` (read-only, same Supabase environment) shows the rows are readable by today's rules and its new chapter section looks as expected.
- * 3. Read the `flagged` and `would be refused if enforcement were on` lines of that run. Honest accounts must produce zero refusals (the allowlist is `gold_jump` and `gems_increase`; `playtime_fast` only records). The live run judges every save as a first save, so it can only show `gems_increase`: a `gold_jump` needs a previous save and a ledger, and is judged by the `save_rejected` log lines of step 6. If one does, tune `VERIFY` or take that flag off `ENFORCEMENT.reject`; keep `tests/audit` green. Restore any honest flagged account with `restore-trust`.
- * 4. Rebirth: no client that does not ask the server to rebirth (`askServerRebirth`) can still be open (a deploy plus a grace period), and the real flow was walked in a browser against real Supabase (Rebirth dialog "Asking the server...", refused toast, retry with the same key). Then `requireServerRebirth: true`; a rebirth without a `/api/rebirth` record keeps the old rebirth count.
- * 5. One PR flips both switches (`ENFORCEMENT.enabled = true`, `EMBER_MODEL.requireServerRebirth = true`); `tests/server/serverRebirth.test.ts` and `tests/server/serverTrust.test.ts` pin the behaviour of both states. The flip PR also has to change the tests that rely on the shadow defaults (checked 2026-11-26 by flipping both: seven files fail, the asserts that pin the switches are only part of it): `tests/audit/server.test.ts`, `tests/server/restoreTrust.test.ts`, `tests/server/serverRebirth.test.ts`, `tests/server/gems.test.ts`, `tests/server/offlineServer.test.ts`, `tests/server/serverInventory.test.ts` and `tests/saves/cloudSave.test.ts`: each calls `acceptSave` or `settleEmbers` with the default and must pass the shadow `Enforcement` (or `requireServer: false`) explicitly. Already prepared and needing no change: with the switch on, the Rebirth dialog refuses to rebirth on its own when the server cannot be asked (`blocksLocalRebirth`), since the next save would revert that rebirth.
- * 6. Watch the `save_rejected` log lines (route `/api/save`) for the first days. A wave of refusals for honest players means: `ENFORCEMENT.enabled = false` (or remove one flag from `reject`), deploy, restore the affected accounts. Nothing was stored for a refused save, so nothing needs repairing.
- * 7. Rollback of the pair: `enabled: false` and `requireServerRebirth: false`; no data migration is involved in either.
- *
- * @title Turning enforcement and the server-run rebirth on together
- * @category Ops/Operator guides
- * @order 4
- * @see ENFORCEMENT, restoreTrust
- */
-/**
- * The kill switch and the allowlist for enforcement (IDL-112). Shadow mode is the default: nothing is refused until the flags of real
- * accounts have been read (`check-live-saves`), no honest account is among them, and someone flips `enabled`. Only flags that are `reject`
- * in `FLAG_POLICY` AND listed here refuse a save, so one noisy check can be taken out without touching the others.
- *
- * @category Saves & Server/Accepting a save
- * @order 10
- */
-export const ENFORCEMENT: Enforcement = {
-	enabled: false,
-	reject: new Set<SaveFlag>(['gold_jump', 'gems_increase']),
-};
-
-/** The flags that make this save refused under the given enforcement (none while it is off). */
-export const rejectedFlags = (flags: readonly SaveFlag[], enforcement: Enforcement = ENFORCEMENT): SaveFlag[] =>
-	enforcement.enabled ? flags.filter((flag) => FLAG_POLICY[flag] === 'reject' && enforcement.reject.has(flag)) : [];
-
-/**
- * Flags that make an account ineligible for rankings for good (and stop its away pay while they stand on the stored save). Going back in time is a player choice (older save), not a cheat. `playtime_fast`, `castle_jump` and `timer_jump` are NOT in
- * this set: leaving the browser open or asleep, an auto-clicker or a late save trips them in normal play, so they are recorded for reading (`check-live-saves`) and nothing more; what a forged level could gain is bounded by `networth_exceeds`.
- *
- * @category Saves & Server/Accepting a save
- * @order 9
- */
-export const POISON_FLAGS: ReadonlySet<SaveFlag> = new Set<SaveFlag>([
-	'baseline_rich',
-	'networth_exceeds',
-	'gold_jump',
-	'xp_jump',
-	'gems_increase',
-	'prestige_regress',
-	'ember_jump',
-]);
 
 /**
  * The flags that say the land or the gold a save claims cannot be explained (a forged map or purse). Only these keep a save's land facts and gold out of the deeds ({@link FORGED_LAND_FLAGS}, {@link FORGED_GOLD_FLAGS}):

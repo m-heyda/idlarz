@@ -44,7 +44,7 @@ Status: **Planned** = decided in IDL-188; **New** = proposed 2026-11-08; **Parke
 
 ## Where it ships
 
-Gems ride on the numbered releases of [RELEASE-PLAN](RELEASE-PLAN.md): **G2** (convenience and time: IDL-191, 234, 192, 193) after the new chapter and before the later economy phases, IDL-192 and IDL-193 needing the server-owned economy actions (IDL-134) and the potion hooks (IDL-177, IDL-159); **G3** (Cap Breaks: IDL-231, 232) after the server-run rebirth, with `verify.ts` enforcement (IDL-208) on; **G4** (affix re-roll, IDL-236) after crafting; **G5** (prestige tail, IDL-237, IDL-184) with the rankings.
+Gems ride on the numbered releases of [RELEASE-PLAN](RELEASE-PLAN.md): **G2** (convenience and time: IDL-191, 234, 192, 193) after the new chapter and before the later economy phases, IDL-192 and IDL-193 needing the server-owned economy actions (IDL-134) and the potion hooks (IDL-177, IDL-159); **G3** (Cap Breaks: IDL-231, 232) after the server-run rebirth; **G4** (affix re-roll, IDL-236) after crafting; **G5** (prestige tail, IDL-237, IDL-184) with the rankings.
 
 ## 9. Targets (the gem sim)
 
