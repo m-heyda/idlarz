@@ -53,3 +53,13 @@ test('every upgrade has a medallion with its icon, the columns carry their categ
 	assert.match(out, /Next paragon level/);
 	assert.ok(out.includes(' points</span>'), 'a category shows its points');
 });
+
+test('from paragon 100 the level ring wears the frame of its milestone (bronze first), below it the ring is plain', async () => {
+	const xp = cumulativeXp(LEVELING.maxLevel) + cumulativeParagonXp(100) + 1;
+	put({ resources: { ...useGameStore.getInitialState().resources, xp }, paragonSpent: {} });
+	const framed = await draw();
+	assert.match(framed, /data-frame="bronze"/);
+	assert.match(framed, /❨✦ 100❩/);
+	put({ resources: { ...useGameStore.getInitialState().resources, xp: cumulativeXp(LEVELING.maxLevel) + cumulativeParagonXp(30) + 1 }, paragonSpent: {} });
+	assert.doesNotMatch(await draw(), /data-frame/);
+});

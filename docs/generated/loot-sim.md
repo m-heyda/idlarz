@@ -48,21 +48,21 @@ Config validation: 0 errors, 25 warnings.
 
 ## Bosses
 
-Each biome's boss drops from a source of its own (`boss_<biome>`, IDL-44): a guaranteed general roll, its potions, its unique (a named legendary weapon: 5 % per kill, +1 % per miss up to +10 %, a drop resets the counter) and, once one is wired, a piece of the set it owns. The kills below are bosses killed in a row, counted until the drop (100,000 runs per row, pity included); hours assume one boss kill per boss timer (`COMBAT.spawn.bossIntervalSec`, 3 h; only one boss stands at a time, so this is the best case of a player who kills every boss).
+Each biome's boss drops from a source of its own (`boss_<biome>`, IDL-44): a guaranteed general roll, its potions, its unique (a named legendary weapon: 5 % per kill, +1 % per miss up to +10 %, a drop resets the counter) and, once one is wired, a piece of the set it owns. The kills below are bosses killed in a row, counted until the drop (100,000 runs per row, pity included); hours assume one boss kill per boss timer (`COMBAT.spawn.bossIntervalSec`, 1.5 h; only one boss stands at a time, so this is the best case of a player who kills every boss).
 
 | Boss | Level | Owns | Gear / kill | Kills to the drop: mean | p10 | p50 | p90 | Hours at 1 boss / timer (mean) |
 |---|---:|---|---:|---:|---:|---:|---:|---:|
 | boss_plains | 25 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_forest | 30 | Starfall Bow | 1.00 | 9.7 | 2 | 8 | 18 | 29 |
-| boss_swamp | 35 | Emberbrand | 1.00 | 9.7 | 2 | 8 | 18 | 29 |
-| boss_tundra | 40 | Titan Maul | 1.00 | 9.7 | 2 | 8 | 18 | 29 |
+| boss_forest | 30 | Starfall Bow | 1.00 | 9.7 | 2 | 8 | 18 | 14 |
+| boss_swamp | 35 | Emberbrand | 1.00 | 9.7 | 2 | 8 | 18 | 14 |
+| boss_tundra | 40 | Titan Maul | 1.00 | 9.7 | 2 | 8 | 18 | 14 |
 | boss_coast | 27 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_hills | 32 | nothing yet | 1.00 | - | - | - | - | - |
 | boss_lake | 37 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_jungle | 58 | Dawnbringer Trident | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
-| boss_fields | 66 | Reaper's Crescent | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
+| boss_jungle | 58 | Dawnbringer Trident | 1.00 | 9.7 | 2 | 8 | 19 | 15 |
+| boss_fields | 66 | Reaper's Crescent | 1.00 | 9.7 | 2 | 8 | 19 | 15 |
 | boss_orchard | 74 | nothing yet | 1.00 | - | - | - | - | - |
-| boss_blight | 82 | Runeforged Titanhammer | 1.00 | 9.7 | 2 | 8 | 19 | 29 |
+| boss_blight | 82 | Runeforged Titanhammer | 1.00 | 9.7 | 2 | 8 | 19 | 15 |
 | boss_battlefield | 90 | nothing yet | 1.00 | - | - | - | - | - |
 
 ### A full set from one boss (projection)
@@ -71,7 +71,7 @@ No set of the four biomes has live pieces yet (`BOSS_LOOT[biome].setId` is null 
 
 | Pieces | Kills for the whole set: mean | p10 | p50 | p90 | Hours at 1 boss / timer (mean) | Hours (p90) |
 |---:|---:|---:|---:|---:|---:|---:|
-| 13 | 22.2 | 18 | 22 | 26 | 67 | 78 |
+| 13 | 22.2 | 18 | 22 | 26 | 33 | 39 |
 
 ## Per biome
 

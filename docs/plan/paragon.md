@@ -69,7 +69,7 @@ For the curve, the original x1.06 growth reaches paragon 500 at about 1e23 XP (p
 
 1. **Curve, display and ranking** (IDL-114, the display half of IDL-186): the paragon functions, the server recompute, the paragon bar, `100 + P37` on tags and rankings, the Paragon column. No bonuses; safe to ship on its own.
 2. **Points and the 20 upgrades** (IDL-186, IDL-187): **built** (the code and its JSDoc are the record: `src/config/paragon.ts`, `src/lib/offline/paragon.ts`, `paragonStep` in `src/lib/offline/online.ts`, the Paragon tab `HeroParagon.tsx`). The ledger column `paragon` (migration `paragon_ledger.sql`, SQL first), `/api/paragon`, the gem shop's `paragon_respec`, and every bonus folded into `idolEconomy` (the one function the browser and the server both read), the fight profile (`idolFx`), the kill and loot rolls, tile discount and build timers. The sims have run (`fight-sim`, `stat-audit` section 6, the `hardcore-rebirth6-paragon` pace probes; results in the JSDoc of `src/config/paragon.ts`).
-3. **Milestones, deeds and cosmetics**: the `paragon` deed condition and tiers, the milestone rewards, titles and frames.
+3. **Milestones, deeds and cosmetics**: **built** (IDL-394; the code and its JSDoc are the record: `src/catalog/achievementsParagon.ts` (the Paragon deed, titles), `paragonBonusPoints` in `src/lib/offline/paragon.ts` (one bonus point per claimed milestone) and `PARAGON_FRAMES` in `src/config/paragon.ts`). The names and colours are placeholders the owner may retune.
 
 ## Owner calls
 

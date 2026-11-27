@@ -183,6 +183,7 @@ export const bankContext = (stored: StoredSave): BankContext => ({
 	tilesOwned: stored.summary.tilesOwned,
 	lakesOwned: stored.summary.derived.lakesOwned ?? 0,
 	castleLevel: stored.summary.castleLevel,
+	rebirths: stored.summary.rebirths,
 	...(stored.summary.derived.idol?.goldenChancePts ? { goldenChancePts: stored.summary.derived.idol.goldenChancePts } : {}),
 });
 

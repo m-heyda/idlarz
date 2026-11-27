@@ -6,12 +6,12 @@ What a hero in the starter kit (points spent 60 % Strength, 40 % Vitality) meets
 
 | Hero | Pick | under 10 % | 10-50 % | 50-90 % | 90 % and up | Win chance above 50 % | ...once grown fully |
 |---|---|---|---|---|---|---|---|
-| level 1 | uniform (before) | 74 % | 0 % | 4 % | 22 % | **26 %** | 0 % |
-| level 1 | weighted (now) | 28 % | 0 % | 12 % | 59 % | **72 %** | 72 % |
-| level 5 | uniform (before) | 68 % | 5 % | 1 % | 26 % | **27 %** | 0 % |
-| level 5 | weighted (now) | 23 % | 6 % | 3 % | 69 % | **71 %** | 71 % |
-| level 10 | uniform (before) | 56 % | 11 % | 6 % | 27 % | **33 %** | 0 % |
-| level 10 | weighted (now) | 13 % | 11 % | 24 % | 52 % | **76 %** | 76 % |
+| level 1 | uniform (before) | 74 % | 1 % | 8 % | 17 % | **25 %** | 0 % |
+| level 1 | weighted (now) | 28 % | 4 % | 21 % | 47 % | **67 %** | 67 % |
+| level 5 | uniform (before) | 71 % | 3 % | 2 % | 25 % | **26 %** | 0 % |
+| level 5 | weighted (now) | 27 % | 4 % | 5 % | 64 % | **70 %** | 70 % |
+| level 10 | uniform (before) | 61 % | 10 % | 3 % | 26 % | **30 %** | 0 % |
+| level 10 | weighted (now) | 17 % | 19 % | 14 % | 50 % | **64 %** | 64 % |
 
 Bosses (stand 8 or more tiles from the castle; the same weights and level cap as normal monsters):
 

@@ -69,7 +69,10 @@ export const COMBAT = {
 	spawn: {
 		firstSec: 120, // first monster this long after the game starts (lib/offline/tickets.ts counts it on the server)
 		intervalSec: 600, // then one per this long (chests: 720 s); Luck shortens it like every spawn timer (`spawnIntervalFactor`)
-		bossIntervalSec: 10800, // a boss (one at a time) appears this long after the last one left, or after the start
+		bossIntervalSec: 5400, // a boss (one at a time) appears this long after the last one left, or after the start: 1.5 h (it was 3 h; from `bossFastFromRebirths` it is `bossFastIntervalSec`)
+		bossFastIntervalSec: 3600, // ...and 1 h once the player has done `bossFastFromRebirths` rebirths (owner 2026-11-27)
+		bossFastFromRebirths: 3,
+		levelsPerRebirth: 4, // every completed rebirth lifts the spawn window and cap of every monster by this many levels (`rebirthLevelBonus`)
 		dangerStep: 8, // a monster that appears this many tiles (Chebyshev) further from the castle spawns one level higher: the frontier is more dangerous than the home land
 	},
 	// What drops (how often, which rarity and item level) is loot config: src/catalog/lootConfig.ts
@@ -502,7 +505,7 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 		critMult: 1.5,
 		stunResist: 0,
 		attackSpeed: b.speed,
-		spawn: { biomes: [biome], minCastleDistance: 2, maxCastleDistance: 9, ...(minRebirths ? { minRebirths } : {}) },
+		spawn: { biomes: [biome], minCastleDistance: 2, maxCastleDistance: NORMAL_MAX_DISTANCE, ...(minRebirths ? { minRebirths } : {}) },
 		reward: { gold: { rewardSec: tier.rewardSec, cap: tier.cap.gold }, xp: { rewardSec: tier.rewardSec, cap: tier.cap.xp }, levelMult: 1.08 },
 		refLevel: 1,
 		scaling: 'exp',
@@ -514,13 +517,16 @@ const normal = (biome: keyof typeof BIOME_TIER, label: string, build: keyof type
 	};
 };
 
+/** The farthest a normal monster can stand from the castle (owner 2026-11-27: 2 to 40 tiles, an even spread, so the rebirth biomes that start 10 to 22 tiles out finally hold normal monsters too; it was 9) */
+export const NORMAL_MAX_DISTANCE = 40;
+
 /**
- * The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters keep 2 to 9, so at distances 8 and 9 a normal monster and a boss may both stand (never on the same tile: one monster per tile).
+ * The boss band (IDL-222, owner decision 2026-11-09): a boss only stands 8 or more tiles from the castle (the owner first picked 10, then lowered it to 8 after testing), just past the outskirts' start (7), and the band is open-ended (`BOSS_MAX_DISTANCE` is only a number larger than any map). Normal monsters stand 2 to 40 tiles out (`NORMAL_MAX_DISTANCE`), so a normal monster and a boss may stand in the same band (never on the same tile: one monster per tile).
  *
  * @category Monsters/Spawning
  * @order 7
  * @formula
- * boss tile: BOSS_MIN_DISTANCE (8) <= castle distance <= BOSS_MAX_DISTANCE; normal monster tile: 2 <= castle distance <= 9
+ * boss tile: BOSS_MIN_DISTANCE (8) <= castle distance <= BOSS_MAX_DISTANCE; normal monster tile: 2 <= castle distance <= 40 (`NORMAL_MAX_DISTANCE`)
  */
 export const BOSS_MIN_DISTANCE = 8;
 export const BOSS_MAX_DISTANCE = 999;
