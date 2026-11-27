@@ -68,6 +68,7 @@ const levelText: Record<EmberUpgradeId, (levels: number) => string> = {
 	decree: () => 'The castle bonus counts double (one-time)',
 	extrabuilder: (n) => `+${n * EMBER_UPGRADES.extrabuilder.effectPerLevel} builder`,
 	workbench: (n) => `+${n * EMBER_UPGRADES.workbench.effectPerLevel} crafting speed: batches finish faster`,
+	wildgrowth: (n) => `Monsters grow a level every ${15 - n} minutes (15 at the start): they reach their growth cap, and pay more, sooner`,
 	nightshift: (n) => `+${n * EMBER_UPGRADES.nightshift.effectPerLevel} hours a crafting batch runs without you (8 at the start)`,
 	thrifty: (n) => `-${n * EMBER_UPGRADES.thrifty.effectPerLevel}% of the resources every craft takes`,
 	buildslots: (n) =>
@@ -89,7 +90,7 @@ const EMBER_CATEGORIES: readonly { id: string; label: string; ids: readonly Embe
 		label: 'Economy',
 		ids: ['mastery', 'miningpower', 'overseer', 'haggler', 'skinner', 'fortune', 'artisan', 'tithe', 'thrift', 'charter', 'startgold', 'provisions'],
 	},
-	{ id: 'time', label: 'Build and away time', ids: ['builders', 'buildtime', 'idoltime', 'nightwatch', 'steward', 'vigil'] },
+	{ id: 'time', label: 'Build and away time', ids: ['builders', 'buildtime', 'idoltime', 'nightwatch', 'steward', 'vigil', 'wildgrowth'] },
 	{ id: 'caps', label: 'Caps and builders', ids: ['castlecap', 'buildcap', 'idolcap', 'extrabuilder', 'buildslots', 'craftslots', 'decree'] },
 	{ id: 'battle', label: 'Battle', ids: ['tempo', 'precision', 'execution', 'brawn', 'sorcery', 'bloodthirst', 'vigor', 'potion'] },
 	{ id: 'utility', label: 'Utility', ids: ['deeppockets', 'workbench', 'nightshift', 'thrifty'] },

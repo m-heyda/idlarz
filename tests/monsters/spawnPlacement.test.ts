@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { api, freshGame, growTo, patchTileAt } from '../helpers';
 import { CASTLE_X, CASTLE_Y } from '../../src/config/castle';
-import { BOSS_MIN_DISTANCE, MONSTERS } from '../../src/config/combatConfig';
+import { BOSS_MIN_DISTANCE, MONSTERS, NORMAL_MAX_DISTANCE } from '../../src/config/combatConfig';
 import { syntheticWorld } from '../../src/utils/worldGen';
 import { castleDistance } from '../../src/lib/distance';
 import { isChestPlaced, isPlaced, needsLook, placeTickets, siteKey, worldFromPart } from '../../src/lib/offline/placement';
@@ -167,13 +167,13 @@ test('IDL-222: a boss stands 8 or more tiles out, and a kingdom that small has n
 	assert.ok(castleDistance({ x: bossOf(out)!.x!, y: bossOf(out)!.y! }) >= BOSS_MIN_DISTANCE);
 });
 
-test('IDL-222: at distance 8 and 9 normal monsters and bosses share the land, never a tile', () => {
+test('IDL-222: normal monsters and bosses share the land, never a tile', () => {
 	const big = syntheticWorld(1500, 4);
 	const out = placeTickets(bankWith(12, true), big, 'k', 0, rollFor);
 	const all = out.monsters;
 	assert.ok(all.every(isPlaced));
 	assert.equal(new Set(all.map((t) => `${t.x},${t.y}`)).size, all.length, 'one monster per tile');
 	const rule = MONSTERS.thistleBoar.spawn;
-	assert.ok(BOSS_MIN_DISTANCE <= rule.maxCastleDistance, 'the 8-9 overlap is intended: both kinds may stand there');
-	for (const t of normalsOf(out)) assert.ok(castleDistance({ x: t.x!, y: t.y! }) <= 9);
+	assert.ok(BOSS_MIN_DISTANCE <= rule.maxCastleDistance, 'the overlap is intended: both kinds may stand there');
+	for (const t of normalsOf(out)) assert.ok(castleDistance({ x: t.x!, y: t.y! }) <= NORMAL_MAX_DISTANCE);
 });

@@ -288,6 +288,7 @@ test('Ember shop: level N+1 costs ceil(base x growth^N) for every upgrade, ladde
 		'tithe',
 		'vigil',
 		'vigor',
+		'wildgrowth',
 		'workbench',
 	]);
 	for (const id of ids) {

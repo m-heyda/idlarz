@@ -50,6 +50,8 @@ export const LIMIT_BONUSES: { [K in LimitKey]?: (ctx: LimitContext) => number } 
 	idolMaxLevel: (ctx) => emberEffect(ctx.prestige, 'idolcap'),
 	buildingMaxLevel: (ctx) => emberEffect(ctx.prestige, 'buildcap'),
 	castleMaxLevel: (ctx) => emberEffect(ctx.prestige, 'castlecap'),
+	// Wild Growth (Ember shop): -60 s per level on the 900 s a monster needs to grow one level, 300 s at level 10
+	monsterGrowthIntervalSec: (ctx) => -emberEffect(ctx.prestige, 'wildgrowth'),
 	buildingCopies: (ctx) => emberEffect(ctx.prestige, 'buildslots') + (ctx.gemCraft?.slots ?? 0),
 };
 

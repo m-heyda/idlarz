@@ -106,6 +106,8 @@ export interface BankContext {
 	/** Owned lake tiles (from the save summary's `derived.lakesOwned`; 0 when absent): they cannot hold a monster or chest */
 	lakesOwned: number;
 	castleLevel: number;
+	/** Completed rebirths (the boss comes faster from `COMBAT.spawn.bossFastFromRebirths`; absent = 0) */
+	rebirths?: number;
 	/** Percentage points more chance that a new monster is golden (the Paragon upgrade; absent = none) */
 	goldenChancePts?: number;
 }
@@ -151,7 +153,9 @@ const ticketRoom = (bank: TicketBank, ctx: BankContext): number => Math.max(0, t
 /** Seconds between two monsters at this Luck (the base interval times the shared Luck factor). */
 export const monsterIntervalSec = (luck: number): number => COMBAT.spawn.intervalSec * spawnIntervalFactor(luck);
 /** Seconds a boss needs to appear after the last one left, at this Luck. */
-export const bossIntervalSec = (luck: number): number => COMBAT.spawn.bossIntervalSec * spawnIntervalFactor(luck);
+/** The seconds between two bosses: 1.5 h, 1 h from the third rebirth (`COMBAT.spawn`), shortened by Luck like every spawn timer (down to half). */
+export const bossIntervalSec = (luck: number, rebirths = 0): number =>
+	(rebirths >= COMBAT.spawn.bossFastFromRebirths ? COMBAT.spawn.bossFastIntervalSec : COMBAT.spawn.bossIntervalSec) * spawnIntervalFactor(luck);
 
 const monsterThreshold = (bank: TicketBank, luck: number): number => (bank.monstersMinted === 0 ? COMBAT.spawn.firstSec : monsterIntervalSec(luck));
 
@@ -212,7 +216,7 @@ export const advanceBank = (
 		}
 		const chestLeft = Math.max(0, chestEvery - next.chestAcc);
 		const monsterLeft = monstersAllowed ? Math.max(0, monsterThreshold(next, ctx.luck) - next.monsterAcc) : Infinity;
-		const bossLeft = bossAllowed ? Math.max(0, bossIntervalSec(ctx.luck) - next.bossAcc) : Infinity;
+		const bossLeft = bossAllowed ? Math.max(0, bossIntervalSec(ctx.luck, ctx.rebirths) - next.bossAcc) : Infinity;
 		const step = Math.min(chestLeft, monsterLeft, bossLeft, dt - used);
 		next.chestAcc += step;
 		if (monstersAllowed) next.monsterAcc += step;
@@ -236,7 +240,7 @@ export const advanceBank = (
 			next.monsters.push(ticket);
 			minted.monsters.push(ticket);
 		}
-		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= bossIntervalSec(ctx.luck) - 1e-9 && ticketRoom(next, ctx) > 0) {
+		if (bossAllowed && !bossOf(next) && bossSiteFree(next) && next.bossAcc >= bossIntervalSec(ctx.luck, ctx.rebirths) - 1e-9 && ticketRoom(next, ctx) > 0) {
 			const ticket: MonsterTicket = { n: next.nextN++, at, kind: 'boss', lucky: false };
 			next.bossAcc = 0;
 			next.monsters.push(ticket);
@@ -315,7 +319,7 @@ export const secondsToNext = (bank: TicketBank, ctx: BankContext): number | null
 	if (ticketRoom(bank, ctx) <= 0) return rockLeft(bank, ctx)[0] ?? null;
 	const left = [Math.max(0, chestIntervalSec(ctx.luck, ctx.chestSpeedPct) - bank.chestAcc)];
 	if (monsterSiteFree(bank)) left.push(Math.max(0, monsterThreshold(bank, ctx.luck) - bank.monsterAcc));
-	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, bossIntervalSec(ctx.luck) - bank.bossAcc));
+	if (!bossOf(bank) && bossSiteFree(bank)) left.push(Math.max(0, bossIntervalSec(ctx.luck, ctx.rebirths) - bank.bossAcc));
 	return Math.min(...left, ...rockLeft(bank, ctx));
 };
 

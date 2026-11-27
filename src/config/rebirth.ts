@@ -327,6 +327,13 @@ export const EMBER_UPGRADES = {
 		costGrowth: 1.8, // 10 / 18 / 33 / 59 / 105 Embers
 		effectPerLevel: 3, // -3% of the resources a craft takes, per level (15% at most; with the Gem shop's Bulk Discount at most `CRAFT_DISCOUNT_MAX`)
 	},
+	wildgrowth: {
+		label: 'Wild Growth',
+		maxLevel: 10,
+		baseCost: 4,
+		costGrowth: 1.4,
+		effectPerLevel: 60, // -60 s of the time a monster needs to grow one level, per level (base `LIMITS.monsterGrowthIntervalSec` 900 s, 300 s at level 10): monsters reach their growth cap, and pay more, sooner
+	},
 	questrarity: {
 		label: 'Quest Rarity',
 		maxLevel: 10,

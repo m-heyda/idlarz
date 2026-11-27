@@ -31,8 +31,8 @@ export const spawnWeight = (winChance: number): number => {
 export const winChanceAt = (profile: PlayerProfile, type: MonsterType, level: number): number => estimateWin(profile, profile.maxHp, type, level).chance;
 
 /** The level the weights judge a type by: the middle of the window it appears in at this castle level. */
-export const expectedSpawnLevel = (type: MonsterType, castleLevel: number): number => {
-	const { min, max } = spawnLevelRange(type, castleLevel);
+export const expectedSpawnLevel = (type: MonsterType, castleLevel: number, rebirths = 0): number => {
+	const { min, max } = spawnLevelRange(type, castleLevel, rebirths);
 	return Math.round((min + max) / 2);
 };
 
@@ -46,8 +46,8 @@ export const expectedSpawnLevel = (type: MonsterType, castleLevel: number): numb
  * @category Monsters/Spawning
  * @order 3
  */
-export const typeWeights = (profile: PlayerProfile, types: readonly MonsterType[], castleLevel: number): number[] =>
-	types.map((type) => spawnWeight(winChanceAt(profile, type, expectedSpawnLevel(type, castleLevel))));
+export const typeWeights = (profile: PlayerProfile, types: readonly MonsterType[], castleLevel: number, rebirths = 0): number[] =>
+	types.map((type) => spawnWeight(winChanceAt(profile, type, expectedSpawnLevel(type, castleLevel, rebirths))));
 
 /**
  * Picks an index with probability proportional to its weight, from one roll in [0, 1). When all the weights are equal it is the plain
@@ -76,8 +76,8 @@ const beatableLevel = (profile: PlayerProfile, type: MonsterType, from: number, 
 };
 
 /** Highest spawn level worth rolling for a player: the highest the player beats, `Infinity` when the whole window is beatable. */
-export const spawnLevelCap = (profile: PlayerProfile, type: MonsterType, castleLevel: number): number => {
-	const { min, max } = spawnLevelRange(type, castleLevel);
+export const spawnLevelCap = (profile: PlayerProfile, type: MonsterType, castleLevel: number, rebirths = 0): number => {
+	const { min, max } = spawnLevelRange(type, castleLevel, rebirths);
 	const best = beatableLevel(profile, type, min, max);
 	return best >= max ? Infinity : best;
 };
