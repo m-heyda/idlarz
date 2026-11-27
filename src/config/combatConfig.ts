@@ -66,6 +66,9 @@ export const COMBAT = {
 	potionMaxSlots: 5, // ...and the most the bar ever has (a belt adds up to +2)
 	potionPowerMaxPct: 50, // the most a potion's healing can be raised by gear (belt Potion Power)
 	victoryToastSec: 15, // how long the result of a fight (the dead monster and its loot) stays in the combat window (hover pauses it)
+	// A normal monster grows exponentially up to `fromLevel`, then gently: its stats are tuned to the gear a hero finds in the first runs, and past that the gear
+	// grows linearly, so the old curve made rebirth-lifted tundra and later monsters impossible (owner 2026-11-27). `monsterStats` applies it; map monsters and open fights follow because their level and HP are derived.
+	softKnee: { fromLevel: 20, hpPerLevel: 1.08, attackPerLevel: 1.03 },
 	spawn: {
 		firstSec: 120, // first monster this long after the game starts (lib/offline/tickets.ts counts it on the server)
 		intervalSec: 600, // then one per this long (chests: 720 s); Luck shortens it like every spawn timer (`spawnIntervalFactor`)

@@ -213,7 +213,7 @@ const readLand = (raw: Record<string, unknown>): RawLand[] | string => {
  * cost) are recomputed instead of trusted. Returns the cleaned persisted slice.
  *
  * Validation of any loaded or imported save, **tolerant of change, strict about damage**. It refuses what no version of the game could have produced: a map that is not a map (bad land, a second castle, unconnected tiles, an unknown biome letter),
- * values below 0 or above 1e21, non-numbers, a missing gold or XP, a castle upgrade to the wrong level, a prestige shop that costs more than every Ember ever earned, a bag that is not a list or is beyond the ceiling.
+ * values below 0 or above `RESOURCE_CAP` (1e63), non-numbers, a missing gold or XP, a castle upgrade to the wrong level, a prestige shop that costs more than every Ember ever earned, a bag that is not a list or is beyond the ceiling.
  * What a later release can change it degrades instead of refusing: an id it does not know (an upgrade, an animal, a loot table, a stray key) is dropped; a level or count above a lowered maximum is cut to it; a resource the save lacks is 0; HP and mana above the maximum are cut;
  * stat points are credited when the level pays more and a free respec when it pays fewer; XP below what the tiles paid for is lifted; the Ember balance is recomputed as earned minus spent; a piece of gear or a stack that is no longer valid leaves an empty slot (`instanceProblem` in `src/lib/itemInstance.ts`). Gear stats are derived, never read from the save.
  *

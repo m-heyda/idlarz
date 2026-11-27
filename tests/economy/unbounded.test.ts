@@ -90,7 +90,8 @@ test('the price keeps rising and stays payable on a big map', () => {
 	}
 	// a purchase on a big synthetic map charges that price and gives XP without ever exceeding the cap
 	store.setState({ tiles: syntheticWorld(3000, 7), freeTiles: 1 });
-	rich();
+	// 1e20, not a tenth of the cap: past 2^53 a price this size no longer changes the balance
+	setResources({ gold: 1e20, wood: 1e20, stone: 1e20, coal: 1e20, food: 1e20, hide: 1e20 });
 	const before = api().resources;
 	const spot = findFrontier();
 	assert.ok(spot, 'a frontier tile exists');
@@ -184,4 +185,16 @@ test('rebirth and reset bring the map back to the starting ring, wherever the la
 	api().resetGame();
 	assert.equal(ownedCount(api().tiles), 5);
 	assert.deepEqual(ownedBounds(api().tiles), { minX: CASTLE_X - 1, maxX: CASTLE_X + 1, minY: CASTLE_Y - 1, maxY: CASTLE_Y + 1 });
+});
+
+test('every stockpile at the cap stays finite and survives a JSON round trip (IDL-129)', () => {
+	freshGame();
+	setResources({ gold: RESOURCE_CAP, wood: RESOURCE_CAP, stone: RESOURCE_CAP, coal: RESOURCE_CAP, food: RESOURCE_CAP, hide: RESOURCE_CAP });
+	api().tick(1);
+	for (const [key, value] of Object.entries(api().resources)) {
+		assert.ok(Number.isFinite(value) && value <= RESOURCE_CAP, `${key}: ${value}`);
+	}
+	const copy = JSON.parse(JSON.stringify(api().resources)) as Record<string, number>;
+	for (const [key, value] of Object.entries(api().resources)) assert.equal(copy[key], value, `${key} survives JSON`);
+	assert.ok(Number.isFinite(RESOURCE_CAP * 1000 * 6 * 1000), 'headroom for price x six stocks x slack stays far below 1.8e308');
 });
