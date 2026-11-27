@@ -120,11 +120,21 @@ export const levelAtAge = (spawnLevel: number, ageSec: number, ctx: LimitContext
 const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
 
 /**
+ * Growth factor of a normal monster's HP or attack over `steps` levels above its reference level: the exponential `perLevel` up to `COMBAT.softKnee.fromLevel`, the gentler soft-knee rate for every level past it.
+ * A boss (`gear` scaling) never reaches this.
+ */
+const levelGrowth = (d: MonsterDef, key: 'hpPerLevel' | 'attackPerLevel', steps: number): number => {
+	const knee = Math.max(0, COMBAT.softKnee.fromLevel - d.refLevel);
+	const early = Math.min(steps, knee);
+	return Math.pow(d[key], early) * Math.pow(d.scaling === 'exp' ? COMBAT.softKnee[key] : d[key], steps - early);
+};
+
+/**
  * HP, attack, armor, crit and stun resistance of a monster at a level (the reward is `monsterReward`).
  *
  * Level scaling: a monster has an integer level. Stats follow `monsterStats`.
  *
- * - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP.
+ * - **Normal** (`scaling: 'exp'`): `HP = round(hp x sqrt(1.5)^(level-1))`, `attack = round(attack x sqrt(1.25)^(level-1))`, `armor = armor + 0.5 x (level-1)`. A level 9 plains monster has 506 HP. Past level `COMBAT.softKnee.fromLevel` (20) the growth per level is the gentler `softKnee` rate (HP x1.08, attack x1.03), because gear grows linearly: a level 41 Frost Hare has about 57K HP, it had 785K.
  * - **Boss** (`scaling: 'gear'`): HP and attack `x levelScale(level) / levelScale(refLevel)` (`1 + 0.07 x (level - 1)`, `src/catalog/stats.ts`); armor `+0.5` per level away from `refLevel`. The plains boss has 1,000 HP and 11 attack at level 15.
  * - Reference levels: plains 15, coast 17, forest 20, hills 22, swamp 25, lake 27, tundra 30.
  * - Boss modifiers ({@link BossModifiers}): **Brutal** raises `attack` by its %, **Enrage** raises `attackSpeed` by its % for every step the fight has reached (`elapsedSec`, one step per `everySec`, a maximum of `maxSteps`).
@@ -132,8 +142,8 @@ const roundHalfUp = (value: number): number => Math.round(value + 1e-9);
  * @category Monsters/Level scaling
  * @order 1
  * @formula
- * normal: HP     = round(hp     x sqrt(1.5)^(level - 1))
- *         attack = round(attack x sqrt(1.25)^(level - 1))
+ * normal: HP     = round(hp     x sqrt(1.5)^(min(level, 20) - 1) x 1.08^max(level - 20, 0))
+ *         attack = round(attack x sqrt(1.25)^(min(level, 20) - 1) x 1.03^max(level - 20, 0))
  *         armor  = armor + 0.5 x (level - 1)
  * boss:   HP, attack = base x levelScale(level) / levelScale(refLevel)         levelScale(L) = 1 + 0.07 x (L - 1)
  *         armor  = armor + 0.5 x (level - refLevel)
@@ -145,8 +155,8 @@ export const monsterStats = (type: MonsterType, level: number, elapsedSec = 0): 
 	const steps = Math.max(1, Math.floor(level)) - d.refLevel;
 	const gear = d.scaling === 'gear' ? (levelScale(Math.max(1, Math.floor(level))) * levelTail(level)) / (levelScale(d.refLevel) * levelTail(d.refLevel)) : null;
 	return {
-		maxHp: roundHalfUp(d.hp * (gear ?? Math.pow(d.hpPerLevel, steps))),
-		attack: roundHalfUp(d.attack * (gear ?? Math.pow(d.attackPerLevel, steps)) * (1 + (d.modifiers?.brutal?.attackPct ?? 0) / 100)),
+		maxHp: roundHalfUp(d.hp * (gear ?? levelGrowth(d, 'hpPerLevel', steps))),
+		attack: roundHalfUp(d.attack * (gear ?? levelGrowth(d, 'attackPerLevel', steps)) * (1 + (d.modifiers?.brutal?.attackPct ?? 0) / 100)),
 		armor: Math.max(0, d.armor + d.armorPerLevel * steps),
 		critChance: d.critChance,
 		critMult: d.critMult,
