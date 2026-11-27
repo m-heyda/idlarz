@@ -189,6 +189,8 @@ interface UiState {
 	showMinimap: boolean;
 	/** The combat panel is shrunk to its icon (a win or defeat is still announced) */
 	combatMinimized: boolean;
+	/** The construction queue (bottom left) in its compact view: one small plate per building (picture, target level, time) instead of a full row */
+	buildQueueCompact: boolean;
 	/** Small amounts next to the header's resource icons (off: icons only) */
 	compactHeader: boolean;
 	/** The Farm window's panels: animal shop, stats readout, upgrade drawer */
@@ -381,6 +383,7 @@ export const useUiStore = create<UiState>((set, get) => ({
 			merchantCustom: (readStringPref('merchantCustom') ?? '').slice(0, MERCHANT_CUSTOM_MAX),
 			showMinimap: readPref('showMinimap'),
 			combatMinimized: readPref('combatMinimized'),
+			buildQueueCompact: readPref('buildQueueCompact'),
 			compactHeader: readPref('compactHeader'),
 			farmAnimalsOpen: readPref('farmAnimalsOpen'),
 			farmHudOpen: readPref('farmHudOpen'),

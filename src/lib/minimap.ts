@@ -14,6 +14,31 @@ export const MINIMAP_MARGIN = 2;
 /** Biggest square a tile gets (px); a small map is shown larger than a huge one, but never as chunky blocks */
 export const MINIMAP_MAX_SCALE = 6;
 
+/**
+ * The overview's box (css px): its default and the smallest it can be dragged to, and the biggest (also capped by the window, see `clampMinimapBox`).
+ * @category Pacing/Minimap
+ */
+export const MINIMAP_BOX_DEFAULT: Size = { w: 176, h: 132 };
+export const MINIMAP_BOX_MAX: Size = { w: 520, h: 420 };
+
+/**
+ * The size the player dragged the overview to, held to what makes sense: never smaller than the default, never bigger than `MINIMAP_BOX_MAX`,
+ * and never so big it covers more than `room` (the window minus the header, the combat panel and a gutter). Whole pixels, so the canvas maps 1:1.
+ * A bad value (NaN from a damaged saved size) falls back to the default.
+ * @category Pacing/Minimap
+ */
+export const clampMinimapBox = (box: Size, room?: Size): Size => {
+	const fit = (value: number, min: number, max: number, limit: number | undefined): number => {
+		if (!Number.isFinite(value)) return min;
+		const top = limit === undefined ? max : Math.max(min, Math.min(max, limit));
+		return Math.round(Math.min(top, Math.max(min, value)));
+	};
+	return {
+		w: fit(box.w, MINIMAP_BOX_DEFAULT.w, MINIMAP_BOX_MAX.w, room?.w),
+		h: fit(box.h, MINIMAP_BOX_DEFAULT.h, MINIMAP_BOX_MAX.h, room?.h),
+	};
+};
+
 export const CASTLE_MARKER_COLOR = '#ffd860';
 export const MONSTER_COLOR = '#ff4d4d';
 export const CHEST_COLOR = '#ffd23a';

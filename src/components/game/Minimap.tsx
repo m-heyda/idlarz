@@ -1,9 +1,11 @@
-import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { TILE_SIZE } from '@/config/biomes';
 import {
 	CHEST_COLOR,
+	MINIMAP_BOX_DEFAULT,
 	MONSTER_COLOR,
 	ORE_COLOR,
+	clampMinimapBox,
 	minimapLayout,
 	minimapMarkers,
 	minimapToTile,
@@ -12,12 +14,25 @@ import {
 	viewRectangle,
 } from '@/lib/minimap';
 import { useRockStore } from '@/stores/rockStore';
+import { readJsonPref, writeJsonPref } from '@/lib/uiPrefs';
 import { useUiStore } from '@/stores/uiStore';
 import '@/styles/Minimap.css';
 import { useMapGame, useMapView } from './mapSource';
 
-/** Size of the overview (css px) */
-const BOX = { w: 176, h: 132 };
+/** Where the dragged size is remembered (localStorage, see lib/uiPrefs) */
+const SIZE_PREF = 'minimapSize';
+/** Window space the overview must leave free: the header above it, the combat panel below and a gutter at the sides (css px) */
+const RESERVED = { w: 48, h: 240 };
+
+const room = (): { w: number; h: number } => ({ w: window.innerWidth - RESERVED.w, h: window.innerHeight - RESERVED.h });
+
+/** The remembered size (or the default), held to the limits again in case the window got smaller since */
+const readBox = () => {
+	const saved = readJsonPref(SIZE_PREF) as { w?: unknown; h?: unknown } | null;
+	const box = saved && typeof saved.w === 'number' && typeof saved.h === 'number' ? { w: saved.w, h: saved.h } : MINIMAP_BOX_DEFAULT;
+	return clampMinimapBox(box, room());
+};
+
 /** The picture is repainted at most this often while the map changes (a purchase repaints one frame later, a flood of them is batched) */
 const REPAINT_MS = 200;
 
@@ -38,8 +53,11 @@ const MinimapBody: React.FC = () => {
 	const viewRef = useRef<HTMLDivElement>(null);
 	const lastPaint = useRef(0);
 	const dragging = useRef(false);
+	// The box the player dragged the bottom left corner to (css px): the canvas is repainted at this size, so a bigger overview shows the map in finer detail
+	const [box, setBox] = useState(readBox);
+	const resize = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 
-	const layout = useMemo(() => minimapLayout(tiles.bounds, BOX), [tiles.bounds]);
+	const layout = useMemo(() => minimapLayout(tiles.bounds, box), [tiles.bounds, box]);
 	const monsters = useMemo(
 		() => (monsterPlaces ? monsterPlaces.split(';').map((p) => ({ x: Number(p.split(',')[0]), y: Number(p.split(',')[1]) })) : []),
 		[monsterPlaces],
@@ -90,6 +108,17 @@ const MinimapBody: React.FC = () => {
 		return view.subscribe(place);
 	}, [layout, view]);
 
+	// A smaller window shrinks an overview that no longer fits
+	useEffect(() => {
+		const fitToWindow = () =>
+			setBox((now) => {
+				const next = clampMinimapBox(now, room());
+				return next.w === now.w && next.h === now.h ? now : next;
+			});
+		window.addEventListener('resize', fitToWindow);
+		return () => window.removeEventListener('resize', fitToWindow);
+	}, []);
+
 	const moveTo = useCallback(
 		(e: React.PointerEvent<HTMLDivElement>) => {
 			const box = canvasRef.current?.getBoundingClientRect();
@@ -109,7 +138,7 @@ const MinimapBody: React.FC = () => {
 	return (
 		<div
 			className='minimap ds-root ds-minimap'
-			style={{ width: BOX.w, height: BOX.h }}
+			style={{ width: box.w, height: box.h }}
 			title={`Map overview: click or drag to move the view${summary.length ? ` (${summary.join(', ')})` : ''}`}
 			aria-label={`Map overview${summary.length ? `, ${summary.join(', ')}` : ''}`}
 			onPointerDown={(e) => {
@@ -125,6 +154,35 @@ const MinimapBody: React.FC = () => {
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
 			<div ref={viewRef} className='minimap-view' />
+			{/* The grip: the overview hangs from the top right corner, so dragging its free bottom left corner out (left and down) makes it bigger, in (right and up) smaller */}
+			<div
+				className='minimap-grip'
+				role='separator'
+				aria-label='Resize the map overview'
+				title='Drag to resize the map overview (double-click: back to the default size)'
+				onPointerDown={(e) => {
+					if (e.button !== 0) return;
+					e.stopPropagation();
+					resize.current = { x: e.clientX, y: e.clientY, w: box.w, h: box.h };
+					e.currentTarget.setPointerCapture(e.pointerId);
+				}}
+				onPointerMove={(e) => {
+					const start = resize.current;
+					if (!start) return;
+					e.stopPropagation();
+					setBox(clampMinimapBox({ w: start.w + (start.x - e.clientX), h: start.h + (e.clientY - start.y) }, room()));
+				}}
+				onPointerUp={(e) => {
+					e.stopPropagation();
+					resize.current = null;
+					writeJsonPref(SIZE_PREF, box);
+				}}
+				onPointerCancel={() => (resize.current = null)}
+				onDoubleClick={() => {
+					setBox(MINIMAP_BOX_DEFAULT);
+					writeJsonPref(SIZE_PREF, MINIMAP_BOX_DEFAULT);
+				}}
+			/>
 			<div className='ds-minimap-stats' aria-hidden>
 				<span style={{ display: 'flex', gap: 8 }}>
 					{monsters.length > 0 && (
