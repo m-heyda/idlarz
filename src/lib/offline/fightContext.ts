@@ -46,8 +46,9 @@ export interface FightCtx {
 	potionIds: string[];
 }
 
-/** Catalog ids of the potions that heal. */
-export const healingPotionIds = (): string[] => Object.keys(ITEM_CATALOG).filter((id) => quickHealOf(ITEM_CATALOG[id]) > 0);
+let healingIds: string[] | undefined;
+/** Catalog ids of the potions that heal (the catalog is fixed, so worked out once). */
+export const healingPotionIds = (): string[] => (healingIds ??= Object.keys(ITEM_CATALOG).filter((id) => quickHealOf(ITEM_CATALOG[id]) > 0));
 
 /** The combat record of a ledger, seeded from the saved HP and mana the first time. */
 export const combatOf = (ledger: Ledger, env: CombatEnv): CombatState => {
