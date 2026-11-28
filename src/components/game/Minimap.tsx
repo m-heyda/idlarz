@@ -83,7 +83,9 @@ const MinimapBody: React.FC = () => {
 	const lastPaint = useRef(0);
 	const dragging = useRef(false);
 	// The box the player dragged the bottom left corner to (css px): the canvas is repainted at this size, so a bigger overview shows the map in finer detail
-	const [box, setBox] = useState(readBox);
+	const [box, setBox] = useState(MINIMAP_BOX_DEFAULT);
+	// read after mount: the server render has no window or localStorage (and the first client render must match it)
+	useEffect(() => setBox(readBox()), []);
 	const resize = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 
 	// Zoom (the + and - buttons): 1 shows the whole map, more zooms in on `focus` (a tile), which follows the screen when it leaves the zoomed part and can be dragged with the right mouse button
