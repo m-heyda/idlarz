@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { castleLevelOf, castleRangeRadius } from '@/lib/castleWard';
 import { TILE_SIZE } from '@/config/biomes';
 import { CASTLE_X, CASTLE_Y } from '@/config/castle';
 import {
@@ -42,6 +43,13 @@ const readBox = () => {
 
 /** The picture is repainted at most this often while the map changes (a purchase repaints one frame later, a flood of them is batched) */
 const REPAINT_MS = 200;
+
+/** The castle's range (the violet bonus area on the map, `castleRangeRadius`) while zoomed in: a translucent violet square under the crown, clipped by the box */
+const RangeArea: React.FC<{ layout: MinimapLayout; radius: number }> = ({ layout, radius }) => {
+	const a = tileToMinimap(layout, CASTLE_X - radius, CASTLE_Y - radius);
+	const side = (radius * 2 + 1) * layout.scale;
+	return <span className='minimap-range' style={{ left: a.x, top: a.y, width: side, height: side }} aria-hidden />;
+};
 
 /** The castle while zoomed in: a gold crown over its tile (the tile itself is just a yellow square at that size), hidden when the castle is outside the zoomed part */
 const Crown: React.FC<{ layout: MinimapLayout }> = ({ layout }) => {
@@ -228,6 +236,7 @@ const MinimapBody: React.FC = () => {
 			<canvas ref={canvasRef} width={layout.width} height={layout.height} className='minimap-canvas' />
 			<canvas ref={glowRef} width={layout.width} height={layout.height} className='minimap-canvas minimap-glow' aria-hidden />
 			<div ref={viewRef} className='minimap-view' />
+			{zoom > 1 && <RangeArea layout={layout} radius={castleRangeRadius(castleLevelOf(tiles))} />}
 			{zoom > 1 && <Crown layout={layout} />}
 			<div className='minimap-zoom' onPointerDown={(e) => e.stopPropagation()}>
 				<button

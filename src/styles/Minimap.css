@@ -162,3 +162,12 @@
 	transform: translate(-50%, -50%);
 	pointer-events: none;
 }
+
+/* the castle's range (the violet bonus area) while zoomed in; the box clips what sticks out */
+.minimap-range {
+	position: absolute;
+	box-sizing: border-box;
+	background: rgba(150, 90, 255, 0.28);
+	border: 1px solid rgba(190, 140, 255, 0.85);
+	pointer-events: none;
+}
