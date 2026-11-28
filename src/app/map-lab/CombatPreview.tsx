@@ -91,6 +91,7 @@ const CombatPreview: React.FC = () => {
 				</label>
 			</div>
 			<CombatPanel
+				biome={entry.biomes[0]}
 				monster={{ type, level, art: entry.id }}
 				flip={flip}
 				fight={fight}

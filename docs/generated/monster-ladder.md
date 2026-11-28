@@ -20,7 +20,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | Gravel Quail | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Stonehorn Bison | 1 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Stonehorn Bison | 10 (castle 8) | 100% | 100% | 100% | 100% | 100% | 100% |
-| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 95% | 100% |
+| Stonehorn Bison | 20 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | The Great Auroch | 15 (castle 1) | 80% | 88% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 23 (castle 8) | 5% | 35% | 100% | 100% | 100% | 100% |
 | The Great Auroch | 33 (grown) | 0% | 3% | 100% | 100% | 100% | 100% |
@@ -119,7 +119,7 @@ Win % of a gear tier (level 30 hero, 25 points spent, Heal and Stun on, gear at 
 | The Ironhorn | 40 (grown) | 0% | 0% | 0% | 0% | 100% | 100% |
 | Wreck Crab | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Wreck Crab | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
-| Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 18% | 100% |
+| Wreck Crab | 21 (grown) | 0% | 0% | 0% | 0% | 23% | 100% |
 | Net Gull | 2 (castle 1) | 100% | 100% | 100% | 100% | 100% | 100% |
 | Net Gull | 11 (castle 8) | 0% | 100% | 100% | 100% | 100% | 100% |
 | Net Gull | 21 (grown) | 0% | 0% | 0% | 0% | 0% | 25% |

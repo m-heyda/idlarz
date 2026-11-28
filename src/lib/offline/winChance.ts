@@ -70,10 +70,10 @@ const monsterDps = (p: PlayerProfile, type: MonsterType, level: number, elapsedS
 
 /**
  * The player's chance against a monster of this type and level, starting with `hp` and with these potions to drink. A monster that
- * cannot be killed inside the fight's time limit (a boss's own clock, `COMBAT.maxFightSec`) is a certain loss.
+ * cannot be killed inside the fight's time limit is a certain loss: only a boss has one (its own clock, at most `COMBAT.maxFightSec`); a regular monster has none beyond the stalemate guard `COMBAT.maxRegularFightSec`.
  *
  * Win chance: a closed form from the frozen profile and `monsterStats`. If `killSec > limit` the chance is 0. The same estimate weights new spawns ({@link typeWeights}).
- * `limit` is min(180 s, the boss's own clock).
+ * `limit` is min(`maxFightSec`, the boss's own clock) for a boss and `maxRegularFightSec` for any other monster.
  *
  * @category Combat/Win chance
  * @formula
@@ -103,7 +103,8 @@ export const estimateWin = (
 		dealt = dps + incoming * thorns;
 	}
 	const killSec = m.maxHp / dealt;
-	const limit = Math.min(COMBAT.maxFightSec, bossClockSec(type, p) ?? Infinity);
+	const bossClock = bossClockSec(type, p);
+	const limit = bossClock === undefined ? COMBAT.maxRegularFightSec : Math.min(COMBAT.maxFightSec, bossClock);
 	if (killSec > limit) return { chance: 0, killSec, surviveSec: 0 };
 
 	// what comes back while the fight lasts: regeneration, life leech, and the potions that fit between their shared cooldown
