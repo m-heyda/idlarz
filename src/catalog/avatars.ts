@@ -1,4 +1,7 @@
+import { AVATAR_UNLOCKS, type AvatarGroup } from '@/catalog/avatarUnlocks';
 import type { PlayerClassId } from '@/config/playerClasses';
+
+export type { AvatarGroup };
 
 /**
  * Avatars (IDL-71, class lock IDL-269): the face a player shows in the header, the character window, the rankings and the map preview. They are purely visual. Each of the eight **starters**
@@ -8,7 +11,7 @@ import type { PlayerClassId } from '@/config/playerClasses';
  * achievements the account has earned. A stored avatar that no longer fits (a later class change) falls back to the class's default (`fitAvatar`). The chosen id lives in `profiles.avatar_id` (null = none chosen yet, the hero's class bust is shown), which only the service role writes.
  *
  * **Art.** The owner's framed busts (64x64, `public/pixel/ui/heroes/<portrait>.png`, listed in `public/pixel/README.md`) are the portraits; `avatarArtUrl` is the only place that
- * builds the path, so a new picture is a change to the `portrait` field. The horned busts not used here stay in the pool for later unlocks. The **Beta tester** is the reward of the Beta tester achievement (a wireframe bust), which every Early tester gets too. A locked avatar is shown as a black
+ * builds the path, so a new picture is a change to the `portrait` field. The avatar expansion (36 more busts in three sets, `catalog/avatarUnlocks.ts`) unlocks by shipped achievements, so veterans get what they already earned. The **Beta tester** is the reward of the Beta tester achievement (a wireframe bust), which every Early tester gets too. A locked avatar is shown as a black
  * cut-out of its own picture (generated in `AvatarArt`, no extra art needed). Small uses (header, rankings at 20 px) scale the same file down.
  *
  * @category Progression/Avatars
@@ -26,6 +29,8 @@ export interface AvatarInfo {
 	unlockedBy?: string;
 	/** How to earn it (shown on the locked card) */
 	how?: string;
+	/** The tab of the Avatar window it is listed under: `class` (the eight starters), `heroes` / `fiends` / `void` (the expansion sets, `catalog/avatarUnlocks.ts`) or `special` (the older rewards, testers and admin) */
+	group: AvatarGroup;
 	/** The picture: file name (no extension) of a framed bust in `public/pixel/ui/heroes/` */
 	portrait: string;
 	/** One or two lines about this face (the creation screens and the Avatar window) */
@@ -38,6 +43,7 @@ const starter = (id: string, name: string, classId: PlayerClassId, portrait: str
 	id,
 	name,
 	kind: 'starter',
+	group: 'class',
 	classId,
 	portrait,
 	bio,
@@ -46,6 +52,7 @@ const unlock = (id: string, name: string, unlockedBy: string, how: string, portr
 	id,
 	name,
 	kind: 'unlock',
+	group: 'special',
 	unlockedBy,
 	how,
 	portrait,
@@ -112,6 +119,8 @@ export const AVATARS: readonly AvatarInfo[] = [
 		),
 		adminOnly: true,
 	},
+	// the avatar expansion: appended after the older ones, never reordered (ids are append-only)
+	...AVATAR_UNLOCKS.map((u): AvatarInfo => ({ ...unlock(u.id, u.name, u.achievement, u.how, u.portrait, u.bio), group: u.group })),
 ];
 
 /**

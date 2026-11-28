@@ -47,12 +47,14 @@ test('once loaded, other classes keep the dimmed look with the lock line and une
 	assert.doesNotMatch(html, /data-loading="true"/);
 });
 
-test('the grid is four rows of four: the faces, then "Soon" cards for the free slots', () => {
-	const { AVATAR_GRID_SLOTS } = require('../../src/components/game/AvatarPicker') as typeof import('../../src/components/game/AvatarPicker'); // eslint-disable-line @typescript-eslint/no-require-imports
-	const html = draw('mage');
-	assert.equal((html.match(/data-testid="avatar-soon"/g) ?? []).length, AVATAR_GRID_SLOTS - AVATARS.filter((a) => !a.adminOnly).length);
-	assert.equal(AVATAR_GRID_SLOTS % 4, 0);
-	assert.ok(AVATARS.length <= AVATAR_GRID_SLOTS);
+test('the window lists every face for the account, a tab per set with its count, and the overall progress', () => {
+	const html = draw('mage', { unlocked: classAvatarIds('mage', ['castle_15', 'biome_blight']) });
+	for (const label of ['All', 'Class', 'Heroes', 'Fiends', 'Void', 'Special']) assert.match(html, new RegExp(`role="tab"[^>]*>${label} `));
+	const faces = AVATARS.filter((a) => !a.adminOnly).length;
+	assert.equal((html.match(/role="radio"/g) ?? []).length, faces, 'no cap and no filler cards');
+	assert.ok(faces > 16, 'the catalog outgrew the old 4x4 grid');
+	assert.doesNotMatch(html, /avatar-soon/);
+	assert.match(html, new RegExp(`${classAvatarIds('mage', ['castle_15', 'biome_blight']).length} of ${faces} faces unlocked`));
 });
 
 test('the Admin avatar is not offered to anyone who does not hold it, not even as a locked card; the admin sees it enabled', () => {

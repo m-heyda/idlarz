@@ -2,6 +2,7 @@ import { BATCH2_ACHIEVEMENTS, BATCH2_DEEDS } from '@/catalog/achievementsBatch2'
 import { BATCH3_TIERS, buildBatch3 } from '@/catalog/achievementsBatch3';
 import { BATCH4_ACHIEVEMENTS, BATCH4_DEEDS } from '@/catalog/achievementsBatch4';
 import { PARAGON_ACHIEVEMENTS, PARAGON_DEEDS } from '@/catalog/achievementsParagon';
+import { AVATAR_UNLOCKS } from '@/catalog/avatarUnlocks';
 import { MASTERY_ENTRY_KILLS, TOTAL_MASTERY_TIERS } from '@/catalog/mastery';
 
 // The launch achievements as data (IDL-73, gem amounts IDL-194, decided 2026-11-07). Order is the order of the list in the game. A condition is a plain tag that
@@ -119,7 +120,7 @@ export interface AchievementDef {
  * @order 0
  * @see settleAchievements, achievementsDue
  */
-export const ACHIEVEMENTS: readonly AchievementDef[] = [
+const BASE_ACHIEVEMENTS: readonly AchievementDef[] = [
 	{
 		id: 'tutorial',
 		title: 'Learned the ropes',
@@ -552,6 +553,20 @@ export const ACHIEVEMENTS: readonly AchievementDef[] = [
 		rewards: { gems: 125, points: 40 },
 	},
 ];
+
+/**
+ * The avatar expansion hangs its face and a title on shipped achievements (`catalog/avatarUnlocks.ts`): the achievement keeps its id, goal and gems; only `rewards.avatarId` (and `titleId` / `titleName` when it has none) is added, so the toast and the Hall of Deeds
+ * name the reward. The real gate stays `AvatarInfo.unlockedBy`. An achievement that already names an avatar or a title keeps it.
+ *
+ * @category Progression/Avatars
+ * @order 6
+ */
+export const ACHIEVEMENTS: readonly AchievementDef[] = BASE_ACHIEVEMENTS.map((def) => {
+	const unlock = AVATAR_UNLOCKS.find((u) => u.achievement === def.id);
+	if (!unlock) return def;
+	const title = !def.rewards.titleId && unlock.title ? { titleId: unlock.title.id, titleName: unlock.title.name } : {};
+	return { ...def, rewards: { ...def.rewards, ...(def.rewards.avatarId ? {} : { avatarId: unlock.id }), ...title } };
+});
 
 export const achievementById = (id: string): AchievementDef | undefined => ACHIEVEMENTS.find((a) => a.id === id);
 
