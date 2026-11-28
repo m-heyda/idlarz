@@ -51,9 +51,7 @@ export interface CheckboxProps extends Omit<React.InputHTMLAttributes<HTMLInputE
 export const Checkbox: React.FC<CheckboxProps> = ({ checked, onChange, label, disabled, className, ...rest }) => (
 	<label className={cx('ds-check', className)} data-disabled={disabled ? 'true' : undefined}>
 		<input {...rest} type='checkbox' className='ds-check-input' checked={checked} disabled={disabled} onChange={(event) => onChange(event.target.checked)} />
-		<span className='ds-check-box' aria-hidden='true'>
-			✓
-		</span>
+		<span className='ds-check-box' aria-hidden='true' />
 		{label ? <span className='ds-check-label'>{label}</span> : null}
 	</label>
 );

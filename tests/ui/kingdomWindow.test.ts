@@ -1,4 +1,6 @@
 import test from 'node:test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import assert from 'node:assert/strict';
 import React from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
@@ -136,4 +138,10 @@ test('the summary counts the monsters at the highest level (the Strongest tile)'
 	const s = kingdomSummary({ ...base, monsters: [at(1, 3), at(2, 9), at(3, 9)] }, 0);
 	assert.equal(s.monsters.highestLevel, 9);
 	assert.equal(s.monsters.strongest, 2);
+});
+
+test('pressing a building name leaves the window open (it keeps its scroll position)', () => {
+	const source = readFileSync(join(process.cwd(), 'src/components/game/KingdomWindow.tsx'), 'utf8');
+	assert.doesNotMatch(source, /closeWindow\(/);
+	assert.match(source, /focusTile\(/);
 });

@@ -3,6 +3,7 @@ import { AVATARS, avatarFitsClass } from '@/catalog/avatars';
 import { PLAYER_CLASSES, type PlayerClassId } from '@/config/playerClasses';
 import { AVATAR_TABS, avatarProgress, visibleAvatars, type AvatarTab } from '@/lib/avatarPick';
 import AvatarArt from './AvatarArt';
+import { Checkbox } from '../../../packages/design-system/src/components/primitives';
 import '@/styles/Heroes.css';
 
 /** The loading grid draws this many skeleton cards (four rows of four). The real grid grows with the catalog and scrolls inside the window. */
@@ -51,9 +52,7 @@ const AvatarGrid: React.FC<AvatarPickerProps> = ({ value, playerClass, unlocked,
 						);
 					})}
 				</div>
-				<label className='avatar-only'>
-					<input type='checkbox' checked={unlockedOnly} onChange={(e) => setUnlockedOnly(e.target.checked)} /> Unlocked only
-				</label>
+				<Checkbox className='avatar-only' checked={unlockedOnly} onChange={setUnlockedOnly} label='Unlocked only' />
 			</div>
 			<p className='avatar-progress ds-dim' data-testid='avatar-progress'>
 				{overall.have} of {overall.total} faces unlocked

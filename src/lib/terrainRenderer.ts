@@ -115,9 +115,20 @@ const patternsOf = (assets: TerrainAssets, ctx: CanvasRenderingContext2D): Recor
 	return patterns;
 };
 
-/** The full picture of one chunk. Dual cells on the chunk's border are drawn by both chunks (each keeps its own half). */
-export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, world: World, cx: number, cy: number): void {
-	const ctx = prepare(canvas, cx, cy);
+/** One chunk is drawn into this canvas and copied onto its own canvas at the end, so a chunk that is drawn in slices never shows half a picture (and the flat colours stay until the real picture is whole). */
+let back: HTMLCanvasElement | null = null;
+
+/**
+ * The full picture of one chunk, as a sequence of small steps (one row of cells each, then the props): run them from `scheduleSteps` and no single frame pays for a whole chunk.
+ * Dual cells on the chunk's border are drawn by both chunks (each keeps its own half). The picture appears on `canvas` when the last step has run.
+ */
+export function* drawChunkSteps(canvas: HTMLCanvasElement, assets: TerrainAssets, world: World, cx: number, cy: number): Generator<void> {
+	if (!back) {
+		back = document.createElement('canvas');
+		back.width = CHUNK_CANVAS_PX;
+		back.height = CHUNK_CANVAS_PX;
+	}
+	const ctx = prepare(back, cx, cy);
 	if (!ctx) return;
 	const g = worldGround(world);
 
@@ -164,6 +175,7 @@ export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, worl
 				else ctx.drawImage(shape, mask * CELL, (variant * 2 + 1) * CELL, CELL, CELL, ox, oy, CELL, CELL);
 			}
 		}
+		yield;
 	}
 
 	for (const s of [...chunkPads(world, cx, cy), ...chunkSprites(world, cx, cy)]) {
@@ -171,30 +183,62 @@ export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, worl
 		const [sx, sy, sw, sh] = ATLAS.sprites[s.id];
 		ctx.drawImage(assets.props, sx, sy, sw, sh, s.x, s.bottom - sh, sw, sh);
 	}
+	yield;
+
+	const out = canvas.getContext('2d');
+	if (!out) return;
+	out.setTransform(1, 0, 0, 1, 0, 0);
+	out.globalCompositeOperation = 'source-over';
+	out.clearRect(0, 0, canvas.width, canvas.height);
+	out.drawImage(back, 0, 0);
+}
+
+/** The whole picture of one chunk at once (the landing bake, tests). The map itself draws it in steps. */
+export function drawChunk(canvas: HTMLCanvasElement, assets: TerrainAssets, world: World, cx: number, cy: number): void {
+	for (const step of drawChunkSteps(canvas, assets, world, cx, cy)) void step;
 }
 
 // ---- spreading the work over frames ---------------------------------------------------------------------------------
 
-/** Time a frame may spend on chunk drawing before the rest waits for the next frame (at least one chunk is always drawn) */
-const FRAME_BUDGET_MS = 6;
-const queue: (() => void)[] = [];
+/** Time a frame may spend on chunk drawing before the rest waits for the next frame (at least one step always runs) */
+const FRAME_BUDGET_MS = 8;
+interface Job {
+	/** Does one piece of the work; true when the job is done */
+	step: () => boolean;
+}
+const queue: Job[] = [];
 let frame = 0;
 
 const runJobs = () => {
 	frame = 0;
 	const started = performance.now();
 	do {
-		queue.shift()?.();
+		// only the job at the head runs, until it is done: the steps of a chunk share one working canvas
+		if (queue[0].step()) queue.shift();
 	} while (queue.length > 0 && performance.now() - started < FRAME_BUDGET_MS);
 	if (queue.length > 0) frame = requestAnimationFrame(runJobs);
 };
 
-/** Runs `job` on a later frame, as many per frame as fit in FRAME_BUDGET_MS, in order. Returns a function that cancels it. */
-export function scheduleDraw(job: () => void): () => void {
+const enqueue = (job: Job): (() => void) => {
 	queue.push(job);
 	if (!frame) frame = requestAnimationFrame(runJobs);
 	return () => {
 		const i = queue.indexOf(job);
 		if (i >= 0) queue.splice(i, 1);
 	};
+};
+
+/** Runs `job` on a later frame, as many per frame as fit in FRAME_BUDGET_MS, in order. Returns a function that cancels it. */
+export function scheduleDraw(job: () => void): () => void {
+	return enqueue({
+		step: () => {
+			job();
+			return true;
+		},
+	});
+}
+
+/** Runs the steps of `steps` (see `drawChunkSteps`) on later frames, within the same budget; a job that is cancelled half way is dropped. */
+export function scheduleSteps(steps: Generator<void>): () => void {
+	return enqueue({ step: () => !!steps.next().done });
 }
