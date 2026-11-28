@@ -304,6 +304,10 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	const dead = over?.kind === 'won';
 	const hpKey = dead ? 'dead' : p.hitTick;
 	const bgUrl = combatBackgroundUrl(p.biome);
+	/** The glide of the picture starts over with every new fight (the next monster from the queue, another target), never carrying the old position over; a result keeps the fight's key so the picture does not jump */
+	const lastFightKey = useRef(String(p.snapKey));
+	if (typeof p.snapKey === 'string' && p.snapKey.startsWith('fight-')) lastFightKey.current = p.snapKey;
+	const sceneKey = `${lastFightKey.current}-${monster.type}-${p.biome ?? ''}`;
 	const [localCompact, setLocalCompact] = useState(false);
 	const compact = p.queueCompact ?? localCompact;
 	const setCompact = p.onQueueCompact ?? setLocalCompact;
@@ -436,7 +440,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 				<div className='fight-body' data-shake={p.shake && !over}>
 					<div className='fight-hurt-flash' data-on={p.shake && !over} aria-hidden />
 					<div className='combat-scene'>
-						{bgUrl && <span className='combat-bg' style={{ backgroundImage: `url(${bgUrl})` }} aria-hidden />}
+						{bgUrl && <span key={sceneKey} className='combat-bg' style={{ backgroundImage: `url(${bgUrl})` }} aria-hidden />}
 						<header className='combat-head'>
 							<b>{`${boss ? '☠ ' : ''}${label} - Lv ${monster.level}`}</b>
 							<span className='flex gap-1'>
