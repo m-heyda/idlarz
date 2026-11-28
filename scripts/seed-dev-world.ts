@@ -3,6 +3,7 @@
  * pre-flip state: the profile is never touched, so an account that has been through a new chapter works too.
  *
  *   npm run seed-dev-world -- --user <uuid> --expect-email <address>          DRY RUN: checks the account, builds the world, prints counts, writes nothing
+ *   options: --tiles <n>   how many explored tiles (default 70, at most 6000)
  *   npm run seed-dev-world -- --user <uuid> --expect-email <address> --yes    backs the account up (`backups/seed-dev-world-<time>.json`), wipes its game data, writes the new world through the server's own save path
  *
  * Undo with `npm run seed-rehearsal -- --restore <backup file> --user <uuid> --expect-email <address> --yes` (the backup format is the same). Output is counts and words only. Needs SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY: they decide which project is touched.
@@ -26,6 +27,10 @@ import { pickPersisted } from '../src/lib/sanitizeSave';
 import { encodeSave } from '../src/lib/saveFormat';
 import { withDone } from '../src/lib/tutorial/engine';
 import { forEachOwned, ownedCount } from '../src/utils/world';
+import { syntheticWorld } from '../src/utils/worldGen';
+import { calculateXpGain } from '../src/utils/game/character';
+import { XP_CAP } from '../src/config/economy';
+import { useGameStore } from '../src/stores/gameStore';
 import { BACKUP_TABLES, applySeed, dumpCounts, type AccountDump, type SeedPlan } from './lib/rehearsalSeed';
 import { api, growTo, patchTileAt, setResources } from '../tests/helpers';
 
@@ -36,6 +41,8 @@ const option = (name: string): string | undefined => {
 };
 const execute = args.includes('--yes');
 const userId = option('--user');
+// how much land: 70 by default, up to 6000 (5000 is what the map performance test uses)
+const tiles = Math.min(6000, Math.max(20, Math.floor(Number(option('--tiles') ?? 70)) || 70));
 const expectEmail = option('--expect-email');
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -81,6 +88,12 @@ const buildWorld = (nowMs: number): SeedPlan & { built: string[] } => {
 	}
 	if (built.length < 3) throw new Error('the land has fewer than three buildable biomes: run again (the map is random)');
 	setResources({ gold: 25_000, wood: 4000, stone: 3000, coal: 800, food: 5000, hide: 300, xp: api().resources.xp });
+	if (tiles > ownedCount(api().tiles)) {
+		// beyond what buying can reach quickly: the same random-blob generator as the perf page, grown from the 70 real tiles (buildings stay where they are), with the XP those tiles would have earned
+		let xp = 0;
+		for (let k = 2; k <= tiles; k++) xp += calculateXpGain(k);
+		useGameStore.setState((s) => ({ tiles: syntheticWorld(tiles, 1, s.tiles), resources: { ...s.resources, xp: Math.min(xp * 1.01, XP_CAP) } }));
+	}
 	api().tick(1000);
 	const persisted = pickPersisted(api());
 	const after = summarize(structuredClone(persisted));
