@@ -39,10 +39,11 @@ import { applyOpen } from '@/lib/offline/openChest';
 import { combatView, dismissTicket, runCombat, type CombatEnv } from '@/lib/offline/fight';
 import type { CombatCommand, QueueResult } from '@/lib/offline/fightTypes';
 import { addTotals, type GrantTotals, type Ledger } from '@/lib/offline/ledger';
-import { applyOp, needsNoFight, receiveInto, sellContextOf, type InventoryOp } from '@/lib/offline/inventory';
+import { applyOp, needsNoFight, receiveInto, sellContextOf, shopCostOf, type InventoryOp } from '@/lib/offline/inventory';
 import { sealedRng } from '@/lib/offline/seal';
 import { recordChest, recordCraft, recordCraftedRare, recordRock } from '@/lib/offline/stats';
-import { buyResource, sellResource } from '@/lib/offline/trade';
+import { buyResource, sellResource, spendGold } from '@/lib/offline/trade';
+import { buyOffer, shelfAfterRebirth, shelfStep } from '@/lib/offline/shelf';
 import {
 	UNCLAIMED_SEC,
 	bankContext,
@@ -413,10 +414,28 @@ export const inventoryStep = (deps: ServiceDeps, userId: string, key: string, op
 			if (!traded.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
 			return { ledger: traded.ledger, value: { ok: true, gold: traded.gold, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
 		}
+		const refusal = (message?: string) => ({
+			ledger,
+			value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, ...(message ? { message } : {}) },
+		});
+		if (op.action === 'shelf') {
+			// the merchant's shelf (IDL-121): rolled, refreshed and priced here with the server's own clock; allowed in a fight like the purchases
+			const stepped = shelfStep(ledger, ctx.stored, { secret: deps.secret, userId }, ctx.nowSec, op.mode);
+			if (!stepped.ok) return refusal(stepped.message);
+			return { ledger: stepped.ledger, value: { ok: true, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec, shelf: stepped.shelf } };
+		}
+		if (op.action === 'buyOffer') {
+			const bought = buyOffer(ledger, ctx.stored, ctx.nowSec, op.index, op.item);
+			if (!bought) return refusal();
+			return { ledger: bought.ledger, value: { ok: true, gold: 0, count: 0, inv: bought.inv, serverNowSec: ctx.nowSec } };
+		}
 		const blocked = needsNoFight(op) && !!ledger.combat?.fight;
 		const result = blocked ? null : applyOp(ledger.inv!, op, sellContextOf(ctx.stored.core));
-		if (!result || !result.ok) return { ledger, value: { ok: false, gold: 0, count: 0, inv: ledger.inv!, serverNowSec: ctx.nowSec } };
-		const next: Ledger = { ...ledger, inv: result.inv, granted: result.gold > 0 ? addTotals(ledger.granted, { gold: result.gold }) : ledger.granted };
+		if (!result || !result.ok) return refusal();
+		// a shop purchase's price is worked out here and recorded as spent (IDL-121): a price the player cannot plausibly pay refuses it
+		const spent = op.action === 'buyShop' ? spendGold(ledger, ctx.stored, ctx.nowSec, shopCostOf(op) ?? Infinity) : ledger;
+		if (!spent) return refusal();
+		const next: Ledger = { ...spent, inv: result.inv, granted: result.gold > 0 ? addTotals(spent.granted, { gold: result.gold }) : spent.granted };
 		return { ledger: next, value: { ok: true, gold: result.gold, count: result.count, inv: result.inv, serverNowSec: ctx.nowSec } };
 	});
 
@@ -554,6 +573,8 @@ export const rebirthStep = (
 			ledger: {
 				...ctx.ledger,
 				inv: wiped,
+				// the price run and the free window of the shelf start again (the shelf and the cooldown stay)
+				stats: { ...ctx.ledger.stats, shelf: shelfAfterRebirth(ctx.ledger.stats.shelf) },
 				buffs: clearBuffsOnRebirth(),
 				attrs: options.keepAttrs ? ctx.ledger.attrs : clearedAttrs(ctx.ledger.attrs),
 				paragon,

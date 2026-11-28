@@ -92,6 +92,42 @@ export const createInventorySync = (set: GameSet, get: GameGet) => {
 		undo?.();
 	};
 
+	/**
+	 * The merchant's shelf is the server's (IDL-121): it rolls the offers, keeps the refresh clocks and prices a refresh. This asks for it (`rotate`: the shelf, rolled again when its time is up; `refresh`: a free or paid refresh) and takes the answer: the offers, the
+	 * server's refresh record (its seconds are moved onto this browser's play-time clock, so the screens that count down keep working) and the gold a paid refresh cost. One request at a time; false when one is already on its way.
+	 */
+	let shelfPending = false;
+	let shelfSynced = false;
+	let shelfAskedAt = 0;
+	const requestShelf = (mode: 'rotate' | 'refresh'): boolean => {
+		if (shelfPending) return false;
+		if (mode === 'rotate' && Date.now() - shelfAskedAt < 5000) return false; // a shelf that is not due is only looked at: no need to ask again within seconds
+		shelfPending = true;
+		shelfAskedAt = Date.now();
+		sendInventoryOp({ action: 'shelf', mode }, (reply) => {
+			shelfPending = false;
+			if (!reply?.ok || !reply.shelf) return;
+			shelfSynced = true;
+			const shelf = reply.shelf;
+			const shift = get().playSeconds - reply.serverNowSec;
+			const onPlayClock = (t: number) => (t > 0 ? Math.max(0.001, t + shift) : 0);
+			set((state) => ({
+				merchantStock: { at: Math.min(shelf.at + shift, state.playSeconds), offers: shelf.offers },
+				merchantRefreshes: shelf.paid,
+				merchantRefresh: {
+					windowAt: onPlayClock(shelf.refresh.windowAt),
+					freeUsed: shelf.refresh.freeUsed,
+					lastAt: onPlayClock(shelf.refresh.lastAt),
+					paidAt: onPlayClock(shelf.refresh.paidAt),
+				},
+				resources: shelf.charged > 0 ? { ...state.resources, gold: Math.max(0, state.resources.gold - shelf.charged) } : state.resources,
+			}));
+		});
+		return true;
+	};
+	/** True until the server has answered once with the shelf: a shelf the browser holds from a save is not the server's, so it is not bought from. */
+	const shelfIsSynced = () => shelfSynced;
+
 	provideInvVer(() => get().invVer);
 
 	/** A New Game starts the changes over: nothing in flight is waited for and an answer from the game before it is dropped. */
@@ -99,9 +135,17 @@ export const createInventorySync = (set: GameSet, get: GameGet) => {
 		invGen++;
 		invOpsInFlight = 0;
 		invQueue = Promise.resolve();
+		resetShelf();
 	};
 
-	return { applyInventory, sendInventoryOp, settleSale, settlePurchase, reset };
+	/** A New Game starts the shelf over too. */
+	const resetShelf = () => {
+		shelfPending = false;
+		shelfSynced = false;
+		shelfAskedAt = 0;
+	};
+
+	return { applyInventory, sendInventoryOp, settleSale, settlePurchase, requestShelf, shelfIsSynced, resetShelf, reset };
 };
 
 export type InventorySync = ReturnType<typeof createInventorySync>;

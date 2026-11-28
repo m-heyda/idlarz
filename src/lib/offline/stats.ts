@@ -4,6 +4,7 @@
 
 import { emptyProgress, isEmptyProgress, type TutorialProgress } from '@/lib/tutorial/engine';
 import { readProgress } from '@/lib/tutorial/progress';
+import type { ItemInstance } from '@/types/game';
 
 /** Lifetime counters. Stored as one jsonb value; a player who has counted nothing yet has `null` in the column and reads as {@link emptyStats}. */
 export interface LifetimeStats {
@@ -73,7 +74,27 @@ export interface LifetimeStats {
 	emberCoal: number;
 	/** One-off events the server recorded for the secret deeds (`curiosity` ids from a short allowlist, `lib/offline/curiosity.ts`). Additive: absent reads as none. */
 	curiosity: string[];
+	/** The merchant's shelf the server holds (IDL-121): its offers, rolled here and priced here. Additive: absent reads as no shelf yet. */
+	shelf: ShelfRecord | null;
 }
+
+/**
+ * The merchant's goods shelf as the server keeps it (IDL-121). The clocks are **server seconds**, so the browser cannot move them by lying about its play time. `rolls` is a lifetime counter (a rebirth keeps it) that
+ * seeds each roll (`sealedRng`, kind `merchant`), so a roll is never repeated or predicted.
+ */
+export interface ShelfRecord {
+	/** Server time (s) the current offers were rolled (0: no shelf yet) */
+	at: number;
+	/** Shelves rolled, lifetime: the ordinal of the next sealed roll is `rolls + 1` */
+	rolls: number;
+	/** Paid refreshes counted towards the price (see `paidRefreshesNow`) */
+	paid: number;
+	/** The free-refresh window, the 30 s cooldown and the 24 h price run, in server seconds */
+	refresh: { windowAt: number; freeUsed: number; lastAt: number; paidAt: number };
+	offers: ItemInstance[];
+}
+
+export const emptyShelf = (): ShelfRecord => ({ at: 0, rolls: 0, paid: 0, refresh: { windowAt: 0, freeUsed: 0, lastAt: 0, paidAt: 0 }, offers: [] });
 
 /** What the server traded with the merchant since the last accepted save. */
 export interface TradeSince {
@@ -125,6 +146,7 @@ export const emptyStats = (): LifetimeStats => ({
 	rocksByTier: {},
 	emberCoal: 0,
 	curiosity: [],
+	shelf: null,
 });
 
 const num = (value: unknown): number => (typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : 0);
@@ -144,6 +166,20 @@ const tradeOf = (value: unknown): TradeSince => {
 
 const ids = (value: unknown): string[] =>
 	Array.isArray(value) ? [...new Set(value.filter((id): id is string => typeof id === 'string' && id.length > 0 && id.length <= 40))] : [];
+
+const shelfOf = (value: unknown): ShelfRecord | null => {
+	if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+	const r = value as Record<string, unknown>;
+	const f = r.refresh && typeof r.refresh === 'object' ? (r.refresh as Record<string, unknown>) : {};
+	const offers = Array.isArray(r.offers) ? r.offers.filter((o): o is ItemInstance => !!o && typeof o === 'object' && !Array.isArray(o)).slice(0, 50) : [];
+	return {
+		at: num(r.at),
+		rolls: Math.floor(num(r.rolls)),
+		paid: Math.floor(num(r.paid)),
+		refresh: { windowAt: num(f.windowAt), freeUsed: Math.floor(num(f.freeUsed)), lastAt: num(f.lastAt), paidAt: num(f.paidAt) },
+		offers,
+	};
+};
 
 /** Reads the stored column back: a missing column, null or anything malformed reads as zeros. */
 export const readStats = (raw: unknown): LifetimeStats => {
@@ -184,6 +220,7 @@ export const readStats = (raw: unknown): LifetimeStats => {
 		rocksByTier: counts(r.rocksByTier),
 		emberCoal: Math.floor(num(r.emberCoal)),
 		curiosity: ids(r.curiosity),
+		shelf: shelfOf(r.shelf),
 	};
 };
 
@@ -212,6 +249,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		rocksByTier,
 		emberCoal,
 		curiosity,
+		shelf,
 		...rest
 	} = s;
 	return {
@@ -239,6 +277,7 @@ export const statsToJson = (s: LifetimeStats): Record<string, unknown> => {
 		...(Object.keys(rocksByTier).length > 0 ? { rocksByTier } : {}),
 		...(emberCoal > 0 ? { emberCoal } : {}),
 		...(curiosity.length > 0 ? { curiosity } : {}),
+		...(shelf ? { shelf } : {}),
 	};
 };
 
@@ -274,7 +313,8 @@ export const isEmptyStats = (s: LifetimeStats): boolean =>
 	s.rocks === 0 &&
 	Object.keys(s.rocksByTier).length === 0 &&
 	s.emberCoal === 0 &&
-	s.curiosity.length === 0;
+	s.curiosity.length === 0 &&
+	s.shelf === null;
 
 /**
  * A kill of monster `type`: counted once, when the server pays it. `ms` (how long the fight lasted) keeps the fastest win per type for the Bestiary, and `flawless` (the hero took no hit) counts

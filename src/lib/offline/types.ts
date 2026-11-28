@@ -48,7 +48,10 @@ export type InventoryOp =
 	| { action: 'markJunk'; index: number; junk: boolean }
 	| { action: 'autoSell'; rarity: string | null }
 	| { action: 'buyShop'; id: string; qty: number }
-	| { action: 'buyOffer'; item: ItemInstance }
+	/** A piece of the merchant's shelf, bought by its place (`index`) and, as a check, the piece itself: the server holds the shelf and prices the piece, so a piece it never put there is refused (IDL-121) */
+	| { action: 'buyOffer'; index?: number; item?: ItemInstance }
+	/** The merchant's shelf (IDL-121): `rotate` asks for the shelf, rolled again when its time is up; `refresh` is a free or paid refresh. The server's clocks decide, and the answer carries the shelf (`InventoryReply.shelf`) */
+	| { action: 'shelf'; mode: 'rotate' | 'refresh' }
 	/** The merchant's resource trades (IDL-319): priced on the server, judged against what the last save and the rates can explain (`lib/offline/trade.ts`) */
 	| { action: 'sellResource'; resource: string; qty: number }
 	| { action: 'buyResource'; resource: string; qty: number }
@@ -188,6 +191,17 @@ export interface InventoryReply {
 	shifted?: OfflineGrant;
 	/** What an opened monster chest held (only on an `open`): the income it paid as a grant with no time in it, the potion in the bag and the chest's name (IDL-163) */
 	opened?: OpenedChest;
+	/** The merchant's shelf as the server holds it (only on a `shelf` operation and only when it did something; times are server seconds, see `ShelfRecord`) */
+	shelf?: ShelfReply;
+}
+
+/** The merchant's shelf in an answer: the offers, the server's refresh record and the gold a paid refresh cost (0 for a free one or a plain look). */
+export interface ShelfReply {
+	offers: ItemInstance[];
+	at: number;
+	paid: number;
+	refresh: { windowAt: number; freeUsed: number; lastAt: number; paidAt: number };
+	charged: number;
 }
 
 /**

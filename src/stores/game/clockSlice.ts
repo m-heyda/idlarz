@@ -8,12 +8,11 @@ import { calculateResourceRates } from '@/utils/game/income';
 import { merchantCombat } from '@/utils/game/merchant';
 import { withClassBonus } from '@/lib/classPassives';
 import { manaRegenPerSec, maxHp, maxMana, regen } from '@/lib/combat';
-import { bestWornGrade, generateMerchantStock, rotationRng, stockDue } from '@/lib/merchant';
+import { stockDue } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { crossedGoldTier } from '@/lib/goldTiers';
 import { gearIncome, xpGainPct } from '@/lib/gearEconomy';
-import { aggregateStats, averageItemLevel } from '@/lib/inventory';
-import { castleLevelOf } from '@/lib/castleWard';
+import { aggregateStats } from '@/lib/inventory';
 import { completeUpgrade } from '@/lib/buildings';
 import { hpMultOf, idolEconomy, xpPctAt } from '@/lib/idolEconomy';
 import { advanceMonsters } from '@/lib/monsters';
@@ -21,8 +20,9 @@ import { planPictureAt } from '@/lib/planPicture';
 import type { Resources } from '@/types/game';
 import { setTile } from '@/utils/world';
 import { findCastle, limitCtx, type GameGet, type GameSet } from './base';
+import type { InventorySync } from './inventorySync';
 
-export const createClockSlice = (set: GameSet, get: GameGet) => ({
+export const createClockSlice = (set: GameSet, get: GameGet, inv: InventorySync) => ({
 	tick: (deltaTime: number) => {
 		const state = get();
 		// Bounded, never negative: editing the system clock cannot grant (or remove) progress
@@ -176,18 +176,10 @@ export const createClockSlice = (set: GameSet, get: GameGet) => ({
 			combat: newCombat,
 			playerHp: newPlayerHp,
 			playerMp: newPlayerMp,
-			merchantStock: stockDue(state.merchantStock, newPlaySeconds, limitCtx(state))
-				? generateMerchantStock(
-						castleLevelOf(state.tiles),
-						averageItemLevel(state.equipment),
-						rotationRng(newPlaySeconds),
-						newPlaySeconds,
-						limitCtx(state),
-						bestWornGrade(state.equipment),
-					)
-				: state.merchantStock,
 			playSeconds: newPlaySeconds,
 		});
+		// the shelf is the server's (IDL-121): when its time is up (or the browser has not heard from the server yet) the server is asked, never rolled here
+		if (!inv.shelfIsSynced() || stockDue(state.merchantStock, newPlaySeconds, limitCtx(state))) inv.requestShelf('rotate');
 		if (castleFinished) emitSaveEvent('castleUpgraded');
 		if (buildingFinished) emitSaveEvent('buildingUpgraded');
 		if (level > state.level.level) emitSaveEvent('levelUp');
