@@ -43,7 +43,27 @@
 /* the counts of enemies, chests and tiles sit on a dark strip along the bottom of the picture (the design system's .ds-minimap-stats) */
 .minimap .ds-minimap-stats {
 	pointer-events: none;
+	padding-left: 18px; /* room for the resize grip in the bottom left corner */
 	line-height: 12px;
+}
+
+/* the resize grip, bottom left: a small corner mark that lights up on hover (the overview hangs from the top right, so this is its free corner) */
+.minimap-grip {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 2;
+	width: 16px;
+	height: 16px;
+	cursor: nesw-resize;
+	background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M1 9l2 2M1 5l6 6M1 1l10 10' stroke='%23e0a93a' stroke-width='1.1' stroke-linecap='round' fill='none'/%3E%3C/svg%3E")
+		no-repeat bottom left / 12px 12px;
+	opacity: 0.65;
+	pointer-events: auto;
+}
+
+.minimap-grip:hover {
+	opacity: 1;
 }
 
 .minimap-dot {
@@ -66,5 +86,88 @@
 	border: 1px solid rgba(255, 255, 255, 0.95);
 	background: rgba(255, 255, 255, 0.08);
 	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+	pointer-events: none;
+}
+
+/* + and - at the top right, one under the other: grow or shrink the overview one step (the grip does the same by dragging).
+   Small dark plates with the gold rim of the other HUD plates; the signs are drawn with bars so they stay crisp and centred */
+.minimap-zoom {
+	position: absolute;
+	top: 4px;
+	right: 4px;
+	z-index: 2;
+	display: flex;
+	flex-direction: column;
+	gap: 3px;
+}
+
+.minimap-zoom button {
+	position: relative;
+	box-sizing: border-box;
+	width: 20px;
+	height: 20px;
+	padding: 0;
+	cursor: pointer;
+	background: rgba(12, 9, 6, 0.85);
+	border: 1px solid var(--ds-gold-dk, #7a5a1c);
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+	--sign: #f0d27a;
+}
+
+.minimap-zoom button::before,
+.minimap-zoom button::after {
+	content: '';
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	background: var(--sign);
+	transform: translate(-50%, -50%);
+}
+
+/* the horizontal bar of both signs, the vertical bar only of the plus */
+.minimap-zoom button::before {
+	width: 8px;
+	height: 2px;
+}
+
+.minimap-zoom button[data-glyph='plus']::after {
+	width: 2px;
+	height: 8px;
+}
+
+.minimap-zoom button:hover:not(:disabled) {
+	border-color: var(--ds-gold, #e0a93a);
+	background: rgba(40, 28, 10, 0.95);
+}
+
+.minimap-zoom button:disabled {
+	--sign: #5a4a2a;
+	cursor: default;
+	opacity: 0.7;
+}
+
+/* the castle's crown while zoomed in */
+.minimap-crown {
+	position: absolute;
+	z-index: 1;
+	font-size: 18px;
+	line-height: 1;
+	color: #ffd860;
+	text-shadow:
+		0 0 2px #15091f,
+		0 1px 0 #15091f,
+		1px 0 0 #15091f,
+		-1px 0 0 #15091f,
+		0 -1px 0 #15091f;
+	transform: translate(-50%, -50%);
+	pointer-events: none;
+}
+
+/* the castle's range (the violet bonus area) while zoomed in; the box clips what sticks out */
+.minimap-range {
+	position: absolute;
+	box-sizing: border-box;
+	background: rgba(150, 90, 255, 0.28);
+	border: 1px solid rgba(190, 140, 255, 0.85);
 	pointer-events: none;
 }
