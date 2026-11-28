@@ -54,6 +54,9 @@ const Crown: React.FC<{ layout: MinimapLayout }> = ({ layout }) => {
 	);
 };
 
+/** While zoomed in a repaint is cheap (only the part in the box) and the picture follows a drag, so it is repainted about 30 times a second */
+const ZOOM_REPAINT_MS = 33;
+
 const MinimapBody: React.FC = () => {
 	const game = useMapGame();
 	const view = useMapView();
@@ -106,14 +109,14 @@ const MinimapBody: React.FC = () => {
 				glowCtx.putImageData(glow, 0, 0);
 			}
 		};
-		const wait = REPAINT_MS - (performance.now() - lastPaint.current);
+		const wait = (zoom > 1 ? ZOOM_REPAINT_MS : REPAINT_MS) - (performance.now() - lastPaint.current);
 		if (wait <= 0) {
 			paint();
 			return;
 		}
 		const timer = setTimeout(paint, wait);
 		return () => clearTimeout(timer);
-	}, [tiles, monsters, ores, layout]);
+	}, [tiles, monsters, ores, layout, zoom]);
 
 	// The outline of the part of the map on screen follows every pan frame, so it is moved straight in the DOM (no React render per frame)
 	useLayoutEffect(() => {

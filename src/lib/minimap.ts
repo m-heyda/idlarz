@@ -139,7 +139,10 @@ const setPixel = (data: Uint8ClampedArray, width: number, height: number, x: num
 };
 
 const fillRect = (data: Uint8ClampedArray, width: number, height: number, x: number, y: number, w: number, h: number, color: RGB): void => {
-	for (let yy = y; yy < y + h; yy++) for (let xx = x; xx < x + w; xx++) setPixel(data, width, height, xx, yy, color);
+	// clipped to the picture first: a zoomed-in tile is far bigger than the box, and most of them lie outside it
+	const x1 = Math.min(width, x + w);
+	const y1 = Math.min(height, y + h);
+	for (let yy = Math.max(0, y); yy < y1; yy++) for (let xx = Math.max(0, x); xx < x1; xx++) setPixel(data, width, height, xx, yy, color);
 };
 
 /** A dot of `inner` px with a 1 px dark outline, centred on the tile whose top left is (px, py) and which is `size` px wide. */
@@ -216,12 +219,19 @@ export const minimapMarkers = (world: World, monsters: { x: number; y: number }[
 		px: l.offsetX + (x - l.x0 + 0.5) * l.scale,
 		py: l.offsetY + (y - l.y0 + 0.5) * l.scale,
 	});
+	// only what lies inside the box is clustered (zoomed in, most of the map does not)
+	const inside = (p: { px: number; py: number }) => p.px >= -10 && p.py >= -10 && p.px <= l.width + 10 && p.py <= l.height + 10;
 	const chests: { px: number; py: number }[] = [];
-	if (world.stats.chests > 0) forEachOwned(world, (tile, x, y) => void (tile.hasChest && chests.push(centre(x, y))));
+	if (world.stats.chests > 0)
+		forEachOwned(world, (tile, x, y) => {
+			if (!tile.hasChest) return;
+			const c = centre(x, y);
+			if (inside(c)) chests.push(c);
+		});
 	return {
-		monsters: clusterPoints(monsters.map((m) => centre(m.x, m.y))),
+		monsters: clusterPoints(monsters.map((m) => centre(m.x, m.y)).filter(inside)),
 		chests: clusterPoints(chests),
-		ores: clusterPoints(ores.map((o) => centre(o.x, o.y))),
+		ores: clusterPoints(ores.map((o) => centre(o.x, o.y)).filter(inside)),
 	};
 };
 
@@ -275,6 +285,7 @@ export const paintMinimap = (data: Uint8ClampedArray, world: World, l: MinimapLa
 	forEachOwned(world, (tile, x, y) => {
 		const px = Math.floor(l.offsetX + (x - l.x0) * l.scale);
 		const py = Math.floor(l.offsetY + (y - l.y0) * l.scale);
+		if (px + size < 0 || py + size < 0 || px >= l.width || py >= l.height) return; // outside the zoomed part: nothing to paint
 		fillRect(data, l.width, l.height, px, py, size, size, rgbOfBiome(tile.biome));
 		if (tile.biome === 'castle') castle.push({ px, py });
 	});
