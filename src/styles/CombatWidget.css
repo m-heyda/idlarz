@@ -907,3 +907,150 @@
 	border-radius: 6px;
 	transform: translateX(-50%);
 }
+
+/* ===== compact pass: less padding, boss strip on glass, centred loss message, win title on top of the monster, queue on top ===== */
+.combat-widget {
+	padding: 8px 10px 10px;
+}
+
+.combat-widget .fight-body {
+	gap: 6px;
+}
+
+.combat-scene .combat-head {
+	padding: 5px 8px;
+}
+
+.combat-widget .fight-boss {
+	padding: 2px 8px;
+	background: rgba(110, 40, 160, 0.3);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+.combat-widget .fight-defeat {
+	top: 50%;
+	bottom: auto;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	transform: translate(-50%, -50%);
+}
+
+.fight-result-title {
+	position: absolute;
+	top: 8px;
+	left: 50%;
+	z-index: 5;
+	max-width: calc(100% - 16px);
+	padding: 3px 12px;
+	background: rgba(0, 0, 0, 0.5);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 6px;
+	transform: translateX(-50%);
+}
+
+.combat-widget .combat-stage[data-dead='true'] {
+	padding-top: 36px;
+	min-height: 160px;
+}
+
+.combat-widget .fight-reward {
+	gap: 4px;
+	padding: 4px 6px;
+}
+
+.combat-widget .victory-row {
+	gap: 2px 12px;
+	font-size: 0.78rem;
+}
+
+.combat-widget .victory-loot {
+	gap: 4px;
+}
+
+.combat-widget .fight-skill {
+	padding: 0;
+}
+
+.combat-widget .combat-switches .ds-check {
+	gap: 5px;
+	font-size: 0.7rem;
+}
+
+.combat-widget .combat-switches .ds-check-box {
+	width: 14px;
+	height: 14px;
+	font-size: 10px;
+	border-radius: 3px;
+}
+
+/* the queue now sits above the panel: darker, tighter, and the compact mode smaller still */
+.combat-queue-window {
+	padding: 3px 6px 4px;
+	background: rgba(4, 5, 9, 0.88);
+}
+
+.combat-queue-head {
+	margin-bottom: 2px;
+	font-size: 0.7rem;
+}
+
+.combat-queue-head .combat-min {
+	height: 18px;
+	min-width: 20px;
+	padding: 0 5px;
+	font-size: 0.65rem;
+}
+
+.combat-queue-window .fight-queue {
+	gap: 3px;
+}
+
+.combat-queue-window .fight-queue-item {
+	zoom: 0.85;
+}
+
+.combat-queue-window[data-compact='true'] {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 2px 6px;
+}
+
+.combat-queue-window[data-compact='true'] .combat-queue-head {
+	flex: none;
+	margin: 0;
+}
+
+.combat-queue-window[data-compact='true'] .fight-queue {
+	flex: 1;
+	min-width: 0;
+}
+
+.combat-queue-window[data-compact='true'] .fight-queue-item {
+	zoom: 0.5;
+}
+
+/* the icon the window shrinks to: a smaller queue strip under it */
+.combat-icon-wrap {
+	gap: 3px;
+}
+
+.combat-queue-chips {
+	gap: 2px;
+	padding: 1px 2px;
+	background: rgba(4, 5, 9, 0.88);
+}
+
+.combat-queue-chip {
+	width: 16px;
+	height: 16px;
+}
+
+.combat-queue-more {
+	font-size: 0.55rem;
+}
