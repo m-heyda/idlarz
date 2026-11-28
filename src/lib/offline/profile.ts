@@ -76,6 +76,19 @@ const merchantOf = (core: Core): Record<string, number> => {
  * @order 5
  */
 export const playerProfile = (core: Core): PlayerProfile => {
+	let profile = profiles.get(core);
+	if (!profile) profiles.set(core, (profile = profileOf(core)));
+	return profile;
+};
+
+/**
+ * The profile of a `core` object, worked out once: it is a pure function of the save, and every request builds its `stored` anew, so a cached profile never outlives the save it
+ * came from. The fight simulations are what notice: they call the engine once per second of a fight with the same save, and each call asked for the profile several times (about
+ * twenty gear sums each), which was most of a simulated fight's cost. A `core` is never edited after it is handed to the engine (build a new one instead).
+ */
+const profiles = new WeakMap<object, PlayerProfile>();
+
+const profileOf = (core: Core): PlayerProfile => {
 	const stats = statsOf(core);
 	const equipment = equipmentOf(core);
 	// the class comes from the stored save, where the save route stamps it from the profile row (never from the upload)
