@@ -48,7 +48,7 @@ export interface CombatTotals {
  *    Life leech heals `damage x leech%`.
  * 3. If the monster is dead the kill is paid ({@link payKill}) and the fight closes.
  * 4. The monster swings every `1 / attackSpeed` (a stunned monster's timer does not advance). Dodge is rolled first; a monster crit uses its `critChance` and `critMult` (1.5).
- * 5. At 0 HP the fight ends `defeated`: HP is set to 30% of max (`knockoutHpFraction`). If the boss clock reaches 0, or a fight lasts 180 s (`maxFightSec`), it ends `timeout`.
+ * 5. At 0 HP the fight ends `defeated`: HP is set to 30% of max (`knockoutHpFraction`). If the boss clock reaches 0, it ends `timeout`. Only a boss has a clock: a regular monster's fight has no time limit (beyond the 600 s stalemate guard `maxRegularFightSec`), so a long fight against a tough monster is simply fought out.
  *    Neither costs anything; the monster stays. `retreat` (switching auto-battle off) also keeps it.
  *
  * The random stream is sealed per swing ({@link rngFor}), so a fight is a pure function of profile, ticket and secret. `tests/combat/goldenFight.test.ts` pins the engine to recorded fights;

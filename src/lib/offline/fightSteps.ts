@@ -269,7 +269,7 @@ export const fightStep = (ctx: FightCtx, t: number, dt: number): void => {
 		if (venom) f.poison = { stacks: Math.min(venom.maxStacks, (f.poison?.stacks ?? 0) + 1), leftSec: venom.durationSec, acc: f.poison?.acc ?? 0 };
 	}
 	if (c.hp <= 0) endFight(ctx, t, 'defeated');
-	else if (f.timeLeftSec === 0 || f.elapsed >= COMBAT.maxFightSec) endFight(ctx, t, 'timeout');
+	else if (f.timeLeftSec === 0 || f.elapsed >= (f.timeLeftSec === null ? COMBAT.maxRegularFightSec : COMBAT.maxFightSec)) endFight(ctx, t, 'timeout');
 };
 
 /** One stretch of resting with no fight open: HP and mana come back, the cooldowns run. Returns how long it lasted. */

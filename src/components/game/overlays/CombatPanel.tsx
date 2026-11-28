@@ -3,6 +3,7 @@ import { monsterNameOf } from '@/stores/bestiaryStore';
 import { formatCompact, formatNumber, tidy } from '@/utils/formatters';
 import { formatRest } from '@/hooks/useRestCountdown';
 import { COMBAT } from '@/config/combatConfig';
+import { COMBAT_BACKGROUND_STYLE, combatBackgroundUrl } from '@/config/combatBackground';
 import { SKILLS, SKILL_ICONS, SKILL_IDS, skillDescription } from '@/catalog/skills';
 import { monsterSpriteUrl } from '@/catalog/monsters';
 import { monsterArtSize } from '@/config/monsterArtSize';
@@ -166,6 +167,8 @@ export interface CombatPanelProps {
 	monster: { type: MonsterType; level: number; art?: string; lucky?: boolean };
 	/** Draw the monster mirrored, so it faces left toward the hero */
 	flip?: boolean;
+	/** The biome the monster lives in: its landscape (config/combatBackground.ts) is drawn behind it; none, or one without a picture, keeps the plain stage */
+	biome?: string;
 	/** The open fight (timer and stun), when there is one */
 	fight: FightView | null;
 	/** A click is waiting for the server: the stage says "Engaging..." */
@@ -227,6 +230,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 	const traits = monsterStats(monster.type, monster.level);
 	const dead = over?.kind === 'won';
 	const hpKey = dead ? 'dead' : p.hitTick;
+	const bgUrl = combatBackgroundUrl(p.biome);
 
 	/** The hotkey slots and the potions (a fight only), and the two switches */
 	const controls = (switchesOnly: boolean) => (
@@ -383,7 +387,20 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						Time left: {Math.ceil(fight.timeLeftSec)} s
 					</div>
 				)}
-				<div className='combat-stage' data-lucky={!!monster.lucky && !dead} data-dead={dead}>
+				<div
+					className='combat-stage'
+					data-lucky={!!monster.lucky && !dead}
+					data-dead={dead}
+					style={
+						{
+							'--bg-dim': COMBAT_BACKGROUND_STYLE.dim,
+							'--bg-dim-dead': COMBAT_BACKGROUND_STYLE.dimDead,
+							'--bg-pan': `${COMBAT_BACKGROUND_STYLE.panSec}s`,
+							'--bg-zoom': COMBAT_BACKGROUND_STYLE.zoom,
+						} as React.CSSProperties
+					}
+				>
+					{bgUrl && <span className='combat-bg' style={{ backgroundImage: `url(${bgUrl})` }} aria-hidden />}
 					{!dead && (
 						<div className='fight-monster-bar'>
 							<Bar value={p.monsterHp} max={p.monsterMaxHp} kind='monster' label='' snapKey={p.snapKey} />
@@ -432,7 +449,13 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 						/>
 					))}
 					{p.numbers.map((n) => (
-						<span key={n.id} className='fight-number' data-kind={n.kind} style={{ left: `${n.x}%` }}>
+						<span
+							key={n.id}
+							className='fight-number'
+							data-kind={n.kind}
+							// each number leans and drifts its own way (from its id, so a number keeps its look between renders)
+							style={{ left: `${n.x}%`, '--dx': `${((n.id * 37) % 41) - 20}px`, '--rot': `${((n.id * 17) % 13) - 6}deg` } as React.CSSProperties}
+						>
 							{n.text}
 						</span>
 					))}

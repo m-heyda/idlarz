@@ -25,7 +25,7 @@ const FX_INDEX: Partial<Record<FightEvent['kind'], number>> = {
  * The open fight carried to its end with the same ticks the real request would take (so the real result is the same unless the player
  * commands something first), as the picture the browser animates: HP of both sides and the hero's mana about once a second, and the swings and
  * spells to fly.
- * Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxFightSec`.
+ * Nothing of the ledger is written. Returns null with no fight open or one that does not end within `COMBAT.maxRegularFightSec` (a boss ends by its own clock first).
  *
  * @category Combat/A fight
  * @order 10
@@ -51,7 +51,7 @@ export const projectFight = (ledger: Ledger, env: CombatEnv, c: CombatState): Fi
 	let lastMp = c.mp;
 	let t = start;
 	let nextSample = 1;
-	const steps = Math.ceil((COMBAT.maxFightSec - f.elapsed + 1) / COMBAT.tickSec);
+	const steps = Math.ceil((COMBAT.maxRegularFightSec - f.elapsed + 1) / COMBAT.tickSec);
 	for (let i = 0; i < steps && sim.fight; i++) {
 		t += COMBAT.tickSec;
 		fightStep(ctx, t, COMBAT.tickSec);

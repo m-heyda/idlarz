@@ -7,6 +7,7 @@ import { useRewardPendingStore } from '@/stores/rewardPendingStore';
 import { COMBAT } from '@/config/combatConfig';
 import { SKILL_IDS } from '@/catalog/skills';
 import { ITEM_CATALOG } from '@/catalog';
+import { biomeOfType } from '@/catalog/mastery';
 import { quickHealOf } from '@/catalog/buffs';
 import { autoBattleUnlocked, autoUseUnlocked } from '@/lib/combat';
 import { aggregateStats } from '@/lib/inventory';
@@ -296,6 +297,7 @@ const CombatWidget: React.FC = () => {
 
 	return (
 		<CombatPanel
+			biome={biomeOfType(type)}
 			monster={{ type, level: monsterLevel, lucky: !!(fight?.lucky ?? lastFight.current?.fight.lucky ?? over?.summary?.lucky) }}
 			fight={fight}
 			loading={!fight && !notice}

@@ -10216,6 +10216,19 @@
 	},
 	{
 		"usedBy": [],
+		"name": "idol_lava_obelisk",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/idols/idol_lava_obelisk.png",
+		"status": "planned",
+		"source": "idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "idol_orchard_blossom_shrine",
 		"category": "buildings",
 		"subcategory": "idol statues (primary, planned)",
@@ -20049,6 +20062,21 @@
 		"category": "biomes",
 		"subcategory": "jungle (in the game)",
 		"src": "/pixel/ui/biomes/biome_jungle_1.png",
+		"status": "used",
+		"source": "ui/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_lava_1",
+		"category": "biomes",
+		"subcategory": "lava (in the game)",
+		"src": "/pixel/ui/biomes/biome_lava_1.png",
 		"status": "used",
 		"source": "ui/biomes",
 		"size": [

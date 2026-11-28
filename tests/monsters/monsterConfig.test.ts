@@ -83,6 +83,7 @@ test('the combat tunables are set: a fixed tick, a poll cadence that spares the 
 	assert.ok(COMBAT.poll.fightSec >= 1, 'no faster than once a second');
 	assert.ok(COMBAT.poll.minimizedSec > COMBAT.poll.fightSec);
 	assert.ok(COMBAT.maxCatchUpSec >= 60 && COMBAT.maxFightSec > MONSTERS.bossGreatAuroch.timeLimitSec);
+	assert.ok(COMBAT.maxRegularFightSec >= COMBAT.maxFightSec, 'only a boss has a clock; a regular monster has no time limit beyond the stalemate guard');
 	assert.ok(COMBAT.auto.potionBelowHpPct < COMBAT.auto.healBelowHpPct);
 	assert.ok(COMBAT.auto.resumeHpPct > COMBAT.knockoutHpFraction * 100);
 });

@@ -14,6 +14,8 @@ export const BIOME_ART: Readonly<Record<string, string>> = {
 	orchard: 'biome_orchard_1',
 	blight: 'biome_blight_1',
 	battlefield: 'biome_battlefield_1',
+	// planned (IDL-371, the land after the battlefield): the picture is ready for its "New land unlocked" window, the biome itself is not built yet
+	lava: 'biome_lava_1',
 };
 
 /** Served URL of a biome's picture, or undefined when it has none (every biome a rebirth unlocks has one, pinned by tests/ui/biomeArt.test.ts) */
