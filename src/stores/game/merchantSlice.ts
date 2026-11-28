@@ -13,21 +13,11 @@ import {
 import { RESOURCE_CAP } from '@/config/economy';
 import { calculateResourceRates } from '@/utils/game/income';
 import { buyCost, merchantLevel, merchantUpgradeCost, sellPayout } from '@/utils/game/merchant';
-import {
-	afterRefresh,
-	bestWornGrade,
-	freeRefreshesLeft,
-	generateMerchantStock,
-	paidRefreshesNow,
-	refreshCooldown,
-	refreshCost,
-	shopPriceOf,
-} from '@/lib/merchant';
+import { freeRefreshesLeft, paidRefreshesNow, refreshCooldown, refreshCost, shopPriceOf } from '@/lib/merchant';
 import { emitSaveEvent } from '@/lib/saveEvents';
 import { gearIncome } from '@/lib/gearEconomy';
-import { addDrop, averageItemLevel } from '@/lib/inventory';
+import { addDrop } from '@/lib/inventory';
 import { plainItem } from '@/lib/itemInstance';
-import { castleLevelOf } from '@/lib/castleWard';
 import { ITEM_CATALOG } from '@/catalog';
 import type { Resources } from '@/types/game';
 import { isPositiveNumber, limitCtx, type GameGet, type GameSet } from './base';
@@ -35,7 +25,7 @@ import type { InventorySync } from './inventorySync';
 import audioManager from '@/utils/audioManager';
 
 export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySync) => {
-	const { sendInventoryOp, settlePurchase } = inv;
+	const { sendInventoryOp, settlePurchase, requestShelf } = inv;
 
 	return {
 		// Sell resources to the merchant for gold. Gold and XP cannot be sold.
@@ -114,7 +104,7 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			if (added.overflow > 0) return false;
 			// the server did not put it in the bag: the offer is back on the shelf and the price is back in the purse
 			sendInventoryOp(
-				{ action: 'buyOffer', item },
+				{ action: 'buyOffer', index, item },
 				settlePurchase(price, () =>
 					set((s) =>
 						s.merchantStock
@@ -133,28 +123,15 @@ export const createMerchantSlice = (set: GameSet, get: GameGet, inv: InventorySy
 			return true;
 		},
 
-		// A new shelf of goods for gold (the free reshuffle comes with the timer, in `tick`)
+		// A new shelf of goods for gold (the free reshuffle comes with the timer, in `tick`). The server rolls it, keeps the clocks and prices it (IDL-121): the browser only checks what it can see and asks; the new shelf and the price arrive with the answer
 		refreshMerchantStock: () => {
 			const state = get();
-			const castle = castleLevelOf(state.tiles);
 			if (refreshCooldown(state.merchantRefresh, state.playSeconds) > 0) return false;
 			const free = freeRefreshesLeft(state.merchantRefresh, state.playSeconds) > 0;
 			const paid = paidRefreshesNow(state.merchantRefreshes, state.merchantRefresh, state.playSeconds);
 			const cost = free ? 0 : refreshCost(paid, limitCtx(state));
 			if (state.resources.gold < cost) return false;
-			set({
-				resources: { ...state.resources, gold: state.resources.gold - cost },
-				merchantStock: generateMerchantStock(
-					castle,
-					averageItemLevel(state.equipment),
-					Math.random,
-					state.playSeconds,
-					limitCtx(state),
-					bestWornGrade(state.equipment),
-				),
-				merchantRefreshes: paid + (free ? 0 : 1),
-				merchantRefresh: afterRefresh(state.merchantRefresh, state.playSeconds, free, paid),
-			});
+			if (!requestShelf('refresh')) return false;
 			emitSaveEvent('refreshMerchantStock');
 			return true;
 		},

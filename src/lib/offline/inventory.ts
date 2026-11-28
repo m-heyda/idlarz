@@ -218,6 +218,7 @@ export type { InventoryOp };
 export const needsNoFight = (op: InventoryOp): boolean =>
 	op.action !== 'buyShop' &&
 	op.action !== 'buyOffer' &&
+	op.action !== 'shelf' &&
 	op.action !== 'autoSell' &&
 	op.action !== 'use' &&
 	op.action !== 'open' &&
@@ -271,8 +272,8 @@ export const sellJunkRule = (inv: Inventory, sellCtx: SellContext, junk: (item: 
 
 /**
  * Applies one of the player's operations. Returns the new inventory (with a higher `ver`) or `ok: false` with the inventory untouched. The
- * gold of a sale is worked out here, with the merchant's Haggler bonus the save holds; a purchase adds to the bag only (the price is
- * paid in the browser until the merchant is server-priced).
+ * gold of a sale is worked out here, with the merchant's Haggler bonus the save holds; a shop purchase adds to the bag here and its price is
+ * recorded by the caller ({@link shopCostOf}, `spendGold`); a shelf piece is bought through shelf.ts.
  */
 export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): OpResult => {
 	switch (op.action) {
@@ -362,12 +363,24 @@ export const applyOp = (inv: Inventory, op: InventoryOp, sellCtx: SellContext): 
 		case 'buyResource':
 			// a resource trade needs the save and the ledger's grants, not the bag: it is made by `tradeResource` (trade.ts)
 			return refused(inv);
-		case 'buyOffer': {
-			if (!isRecord(op.item) || instanceProblem(op.item as ItemInstance)) return refused(inv);
-			const added = addDrop(inv.bag, { kind: 'gear', item: op.item as ItemInstance });
-			return added.overflow > 0 ? refused(inv) : done(bump(inv, { bag: added.bag }));
-		}
+		case 'buyOffer':
+		case 'shelf':
+			// the shelf is the server's (IDL-121): a piece is bought from it, and it is rolled, by `lib/offline/shelf.ts`
+			return refused(inv);
 	}
+};
+
+/** Puts a piece of the merchant's shelf in the bag (the price is recorded by `buyOffer`, shelf.ts). Null when the bag has no room or the piece is not a valid one. */
+export const receiveOffer = (inv: Inventory, item: ItemInstance): Inventory | null => {
+	if (instanceProblem(item)) return null;
+	const added = addDrop(inv.bag, { kind: 'gear', item });
+	return added.overflow > 0 ? null : bump(inv, { bag: added.bag });
+};
+
+/** What a `buyShop` costs: the catalog price times the quantity (null for something the shop does not sell). */
+export const shopCostOf = (op: Extract<InventoryOp, { action: 'buyShop' }>): number | null => {
+	const entry = MERCHANT_SHOP_ITEMS.find((item) => item.id === op.id);
+	return entry && Number.isInteger(op.qty) && op.qty >= 1 && op.qty <= 99 ? entry.price * op.qty : null;
 };
 
 /** Parses the body of /api/inventory into an operation (null: not one). Numbers are checked again by `applyOp`. */
@@ -410,7 +423,16 @@ export const parseOp = (raw: unknown): InventoryOp | null => {
 				? { action: 'buyResource', resource: raw.resource, qty: raw.qty }
 				: null;
 		case 'buyOffer':
-			return isRecord(raw.item) ? { action: 'buyOffer', item: raw.item as unknown as ItemInstance } : null;
+			// by place, by piece, or both (an older browser sends only the piece); the server checks the piece against its own shelf
+			return int(raw.index) || isRecord(raw.item)
+				? {
+						action: 'buyOffer',
+						...(int(raw.index) ? { index: raw.index } : {}),
+						...(isRecord(raw.item) ? { item: raw.item as unknown as ItemInstance } : {}),
+					}
+				: null;
+		case 'shelf':
+			return raw.mode === 'rotate' || raw.mode === 'refresh' ? { action: 'shelf', mode: raw.mode } : null;
 		default:
 			return null;
 	}

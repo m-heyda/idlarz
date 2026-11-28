@@ -142,3 +142,18 @@ export const buyResource = (ledger: Ledger, stored: StoredSave, nowSec: number, 
 		},
 	};
 };
+
+/**
+ * Records `cost` gold as spent at the merchant (a shelf piece, a shop potion, a paid shelf refresh): the same spent-since-save record a resource purchase uses ({@link buyResource}), so the next save is judged against the gold the player had
+ * less this cost. Refused (null) for a cost the player cannot plausibly pay. The gold itself is still taken in the browser; a cost of 0 changes nothing.
+ *
+ * @category Economy/Merchant
+ * @order 12
+ */
+export const spendGold = (ledger: Ledger, stored: StoredSave, nowSec: number, cost: number): Ledger | null => {
+	if (typeof cost !== 'number' || !Number.isFinite(cost) || cost < 0) return null;
+	if (cost === 0) return ledger;
+	const record = liveTrade(ledger.stats.tradeSince, nowSec);
+	if (cost > stockBound(ledger, stored, nowSec, 'gold', 0, record.boughtGold)) return null;
+	return { ...ledger, stats: { ...ledger.stats, tradeSince: { ...record, since: record.since ?? nowSec, boughtGold: record.boughtGold + cost } } };
+};

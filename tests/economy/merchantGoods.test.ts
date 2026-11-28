@@ -118,25 +118,20 @@ test('the refresh costs 10k and doubles up to 1b; the rotation is a countdown in
 	assert.equal(stockDue(s, 100 + MERCHANT_GOODS.rotateSec), true);
 });
 
-test('the first tick puts goods on the shelf, and the shelf is reshuffled after 30 minutes of play time, not before', () => {
+test('the browser never rolls the shelf: a tick leaves it alone and asks the server (IDL-121), which rolls and rotates it', () => {
 	freshGame();
 	assert.equal(api().merchantStock, null);
-	api().tick(1000);
-	const first = api().merchantStock!;
-	assert.equal(first.offers.length, MERCHANT_GOODS.offers);
 	tick(60);
-	assert.equal(api().merchantStock, first, 'the same shelf: nothing changes between rotations');
-	store.setState({ playSeconds: first.at + MERCHANT_GOODS.rotateSec - 1 });
-	api().tick(500);
-	assert.equal(api().merchantStock, first, 'not yet');
+	assert.equal(api().merchantStock, null, 'no shelf comes from the browser; it arrives with the server answer');
+	const shelf = stock(1, 1, 0, 100);
+	store.setState({ merchantStock: shelf, playSeconds: shelf.at + MERCHANT_GOODS.rotateSec + 100 });
 	api().tick(1000);
-	assert.notEqual(api().merchantStock, first);
-	assert.ok(api().merchantStock!.at >= first.at + MERCHANT_GOODS.rotateSec - 1);
+	assert.equal(api().merchantStock, shelf, 'a due shelf is not replaced here either');
 });
 
 test('buyOffer: pays the price, puts the piece in the bag and takes it off the shelf', () => {
 	freshGame({ gold: 1e9 });
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	const offers = api().merchantStock!.offers;
 	const item = offers[2];
 	const price = shopPriceOf(item);
@@ -159,7 +154,7 @@ test('buyOffer: pays the price, puts the piece in the bag and takes it off the s
 
 test('buyOffer: too little gold or a full bag buys nothing, and an empty shelf is safe', () => {
 	freshGame({ gold: 10 });
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	assert.equal(api().buyOffer(0), false, 'not enough gold');
 	assert.equal(api().merchantStock!.offers.length, MERCHANT_GOODS.offers);
 
@@ -174,53 +169,26 @@ test('buyOffer: too little gold or a full bag buys nothing, and an empty shelf i
 	assert.equal(api().buyOffer(0), false);
 });
 
-test('refreshMerchantStock: three free per 12 h, then gold; a cooldown between any two', () => {
-	const { freePerWindow, windowSec, cooldownSec } = MERCHANT_GOODS.refresh;
-	// waiting without a tick, so no income muddies the gold
-	const wait = (sec: number) => store.setState((s) => ({ playSeconds: s.playSeconds + sec }));
+test('refreshMerchantStock: the browser only checks the cooldown and the gold it can see; the server rolls, counts and prices the refresh (IDL-121)', () => {
+	const { cooldownSec } = MERCHANT_GOODS.refresh;
 	freshGame({ gold: 1e9 });
-	api().tick(1000);
-	const before = api().merchantStock!;
-	wait(30);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
+	const before = api().merchantStock;
 	const gold = api().resources.gold;
-	for (let i = 0; i < freePerWindow; i++) {
-		assert.equal(api().refreshMerchantStock(), true, `free ${i}`);
-		assert.equal(api().merchantStock!.at, api().playSeconds, 'restarts the half hour');
-		assert.equal(api().refreshMerchantStock(), false, 'the cooldown');
-		wait(cooldownSec);
-	}
-	assert.equal(api().resources.gold, gold, 'the free ones cost nothing');
-	assert.equal(api().merchantRefreshes, 0);
-	assert.notEqual(api().merchantStock, before);
-	assert.equal(api().merchantStock!.offers.length, MERCHANT_GOODS.offers);
-	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(0), 'the fourth one is paid');
-	assert.equal(api().merchantRefreshes, 1);
-	wait(cooldownSec);
-	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'the next one costs more');
-	assert.equal(api().merchantRefreshes, 2);
-	// a new window of play time gives the free ones back
-	wait(windowSec);
-	assert.equal(api().refreshMerchantStock(), true);
-	assert.equal(api().resources.gold, gold - refreshCost(0) - refreshCost(1), 'free again');
-	assert.equal(api().merchantRefreshes, 2);
-
+	store.setState((s) => ({ playSeconds: s.playSeconds + 30, merchantRefresh: { windowAt: 0, freeUsed: 0, lastAt: s.playSeconds + 30 - cooldownSec / 2 } }));
+	assert.equal(api().refreshMerchantStock(), false, 'the cooldown');
+	// out of free refreshes and without the gold for the paid one
 	freshGame({ gold: refreshCost(0) - 1 });
-	api().tick(1000);
-	for (let i = 0; i < freePerWindow; i++) {
-		wait(cooldownSec);
-		api().refreshMerchantStock();
-	}
-	wait(cooldownSec);
-	const shelf = api().merchantStock;
-	assert.equal(api().refreshMerchantStock(), false);
-	assert.equal(api().merchantStock, shelf, 'nothing happens without the gold');
+	store.setState({ merchantStock: before, merchantRefresh: { windowAt: api().playSeconds, freeUsed: MERCHANT_GOODS.refresh.freePerWindow, lastAt: 0 } });
+	assert.equal(api().refreshMerchantStock(), false, 'not enough gold');
+	assert.equal(api().merchantStock, before, 'nothing happens here without the gold');
+	assert.equal(api().resources.gold, refreshCost(0) - 1);
+	assert.ok(gold > 0);
 });
 
 test('a shelf that was bought out stays empty until the next rotation: the paid refresh is the way around it', () => {
 	freshGame({ gold: 1e12 });
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	for (let i = 0; i < MERCHANT_GOODS.offers; i++) {
 		store.setState({ bag: emptyBag() });
 		assert.equal(api().buyOffer(0), true);
@@ -232,7 +200,7 @@ test('a shelf that was bought out stays empty until the next rotation: the paid 
 
 test('the shelf is saved and restored, and bought pieces stay gone after a reload', () => {
 	freshGame({ gold: 1e9 });
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	api().buyOffer(0);
 	const shelf = api().merchantStock!;
 	const result = sanitizeSave(rawSnapshot());
@@ -251,7 +219,7 @@ test('a save from before the goods existed loads and gets a shelf on the next ti
 
 test('a forged shelf never gets through: an invalid offer is dropped, damage to the stock itself is refused', () => {
 	freshGame();
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	const good = rawSnapshot();
 	const shelf = (fn: (raw: ReturnType<typeof rawSnapshot>) => void) => {
 		const raw = JSON.parse(JSON.stringify(good));
@@ -322,7 +290,7 @@ test('a rebirth keeps the shelf of the merchant: it is no free reshuffle', () =>
 	freshGame();
 	growTo(REBIRTH.minTiles);
 	store.setState((s) => ({ tiles: patchTile(s.tiles, CASTLE_X, CASTLE_Y, { level: REBIRTH.minCastleLevel }) }));
-	api().tick(1000);
+	store.setState({ merchantStock: stock(1, 1, 0, 100) });
 	const shelf = api().merchantStock!;
 	assert.ok(shelf);
 	assert.equal(api().rebirth(), true);

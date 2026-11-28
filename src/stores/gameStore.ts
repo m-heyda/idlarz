@@ -41,7 +41,7 @@ const createGameSlice = (set: GameSet, get: GameGet) => {
 		...createRebirthSlice(set, get, inv, chests, character),
 		...createEconomySlice(set, get),
 		...createBuildingSlice(set, get),
-		...createClockSlice(set, get),
+		...createClockSlice(set, get, inv),
 		...createFarmSlice(set, get),
 		...createCharacterSlice(set, get, character),
 		...createParagonSlice(paragon),

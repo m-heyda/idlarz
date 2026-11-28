@@ -12,6 +12,8 @@ import { countJunk, isJunk } from '../../src/lib/loot/junk';
 import { addDrop, emptyBag } from '../../src/lib/inventory';
 import { plainItem, sellValueOf } from '../../src/lib/itemInstance';
 import { sellPayout } from '../../src/utils/game/merchant';
+import { MERCHANT_GOODS } from '../../src/config/merchant';
+import { refreshCost, shopPriceOf } from '../../src/lib/merchant';
 import { TRADE_RECORD_MAX_AGE_SEC, TRADE_SLACK, TRADE_SLACK_UNITS } from '../../src/lib/offline/trade';
 import { ITEM_CATALOG, LOOT_PROFILES } from '../../src/catalog';
 import type { Inventory } from '../../src/lib/offline/types';
@@ -281,15 +283,11 @@ test("purchases add to the ledger's bag: shop items and an offered piece; a full
 	assert.equal((await op(p, { action: 'buyShop', id: 'steel_helm', qty: 1 })).ok, false, 'not on the shelf');
 	assert.equal((await op(p, { action: 'buyShop', id: 'potion_minor', qty: 0 })).ok, false);
 
-	const offer = { ...plainItem('steel_helm'), level: 4, rarity: 'uncommon' as const, quality: 50, affixes: [] };
-	const piece = await op(p, { action: 'buyOffer', item: offer });
-	assert.equal(piece.ok, true);
-	assert.ok(piece.inv.bag.some((slot) => slot && 'item' in slot && slot.item.base === 'steel_helm'));
-	const forged = await op(p, { action: 'buyOffer', item: { base: 'steel_helm', level: 4, rarity: 'legendary', quality: 999, affixes: [] } });
-	assert.equal(forged.ok, false, 'an item that cannot exist');
-
+	// a piece of the shelf is bought from the server's own shelf (IDL-121, see the shelf tests below)
+	await op(p, { action: 'shelf', mode: 'rotate' });
+	const offer = p.m.ledgers.get(p.id)!.stats.shelf!.offers[0];
 	p.m.ledgers.set(p.id, { ...p.m.ledgers.get(p.id)!, inv: { ...p.inv(), bag: emptyBag().map(() => ({ item: plainItem('wooden_sword') })) } });
-	assert.equal((await op(p, { action: 'buyOffer', item: offer })).ok, false, 'a full bag');
+	assert.equal((await op(p, { action: 'buyOffer', index: 0, item: offer })).ok, false, 'a full bag');
 });
 
 test('changes that swap or sell gear are refused while a fight is open, purchases and the filter are not; the same key replays the answer', async () => {
@@ -729,4 +727,74 @@ test('a flagged save keeps the land and farm facts of the save before it, so a c
 	assert.equal(saved.kind, 'ok');
 	if (saved.kind === 'ok') assert.ok(saved.flags.length > 0);
 	assert.deepEqual(p.m.rows.get(p.id)!.summary.derived.deedWorld, before);
+});
+
+// IDL-121: the merchant's shelf is rolled, refreshed and priced by the server
+
+const shelfOf = (p: Awaited<ReturnType<typeof player>>) => p.m.ledgers.get(p.id)!.stats.shelf!;
+const spentOf = (p: Awaited<ReturnType<typeof player>>) => p.m.ledgers.get(p.id)!.stats.tradeSince.boughtGold;
+
+test('the shelf is rolled by the server on the first ask, only looked at while it is not due, and rolled again when its time is up', async () => {
+	const p = await player();
+	const first = await op(p, { action: 'shelf', mode: 'rotate' });
+	assert.equal(first.ok, true);
+	assert.equal(shelfOf(p).offers.length, MERCHANT_GOODS.offers);
+	assert.equal(first.shelf!.offers.length, MERCHANT_GOODS.offers);
+	const offers = shelfOf(p).offers;
+	await op(p, { action: 'shelf', mode: 'rotate' }, T0 + 2 * MIN);
+	assert.deepEqual(shelfOf(p).offers, offers, 'not due: the same shelf');
+	assert.equal(shelfOf(p).rolls, 1);
+	await stay(p, 40);
+	await op(p, { action: 'shelf', mode: 'rotate' }, T0 + 41 * MIN);
+	assert.equal(shelfOf(p).rolls, 2, 'due: rolled again');
+	assert.notDeepEqual(shelfOf(p).offers, offers);
+});
+
+test('a piece is bought by its place on the server shelf at the server price; a piece it never held, or a gone one, is refused', async () => {
+	const p = await player();
+	await op(p, { action: 'shelf', mode: 'rotate' });
+	const [first, second] = shelfOf(p).offers;
+	const bought = await op(p, { action: 'buyOffer', index: 1, item: second });
+	assert.equal(bought.ok, true);
+	assert.deepEqual(shelfOf(p).offers.length, MERCHANT_GOODS.offers - 1);
+	assert.ok(!shelfOf(p).offers.some((o) => JSON.stringify(o) === JSON.stringify(second)), 'the piece left the shelf');
+	assert.equal(spentOf(p), shopPriceOf(second), 'the price is recorded as spent, worked out by the server');
+	assert.equal((await op(p, { action: 'buyOffer', index: 1, item: second })).ok, false, 'a piece cannot be bought twice');
+	const forged = { ...first, quality: 999, rarity: 'legendary' as const };
+	assert.equal((await op(p, { action: 'buyOffer', index: 0, item: forged })).ok, false, 'a forged piece is not on the shelf');
+	assert.equal((await op(p, { action: 'buyOffer', item: forged })).ok, false);
+	assert.equal(spentOf(p), shopPriceOf(second), 'a refused purchase records nothing');
+	assert.equal((await op(p, { action: 'buyOffer', item: first })).ok, true, 'an older browser names only the piece');
+});
+
+test('a refresh: three free ones, a cooldown between any two, then the doubling price, recorded as spent and refused beyond what the player can plausibly pay', async () => {
+	const p = await player();
+	await op(p, { action: 'shelf', mode: 'rotate' });
+	const at = (n: number) => T0 + MIN * (1 + n);
+	for (let i = 0; i < MERCHANT_GOODS.refresh.freePerWindow; i++) {
+		assert.equal((await op(p, { action: 'shelf', mode: 'refresh' }, at(i + 1))).ok, true, `free ${i}`);
+	}
+	assert.equal(spentOf(p), 0, 'the free ones cost nothing');
+	assert.equal((await op(p, { action: 'shelf', mode: 'refresh' }, at(3) + 1000)).ok, false, 'the cooldown');
+	let total = 0;
+	let n = 4;
+	for (let paid = 0; paid < 3; paid++, n++) {
+		const reply = await op(p, { action: 'shelf', mode: 'refresh' }, at(n));
+		assert.equal(reply.ok, true, `paid ${paid}`);
+		assert.equal(reply.shelf!.charged, refreshCost(paid));
+		total += refreshCost(paid);
+		assert.equal(spentOf(p), total);
+	}
+	assert.equal(shelfOf(p).paid, 3);
+	assert.equal((await op(p, { action: 'shelf', mode: 'refresh' }, at(n))).ok, false, 'a price far beyond the gold the player could have');
+	assert.equal(spentOf(p), total, 'nothing recorded for the refusal');
+});
+
+test('a shop potion is priced by the server and recorded as spent', async () => {
+	const p = await player();
+	assert.equal((await op(p, { action: 'buyShop', id: 'potion_minor', qty: 3 })).ok, true);
+	assert.ok(spentOf(p) > 0, 'the shop price is recorded');
+	const before = spentOf(p);
+	assert.equal((await op(p, { action: 'buyShop', id: 'steel_helm', qty: 1 })).ok, false);
+	assert.equal(spentOf(p), before);
 });
