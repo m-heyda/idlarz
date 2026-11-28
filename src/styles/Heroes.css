@@ -91,7 +91,75 @@
 	border-color: var(--accent);
 }
 
-/* Avatar picker (character window, new chapter screen, sign-up): small bust cards, locked ones as silhouettes. */
+/* Avatar picker (character window): set tabs, a counter, and a grid of small bust cards that scrolls inside the window; locked ones are silhouettes. */
+.avatar-toolbar {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+}
+
+.avatar-tabs {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+}
+
+.avatar-tab {
+	padding: 4px 8px;
+	font-family: inherit;
+	font-size: 0.75rem;
+	font-weight: 700;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	color: #b9a987;
+	cursor: pointer;
+	background: #0a0c12;
+	border: 1px solid #3a4258;
+}
+
+.avatar-tab[data-active='true'] {
+	color: #f1e6c8;
+	border-color: var(--ds-gold, #e0a93a);
+	background: rgba(224, 169, 58, 0.14);
+}
+
+.avatar-tab:focus-visible {
+	outline: 2px solid #f0d27a;
+	outline-offset: 2px;
+}
+
+.avatar-tab-count {
+	font-weight: 400;
+	opacity: 0.75;
+}
+
+.avatar-only {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 0.75rem;
+	cursor: pointer;
+}
+
+.avatar-progress {
+	margin: 8px 0;
+	font-size: 0.8rem;
+	text-align: center;
+}
+
+.avatar-empty {
+	grid-column: 1 / -1;
+	text-align: center;
+}
+
+.avatar-window .avatar-grid {
+	max-height: min(56vh, 520px);
+	padding-right: 4px;
+	overflow-y: auto;
+}
+
 .avatar-grid {
 	display: grid;
 	grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -190,31 +258,6 @@
 	.sk {
 		animation: none;
 	}
-}
-
-.avatar-card-soon {
-	cursor: default;
-	color: #5c5040;
-	opacity: 0.45;
-	outline: none;
-}
-
-.avatar-card-soon-art {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 60px;
-	height: 60px;
-	font-size: 1.6rem;
-	color: #3c3226;
-	background: rgba(0, 0, 0, 0.35);
-	border: 2px dashed #3c3226;
-}
-
-.avatar-card-soon-note {
-	overflow-wrap: anywhere;
-	font-size: 0.65rem;
-	line-height: 1.15;
 }
 
 .avatar-card-lock {

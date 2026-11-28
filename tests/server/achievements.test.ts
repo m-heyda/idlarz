@@ -48,7 +48,7 @@ test('the catalog is the launch set plus the Beta tester (13 achievements, 925 g
 		925,
 	);
 	assert.ok(ACHIEVEMENTS.every((a) => a.rewards.gems >= 20 && a.rewards.gems <= 400));
-	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5);
+	assert.equal(ACHIEVEMENTS.filter((a) => a.rewards.avatarId).length, 5 + 36, 'the five launch avatars plus the 36 of the expansion');
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.rewards.gems, 200);
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'beta_tester')?.withAchievement, 'early_tester');
 	assert.equal(ACHIEVEMENTS.find((a) => a.id === 'early_tester')?.rewards.titleId, 'early-tester');

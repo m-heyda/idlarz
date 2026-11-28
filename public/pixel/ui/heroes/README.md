@@ -1,4 +1,4 @@
-# ui/heroes (20 avatar busts)
+# ui/heroes (56 avatar busts)
 
 Framed 64x64 busts for the avatar picker (`src/catalog/avatars.ts`, picture = `AvatarInfo.portrait`, URL from `avatarArtUrl`). `tests/saves/avatars.test.ts` fails when an avatar points at a file that is not here. Made by the owner with Sprite Fusion on 2026-11-10 (and 2026-11-11 for the Beta tester); the avatar ids and unlock rules are in the code, the "Use" column is the intent when they were named.
 
@@ -35,3 +35,7 @@ Not named by any avatar yet (spare for later unlocks): `avatar_horned_black_helm
 ## Before it ships
 
 `avatar_winged_helm_veteran.png` is 65x65: crop it to 64x64 if the frame is off by one pixel. Each avatar must stay readable at 20 px (HUD, ranking row).
+
+## Avatar expansion (36 busts)
+
+Three sheets of 12 framed busts, cut out and downscaled to 64x64 (one-off crop, not the legacy generator): `avatar_<name>.png` for the heroes (gold frames), the fiends (monsters and villains) and the void set (purple). Which achievement unlocks each one is in `src/catalog/avatarUnlocks.ts`.
