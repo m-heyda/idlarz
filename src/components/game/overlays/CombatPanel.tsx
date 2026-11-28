@@ -115,7 +115,6 @@ const FightResult: React.FC<{ notice: CombatNotice }> = ({ notice }) => {
 		<div className='fight-reward'>
 			{won ? (
 				<>
-					<div className='victory-title'>{def.label} defeated</div>
 					<div className='victory-row'>
 						<span className='flex items-center gap-1'>
 							+{formatNumber(Math.floor(summary.gold))} <ResourceIcon resource='gold' />
@@ -424,6 +423,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 
 	return (
 		<div className='combat-stack' onMouseEnter={p.onMouseEnter} onMouseLeave={p.onMouseLeave}>
+			<CombatQueue queue={p.queue} queueMax={p.queueMax} onUnqueue={p.onUnqueue} compact={compact} onCompact={setCompact} />
 			<section
 				className='ds-root combat-widget'
 				aria-label='Combat'
@@ -513,6 +513,7 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 								</span>
 							)}
 							{fight && fight.stunLeft > 0 && <div className='fight-stunned'>Stunned {tidy(fight.stunLeft.toFixed(1))} s</div>}
+							{over && dead && <div className='victory-title fight-result-title'>{def.label} defeated</div>}
 							{over && !dead && (
 								<div className='fight-defeat' role='status'>
 									<div className='victory-title'>{over.kind === 'defeated' ? `Knocked out by the ${def.label}` : `Time ran out against the ${def.label}`}</div>
@@ -564,7 +565,6 @@ const CombatPanel: React.FC<CombatPanelProps> = (p) => {
 					{controls(!!over)}
 				</div>
 			</section>
-			<CombatQueue queue={p.queue} queueMax={p.queueMax} onUnqueue={p.onUnqueue} compact={compact} onCompact={setCompact} />
 		</div>
 	);
 };
