@@ -77,6 +77,7 @@ const CombatWidget: React.FC = () => {
 	const unqueueMonster = useGameStore((state) => state.unqueueMonster);
 	const clearNotice = useGameStore((state) => state.clearCombatNotice);
 	const minimized = useUiStore((state) => state.combatMinimized);
+	const queueCompact = useUiStore((state) => state.combatQueueCompact);
 	const setPref = useUiStore((state) => state.setPref);
 
 	const [numbers, setNumbers] = useState<FloatNumber[]>([]);
@@ -329,6 +330,8 @@ const CombatWidget: React.FC = () => {
 			onFlee={flee}
 			onCloseResult={clearNotice}
 			onMinimize={() => setPref('combatMinimized', true)}
+			queueCompact={queueCompact}
+			onQueueCompact={(on) => setPref('combatQueueCompact', on)}
 			onAutoBattle={setAutoBattle}
 			onAutoUse={setAutoUse}
 			onMouseEnter={() => clearTimeout(closeTimer.current)}

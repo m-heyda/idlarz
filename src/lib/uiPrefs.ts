@@ -6,6 +6,7 @@ import { scoped } from '@/lib/storageScope';
 export type UiPrefKey =
 	| 'showMinimap'
 	| 'combatMinimized'
+	| 'combatQueueCompact'
 	| 'buildQueueCompact'
 	| 'compactHeader'
 	| 'farmAnimalsOpen'
@@ -24,6 +25,7 @@ export type UiPrefKey =
 export const PREF_DEFAULTS: Record<UiPrefKey, boolean> = {
 	showMinimap: true,
 	combatMinimized: false, // the combat panel starts open
+	combatQueueCompact: false, // the battle queue window under the combat panel starts in its full view; compact is one row of small chips
 	buildQueueCompact: false, // the construction queue (bottom left) starts in its full view, one row per building; compact is one small plate per building
 	compactHeader: false, // the header shows each resource with its amount; compact leaves only the icons (the amounts are in the dropdown of each group)
 	farmAnimalsOpen: true, // the Farm window's animal shop, stats readout and upgrade drawer: what is folded stays folded

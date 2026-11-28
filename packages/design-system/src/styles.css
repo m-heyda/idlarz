@@ -5076,34 +5076,72 @@ button.ds-income-head:hover {
 .ds-check-box {
 	display: grid;
 	place-items: center;
-	width: 18px;
-	height: 18px;
+	width: 20px;
+	height: 20px;
 	flex: none;
-	font-size: 13px;
+	font-size: 14px;
+	font-weight: 700;
 	line-height: 1;
 	color: transparent;
-	background: linear-gradient(#0a0c12, #12151f);
+	background: linear-gradient(#07080d, #141826);
 	border: 1px solid #4a5270;
-	box-shadow: inset 0 0 0 1px #05060a;
+	border-radius: 5px;
+	box-shadow:
+		inset 0 1px 3px rgba(0, 0, 0, 0.8),
+		0 0 0 1px #05060a;
 	transition:
-		border-color 0.12s,
-		background 0.12s,
-		color 0.12s;
+		border-color 0.15s,
+		background 0.15s,
+		box-shadow 0.2s;
+}
+
+/* the tick pops in with a small overshoot instead of just appearing */
+.ds-check-box::before {
+	content: '✓';
+	transform: scale(0.2) rotate(-20deg);
+	opacity: 0;
+	transition:
+		transform 0.18s cubic-bezier(0.3, 1.6, 0.5, 1),
+		opacity 0.12s;
 }
 
 .ds-check:hover .ds-check-box {
 	border-color: var(--ds-gold, #e0a93a);
+	box-shadow:
+		inset 0 1px 3px rgba(0, 0, 0, 0.8),
+		0 0 0 1px #05060a,
+		0 0 8px rgba(224, 169, 58, 0.35);
 }
 
 .ds-check-input:checked + .ds-check-box {
 	color: #2a1a05;
-	background: linear-gradient(#f0c75a, #c28a22);
-	border-color: var(--ds-gold, #e0a93a);
+	background: linear-gradient(#f6d46e, #c28a22);
+	border-color: var(--ds-gold-lt, #f4d57e);
+	box-shadow:
+		inset 0 1px 0 rgba(255, 255, 255, 0.45),
+		0 0 0 1px #05060a,
+		0 0 10px rgba(240, 199, 90, 0.45);
+}
+
+.ds-check-input:checked + .ds-check-box::before {
+	transform: scale(1) rotate(0);
+	opacity: 1;
 }
 
 .ds-check-input:focus-visible + .ds-check-box {
 	outline: 2px solid var(--ds-gold-lt, #f4d57e);
 	outline-offset: 2px;
+}
+
+.ds-check:active .ds-check-box {
+	transform: scale(0.92);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ds-check-box,
+	.ds-check-box::before {
+		transition: none;
+	}
 }
 
 .ds-check-label {

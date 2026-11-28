@@ -6,7 +6,7 @@ import { pixelIconSrc } from '@/config/pixelIcons';
 import { notify } from '@/lib/notices';
 import type { RebirthChoice } from '@/lib/serverRebirth';
 import GameModal from '../GameModal';
-import { Button, HoverTip, SectionLabel, Slot } from '../../../../packages/design-system/src/components/primitives';
+import { Button, Checkbox, HoverTip, SectionLabel, Slot } from '../../../../packages/design-system/src/components/primitives';
 import { HintTooltip } from '../../../../packages/design-system/src/components/tooltips';
 import { toRarity } from '../../../../packages/design-system/src/logic';
 import { resolveItem } from '@/lib/itemInstance';
@@ -149,20 +149,28 @@ const RebirthConfirmModal: React.FC<RebirthConfirmProps> = ({
 					</div>
 					<div className='rb-card' data-testid='rebirth-respec'>
 						<SectionLabel>Free respec</SectionLabel>
-						<label className='rb-check'>
-							<input type='checkbox' checked={takeAttrsBack} onChange={(e) => setTakeAttrsBack(e.target.checked)} data-testid='respec-attrs' />
-							<span>Take back my attribute points to spend again (free respec)</span>
-						</label>
+						<div className='rb-respec-row'>
+							<Checkbox
+								checked={takeAttrsBack}
+								onChange={setTakeAttrsBack}
+								data-testid='respec-attrs'
+								label='Take back my attribute points to spend again (free respec)'
+							/>
+						</div>
 						<p className='rb-note'>
 							{takeAttrsBack
 								? 'Every attribute point goes back and you spend them all again.'
 								: `Your attributes stay as they are and you only get the ${extraPoints} extra points to spend.`}
 						</p>
 						{paragonPoints > 0 && (
-							<label className='rb-check'>
-								<input type='checkbox' checked={takeParagonBack} onChange={(e) => setTakeParagonBack(e.target.checked)} data-testid='respec-paragon' />
-								<span>Take back my {paragonPoints} paragon points to spend again (free respec)</span>
-							</label>
+							<div className='rb-respec-row'>
+								<Checkbox
+									checked={takeParagonBack}
+									onChange={setTakeParagonBack}
+									data-testid='respec-paragon'
+									label={<>Take back my {paragonPoints} paragon points to spend again (free respec)</>}
+								/>
+							</div>
 						)}
 					</div>
 					{unlockLabel && (

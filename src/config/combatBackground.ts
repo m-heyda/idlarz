@@ -2,8 +2,9 @@
  * The picture behind the monster in the combat window: one wide pixel-art landscape (1200x400, `public/pixel/ui/combat/combat_<biome>.webp`, made in Gemini from the
  * biome prompts) per biome, chosen by the biome the monster lives in (`biomeOfType`). A biome without a picture keeps the plain dark stage.
  *
- * The picture is drawn `zoom` times as wide as the stage and drifts slowly from one side to the other and back (`panSec` for the whole trip) for a parallax feel; a black
- * layer of `dim` opacity (`dimDead` once the monster is dead, so the loot reads) keeps the monster and its bar clear. `prefers-reduced-motion` stops the drift.
+ * The picture fills the scene at the top of the combat window (the header on a blurred dark glass, then the stage); the bars, potions and switches below sit on a dark panel.
+ * It is drawn `zoom` times as wide as the scene and glides slowly from one side to the other and back (`panSec` for the whole trip, eased so it never jerks);
+ * a black layer of `dim` opacity (`dimDead` once the monster is dead, so the loot reads) keeps the monster and the text clear. `prefers-reduced-motion` stops the glide.
  * The values reach the stylesheet as CSS variables set by `CombatPanel`.
  *
  * `lava` is the planned land after the battlefield (IDL-371): its picture is ready, no monster lives there yet.
@@ -13,13 +14,13 @@
  */
 export const COMBAT_BACKGROUND_STYLE = {
 	/** Opacity of the black layer over the picture while the monster fights */
-	dim: 0.25,
+	dim: 0.4,
 	/** The same once the monster lies dead */
-	dimDead: 0.4,
-	/** Seconds for the picture to drift to one side and back */
-	panSec: 70,
-	/** How much wider than the stage the picture is drawn (the room it has to drift in) */
-	zoom: 1.3,
+	dimDead: 0.55,
+	/** Seconds for the picture to glide to one side and back (long enough to stay calm, short enough to be seen) */
+	panSec: 45,
+	/** How much wider than the scene the picture is drawn (the room it has to glide in) */
+	zoom: 1.4,
 } as const;
 
 /** Biome -> picture file name (without folder and extension) */
