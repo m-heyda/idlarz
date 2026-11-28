@@ -715,6 +715,19 @@ body {
 }
 
 /* owned tiles light up on hover with an overlay (a filter would wash out the tile's own sprites) */
+/* While the map is dragged or flung (Grid sets data-panning) nothing under the cursor takes pointer events (no hover styles, no tooltip mounting and measuring, no hit-testing of ~900 tiles per mouse move)
+   and the map's animations hold still: the fog drift, the water sprites, the castle range and the sparkles are all repainted by the browser frame by frame (Firefox pays the most), and they would compete with the pan. They carry on where they stopped. */
+.map-root[data-panning],
+.map-root[data-panning] *,
+.map-root[data-panning] *::before,
+.map-root[data-panning] *::after {
+	animation-play-state: paused !important;
+}
+
+.map-root[data-panning] * {
+	pointer-events: none;
+}
+
 .tile-owned {
 	&::after {
 		content: '';

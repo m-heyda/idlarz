@@ -12,6 +12,7 @@
 		"pace:local": "tsx scripts/pace-local.ts",
 		"pace:classes": "tsx scripts/pace-classes.ts",
 		"perf": "tsx scripts/perf-world.ts",
+		"perf:map": "node scripts/perf-map.mjs",
 		"test": "tsx --test \"tests/**/*.test.ts\"",
 		"report": "tsx scripts/balance-report.ts",
 		"reset-test-account": "tsx scripts/reset-test-account.ts",

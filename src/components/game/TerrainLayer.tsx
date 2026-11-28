@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CHUNK_TILES, chunkOf, chunkSignature } from '@/utils/terrain';
 import { ownedBounds, type World } from '@/utils/world';
-import { CHUNK_CANVAS_PX, CHUNK_PX, drawChunk, drawChunkFlat, loadTerrainAssets, scheduleDraw, type TerrainAssets } from '@/lib/terrainRenderer';
+import { CHUNK_CANVAS_PX, CHUNK_PX, drawChunkFlat, drawChunkSteps, loadTerrainAssets, scheduleSteps, type TerrainAssets } from '@/lib/terrainRenderer';
 import { useMapGame } from './mapSource';
 
 /**
@@ -44,10 +44,12 @@ const TerrainChunk: React.FC<ChunkProps> = React.memo(({ cx, cy, tiles, assets }
 		// flat colours first, but never over a finished picture (that would flash on every purchase)
 		if (!fullyDrawn.current) drawChunkFlat(canvas, tilesRef.current, cx, cy);
 		if (!assets) return;
-		return scheduleDraw(() => {
-			drawChunk(canvas, assets, tilesRef.current, cx, cy);
+		// the steps of the picture run over a few frames; the flat colours stay on the canvas until the whole picture replaces them
+		const steps = (function* () {
+			yield* drawChunkSteps(canvas, assets, tilesRef.current, cx, cy);
 			fullyDrawn.current = true;
-		});
+		})();
+		return scheduleSteps(steps);
 	}, [signature, assets, cx, cy]);
 
 	return (
