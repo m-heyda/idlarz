@@ -8,7 +8,6 @@ import { castleIconName, pixelIconSrc } from '@/config/pixelIcons';
 import { kingdomSummary, type KingdomBuildingRow } from '@/lib/kingdomSummary';
 import { nextBuildingTile, tilesWithBuilding } from '@/lib/buildingEffect';
 import { useViewStore } from '@/stores/viewStore';
-import { useWindowStore } from '@/stores/windowStore';
 import { useGameStore } from '@/stores/gameStore';
 import { useRockStore } from '@/stores/rockStore';
 import { formatNumber } from '@/utils/formatters';
@@ -18,7 +17,7 @@ import '@/styles/Kingdom.css';
 
 /**
  * The Kingdom overview window (the crown icon next to the settings gear): a one-screen summary of the realm, built by `kingdomSummary`. The castle's level against its cap and the builders, the land owned per biome (a heatmap of one square per tile, coloured by biome, with the count per biome under it), every building with its level
- * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many chests, ore nodes and monsters stand on the map. The last panel, "Find on the map", is one grid of equal tiles, all pressable: Chests, Ore nodes and Monsters, then Bosses, Strongest, Golden, Fully grown and Still growing with their counts. A press rings just those on the map and lights the tile (one mark at a time, the same marks as the buttons under the minimap, `useMapMarks` and `MARK_TARGETS`). No income or resources: the resource windows have them. Pointing at a building's name shows what it gives now (or what level 1 would give), and pressing the name of a standing building closes the window, centres the map on it and frames it for a few seconds (`focusTile`; pressing again shows the next copy). A first version, meant to grow.
+ * against its top level (the Ember caps, not the castle level; dimmed when not built yet) and how many chests, ore nodes and monsters stand on the map. The last panel, "Find on the map", is one grid of equal tiles, all pressable: Chests, Ore nodes and Monsters, then Bosses, Strongest, Golden, Fully grown and Still growing with their counts. A press rings just those on the map and lights the tile (one mark at a time, the same marks as the buttons under the minimap, `useMapMarks` and `MARK_TARGETS`). No income or resources: the resource windows have them. Pointing at a building's name shows what it gives now (or what level 1 would give), and pressing the name of a standing building centres the map on it and frames it for a few seconds (`focusTile`; pressing again shows the next copy); the window stays open and keeps its scroll position. A first version, meant to grow.
  */
 /** The most squares the land heatmap draws; above it each square stands for several tiles */
 const HEAT_MAX_CELLS = 400;
@@ -55,12 +54,11 @@ const KingdomWindow: React.FC = () => {
 	const summary = useMemo(() => kingdomSummary(input, rockCount), [input, rockCount]);
 	const { castle, builders, land, buildings, monsters } = summary;
 	const { on: marked, choose } = useMapMarks();
-	/** Closes the window and centres the map on a standing building (the next copy when it was pressed before), framing it for a few seconds */
+	/** Centres the map on a standing building (the next copy when it was pressed before), framing it for a few seconds. The window stays open, so the scroll position is kept */
 	const findBuilding = (id: string) => {
 		const tile = nextBuildingTile(tilesWithBuilding(input.tiles, id), lastFound[id] ?? null);
 		if (!tile) return;
 		lastFound[id] = tile;
-		useWindowStore.getState().closeWindow('kingdom');
 		useViewStore.getState().focusTile(tile.x, tile.y);
 	};
 	/** How many of each kind stand on the map, for the "Find on the map" tiles (the Strongest tile counts the monsters at the highest level) */

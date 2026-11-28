@@ -614,47 +614,181 @@
 	color: #ff7a6a;
 }
 
-/* ===== the biome landscape behind the monster (config/combatBackground.ts): dimmed, drifting slowly from side to side ===== */
-.combat-widget .combat-stage {
+/* ===== the biome landscape behind the scene (header and stage) at the top of the window (config/combatBackground.ts): dimmed, gliding slowly from side to side; the bars and slots below sit on the dark panel ===== */
+.combat-stack {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	width: 580px;
+	max-width: calc(100vw - 32px);
+	pointer-events: auto;
+}
+
+.combat-stack .combat-widget,
+.combat-stack .combat-queue-window {
+	width: 100%;
+}
+
+.combat-widget {
+	position: relative;
 	overflow: hidden;
-	isolation: isolate; /* the picture sits at z -1: above the stage's own colour, below everything drawn on the stage */
+	border-radius: 8px;
+}
+
+.combat-scene {
+	position: relative;
+	overflow: hidden;
+	isolation: isolate; /* the picture sits at z -1: above the scene's own colour, below everything drawn on it */
+	border-radius: 6px;
+	border: 1px solid rgba(255, 255, 255, 0.08);
+	background: #0a0c12;
 }
 
 .combat-bg {
 	position: absolute;
 	inset: 0;
-	left: calc((1 - var(--bg-zoom, 1.3)) * 50%);
-	width: calc(var(--bg-zoom, 1.3) * 100%);
+	left: calc((1 - var(--bg-zoom, 1.4)) * 50%);
+	width: calc(var(--bg-zoom, 1.4) * 100%);
 	z-index: -1;
 	background-size: cover;
 	background-position: center bottom;
 	image-rendering: pixelated;
 	pointer-events: none;
-	animation: combat-bg-pan var(--bg-pan, 70s) ease-in-out infinite alternate;
+	animation: combat-bg-pan var(--bg-pan, 45s) ease-in-out infinite alternate;
 	will-change: transform;
 }
 
-/* the black layer that keeps the monster clear (a won fight dims more so the loot reads) */
+/* the black layer that keeps the monster and the text clear (a won fight dims more so the loot reads) */
 .combat-bg::after {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background: rgba(0, 0, 0, var(--bg-dim, 0.25));
-	transition: background 0.6s;
+	background: rgba(0, 0, 0, var(--bg-dim, 0.4));
 }
 
-.combat-stage[data-dead='true'] .combat-bg::after {
-	background: rgba(0, 0, 0, var(--bg-dim-dead, 0.4));
+.combat-widget[data-dead='true'] .combat-bg::after {
+	background: rgba(0, 0, 0, var(--bg-dim-dead, 0.55));
 }
 
-/* it drifts the room it has: the extra width of the zoomed picture, half to each side */
+/* it glides the room it has: the extra width of the zoomed picture, half to each side (transform only, so the browser composites it on the GPU) */
 @keyframes combat-bg-pan {
 	from {
-		transform: translateX(calc((1 - 1 / var(--bg-zoom, 1.3)) * 50%));
+		transform: translate3d(calc((1 - 1 / var(--bg-zoom, 1.4)) * 50%), 0, 0);
 	}
 	to {
-		transform: translateX(calc((1 - 1 / var(--bg-zoom, 1.3)) * -50%));
+		transform: translate3d(calc((1 - 1 / var(--bg-zoom, 1.4)) * -50%), 0, 0);
 	}
+}
+
+/* the header is a frosted dark strip over the picture */
+.combat-scene .combat-head {
+	margin: 0;
+	padding: 8px 10px;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+	background: rgba(0, 0, 0, 0.45);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+}
+
+/* dark glass: the slots behind the bars, potions, skills, switches and the queue, readable over any biome */
+.combat-widget .fight-bars-row .fight-bar,
+.combat-widget .fight-monster-bar .fight-bar,
+.combat-widget .fight-hotbar,
+.combat-widget .fight-rest,
+.combat-widget .fight-reward,
+.combat-queue-window {
+	background: rgba(0, 0, 0, 0.55);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, 0.09);
+	border-radius: 6px;
+}
+
+.combat-widget .fight-bars-row .fight-bar,
+.combat-widget .fight-monster-bar .fight-bar {
+	box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.6);
+}
+
+.combat-widget .fight-hotbar {
+	padding: 4px 6px;
+	background: rgba(0, 0, 0, 0.4);
+}
+
+/* every potion and skill sits in its own black slot */
+.combat-widget .fight-potion,
+.combat-widget .fight-skill {
+	background: rgba(0, 0, 0, 0.6);
+	border-radius: 5px;
+}
+
+.combat-widget .combat-switches {
+	padding: 2px 4px 0;
+	margin-top: 0;
+	border-top: 0;
+}
+
+/* the stage takes the room: no frame of its own, the picture runs behind it */
+.combat-widget .combat-stage {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	min-height: 210px;
+	padding-top: 34px;
+}
+
+.combat-widget .combat-stage[data-dead='true'] {
+	min-height: 170px;
+	padding-top: 12px;
+}
+
+/* the queue window under the combat panel */
+.combat-queue-window {
+	padding: 6px 8px 8px;
+	color: #f0d27a;
+	border-color: rgba(224, 169, 58, 0.35);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5);
+}
+
+.combat-queue-head {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 4px;
+	font-size: 0.8rem;
+	letter-spacing: 0.05em;
+}
+
+.combat-queue-window .fight-queue {
+	margin-top: 0;
+	padding: 0;
+	background: none;
+	border: 0;
+}
+
+/* compact: one row of small chips, the picture and the win mark only */
+.combat-queue-window[data-compact='true'] {
+	padding-bottom: 6px;
+}
+
+.combat-queue-window[data-compact='true'] .fight-queue {
+	flex-wrap: nowrap;
+	overflow: hidden;
+	gap: 3px;
+}
+
+.combat-queue-window[data-compact='true'] .fight-queue-item {
+	zoom: 0.7;
+}
+
+.combat-queue-window[data-compact='true'] .fight-queue-lv,
+.combat-queue-window[data-compact='true'] .fight-queue-x {
+	display: none;
+}
+
+/* the switches use the design system's checkbox */
+.combat-switches .ds-check {
+	gap: 6px;
+	font-size: 0.78rem;
 }
 
 /* ===== livelier numbers and a breathing monster ===== */
@@ -755,4 +889,21 @@
 	.combat-stage:not([data-dead='true']) .fight-sprite[data-hit='true'] {
 		animation: none;
 	}
+}
+
+/* a lost fight: the message sits on the stage over the monster, on frosted dark glass, instead of a box of its own */
+.fight-defeat {
+	position: absolute;
+	left: 50%;
+	bottom: 12px;
+	z-index: 5;
+	width: min(88%, 440px);
+	padding: 8px 12px;
+	text-align: center;
+	background: rgba(0, 0, 0, 0.5);
+	-webkit-backdrop-filter: blur(6px);
+	backdrop-filter: blur(6px);
+	border: 1px solid rgba(255, 255, 255, 0.12);
+	border-radius: 6px;
+	transform: translateX(-50%);
 }
