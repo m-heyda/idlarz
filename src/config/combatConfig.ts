@@ -31,7 +31,8 @@ export const COMBAT = {
 	// Fights run on the server in fixed ticks: the player swings at the weapon's attack speed, a monster at its own. Nobody clicks to hit: a click on a monster only starts the fight.
 	tickSec: 0.1, // the server's fight step
 	maxCatchUpSec: 120, // one request runs a fight forward by at most this long (a longer silence is simulated by the next request)
-	maxFightSec: 180, // a fight that has not been decided by now is called off (the monster stays, no reward)
+	maxFightSec: 180, // a boss fight is also called off after this long, whatever its own clock says (the boss stays, no reward); every boss clock is shorter
+	maxRegularFightSec: 600, // a regular monster has NO time limit; this is only a guard against a stalemate (hero regeneration cancelling the monster's damage), after which the fight is called off
 	poll: {
 		fightSec: 2, // a fight the server could not run to its end (it is `behind`) is asked about this often with the panel open...
 		minimizedSec: 8, // ...the minimized icon (or a hidden tab) this often

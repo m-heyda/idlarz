@@ -105,7 +105,7 @@ jobs:
           fi
 
   # The full regeneration (IDL-9, IDL-17). `npm run docs:gen` reruns every report, including the full sim, and the committed docs/generated must be exactly what it writes.
-  # A matrix that runs in parallel (the pace sim in one shard, about a minute and a half; the other generators in three groups); each shard uploads
+  # A matrix that runs in parallel (the pace sim in four shards; the other generators in three groups); each shard uploads
   # what it wrote and `generated` puts them together with `scripts/pace.ts --merge` (which fails if a profile is missing or twice). The wall time is about the slowest shard plus the install.
   generate:
     needs: hash
@@ -115,10 +115,17 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # every pace profile in one process: about a minute and a half all together (the long ten-rebirth profile alone used to take 5 minutes; a new profile lands here on its own)
-          - shard: pace
-            command: npx tsx scripts/pace.ts --dump=shard/pace.json
-          # the other generators, in three groups (now the slowest shards: about 3 minutes or less each) (the groups are the docs:gen:rest:* scripts in package.json)
+          # the pace profiles in four balanced shards (about 7 minutes each; all sixteen in one process took 25). `scripts/pace.ts --merge` insists on every profile exactly once, so a profile
+          # added to PROFILES but listed in no shard fails the merge loudly: put it in the lightest shard.
+          - shard: pace-1
+            command: npx tsx scripts/pace.ts --dump=shard/pace-1.json autoclicker
+          - shard: pace-2
+            command: npx tsx scripts/pace.ts --dump=shard/pace-2.json human human-rebirth8
+          - shard: pace-3
+            command: npx tsx scripts/pace.ts --dump=shard/pace-3.json hardcore hardcore-rebirth10 casual
+          - shard: pace-4
+            command: npx tsx scripts/pace.ts --dump=shard/pace-4.json idle hardcore-clicker hardcore-rebirth6 hardcore-rebirth6-rocks hardcore-rebirth6-x10 human-rebirth6 human-rebirth6-gems human-rebirth6-builder2 human-rebirth6-economy human-rebirth6-full
+          # the other generators, in three groups (a few minutes each) (the groups are the docs:gen:rest:* scripts in package.json)
           - shard: docs-quick
             command: npm run docs:gen:rest:quick
           - shard: docs-fights
@@ -169,7 +176,7 @@ jobs:
         run: |
           # the pace shard's dump, merged into pace-milestones.md and pace-baseline.json
           mkdir pace-dumps
-          cp shards/shard-pace/*.json pace-dumps/
+          cp shards/shard-pace-*/*.json pace-dumps/
           # the other generators: the files each wrote go over the committed ones
           for t in shards/shard-docs-*/docs.tar; do tar -xf "$t"; done
           npx tsx scripts/pace.ts --merge=pace-dumps > /dev/null

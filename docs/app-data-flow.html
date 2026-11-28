@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Idle Realm — Application data flow</title>
+  <style>
+    :root { --ink:#17202b; --muted:#556273; --paper:#f6f7f3; --card:#fff; --line:#d9dee5; --client:#1869a8; --server:#8057c7; --data:#168068; --event:#c46a15; --shadow:0 8px 28px #17202b12; }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.55 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header { padding:52px max(24px,calc((100vw - 1120px)/2)); background:linear-gradient(125deg,#102535,#1c5273 58%,#5965a6); color:white; }
+    h1 { margin:0 0 8px; font-size:clamp(2rem,5vw,3.4rem); line-height:1.08; letter-spacing:-.04em; } h2 { margin:0 0 10px; font-size:1.5rem; letter-spacing:-.025em; } h3 { margin:0 0 8px; font-size:1rem; } p { margin:0 0 12px; } a { color:#075b9e; text-decoration-thickness:1px; text-underline-offset:2px; } header p { max-width:720px; color:#dcecf6; font-size:1.08rem; }
+    nav { position:sticky; top:0; z-index:2; display:flex; gap:18px; overflow:auto; padding:11px max(24px,calc((100vw - 1120px)/2)); background:#ffffffed; border-bottom:1px solid var(--line); backdrop-filter:blur(10px); white-space:nowrap; } nav a { color:var(--ink); font-weight:650; text-decoration:none; }
+    main { max-width:1120px; margin:auto; padding:36px 24px 72px; } section { margin:0 0 44px; scroll-margin-top:62px; } .lede { max-width:820px; color:var(--muted); font-size:1.05rem; }
+    .diagram { overflow-x:auto; padding:20px; background:var(--card); border:1px solid var(--line); border-radius:16px; box-shadow:var(--shadow); } svg { display:block; width:100%; min-width:760px; height:auto; } .node { stroke-width:1.5; } .client { fill:#e7f3fc; stroke:var(--client); } .server { fill:#f0eafd; stroke:var(--server); } .data { fill:#e7f6ef; stroke:var(--data); } .event { fill:#fff0df; stroke:var(--event); } .label { font-size:15px; font-weight:700; fill:var(--ink); } .sub { font-size:12px; fill:var(--muted); } .arrow { fill:none; stroke:#657180; stroke-width:2; marker-end:url(#arrow); } .dashed { stroke-dasharray:6 5; } .tag { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; fill:#536071; }
+    .grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:16px; margin-top:18px; } .card { padding:18px; background:var(--card); border:1px solid var(--line); border-radius:12px; } .card.client { border-left:5px solid var(--client); } .card.server { border-left:5px solid var(--server); } .card.data { border-left:5px solid var(--data); } .card.event { border-left:5px solid var(--event); } ul { margin:8px 0 0; padding-left:20px; } li+li { margin-top:4px; }
+    .flow { display:grid; gap:8px; margin-top:14px; } .step { display:grid; grid-template-columns:36px 1fr; align-items:start; gap:10px; padding:13px; background:var(--card); border:1px solid var(--line); border-radius:10px; } .n { display:grid; place-items:center; width:29px; height:29px; border-radius:50%; color:white; background:#315e7c; font-weight:800; }
+    table { width:100%; border-collapse:collapse; background:var(--card); border:1px solid var(--line); border-radius:12px; overflow:hidden; } th,td { padding:12px 14px; vertical-align:top; border-bottom:1px solid var(--line); text-align:left; } th { background:#eef2f5; font-size:.8rem; text-transform:uppercase; letter-spacing:.04em; } tr:last-child td { border:0; } code { padding:1px 4px; border-radius:4px; background:#eef1f4; font:12px ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .callout { margin-top:16px; padding:15px 18px; border-radius:10px; background:#fff8e9; border:1px solid #ecd49f; } footer { color:var(--muted); font-size:.9rem; } @media(max-width:760px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Application data flow</h1>
+    <p>A current code map for Idle Realm: where a player action goes, what is authoritative, and which files to open before changing it.</p>
+  </header>
+  <nav><a href="#overview">Overview</a><a href="#startup">Startup & saves</a><a href="#gameplay">Authoritative gameplay</a><a href="#domains">Domain map</a><a href="#rules">Change safely</a></nav>
+  <main>
+    <section id="overview">
+      <h2>1. System overview</h2>
+      <p class="lede">The browser renders and simulates ordinary time locally. It does not connect to Supabase directly. Next.js route handlers read the HttpOnly session cookie, validate small requests, and use a server-only Supabase client plus the game services. This boundary prevents clients from deciding rewards, spawns, or fight outcomes.</p>
+      <div class="diagram"><svg viewBox="0 0 1040 370" role="img" aria-label="Browser, Next.js server and Supabase data flow"><defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#657180"/></marker></defs>
+        <text x="58" y="38" class="tag">Browser — untrusted UI and local cache</text><text x="424" y="38" class="tag">Next.js — authenticated server boundary</text><text x="788" y="38" class="tag">Supabase — persisted account data</text>
+        <rect x="35" y="62" width="270" height="102" rx="12" class="node client"/><text x="58" y="94" class="label">React + GameApp</text><text x="58" y="118" class="sub">map, windows, controls, notifications</text><text x="58" y="140" class="sub">100 ms local tick in one owning tab</text>
+        <rect x="35" y="214" width="270" height="102" rx="12" class="node client"/><text x="58" y="246" class="label">Zustand stores + localStorage</text><text x="58" y="270" class="sub">validated persisted game cache / export</text><text x="58" y="292" class="sub">UI, settings, crafting & feature stores</text>
+        <rect x="390" y="62" width="285" height="102" rx="12" class="node server"/><text x="414" y="94" class="label">App Router API routes</text><text x="414" y="118" class="sub">cookie auth · request parsing · responses</text><text x="414" y="140" class="sub">/api/save, /offline, /spawn, /fight …</text>
+        <rect x="390" y="214" width="285" height="102" rx="12" class="node server"/><text x="414" y="246" class="label">Server game services</text><text x="414" y="270" class="sub">offline ledger · tickets · combat · loot</text><text x="414" y="292" class="sub">idempotency, secret rolls, validation</text>
+        <rect x="760" y="62" width="245" height="102" rx="12" class="node data"/><text x="784" y="94" class="label">Auth + profiles</text><text x="784" y="118" class="sub">email session and character identity</text>
+        <rect x="760" y="214" width="245" height="102" rx="12" class="node data"/><text x="784" y="246" class="label">Save + server records</text><text x="784" y="270" class="sub">save/world/stats, ledger, history</text><text x="784" y="292" class="sub">inventory, achievements, rankings</text>
+        <path d="M305 113 H390" class="arrow"/><path d="M305 265 H390" class="arrow dashed"/><path d="M675 113 H760" class="arrow"/><path d="M675 265 H760" class="arrow"/><path d="M170 164 V214" class="arrow"/><path d="M532 164 V214" class="arrow"/>
+        <text x="320" y="103" class="sub">fetch JSON</text><text x="684" y="103" class="sub">cookie + service role</text><text x="319" y="254" class="sub">saved state / events</text></svg></div>
+      <div class="grid"><div class="card client"><h3>Local responsibility</h3><p>Fast UI, ordinary resource/time progression, map display, cached save, and visualizing a server-provided combat plan.</p></div><div class="card server"><h3>Server authority</h3><p>Cloud-save acceptance, absence rewards, chest contents, monster tickets, combat, inventory mutations, crafting and gems.</p></div><div class="card data"><h3>Database responsibility</h3><p>Durable account state. RLS limits player reads; service-role code performs game writes.</p></div></div>
+    </section>
+
+    <section id="startup">
+      <h2>2. Startup, persistence, and cloud sync</h2>
+      <p class="lede">A browser copy makes first paint and offline use responsive; the signed-in account’s verified cloud save is the shared source for server gameplay. The owner tab claims time away before it starts its local tick or background synchronization.</p>
+      <div class="diagram"><svg viewBox="0 0 1040 280" role="img" aria-label="Startup and save synchronization flow"><defs><marker id="arrow2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#657180"/></marker></defs>
+        <rect x="22" y="90" width="150" height="86" rx="12" class="node client"/><text x="43" y="122" class="label">Load browser save</text><text x="43" y="146" class="sub">sanitize + hydrate</text>
+        <rect x="220" y="90" width="150" height="86" rx="12" class="node client"/><text x="241" y="122" class="label">Acquire tab lock</text><text x="241" y="146" class="sub">one active loop</text>
+        <rect x="418" y="90" width="170" height="86" rx="12" class="node event"/><text x="439" y="122" class="label">Claim absence</text><text x="439" y="146" class="sub">idempotent /api/offline</text>
+        <rect x="636" y="90" width="170" height="86" rx="12" class="node server"/><text x="657" y="122" class="label">Sync server state</text><text x="657" y="146" class="sub">/api/spawn + boot data</text>
+        <rect x="854" y="90" width="160" height="86" rx="12" class="node client"/><text x="875" y="122" class="label">Run & persist</text><text x="875" y="146" class="sub">tick + sync scheduler</text>
+        <path d="M172 133 H220 M370 133 H418 M588 133 H636 M806 133 H854" class="arrow" style="marker-end:url(#arrow2)"/>
+        <text x="68" y="57" class="tag">Local cache</text><text x="442" y="57" class="tag">Server reconciliation</text><text x="865" y="57" class="tag">Normal play</text>
+      </svg></div>
+      <div class="flow"><div class="step"><span class="n">1</span><div><strong>Hydrate a safe local game.</strong> <a href="../src/stores/gameStore.ts">gameStore.ts</a> reads through <code>saveStorage</code>, validates with <a href="../src/lib/sanitizeSave.ts">sanitizeSave.ts</a>, and rebuilds derived rates. It resets local combat because combat belongs to the server.</div></div><div class="step"><span class="n">2</span><div><strong>Establish the single owner.</strong> <a href="../src/app/GameApp.tsx">GameApp.tsx</a> waits for <code>useSingleTab</code>; only the owner ticks, claims absence, polls, and uploads.</div></div><div class="step"><span class="n">3</span><div><strong>Claim time away, then ask for current tickets.</strong> <a href="../src/hooks/useOfflineClaim.ts">useOfflineClaim.ts</a> uses a reusable claim ID. <a href="../src/hooks/useSpawnSync.ts">useSpawnSync.ts</a> obtains chests, monsters, combat events, inventory versioning, and the next poll time.</div></div><div class="step"><span class="n">4</span><div><strong>Persist locally, then synchronize cloud state.</strong> Local writes are debounced and flushed on <code>pagehide</code>. <a href="../src/hooks/useCloudSync.ts">useCloudSync.ts</a> uploads milestones/idle checkpoints and resolves revision conflicts without silently overwriting a newer active session.</div></div></div>
+    </section>
+
+    <section id="gameplay">
+      <h2>3. Authoritative gameplay loop</h2>
+      <p class="lede">The important distinction: map clicks and ordinary economy actions can change the local store; rewards and contested state must be confirmed by the server. Server responses are reconciled back into the stores and rendered by React.</p>
+      <div class="diagram"><svg viewBox="0 0 1040 330" role="img" aria-label="Authoritative event flow for chest, spawn and combat"><defs><marker id="arrow3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#657180"/></marker></defs>
+        <rect x="28" y="108" width="175" height="90" rx="12" class="node client"/><text x="50" y="141" class="label">Player action / poll</text><text x="50" y="165" class="sub">chest, monster, craft, spawn</text>
+        <rect x="270" y="108" width="165" height="90" rx="12" class="node server"/><text x="293" y="141" class="label">Route validation</text><text x="293" y="165" class="sub">cookie, JSON, idempotency key</text>
+        <rect x="502" y="108" width="185" height="90" rx="12" class="node server"/><text x="525" y="141" class="label">Game service</text><text x="525" y="165" class="sub">ledger + secret roll + rules</text>
+        <rect x="754" y="38" width="240" height="90" rx="12" class="node data"/><text x="778" y="71" class="label">Write server records</text><text x="778" y="95" class="sub">ledger, inventory, save/stat rows</text>
+        <rect x="754" y="206" width="240" height="90" rx="12" class="node event"/><text x="778" y="239" class="label">Return reconciled view</text><text x="778" y="263" class="sub">tickets, inventory, combat events/plan</text>
+        <path d="M203 153 H270 M435 153 H502 M687 137 L754 84 M687 170 L754 251 M754 251 H203" class="arrow" style="marker-end:url(#arrow3)"/>
+        <text x="706" y="107" class="sub">durable change</text><text x="417" y="240" class="sub">applyServerTickets / inventory / combat</text>
+      </svg></div>
+      <table><thead><tr><th>Flow</th><th>Browser asks</th><th>Server decides and returns</th><th>Primary implementation</th></tr></thead><tbody>
+        <tr><td>Spawn poll</td><td>last combat event and inventory version</td><td>new chest/monster tickets, combat view, next poll time</td><td><a href="../src/app/api/spawn/route.ts">api/spawn</a> → <a href="../src/lib/offline/online.ts">offline/online.ts</a></td></tr>
+        <tr><td>Offline claim</td><td>idempotency key only</td><td>server-clocked, capped absence grant; replay-safe result</td><td><a href="../src/app/api/offline/route.ts">api/offline</a> → <a href="../src/lib/offline/service.ts">offline/service.ts</a></td></tr>
+        <tr><td>Chest</td><td>ticket coordinate + idempotency key</td><td>validated chest, secret loot roll, inventory update</td><td><a href="../src/app/api/chest/route.ts">api/chest</a></td></tr>
+        <tr><td>Combat</td><td>start/use/auto/dismiss intent</td><td>fight progression, rewards, event log and visual plan</td><td><a href="../src/app/api/fight/route.ts">api/fight</a> → <a href="../src/lib/offline/fight.ts">offline/fight.ts</a></td></tr>
+        <tr><td>Cloud save</td><td>validated text + base revision</td><td>accepted revision or conflict; trusted headline stats</td><td><a href="../src/app/api/save/route.ts">api/save</a> → <a href="../src/lib/cloudSave/pipeline.ts">cloudSave/pipeline.ts</a></td></tr>
+      </tbody></table>
+      <div class="callout"><strong>Guest mode is deliberately different.</strong> <code>/guest</code> uses a local copy of the server engine and never calls Supabase. Treat it as an isolated browser-only game; do not infer production-account behavior from it.</div>
+    </section>
+
+    <section id="domains">
+      <h2>4. Domain ownership map</h2>
+      <p class="lede">Start in the domain closest to the intended rule. Config is data, game math is pure where possible, stores compose client behavior, and route/service pairs enforce server authority.</p>
+      <div class="grid"><div class="card client"><h3>UI and client orchestration</h3><ul><li><a href="../src/app/GameApp.tsx">src/app/GameApp.tsx</a> — lifecycle composition</li><li><a href="../src/components/game/">src/components/game/</a> — map, windows, dialogs</li><li><a href="../src/hooks/">src/hooks/</a> — browser lifecycle and sync</li><li><a href="../src/stores/">src/stores/</a> — game, UI, settings, feature slices</li></ul></div><div class="card event"><h3>Rules and local simulation</h3><ul><li><a href="../src/config/">src/config/</a> — tunable values</li><li><a href="../src/catalog/">src/catalog/</a> — item and content data</li><li><a href="../src/utils/game/">src/utils/game/</a> — pure economy/map math</li><li><a href="../src/lib/sanitizeSave.ts">sanitizeSave.ts</a> — persisted-shape validation</li></ul></div><div class="card server"><h3>Server game engine</h3><ul><li><a href="../src/app/api/">src/app/api/</a> — HTTP boundary</li><li><a href="../src/lib/offline/">src/lib/offline/</a> — ledger, rewards, combat, tickets</li><li><a href="../src/lib/cloudSave/">src/lib/cloudSave/</a> — save acceptance/versioning</li><li><a href="../src/lib/supabase/">src/lib/supabase/</a> — server clients</li></ul></div></div>
+      <div class="grid"><div class="card data"><h3>Supabase record families</h3><p><code>profiles</code> holds identity. <code>player_saves</code> + <code>player_worlds</code> hold state. <code>player_stats</code>/<code>player_rankings</code> provide trusted public summaries. <code>player_ledger</code> records server-authoritative activity.</p><p><a href="../supabase/schema.sql">supabase/schema.sql</a></p></div><div class="card"><h3>Docs and tests</h3><p>JSDoc adjacent to implementations remains the rule-level source of truth. Generated balance outputs are measured from scripts; tests protect behavior and saved-data compatibility.</p><p><a href="../tests/">tests/</a> · <a href="generated/">docs/generated/</a></p></div><div class="card"><h3>Useful entry searches</h3><p>Search <code>@category</code> in <code>src</code> for rule docs, or trace an endpoint from <code>src/app/api</code> into <code>src/lib</code>. Follow the service call before changing an API response or client reconciliation.</p></div></div>
+    </section>
+
+    <section id="rules">
+      <h2>5. Change safely</h2>
+      <div class="grid"><div class="card"><h3>Changing a local rule</h3><p>Locate the config and pure function, then the store action that validates/mutates it. Update its nearby JSDoc and focused tests in the same change.</p></div><div class="card"><h3>Changing server-authoritative behavior</h3><p>Trace route → parser → service → repository/ledger → client reconciler. Keep request bodies intent-only; do not let a client name a reward amount or elapsed duration.</p></div><div class="card"><h3>Changing save shape</h3><p>Maintain additive compatibility. Validate through <code>sanitizeSave</code>, preserve fixtures, and add an upgrade when a schema bump is genuinely necessary.</p></div></div>
+      <div class="callout"><strong>Read before editing:</strong> <a href="../CLAUDE.md">CLAUDE.md</a> describes the project’s documentation, asset, and save-compatibility conventions. This page is a navigation aid, not a second specification of formulas or values.</div>
+    </section>
+    <footer>Last mapped from the checked-in architecture on this branch. Update this page when a boundary, authority, or major data path changes.</footer>
+  </main>
+</body>
+</html>

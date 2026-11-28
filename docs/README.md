@@ -9,9 +9,10 @@ Find a rule with `grep -rn "@category" src scripts` (add the section, e.g. `@cat
 
 | Folder | What it holds |
 | --- | --- |
+| [app-data-flow.html](app-data-flow.html) | A hand-maintained, single-file visual code map: client/server responsibilities, current startup and authoritative gameplay flows, and links to their implementation. It is a navigation aid, not a duplicate rules reference. |
 | [generated/](generated/) | Measured by `npm run docs:gen`, never edited by hand: balance tables, the bot simulation, item catalog, loot/fight/kill simulations, monster ladder, stat audit. |
 | [BONUSES.md](BONUSES.md) + [bonuses.html](bonuses.html) | Index of every bonus (base / additive / multiplicative), the order they combine in and every cap, for the economy, combat and loot. Hand-maintained; values are checked against the code by `tests/docs/bonuses.test.ts`. |
-| [plan/](plan/ROADMAP.md) | The plans for what is **not built**: [ROADMAP](plan/ROADMAP.md), the [UI refresh layout/UX reference](plan/ui-refresh.md), [RELEASE-PLAN](plan/RELEASE-PLAN.md), drafts, research and the art prompt sheets. These are the only hand-written documents; a built draft leaves `plan/` and is described in the JSDoc. |
+| [plan/](plan/ROADMAP.md) | The plans for what is **not built**: [ROADMAP](plan/ROADMAP.md), the [UI refresh layout/UX reference](plan/ui-refresh.md), [RELEASE-PLAN](plan/RELEASE-PLAN.md), drafts, research and the art prompt sheets. A built draft leaves `plan/` and is described in the JSDoc. |
 
 ## Changing a rule? Change its JSDoc in the same edit
 

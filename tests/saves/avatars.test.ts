@@ -16,12 +16,11 @@ import { checkAvatar, checkProfile } from '../../src/lib/authValidation';
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 
-test('the catalog has 8 starters and the 5 unlockables plus the two admin-only avatars, each with its portrait file', () => {
+test('the catalog has 8 starters, the 5 older unlockables, the two admin-only avatars and the 36 of the expansion, each with its portrait file', () => {
 	assert.equal(STARTER_AVATAR_IDS.length, 8);
-	assert.deepEqual(
-		AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id),
-		['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester', 'admin', 'admin_hooded'],
-	);
+	const unlocks = AVATARS.filter((a) => a.kind === 'unlock').map((a) => a.id);
+	assert.deepEqual(unlocks.slice(0, 7), ['architect', 'reborn', 'boss_slayer', 'early_tester', 'beta_tester', 'admin', 'admin_hooded']);
+	assert.equal(unlocks.length, 7 + 36);
 	assert.equal(new Set(AVATARS.map((a) => a.id)).size, AVATARS.length);
 	for (const avatar of AVATARS) {
 		assert.ok(existsSync(join(__dirname, '..', '..', 'public', 'pixel', 'ui', 'heroes', `${avatar.portrait}.png`)), avatar.id);
@@ -145,4 +144,21 @@ test('the hooded avatar is a second admin-only face: only an account holding the
 	assert.equal(hooded?.unlockedBy, ADMIN_UNLOCK);
 	assert.deepEqual(checkAvatar('admin_hooded', 'mage', [ADMIN_UNLOCK]), { ok: true, value: 'admin_hooded' });
 	assert.equal(checkAvatar('admin_hooded', 'mage', []).ok, false, 'not for a player');
+});
+
+test('every expansion avatar is unlocked by a shipped achievement, retroactively, and that achievement names it (no claim step)', async () => {
+	const { AVATAR_UNLOCKS } = await import('../../src/catalog/avatarUnlocks');
+	const { ACHIEVEMENTS } = await import('../../src/catalog/achievements');
+	const released = new Set((await import('../fixtures/saves/released-ids.json')).default.achievementIds as string[]);
+	assert.equal(AVATAR_UNLOCKS.length, 36);
+	assert.equal(new Set(AVATAR_UNLOCKS.map((u) => u.achievement)).size, 36, 'one achievement per face');
+	for (const u of AVATAR_UNLOCKS) {
+		assert.ok(released.has(u.achievement), `${u.id}: ${u.achievement} is a shipped achievement`);
+		assert.equal(ACHIEVEMENTS.find((a) => a.id === u.achievement)?.rewards.avatarId, u.id);
+		assert.ok(unlockedAvatarIds([u.achievement]).includes(u.id), u.id);
+		assert.ok(!unlockedAvatarIds([]).includes(u.id), u.id);
+	}
+	// a veteran who already holds these deeds opens the matching faces with nothing else
+	const vet = unlockedAvatarIds(['castle_15', 'biome_blight', 'reborn_100']);
+	for (const id of ['king', 'plague_doctor', 'void_knight']) assert.ok(vet.includes(id), id);
 });

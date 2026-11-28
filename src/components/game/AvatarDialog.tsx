@@ -43,7 +43,7 @@ const AvatarDialog: React.FC = () => {
 	};
 
 	return (
-		<GameModal title='Choose your avatar' size='md' onClose={close}>
+		<GameModal title='Choose your avatar' size='lg' onClose={close}>
 			<p className='ds-dim' style={{ textAlign: 'center', margin: '0 0 12px' }}>
 				Your face in the header and the rankings.
 			</p>

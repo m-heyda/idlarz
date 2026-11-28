@@ -613,3 +613,146 @@
 .fight-skill-cost[data-short='true'] {
 	color: #ff7a6a;
 }
+
+/* ===== the biome landscape behind the monster (config/combatBackground.ts): dimmed, drifting slowly from side to side ===== */
+.combat-widget .combat-stage {
+	overflow: hidden;
+	isolation: isolate; /* the picture sits at z -1: above the stage's own colour, below everything drawn on the stage */
+}
+
+.combat-bg {
+	position: absolute;
+	inset: 0;
+	left: calc((1 - var(--bg-zoom, 1.3)) * 50%);
+	width: calc(var(--bg-zoom, 1.3) * 100%);
+	z-index: -1;
+	background-size: cover;
+	background-position: center bottom;
+	image-rendering: pixelated;
+	pointer-events: none;
+	animation: combat-bg-pan var(--bg-pan, 70s) ease-in-out infinite alternate;
+	will-change: transform;
+}
+
+/* the black layer that keeps the monster clear (a won fight dims more so the loot reads) */
+.combat-bg::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, var(--bg-dim, 0.25));
+	transition: background 0.6s;
+}
+
+.combat-stage[data-dead='true'] .combat-bg::after {
+	background: rgba(0, 0, 0, var(--bg-dim-dead, 0.4));
+}
+
+/* it drifts the room it has: the extra width of the zoomed picture, half to each side */
+@keyframes combat-bg-pan {
+	from {
+		transform: translateX(calc((1 - 1 / var(--bg-zoom, 1.3)) * 50%));
+	}
+	to {
+		transform: translateX(calc((1 - 1 / var(--bg-zoom, 1.3)) * -50%));
+	}
+}
+
+/* ===== livelier numbers and a breathing monster ===== */
+.combat-widget .fight-number {
+	animation: fight-pop 0.95s cubic-bezier(0.2, 0.9, 0.3, 1) forwards;
+	will-change: transform, opacity;
+}
+
+.combat-widget .fight-number[data-kind='crit'],
+.combat-widget .fight-number[data-kind='super'] {
+	animation-name: fight-pop-big;
+	text-shadow:
+		2px 2px 0 #000,
+		-2px 2px 0 #000,
+		2px -2px 0 #000,
+		-2px -2px 0 #000,
+		0 0 10px currentColor;
+}
+
+/* the number jumps up out of the monster with a bounce, leans its own way, then floats off and fades */
+@keyframes fight-pop {
+	0% {
+		transform: translate(0, 8px) scale(0.3) rotate(0);
+		opacity: 0;
+	}
+	18% {
+		transform: translate(calc(var(--dx, 0px) * 0.4), -14px) scale(1.3) rotate(var(--rot, 0deg));
+		opacity: 1;
+	}
+	32% {
+		transform: translate(calc(var(--dx, 0px) * 0.6), -8px) scale(0.95) rotate(var(--rot, 0deg));
+	}
+	45% {
+		transform: translate(calc(var(--dx, 0px) * 0.7), -20px) scale(1) rotate(var(--rot, 0deg));
+		opacity: 1;
+	}
+	100% {
+		transform: translate(var(--dx, 0px), -52px) scale(0.9) rotate(var(--rot, 0deg));
+		opacity: 0;
+	}
+}
+
+@keyframes fight-pop-big {
+	0% {
+		transform: translate(0, 10px) scale(0.2) rotate(0);
+		opacity: 0;
+	}
+	14% {
+		transform: translate(calc(var(--dx, 0px) * 0.4), -18px) scale(1.7) rotate(var(--rot, 0deg));
+		opacity: 1;
+	}
+	28% {
+		transform: translate(calc(var(--dx, 0px) * 0.6), -10px) scale(1.05) rotate(var(--rot, 0deg));
+	}
+	42% {
+		transform: translate(calc(var(--dx, 0px) * 0.7), -24px) scale(1.2) rotate(var(--rot, 0deg));
+		opacity: 1;
+	}
+	100% {
+		transform: translate(var(--dx, 0px), -60px) scale(1) rotate(var(--rot, 0deg));
+		opacity: 0;
+	}
+}
+
+/* the monster breathes between blows (the hit flash plays first, then the idle takes over) */
+.combat-stage:not([data-dead='true']) .fight-sprite {
+	animation: fight-idle 2.4s ease-in-out infinite;
+}
+
+.combat-stage:not([data-dead='true']) .fight-sprite[data-hit='true'] {
+	animation:
+		fight-hit 0.16s steps(4) 1,
+		fight-idle 2.4s ease-in-out 0.16s infinite;
+}
+
+@keyframes fight-idle {
+	0%,
+	100% {
+		transform: translateY(0) scale(1, 1);
+	}
+	50% {
+		transform: translateY(-3px) scale(1.015, 0.99);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.combat-bg {
+		animation: none;
+		left: 0;
+		width: 100%;
+	}
+	.combat-widget .fight-number,
+	.combat-widget .fight-number[data-kind='crit'],
+	.combat-widget .fight-number[data-kind='super'] {
+		animation: fight-float 0.9s ease-out forwards;
+	}
+	.combat-stage:not([data-dead='true']) .fight-sprite,
+	.combat-stage:not([data-dead='true']) .fight-sprite[data-hit='true'] {
+		animation: none;
+	}
+}

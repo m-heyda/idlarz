@@ -36,6 +36,21 @@ const weightIn = (item: ItemDef, pool: PoolDef): number => pool.weights?.[item.i
  * @order 7
  */
 export const eligibleCandidates = (data: LootData, poolId: string, level: number, maxGrade?: Grade): Candidate[] => {
+	let byKey = eligibleCache.get(data);
+	if (!byKey) eligibleCache.set(data, (byKey = new Map()));
+	const key = `${poolId}|${level}|${maxGrade ?? ''}`;
+	let found = byKey.get(key);
+	if (!found) byKey.set(key, (found = scanEligible(data, poolId, level, maxGrade)));
+	return found;
+};
+
+/**
+ * The scan of every item for a pool at a level, kept per `LootData` object: the catalog is fixed once the data is built (a test or a projection that edits items builds its own copy
+ * first), and a simulation of millions of kills asks the same few (pool, level) questions again and again, which made the scan most of its time. Callers only read the list.
+ */
+const eligibleCache = new WeakMap<LootData, Map<string, Candidate[]>>();
+
+const scanEligible = (data: LootData, poolId: string, level: number, maxGrade?: Grade): Candidate[] => {
 	const pool = data.pools[poolId];
 	if (!pool) return [];
 	const out: Candidate[] = [];

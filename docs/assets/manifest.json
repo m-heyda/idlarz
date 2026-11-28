@@ -10216,6 +10216,19 @@
 	},
 	{
 		"usedBy": [],
+		"name": "idol_lava_obelisk",
+		"category": "buildings",
+		"subcategory": "idol statues (primary, planned)",
+		"src": "/pixel/idols/idol_lava_obelisk.png",
+		"status": "planned",
+		"source": "idols",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [],
 		"name": "idol_orchard_blossom_shrine",
 		"category": "buildings",
 		"subcategory": "idol statues (primary, planned)",
@@ -19173,6 +19186,21 @@
 	},
 	{
 		"usedBy": [
+			"bloody_helm"
+		],
+		"name": "avatar_bloody_helm",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_bloody_helm.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"alchemist"
 		],
 		"name": "avatar_blue_plume_knight",
@@ -19203,12 +19231,117 @@
 	},
 	{
 		"usedBy": [
+			"horned_demon"
+		],
+		"name": "avatar_demon_horned",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_demon_horned.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"dragonborn"
+		],
+		"name": "avatar_dragonborn",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_dragonborn.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"dragonkin"
+		],
+		"name": "avatar_dragonkin_blue",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_dragonkin_blue.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"stag_druid"
+		],
+		"name": "avatar_druid_stag",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_druid_stag.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"miner"
 		],
 		"name": "avatar_dwarf_knight_orange_eyes",
 		"category": "portraits",
 		"subcategory": "avatar portraits",
 		"src": "/pixel/ui/heroes/avatar_dwarf_knight_orange_eyes.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"dwarf_lord"
+		],
+		"name": "avatar_dwarf_lord",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_dwarf_lord.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elf_prince"
+		],
+		"name": "avatar_elf_prince",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_elf_prince.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"elf_queen"
+		],
+		"name": "avatar_elf_queen",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_elf_queen.png",
 		"status": "used",
 		"source": "ui/heroes",
 		"size": [
@@ -19239,6 +19372,21 @@
 		"category": "portraits",
 		"subcategory": "avatar portraits",
 		"src": "/pixel/ui/heroes/avatar_green_horned_elf.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"archmage"
+		],
+		"name": "avatar_hooded_archmage",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_hooded_archmage.png",
 		"status": "used",
 		"source": "ui/heroes",
 		"size": [
@@ -19293,6 +19441,111 @@
 	},
 	{
 		"usedBy": [
+			"ice_wraith"
+		],
+		"name": "avatar_ice_wraith",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_ice_wraith.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"king"
+		],
+		"name": "avatar_king",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_king.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"laurel_paladin"
+		],
+		"name": "avatar_laurel_paladin",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_laurel_paladin.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"lich_reaper"
+		],
+		"name": "avatar_lich_reaper",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_lich_reaper.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"magma_golem"
+		],
+		"name": "avatar_magma_golem",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_magma_golem.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"orc_warlord"
+		],
+		"name": "avatar_orc_warlord",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_orc_warlord.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"plague_doctor"
+		],
+		"name": "avatar_plague_doctor",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_plague_doctor.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
 			"bard"
 		],
 		"name": "avatar_purple_elf_lady",
@@ -19329,6 +19582,306 @@
 		"category": "portraits",
 		"subcategory": "avatar portraits",
 		"src": "/pixel/ui/heroes/avatar_red_plume_lady.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"saint"
+		],
+		"name": "avatar_saint",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_saint.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"shadow_knight"
+		],
+		"name": "avatar_shadow_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_shadow_knight.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"lion_lord"
+		],
+		"name": "avatar_silver_lion_lord",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_silver_lion_lord.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"skeleton_king"
+		],
+		"name": "avatar_skeleton_king",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_skeleton_king.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"stone_maiden"
+		],
+		"name": "avatar_stone_maiden",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_stone_maiden.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"storm_knight"
+		],
+		"name": "avatar_storm_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_storm_knight.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"treant"
+		],
+		"name": "avatar_treant",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_treant.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"valkyrie"
+		],
+		"name": "avatar_valkyrie",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_valkyrie.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_crystal_knight"
+		],
+		"name": "avatar_void_crystal_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_crystal_knight.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_cultist"
+		],
+		"name": "avatar_void_cultist",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_cultist.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_demon"
+		],
+		"name": "avatar_void_demon",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_demon.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_elf"
+		],
+		"name": "avatar_void_elf",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_elf.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_eye"
+		],
+		"name": "avatar_void_eye",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_eye.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_hood"
+		],
+		"name": "avatar_void_hood",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_hood.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_king"
+		],
+		"name": "avatar_void_king",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_king.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_knight"
+		],
+		"name": "avatar_void_knight",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_knight.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_lich"
+		],
+		"name": "avatar_void_lich",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_lich.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_orc"
+		],
+		"name": "avatar_void_orc",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_orc.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_queen"
+		],
+		"name": "avatar_void_queen",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_queen.png",
+		"status": "used",
+		"source": "ui/heroes",
+		"size": [
+			64,
+			64
+		]
+	},
+	{
+		"usedBy": [
+			"void_zombie"
+		],
+		"name": "avatar_void_zombie",
+		"category": "portraits",
+		"subcategory": "avatar portraits",
+		"src": "/pixel/ui/heroes/avatar_void_zombie.png",
 		"status": "used",
 		"source": "ui/heroes",
 		"size": [
@@ -19509,6 +20062,21 @@
 		"category": "biomes",
 		"subcategory": "jungle (in the game)",
 		"src": "/pixel/ui/biomes/biome_jungle_1.png",
+		"status": "used",
+		"source": "ui/biomes",
+		"size": [
+			80,
+			80
+		]
+	},
+	{
+		"usedBy": [
+			"RebirthUnlockModal"
+		],
+		"name": "biome_lava_1",
+		"category": "biomes",
+		"subcategory": "lava (in the game)",
+		"src": "/pixel/ui/biomes/biome_lava_1.png",
 		"status": "used",
 		"source": "ui/biomes",
 		"size": [

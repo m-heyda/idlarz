@@ -1,3 +1,5 @@
+import type { AvatarGroup, AvatarInfo } from '@/catalog/avatars';
+
 /** What the server said to an avatar change: the id it stored (it may differ from the one asked for) or the reason it refused. */
 export type AvatarSendResult = { ok: true; avatarId?: string | null } | { ok: false; message: string };
 
@@ -54,4 +56,31 @@ export const createAvatarPicker = (deps: AvatarPickDeps) => {
 		return { status: 'reverted', message: result.message };
 	};
 	return { pick };
+};
+
+/** The tabs of the Avatar window: everything, or one set (`AvatarInfo.group`). */
+export type AvatarTab = 'all' | AvatarGroup;
+
+export const AVATAR_TABS: readonly { id: AvatarTab; label: string }[] = [
+	{ id: 'all', label: 'All' },
+	{ id: 'class', label: 'Class' },
+	{ id: 'heroes', label: 'Heroes' },
+	{ id: 'fiends', label: 'Fiends' },
+	{ id: 'void', label: 'Void' },
+	{ id: 'special', label: 'Special' },
+];
+
+/**
+ * The faces the Avatar window lists. The Admin faces are only for the account that holds them; `tab` narrows to one set; `unlockedOnly` hides every face the account cannot wear yet. The catalog order is kept.
+ *
+ * @category Progression/Avatars
+ * @order 7
+ */
+export const visibleAvatars = (avatars: readonly AvatarInfo[], unlocked: readonly string[], tab: AvatarTab = 'all', unlockedOnly = false): AvatarInfo[] =>
+	avatars.filter((a) => (!a.adminOnly || unlocked.includes(a.id)) && (tab === 'all' || a.group === tab) && (!unlockedOnly || unlocked.includes(a.id)));
+
+/** How many of the faces in `tab` are open (`have`) out of how many exist for this account (`total`; the Admin faces count only for an admin). */
+export const avatarProgress = (avatars: readonly AvatarInfo[], unlocked: readonly string[], tab: AvatarTab = 'all'): { have: number; total: number } => {
+	const faces = visibleAvatars(avatars, unlocked, tab);
+	return { have: faces.filter((a) => unlocked.includes(a.id)).length, total: faces.length };
 };

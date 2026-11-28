@@ -11,7 +11,7 @@ import type { BiomeType } from '@/types/game';
  */
 
 /** Biomes planned in docs/plan/12-rebirth-biomes.md that are not in `BIOMES` yet (unlocked by rebirth). */
-export type PlannedBiome = 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlefield';
+export type PlannedBiome = 'jungle' | 'fields' | 'orchard' | 'blight' | 'battlefield' | 'lava';
 export type CatalogBiome = BiomeType | PlannedBiome;
 
 /** What a monster is, for the Bestiary filters and the "+x% against beasts" mastery bonuses (IDL-336). One family per monster. */
